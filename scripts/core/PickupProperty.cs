@@ -88,11 +88,17 @@ namespace Kuros.Core
                 if (explicitTarget != null)
                 {
                     targetParent = explicitTarget;
+                    GD.Print($"Successfully found attachment target: {explicitTarget.Name} at path {explicitTarget.GetPath()}");
+                }
+                else
+                {
+                    GD.PrintErr($"Failed to find attachment target at path: {AttachmentPointPath} relative to {actor.Name}");
                 }
             }
 
             MoveToParent(targetParent);
             Position = AttachedLocalOffset;
+            Rotation = 0; // Reset rotation to align with the bone
         }
 
         protected virtual void OnPicked(GameActor actor)

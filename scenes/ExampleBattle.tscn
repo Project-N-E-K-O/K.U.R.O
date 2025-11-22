@@ -124,6 +124,7 @@ shape = SubResource("CapsuleShape2D_enemy")
 [node name="DroppableExample" parent="." instance=ExtResource("11_drop_example")]
 z_index = 255
 position = Vector2(419, 360)
+AttachmentPointPath = NodePath("SpineCharacter/Skeleton2D/root/bone/bone2/bone3/bone11/bone12/bone13")
 EnergyValue = 25
 PickedColor = Color(0.19607843, 0.8039216, 0.19607843, 1)
 
