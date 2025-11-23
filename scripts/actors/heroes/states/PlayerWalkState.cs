@@ -7,6 +7,7 @@ namespace Kuros.Actors.Heroes.States
 	{
 		public override void Enter()
 		{
+			Player.NotifyMovementState(Name);
 			if (Actor.AnimPlayer != null)
 			{
 				Actor.AnimPlayer.Play("animations/Walk");
@@ -18,8 +19,9 @@ namespace Kuros.Actors.Heroes.States
 
 		public override void PhysicsUpdate(double delta)
 		{
-			if (Input.IsActionJustPressed("attack") && Actor.AttackTimer <= 0)
+		if (Input.IsActionJustPressed("attack") && Actor.AttackTimer <= 0)
 			{
+			Player.RequestAttackFromState(Name);
 				ChangeState("Attack");
 				return;
 			}

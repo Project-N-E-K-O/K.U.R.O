@@ -12,6 +12,7 @@ public partial class SampleEnemy : GameActor
     private SamplePlayer? _player;
     private RandomNumberGenerator _rng = new RandomNumberGenerator();
     private float _hitStunTimer = 0.0f; // Re-declared here as it was removed from base
+    private const float FALLBACK_ATTACK_RANGE = 80.0f;
     
     public SampleEnemy()
     {
@@ -37,11 +38,19 @@ public partial class SampleEnemy : GameActor
         }
     }
     
+    public SamplePlayer? PlayerTarget => _player;
+    
     public override void _PhysicsProcess(double delta)
     {
-        if (_player == null) return;
-        
         base._PhysicsProcess(delta);
+        
+        // If a StateMachine is present, defer movement/AI to states.
+        if (StateMachine != null)
+        {
+            return;
+        }
+
+        if (_player == null) return;
         
         if (_hitStunTimer > 0)
         {
@@ -74,23 +83,17 @@ public partial class SampleEnemy : GameActor
             }
 
             bool canAttack = false;
-            float fallbackAttackRange = 80.0f; // Hardcoded fallback if no Area2D
 
             // Priority 1: Check actual collision overlap if Area exists
             if (AttackArea != null)
             {
-                // AttackArea flip is handled by FlipFacing now (if child of sprite) 
-                // or needs manual flip here if not? 
-                // Actually, FlipFacing above handles the visual flip. 
-                // If AttackArea is child of sprite, it is already flipped by the time we check here.
-                
                 if (AttackArea.OverlapsBody(_player))
                 {
                     canAttack = true;
                 }
             }
             // Priority 2: Fallback to distance
-            else if (distanceToPlayer <= fallbackAttackRange + 10.0f)
+            else if (distanceToPlayer <= FALLBACK_ATTACK_RANGE + 10.0f)
             {
                 canAttack = true;
             }
@@ -102,7 +105,7 @@ public partial class SampleEnemy : GameActor
                 
                 if (AttackTimer <= 0 && _hitStunTimer <= 0) // Used Property AttackTimer from base
                 {
-                    AttackPlayer();
+                    PerformAttack();
                 }
             }
             else
@@ -124,9 +127,40 @@ public partial class SampleEnemy : GameActor
         MoveAndSlide();
     }
     
-    private void AttackPlayer()
+    public bool IsPlayerWithinDetectionRange(float extraMargin = 0.0f)
+    {
+        if (_player == null) return false;
+        float limit = DetectionRange + extraMargin;
+        return _player.GlobalPosition.DistanceTo(GlobalPosition) <= limit;
+    }
+    
+    public bool IsPlayerInAttackRange()
+    {
+
+        if (_player == null) return false;
+
+        
+        if (AttackArea != null)
+        {
+            return AttackArea.OverlapsBody(_player);
+        }
+
+        
+        return _player.GlobalPosition.DistanceTo(GlobalPosition) <= FALLBACK_ATTACK_RANGE + 10.0f;
+    }
+    
+    public Vector2 GetDirectionToPlayer()
+    {
+        if (_player == null) return Vector2.Zero;
+        
+        Vector2 direction = (_player.GlobalPosition - GlobalPosition);
+        return direction == Vector2.Zero ? Vector2.Zero : direction.Normalized();
+    }
+    
+    public void PerformAttack()
     {
         AttackTimer = AttackCooldown; 
+        GD.Print("Enemy PerformAttack");
         
         // Use AttackArea for detection if available
         if (AttackArea != null)

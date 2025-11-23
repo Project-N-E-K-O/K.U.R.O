@@ -12,6 +12,8 @@ public partial class SamplePlayer : GameActor
 	[Export] public Label StatsLabel { get; private set; } = null!; // Drag & Drop in Editor
 	
 	private int _score = 0;
+	private string _pendingAttackSourceState = string.Empty;
+	public string LastMovementStateName { get; private set; } = "Idle";
 	
 	// Signal for UI updates (Alternative to direct reference)
 	[Signal] public delegate void StatsChangedEventHandler(int health, int score);
@@ -25,6 +27,23 @@ public partial class SamplePlayer : GameActor
 		if (StatsLabel == null) StatsLabel = GetNodeOrNull<Label>("../UI/PlayerStats");
 		
 		UpdateStatsUI();
+	}
+	
+	public void RequestAttackFromState(string stateName)
+	{
+		_pendingAttackSourceState = stateName;
+	}
+
+	public string ConsumeAttackRequestSource()
+	{
+		string source = _pendingAttackSourceState;
+		_pendingAttackSourceState = string.Empty;
+		return source;
+	}
+
+	public void NotifyMovementState(string stateName)
+	{
+		LastMovementStateName = stateName;
 	}
 	
 	// Override FlipFacing to handle AttackArea flipping correctly when turning
@@ -89,6 +108,7 @@ public partial class SamplePlayer : GameActor
     
     public override void TakeDamage(int damage)
     {
+		_pendingAttackSourceState = string.Empty;
         base.TakeDamage(damage);
         UpdateStatsUI();
     }
