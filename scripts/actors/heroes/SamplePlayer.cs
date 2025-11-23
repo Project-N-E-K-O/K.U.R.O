@@ -21,6 +21,7 @@ public partial class SamplePlayer : GameActor
 	public override void _Ready()
 	{
 		base._Ready();
+		AddToGroup("player");
 		
 		// Fallback: Try to find nodes if not assigned in editor (Backward compatibility)
 		if (AttackArea == null) AttackArea = GetNodeOrNull<Area2D>("AttackArea");

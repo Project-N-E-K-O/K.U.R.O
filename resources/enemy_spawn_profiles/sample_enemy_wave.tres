@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="EnemySpawnProfile" load_steps=3 format=3 uid="uid://c8bbadt8d8xyx"]
+
+[ext_resource type="Script" uid="uid://bo7rlwu71ak5y" path="res://scripts/controllers/EnemySpawnProfile.cs" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/actors/enemies/SampleEnemyUnit.tscn" id="2"]
+
+[resource]
+script = ExtResource("1")
+ProfileId = "sample_enemy_wave"
+EnemyScene = ExtResource("2")
+UseExplicitPositions = true

@@ -45,7 +45,7 @@ namespace Kuros.Actors.Enemies.States
 
         public override void Exit()
         {
-            _activeTemplate?.Cancel();
+            _activeTemplate?.Cancel(clearCooldown: true);
             _activeTemplate = null;
         }
 
@@ -130,6 +130,12 @@ namespace Kuros.Actors.Enemies.States
             }
 
             _activeTemplate = null;
+
+            if (TryStartTemplateAttack())
+            {
+                return true;
+            }
+
             ChangeToNextState();
             return true;
         }
