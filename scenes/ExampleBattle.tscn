@@ -128,10 +128,20 @@ shape = SubResource("CapsuleShape2D_enemy")
 [node name="DroppableExample" parent="." node_paths=PackedStringArray("TriggerArea") instance=ExtResource("11_drop_example")]
 z_index = 255
 position = Vector2(419, 360)
+TriggerArea = NodePath("PickupArea")
 EnergyValue = 25
 PickedColor = Color(0.19607843, 0.8039216, 0.19607843, 1)
 SpineAttachmentRootPath = NodePath("")
 AttachmentPointPath = NodePath("SpineCharacter/Skeleton2D/root/bone/bone2/bone3/bone14/bone15/bone16")
+
+[node name="PickupArea" type="Area2D" parent="DroppableExample"]
+scale = Vector2(1.6293683, 1.6293683)
+collision_layer = 0
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DroppableExample/PickupArea"]
+scale = Vector2(5.1025953, 5.1025953)
+shape = SubResource("CircleShape2D_bhpvs")
 
 [node name="UI" type="CanvasLayer" parent="."]
 
