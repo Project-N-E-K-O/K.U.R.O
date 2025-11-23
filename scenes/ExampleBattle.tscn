@@ -126,6 +126,8 @@ z_index = 255
 position = Vector2(419, 360)
 EnergyValue = 25
 PickedColor = Color(0.19607843, 0.8039216, 0.19607843, 1)
+SpineAttachmentRootPath = NodePath("")
+AttachmentPointPath = NodePath("SpineCharacter/Skeleton2D/root/bone/bone2/bone3/bone14/bone15/bone16")
 
 [node name="UI" type="CanvasLayer" parent="."]
 
