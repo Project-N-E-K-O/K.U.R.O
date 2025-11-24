@@ -20,7 +20,7 @@ size = Vector2(40, 60)
 size = Vector2(80, 150)
 
 [sub_resource type="RectangleShape2D" id="4"]
-size = Vector2(81.5, 84.666664)
+size = Vector2(50.64583, 26.785715)
 
 [sub_resource type="CapsuleShape2D" id="3"]
 radius = 18.0
@@ -47,17 +47,18 @@ collision_layer = 0
 monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/AttackArea"]
-position = Vector2(60, 0)
+position = Vector2(60.000004, 0)
+scale = Vector2(1.0000001, 1.0000001)
 shape = SubResource("2")
 
-[node name="DetectionArea" type="Area2D" parent="."]
-position = Vector2(15, -10)
+[node name="DetectionArea" type="Area2D" parent="Sprite2D"]
+position = Vector2(15, 0)
 scale = Vector2(3, 3)
 collision_layer = 0
 monitorable = false
 
-[node name="DetectionShape" type="CollisionShape2D" parent="DetectionArea"]
-position = Vector2(39.583336, 0)
+[node name="DetectionShape" type="CollisionShape2D" parent="Sprite2D/DetectionArea"]
+position = Vector2(24.156, 0)
 shape = SubResource("4")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
@@ -79,12 +80,12 @@ script = ExtResource("5")
 
 [node name="AttackController" type="Node" parent="StateMachine/Attack"]
 script = ExtResource("10")
-PlayerDetectionAreaPath = NodePath("DetectionArea")
+PlayerDetectionAreaPath = NodePath("../../../Sprite2D/DetectionArea")
 
 [node name="ChargeEscapeAttack" type="Node" parent="StateMachine/Attack/AttackController"]
 script = ExtResource("9")
-DetectionAreaPath = NodePath("DetectionArea")
-GrabAreaPath = NodePath("DetectionArea")
+DetectionAreaPath = NodePath("../../../Sprite2D/DetectionArea")
+GrabAreaPath = NodePath("../../../Sprite2D/AttackArea")
 DashSpeed = 150.0
 metadata/attack_weight = 60.0
 

@@ -2,12 +2,14 @@ using Godot;
 using System;
 using Kuros.Core;
 using Kuros.Systems.FSM;
+using Kuros.Actors.Heroes.States;
 
 public partial class SamplePlayer : GameActor
 {
 	[ExportCategory("Combat")]
 	[Export] public Area2D AttackArea { get; private set; } = null!;
-	
+	public PlayerFrozenState? FrozenState { get; private set; }
+
 	[ExportCategory("UI")]
 	[Export] public Label StatsLabel { get; private set; } = null!; // Drag & Drop in Editor
 	
@@ -25,6 +27,7 @@ public partial class SamplePlayer : GameActor
 		
 		// Fallback: Try to find nodes if not assigned in editor (Backward compatibility)
 		if (AttackArea == null) AttackArea = GetNodeOrNull<Area2D>("AttackArea");
+		if (FrozenState == null) FrozenState = StateMachine?.GetNodeOrNull<PlayerFrozenState>("Frozen");
 		if (StatsLabel == null) StatsLabel = GetNodeOrNull<Label>("../UI/PlayerStats");
 		
 		UpdateStatsUI();

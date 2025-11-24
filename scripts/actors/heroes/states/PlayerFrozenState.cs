@@ -11,10 +11,12 @@ namespace Kuros.Actors.Heroes.States
         public float FrozenDuration = 2.0f;
 
         private float _timer;
+        private bool _externallyHeld;
 
         public override void Enter()
         {
             _timer = FrozenDuration;
+            _externallyHeld = false;
             Actor.Velocity = Vector2.Zero;
 
             if (Actor.AnimPlayer != null)
@@ -35,11 +37,28 @@ namespace Kuros.Actors.Heroes.States
             Actor.Velocity = Vector2.Zero;
             Actor.MoveAndSlide();
 
+            if (_externallyHeld)
+            {
+                return;
+            }
+
             _timer -= (float)delta;
             if (_timer <= 0)
             {
                 ChangeState("Idle");
             }
+        }
+
+        public void BeginExternalHold()
+        {
+            _timer = FrozenDuration;
+            _externallyHeld = true;
+        }
+
+        public void EndExternalHold()
+        {
+            _externallyHeld = false;
+            _timer = FrozenDuration;
         }
     }
 }

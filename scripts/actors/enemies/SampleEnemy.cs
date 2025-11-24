@@ -41,16 +41,16 @@ public partial class SampleEnemy : GameActor
     }
     
     public bool IsPlayerInAttackRange()
-    {
+        {
         RefreshPlayerReference();
         if (_player == null) return false;
-        if (AttackArea != null)
-        {
+            if (AttackArea != null)
+            {
             return AttackArea.OverlapsBody(_player);
-        }
+                }
         return _player.GlobalPosition.DistanceTo(GlobalPosition) <= FALLBACK_ATTACK_RANGE + 10.0f;
-    }
-    
+            }
+
     public Vector2 GetDirectionToPlayer()
     {
         RefreshPlayerReference();
@@ -78,9 +78,9 @@ public partial class SampleEnemy : GameActor
             }
         }
         else if (_player != null)
-        {
-            _player.TakeDamage((int)AttackDamage);
-            GD.Print("Enemy attacked player (Fallback)!");
+            {
+                _player.TakeDamage((int)AttackDamage);
+                GD.Print("Enemy attacked player (Fallback)!");
         }
         
         // Attack visual effect (scaling)

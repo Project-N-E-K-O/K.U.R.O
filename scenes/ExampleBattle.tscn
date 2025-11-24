@@ -9,11 +9,11 @@
 [ext_resource type="Script" uid="uid://d3ancpb5wo2ie" path="res://scripts/actors/heroes/states/PlayerAttackState.cs" id="6_bhpvs"]
 [ext_resource type="Script" uid="uid://l40es7irdvdw" path="res://scripts/actors/heroes/states/PlayerHitState.cs" id="7_w7wnm"]
 [ext_resource type="Script" uid="uid://ba1kd5qgh17ag" path="res://scripts/actors/heroes/states/PlayerRunState.cs" id="8_bhpvs"]
-[ext_resource type="PackedScene" uid="uid://bvivxwyc4eucf" path="res://scenes/properties/DroppableExampleProperty.tscn" id="11_drop_example"]
+[ext_resource type="PackedScene" uid="uid://ciwlpphli7o01" path="res://scenes/properties/DroppableExampleProperty.tscn" id="11_drop_example"]
 [ext_resource type="Script" uid="uid://d1g4amacs13a3" path="res://scripts/actors/heroes/states/PlayerFrozenState.cs" id="17_player_frozen"]
 [ext_resource type="Script" uid="uid://c2pgsls8pb7oh" path="res://scripts/actors/heroes/attacks/PlayerBasicMeleeAttack.cs" id="19_player_basic_attack"]
 [ext_resource type="Script" uid="uid://cn2bsvambjids" path="res://scripts/controllers/EnemySpawnController.cs" id="20_spawn_controller"]
-[ext_resource type="PackedScene" uid="uid://cofm45kotvgto" path="res://scenes/actors/enemies/Enemy_B1_fat.tscn" id="21_enemy_b1"]
+[ext_resource type="PackedScene" path="res://scenes/actors/enemies/SampleEnemyUnit.tscn" id="21_sample_enemy"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_attack"]
 size = Vector2(64.75629, 180.66397)
@@ -123,7 +123,7 @@ script = ExtResource("8_bhpvs")
 [node name="EnemySpawnController" type="Node2D" parent="."]
 script = ExtResource("20_spawn_controller")
 
-[node name="EnemyInstance" parent="EnemySpawnController" instance=ExtResource("21_enemy_b1")]
+[node name="EnemyInstance" parent="EnemySpawnController" instance=ExtResource("21_sample_enemy")]
 position = Vector2(800, 400)
 DetectionRange = 1000.0
 Speed = 50.0

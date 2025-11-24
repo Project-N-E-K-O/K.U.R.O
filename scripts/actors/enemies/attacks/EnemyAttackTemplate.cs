@@ -147,6 +147,14 @@ namespace Kuros.Actors.Enemies.Attacks
 
         protected virtual void OnAttackFinished() { }
 
+        protected void ForceEnterRecoveryPhase()
+        {
+            if (_phase == AttackPhase.Active)
+            {
+                SetPhase(AttackPhase.Recovery);
+            }
+        }
+
         private void SetPhase(AttackPhase phase)
         {
             _phase = phase;

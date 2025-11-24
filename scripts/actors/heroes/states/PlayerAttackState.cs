@@ -10,13 +10,13 @@ namespace Kuros.Actors.Heroes.States
 		private PlayerAttackTemplate? _activeTemplate;
 
 		protected override void _ReadyState()
-		{
+			{
 			base._ReadyState();
 
 			foreach (Node child in GetChildren())
 			{
 				if (child is PlayerAttackTemplate template)
-				{
+			{
 					template.Initialize(Player);
 					_attackTemplates.Add(template);
 				}
@@ -26,7 +26,7 @@ namespace Kuros.Actors.Heroes.States
 			{
 				GD.PushWarning($"{Name}: No PlayerAttackTemplate found. Attach at least one attack to this state.");
 			}
-		}
+			}
 
 		public override void Enter()
 		{
@@ -39,7 +39,7 @@ namespace Kuros.Actors.Heroes.States
 		}
 
 		public override void Exit()
-		{
+			{
 			_activeTemplate?.Cancel(clearCooldown: true);
 			_activeTemplate = null;
 		}
@@ -60,10 +60,10 @@ namespace Kuros.Actors.Heroes.States
 			if (!_activeTemplate.IsRunning)
 			{
 				_activeTemplate = null;
-				ChangeState("Idle");
+				 ChangeState("Idle");
 			}
 		}
-
+		
 		private bool TryStartTemplateAttack()
 		{
 			string requestedState = Player.ConsumeAttackRequestSource();
@@ -79,7 +79,7 @@ namespace Kuros.Actors.Heroes.States
 				{
 					_activeTemplate = template;
 					return true;
-				}
+			}
 			}
 
 			return false;
