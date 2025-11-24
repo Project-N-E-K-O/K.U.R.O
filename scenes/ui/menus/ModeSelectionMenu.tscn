@@ -1,0 +1,87 @@
+[gd_scene load_steps=2 format=3 uid="uid://mode_selection_menu"]
+
+[ext_resource type="Script" uid="uid://vv84knh5hts8" path="res://scripts/ui/ModeSelectionMenu.cs" id="1_mode_selection"]
+
+[node name="ModeSelectionMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_mode_selection")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.1, 0.1, 0.15, 1)
+
+[node name="MenuPanel" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -250.0
+offset_right = 300.0
+offset_bottom = 250.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="Panel" parent="MenuPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MenuPanel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -200.0
+offset_right = 200.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" type="Label" parent="MenuPanel/VBoxContainer"]
+layout_mode = 2
+text = "选择游戏模式"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 32
+
+[node name="HSeparator" type="HSeparator" parent="MenuPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="StoryModeButton" type="Button" parent="MenuPanel/VBoxContainer"]
+layout_mode = 2
+text = "剧情模式"
+theme_override_font_sizes/font_size = 20
+
+[node name="ArcadeModeButton" type="Button" parent="MenuPanel/VBoxContainer"]
+layout_mode = 2
+text = "街机模式"
+theme_override_font_sizes/font_size = 20
+
+[node name="EndlessModeButton" type="Button" parent="MenuPanel/VBoxContainer"]
+layout_mode = 2
+text = "无尽模式"
+theme_override_font_sizes/font_size = 20
+
+[node name="BackButton" type="Button" parent="MenuPanel/VBoxContainer"]
+layout_mode = 2
+text = "返回"
+theme_override_font_sizes/font_size = 20
+

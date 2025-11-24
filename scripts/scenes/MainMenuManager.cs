@@ -1,0 +1,249 @@
+using Godot;
+using Kuros.Managers;
+using Kuros.UI;
+
+namespace Kuros.Scenes
+{
+    /// <summary>
+    /// 主菜单场景管理器 - 管理主菜单及其子菜单的显示和切换
+    /// </summary>
+    public partial class MainMenuManager : Control
+    {
+        [ExportCategory("Scene Paths")]
+        [Export] public string BattleScenePath = "res://scenes/ExampleBattle.tscn";
+
+        private MainMenu? _mainMenu;
+        private ModeSelectionMenu? _modeSelectionMenu;
+        private SettingsMenu? _settingsMenu;
+        private SaveSlotSelection? _saveSlotSelection;
+
+        public override void _Ready()
+        {
+            // 延迟加载，确保UIManager已初始化
+            CallDeferred(MethodName.InitializeMenus);
+        }
+
+        private void InitializeMenus()
+        {
+            if (UIManager.Instance == null)
+            {
+                GD.PrintErr("MainMenuManager: UIManager未初始化！");
+                return;
+            }
+
+            // 加载主菜单
+            LoadMainMenu();
+        }
+
+        /// <summary>
+        /// 加载主菜单
+        /// </summary>
+        public void LoadMainMenu()
+        {
+            if (UIManager.Instance == null) return;
+
+            // 隐藏其他菜单
+            HideAllMenus();
+
+            // 如果已经加载，直接显示
+            if (_mainMenu != null && IsInstanceValid(_mainMenu))
+            {
+                _mainMenu.Visible = true;
+                return;
+            }
+
+            _mainMenu = UIManager.Instance.LoadMainMenu();
+            if (_mainMenu != null)
+            {
+                _mainMenu.Visible = true;
+                _mainMenu.StartGameRequested += OnStartGame;
+                _mainMenu.ModeSelectionRequested += OnModeSelectionRequested;
+                _mainMenu.LoadGameRequested += OnLoadGameRequested;
+                _mainMenu.SettingsRequested += OnSettingsRequested;
+                _mainMenu.QuitRequested += OnQuit;
+            }
+        }
+
+        /// <summary>
+        /// 加载模式选择菜单
+        /// </summary>
+        public void LoadModeSelectionMenu()
+        {
+            if (UIManager.Instance == null) return;
+
+            HideAllMenus();
+
+            // 如果已经加载，直接显示
+            if (_modeSelectionMenu != null && IsInstanceValid(_modeSelectionMenu))
+            {
+                _modeSelectionMenu.Visible = true;
+                return;
+            }
+
+            _modeSelectionMenu = UIManager.Instance.LoadModeSelectionMenu();
+            if (_modeSelectionMenu != null)
+            {
+                _modeSelectionMenu.Visible = true;
+                _modeSelectionMenu.ModeSelected += OnModeSelected;
+                _modeSelectionMenu.BackRequested += LoadMainMenu;
+            }
+        }
+
+        /// <summary>
+        /// 加载设置菜单
+        /// </summary>
+        public void LoadSettingsMenu()
+        {
+            if (UIManager.Instance == null) return;
+
+            HideAllMenus();
+
+            // 如果已经加载，直接显示
+            if (_settingsMenu != null && IsInstanceValid(_settingsMenu))
+            {
+                _settingsMenu.Visible = true;
+                return;
+            }
+
+            _settingsMenu = UIManager.Instance.LoadSettingsMenu();
+            if (_settingsMenu != null)
+            {
+                _settingsMenu.Visible = true;
+                _settingsMenu.BackRequested += LoadMainMenu;
+            }
+        }
+
+        /// <summary>
+        /// 加载存档选择菜单
+        /// </summary>
+        public void LoadSaveSlotSelection()
+        {
+            if (UIManager.Instance == null) return;
+
+            HideAllMenus();
+
+            // 如果已经加载，直接显示并刷新
+            if (_saveSlotSelection != null && IsInstanceValid(_saveSlotSelection))
+            {
+                _saveSlotSelection.Visible = true;
+                _saveSlotSelection.RefreshSlots();
+                return;
+            }
+
+            _saveSlotSelection = UIManager.Instance.LoadSaveSlotSelection();
+            if (_saveSlotSelection != null)
+            {
+                _saveSlotSelection.Visible = true;
+                _saveSlotSelection.SlotSelected += OnSaveSlotSelected;
+                _saveSlotSelection.BackRequested += LoadMainMenu;
+            }
+        }
+
+        private void HideAllMenus()
+        {
+            if (UIManager.Instance == null) return;
+
+            if (_mainMenu != null && IsInstanceValid(_mainMenu))
+            {
+                _mainMenu.Visible = false;
+            }
+            if (_modeSelectionMenu != null && IsInstanceValid(_modeSelectionMenu))
+            {
+                _modeSelectionMenu.Visible = false;
+            }
+            if (_settingsMenu != null && IsInstanceValid(_settingsMenu))
+            {
+                _settingsMenu.Visible = false;
+            }
+            if (_saveSlotSelection != null && IsInstanceValid(_saveSlotSelection))
+            {
+                _saveSlotSelection.Visible = false;
+            }
+        }
+
+        private void OnStartGame()
+        {
+            GD.Print("开始新游戏");
+            GD.Print($"切换到场景: {BattleScenePath}");
+            
+            // 清理UI
+            if (UIManager.Instance != null)
+            {
+                UIManager.Instance.ClearAllUI();
+            }
+            
+            // 检查场景文件是否存在
+            if (!ResourceLoader.Exists(BattleScenePath))
+            {
+                GD.PrintErr($"错误：场景文件不存在: {BattleScenePath}");
+                return;
+            }
+            
+            // 切换场景
+            var error = GetTree().ChangeSceneToFile(BattleScenePath);
+            if (error != Error.Ok)
+            {
+                GD.PrintErr($"错误：无法切换场景: {BattleScenePath}, 错误代码: {error}");
+            }
+        }
+
+        private void OnModeSelectionRequested()
+        {
+            LoadModeSelectionMenu();
+        }
+
+        private void OnLoadGameRequested()
+        {
+            LoadSaveSlotSelection();
+        }
+
+        private void OnSettingsRequested()
+        {
+            LoadSettingsMenu();
+        }
+
+        private void OnModeSelected(string modeName)
+        {
+            GD.Print($"选择了模式: {modeName}");
+            GD.Print($"切换到场景: {BattleScenePath}");
+            
+            // 清理UI
+            if (UIManager.Instance != null)
+            {
+                UIManager.Instance.ClearAllUI();
+            }
+            
+            // 根据模式加载不同的场景
+            var error = GetTree().ChangeSceneToFile(BattleScenePath);
+            if (error != Error.Ok)
+            {
+                GD.PrintErr($"错误：无法切换场景: {BattleScenePath}, 错误代码: {error}");
+            }
+        }
+
+        private void OnSaveSlotSelected(int slotIndex)
+        {
+            GD.Print($"加载存档槽位: {slotIndex}");
+            GD.Print($"切换到场景: {BattleScenePath}");
+            
+            // 清理UI
+            if (UIManager.Instance != null)
+            {
+                UIManager.Instance.ClearAllUI();
+            }
+            
+            // 这里应该加载存档数据
+            var error = GetTree().ChangeSceneToFile(BattleScenePath);
+            if (error != Error.Ok)
+            {
+                GD.PrintErr($"错误：无法切换场景: {BattleScenePath}, 错误代码: {error}");
+            }
+        }
+
+        private void OnQuit()
+        {
+            GetTree().Quit();
+        }
+    }
+}
+
