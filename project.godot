@@ -15,6 +15,10 @@ run/main_scene="res://scenes/ExampleBattle.tscn"
 config/features=PackedStringArray("4.5", "C#", "Mobile")
 config/icon="res://icon.svg"
 
+[autoload]
+
+UIManager="*res://scripts/managers/UIManager.cs"
+
 [display]
 
 window/size/viewport_width=3000

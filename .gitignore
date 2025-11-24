@@ -1,6 +1,9 @@
 # Godot 4+ specific ignores
 .godot/
 
+# IDE files
+.vscode/
+
 # Mono-specific ignores
 .mono/
 data_*/

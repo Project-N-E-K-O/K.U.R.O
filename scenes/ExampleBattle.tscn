@@ -11,6 +11,7 @@
 [ext_resource type="Script" uid="uid://l40es7irdvdw" path="res://scripts/actors/heroes/states/PlayerHitState.cs" id="7_w7wnm"]
 [ext_resource type="Script" uid="uid://ba1kd5qgh17ag" path="res://scripts/actors/heroes/states/PlayerRunState.cs" id="8_bhpvs"]
 [ext_resource type="PackedScene" uid="uid://bvivxwyc4eucf" path="res://scenes/properties/DroppableExampleProperty.tscn" id="11_drop_example"]
+[ext_resource type="Script" path="res://scripts/scenes/BattleSceneManager.cs" id="12_battle_manager"]
 [ext_resource type="PackedScene" uid="uid://ceou8wonisj4d" path="res://scenes/environments/wall.tscn" id="12_v8do6"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_attack"]
@@ -163,7 +164,14 @@ PickedColor = Color(0.19607843, 0.8039216, 0.19607843, 1)
 SpineAttachmentRootPath = NodePath("")
 AttachmentPointPath = NodePath("SpineCharacter/Skeleton2D/root/bone/bone2/bone3/bone14/bone15/bone16")
 
+[node name="BattleSceneManager" type="Node2D" parent="."]
+script = ExtResource("12_battle_manager")
+Player = NodePath("Player")
+AutoLoadHUD = true
+AutoLoadMenu = true
+
 [node name="UI" type="CanvasLayer" parent="."]
+visible = false
 
 [node name="PlayerStats" type="Label" parent="UI"]
 offset_left = 10.0

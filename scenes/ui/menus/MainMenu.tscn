@@ -1,0 +1,92 @@
+[gd_scene load_steps=2 format=3 uid="uid://main_menu_ui"]
+
+[ext_resource type="Script" uid="uid://dykq2etjvxy2j" path="res://scripts/ui/MainMenu.cs" id="1_main_menu"]
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_main_menu")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.1, 0.1, 0.15, 1)
+
+[node name="MenuPanel" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -300.0
+offset_right = 300.0
+offset_bottom = 300.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="Panel" parent="MenuPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MenuPanel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -200.0
+offset_right = 200.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" type="Label" parent="MenuPanel/VBoxContainer"]
+layout_mode = 2
+text = "K.U.R.O"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 48
+
+[node name="HSeparator" type="HSeparator" parent="MenuPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="StartGameButton" type="Button" parent="MenuPanel/VBoxContainer"]
+layout_mode = 2
+text = "开始游戏"
+theme_override_font_sizes/font_size = 24
+
+[node name="ModeSelectionButton" type="Button" parent="MenuPanel/VBoxContainer"]
+layout_mode = 2
+text = "模式选择"
+theme_override_font_sizes/font_size = 24
+
+[node name="LoadGameButton" type="Button" parent="MenuPanel/VBoxContainer"]
+layout_mode = 2
+text = "读取存档"
+theme_override_font_sizes/font_size = 24
+
+[node name="SettingsButton" type="Button" parent="MenuPanel/VBoxContainer"]
+layout_mode = 2
+text = "设置"
+theme_override_font_sizes/font_size = 24
+
+[node name="QuitButton" type="Button" parent="MenuPanel/VBoxContainer"]
+layout_mode = 2
+text = "退出游戏"
+theme_override_font_sizes/font_size = 24
+
