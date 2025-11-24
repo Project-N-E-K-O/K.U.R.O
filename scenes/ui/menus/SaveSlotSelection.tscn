@@ -1,0 +1,60 @@
+[gd_scene load_steps=2 format=3 uid="uid://save_slot_selection"]
+
+[ext_resource type="Script" path="res://scripts/ui/SaveSlotSelection.cs" id="1_save_slot"]
+
+[node name="SaveSlotSelection" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_save_slot")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.1, 0.1, 0.15, 1)
+
+[node name="MenuPanel" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MenuPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" type="Label" parent="MenuPanel/VBoxContainer"]
+layout_mode = 2
+text = "选择存档"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 32
+
+[node name="HSeparator" type="HSeparator" parent="MenuPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MenuPanel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="SlotGrid" type="GridContainer" parent="MenuPanel/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+columns = 3
+
+[node name="BackButton" type="Button" parent="MenuPanel/VBoxContainer"]
+layout_mode = 2
+text = "返回"
+theme_override_font_sizes/font_size = 20
+
