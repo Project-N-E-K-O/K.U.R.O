@@ -9,6 +9,7 @@ namespace Kuros.Actors.Enemies.Attacks
     public partial class EnemyAttackController : EnemyAttackTemplate
     {
         [Export] public NodePath PlayerDetectionAreaPath = new NodePath();
+        [Export] public bool EnableDebugLogs = false;
 
         private const float ControllerActiveDuration = 9999f;
         private readonly List<Entry> _entries = new();
@@ -35,6 +36,10 @@ namespace Kuros.Actors.Enemies.Attacks
             {
                 _playerDetectionArea.BodyEntered += OnDetectionAreaBodyEntered;
                 _playerDetectionArea.BodyExited += OnDetectionAreaBodyExited;
+            }
+            else
+            {
+                DebugLog("PlayerDetectionAreaPath did not resolve to a valid Area2D.");
             }
 
             foreach (Node child in GetChildren())
@@ -86,18 +91,25 @@ namespace Kuros.Actors.Enemies.Attacks
             _currentAttack = _queuedAttack;
             _queuedAttack = null;
 
-            if (_currentAttack == null)
-            {
-                GD.Print("[EnemyAttackController] No attack selected, cancelling.");
-                Cancel(clearCooldown: true);
-                return;
-            }
+			if (_currentAttack == null)
+			{
+				DebugLog("No attack queued; cancelling controller run.");
+				Cancel(clearCooldown: true);
+				return;
+			}
 
-            GD.Print($"[EnemyAttackController] Starting {_currentAttack.Name} for enemy {Enemy.Name}.");
-            if (!_currentAttack.TryStart())
-            {
-                FinishControllerAttack("ChildFailedToStart");
-            }
+			if (!_currentAttack.CanStart())
+			{
+				DebugLog($"Attack {_currentAttack.Name} cannot start (likely cooldown/range).");
+				FinishControllerAttack("AwaitingStart");
+				return;
+			}
+
+			if (!_currentAttack.TryStart())
+			{
+				DebugLog($"Attack {_currentAttack.Name} failed to start.");
+				FinishControllerAttack("ChildFailedToStart");
+			}
         }
 
         protected override void OnRecoveryStarted()
@@ -152,19 +164,19 @@ namespace Kuros.Actors.Enemies.Attacks
             return null;
         }
 
-        private void QueueNextAttack(string reason = "Auto")
-        {
-            _queuedAttack = PickAttack();
-            if (_queuedAttack != null)
-            {
-                GD.Print($"[EnemyAttackController] ({reason}) Queued {_queuedAttack.Name} for enemy {Enemy.Name}.");
-                DebugLogPendingAttackIfPlayerInside(reason);
-            }
-            else
-            {
-                GD.Print($"[EnemyAttackController] ({reason}) No attack available to queue for {Enemy.Name}.");
-            }
-        }
+		private void QueueNextAttack(string reason = "Auto")
+		{
+			_queuedAttack = PickAttack();
+			if (_queuedAttack != null)
+			{
+				DebugLog($"({reason}) queued attack {_queuedAttack.Name}.");
+				DebugLogPendingAttackIfPlayerInside();
+			}
+			else
+			{
+				DebugLog($"({reason}) no attack available to queue.");
+			}
+		}
 
         private Area2D? ResolveArea(NodePath path, Area2D? fallback = null)
         {
@@ -184,9 +196,9 @@ namespace Kuros.Actors.Enemies.Attacks
 
         public EnemyAttackTemplate? PeekQueuedAttack() => _queuedAttack;
 
-        public void ForceQueueNextAttack(string reason = "Forced")
+		public void ForceQueueNextAttack(string reason = "Forced")
         {
-            GD.Print($"[EnemyAttackController] Force queue requested ({reason}) for {Enemy.Name}.");
+			DebugLog($"Force queue requested ({reason}).");
             if (_currentAttack != null)
             {
                 _currentAttack.Cancel(clearCooldown: true);
@@ -211,6 +223,7 @@ namespace Kuros.Actors.Enemies.Attacks
 
             _currentAttack = null;
             _pendingQueueReason = reason;
+			DebugLog($"Controller finishing because '{reason}'.");
 
             if (IsRunning)
             {
@@ -223,18 +236,15 @@ namespace Kuros.Actors.Enemies.Attacks
             }
         }
 
-        private void DebugLogPendingAttackIfPlayerInside(string reason)
-        {
-            if (_playerDetectionArea == null) return;
-            var player = Enemy?.PlayerTarget;
-            if (player == null) return;
-
-            if (_playerDetectionArea.OverlapsBody(player))
-            {
-                string attackName = _queuedAttack?.Name ?? "(none queued)";
-                GD.Print($"[EnemyAttackController] ({reason}) Player already inside detection area. Next attack: {attackName}");
-            }
-        }
+		private void DebugLogPendingAttackIfPlayerInside()
+		{
+			if (_playerDetectionArea == null) return;
+			var player = Enemy?.PlayerTarget;
+			if (player == null) return;
+			if (!_playerInside || !_playerDetectionArea.OverlapsBody(player)) return;
+			string attackName = _queuedAttack?.Name ?? "(none queued)";
+			DebugLog($"Player already inside detection area. Next attack: {attackName}");
+		}
 
         public override void _ExitTree()
         {
@@ -253,19 +263,18 @@ namespace Kuros.Actors.Enemies.Attacks
                 return;
             }
 
-            _playerInside = true;
-            if (_queuedAttack == null && _currentAttack == null)
-            {
-                QueueNextAttack("PlayerEntered");
-            }
+			_playerInside = true;
+			DebugLog("Player entered detection area.");
+			if (_queuedAttack == null && _currentAttack == null)
+			{
+				QueueNextAttack("PlayerEntered");
+			}
 
             if (ShouldForceAttackState())
             {
                 Enemy?.StateMachine?.ChangeState("Attack");
             }
 
-            string attackName = _queuedAttack?.Name ?? "(none queued)";
-            GD.Print($"[EnemyAttackController] Player entered detection area. Next attack: {attackName}");
         }
 
         private void OnDetectionAreaBodyExited(Node body)
@@ -275,17 +284,17 @@ namespace Kuros.Actors.Enemies.Attacks
                 return;
             }
 
-            _playerInside = false;
-            GD.Print("[EnemyAttackController] Player left detection area. Resetting attack controller.");
+			_playerInside = false;
+			DebugLog("Player left detection area.");
 
-            if (_currentAttack != null)
-            {
-                FinishControllerAttack("PlayerExit", clearControllerCooldown: true);
-            }
-            else
-            {
-                QueueNextAttack("PlayerExit");
-            }
+			if (_currentAttack != null)
+			{
+				FinishControllerAttack("PlayerExit", clearControllerCooldown: true);
+			}
+			else
+			{
+				QueueNextAttack("PlayerExit");
+			}
         }
 
         private bool ShouldForceAttackState()
@@ -299,6 +308,13 @@ namespace Kuros.Actors.Enemies.Attacks
             }
 
             return false;
+        }
+
+        private void DebugLog(string message)
+        {
+            if (!EnableDebugLogs) return;
+            string enemyName = Enemy?.Name ?? "UnknownEnemy";
+            GD.Print($"[EnemyAttackController] {enemyName}: {message}");
         }
 
         private class Entry

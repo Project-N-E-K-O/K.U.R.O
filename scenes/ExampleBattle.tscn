@@ -1,7 +1,6 @@
-[gd_scene load_steps=21 format=3 uid="uid://d15hs7qpxqhf3"]
+[gd_scene load_steps=20 format=3 uid="uid://d15hs7qpxqhf3"]
 
 [ext_resource type="Script" uid="uid://btbsyf4hokvud" path="res://scripts/actors/heroes/SamplePlayer.cs" id="1_player"]
-[ext_resource type="Script" uid="uid://hhpl8w4ty1ky" path="res://scripts/actors/enemies/SampleEnemy.cs" id="2_enemy"]
 [ext_resource type="Script" uid="uid://cenpuhlcgesin" path="res://scripts/systems/fsm/StateMachine.cs" id="3_ceqyr"]
 [ext_resource type="PackedScene" uid="uid://bg3ltu6fhm4pa" path="res://scenes/actors/heroes/jsmb_2.tscn" id="3_spine"]
 [ext_resource type="Script" uid="uid://0u5whf0qv6i5" path="res://scripts/actors/heroes/states/PlayerIdleState.cs" id="4_op3tf"]
@@ -13,7 +12,7 @@
 [ext_resource type="Script" uid="uid://d1g4amacs13a3" path="res://scripts/actors/heroes/states/PlayerFrozenState.cs" id="17_player_frozen"]
 [ext_resource type="Script" uid="uid://c2pgsls8pb7oh" path="res://scripts/actors/heroes/attacks/PlayerBasicMeleeAttack.cs" id="19_player_basic_attack"]
 [ext_resource type="Script" uid="uid://cn2bsvambjids" path="res://scripts/controllers/EnemySpawnController.cs" id="20_spawn_controller"]
-[ext_resource type="PackedScene" path="res://scenes/actors/enemies/SampleEnemyUnit.tscn" id="21_sample_enemy"]
+[ext_resource type="PackedScene" uid="uid://cofm45kotvgto" path="res://scenes/actors/enemies/Enemy_B1_fat.tscn" id="21_enemy_b1"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_attack"]
 size = Vector2(64.75629, 180.66397)
@@ -24,8 +23,6 @@ size = Vector2(32, 64)
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_player"]
 radius = 15.0
 height = 60.0
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_bhpvs"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_sb658"]
 size = Vector2(8, 1444)
@@ -123,15 +120,14 @@ script = ExtResource("8_bhpvs")
 [node name="EnemySpawnController" type="Node2D" parent="."]
 script = ExtResource("20_spawn_controller")
 
-[node name="EnemyInstance" parent="EnemySpawnController" instance=ExtResource("21_sample_enemy")]
-position = Vector2(800, 400)
+[node name="EnemyInstance" parent="EnemySpawnController" instance=ExtResource("21_enemy_b1")]
+position = Vector2(1369, 456)
 DetectionRange = 1000.0
 Speed = 50.0
 
-[node name="DroppableExample" parent="." node_paths=PackedStringArray("TriggerArea") instance=ExtResource("11_drop_example")]
+[node name="DroppableExample" parent="." instance=ExtResource("11_drop_example")]
 z_index = 255
 position = Vector2(419, 360)
-TriggerArea = NodePath("PickupArea")
 SpineAttachmentRootPath = NodePath("")
 AttachmentPointPath = NodePath("SpineCharacter/Skeleton2D/root/bone/bone2/bone3/bone14/bone15/bone16")
 

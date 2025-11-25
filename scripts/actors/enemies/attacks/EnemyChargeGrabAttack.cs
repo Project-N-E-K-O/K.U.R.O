@@ -263,7 +263,17 @@ namespace Kuros.Actors.Enemies.Attacks
 			if (Enemy == null) return;
 
 			Vector2 dashStart = Enemy.GlobalPosition;
-			Vector2 recordedTarget = Enemy.PlayerTarget?.GlobalPosition ?? dashStart + (Enemy.FacingRight ? Vector2.Right : Vector2.Left) * MinDashDistance;
+			Vector2 recordedTarget;
+
+			if (Enemy.PlayerTarget != null)
+			{
+				float targetX = Enemy.PlayerTarget.GlobalPosition.X;
+				recordedTarget = new Vector2(targetX, dashStart.Y);
+			}
+			else
+			{
+				recordedTarget = dashStart + (Enemy.FacingRight ? Vector2.Right : Vector2.Left) * MinDashDistance;
+			}
 
 			Vector2 direction = recordedTarget - dashStart;
 			if (direction == Vector2.Zero)
