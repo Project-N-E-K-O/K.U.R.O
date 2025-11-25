@@ -58,7 +58,8 @@ namespace Kuros.Actors.Heroes.States
         public void EndExternalHold()
         {
             _externallyHeld = false;
-            _timer = FrozenDuration;
+			_timer = 0f;
+			ChangeState("Idle");
         }
     }
 }

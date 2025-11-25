@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://bo6uhkbqyxe6o" path="res://scripts/actors/enemies/states/EnemyAttackState.cs" id="5"]
 [ext_resource type="Script" uid="uid://cwnxfhj8ysc2f" path="res://scripts/actors/enemies/states/EnemyHitState.cs" id="6"]
 [ext_resource type="Script" uid="uid://cihawgv4js52w" path="res://scripts/actors/enemies/states/EnemyFrozenState.cs" id="7"]
+[ext_resource type="Script" path="res://scripts/actors/enemies/states/EnemyCooldownFrozenState.cs" id="14"]
 [ext_resource type="Script" uid="uid://cu6enbmbcicac" path="res://scripts/actors/enemies/attacks/EnemySimpleMeleeAttack.cs" id="8"]
 [ext_resource type="Script" uid="uid://3vw4k62inr77" path="res://scripts/actors/enemies/attacks/EnemyChargeEscapeAttack.cs" id="9"]
 [ext_resource type="Script" uid="uid://b3yljatiudox4" path="res://scripts/actors/enemies/attacks/EnemyAttackController.cs" id="10"]
@@ -84,8 +85,8 @@ PlayerDetectionAreaPath = NodePath("../../../Sprite2D/DetectionArea")
 
 [node name="ChargeEscapeAttack" type="Node" parent="StateMachine/Attack/AttackController"]
 script = ExtResource("9")
-DetectionAreaPath = NodePath("../../../Sprite2D/DetectionArea")
-GrabAreaPath = NodePath("../../../Sprite2D/AttackArea")
+DetectionAreaPath = NodePath("../../../../Sprite2D/DetectionArea")
+GrabAreaPath = NodePath("../../../../Sprite2D/AttackArea")
 DashSpeed = 150.0
 metadata/attack_weight = 60.0
 
@@ -100,6 +101,9 @@ script = ExtResource("6")
 
 [node name="Frozen" type="Node" parent="StateMachine"]
 script = ExtResource("7")
+
+[node name="CooldownFrozen" type="Node" parent="StateMachine"]
+script = ExtResource("14")
 
 [node name="FreezeOnTurnMovement" type="Node" parent="."]
 script = ExtResource("11")

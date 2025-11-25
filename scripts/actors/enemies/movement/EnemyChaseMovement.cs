@@ -1,5 +1,6 @@
 using Godot;
 using Godot.Collections;
+using Kuros.Core.Effects;
 
 public partial class EnemyChaseMovement : Node
 {
@@ -8,11 +9,17 @@ public partial class EnemyChaseMovement : Node
     [Export] public float DetectionRangeOverride = -1f;
     [Export] public string IdleStateName = "Idle";
     [Export] public string WalkStateName = "Walk";
+    private static readonly StringName AttackStateName = new("Attack");
+    private static readonly StringName HitStateName = new("Hit");
+    private static readonly StringName FrozenStateName = new("Frozen");
+    private static readonly StringName CooldownStateName = new("CooldownFrozen");
+
     [Export] public Array<StringName> BlockedStates { get; set; } = new Array<StringName>
     {
-        new StringName("Attack"),
-        new StringName("Hit"),
-        new StringName("Frozen")
+        AttackStateName,
+        HitStateName,
+        FrozenStateName,
+        CooldownStateName
     };
 
     protected SampleEnemy? Enemy;
@@ -38,6 +45,7 @@ public partial class EnemyChaseMovement : Node
         }
 
         Enemy.SetMeta(MovementMetaKey, this);
+
     }
 
     public override void _ExitTree()
@@ -118,5 +126,6 @@ public partial class EnemyChaseMovement : Node
         if (currentState == targetState) return;
         Enemy?.StateMachine?.ChangeState(targetState);
     }
+
 }
 

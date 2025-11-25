@@ -25,7 +25,6 @@ public partial class EnemyB1Fat : SampleEnemy
         _hitTracker.RegisterHit();
         if (_hitTracker.ShouldFreeze(HitsToFreeze, HitWindowSeconds))
         {
-            GD.Print($"[B1Fat] {Name} hit {HitsToFreeze} times in {HitWindowSeconds}s. Applying freeze.");
             ApplyFreezeEffect();
             _hitTracker.Reset();
         }
@@ -38,10 +37,10 @@ public partial class EnemyB1Fat : SampleEnemy
         var freezeEffect = new FreezeEffect
         {
             FrozenStateName = "Frozen",
-            FallbackStateName = "Idle",
+            FallbackStateName = "Walk",
             Duration = FreezeOnHitDuration,
             EffectId = $"b1_fat_hit_freeze_{GetInstanceId()}",
-            ResumePreviousState = false
+            ResumePreviousState = true
         };
 
         ApplyEffect(freezeEffect);

@@ -99,15 +99,29 @@ namespace Kuros.Actors.Enemies.States
 				return true;
 			}
 
+			if (Enemy.AttackTimer > 0f)
+			{
+				Enemy.Velocity = Vector2.Zero;
+				Enemy.MoveAndSlide();
+				return true;
+			}
+
 			ChangeToNextState();
 			return true;
 		}
 
 		private void ChangeToNextState()
 		{
+			if (Enemy.AttackTimer > 0f)
+			{
+				Enemy.Velocity = Vector2.Zero;
+				Enemy.MoveAndSlide();
+				return;
+			}
+
 			if (Enemy.IsPlayerWithinDetectionRange())
 			{
-				if (Enemy.IsPlayerInAttackRange() && Enemy.AttackTimer <= 0)
+				if (Enemy.IsPlayerInAttackRange())
 				{
 					ChangeState("Attack");
 				}

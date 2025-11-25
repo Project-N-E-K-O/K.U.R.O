@@ -24,6 +24,7 @@ namespace Kuros.Actors.Enemies.Attacks
 		[ExportCategory("Effects")]
 		[Export(PropertyHint.Range, "0,10,0.1")] public float AppliedFrozenDuration = 5.0f;
 		[Export(PropertyHint.Range, "0,1000,1")] public int DamageOnEscapeFailure = 20;
+		[Export] public StringName CooldownStateName = "CooldownFrozen";
 
 		[ExportCategory("Escape")]
 		[Export(PropertyHint.Range, "0,10,0.1")] public float EscapeWindowSeconds = 0.0f;
@@ -45,6 +46,7 @@ namespace Kuros.Actors.Enemies.Attacks
 		private bool _dashFinalized;
 		private bool _skipRecoveryGrab;
 		private float _postAttackCooldown;
+		private bool _pendingCooldownExit;
 
 		protected override void OnInitialized()
 		{
@@ -90,7 +92,6 @@ namespace Kuros.Actors.Enemies.Attacks
 			if (Enemy.AttackTimer > 0) return false;
 			if (_postAttackCooldown > 0f)
 			{
-				GD.Print($"[EnemyChargeGrabAttack] {_postAttackCooldown:F2}s of cooldown remaining for {Enemy.Name}.");
 				return false;
 			}
 
@@ -120,6 +121,7 @@ namespace Kuros.Actors.Enemies.Attacks
 			_dashFinalized = false;
 			_skipRecoveryGrab = false;
 			_postAttackCooldown = 0f;
+			_pendingCooldownExit = false;
 			PrepareDashTowardsPlayer();
 		}
 
@@ -163,19 +165,23 @@ namespace Kuros.Actors.Enemies.Attacks
 
 			if (HasActiveGrab)
 			{
-				GD.Print($"[EnemyChargeGrabAttack] {Enemy?.Name} already resolving grab, skipping recovery grab attempt.");
 				return;
 			}
 
 			if (!TryExecuteGrab())
 			{
 				StartPostCooldown();
-				FinishCooldownState();
+				_pendingCooldownExit = true;
 			}
 		}
 
 		public override void _PhysicsProcess(double delta)
 		{
+			if (Enemy == null || !GodotObject.IsInstanceValid(Enemy) || !Enemy.IsInsideTree())
+			{
+				return;
+			}
+
 			if (_isEvaluatingEscape && _grabbedPlayer != null)
 			{
 				_escapeTimer -= (float)delta;
@@ -183,7 +189,6 @@ namespace Kuros.Actors.Enemies.Attacks
 
 				if (_escapeTimer <= 0f)
 				{
-					GD.Print($"[EnemyChargeGrabAttack] {_grabbedPlayer.Name} freeze timer expired.");
 					ResolveEscape(false);
 				}
 			}
@@ -191,6 +196,15 @@ namespace Kuros.Actors.Enemies.Attacks
 			if (_postAttackCooldown > 0f)
 			{
 				_postAttackCooldown -= (float)delta;
+				if (_postAttackCooldown <= 0f)
+				{
+					_postAttackCooldown = 0f;
+					if (_pendingCooldownExit)
+					{
+						FinishCooldownState();
+						_pendingCooldownExit = false;
+					}
+				}
 				if (Enemy != null)
 				{
 					Enemy.Velocity = Vector2.Zero;
@@ -306,6 +320,7 @@ namespace Kuros.Actors.Enemies.Attacks
 
 			_isEvaluatingEscape = true;
 			_escapeTimer = AppliedFrozenDuration;
+			OnEscapeSequenceStarted(player);
 			return true;
 		}
 
@@ -338,7 +353,6 @@ namespace Kuros.Actors.Enemies.Attacks
 			{
 				_grabbedPlayer.TakeDamage(DamageOnEscapeFailure);
 				_grabbedPlayer.StateMachine?.ChangeState("Hit");
-				GD.Print($"[EnemyChargeGrabAttack] {_grabbedPlayer.Name} took {DamageOnEscapeFailure} damage after freeze.");
 			}
 
 			var frozenState = _grabbedPlayer.StateMachine?.GetNodeOrNull<PlayerFrozenState>("Frozen");
@@ -347,28 +361,45 @@ namespace Kuros.Actors.Enemies.Attacks
 			_grabbedPlayer = null;
 
 			StartPostCooldown();
+			_pendingCooldownExit = true;
 		}
 
 		private void StartPostCooldown()
 		{
 			if (Enemy == null) return;
 
+			bool starting = _postAttackCooldown <= 0f;
 			_postAttackCooldown = PostCooldownDuration;
 			Enemy.AttackTimer = Mathf.Max(Enemy.AttackTimer, PostCooldownDuration);
 			Enemy.Velocity = Vector2.Zero;
-			GD.Print($"[EnemyChargeGrabAttack] {Enemy.Name} entering post-attack cooldown for {PostCooldownDuration:F2}s.");
+
+			if (starting)
+			{
+				if (!CooldownStateName.IsEmpty && Enemy.StateMachine != null)
+				{
+					Enemy.StateMachine.ChangeState(CooldownStateName);
+				}
+			}
+
+			_pendingCooldownExit = true;
 		}
 
 		private void FinishCooldownState()
 		{
+			if (Enemy?.StateMachine == null) return;
+
+			if (Enemy.StateMachine.CurrentState?.Name == CooldownStateName)
+			{
+				Enemy.StateMachine.ChangeState("Walk");
+			}
+			else if (Enemy.StateMachine.CurrentState?.Name == "Attack")
+			{
+				Enemy.StateMachine.ChangeState("Walk");
+			}
+
 			if (IsRunning)
 			{
 				Cancel();
-			}
-
-			if (Enemy?.StateMachine?.CurrentState?.Name == "Attack")
-			{
-				Enemy.StateMachine.ChangeState("Walk");
 			}
 		}
 
@@ -391,6 +422,7 @@ namespace Kuros.Actors.Enemies.Attacks
 		{
 			if (_detectionArea == null || Enemy?.PlayerTarget == null) return;
 			if (HasActiveGrab) return;
+		if (_postAttackCooldown > 0f) return;
 
 			bool overlaps = _detectionArea.OverlapsBody(Enemy.PlayerTarget);
 			if (overlaps && !_playerInsideDetection)

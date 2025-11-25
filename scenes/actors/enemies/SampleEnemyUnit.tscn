@@ -7,6 +7,7 @@
 [ext_resource type="Script" path="res://scripts/actors/enemies/states/EnemyAttackState.cs" id="5"]
 [ext_resource type="Script" path="res://scripts/actors/enemies/states/EnemyHitState.cs" id="6"]
 [ext_resource type="Script" path="res://scripts/actors/enemies/states/EnemyFrozenState.cs" id="7"]
+[ext_resource type="Script" path="res://scripts/actors/enemies/states/EnemyCooldownFrozenState.cs" id="14"]
 [ext_resource type="Script" path="res://scripts/actors/enemies/movement/EnemyChaseMovement.cs" id="9"]
 [ext_resource type="Script" path="res://scripts/core/effects/EffectController.cs" id="11"]
 [ext_resource type="Script" path="res://scripts/actors/enemies/attacks/EnemyChargeEscapeAttack.cs" id="13"]
@@ -94,4 +95,8 @@ script = ExtResource("6")
 
 [node name="Frozen" type="Node" parent="./StateMachine"]
 script = ExtResource("7")
+
+[node name="CooldownFrozen" type="Node" parent="./StateMachine"]
+script = ExtResource("14")
+
 

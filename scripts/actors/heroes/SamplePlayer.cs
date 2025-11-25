@@ -9,7 +9,7 @@ public partial class SamplePlayer : GameActor
 	[ExportCategory("Combat")]
 	[Export] public Area2D AttackArea { get; private set; } = null!;
 	public PlayerFrozenState? FrozenState { get; private set; }
-
+	
 	[ExportCategory("UI")]
 	[Export] public Label StatsLabel { get; private set; } = null!; // Drag & Drop in Editor
 	

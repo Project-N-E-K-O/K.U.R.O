@@ -2,7 +2,7 @@ using Godot;
 using Kuros.Core.Effects;
 
 /// <summary>
-/// 在基础寻敌功能上，转身时会给敌人施加冻结效果。
+/// 在基础寻敌功能上，转身时会给敌人施加冷却冻结。
 /// </summary>
 public partial class EnemyFreezeOnTurnMovement : EnemyChaseMovement
 {
@@ -40,7 +40,6 @@ public partial class EnemyFreezeOnTurnMovement : EnemyChaseMovement
         {
             if (ShouldApplyFreeze(Enemy))
             {
-                GD.Print($"[FreezeOnTurn] {Enemy.Name} turning. Applying freeze for {FreezeDuration} seconds.");
                 ApplyFreezeEffect(Enemy);
             }
             _wasFacingRight = Enemy.FacingRight;
@@ -60,8 +59,8 @@ public partial class EnemyFreezeOnTurnMovement : EnemyChaseMovement
 
         var freezeEffect = new FreezeEffect
         {
-            FrozenStateName = "Frozen",
-            FallbackStateName = "Idle",
+            FrozenStateName = "CooldownFrozen",
+            FallbackStateName = "Walk",
             Duration = FreezeDuration,
             EffectId = $"freeze_on_turn_{GetInstanceId()}",
             ResumePreviousState = false
