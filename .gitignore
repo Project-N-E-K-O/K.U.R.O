@@ -29,3 +29,4 @@ obj/
 *.pyc
 *.tmp
 *~
+export_presets.cfg
