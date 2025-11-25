@@ -1,6 +1,7 @@
-[gd_scene load_steps=19 format=3 uid="uid://d15hs7qpxqhf3"]
+[gd_scene load_steps=23 format=3 uid="uid://d15hs7qpxqhf3"]
 
 [ext_resource type="Script" uid="uid://btbsyf4hokvud" path="res://scripts/actors/heroes/SamplePlayer.cs" id="1_player"]
+[ext_resource type="PackedScene" uid="uid://b1ljb2q212v3d" path="res://scenes/environments/floor.tscn" id="1_sb658"]
 [ext_resource type="Script" uid="uid://hhpl8w4ty1ky" path="res://scripts/actors/enemies/SampleEnemy.cs" id="2_enemy"]
 [ext_resource type="Script" uid="uid://cenpuhlcgesin" path="res://scripts/systems/fsm/StateMachine.cs" id="3_ceqyr"]
 [ext_resource type="PackedScene" uid="uid://bg3ltu6fhm4pa" path="res://scenes/actors/heroes/jsmb_2.tscn" id="3_spine"]
@@ -11,6 +12,7 @@
 [ext_resource type="Script" uid="uid://ba1kd5qgh17ag" path="res://scripts/actors/heroes/states/PlayerRunState.cs" id="8_bhpvs"]
 [ext_resource type="PackedScene" uid="uid://bvivxwyc4eucf" path="res://scenes/properties/DroppableExampleProperty.tscn" id="11_drop_example"]
 [ext_resource type="Script" path="res://scripts/scenes/BattleSceneManager.cs" id="12_battle_manager"]
+[ext_resource type="PackedScene" uid="uid://ceou8wonisj4d" path="res://scenes/environments/wall.tscn" id="12_v8do6"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_attack"]
 size = Vector2(64.75629, 180.66397)
@@ -34,21 +36,38 @@ height = 45.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_bhpvs"]
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_sb658"]
+size = Vector2(8, 1444)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_v8do6"]
+size = Vector2(10, 1440)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_x7t42"]
+size = Vector2(2397, 16)
+
 [node name="BattleScene" type="Node2D"]
 
-[node name="Camera2D" type="Camera2D" parent="."]
-position = Vector2(640, 360)
-
 [node name="Background" type="ColorRect" parent="."]
-offset_right = 1280.0
-offset_bottom = 720.0
+offset_left = 7.0
+offset_top = 10.0
+offset_right = 1838.0
+offset_bottom = 1118.0
 color = Color(0.2, 0.3, 0.4, 1)
 
 [node name="Ground" type="ColorRect" parent="."]
-offset_top = 600.0
-offset_right = 1280.0
-offset_bottom = 720.0
+offset_left = 8.0
+offset_top = 999.0
+offset_right = 1842.0
+offset_bottom = 1119.0
 color = Color(0.4, 0.35, 0.3, 1)
+
+[node name="floor" parent="." instance=ExtResource("1_sb658")]
+position = Vector2(1127, 706)
+scale = Vector2(1.8534186, 1.9305735)
+
+[node name="wall" parent="." instance=ExtResource("12_v8do6")]
+position = Vector2(1380.9999, 397.00003)
+scale = Vector2(0.72410905, 0.70131683)
 
 [node name="Player" type="CharacterBody2D" parent="." node_paths=PackedStringArray("AttackArea")]
 position = Vector2(200, 400)
@@ -56,6 +75,17 @@ collision_mask = 3
 motion_mode = 1
 script = ExtResource("1_player")
 AttackArea = NodePath("SpineCharacter/AttackArea")
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
+position = Vector2(-5, -17)
+scale = Vector2(0.8799991, 0.68)
+zoom = Vector2(1.75, 1.75)
+limit_left = 0
+limit_top = 10
+limit_right = 2360
+limit_bottom = 1425
+drag_horizontal_enabled = true
+drag_vertical_enabled = true
 
 [node name="SpineCharacter" parent="Player" instance=ExtResource("3_spine")]
 position = Vector2(-4, 62.999996)
@@ -69,7 +99,7 @@ collision_mask = 2
 monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Player/SpineCharacter/AttackArea"]
-position = Vector2(68.19653, -35.078217)
+position = Vector2(73, -32)
 scale = Vector2(1.1057913, 0.9401098)
 shape = SubResource("RectangleShape2D_attack")
 
@@ -157,11 +187,25 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -200.0
-offset_top = -50.0
-offset_right = 200.0
-offset_bottom = -10.0
+offset_left = 49.0
+offset_top = 127.0
+offset_right = 563.0
+offset_bottom = 167.0
 grow_horizontal = 2
 grow_vertical = 0
 text = "WASD: Move | Space: Attack | Shift: Run | F: Pick Up | G: Put Down"
 horizontal_alignment = 1
+
+[node name="ArillWall" type="StaticBody2D" parent="."]
+
+[node name="left" type="CollisionShape2D" parent="ArillWall"]
+position = Vector2(-20, 714)
+shape = SubResource("RectangleShape2D_sb658")
+
+[node name="right" type="CollisionShape2D" parent="ArillWall"]
+position = Vector2(2365, 707)
+shape = SubResource("RectangleShape2D_v8do6")
+
+[node name="down" type="CollisionShape2D" parent="ArillWall"]
+position = Vector2(1165.5, 1421)
+shape = SubResource("RectangleShape2D_x7t42")

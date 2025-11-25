@@ -2,6 +2,9 @@
 .godot/
 .import/
 
+# IDE files
+.vscode/
+
 # Mono-specific ignores
 .mono/
 data_*/
