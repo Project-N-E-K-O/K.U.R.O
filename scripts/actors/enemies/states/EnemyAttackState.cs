@@ -45,7 +45,7 @@ namespace Kuros.Actors.Enemies.States
 
 			if (!ProcessTemplateAttack(delta))
 			{
-				ChangeToNextState();
+			ChangeToNextState();
 			}
 		}
 

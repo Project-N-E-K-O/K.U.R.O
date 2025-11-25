@@ -3,27 +3,27 @@ using Kuros.Actors.Heroes.States;
 
 namespace Kuros.Actors.Enemies.Attacks
 {
-	/// <summary>
-	/// 冲刺抓取攻击：
+    /// <summary>
+    /// 冲刺抓取攻击：
 	/// 1. 玩家进入检测区域后触发预热；
 	/// 2. 预热结束直线冲刺至玩家先前位置；
 	/// 3. 冲刺结束若命中，施加冻结并进入逃脱判定；
 	/// 4. 逃脱失败造成伤害，任一阶段被打断则立即结束。
-	/// </summary>
-	public partial class EnemyChargeGrabAttack : EnemyAttackTemplate
-	{
-		[ExportCategory("Areas")]
-		[Export] public NodePath DetectionAreaPath = new NodePath();
-		[Export] public NodePath GrabAreaPath = new NodePath();
+    /// </summary>
+    public partial class EnemyChargeGrabAttack : EnemyAttackTemplate
+    {
+        [ExportCategory("Areas")]
+        [Export] public NodePath DetectionAreaPath = new NodePath();
+        [Export] public NodePath GrabAreaPath = new NodePath();
 
-		[ExportCategory("Dash")]
-		[Export(PropertyHint.Range, "10,2000,10")] public float DashSpeed = 600f;
+        [ExportCategory("Dash")]
+        [Export(PropertyHint.Range, "10,2000,10")] public float DashSpeed = 600f;
 		[Export(PropertyHint.Range, "0,2000,10")] public float DashDistance = 0f;
-		[Export] public bool LockFacingDuringDash = true;
+        [Export] public bool LockFacingDuringDash = true;
 
-		[ExportCategory("Effects")]
+        [ExportCategory("Effects")]
 		[Export(PropertyHint.Range, "0,10,0.1")] public float AppliedFrozenDuration = 5.0f;
-		[Export(PropertyHint.Range, "0,1000,1")] public int DamageOnEscapeFailure = 20;
+        [Export(PropertyHint.Range, "0,1000,1")] public int DamageOnEscapeFailure = 20;
 		[Export] public StringName CooldownStateName = "CooldownFrozen";
 
 		[ExportCategory("Escape")]
@@ -32,12 +32,12 @@ namespace Kuros.Actors.Enemies.Attacks
 		private const float MinDashDistance = 32f;
 		private const float PostCooldownDuration = 1.0f;
 
-		private Area2D? _detectionArea;
-		private Area2D? _grabArea;
-		private EnemyAttackController? _controller;
+        private Area2D? _detectionArea;
+        private Area2D? _grabArea;
+        private EnemyAttackController? _controller;
 		private bool _playerInsideDetection;
 
-		private Vector2 _dashDirection = Vector2.Right;
+        private Vector2 _dashDirection = Vector2.Right;
 		private Vector2 _dashTarget;
 		private SamplePlayer? _grabbedPlayer;
 		private bool _isEvaluatingEscape;
@@ -48,45 +48,45 @@ namespace Kuros.Actors.Enemies.Attacks
 		private float _postAttackCooldown;
 		private bool _pendingCooldownExit;
 
-		protected override void OnInitialized()
-		{
-			base.OnInitialized();
-			_controller = GetParent() as EnemyAttackController;
+        protected override void OnInitialized()
+        {
+            base.OnInitialized();
+            _controller = GetParent() as EnemyAttackController;
 
-			_detectionArea = ResolveArea(DetectionAreaPath);
-			if (_detectionArea != null)
-			{
+            _detectionArea = ResolveArea(DetectionAreaPath);
+            if (_detectionArea != null)
+            {
 				_detectionArea.Monitoring = true;
-				_detectionArea.BodyEntered += OnDetectionAreaBodyEntered;
+                _detectionArea.BodyEntered += OnDetectionAreaBodyEntered;
 				_detectionArea.BodyExited += OnDetectionAreaBodyExited;
 			}
 			else
 			{
 				GD.PushWarning($"[EnemyChargeGrabAttack] DetectionArea not found for {Enemy?.Name ?? Name}, fallback to DetectionRange.");
-			}
+            }
 
-			_grabArea = ResolveArea(GrabAreaPath);
-			if (_grabArea == null)
-			{
-				_grabArea = AttackArea;
-			}
+            _grabArea = ResolveArea(GrabAreaPath);
+            if (_grabArea == null)
+            {
+                _grabArea = AttackArea;
+            }
 
 			SetPhysicsProcess(true);
-		}
+        }
 
-		public override void _ExitTree()
-		{
-			if (_detectionArea != null)
-			{
-				_detectionArea.BodyEntered -= OnDetectionAreaBodyEntered;
+        public override void _ExitTree()
+        {
+            if (_detectionArea != null)
+            {
+                _detectionArea.BodyEntered -= OnDetectionAreaBodyEntered;
 				_detectionArea.BodyExited -= OnDetectionAreaBodyExited;
-			}
+            }
 
-			base._ExitTree();
-		}
+            base._ExitTree();
+        }
 
-		public override bool CanStart()
-		{
+        public override bool CanStart()
+        {
 			if (Enemy == null || Enemy.PlayerTarget == null) return false;
 			if (IsRunning || IsOnCooldown) return false;
 			if (Enemy.AttackTimer > 0) return false;
@@ -104,7 +104,7 @@ namespace Kuros.Actors.Enemies.Attacks
 				return false;
 			}
 
-			AlignFacingWithPlayer();
+            AlignFacingWithPlayer();
 
 			Vector2 toPlayer = Enemy.GetDirectionToPlayer();
 			if (toPlayer == Vector2.Zero) return false;
@@ -132,20 +132,20 @@ namespace Kuros.Actors.Enemies.Attacks
 			{
 				Enemy.Velocity = Vector2.Zero;
 			}
-		}
+        }
 
-		protected override void OnActivePhase()
-		{
+        protected override void OnActivePhase()
+        {
 			if (Enemy == null) return;
 			_isDashing = true;
 			Enemy.Velocity = _dashDirection * DashSpeed;
-		}
+        }
 
 		private bool HasActiveGrab => _grabbedPlayer != null || _isEvaluatingEscape;
 
-		protected override void OnRecoveryStarted()
-		{
-			base.OnRecoveryStarted();
+        protected override void OnRecoveryStarted()
+        {
+            base.OnRecoveryStarted();
 			_playerInsideDetection = false;
 			if (Enemy != null)
 			{
@@ -207,7 +207,7 @@ namespace Kuros.Actors.Enemies.Attacks
 				}
 				if (Enemy != null)
 				{
-					Enemy.Velocity = Vector2.Zero;
+            Enemy.Velocity = Vector2.Zero;
 					Enemy.MoveAndSlide();
 				}
 				return;
@@ -237,7 +237,7 @@ namespace Kuros.Actors.Enemies.Attacks
 			if (!escaped)
 			{
 				ReleasePlayer(applyDamage: true);
-			}
+        }
 			else
 			{
 				ReleasePlayer(applyDamage: false);
@@ -259,8 +259,8 @@ namespace Kuros.Actors.Enemies.Attacks
 		protected virtual void OnEscapeSequenceFinished(SamplePlayer player, bool escaped) { }
 
 		private void PrepareDashTowardsPlayer()
-		{
-			if (Enemy == null) return;
+        {
+            if (Enemy == null) return;
 
 			Vector2 dashStart = Enemy.GlobalPosition;
 			Vector2 recordedTarget;
@@ -279,7 +279,7 @@ namespace Kuros.Actors.Enemies.Attacks
 			if (direction == Vector2.Zero)
 			{
 				direction = Enemy.FacingRight ? Vector2.Right : Vector2.Left;
-			}
+            }
 
 			_dashDirection = direction.Normalized();
 
@@ -298,62 +298,62 @@ namespace Kuros.Actors.Enemies.Attacks
 
 			_dashTarget = dashStart + _dashDirection * targetDistance;
 
-			if (LockFacingDuringDash && _dashDirection.X != 0)
-			{
-				Enemy.FlipFacing(_dashDirection.X > 0);
-			}
+            if (LockFacingDuringDash && _dashDirection.X != 0)
+            {
+                Enemy.FlipFacing(_dashDirection.X > 0);
+            }
 
 			float dashTime = Mathf.Max(targetDistance / Mathf.Max(DashSpeed, 1f), 0.05f);
-			ActiveDuration = dashTime;
+            ActiveDuration = dashTime;
 			RecoveryDuration = 1.0f;
-		}
+        }
 
 		private bool TryExecuteGrab()
-		{
+        {
 			if (Enemy == null) return false;
 
-			var player = Enemy.PlayerTarget;
+            var player = Enemy.PlayerTarget;
 			if (player == null)
 			{
 				return false;
 			}
 
-			if (!IsPlayerInsideGrabZone(player))
-			{
+            if (!IsPlayerInsideGrabZone(player))
+            {
 				_playerInsideDetection = false;
 				return false;
-			}
+            }
 
 			_grabbedPlayer = player;
-			ApplyFrozenState(player);
+            ApplyFrozenState(player);
 			_playerInsideDetection = false;
 
 			_isEvaluatingEscape = true;
 			_escapeTimer = AppliedFrozenDuration;
 			OnEscapeSequenceStarted(player);
 			return true;
-		}
+        }
 
-		private bool IsPlayerInsideGrabZone(SamplePlayer player)
-		{
-			if (_grabArea != null)
-			{
-				return _grabArea.OverlapsBody(player);
-			}
+        private bool IsPlayerInsideGrabZone(SamplePlayer player)
+        {
+            if (_grabArea != null)
+            {
+                return _grabArea.OverlapsBody(player);
+            }
 
-			return AttackArea != null && AttackArea.OverlapsBody(player);
-		}
+            return AttackArea != null && AttackArea.OverlapsBody(player);
+        }
 
-		private void ApplyFrozenState(SamplePlayer player)
-		{
-			var frozenState = player.StateMachine?.GetNodeOrNull<PlayerFrozenState>("Frozen");
-			if (frozenState != null)
-			{
-				frozenState.FrozenDuration = AppliedFrozenDuration;
+        private void ApplyFrozenState(SamplePlayer player)
+        {
+            var frozenState = player.StateMachine?.GetNodeOrNull<PlayerFrozenState>("Frozen");
+            if (frozenState != null)
+            {
+                frozenState.FrozenDuration = AppliedFrozenDuration;
 				frozenState.BeginExternalHold();
-				player.StateMachine?.ChangeState("Frozen");
+            player.StateMachine?.ChangeState("Frozen");
 			}
-		}
+        }
 
 		private void ReleasePlayer(bool applyDamage)
 		{
@@ -375,7 +375,7 @@ namespace Kuros.Actors.Enemies.Attacks
 		}
 
 		private void StartPostCooldown()
-		{
+        {
 			if (Enemy == null) return;
 
 			bool starting = _postAttackCooldown <= 0f;
@@ -410,12 +410,12 @@ namespace Kuros.Actors.Enemies.Attacks
 			if (IsRunning)
 			{
 				Cancel();
-			}
-		}
+            }
+        }
 
-		private void OnDetectionAreaBodyEntered(Node body)
-		{
-			if (Enemy == null || body != Enemy.PlayerTarget) return;
+        private void OnDetectionAreaBodyEntered(Node body)
+        {
+            if (Enemy == null || body != Enemy.PlayerTarget) return;
 
 			_playerInsideDetection = true;
 
@@ -449,7 +449,7 @@ namespace Kuros.Actors.Enemies.Attacks
 		private void TryRequestAttackFromDetection(string reason)
 		{
 			if (Enemy == null) return;
-			if (IsRunning || IsOnCooldown) return;
+            if (IsRunning || IsOnCooldown) return;
 			if (Enemy.AttackTimer > 0) return;
 			if (HasActiveGrab) return;
 			if (_postAttackCooldown > 0f) return;
@@ -460,10 +460,10 @@ namespace Kuros.Actors.Enemies.Attacks
 			}
 
 			if (Enemy.StateMachine?.CurrentState?.Name != "Attack")
-			{
-				Enemy.StateMachine?.ChangeState("Attack");
-			}
-		}
+            {
+                Enemy.StateMachine?.ChangeState("Attack");
+            }
+        }
 
 		private void UpdateDashMovement(double delta)
 		{
@@ -501,7 +501,7 @@ namespace Kuros.Actors.Enemies.Attacks
 			_dashFinalized = true;
 
 			if (!forceGrab)
-			{
+        {
 				Enemy.GlobalPosition = _dashTarget;
 			}
 
@@ -520,33 +520,33 @@ namespace Kuros.Actors.Enemies.Attacks
 			}
 
 			ForceEnterRecoveryPhase();
-		}
+        }
 
-		private Area2D? ResolveArea(NodePath path)
-		{
-			if (path.IsEmpty)
-			{
-				return null;
-			}
+        private Area2D? ResolveArea(NodePath path)
+        {
+            if (path.IsEmpty)
+            {
+                return null;
+            }
 
-			var area = GetNodeOrNull<Area2D>(path);
-			if (area != null)
-			{
-				return area;
-			}
+            var area = GetNodeOrNull<Area2D>(path);
+            if (area != null)
+            {
+                return area;
+            }
 
-			return Enemy?.GetNodeOrNull<Area2D>(path);
-		}
+            return Enemy?.GetNodeOrNull<Area2D>(path);
+        }
 
-		private void AlignFacingWithPlayer()
-		{
-			if (Enemy == null) return;
-			Vector2 toPlayer = Enemy.GetDirectionToPlayer();
-			if (Mathf.Abs(toPlayer.X) > 0.01f)
-			{
-				Enemy.FlipFacing(toPlayer.X > 0f);
-			}
-		}
+        private void AlignFacingWithPlayer()
+        {
+            if (Enemy == null) return;
+            Vector2 toPlayer = Enemy.GetDirectionToPlayer();
+            if (Mathf.Abs(toPlayer.X) > 0.01f)
+            {
+                Enemy.FlipFacing(toPlayer.X > 0f);
+            }
+        }
 
 		protected override void OnAttackFinished()
 		{
@@ -557,6 +557,6 @@ namespace Kuros.Actors.Enemies.Attacks
 				StartPostCooldown();
 			}
 			_skipRecoveryGrab = false;
-		}
-	}
+    }
+}
 }

@@ -12,7 +12,8 @@
 [ext_resource type="Script" uid="uid://d1g4amacs13a3" path="res://scripts/actors/heroes/states/PlayerFrozenState.cs" id="17_player_frozen"]
 [ext_resource type="Script" uid="uid://c2pgsls8pb7oh" path="res://scripts/actors/heroes/attacks/PlayerBasicMeleeAttack.cs" id="19_player_basic_attack"]
 [ext_resource type="Script" uid="uid://cn2bsvambjids" path="res://scripts/controllers/EnemySpawnController.cs" id="20_spawn_controller"]
-[ext_resource type="PackedScene" uid="uid://cofm45kotvgto" path="res://scenes/actors/enemies/Enemy_B1_fat.tscn" id="21_enemy_b1"]
+[ext_resource type="PackedScene" uid="uid://bs6eki6cankpq" path="res://scenes/actors/enemies/Enemy_B1_thin.tscn" id="21_enemy_b1_thin"]
+[ext_resource type="Script" path="res://scripts/actors/heroes/PlayerInventoryComponent.cs" id="22_player_inventory"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_attack"]
 size = Vector2(64.75629, 180.66397)
@@ -96,6 +97,10 @@ shape = SubResource("CapsuleShape2D_player")
 script = ExtResource("3_ceqyr")
 InitialState = NodePath("Idle")
 
+[node name="Inventory" type="Node" parent="Player"]
+script = ExtResource("22_player_inventory")
+BackpackSlots = 24
+
 [node name="Idle" type="Node" parent="Player/StateMachine"]
 script = ExtResource("4_op3tf")
 
@@ -120,7 +125,7 @@ script = ExtResource("8_bhpvs")
 [node name="EnemySpawnController" type="Node2D" parent="."]
 script = ExtResource("20_spawn_controller")
 
-[node name="EnemyInstance" parent="EnemySpawnController" instance=ExtResource("21_enemy_b1")]
+[node name="EnemyInstance" parent="EnemySpawnController" instance=ExtResource("21_enemy_b1_thin")]
 position = Vector2(1369, 456)
 DetectionRange = 1000.0
 Speed = 50.0

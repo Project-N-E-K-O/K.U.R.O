@@ -17,8 +17,8 @@ namespace Kuros.Actors.Enemies.Attacks
 
         private Area2D? _detectionArea;
         private int _strikesDone = 0;
-        private float _intervalTimer = 0f;
-        private bool _isAttacking = false;
+        private float _strikeTimer = 0f;
+        private bool _comboActive = false;
 
         protected override void OnInitialized()
         {
@@ -45,60 +45,54 @@ namespace Kuros.Actors.Enemies.Attacks
 
         protected override void OnAttackStarted()
         {
+            WarmupDuration = 0.5f;
+            ActiveDuration = float.MaxValue;
+
             base.OnAttackStarted();
+
             _strikesDone = 0;
-            _intervalTimer = 0f;
-            _isAttacking = true;
+            _strikeTimer = 0f;
+            _comboActive = false;
             Enemy.Velocity = Vector2.Zero;
         }
 
         protected override void OnActivePhase()
         {
-            ExecuteStrike();
+            _comboActive = true;
+            _strikeTimer = 0f;
         }
 
         public override void _PhysicsProcess(double delta)
         {
-            if (!_isAttacking) return;
+            if (!_comboActive) return;
 
-            _intervalTimer -= (float)delta;
-            if (_intervalTimer <= 0f)
+            _strikeTimer -= (float)delta;
+            while (_comboActive && _strikeTimer <= 0f)
             {
                 ExecuteStrike();
+                if (_comboActive)
+                {
+                    _strikeTimer += IntervalBetweenStrikes;
+                }
             }
         }
 
         protected override void OnRecoveryStarted()
         {
             base.OnRecoveryStarted();
-            _isAttacking = false;
+            _comboActive = false;
         }
 
         private void ExecuteStrike()
         {
-            if (_strikesDone >= StrikeCount)
-            {
-                _isAttacking = false;
-                SetPhaseToRecovery();
-                return;
-            }
-
             Enemy.PerformAttack();
             _strikesDone++;
-            _intervalTimer = IntervalBetweenStrikes;
-        }
 
-        private void SetPhaseToRecovery()
-        {
-            // 强制进入恢复阶段
-            if (Enemy.AttackTimer <= 0)
+            if (_strikesDone >= StrikeCount)
             {
-                Enemy.AttackTimer = IntervalBetweenStrikes;
+                _comboActive = false;
+                ForceEnterRecoveryPhase();
             }
-
-            _isAttacking = false;
-            _strikesDone = StrikeCount;
-            Enemy.Velocity = Vector2.Zero;
         }
     }
 }

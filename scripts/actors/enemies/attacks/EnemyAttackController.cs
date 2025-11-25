@@ -1,4 +1,5 @@
 using Godot;
+using System;
 using System.Collections.Generic;
 
 namespace Kuros.Actors.Enemies.Attacks
@@ -10,7 +11,6 @@ namespace Kuros.Actors.Enemies.Attacks
     {
         [Export] public NodePath PlayerDetectionAreaPath = new NodePath();
         [Export] public bool EnableDebugLogs = false;
-
         private const float ControllerActiveDuration = 9999f;
         private readonly List<Entry> _entries = new();
         private EnemyAttackTemplate? _currentAttack;
@@ -57,7 +57,13 @@ namespace Kuros.Actors.Enemies.Attacks
                         }
                     }
 
-                    _entries.Add(new Entry { Template = template, Weight = Mathf.Max(weight, 0f) });
+                    var entry = new Entry
+                    {
+                        Template = template,
+                        Weight = Mathf.Max(weight, 0f)
+                    };
+
+                    _entries.Add(entry);
                 }
             }
 
@@ -105,11 +111,14 @@ namespace Kuros.Actors.Enemies.Attacks
 				return;
 			}
 
-			if (!_currentAttack.TryStart())
-			{
-				DebugLog($"Attack {_currentAttack.Name} failed to start.");
-				FinishControllerAttack("ChildFailedToStart");
-			}
+            if (!_currentAttack.TryStart())
+            {
+                DebugLog($"Attack {_currentAttack.Name} failed to start.");
+                FinishControllerAttack("ChildFailedToStart");
+                return;
+            }
+
+            OnChildAttackStarted(_currentAttack);
         }
 
         protected override void OnRecoveryStarted()
@@ -315,6 +324,24 @@ namespace Kuros.Actors.Enemies.Attacks
             if (!EnableDebugLogs) return;
             string enemyName = Enemy?.Name ?? "UnknownEnemy";
             GD.Print($"[EnemyAttackController] {enemyName}: {message}");
+        }
+
+        protected virtual void OnChildAttackStarted(EnemyAttackTemplate attack)
+        {
+        }
+
+        protected bool TrySetAttackWeight(string attackName, float weight)
+        {
+            foreach (var entry in _entries)
+            {
+                if (entry.Template?.Name == attackName)
+                {
+                    entry.Weight = Mathf.Max(weight, 0f);
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private class Entry
