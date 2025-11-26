@@ -9,21 +9,11 @@ namespace Kuros.UI
 	/// </summary>
 	public partial class BattleHUD : Control
 	{
-	[ExportCategory("UI References")]
-	[Export] public Label PlayerStatsLabel { get; private set; } = null!;
-	[Export] public Label InstructionsLabel { get; private set; } = null!;
-	[Export] public TextureProgressBar HealthBar { get; private set; } = null!;
-	[Export] public Label ScoreLabel { get; private set; } = null!;
-
-	[ExportCategory("New UI Components")]
-	[Export] public PathIndicator PathIndicator { get; private set; } = null!;
-	[Export] public HealthBar P1HealthBar { get; private set; } = null!;
-	[Export] public HealthBar P2HealthBar { get; private set; } = null!;
-	[Export] public EnemySpawnIndicator EnemySpawnIndicator { get; private set; } = null!;
-	[Export] public InventoryUI InventoryUI { get; private set; } = null!;
-	[Export] public WeaponBar WeaponBar { get; private set; } = null!;
-	[Export] public DialogueUI DialogueUI { get; private set; } = null!;
-	[Export] public ShopUI ShopUI { get; private set; } = null!;
+		[ExportCategory("UI References")]
+		[Export] public Label PlayerStatsLabel { get; private set; } = null!;
+		[Export] public Label InstructionsLabel { get; private set; } = null!;
+		[Export] public ProgressBar HealthBar { get; private set; } = null!;
+		[Export] public Label ScoreLabel { get; private set; } = null!;
 
 		// 当前显示的数据
 		private int _currentHealth = 100;
@@ -48,48 +38,7 @@ namespace Kuros.UI
 
 			if (HealthBar == null)
 			{
-				HealthBar = GetNodeOrNull<TextureProgressBar>("HealthBar");
-			}
-
-			// 查找新UI组件
-			if (PathIndicator == null)
-			{
-				PathIndicator = GetNodeOrNull<PathIndicator>("PathIndicator");
-			}
-
-			if (P1HealthBar == null)
-			{
-				P1HealthBar = GetNodeOrNull<HealthBar>("P1HealthBar");
-			}
-
-			if (P2HealthBar == null)
-			{
-				P2HealthBar = GetNodeOrNull<HealthBar>("P2HealthBar");
-			}
-
-			if (EnemySpawnIndicator == null)
-			{
-				EnemySpawnIndicator = GetNodeOrNull<EnemySpawnIndicator>("EnemySpawnIndicator");
-			}
-
-			if (InventoryUI == null)
-			{
-				InventoryUI = GetNodeOrNull<InventoryUI>("InventoryUI");
-			}
-
-			if (WeaponBar == null)
-			{
-				WeaponBar = GetNodeOrNull<WeaponBar>("WeaponBar");
-			}
-
-			if (DialogueUI == null)
-			{
-				DialogueUI = GetNodeOrNull<DialogueUI>("DialogueUI");
-			}
-
-			if (ShopUI == null)
-			{
-				ShopUI = GetNodeOrNull<ShopUI>("ShopUI");
+				HealthBar = GetNodeOrNull<ProgressBar>("HealthBar");
 			}
 
 			if (ScoreLabel == null)

@@ -1,5 +1,6 @@
 # Godot 4+ specific ignores
 .godot/
+.import/
 
 # IDE files
 .vscode/
@@ -9,6 +10,10 @@
 data_*/
 mono_crash.*.json
 
+# Godot export / build output
+export/
+build/
+
 # .NET ignores
 bin/
 obj/
@@ -16,6 +21,7 @@ obj/
 *.suo
 *.userprefs
 .vs/
+.vscode/
 *.csproj.user
 *.unityproj
 *.sln.iml

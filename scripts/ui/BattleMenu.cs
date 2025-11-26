@@ -28,6 +28,9 @@ namespace Kuros.UI
 
         public override void _Ready()
         {
+            // Pause下也要接收输入
+            ProcessMode = ProcessModeEnum.Always;
+
             // 自动查找节点
             if (MenuPanel == null)
             {
@@ -36,17 +39,17 @@ namespace Kuros.UI
 
             if (ResumeButton == null)
             {
-                ResumeButton = GetNodeOrNull<Button>("MenuPanel/ResumeButton");
+                ResumeButton = GetNodeOrNull<Button>("MenuPanel/VBoxContainer/ResumeButton");
             }
 
             if (SettingsButton == null)
             {
-                SettingsButton = GetNodeOrNull<Button>("MenuPanel/SettingsButton");
+                SettingsButton = GetNodeOrNull<Button>("MenuPanel/VBoxContainer/SettingsButton");
             }
 
             if (QuitButton == null)
             {
-                QuitButton = GetNodeOrNull<Button>("MenuPanel/QuitButton");
+                QuitButton = GetNodeOrNull<Button>("MenuPanel/VBoxContainer/QuitButton");
             }
 
             // 连接按钮信号
@@ -155,9 +158,7 @@ namespace Kuros.UI
         private void OnQuitPressed()
         {
             EmitSignal(SignalName.QuitRequested);
-            // 返回主菜单
-            GetTree().Paused = false; // 确保取消暂停
-            GetTree().ChangeSceneToFile("res://scenes/MainMenu.tscn");
+            // 场景切换逻辑由BattleSceneManager处理
         }
 
         public bool IsOpen => _isOpen;
