@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using Kuros.Systems.FSM;
+using Kuros.Core.Effects;
 
 namespace Kuros.Core
 {
@@ -16,6 +17,7 @@ namespace Kuros.Core
         
         [ExportCategory("Components")]
         [Export] public StateMachine StateMachine { get; private set; } = null!;
+        [Export] public EffectController EffectController { get; private set; } = null!;
 
         // Exposed state for States to use
         public int CurrentHealth { get; protected set; }
@@ -49,6 +51,11 @@ namespace Kuros.Core
             if (StateMachine != null)
             {
                 StateMachine.Initialize(this);
+            }
+
+            if (EffectController == null)
+            {
+                EffectController = GetNodeOrNull<EffectController>("EffectController");
             }
         }
 
@@ -86,7 +93,22 @@ namespace Kuros.Core
 
         protected virtual void Die()
         {
+            EffectController?.ClearAll();
             QueueFree();
+        }
+
+        public void ApplyEffect(ActorEffect effect)
+        {
+            EffectController?.AddEffect(effect);
+        }
+
+        public void RemoveEffect(string effectId)
+        {
+            var effect = EffectController?.GetEffect(effectId);
+            if (effect != null)
+            {
+                EffectController?.RemoveEffect(effect);
+            }
         }
 
         protected virtual void FlashDamageEffect()

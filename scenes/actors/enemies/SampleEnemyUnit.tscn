@@ -1,0 +1,100 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://scripts/actors/enemies/SampleEnemy.cs" id="1"]
+[ext_resource type="Script" path="res://scripts/systems/fsm/StateMachine.cs" id="2"]
+[ext_resource type="Script" path="res://scripts/actors/enemies/states/EnemyIdleState.cs" id="3"]
+[ext_resource type="Script" path="res://scripts/actors/enemies/states/EnemyWalkState.cs" id="4"]
+[ext_resource type="Script" path="res://scripts/actors/enemies/states/EnemyAttackState.cs" id="5"]
+[ext_resource type="Script" path="res://scripts/actors/enemies/states/EnemyHitState.cs" id="6"]
+[ext_resource type="Script" path="res://scripts/actors/enemies/states/EnemyFrozenState.cs" id="7"]
+[ext_resource type="Script" path="res://scripts/actors/enemies/states/EnemyCooldownFrozenState.cs" id="14"]
+[ext_resource type="Script" path="res://scripts/actors/enemies/movement/EnemyChaseMovement.cs" id="9"]
+[ext_resource type="Script" path="res://scripts/core/effects/EffectController.cs" id="11"]
+[ext_resource type="Script" path="res://scripts/actors/enemies/attacks/EnemyMultiStrikeAttack.cs" id="13"]
+
+[sub_resource type="PlaceholderTexture2D" id="1"]
+size = Vector2(32, 48)
+
+[sub_resource type="RectangleShape2D" id="2"]
+size = Vector2(61, 119)
+
+[sub_resource type="CapsuleShape2D" id="3"]
+radius = 12.0
+height = 45.0
+
+[sub_resource type="RectangleShape2D" id="4"]
+size = Vector2(50.64583, 26.785715)
+
+[node name="Enemy" type="CharacterBody2D" node_paths=PackedStringArray("AttackArea")]
+position = Vector2(0, 0)
+collision_layer = 2
+motion_mode = 1
+script = ExtResource("1")
+AttackArea = NodePath("Sprite2D/AttackArea")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+modulate = Color(1, 0.3, 0.3, 1)
+scale = Vector2(2.9374359, 2.5119002)
+texture = SubResource("1")
+
+[node name="AttackArea" type="Area2D" parent="./Sprite2D"]
+scale = Vector2(0.34043294, 0.39810497)
+collision_layer = 0
+collision_mask = 1
+monitoring = true
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="./Sprite2D/AttackArea"]
+position = Vector2(53.5, 0)
+scale = Vector2(0.99999964, 0.99999964)
+shape = SubResource("2")
+
+[node name="DetectionArea" type="Area2D" parent="./Sprite2D"]
+position = Vector2(15, 0)
+scale = Vector2(3, 3)
+collision_layer = 0
+collision_mask = 1
+monitoring = true
+monitorable = false
+
+[node name="DetectionShape" type="CollisionShape2D" parent="./Sprite2D/DetectionArea"]
+position = Vector2(24.156, 0)
+shape = SubResource("4")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+scale = Vector2(3.9243398, 2.6851737)
+shape = SubResource("3")
+
+[node name="StateMachine" type="Node" parent="." node_paths=PackedStringArray("InitialState")]
+script = ExtResource("2")
+InitialState = NodePath("Idle")
+
+[node name="EffectController" type="Node" parent="."]
+script = ExtResource("11")
+
+[node name="ChaseMovement" type="Node" parent="."]
+script = ExtResource("9")
+
+[node name="Idle" type="Node" parent="./StateMachine"]
+script = ExtResource("3")
+
+[node name="Walk" type="Node" parent="./StateMachine"]
+script = ExtResource("4")
+
+[node name="Attack" type="Node" parent="./StateMachine"]
+script = ExtResource("5")
+
+[node name="MultiStrikeAttack" type="Node" parent="./StateMachine/Attack"]
+script = ExtResource("13")
+DetectionAreaPath = NodePath("../../../Sprite2D/DetectionArea")
+
+[node name="Hit" type="Node" parent="./StateMachine"]
+script = ExtResource("6")
+
+[node name="Frozen" type="Node" parent="./StateMachine"]
+script = ExtResource("7")
+
+[node name="CooldownFrozen" type="Node" parent="./StateMachine"]
+script = ExtResource("14")
+
+

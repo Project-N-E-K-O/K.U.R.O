@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://bvivxwyc4eucf"]
+[gd_scene load_steps=4 format=3 uid="uid://ciwlpphli7o01"]
 
 [ext_resource type="PackedScene" path="res://scenes/core/DroppablePickupProperty.tscn" id="1_core_drop"]
 [ext_resource type="Script" uid="uid://dnv7cdxwx3lj2" path="res://scripts/properties/DroppableExampleProperty.cs" id="2_drop_example"]

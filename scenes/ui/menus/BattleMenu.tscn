@@ -1,4 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://battle_menu_ui"]
+[gd_scene load_steps=2 format=3 uid="uid://brqbvxm4uy5io"]
 
 [ext_resource type="Script" uid="uid://cmrjwunvir0ik" path="res://scripts/ui/BattleMenu.cs" id="1_battle_menu"]
 
@@ -59,25 +59,24 @@ grow_vertical = 2
 
 [node name="Title" type="Label" parent="MenuPanel/VBoxContainer"]
 layout_mode = 2
+theme_override_font_sizes/font_size = 32
 text = "Pause Menu"
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 32
 
 [node name="HSeparator" type="HSeparator" parent="MenuPanel/VBoxContainer"]
 layout_mode = 2
 
 [node name="ResumeButton" type="Button" parent="MenuPanel/VBoxContainer"]
 layout_mode = 2
-text = "Resume"
 theme_override_font_sizes/font_size = 20
+text = "Resume"
 
 [node name="SettingsButton" type="Button" parent="MenuPanel/VBoxContainer"]
 layout_mode = 2
-text = "Settings"
 theme_override_font_sizes/font_size = 20
+text = "Settings"
 
 [node name="QuitButton" type="Button" parent="MenuPanel/VBoxContainer"]
 layout_mode = 2
-text = "Quit to Main Menu"
 theme_override_font_sizes/font_size = 20
-
+text = "Quit to Main Menu"

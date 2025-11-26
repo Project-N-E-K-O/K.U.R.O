@@ -22,6 +22,9 @@ namespace Kuros.UI
 
         public override void _Ready()
         {
+            // 确保在游戏暂停时也能接收输入
+            ProcessMode = ProcessModeEnum.Always;
+
             // 自动查找节点
             if (BackButton == null)
             {

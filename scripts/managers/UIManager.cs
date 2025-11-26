@@ -20,8 +20,6 @@ namespace Kuros.Managers
 		private const string MODE_SELECTION_PATH = "res://scenes/ui/menus/ModeSelectionMenu.tscn";
 		private const string SETTINGS_MENU_PATH = "res://scenes/ui/menus/SettingsMenu.tscn";
 		private const string SAVE_SLOT_SELECTION_PATH = "res://scenes/ui/menus/SaveSlotSelection.tscn";
-		private const string DIALOGUE_UI_PATH = "res://scenes/ui/windows/DialogueUI.tscn";
-		private const string SHOP_UI_PATH = "res://scenes/ui/windows/ShopUI.tscn";
 
 		// 当前加载的UI节点
 		private Dictionary<string, Node> _loadedUIs = new Dictionary<string, Node>();
@@ -225,30 +223,6 @@ namespace Kuros.Managers
 		public void UnloadSaveSlotSelection()
 		{
 			UnloadUI("SaveSlotSelection");
-		}
-
-		// 便捷方法：加载对话UI
-		public DialogueUI LoadDialogueUI()
-		{
-			return LoadUI<DialogueUI>(DIALOGUE_UI_PATH, UILayer.Menu, "DialogueUI");
-		}
-
-		// 便捷方法：加载商店UI
-		public ShopUI LoadShopUI()
-		{
-			return LoadUI<ShopUI>(SHOP_UI_PATH, UILayer.Menu, "ShopUI");
-		}
-
-		// 便捷方法：卸载对话UI
-		public void UnloadDialogueUI()
-		{
-			UnloadUI("DialogueUI");
-		}
-
-		// 便捷方法：卸载商店UI
-		public void UnloadShopUI()
-		{
-			UnloadUI("ShopUI");
 		}
 	}
 

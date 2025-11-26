@@ -7,6 +7,8 @@ namespace Kuros.Actors.Heroes.States
 	{
 		public override void Enter()
 		{
+			Player.NotifyMovementState(Name);
+			
 			if (Actor.AnimPlayer != null)
 			{
 				// Reset bones first to avoid "stuck" poses from previous animations
@@ -28,6 +30,7 @@ namespace Kuros.Actors.Heroes.States
 			// Check for transitions
 			if (Input.IsActionJustPressed("attack") && Actor.AttackTimer <= 0)
 			{
+				Player.RequestAttackFromState(Name);
 				ChangeState("Attack");
 				return;
 			}

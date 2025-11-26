@@ -10,8 +10,7 @@ public partial class SampleEnemy : GameActor
     [Export] public Area2D AttackArea { get; private set; } = null!;
     
     private SamplePlayer? _player;
-    private RandomNumberGenerator _rng = new RandomNumberGenerator();
-    private float _hitStunTimer = 0.0f; // Re-declared here as it was removed from base
+    private const float FALLBACK_ATTACK_RANGE = 80.0f;
     
     public SampleEnemy()
     {
@@ -24,117 +23,50 @@ public partial class SampleEnemy : GameActor
     public override void _Ready()
     {
         base._Ready();
-        _rng.Randomize();
         
         // Try to find AttackArea if not assigned
         if (AttackArea == null) AttackArea = GetNodeOrNull<Area2D>("AttackArea");
         
-        // Find player
-        var parent = GetParent();
-        if (parent != null)
-        {
-            _player = parent.GetNodeOrNull<SamplePlayer>("Player");
-        }
+        RefreshPlayerReference();
     }
     
-    public override void _PhysicsProcess(double delta)
+    public SamplePlayer? PlayerTarget => _player;
+    
+    public bool IsPlayerWithinDetectionRange(float extraMargin = 0.0f)
     {
-        if (_player == null) return;
-        
-        base._PhysicsProcess(delta);
-        
-        if (_hitStunTimer > 0)
+        RefreshPlayerReference();
+        if (_player == null) return false;
+        float limit = DetectionRange + extraMargin;
+        return _player.GlobalPosition.DistanceTo(GlobalPosition) <= limit;
+    }
+    
+    public bool IsPlayerInAttackRange()
         {
-             _hitStunTimer -= (float)delta;
-        }
-        
-        // Distance check
-        Vector2 playerPos = _player.GlobalPosition;
-        Vector2 enemyPos = GlobalPosition;
-        float distanceToPlayer = playerPos.DistanceTo(enemyPos);
-        
-        Vector2 velocity = Velocity;
-        
-        if (_hitStunTimer > 0)
-        {
-            velocity = Vector2.Zero;
-            Velocity = velocity;
-            MoveAndSlide();
-            return;
-        }
-        
-        // AI Logic
-        if (distanceToPlayer <= DetectionRange)
-        {
-            // Always face player if detected, regardless of attack state
-            Vector2 direction = (playerPos - enemyPos).Normalized();
-            if (direction.X != 0)
-            {
-                FlipFacing(direction.X > 0);
-            }
-
-            bool canAttack = false;
-            float fallbackAttackRange = 80.0f; // Hardcoded fallback if no Area2D
-
-            // Priority 1: Check actual collision overlap if Area exists
+        RefreshPlayerReference();
+        if (_player == null) return false;
             if (AttackArea != null)
             {
-                // AttackArea flip is handled by FlipFacing now (if child of sprite) 
-                // or needs manual flip here if not? 
-                // Actually, FlipFacing above handles the visual flip. 
-                // If AttackArea is child of sprite, it is already flipped by the time we check here.
-                
-                if (AttackArea.OverlapsBody(_player))
-                {
-                    canAttack = true;
+            return AttackArea.OverlapsBody(_player);
                 }
-            }
-            // Priority 2: Fallback to distance
-            else if (distanceToPlayer <= fallbackAttackRange + 10.0f)
-            {
-                canAttack = true;
+        return _player.GlobalPosition.DistanceTo(GlobalPosition) <= FALLBACK_ATTACK_RANGE + 10.0f;
             }
 
-            if (canAttack)
-            {
-                // Stop and attack
-                velocity = Vector2.Zero;
-                
-                if (AttackTimer <= 0 && _hitStunTimer <= 0) // Used Property AttackTimer from base
-                {
-                    AttackPlayer();
-                }
-            }
-            else
-            {
-                // Chase
-                velocity = direction * Speed;
-            }
-        }
-        else
-        {
-            // Idle behavior (slow down)
-            velocity.X = Mathf.MoveToward(Velocity.X, 0, Speed * 2);
-            velocity.Y = Mathf.MoveToward(Velocity.Y, 0, Speed * 2);
-        }
-        
-        ClampPositionToScreen();
-        
-        Velocity = velocity;
-        MoveAndSlide();
+    public Vector2 GetDirectionToPlayer()
+    {
+        RefreshPlayerReference();
+        if (_player == null) return Vector2.Zero;
+        Vector2 direction = (_player.GlobalPosition - GlobalPosition);
+        return direction == Vector2.Zero ? Vector2.Zero : direction.Normalized();
     }
     
-    private void AttackPlayer()
+    public void PerformAttack()
     {
         AttackTimer = AttackCooldown; 
+        GD.Print("Enemy PerformAttack");
         
-        // Use AttackArea for detection if available
+        RefreshPlayerReference();
         if (AttackArea != null)
         {
-            // Flip AttackArea based on facing direction
-            var areaPos = AttackArea.Position;
-            AttackArea.Position = new Vector2(FacingRight ? Mathf.Abs(areaPos.X) : -Mathf.Abs(areaPos.X), areaPos.Y);
-            
             var bodies = AttackArea.GetOverlappingBodies();
             foreach (var body in bodies)
             {
@@ -145,14 +77,10 @@ public partial class SampleEnemy : GameActor
                 }
             }
         }
-        else
-        {
-            // Fallback to old distance logic
-             if (_player != null)
+        else if (_player != null)
             {
                 _player.TakeDamage((int)AttackDamage);
                 GD.Print("Enemy attacked player (Fallback)!");
-            }
         }
         
         // Attack visual effect (scaling)
@@ -173,9 +101,6 @@ public partial class SampleEnemy : GameActor
     public override void TakeDamage(int damage)
     {
         base.TakeDamage(damage);
-        // Enemy has shorter stun
-        _hitStunTimer = 0.3f;
-        
         // If we want to play hit animation manually since base FSM logic might not cover enemy without state machine
         if (_animationPlayer != null)
         {
@@ -203,6 +128,15 @@ public partial class SampleEnemy : GameActor
         else
         {
             QueueFree();
+        }
+    }
+    private void RefreshPlayerReference()
+    {
+        if (_player != null && IsInstanceValid(_player)) return;
+        _player = GetTree().GetFirstNodeInGroup("player") as SamplePlayer;
+        if (_player == null)
+        {
+            _player = GetTree().Root.FindChild("Player", true, false) as SamplePlayer;
         }
     }
 }

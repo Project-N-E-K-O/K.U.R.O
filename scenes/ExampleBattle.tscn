@@ -1,8 +1,6 @@
-[gd_scene load_steps=23 format=3 uid="uid://d15hs7qpxqhf3"]
+[gd_scene load_steps=20 format=3 uid="uid://d15hs7qpxqhf3"]
 
 [ext_resource type="Script" uid="uid://btbsyf4hokvud" path="res://scripts/actors/heroes/SamplePlayer.cs" id="1_player"]
-[ext_resource type="PackedScene" uid="uid://b1ljb2q212v3d" path="res://scenes/environments/floor.tscn" id="1_sb658"]
-[ext_resource type="Script" uid="uid://hhpl8w4ty1ky" path="res://scripts/actors/enemies/SampleEnemy.cs" id="2_enemy"]
 [ext_resource type="Script" uid="uid://cenpuhlcgesin" path="res://scripts/systems/fsm/StateMachine.cs" id="3_ceqyr"]
 [ext_resource type="PackedScene" uid="uid://bg3ltu6fhm4pa" path="res://scenes/actors/heroes/jsmb_2.tscn" id="3_spine"]
 [ext_resource type="Script" uid="uid://0u5whf0qv6i5" path="res://scripts/actors/heroes/states/PlayerIdleState.cs" id="4_op3tf"]
@@ -10,9 +8,12 @@
 [ext_resource type="Script" uid="uid://d3ancpb5wo2ie" path="res://scripts/actors/heroes/states/PlayerAttackState.cs" id="6_bhpvs"]
 [ext_resource type="Script" uid="uid://l40es7irdvdw" path="res://scripts/actors/heroes/states/PlayerHitState.cs" id="7_w7wnm"]
 [ext_resource type="Script" uid="uid://ba1kd5qgh17ag" path="res://scripts/actors/heroes/states/PlayerRunState.cs" id="8_bhpvs"]
-[ext_resource type="PackedScene" uid="uid://bvivxwyc4eucf" path="res://scenes/properties/DroppableExampleProperty.tscn" id="11_drop_example"]
-[ext_resource type="Script" path="res://scripts/scenes/BattleSceneManager.cs" id="12_battle_manager"]
-[ext_resource type="PackedScene" uid="uid://ceou8wonisj4d" path="res://scenes/environments/wall.tscn" id="12_v8do6"]
+[ext_resource type="PackedScene" uid="uid://ciwlpphli7o01" path="res://scenes/properties/DroppableExampleProperty.tscn" id="11_drop_example"]
+[ext_resource type="Script" uid="uid://d1g4amacs13a3" path="res://scripts/actors/heroes/states/PlayerFrozenState.cs" id="17_player_frozen"]
+[ext_resource type="Script" uid="uid://c2pgsls8pb7oh" path="res://scripts/actors/heroes/attacks/PlayerBasicMeleeAttack.cs" id="19_player_basic_attack"]
+[ext_resource type="Script" uid="uid://cn2bsvambjids" path="res://scripts/controllers/EnemySpawnController.cs" id="20_spawn_controller"]
+[ext_resource type="PackedScene" uid="uid://bs6eki6cankpq" path="res://scenes/actors/enemies/Enemy_B1_thin.tscn" id="21_enemy_b1_thin"]
+[ext_resource type="Script" path="res://scripts/actors/heroes/PlayerInventoryComponent.cs" id="22_player_inventory"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_attack"]
 size = Vector2(64.75629, 180.66397)
@@ -23,18 +24,6 @@ size = Vector2(32, 64)
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_player"]
 radius = 15.0
 height = 60.0
-
-[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_enemy"]
-size = Vector2(32, 48)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_w7wnm"]
-size = Vector2(46.75, 119)
-
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_enemy"]
-radius = 12.0
-height = 45.0
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_bhpvs"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_sb658"]
 size = Vector2(8, 1444)
@@ -60,14 +49,6 @@ offset_top = 999.0
 offset_right = 1842.0
 offset_bottom = 1119.0
 color = Color(0.4, 0.35, 0.3, 1)
-
-[node name="floor" parent="." instance=ExtResource("1_sb658")]
-position = Vector2(1127, 706)
-scale = Vector2(1.8534186, 1.9305735)
-
-[node name="wall" parent="." instance=ExtResource("12_v8do6")]
-position = Vector2(1380.9999, 397.00003)
-scale = Vector2(0.72410905, 0.70131683)
 
 [node name="Player" type="CharacterBody2D" parent="." node_paths=PackedStringArray("AttackArea")]
 position = Vector2(200, 400)
@@ -116,6 +97,10 @@ shape = SubResource("CapsuleShape2D_player")
 script = ExtResource("3_ceqyr")
 InitialState = NodePath("Idle")
 
+[node name="Inventory" type="Node" parent="Player"]
+script = ExtResource("22_player_inventory")
+BackpackSlots = 24
+
 [node name="Idle" type="Node" parent="Player/StateMachine"]
 script = ExtResource("4_op3tf")
 
@@ -125,50 +110,31 @@ script = ExtResource("5_w7wnm")
 [node name="Attack" type="Node" parent="Player/StateMachine"]
 script = ExtResource("6_bhpvs")
 
+[node name="BasicMeleeAttack" type="Node" parent="Player/StateMachine/Attack"]
+script = ExtResource("19_player_basic_attack")
+
 [node name="Hit" type="Node" parent="Player/StateMachine"]
 script = ExtResource("7_w7wnm")
+
+[node name="Frozen" type="Node" parent="Player/StateMachine"]
+script = ExtResource("17_player_frozen")
 
 [node name="Run" type="Node" parent="Player/StateMachine"]
 script = ExtResource("8_bhpvs")
 
-[node name="Enemy" type="CharacterBody2D" parent="." node_paths=PackedStringArray("AttackArea")]
-position = Vector2(800, 400)
-collision_layer = 2
-motion_mode = 1
-script = ExtResource("2_enemy")
-AttackArea = NodePath("Sprite2D/AttackArea")
+[node name="EnemySpawnController" type="Node2D" parent="."]
+script = ExtResource("20_spawn_controller")
 
-[node name="Sprite2D" type="Sprite2D" parent="Enemy"]
-modulate = Color(1, 0.3, 0.3, 1)
-scale = Vector2(2.9374359, 2.5119002)
-texture = SubResource("PlaceholderTexture2D_enemy")
+[node name="EnemyInstance" parent="EnemySpawnController" instance=ExtResource("21_enemy_b1_thin")]
+position = Vector2(1369, 456)
+DetectionRange = 1000.0
+Speed = 50.0
 
-[node name="AttackArea" type="Area2D" parent="Enemy/Sprite2D"]
-scale = Vector2(0.34043294, 0.39810497)
-collision_layer = 0
-monitorable = false
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Enemy/Sprite2D/AttackArea"]
-position = Vector2(-38.625, 0)
-shape = SubResource("RectangleShape2D_w7wnm")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Enemy"]
-scale = Vector2(3.9243398, 2.6851737)
-shape = SubResource("CapsuleShape2D_enemy")
-
-[node name="DroppableExample" parent="." node_paths=PackedStringArray("TriggerArea") instance=ExtResource("11_drop_example")]
+[node name="DroppableExample" parent="." instance=ExtResource("11_drop_example")]
 z_index = 255
 position = Vector2(419, 360)
-EnergyValue = 25
-PickedColor = Color(0.19607843, 0.8039216, 0.19607843, 1)
 SpineAttachmentRootPath = NodePath("")
 AttachmentPointPath = NodePath("SpineCharacter/Skeleton2D/root/bone/bone2/bone3/bone14/bone15/bone16")
-
-[node name="BattleSceneManager" type="Node2D" parent="."]
-script = ExtResource("12_battle_manager")
-Player = NodePath("Player")
-AutoLoadHUD = true
-AutoLoadMenu = true
 
 [node name="UI" type="CanvasLayer" parent="."]
 visible = false
