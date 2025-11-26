@@ -1,0 +1,16 @@
+[remap]
+
+importer="spine.atlas"
+type="SpineAtlasResource"
+uid="uid://b0xvx3em6bfuq"
+path="res://.godot/imported/Enemy_B1_fat.atlas-8fb12bb9a98e4ac8200988f6c424bd7e.spatlas"
+
+[deps]
+
+source_file="res://assets/spine/demo/Enemy_B1_fat.atlas"
+dest_files=["res://.godot/imported/Enemy_B1_fat.atlas-8fb12bb9a98e4ac8200988f6c424bd7e.spatlas"]
+
+[params]
+
+normal_map_prefix="n"
+specular_map_prefix="s"
