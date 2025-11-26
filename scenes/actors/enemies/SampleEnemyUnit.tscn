@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://scripts/actors/enemies/SampleEnemy.cs" id="1"]
 [ext_resource type="Script" path="res://scripts/systems/fsm/StateMachine.cs" id="2"]
@@ -8,6 +8,8 @@
 [ext_resource type="Script" path="res://scripts/actors/enemies/states/EnemyHitState.cs" id="6"]
 [ext_resource type="Script" path="res://scripts/actors/enemies/states/EnemyFrozenState.cs" id="7"]
 [ext_resource type="Script" path="res://scripts/actors/enemies/states/EnemyCooldownFrozenState.cs" id="14"]
+[ext_resource type="Script" path="res://scripts/actors/enemies/states/EnemyDyingState.cs" id="15"]
+[ext_resource type="Script" path="res://scripts/actors/enemies/states/EnemyDeadState.cs" id="16"]
 [ext_resource type="Script" path="res://scripts/actors/enemies/movement/EnemyChaseMovement.cs" id="9"]
 [ext_resource type="Script" path="res://scripts/core/effects/EffectController.cs" id="11"]
 [ext_resource type="Script" path="res://scripts/actors/enemies/attacks/EnemyMultiStrikeAttack.cs" id="13"]
@@ -96,5 +98,11 @@ script = ExtResource("7")
 
 [node name="CooldownFrozen" type="Node" parent="./StateMachine"]
 script = ExtResource("14")
+
+[node name="Dying" type="Node" parent="./StateMachine"]
+script = ExtResource("15")
+
+[node name="Dead" type="Node" parent="./StateMachine"]
+script = ExtResource("16")
 
 

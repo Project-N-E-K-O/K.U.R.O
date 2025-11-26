@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://bs6eki6cankpq"]
+[gd_scene load_steps=21 format=3 uid="uid://bs6eki6cankpq"]
 
 [ext_resource type="Script" uid="uid://b8q1vhuc5h8vx" path="res://scripts/actors/enemies/EnemyB1Fat.cs" id="1"]
 [ext_resource type="Script" uid="uid://cenpuhlcgesin" path="res://scripts/systems/fsm/StateMachine.cs" id="2"]
@@ -9,10 +9,13 @@
 [ext_resource type="Script" uid="uid://cihawgv4js52w" path="res://scripts/actors/enemies/states/EnemyFrozenState.cs" id="7"]
 [ext_resource type="Script" uid="uid://dasv6eyuks8yq" path="res://scripts/actors/enemies/movement/EnemyFreezeOnTurnMovement.cs" id="11"]
 [ext_resource type="Script" uid="uid://d6ppl6a6djpr" path="res://scripts/core/effects/EffectController.cs" id="12"]
-[ext_resource type="Script" path="res://scripts/actors/enemies/attacks/EnemyB1ThinAttackController.cs" id="13"]
+[ext_resource type="Script" uid="uid://cdjlv11ra7aby" path="res://scripts/actors/enemies/attacks/EnemyB1ThinAttackController.cs" id="13"]
 [ext_resource type="Script" uid="uid://fpfidsmcwy6w" path="res://scripts/actors/enemies/states/EnemyCooldownFrozenState.cs" id="14"]
-[ext_resource type="Script" path="res://scripts/actors/enemies/attacks/EnemyMultiStrikeAttack.cs" id="15"]
-[ext_resource type="Script" path="res://scripts/actors/enemies/attacks/EnemyFreezeMeleeAttack.cs" id="16"]
+[ext_resource type="Script" path="res://scripts/actors/enemies/states/EnemyDyingState.cs" id="17"]
+[ext_resource type="Script" path="res://scripts/actors/enemies/states/EnemyDeadState.cs" id="18"]
+[ext_resource type="Script" uid="uid://8c6vvjl6hwlo" path="res://scripts/actors/enemies/attacks/EnemyMultiStrikeAttack.cs" id="15"]
+[ext_resource type="Script" uid="uid://daikl2ix702w1" path="res://scripts/actors/enemies/attacks/EnemyFreezeMeleeAttack.cs" id="16"]
+
 [sub_resource type="PlaceholderTexture2D" id="1"]
 size = Vector2(40, 60)
 
@@ -47,9 +50,7 @@ texture = SubResource("1")
 [node name="AttackArea" type="Area2D" parent="Sprite2D"]
 scale = Vector2(0.4, 0.4)
 collision_layer = 0
-collision_mask = 1
 monitorable = false
-monitoring = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/AttackArea"]
 position = Vector2(60.000004, 0)
@@ -60,9 +61,7 @@ shape = SubResource("2")
 position = Vector2(15, 0)
 scale = Vector2(3, 3)
 collision_layer = 0
-collision_mask = 1
 monitorable = false
-monitoring = true
 
 [node name="AttackDetectionShape" type="CollisionShape2D" parent="Sprite2D/AttackDetectionArea"]
 position = Vector2(24.156, 0)
@@ -72,9 +71,7 @@ shape = SubResource("4")
 position = Vector2(15, 0)
 scale = Vector2(4, 4)
 collision_layer = 0
-collision_mask = 1
 monitorable = false
-monitoring = true
 
 [node name="ControllerDetectionShape" type="CollisionShape2D" parent="Sprite2D/ControllerDetectionArea"]
 position = Vector2(-3.828, 0)
@@ -119,6 +116,11 @@ script = ExtResource("7")
 [node name="CooldownFrozen" type="Node" parent="StateMachine"]
 script = ExtResource("14")
 
+[node name="Dying" type="Node" parent="StateMachine"]
+script = ExtResource("17")
+
+[node name="Dead" type="Node" parent="StateMachine"]
+script = ExtResource("18")
+
 [node name="FreezeOnTurnMovement" type="Node" parent="."]
 script = ExtResource("11")
-FreezeDuration = 0.5

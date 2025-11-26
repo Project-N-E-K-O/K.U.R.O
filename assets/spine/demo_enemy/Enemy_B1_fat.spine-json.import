@@ -1,0 +1,14 @@
+[remap]
+
+importer="spine.json"
+type="SpineSkeletonFileResource"
+uid="uid://b7i13tc1g2ojd"
+path="res://.godot/imported/Enemy_B1_fat.spine-json-8ac5f51ca2af2ed90329388f498290e5.spjson"
+
+[deps]
+
+source_file="res://assets/spine/demo_enemy/Enemy_B1_fat.spine-json"
+dest_files=["res://.godot/imported/Enemy_B1_fat.spine-json-8ac5f51ca2af2ed90329388f498290e5.spjson"]
+
+[params]
+

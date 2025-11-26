@@ -54,6 +54,11 @@ namespace Kuros.Systems.FSM
             CurrentState?.PhysicsUpdate(delta);
         }
 
+        public bool HasState(string stateName)
+        {
+            return _states.ContainsKey(stateName);
+        }
+
         public void ChangeState(string stateName)
         {
             if (!_states.ContainsKey(stateName))

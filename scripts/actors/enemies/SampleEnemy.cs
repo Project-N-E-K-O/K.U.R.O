@@ -59,8 +59,8 @@ public partial class SampleEnemy : GameActor
         return direction == Vector2.Zero ? Vector2.Zero : direction.Normalized();
     }
     
-    public void PerformAttack()
-    {
+        public void PerformAttack()
+        {
         AttackTimer = AttackCooldown; 
         GD.Print("Enemy PerformAttack");
         
@@ -82,21 +82,7 @@ public partial class SampleEnemy : GameActor
                 _player.TakeDamage((int)AttackDamage);
                 GD.Print("Enemy attacked player (Fallback)!");
         }
-        
-        // Attack visual effect (scaling)
-        Node2D? visualNode = _spineCharacter ?? (Node2D?)_sprite;
-        if (visualNode != null)
-        {
-            var originalScale = visualNode.Scale;
-            var targetScale = new Vector2(
-                originalScale.X * 1.3f,
-                originalScale.Y * 1.3f
-            );
-            var tween = CreateTween();
-            tween.TweenProperty(visualNode, "scale", targetScale, 0.15);
-            tween.TweenProperty(visualNode, "scale", originalScale, 0.15);
         }
-    }
     
     public override void TakeDamage(int damage)
     {
@@ -108,28 +94,17 @@ public partial class SampleEnemy : GameActor
         }
     }
     
-    protected override void Die()
-    {
-        GD.Print("Enemy died!");
-        
-        if (_player != null)
+        protected override void Die()
         {
-            _player.AddScore(ScoreValue);
-        }
-        
-        // Shrink and disappear
-        Node2D? visualNode = _spineCharacter ?? (Node2D?)_sprite;
-        if (visualNode != null)
-        {
-            var tween = CreateTween();
-            tween.TweenProperty(visualNode, "scale", Vector2.Zero, 0.3);
-            tween.TweenCallback(Callable.From(QueueFree));
-        }
-        else
-        {
+            GD.Print("Enemy died!");
+            
+            if (_player != null)
+            {
+                _player.AddScore(ScoreValue);
+            }
+            
             QueueFree();
         }
-    }
     private void RefreshPlayerReference()
     {
         if (_player != null && IsInstanceValid(_player)) return;
