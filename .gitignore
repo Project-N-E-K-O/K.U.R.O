@@ -15,7 +15,6 @@ export/
 build/
 
 # .NET ignores
-bin/
 obj/
 *.user
 *.suo
