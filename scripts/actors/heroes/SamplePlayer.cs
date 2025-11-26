@@ -140,8 +140,9 @@ public partial class SamplePlayer : GameActor
         }
     }
     
-    protected override void Die()
+    protected override void OnDeathFinalized()
     {
+        EffectController?.ClearAll();
         GD.Print("Player died! Game Over!");
         GetTree().ReloadCurrentScene();
     }

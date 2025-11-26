@@ -97,12 +97,12 @@ namespace Kuros.Actors.Enemies.Attacks
             _currentAttack = _queuedAttack;
             _queuedAttack = null;
 
-			if (_currentAttack == null)
-			{
+            if (_currentAttack == null)
+            {
 				DebugLog("No attack queued; cancelling controller run.");
-				Cancel(clearCooldown: true);
-				return;
-			}
+                Cancel(clearCooldown: true);
+                return;
+            }
 
 			if (!_currentAttack.CanStart())
 			{
@@ -173,19 +173,19 @@ namespace Kuros.Actors.Enemies.Attacks
             return null;
         }
 
-		private void QueueNextAttack(string reason = "Auto")
-		{
-			_queuedAttack = PickAttack();
-			if (_queuedAttack != null)
-			{
+        private void QueueNextAttack(string reason = "Auto")
+        {
+            _queuedAttack = PickAttack();
+            if (_queuedAttack != null)
+            {
 				DebugLog($"({reason}) queued attack {_queuedAttack.Name}.");
 				DebugLogPendingAttackIfPlayerInside();
-			}
-			else
-			{
+            }
+            else
+            {
 				DebugLog($"({reason}) no attack available to queue.");
-			}
-		}
+            }
+        }
 
         private Area2D? ResolveArea(NodePath path, Area2D? fallback = null)
         {
@@ -205,7 +205,7 @@ namespace Kuros.Actors.Enemies.Attacks
 
         public EnemyAttackTemplate? PeekQueuedAttack() => _queuedAttack;
 
-		public void ForceQueueNextAttack(string reason = "Forced")
+        public void ForceQueueNextAttack(string reason = "Forced")
         {
 			DebugLog($"Force queue requested ({reason}).");
             if (_currentAttack != null)
@@ -246,14 +246,14 @@ namespace Kuros.Actors.Enemies.Attacks
         }
 
 		private void DebugLogPendingAttackIfPlayerInside()
-		{
-			if (_playerDetectionArea == null) return;
-			var player = Enemy?.PlayerTarget;
-			if (player == null) return;
+        {
+            if (_playerDetectionArea == null) return;
+            var player = Enemy?.PlayerTarget;
+            if (player == null) return;
 			if (!_playerInside || !_playerDetectionArea.OverlapsBody(player)) return;
-			string attackName = _queuedAttack?.Name ?? "(none queued)";
+                string attackName = _queuedAttack?.Name ?? "(none queued)";
 			DebugLog($"Player already inside detection area. Next attack: {attackName}");
-		}
+        }
 
         public override void _ExitTree()
         {
@@ -272,12 +272,12 @@ namespace Kuros.Actors.Enemies.Attacks
                 return;
             }
 
-			_playerInside = true;
+            _playerInside = true;
 			DebugLog("Player entered detection area.");
-			if (_queuedAttack == null && _currentAttack == null)
-			{
-				QueueNextAttack("PlayerEntered");
-			}
+            if (_queuedAttack == null && _currentAttack == null)
+            {
+                QueueNextAttack("PlayerEntered");
+            }
 
             if (ShouldForceAttackState())
             {
@@ -293,17 +293,17 @@ namespace Kuros.Actors.Enemies.Attacks
                 return;
             }
 
-			_playerInside = false;
+            _playerInside = false;
 			DebugLog("Player left detection area.");
 
-			if (_currentAttack != null)
-			{
-				FinishControllerAttack("PlayerExit", clearControllerCooldown: true);
-			}
-			else
-			{
-				QueueNextAttack("PlayerExit");
-			}
+            if (_currentAttack != null)
+            {
+                FinishControllerAttack("PlayerExit", clearControllerCooldown: true);
+            }
+            else
+            {
+                QueueNextAttack("PlayerExit");
+            }
         }
 
         private bool ShouldForceAttackState()

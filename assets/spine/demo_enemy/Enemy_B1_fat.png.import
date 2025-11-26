@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cd0qo58yoyf8c"
-path="res://.godot/imported/Enemy_B1_fat.png-6eb6075ac4e3b3d60da21e98b2f6ab6d.ctex"
+path="res://.godot/imported/Enemy_B1_fat.png-7e3a252df75b1b066fd88bcfe521eed8.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/spine/demo/Enemy_B1_fat.png"
-dest_files=["res://.godot/imported/Enemy_B1_fat.png-6eb6075ac4e3b3d60da21e98b2f6ab6d.ctex"]
+source_file="res://assets/spine/demo_enemy/Enemy_B1_fat.png"
+dest_files=["res://.godot/imported/Enemy_B1_fat.png-7e3a252df75b1b066fd88bcfe521eed8.ctex"]
 
 [params]
 

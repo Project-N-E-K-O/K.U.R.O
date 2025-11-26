@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://d15hs7qpxqhf3"]
+[gd_scene load_steps=22 format=3 uid="uid://d15hs7qpxqhf3"]
 
 [ext_resource type="Script" uid="uid://btbsyf4hokvud" path="res://scripts/actors/heroes/SamplePlayer.cs" id="1_player"]
 [ext_resource type="Script" uid="uid://cenpuhlcgesin" path="res://scripts/systems/fsm/StateMachine.cs" id="3_ceqyr"]
@@ -12,8 +12,10 @@
 [ext_resource type="Script" uid="uid://d1g4amacs13a3" path="res://scripts/actors/heroes/states/PlayerFrozenState.cs" id="17_player_frozen"]
 [ext_resource type="Script" uid="uid://c2pgsls8pb7oh" path="res://scripts/actors/heroes/attacks/PlayerBasicMeleeAttack.cs" id="19_player_basic_attack"]
 [ext_resource type="Script" uid="uid://cn2bsvambjids" path="res://scripts/controllers/EnemySpawnController.cs" id="20_spawn_controller"]
-[ext_resource type="PackedScene" uid="uid://bs6eki6cankpq" path="res://scenes/actors/enemies/Enemy_B1_thin.tscn" id="21_enemy_b1_thin"]
+[ext_resource type="PackedScene" uid="uid://cofm45kotvgto" path="res://scenes/actors/enemies/Enemy_B1_fat.tscn" id="21_enemy_b1_fat"]
 [ext_resource type="Script" path="res://scripts/actors/heroes/PlayerInventoryComponent.cs" id="22_player_inventory"]
+[ext_resource type="Script" path="res://scripts/actors/heroes/states/PlayerDyingState.cs" id="23_player_dying"]
+[ext_resource type="Script" path="res://scripts/actors/heroes/states/PlayerDeadState.cs" id="24_player_dead"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_attack"]
 size = Vector2(64.75629, 180.66397)
@@ -122,10 +124,16 @@ script = ExtResource("17_player_frozen")
 [node name="Run" type="Node" parent="Player/StateMachine"]
 script = ExtResource("8_bhpvs")
 
+[node name="Dying" type="Node" parent="Player/StateMachine"]
+script = ExtResource("23_player_dying")
+
+[node name="Dead" type="Node" parent="Player/StateMachine"]
+script = ExtResource("24_player_dead")
+
 [node name="EnemySpawnController" type="Node2D" parent="."]
 script = ExtResource("20_spawn_controller")
 
-[node name="EnemyInstance" parent="EnemySpawnController" instance=ExtResource("21_enemy_b1_thin")]
+[node name="EnemyInstance" parent="EnemySpawnController" instance=ExtResource("21_enemy_b1_fat")]
 position = Vector2(1369, 456)
 DetectionRange = 1000.0
 Speed = 50.0

@@ -13,13 +13,17 @@ public partial class EnemyChaseMovement : Node
     private static readonly StringName HitStateName = new("Hit");
     private static readonly StringName FrozenStateName = new("Frozen");
     private static readonly StringName CooldownStateName = new("CooldownFrozen");
+    private static readonly StringName DyingStateName = new("Dying");
+    private static readonly StringName DeadStateName = new("Dead");
 
     [Export] public Array<StringName> BlockedStates { get; set; } = new Array<StringName>
     {
         AttackStateName,
         HitStateName,
         FrozenStateName,
-        CooldownStateName
+        CooldownStateName,
+        DyingStateName,
+        DeadStateName
     };
 
     protected SampleEnemy? Enemy;
