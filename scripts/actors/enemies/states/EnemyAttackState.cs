@@ -117,13 +117,6 @@ namespace Kuros.Actors.Enemies.States
 
             if (Enemy.AttackTimer > 0f)
             {
-                if (playerInAttackRange)
-                {
-                    Enemy.Velocity = Vector2.Zero;
-                    Enemy.MoveAndSlide();
-                    return;
-                }
-
                 if (playerDetected)
                 {
                     ChangeState("Walk");
