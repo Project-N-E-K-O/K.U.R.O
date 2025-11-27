@@ -167,7 +167,7 @@ namespace Kuros.UI
             }
 
             AddChild(window);
-            window.HideWindow();
+            // HideWindow() is called in CompendiumWindow._Ready(), so no need to call it here
             CompendiumWindow = window;
             return CompendiumWindow;
         }

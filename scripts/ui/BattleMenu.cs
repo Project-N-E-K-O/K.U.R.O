@@ -78,8 +78,8 @@ namespace Kuros.UI
             }
 
             _compendiumWindow = _compendiumScene.Instantiate<CompendiumWindow>();
-            _compendiumWindow.HideWindow();
             AddChild(_compendiumWindow);
+            // HideWindow() is called in CompendiumWindow._Ready(), so no need to call it here
         }
 
         public void OpenMenu()
