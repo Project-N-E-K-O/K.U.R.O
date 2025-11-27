@@ -3,143 +3,140 @@ using Godot;
 namespace Kuros.UI
 {
     /// <summary>
-    /// 战斗菜单 - 暂停菜单、设置等
-    /// 可以通过ESC键或按钮打开/关闭
+    /// 战斗菜单 - 暂停菜单
+    /// 通过ESC键打开/关闭
     /// </summary>
     public partial class BattleMenu : Control
     {
-        [ExportCategory("UI References")]
-        [Export] public Button ResumeButton { get; private set; } = null!;
-        [Export] public Button SettingsButton { get; private set; } = null!;
-        [Export] public Button QuitButton { get; private set; } = null!;
-        [Export] public Control MenuPanel { get; private set; } = null!;
-
-        [ExportCategory("Settings")]
-        [Export] public bool PauseGameWhenOpen = true;
-
         // 信号
-        [Signal] public delegate void MenuOpenedEventHandler();
-        [Signal] public delegate void MenuClosedEventHandler();
         [Signal] public delegate void ResumeRequestedEventHandler();
         [Signal] public delegate void SettingsRequestedEventHandler();
         [Signal] public delegate void QuitRequestedEventHandler();
+        [Signal] public delegate void ExitGameRequestedEventHandler();
 
         private bool _isOpen = false;
+        private Control _menuContainer = null!;
+
+        public bool IsOpen => _isOpen;
 
         public override void _Ready()
         {
-            // Pause下也要接收输入
+            // 暂停时也要接收输入
             ProcessMode = ProcessModeEnum.Always;
 
-            // 自动查找节点
-            if (MenuPanel == null)
-            {
-                MenuPanel = GetNodeOrNull<Control>("MenuPanel");
-            }
+            // 创建菜单UI
+            CreateMenuUI();
 
-            if (ResumeButton == null)
-            {
-                ResumeButton = GetNodeOrNull<Button>("MenuPanel/VBoxContainer/ResumeButton");
-            }
-
-            if (SettingsButton == null)
-            {
-                SettingsButton = GetNodeOrNull<Button>("MenuPanel/VBoxContainer/SettingsButton");
-            }
-
-            if (QuitButton == null)
-            {
-                QuitButton = GetNodeOrNull<Button>("MenuPanel/VBoxContainer/QuitButton");
-            }
-
-            // 连接按钮信号
-            if (ResumeButton != null)
-            {
-                ResumeButton.Pressed += OnResumePressed;
-            }
-
-            if (SettingsButton != null)
-            {
-                SettingsButton.Pressed += OnSettingsPressed;
-            }
-
-            if (QuitButton != null)
-            {
-                QuitButton.Pressed += OnQuitPressed;
-            }
-
-            // 初始状态：隐藏菜单
-            SetMenuVisible(false);
+            // 初始隐藏
+            _menuContainer.Visible = false;
         }
 
         public override void _Input(InputEvent @event)
         {
-            // ESC键切换菜单
-            if (@event.IsActionPressed("ui_cancel"))
+            if (@event.IsActionPressed("Return"))
             {
                 ToggleMenu();
                 GetViewport().SetInputAsHandled();
             }
         }
 
-        /// <summary>
-        /// 打开菜单
-        /// </summary>
+        private void CreateMenuUI()
+        {
+            // 菜单容器 - 设置为Always以在暂停时也能响应
+            _menuContainer = new Control();
+            _menuContainer.Name = "MenuContainer";
+            _menuContainer.SetAnchorsPreset(LayoutPreset.FullRect);
+            _menuContainer.ProcessMode = ProcessModeEnum.Always;
+            AddChild(_menuContainer);
+
+            // 背景遮罩
+            var background = new ColorRect();
+            background.Name = "Background";
+            background.SetAnchorsPreset(LayoutPreset.FullRect);
+            background.Color = new Color(0, 0, 0, 0.7f);
+            _menuContainer.AddChild(background);
+
+            // 面板
+            var panel = new Panel();
+            panel.Name = "Panel";
+            panel.SetAnchorsPreset(LayoutPreset.Center);
+            panel.CustomMinimumSize = new Vector2(400, 350);
+            panel.Position = new Vector2(-200, -175);
+            _menuContainer.AddChild(panel);
+
+            // 按钮容器
+            var vbox = new VBoxContainer();
+            vbox.Name = "VBoxContainer";
+            vbox.SetAnchorsPreset(LayoutPreset.Center);
+            vbox.Position = new Vector2(-150, -140);
+            vbox.CustomMinimumSize = new Vector2(300, 280);
+            vbox.AddThemeConstantOverride("separation", 20);
+            _menuContainer.AddChild(vbox);
+
+            // 标题
+            var title = new Label();
+            title.Text = "暂停菜单";
+            title.HorizontalAlignment = HorizontalAlignment.Center;
+            title.AddThemeFontSizeOverride("font_size", 32);
+            vbox.AddChild(title);
+
+            // 分隔线
+            var separator = new HSeparator();
+            vbox.AddChild(separator);
+
+            // 继续游戏按钮
+            var resumeBtn = new Button();
+            resumeBtn.Text = "继续游戏";
+            resumeBtn.AddThemeFontSizeOverride("font_size", 20);
+            resumeBtn.Pressed += OnResumePressed;
+            vbox.AddChild(resumeBtn);
+
+            // 设置按钮
+            var settingsBtn = new Button();
+            settingsBtn.Text = "设置";
+            settingsBtn.AddThemeFontSizeOverride("font_size", 20);
+            settingsBtn.Pressed += OnSettingsPressed;
+            vbox.AddChild(settingsBtn);
+
+            // 返回主菜单按钮
+            var quitBtn = new Button();
+            quitBtn.Text = "返回主菜单";
+            quitBtn.AddThemeFontSizeOverride("font_size", 20);
+            quitBtn.Pressed += OnQuitPressed;
+            vbox.AddChild(quitBtn);
+
+            // 退出游戏按钮
+            var exitBtn = new Button();
+            exitBtn.Text = "退出游戏";
+            exitBtn.AddThemeFontSizeOverride("font_size", 20);
+            exitBtn.Pressed += OnExitGamePressed;
+            vbox.AddChild(exitBtn);
+        }
+
         public void OpenMenu()
         {
             if (_isOpen) return;
 
-            SetMenuVisible(true);
+            _menuContainer.Visible = true;
             _isOpen = true;
-
-            if (PauseGameWhenOpen)
-            {
-                GetTree().Paused = true;
-            }
-
-            EmitSignal(SignalName.MenuOpened);
+            GetTree().Paused = true;
         }
 
-        /// <summary>
-        /// 关闭菜单
-        /// </summary>
         public void CloseMenu()
         {
             if (!_isOpen) return;
 
-            SetMenuVisible(false);
+            _menuContainer.Visible = false;
             _isOpen = false;
-
-            if (PauseGameWhenOpen)
-            {
-                GetTree().Paused = false;
-            }
-
-            EmitSignal(SignalName.MenuClosed);
+            GetTree().Paused = false;
         }
 
-        /// <summary>
-        /// 切换菜单状态
-        /// </summary>
         public void ToggleMenu()
         {
             if (_isOpen)
-            {
                 CloseMenu();
-            }
             else
-            {
                 OpenMenu();
-            }
-        }
-
-        private void SetMenuVisible(bool visible)
-        {
-            Visible = visible;
-            if (MenuPanel != null)
-            {
-                MenuPanel.Visible = visible;
-            }
         }
 
         private void OnResumePressed()
@@ -155,11 +152,15 @@ namespace Kuros.UI
 
         private void OnQuitPressed()
         {
+            // 先关闭菜单并取消暂停
+            CloseMenu();
             EmitSignal(SignalName.QuitRequested);
-            // 场景切换逻辑由BattleSceneManager处理
         }
 
-        public bool IsOpen => _isOpen;
+        private void OnExitGamePressed()
+        {
+            EmitSignal(SignalName.ExitGameRequested);
+            GetTree().Quit();
+        }
     }
 }
-

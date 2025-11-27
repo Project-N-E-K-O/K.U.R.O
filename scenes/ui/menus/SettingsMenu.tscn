@@ -114,17 +114,13 @@ layout_mode = 2
 text = "视频设置"
 theme_override_font_sizes/font_size = 20
 
-[node name="ResolutionLabel" type="Label" parent="MenuPanel/VBoxContainer"]
+[node name="WindowModeLabel" type="Label" parent="MenuPanel/VBoxContainer"]
 layout_mode = 2
-text = "分辨率:"
+text = "窗口模式:"
 theme_override_font_sizes/font_size = 16
 
-[node name="ResolutionOption" type="OptionButton" parent="MenuPanel/VBoxContainer"]
+[node name="WindowModeOption" type="OptionButton" parent="MenuPanel/VBoxContainer"]
 layout_mode = 2
-
-[node name="FullscreenCheckBox" type="CheckBox" parent="MenuPanel/VBoxContainer"]
-layout_mode = 2
-text = "全屏模式"
 
 [node name="HSeparator3" type="HSeparator" parent="MenuPanel/VBoxContainer"]
 layout_mode = 2
@@ -145,3 +141,7 @@ layout_mode = 2
 text = "返回"
 theme_override_font_sizes/font_size = 20
 
+[node name="RestartDialog" type="ConfirmationDialog" parent="MenuPanel"]
+layout_mode = 1
+title = "重新启动游戏"
+dialog_text = "修改分辨率需要重新启动游戏，是否立即重启？"
