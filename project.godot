@@ -21,8 +21,8 @@ UIManager="*res://scripts/managers/UIManager.cs"
 
 [display]
 
-window/size/viewport_width=3000
-window/size/viewport_height=2000
+window/size/viewport_width=2560
+window/size/viewport_height=1440
 window/stretch/mode="canvas_items"
 
 [dotnet]
@@ -74,4 +74,5 @@ put_down={
 
 [rendering]
 
-renderer/rendering_method="mobile"
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"

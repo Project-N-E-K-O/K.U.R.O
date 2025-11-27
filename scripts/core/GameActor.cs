@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using Kuros.Systems.FSM;
+using Kuros.Core.Effects;
 
 namespace Kuros.Core
 {
@@ -16,6 +17,7 @@ namespace Kuros.Core
         
         [ExportCategory("Components")]
         [Export] public StateMachine StateMachine { get; private set; } = null!;
+        [Export] public EffectController EffectController { get; private set; } = null!;
 
         // Exposed state for States to use
         public int CurrentHealth { get; protected set; }
@@ -27,12 +29,22 @@ namespace Kuros.Core
         protected Sprite2D _sprite = null!;
         protected AnimationPlayer _animationPlayer = null!;
 
+        private bool _deathStarted = false;
+        private bool _deathFinalized = false;
+
+        public bool IsDeathSequenceActive => _deathStarted && !_deathFinalized;
+        public bool IsDead => _deathFinalized;
+
         public override void _Ready()
         {
             CurrentHealth = MaxHealth;
             
             // Node fetching
             _spineCharacter = GetNodeOrNull<Node2D>("SpineCharacter");
+            if (_spineCharacter == null)
+            {
+                _spineCharacter = GetNodeOrNull<Node2D>("SpineSprite");
+            }
             _sprite = GetNodeOrNull<Sprite2D>("Sprite2D");
             
             if (_spineCharacter != null)
@@ -49,6 +61,11 @@ namespace Kuros.Core
             if (StateMachine != null)
             {
                 StateMachine.Initialize(this);
+            }
+
+            if (EffectController == null)
+            {
+                EffectController = GetNodeOrNull<EffectController>("EffectController");
             }
         }
 
@@ -86,7 +103,46 @@ namespace Kuros.Core
 
         protected virtual void Die()
         {
+            if (_deathStarted) return;
+
+            _deathStarted = true;
+
+            if (StateMachine != null && StateMachine.HasState("Dying"))
+            {
+                StateMachine.ChangeState("Dying");
+            }
+            else
+            {
+                FinalizeDeath();
+            }
+        }
+
+        public void FinalizeDeath()
+        {
+            if (_deathFinalized) return;
+
+            _deathFinalized = true;
+            OnDeathFinalized();
+        }
+
+        protected virtual void OnDeathFinalized()
+        {
+            EffectController?.ClearAll();
             QueueFree();
+        }
+
+        public void ApplyEffect(ActorEffect effect)
+        {
+            EffectController?.AddEffect(effect);
+        }
+
+        public void RemoveEffect(string effectId)
+        {
+            var effect = EffectController?.GetEffect(effectId);
+            if (effect != null)
+            {
+                EffectController?.RemoveEffect(effect);
+            }
         }
 
         protected virtual void FlashDamageEffect()
@@ -122,7 +178,8 @@ namespace Kuros.Core
                 float absX = Mathf.Abs(scale.X);
                 _spineCharacter.Scale = new Vector2(absX * sign, scale.Y);
             }
-            else if (_sprite != null)
+
+            if (_sprite != null)
             {
                 // Prefer Scale flipping over FlipH, so children (like AttackArea) flip too
                 var scale = _sprite.Scale;

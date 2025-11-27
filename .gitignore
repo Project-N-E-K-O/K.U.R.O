@@ -15,7 +15,6 @@ export/
 build/
 
 # .NET ignores
-bin/
 obj/
 *.user
 *.suo
@@ -35,3 +34,4 @@ obj/
 *.pyc
 *.tmp
 *~
+export_presets.cfg
