@@ -9,7 +9,6 @@
 [ext_resource type="Script" uid="uid://d3ancpb5wo2ie" path="res://scripts/actors/heroes/states/PlayerAttackState.cs" id="6_bhpvs"]
 [ext_resource type="Script" uid="uid://l40es7irdvdw" path="res://scripts/actors/heroes/states/PlayerHitState.cs" id="7_w7wnm"]
 [ext_resource type="Script" uid="uid://ba1kd5qgh17ag" path="res://scripts/actors/heroes/states/PlayerRunState.cs" id="8_bhpvs"]
-[ext_resource type="PackedScene" uid="uid://ciwlpphli7o01" path="res://scenes/properties/DroppableExampleProperty.tscn" id="11_drop_example"]
 [ext_resource type="PackedScene" path="res://scenes/environments/wall.tscn" id="12_v8do6"]
 [ext_resource type="Script" uid="uid://d1g4amacs13a3" path="res://scripts/actors/heroes/states/PlayerFrozenState.cs" id="17_player_frozen"]
 [ext_resource type="Script" uid="uid://c2pgsls8pb7oh" path="res://scripts/actors/heroes/attacks/PlayerBasicMeleeAttack.cs" id="19_player_basic_attack"]
@@ -147,11 +146,6 @@ position = Vector2(1369, 456)
 DetectionRange = 1000.0
 Speed = 50.0
 
-[node name="DroppableExample" parent="." instance=ExtResource("11_drop_example")]
-z_index = 255
-position = Vector2(419, 360)
-SpineAttachmentRootPath = NodePath("")
-AttachmentPointPath = NodePath("SpineCharacter/Skeleton2D/root/bone/bone2/bone3/bone14/bone15/bone16")
 
 [node name="UI" type="CanvasLayer" parent="."]
 visible = false

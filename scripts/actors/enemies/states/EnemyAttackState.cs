@@ -4,100 +4,100 @@ using Kuros.Actors.Enemies.Attacks;
 
 namespace Kuros.Actors.Enemies.States
 {
-	public partial class EnemyAttackState : EnemyState
-	{
-		private readonly List<EnemyAttackTemplate> _attackTemplates = new();
-		private EnemyAttackTemplate? _activeTemplate;
+    public partial class EnemyAttackState : EnemyState
+    {
+        private readonly List<EnemyAttackTemplate> _attackTemplates = new();
+        private EnemyAttackTemplate? _activeTemplate;
 
-		protected override void _ReadyState()
-		{
-			base._ReadyState();
+        protected override void _ReadyState()
+        {
+            base._ReadyState();
 
-			foreach (Node child in GetChildren())
-			{
-				if (child is EnemyAttackTemplate template)
-				{
-					template.Initialize(Enemy);
-					_attackTemplates.Add(template);
-				}
-			}
-		}
+            foreach (Node child in GetChildren())
+            {
+                if (child is EnemyAttackTemplate template)
+                {
+                    template.Initialize(Enemy);
+                    _attackTemplates.Add(template);
+                }
+            }
+        }
 
-		public override void Enter()
-		{
-			Enemy.Velocity = Vector2.Zero;
+        public override void Enter()
+        {
+            Enemy.Velocity = Vector2.Zero;
 			TryStartTemplateAttack();
-		}
+        }
 
-		public override void Exit()
-		{
-			_activeTemplate?.Cancel(clearCooldown: true);
-			_activeTemplate = null;
-		}
+        public override void Exit()
+        {
+            _activeTemplate?.Cancel(clearCooldown: true);
+            _activeTemplate = null;
+        }
 
-		public override void PhysicsUpdate(double delta)
-		{
-			if (!HasPlayer)
-			{
-				ChangeState("Idle");
-				return;
-			}
+        public override void PhysicsUpdate(double delta)
+        {
+            if (!HasPlayer)
+            {
+                ChangeState("Idle");
+                return;
+            }
 
 			if (!ProcessTemplateAttack(delta))
-			{
-			ChangeToNextState();
+            {
+            ChangeToNextState();
 			}
-		}
+        }
 
-		private bool TryStartTemplateAttack()
-		{
-			if (_attackTemplates.Count == 0) return false;
+        private bool TryStartTemplateAttack()
+        {
+            if (_attackTemplates.Count == 0) return false;
 
-			_activeTemplate = SelectTemplate();
-			if (_activeTemplate == null) return false;
+            _activeTemplate = SelectTemplate();
+            if (_activeTemplate == null) return false;
 
-			if (_activeTemplate.TryStart())
-			{
-				return true;
-			}
+            if (_activeTemplate.TryStart())
+            {
+                return true;
+            }
 
-			_activeTemplate = null;
-			return false;
-		}
+            _activeTemplate = null;
+            return false;
+        }
 
-		private EnemyAttackTemplate? SelectTemplate()
-		{
-			foreach (var template in _attackTemplates)
-			{
-				if (template.CanStart())
-				{
-					return template;
-				}
-			}
+        private EnemyAttackTemplate? SelectTemplate()
+        {
+            foreach (var template in _attackTemplates)
+            {
+                if (template.CanStart())
+                {
+                    return template;
+                }
+            }
 
-			return null;
-		}
+            return null;
+        }
 
-		private bool ProcessTemplateAttack(double delta)
-		{
+        private bool ProcessTemplateAttack(double delta)
+        {
 			var template = _activeTemplate;
 			if (template == null) return false;
 
-			Enemy.MoveAndSlide();
-			Enemy.ClampPositionToScreen();
+            Enemy.MoveAndSlide();
+            Enemy.ClampPositionToScreen();
 
 			template.Tick(delta);
 			if (template.IsRunning)
-			{
-				return true;
-			}
+            {
+                return true;
+            }
 
-			_activeTemplate = null;
+            _activeTemplate = null;
 
-			if (TryStartTemplateAttack())
-			{
-				return true;
-			}
+            if (TryStartTemplateAttack())
+            {
+                return true;
+            }
 
 			if (Enemy.AttackTimer > 0f)
 			{
@@ -106,9 +106,9 @@ namespace Kuros.Actors.Enemies.States
 				return true;
 			}
 
-			ChangeToNextState();
-			return true;
-		}
+            ChangeToNextState();
+            return true;
+        }
 
         private void ChangeToNextState()
         {
@@ -135,13 +135,13 @@ namespace Kuros.Actors.Enemies.States
             }
 
             if (playerInAttackRange)
-            {
-                ChangeState("Attack");
-            }
-            else
-            {
-                ChangeState("Walk");
+                {
+                    ChangeState("Attack");
+                }
+                else
+                {
+                    ChangeState("Walk");
             }
         }
-	}
+    }
 }

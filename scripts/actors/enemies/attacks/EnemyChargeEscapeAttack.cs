@@ -3,16 +3,16 @@ using Kuros.Utils;
 
 namespace Kuros.Actors.Enemies.Attacks
 {
-	/// <summary>
+    /// <summary>
 	/// 冲刺抓取攻击示例：玩家需在逃脱时间内左右输入各若干次才能脱困。
-	/// </summary>
-	public partial class EnemyChargeEscapeAttack : EnemyChargeGrabAttack
-	{
-		[Export(PropertyHint.Range, "1,20,1")]
-		public int RequiredLeftInputs = 4;
+    /// </summary>
+    public partial class EnemyChargeEscapeAttack : EnemyChargeGrabAttack
+    {
+        [Export(PropertyHint.Range, "1,20,1")]
+        public int RequiredLeftInputs = 4;
 
-		[Export(PropertyHint.Range, "1,20,1")]
-		public int RequiredRightInputs = 4;
+        [Export(PropertyHint.Range, "1,20,1")]
+        public int RequiredRightInputs = 4;
 
 		private int _leftCount;
 		private int _rightCount;
@@ -20,10 +20,10 @@ namespace Kuros.Actors.Enemies.Attacks
 		private bool _escapeResolved;
 
 	public override void _Ready()
-	{
+        {
 		base._Ready();
 		if (EscapeWindowSeconds <= 0f)
-		{
+            {
 			EscapeWindowSeconds = 2.0f;
 		}
 	}
@@ -31,31 +31,31 @@ namespace Kuros.Actors.Enemies.Attacks
 		public EnemyChargeEscapeAttack()
 		{
 			EscapeWindowSeconds = 2.0f;
-		}
+                }
 
 		protected override void OnEscapeSequenceStarted(SamplePlayer player)
 		{
-			_leftCount = 0;
-			_rightCount = 0;
+            _leftCount = 0;
+            _rightCount = 0;
 			_escapeTimer = EscapeWindowSeconds;
 			_escapeResolved = false;
-		}
+        }
 
 		protected override void UpdateEscapeSequence(SamplePlayer player, double delta)
-		{
+        {
 			if (_escapeResolved) return;
 
-			_escapeTimer -= (float)delta;
+            _escapeTimer -= (float)delta;
 
-			if (Input.IsActionJustPressed("move_left"))
-			{
-				_leftCount++;
-			}
+            if (Input.IsActionJustPressed("move_left"))
+            {
+                _leftCount++;
+            }
 
-			if (Input.IsActionJustPressed("move_right"))
-			{
-				_rightCount++;
-			}
+            if (Input.IsActionJustPressed("move_right"))
+            {
+                _rightCount++;
+            }
 
 			if (_leftCount >= RequiredLeftInputs && _rightCount >= RequiredRightInputs)
 			{
