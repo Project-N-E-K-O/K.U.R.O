@@ -2,6 +2,8 @@ using Godot;
 using System;
 using Kuros.Systems.FSM;
 using Kuros.Core.Effects;
+using Kuros.Utils;
+using Kuros.Core.Stats;
 
 namespace Kuros.Core
 {
@@ -18,6 +20,7 @@ namespace Kuros.Core
         [ExportCategory("Components")]
         [Export] public StateMachine StateMachine { get; private set; } = null!;
         [Export] public EffectController EffectController { get; private set; } = null!;
+        [Export] public CharacterStatProfile? StatProfile { get; private set; }
 
         // Exposed state for States to use
         public int CurrentHealth { get; protected set; }
@@ -28,6 +31,8 @@ namespace Kuros.Core
         protected Node2D _spineCharacter = null!;
         protected Sprite2D _sprite = null!;
         protected AnimationPlayer _animationPlayer = null!;
+        private Color _spineDefaultModulate = Colors.White;
+        private Color _spriteDefaultModulate = Colors.White;
 
         private bool _deathStarted = false;
         private bool _deathFinalized = false;
@@ -45,7 +50,15 @@ namespace Kuros.Core
             {
                 _spineCharacter = GetNodeOrNull<Node2D>("SpineSprite");
             }
+            if (_spineCharacter != null)
+            {
+                _spineDefaultModulate = _spineCharacter.Modulate;
+            }
             _sprite = GetNodeOrNull<Sprite2D>("Sprite2D");
+            if (_sprite != null)
+            {
+                _spriteDefaultModulate = _sprite.Modulate;
+            }
             
             if (_spineCharacter != null)
             {
@@ -63,10 +76,17 @@ namespace Kuros.Core
                 StateMachine.Initialize(this);
             }
 
+            EffectController ??= GetNodeOrNull<EffectController>("EffectController");
             if (EffectController == null)
             {
-                EffectController = GetNodeOrNull<EffectController>("EffectController");
+                EffectController = new EffectController
+                {
+                    Name = "EffectController"
+                };
+                AddChild(EffectController);
             }
+
+            ApplyStatProfile();
         }
 
         public override void _PhysicsProcess(double delta)
@@ -83,7 +103,7 @@ namespace Kuros.Core
             CurrentHealth -= damage;
             CurrentHealth = Mathf.Max(CurrentHealth, 0);
             
-            GD.Print($"{Name} took {damage} damage! Health: {CurrentHealth}");
+            GameLogger.Info(nameof(GameActor), $"{Name} took {damage} damage! Health: {CurrentHealth}");
             
             FlashDamageEffect();
 
@@ -145,18 +165,74 @@ namespace Kuros.Core
             }
         }
 
+        private void ApplyStatProfile()
+        {
+            if (StatProfile == null)
+            {
+                return;
+            }
+
+            foreach (var modifier in StatProfile.GetModifiers())
+            {
+                if (modifier == null || string.IsNullOrWhiteSpace(modifier.StatId)) continue;
+                ApplyStatModifier(modifier);
+            }
+
+            if (EffectController == null)
+            {
+                return;
+            }
+
+            foreach (var effectScene in StatProfile.GetAttachedEffectScenes())
+            {
+                if (effectScene == null) continue;
+                EffectController.AddEffectFromScene(effectScene);
+            }
+        }
+
+        protected virtual void ApplyStatModifier(StatModifier modifier)
+        {
+            switch (modifier.StatId.ToLowerInvariant())
+            {
+                case "max_health":
+                    MaxHealth = (int)MathF.Round(ApplyStatOperation(MaxHealth, modifier));
+                    CurrentHealth = MaxHealth;
+                    break;
+                case "attack_damage":
+                    AttackDamage = ApplyStatOperation(AttackDamage, modifier);
+                    break;
+                case "speed":
+                    Speed = ApplyStatOperation(Speed, modifier);
+                    break;
+            }
+        }
+
+        private static float ApplyStatOperation(float baseValue, StatModifier modifier)
+        {
+            return modifier.Operation switch
+            {
+                StatOperation.Add => baseValue + modifier.Value,
+                StatOperation.Multiply => baseValue * modifier.Value,
+                _ => baseValue
+            };
+        }
+
         protected virtual void FlashDamageEffect()
         {
-            Node2D visualNode = _spineCharacter ?? (Node2D)_sprite;
-            if (visualNode != null)
+            Node2D? visualNode = _spineCharacter ?? _sprite;
+            if (visualNode == null) return;
+
+            Color baseColor = visualNode == _spineCharacter ? _spineDefaultModulate : _spriteDefaultModulate;
+            visualNode.Modulate = new Color(1f, 0f, 0f);
+
+            var tween = CreateTween();
+            tween.TweenInterval(0.1);
+            Node2D targetNode = visualNode;
+            tween.TweenCallback(Callable.From(() =>
             {
-                var originalColor = visualNode.Modulate;
-                visualNode.Modulate = new Color(1, 0, 0); 
-                
-                var tween = CreateTween();
-                tween.TweenInterval(0.1);
-                tween.TweenCallback(Callable.From(() => visualNode.Modulate = originalColor));
-            }
+                if (!GodotObject.IsInstanceValid(targetNode)) return;
+                targetNode.Modulate = baseColor;
+            }));
         }
 
         public virtual void FlipFacing(bool faceRight)

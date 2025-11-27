@@ -1,4 +1,5 @@
 using Godot;
+using Kuros.Utils;
 
 namespace Kuros.UI
 {
@@ -71,7 +72,7 @@ namespace Kuros.UI
         private void OnModeSelected(string modeName)
         {
             EmitSignal(SignalName.ModeSelected, modeName);
-            GD.Print($"选择了模式: {modeName}");
+            GameLogger.Info(nameof(ModeSelectionMenu), $"选择了模式: {modeName}");
         }
 
         private void OnBackPressed()

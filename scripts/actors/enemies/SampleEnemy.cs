@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using Kuros.Core;
+using Kuros.Utils;
 
 public partial class SampleEnemy : GameActor
 {
@@ -62,7 +63,7 @@ public partial class SampleEnemy : GameActor
         public void PerformAttack()
         {
         AttackTimer = AttackCooldown; 
-        GD.Print("Enemy PerformAttack");
+        GameLogger.Info(nameof(SampleEnemy), "Enemy PerformAttack");
         
         RefreshPlayerReference();
         if (AttackArea != null)
@@ -73,14 +74,14 @@ public partial class SampleEnemy : GameActor
                 if (body is SamplePlayer player)
                 {
                     player.TakeDamage((int)AttackDamage);
-                    GD.Print("Enemy attacked player via Area2D!");
+                    GameLogger.Info(nameof(SampleEnemy), "Enemy attacked player via Area2D!");
                 }
             }
         }
         else if (_player != null)
             {
                 _player.TakeDamage((int)AttackDamage);
-                GD.Print("Enemy attacked player (Fallback)!");
+                GameLogger.Info(nameof(SampleEnemy), "Enemy attacked player (Fallback)!");
         }
         }
     
@@ -96,7 +97,7 @@ public partial class SampleEnemy : GameActor
     
         protected override void Die()
         {
-            GD.Print("Enemy died!");
+            GameLogger.Info(nameof(SampleEnemy), "Enemy died!");
             
             if (_player != null)
             {

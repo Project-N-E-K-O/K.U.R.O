@@ -1,5 +1,6 @@
 using Godot;
 using System.Collections.Generic;
+using Kuros.Utils;
 
 namespace Kuros.UI
 {
@@ -124,7 +125,7 @@ namespace Kuros.UI
         private void OnSlotCardSelected(int slotIndex)
         {
             EmitSignal(SignalName.SlotSelected, slotIndex);
-            GD.Print($"选择了存档槽位: {slotIndex}");
+            GameLogger.Info(nameof(SaveSlotSelection), $"选择了存档槽位: {slotIndex}");
         }
 
         private void OnBackPressed()

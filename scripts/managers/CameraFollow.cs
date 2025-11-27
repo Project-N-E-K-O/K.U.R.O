@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using Kuros.Utils;
 
 namespace Kuros.Managers
 {
@@ -89,7 +90,7 @@ namespace Kuros.Managers
             }
             else
             {
-                GD.PrintErr("CameraFollow: 无法获取视口！");
+                GameLogger.Error(nameof(CameraFollow), "无法获取视口！");
             }
         }
 
@@ -107,7 +108,7 @@ namespace Kuros.Managers
             if (playerFromGroup != null)
             {
                 Target = playerFromGroup;
-                GD.Print("CameraFollow: 从组 'player' 中找到跟随目标");
+                GameLogger.Info(nameof(CameraFollow), "从组 'player' 中找到跟随目标");
                 return;
             }
 
@@ -116,12 +117,12 @@ namespace Kuros.Managers
             if (playerNode != null)
             {
                 Target = playerNode;
-                GD.Print("CameraFollow: 通过路径 '../Player' 找到跟随目标");
+                GameLogger.Info(nameof(CameraFollow), "通过路径 '../Player' 找到跟随目标");
                 return;
             }
 
             // 如果仍然没有目标，输出警告
-            GD.PrintErr("CameraFollow: 未找到跟随目标！请在编辑器中设置Target属性，或将目标节点添加到 'player' 组。");
+            GameLogger.Error(nameof(CameraFollow), "未找到跟随目标！请在编辑器中设置Target属性，或将目标节点添加到 'player' 组。");
         }
 
         /// <summary>
@@ -161,7 +162,7 @@ namespace Kuros.Managers
             // 检查边界是否有效（Min应该小于Max）
             if (MapMin.X >= MapMax.X || MapMin.Y >= MapMax.Y)
             {
-                GD.PrintErr($"CameraFollow: 地图边界无效！MapMin ({MapMin}) 应该小于 MapMax ({MapMax})");
+                GameLogger.Error(nameof(CameraFollow), $"地图边界无效！MapMin ({MapMin}) 应该小于 MapMax ({MapMax})");
                 _boundsValidated = false;
                 return;
             }
@@ -184,12 +185,12 @@ namespace Kuros.Managers
                 MapMin = new Vector2(rect.Position.X, rect.Position.Y);
                 MapMax = new Vector2(rect.Position.X + rect.Size.X, rect.Position.Y + rect.Size.Y);
                 
-                GD.Print($"CameraFollow: 自动检测到地图边界 - Min: {MapMin}, Max: {MapMax}");
+                GameLogger.Info(nameof(CameraFollow), $"自动检测到地图边界 - Min: {MapMin}, Max: {MapMax}");
                 ValidateMapBounds();
             }
             else
             {
-                GD.Print("CameraFollow: 未找到Background节点，无法自动检测地图边界。请在编辑器中手动设置MapMin和MapMax。");
+                GameLogger.Warn(nameof(CameraFollow), "未找到Background节点，无法自动检测地图边界。请在编辑器中手动设置MapMin和MapMax。");
             }
         }
 

@@ -1,4 +1,5 @@
 using Godot;
+using Kuros.Utils;
 
 namespace Kuros.UI
 {
@@ -152,7 +153,7 @@ namespace Kuros.UI
         {
             EmitSignal(SignalName.SettingsRequested);
             // 这里可以打开设置菜单
-            GD.Print("打开设置菜单");
+            GameLogger.Info(nameof(BattleMenu), "打开设置菜单");
         }
 
         private void OnQuitPressed()

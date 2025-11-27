@@ -53,6 +53,24 @@ namespace Kuros.Core.Effects
             effect.Initialize(_actor, this);
         }
 
+        public ActorEffect? AddEffectFromScene(PackedScene? effectScene)
+        {
+            if (effectScene == null)
+            {
+                return null;
+            }
+
+            var effectInstance = effectScene.Instantiate<ActorEffect>();
+            if (effectInstance == null)
+            {
+                GD.PushWarning($"Failed to instantiate effect scene {effectScene.ResourcePath}");
+                return null;
+            }
+
+            AddEffect(effectInstance);
+            return effectInstance;
+        }
+
         public void RemoveEffect(ActorEffect effect)
         {
             if (!_effects.Remove(effect)) return;

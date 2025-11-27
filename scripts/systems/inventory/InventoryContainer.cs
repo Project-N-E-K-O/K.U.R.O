@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Godot;
 using Kuros.Items;
+using Kuros.Items.Attributes;
 
 namespace Kuros.Systems.Inventory
 {
@@ -30,6 +31,130 @@ namespace Kuros.Systems.Inventory
         {
             if (slotIndex < 0 || slotIndex >= _slots.Count) return null;
             return _slots[slotIndex];
+        }
+
+        public bool TryExtractFromSlot(int slotIndex, int amount, out InventoryItemStack? extracted)
+        {
+            extracted = null;
+            if (slotIndex < 0 || slotIndex >= _slots.Count) return false;
+            var stack = _slots[slotIndex];
+            if (stack == null || amount <= 0) return false;
+
+            int clamped = Math.Min(amount, stack.Quantity);
+            if (clamped <= 0) return false;
+
+            var split = stack.Split(clamped);
+            if (split.Quantity <= 0) return false;
+
+            extracted = split;
+
+            if (stack.IsEmpty)
+            {
+                _slots[slotIndex] = null;
+                EmitSignal(SignalName.SlotChanged, slotIndex, string.Empty, 0);
+            }
+            else
+            {
+                EmitSignal(SignalName.SlotChanged, slotIndex, stack.Item.ItemId, stack.Quantity);
+            }
+
+            EmitSignal(SignalName.InventoryChanged);
+            return true;
+        }
+
+        public float GetAttributeValue(string attributeId, float baseValue = 0f)
+        {
+            if (string.IsNullOrWhiteSpace(attributeId)) return baseValue;
+
+            var accumulator = new ItemAttributeAccumulator();
+            foreach (var stack in _slots)
+            {
+                if (stack == null) continue;
+                if (!stack.TryGetAttribute(attributeId, out var attribute)) continue;
+                accumulator.Accumulate(attribute);
+            }
+
+            return accumulator.HasContribution ? accumulator.Resolve(baseValue) : baseValue;
+        }
+
+        public Dictionary<string, float> GetAttributeSnapshot()
+        {
+            var accumulators = new Dictionary<string, ItemAttributeAccumulator>(StringComparer.Ordinal);
+
+            foreach (var stack in _slots)
+            {
+                if (stack == null) continue;
+
+                foreach (var attribute in stack.GetAllAttributes())
+                {
+                    if (!attribute.IsValid) continue;
+
+                    if (!accumulators.TryGetValue(attribute.AttributeId, out var accumulator))
+                    {
+                        accumulator = new ItemAttributeAccumulator();
+                        accumulators[attribute.AttributeId] = accumulator;
+                    }
+
+                    accumulator.Accumulate(attribute);
+                }
+            }
+
+            var result = new Dictionary<string, float>(accumulators.Count, StringComparer.Ordinal);
+            foreach (var pair in accumulators)
+            {
+                result[pair.Key] = pair.Value.Resolve();
+            }
+
+            return result;
+        }
+
+        public IEnumerable<InventoryItemStack> GetStacksWithTag(string tagId)
+        {
+            if (string.IsNullOrWhiteSpace(tagId)) yield break;
+
+            foreach (var stack in _slots)
+            {
+                if (stack == null) continue;
+                if (stack.HasTag(tagId))
+                {
+                    yield return stack;
+                }
+            }
+        }
+
+        public int CountItemsWithTag(string tagId)
+        {
+            if (string.IsNullOrWhiteSpace(tagId)) return 0;
+
+            int total = 0;
+            foreach (var stack in _slots)
+            {
+                if (stack == null) continue;
+                if (!stack.HasTag(tagId)) continue;
+                total += stack.Quantity;
+            }
+
+            return total;
+        }
+
+        public bool TryFindFirstStackWithTag(string tagId, out InventoryItemStack? stack)
+        {
+            if (string.IsNullOrWhiteSpace(tagId))
+            {
+                stack = null;
+                return false;
+            }
+
+            foreach (var candidate in _slots)
+            {
+                if (candidate == null) continue;
+                if (!candidate.HasTag(tagId)) continue;
+                stack = candidate;
+                return true;
+            }
+
+            stack = null;
+            return false;
         }
 
         public bool TryAddItem(ItemDefinition item, int amount)
