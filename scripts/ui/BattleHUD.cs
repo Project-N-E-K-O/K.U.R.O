@@ -9,21 +9,11 @@ namespace Kuros.UI
 	/// </summary>
 	public partial class BattleHUD : Control
 	{
-	[ExportCategory("UI References")]
-	[Export] public Label PlayerStatsLabel { get; private set; } = null!;
-	[Export] public Label InstructionsLabel { get; private set; } = null!;
-	[Export] public TextureProgressBar HealthBar { get; private set; } = null!;
-	[Export] public Label ScoreLabel { get; private set; } = null!;
-
-	[ExportCategory("New UI Components")]
-	[Export] public PathIndicator PathIndicator { get; private set; } = null!;
-	[Export] public HealthBar P1HealthBar { get; private set; } = null!;
-	[Export] public HealthBar P2HealthBar { get; private set; } = null!;
-	[Export] public EnemySpawnIndicator EnemySpawnIndicator { get; private set; } = null!;
-	[Export] public InventoryUI InventoryUI { get; private set; } = null!;
-	[Export] public WeaponBar WeaponBar { get; private set; } = null!;
-	[Export] public DialogueUI DialogueUI { get; private set; } = null!;
-	[Export] public ShopUI ShopUI { get; private set; } = null!;
+		[ExportCategory("UI References")]
+		[Export] public Label PlayerStatsLabel { get; private set; } = null!;
+		[Export] public Label InstructionsLabel { get; private set; } = null!;
+		[Export] public ProgressBar HealthBar { get; private set; } = null!;
+		[Export] public Label ScoreLabel { get; private set; } = null!;
 
 		// 当前显示的数据
 		private int _currentHealth = 100;
@@ -48,48 +38,7 @@ namespace Kuros.UI
 
 			if (HealthBar == null)
 			{
-				HealthBar = GetNodeOrNull<TextureProgressBar>("HealthBar");
-			}
-
-			// 查找新UI组件
-			if (PathIndicator == null)
-			{
-				PathIndicator = GetNodeOrNull<PathIndicator>("PathIndicator");
-			}
-
-			if (P1HealthBar == null)
-			{
-				P1HealthBar = GetNodeOrNull<HealthBar>("P1HealthBar");
-			}
-
-			if (P2HealthBar == null)
-			{
-				P2HealthBar = GetNodeOrNull<HealthBar>("P2HealthBar");
-			}
-
-			if (EnemySpawnIndicator == null)
-			{
-				EnemySpawnIndicator = GetNodeOrNull<EnemySpawnIndicator>("EnemySpawnIndicator");
-			}
-
-			if (InventoryUI == null)
-			{
-				InventoryUI = GetNodeOrNull<InventoryUI>("InventoryUI");
-			}
-
-			if (WeaponBar == null)
-			{
-				WeaponBar = GetNodeOrNull<WeaponBar>("WeaponBar");
-			}
-
-			if (DialogueUI == null)
-			{
-				DialogueUI = GetNodeOrNull<DialogueUI>("DialogueUI");
-			}
-
-			if (ShopUI == null)
-			{
-				ShopUI = GetNodeOrNull<ShopUI>("ShopUI");
+				HealthBar = GetNodeOrNull<ProgressBar>("HealthBar");
 			}
 
 			if (ScoreLabel == null)
@@ -98,67 +47,34 @@ namespace Kuros.UI
 			}
 
 			// 初始化UI显示
-			UpdateHealthDisplay();
-			UpdateScoreDisplay();
-			UpdateStatsLabel();
+			UpdateDisplay();
 
 			// 发出就绪信号
 			EmitSignal(SignalName.HUDReady);
 		}
 
 		/// <summary>
-		/// 更新玩家生命值显示
-		/// </summary>
-		public void UpdateHealth(int current, int max)
-		{
-			_currentHealth = current;
-			_maxHealth = max;
-			UpdateHealthDisplay();
-			UpdateStatsLabel();
-		}
-
-		/// <summary>
-		/// 更新分数显示
-		/// </summary>
-		public void UpdateScore(int score)
-		{
-			_score = score;
-			UpdateScoreDisplay();
-			UpdateStatsLabel();
-		}
-
-		/// <summary>
-		/// 更新玩家状态（生命值和分数）
+		/// 更新玩家状态
 		/// </summary>
 		public void UpdateStats(int health, int maxHealth, int score)
 		{
 			_currentHealth = health;
 			_maxHealth = maxHealth;
 			_score = score;
-			UpdateHealthDisplay();
-			UpdateScoreDisplay();
-			UpdateStatsLabel();
+			UpdateDisplay();
 		}
 
-		private void UpdateHealthDisplay()
+		private void UpdateDisplay()
 		{
 			if (HealthBar != null)
 			{
 				HealthBar.MaxValue = _maxHealth;
 				HealthBar.Value = _currentHealth;
 			}
-		}
-
-		private void UpdateScoreDisplay()
-		{
 			if (ScoreLabel != null)
 			{
 				ScoreLabel.Text = $"Score: {_score}";
 			}
-		}
-
-		private void UpdateStatsLabel()
-		{
 			if (PlayerStatsLabel != null)
 			{
 				PlayerStatsLabel.Text = $"Player HP: {_currentHealth}/{_maxHealth}\nScore: {_score}";
