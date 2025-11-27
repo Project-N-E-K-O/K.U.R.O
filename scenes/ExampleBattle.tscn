@@ -1,6 +1,7 @@
-[gd_scene load_steps=22 format=3 uid="uid://d15hs7qpxqhf3"]
+[gd_scene load_steps=27 format=3 uid="uid://d15hs7qpxqhf3"]
 
 [ext_resource type="Script" uid="uid://btbsyf4hokvud" path="res://scripts/actors/heroes/SamplePlayer.cs" id="1_player"]
+[ext_resource type="PackedScene" uid="uid://b1ljb2q212v3d" path="res://scenes/environments/floor.tscn" id="1_sb658"]
 [ext_resource type="Script" uid="uid://cenpuhlcgesin" path="res://scripts/systems/fsm/StateMachine.cs" id="3_ceqyr"]
 [ext_resource type="PackedScene" uid="uid://bg3ltu6fhm4pa" path="res://scenes/actors/heroes/jsmb_2.tscn" id="3_spine"]
 [ext_resource type="Script" uid="uid://0u5whf0qv6i5" path="res://scripts/actors/heroes/states/PlayerIdleState.cs" id="4_op3tf"]
@@ -9,6 +10,7 @@
 [ext_resource type="Script" uid="uid://l40es7irdvdw" path="res://scripts/actors/heroes/states/PlayerHitState.cs" id="7_w7wnm"]
 [ext_resource type="Script" uid="uid://ba1kd5qgh17ag" path="res://scripts/actors/heroes/states/PlayerRunState.cs" id="8_bhpvs"]
 [ext_resource type="PackedScene" uid="uid://ciwlpphli7o01" path="res://scenes/properties/DroppableExampleProperty.tscn" id="11_drop_example"]
+[ext_resource type="PackedScene" uid="uid://ceou8wonisj4d" path="res://scenes/environments/wall.tscn" id="12_v8do6"]
 [ext_resource type="Script" uid="uid://d1g4amacs13a3" path="res://scripts/actors/heroes/states/PlayerFrozenState.cs" id="17_player_frozen"]
 [ext_resource type="Script" uid="uid://c2pgsls8pb7oh" path="res://scripts/actors/heroes/attacks/PlayerBasicMeleeAttack.cs" id="19_player_basic_attack"]
 [ext_resource type="Script" uid="uid://cn2bsvambjids" path="res://scripts/controllers/EnemySpawnController.cs" id="20_spawn_controller"]
@@ -36,6 +38,15 @@ size = Vector2(10, 1440)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_x7t42"]
 size = Vector2(2397, 16)
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_sb658"]
+size = Vector2(8, 1444)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_v8do6"]
+size = Vector2(10, 1440)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_x7t42"]
+size = Vector2(2397, 16)
+
 [node name="BattleScene" type="Node2D"]
 
 [node name="Background" type="ColorRect" parent="."]
@@ -51,6 +62,14 @@ offset_top = 999.0
 offset_right = 1842.0
 offset_bottom = 1119.0
 color = Color(0.4, 0.35, 0.3, 1)
+
+[node name="floor" parent="." instance=ExtResource("1_sb658")]
+position = Vector2(1127, 706)
+scale = Vector2(1.8534186, 1.9305735)
+
+[node name="wall" parent="." instance=ExtResource("12_v8do6")]
+position = Vector2(1380.9999, 397.00003)
+scale = Vector2(0.72410905, 0.70131683)
 
 [node name="Player" type="CharacterBody2D" parent="." node_paths=PackedStringArray("AttackArea")]
 position = Vector2(200, 400)
