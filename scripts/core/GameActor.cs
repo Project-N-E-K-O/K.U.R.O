@@ -2,6 +2,7 @@ using Godot;
 using System;
 using Kuros.Systems.FSM;
 using Kuros.Core.Effects;
+using Kuros.Utils;
 
 namespace Kuros.Core
 {
@@ -93,7 +94,7 @@ namespace Kuros.Core
             CurrentHealth -= damage;
             CurrentHealth = Mathf.Max(CurrentHealth, 0);
             
-            GD.Print($"{Name} took {damage} damage! Health: {CurrentHealth}");
+            GameLogger.Info(nameof(GameActor), $"{Name} took {damage} damage! Health: {CurrentHealth}");
             
             FlashDamageEffect();
 

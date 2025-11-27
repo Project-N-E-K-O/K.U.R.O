@@ -1,4 +1,5 @@
 using Godot;
+using Kuros.Utils;
 
 namespace Kuros.Actors.Enemies.Attacks
 {
@@ -58,13 +59,13 @@ namespace Kuros.Actors.Enemies.Attacks
 
 			if (_leftCount >= RequiredLeftInputs && _rightCount >= RequiredRightInputs)
 			{
-				GD.Print($"[EnemyChargeEscapeAttack] {player.Name} escaped by inputs L:{_leftCount}/R:{_rightCount}.");
+				GameLogger.Info(nameof(EnemyChargeEscapeAttack), $"{player.Name} escaped by inputs L:{_leftCount}/R:{_rightCount}.");
 				_escapeResolved = true;
 				ResolveEscape(true);
 			}
 			else if (_escapeTimer <= 0f)
 			{
-				GD.Print($"[EnemyChargeEscapeAttack] {player.Name} failed to escape (inputs L:{_leftCount}/R:{_rightCount}).");
+				GameLogger.Info(nameof(EnemyChargeEscapeAttack), $"{player.Name} failed to escape (inputs L:{_leftCount}/R:{_rightCount}).");
 				_escapeResolved = true;
 				ResolveEscape(false);
 			}

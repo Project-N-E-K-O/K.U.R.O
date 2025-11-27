@@ -1,5 +1,6 @@
 using Godot;
 using Kuros.Core;
+using Kuros.Utils;
 
 public partial class DroppableExampleProperty : DroppablePickupProperty
 {
@@ -31,7 +32,7 @@ public partial class DroppableExampleProperty : DroppablePickupProperty
             _sprite.Modulate = PickedColor;
         }
 
-        GD.Print($"{Name} granting {EnergyValue} energy to {actor.Name}");
+        GameLogger.Info(nameof(DroppableExampleProperty), $"{Name} granting {EnergyValue} energy to {actor.Name}");
     }
 
     protected override void OnPutDown(GameActor actor)
@@ -45,7 +46,7 @@ public partial class DroppableExampleProperty : DroppablePickupProperty
 
         if (_energyGranted)
         {
-            GD.Print($"{Name} put down by {actor.Name}. Energy effect removed.");
+            GameLogger.Info(nameof(DroppableExampleProperty), $"{Name} put down by {actor.Name}. Energy effect removed.");
             _energyGranted = false;
         }
     }

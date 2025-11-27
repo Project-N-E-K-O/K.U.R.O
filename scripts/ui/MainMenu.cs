@@ -1,4 +1,5 @@
 using Godot;
+using Kuros.Utils;
 
 namespace Kuros.UI
 {
@@ -79,31 +80,31 @@ namespace Kuros.UI
         private void OnStartGamePressed()
         {
             EmitSignal(SignalName.StartGameRequested);
-            GD.Print("开始游戏");
+            GameLogger.Info(nameof(MainMenu), "开始游戏");
         }
 
         private void OnModeSelectionPressed()
         {
             EmitSignal(SignalName.ModeSelectionRequested);
-            GD.Print("打开模式选择");
+            GameLogger.Info(nameof(MainMenu), "打开模式选择");
         }
 
         private void OnLoadGamePressed()
         {
             EmitSignal(SignalName.LoadGameRequested);
-            GD.Print("打开存档选择");
+            GameLogger.Info(nameof(MainMenu), "打开存档选择");
         }
 
         private void OnSettingsPressed()
         {
             EmitSignal(SignalName.SettingsRequested);
-            GD.Print("打开设置");
+            GameLogger.Info(nameof(MainMenu), "打开设置");
         }
 
         private void OnQuitPressed()
         {
             EmitSignal(SignalName.QuitRequested);
-            GD.Print("退出游戏");
+            GameLogger.Info(nameof(MainMenu), "退出游戏");
         }
     }
 }

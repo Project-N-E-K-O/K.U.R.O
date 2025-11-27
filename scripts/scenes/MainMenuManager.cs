@@ -1,6 +1,7 @@
 using Godot;
 using Kuros.Managers;
 using Kuros.UI;
+using Kuros.Utils;
 
 namespace Kuros.Scenes
 {
@@ -30,7 +31,7 @@ namespace Kuros.Scenes
 		{
 			if (UIManager.Instance == null)
 			{
-				GD.PrintErr("MainMenuManager: UIManager未初始化！");
+				GameLogger.Error(nameof(MainMenuManager), "UIManager未初始化！");
 				return;
 			}
 
@@ -173,7 +174,7 @@ namespace Kuros.Scenes
 
 		private void OnStartGame()
 		{
-			GD.Print("开始新游戏");
+			GameLogger.Info(nameof(MainMenuManager), "开始新游戏");
 			var tree = GetTree();
 			CleanupUI();
 			tree.ChangeSceneToFile(BattleScenePath);
@@ -196,7 +197,7 @@ namespace Kuros.Scenes
 
 		private void OnModeSelected(string modeName)
 		{
-			GD.Print($"选择了模式: {modeName}");
+			GameLogger.Info(nameof(MainMenuManager), $"选择了模式: {modeName}");
 			var tree = GetTree();
 			CleanupUI();
 			// 根据模式加载不同的场景
@@ -205,7 +206,7 @@ namespace Kuros.Scenes
 
 		private void OnSaveSlotSelected(int slotIndex)
 		{
-			GD.Print($"加载存档槽位: {slotIndex}");
+			GameLogger.Info(nameof(MainMenuManager), $"加载存档槽位: {slotIndex}");
 			var tree = GetTree();
 			CleanupUI();
 			// 这里应该加载存档数据

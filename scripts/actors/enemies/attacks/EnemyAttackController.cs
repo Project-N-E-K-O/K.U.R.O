@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using Kuros.Utils;
 
 namespace Kuros.Actors.Enemies.Attacks
 {
@@ -128,10 +129,16 @@ namespace Kuros.Actors.Enemies.Attacks
 
         protected override void OnAttackFinished()
         {
+            CleanupChildAttack(clearCooldown: true);
+
             if (_pendingQueueReason != null)
             {
                 QueueNextAttack(_pendingQueueReason);
                 _pendingQueueReason = null;
+            }
+            else if (ShouldAutoQueueAfterInterruption())
+            {
+                QueueNextAttack("Interrupted");
             }
 
             base.OnAttackFinished();
@@ -176,10 +183,16 @@ namespace Kuros.Actors.Enemies.Attacks
         private void QueueNextAttack(string reason = "Auto")
         {
             _queuedAttack = PickAttack();
+            RefreshPlayerDetectionState();
             if (_queuedAttack != null)
             {
 				DebugLog($"({reason}) queued attack {_queuedAttack.Name}.");
 				DebugLogPendingAttackIfPlayerInside();
+
+                if (reason != "PlayerExit" && ShouldForceAttackState())
+                {
+                    Enemy?.StateMachine?.ChangeState("Attack");
+                }
             }
             else
             {
@@ -225,12 +238,7 @@ namespace Kuros.Actors.Enemies.Attacks
 
         private void FinishControllerAttack(string reason, bool clearControllerCooldown = false)
         {
-            if (_currentAttack != null && _currentAttack.IsRunning)
-            {
-                _currentAttack.Cancel();
-            }
-
-            _currentAttack = null;
+            CleanupChildAttack(clearCooldown: false);
             _pendingQueueReason = reason;
 			DebugLog($"Controller finishing because '{reason}'.");
 
@@ -323,7 +331,7 @@ namespace Kuros.Actors.Enemies.Attacks
         {
             if (!EnableDebugLogs) return;
             string enemyName = Enemy?.Name ?? "UnknownEnemy";
-            GD.Print($"[EnemyAttackController] {enemyName}: {message}");
+            GameLogger.Debug(nameof(EnemyAttackController), $"{enemyName}: {message}");
         }
 
         protected virtual void OnChildAttackStarted(EnemyAttackTemplate attack)
@@ -348,6 +356,41 @@ namespace Kuros.Actors.Enemies.Attacks
         {
             public EnemyAttackTemplate Template = null!;
             public float Weight;
+        }
+
+        private void CleanupChildAttack(bool clearCooldown)
+        {
+            if (_currentAttack == null) return;
+            if (_currentAttack.IsRunning)
+            {
+                _currentAttack.Cancel(clearCooldown);
+            }
+
+            _currentAttack = null;
+        }
+
+        private bool ShouldAutoQueueAfterInterruption()
+        {
+            if (_playerDetectionArea == null || Enemy?.PlayerTarget == null) return false;
+            if (!_playerDetectionArea.IsInsideTree()) return false;
+            return _playerInside && _playerDetectionArea.OverlapsBody(Enemy.PlayerTarget);
+        }
+
+        private void RefreshPlayerDetectionState()
+        {
+            if (_playerDetectionArea == null || Enemy?.PlayerTarget == null)
+            {
+                _playerInside = false;
+                return;
+            }
+
+            if (!_playerDetectionArea.IsInsideTree())
+            {
+                _playerInside = false;
+                return;
+            }
+
+            _playerInside = _playerDetectionArea.OverlapsBody(Enemy.PlayerTarget);
         }
     }
 }

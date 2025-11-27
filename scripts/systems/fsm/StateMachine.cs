@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using Kuros.Core;
+using Kuros.Utils;
 
 namespace Kuros.Systems.FSM
 {
@@ -63,7 +64,7 @@ namespace Kuros.Systems.FSM
         {
             if (!_states.ContainsKey(stateName))
             {
-                GD.PrintErr($"StateMachine: State '{stateName}' not found!");
+                GameLogger.Error(nameof(StateMachine), $"State '{stateName}' not found!");
                 return;
             }
 

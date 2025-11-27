@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using Kuros.Utils;
 
 namespace Kuros.Core
 {
@@ -117,7 +118,7 @@ namespace Kuros.Core
 
         protected virtual void OnPicked(GameActor actor)
         {
-            GD.Print($"{Name} picked by {actor.Name}");
+            GameLogger.Info(nameof(PickupProperty), $"{Name} picked by {actor.Name}");
         }
 
         protected virtual void OnPutDown(GameActor actor) { }
