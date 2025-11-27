@@ -110,30 +110,45 @@ namespace Kuros.Actors.Enemies.States
 			return true;
 		}
 
-		private void ChangeToNextState()
-		{
-			if (Enemy.AttackTimer > 0f)
-			{
-				Enemy.Velocity = Vector2.Zero;
-				Enemy.MoveAndSlide();
-				return;
-			}
+        private void ChangeToNextState()
+        {
+            bool playerDetected = Enemy.IsPlayerWithinDetectionRange();
+            bool playerInAttackRange = Enemy.IsPlayerInAttackRange();
 
-			if (Enemy.IsPlayerWithinDetectionRange())
-			{
-				if (Enemy.IsPlayerInAttackRange())
-				{
-					ChangeState("Attack");
-				}
-				else
-				{
-					ChangeState("Walk");
-				}
-			}
-			else
-			{
-				ChangeState("Idle");
-			}
-		}
+            if (Enemy.AttackTimer > 0f)
+            {
+                if (playerInAttackRange)
+                {
+                    Enemy.Velocity = Vector2.Zero;
+                    Enemy.MoveAndSlide();
+                    return;
+                }
+
+                if (playerDetected)
+                {
+                    ChangeState("Walk");
+                }
+                else
+                {
+                    ChangeState("Idle");
+                }
+                return;
+            }
+
+            if (!playerDetected)
+            {
+                ChangeState("Idle");
+                return;
+            }
+
+            if (playerInAttackRange)
+            {
+                ChangeState("Attack");
+            }
+            else
+            {
+                ChangeState("Walk");
+            }
+        }
 	}
 }

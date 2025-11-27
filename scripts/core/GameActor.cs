@@ -28,6 +28,8 @@ namespace Kuros.Core
         protected Node2D _spineCharacter = null!;
         protected Sprite2D _sprite = null!;
         protected AnimationPlayer _animationPlayer = null!;
+        private Color _spineDefaultModulate = Colors.White;
+        private Color _spriteDefaultModulate = Colors.White;
 
         private bool _deathStarted = false;
         private bool _deathFinalized = false;
@@ -45,7 +47,15 @@ namespace Kuros.Core
             {
                 _spineCharacter = GetNodeOrNull<Node2D>("SpineSprite");
             }
+            if (_spineCharacter != null)
+            {
+                _spineDefaultModulate = _spineCharacter.Modulate;
+            }
             _sprite = GetNodeOrNull<Sprite2D>("Sprite2D");
+            if (_sprite != null)
+            {
+                _spriteDefaultModulate = _sprite.Modulate;
+            }
             
             if (_spineCharacter != null)
             {
@@ -147,16 +157,20 @@ namespace Kuros.Core
 
         protected virtual void FlashDamageEffect()
         {
-            Node2D visualNode = _spineCharacter ?? (Node2D)_sprite;
-            if (visualNode != null)
+            Node2D? visualNode = _spineCharacter ?? _sprite;
+            if (visualNode == null) return;
+
+            Color baseColor = visualNode == _spineCharacter ? _spineDefaultModulate : _spriteDefaultModulate;
+            visualNode.Modulate = new Color(1f, 0f, 0f);
+
+            var tween = CreateTween();
+            tween.TweenInterval(0.1);
+            Node2D targetNode = visualNode;
+            tween.TweenCallback(Callable.From(() =>
             {
-                var originalColor = visualNode.Modulate;
-                visualNode.Modulate = new Color(1, 0, 0); 
-                
-                var tween = CreateTween();
-                tween.TweenInterval(0.1);
-                tween.TweenCallback(Callable.From(() => visualNode.Modulate = originalColor));
-            }
+                if (!GodotObject.IsInstanceValid(targetNode)) return;
+                targetNode.Modulate = baseColor;
+            }));
         }
 
         public virtual void FlipFacing(bool faceRight)
