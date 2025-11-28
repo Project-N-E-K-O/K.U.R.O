@@ -10,6 +10,7 @@ namespace Kuros.UI
     public partial class BattleMenu : Control
     {
         private const string CompendiumScenePath = "res://scenes/ui/windows/CompendiumWindow.tscn";
+        private const string PauseToggleAction = "ui_cancel";
 
         // 信号
         [Signal] public delegate void ResumeRequestedEventHandler();
@@ -62,7 +63,7 @@ namespace Kuros.UI
 
         public override void _Input(InputEvent @event)
         {
-            if (@event.IsActionPressed("Return"))
+            if (@event.IsActionPressed(PauseToggleAction))
             {
                 ToggleMenu();
                 GetViewport().SetInputAsHandled();

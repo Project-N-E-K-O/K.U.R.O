@@ -28,6 +28,9 @@ namespace Kuros.UI
 		private const string InventoryScenePath = "res://scenes/ui/windows/InventoryWindow.tscn";
 		private PackedScene? _inventoryScene;
 
+		private GameActor? _player;
+		private IPlayerStatsSource? _playerStatsSource;
+
 		// 信号：用于通知外部系统
 		[Signal] public delegate void HUDReadyEventHandler();
 		[Signal] public delegate void BattleMenuRequestedEventHandler();
@@ -102,15 +105,17 @@ namespace Kuros.UI
 			EmitSignal(SignalName.BattleMenuRequested);
 		}
 
-		/// <summary>
-		/// 更新玩家状态
-		/// </summary>
-		public void UpdateStats(int health, int maxHealth, int score)
+		private void ApplyStatsSnapshot(int health, int maxHealth, int score)
 		{
 			_currentHealth = health;
 			_maxHealth = maxHealth;
 			_score = score;
 			UpdateDisplay();
+		}
+
+		public void SetFallbackStats(int health = 100, int maxHealth = 100, int score = 0)
+		{
+			ApplyStatsSnapshot(health, maxHealth, score);
 		}
 
 		private void UpdateDisplay()
@@ -131,49 +136,64 @@ namespace Kuros.UI
 		}
 
 		/// <summary>
-		/// 连接到玩家信号（在外部调用）
+		/// 连接到任意 GameActor（可选实现 IPlayerStatsSource）
 		/// </summary>
-		public void ConnectToPlayer(GameActor player)
+		public void AttachActor(GameActor actor)
 		{
-			if (player is SamplePlayer samplePlayer)
+			if (actor == null) return;
+			if (_player == actor) return;
+
+			DetachCurrentActor();
+
+			_player = actor;
+			_player.HealthChanged += OnActorHealthChanged;
+
+			if (actor is IPlayerStatsSource statsSource)
 			{
-				// 连接玩家状态变化信号
-				if (!samplePlayer.IsConnected(SamplePlayer.SignalName.StatsChanged, new Callable(this, MethodName.OnPlayerStatsChanged)))
-				{
-					samplePlayer.StatsChanged += OnPlayerStatsChanged;
-				}
+				_playerStatsSource = statsSource;
+				_playerStatsSource.StatsUpdated += OnStatsSourceUpdated;
+				ApplyStatsSnapshot(_playerStatsSource.CurrentHealth, _playerStatsSource.MaxHealth, _playerStatsSource.Score);
+				return;
 			}
+
+			ApplyStatsSnapshot(actor.CurrentHealth, actor.MaxHealth, _score);
 		}
 
-		/// <summary>
-		/// 断开与玩家的连接
-		/// </summary>
-		public void DisconnectFromPlayer(GameActor player)
+		public void DetachActor(GameActor actor)
 		{
-			if (player is SamplePlayer samplePlayer)
+			if (actor == null || _player != actor)
 			{
-				if (samplePlayer.IsConnected(SamplePlayer.SignalName.StatsChanged, new Callable(this, MethodName.OnPlayerStatsChanged)))
-				{
-					samplePlayer.StatsChanged -= OnPlayerStatsChanged;
-				}
+				return;
 			}
+
+			DetachCurrentActor();
 		}
 
-		private SamplePlayer? _player;
-		
-		/// <summary>
-		/// 设置玩家引用（用于获取最大生命值等属性）
-		/// </summary>
-		public void SetPlayer(SamplePlayer playerRef)
+		private void DetachCurrentActor()
 		{
-			_player = playerRef;
+			if (_player != null)
+			{
+				_player.HealthChanged -= OnActorHealthChanged;
+			}
+
+			if (_playerStatsSource != null)
+			{
+				_playerStatsSource.StatsUpdated -= OnStatsSourceUpdated;
+			}
+
+			_player = null;
+			_playerStatsSource = null;
 		}
 
-		private void OnPlayerStatsChanged(int health, int score)
+		private void OnActorHealthChanged(int health, int maxHealth)
 		{
-			// 从玩家获取最大生命值
-			int maxHealth = _player?.MaxHealth ?? 100;
-			UpdateStats(health, maxHealth, score);
+			int score = _playerStatsSource?.Score ?? _score;
+			ApplyStatsSnapshot(health, maxHealth, score);
+		}
+
+		private void OnStatsSourceUpdated(int health, int maxHealth, int score)
+		{
+			ApplyStatsSnapshot(health, maxHealth, score);
 		}
 
 		public override void _UnhandledInput(InputEvent @event)

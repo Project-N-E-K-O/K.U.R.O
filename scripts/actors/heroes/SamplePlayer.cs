@@ -5,9 +5,10 @@ using Kuros.Systems.FSM;
 using Kuros.Actors.Heroes.States;
 using Kuros.Actors.Heroes;
 using Kuros.Systems.Inventory;
+using Kuros.UI;
 using Kuros.Utils;
 
-public partial class SamplePlayer : GameActor
+public partial class SamplePlayer : GameActor, IPlayerStatsSource
 {
 	[ExportCategory("Combat")]
 	[Export] public Area2D AttackArea { get; private set; } = null!;
@@ -22,8 +23,8 @@ public partial class SamplePlayer : GameActor
 	private string _pendingAttackSourceState = string.Empty;
 	public string LastMovementStateName { get; private set; } = "Idle";
 	
-	// Signal for UI updates (Alternative to direct reference)
-	[Signal] public delegate void StatsChangedEventHandler(int health, int score);
+	public event Action<int, int, int>? StatsUpdated;
+	public int Score => _score;
 
 	public override void _Ready()
 	{
@@ -131,15 +132,18 @@ public partial class SamplePlayer : GameActor
     
     private void UpdateStatsUI()
     {
-        // Emit signal for decoupled UI systems
-        EmitSignal(SignalName.StatsChanged, CurrentHealth, _score);
-        
-        // Direct update if label is assigned (Simple approach)
+		NotifyStatsListeners();
+
         if (StatsLabel != null)
         {
             StatsLabel.Text = $"Player HP: {CurrentHealth}\nScore: {_score}";
         }
     }
+
+	private void NotifyStatsListeners()
+	{
+		StatsUpdated?.Invoke(CurrentHealth, MaxHealth, _score);
+	}
     
     protected override void OnDeathFinalized()
     {

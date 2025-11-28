@@ -11,7 +11,9 @@ namespace Kuros.Managers
 	{
 		public static GameSettingsManager Instance { get; private set; } = null!;
 
-		private const string ConfigPath = "res://config/window_settings.cfg";
+		private const string ConfigDirectory = "user://config";
+		private const string ConfigFileName = "window_settings.cfg";
+		private static readonly string ConfigPath = $"{ConfigDirectory}/{ConfigFileName}";
 		private const string WindowSection = "Window";
 		private const string PresetKey = "Preset";
 
@@ -92,6 +94,7 @@ namespace Kuros.Managers
 		private void LoadSettings()
 		{
 			var config = new ConfigFile();
+			EnsureConfigDirectory();
 			var result = config.Load(ConfigPath);
 
 			if (result == Error.Ok)
@@ -110,11 +113,18 @@ namespace Kuros.Managers
 			var config = new ConfigFile();
 			config.SetValue(WindowSection, PresetKey, _currentPresetId);
 
+			EnsureConfigDirectory();
 			var err = config.Save(ConfigPath);
 			if (err != Error.Ok)
 			{
 				GD.PushWarning($"GameSettingsManager: 保存配置失败 ({err})，路径: {ConfigPath}");
 			}
+		}
+
+		private static void EnsureConfigDirectory()
+		{
+			var absolutePath = ProjectSettings.GlobalizePath(ConfigDirectory);
+			DirAccess.MakeDirRecursiveAbsolute(absolutePath);
 		}
 
 		private void CenterWindow()

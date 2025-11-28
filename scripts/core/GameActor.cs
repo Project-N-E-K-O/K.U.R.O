@@ -9,6 +9,8 @@ namespace Kuros.Core
 {
     public partial class GameActor : CharacterBody2D
     {
+        public event Action<int, int>? HealthChanged;
+
         [ExportCategory("Stats")]
         [Export] public float Speed = 300.0f;
         [Export] public float AttackDamage = 25.0f;
@@ -87,6 +89,7 @@ namespace Kuros.Core
             }
 
             ApplyStatProfile();
+            NotifyHealthChanged();
         }
 
         public override void _PhysicsProcess(double delta)
@@ -102,7 +105,8 @@ namespace Kuros.Core
         {
             CurrentHealth -= damage;
             CurrentHealth = Mathf.Max(CurrentHealth, 0);
-            
+            NotifyHealthChanged();
+
             GameLogger.Info(nameof(GameActor), $"{Name} took {damage} damage! Health: {CurrentHealth}");
             
             FlashDamageEffect();
@@ -197,6 +201,7 @@ namespace Kuros.Core
                 case "max_health":
                     MaxHealth = (int)MathF.Round(ApplyStatOperation(MaxHealth, modifier));
                     CurrentHealth = MaxHealth;
+                    NotifyHealthChanged();
                     break;
                 case "attack_damage":
                     AttackDamage = ApplyStatOperation(AttackDamage, modifier);
@@ -271,6 +276,11 @@ namespace Kuros.Core
                 Mathf.Clamp(GlobalPosition.X, margin, screenSize.X - margin),
                 Mathf.Clamp(GlobalPosition.Y, margin, screenSize.Y - bottomOffset)
             );
+        }
+
+        protected void NotifyHealthChanged()
+        {
+            HealthChanged?.Invoke(CurrentHealth, MaxHealth);
         }
     }
 }

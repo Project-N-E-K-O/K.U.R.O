@@ -101,23 +101,13 @@ namespace Kuros.Scenes
 			
 			if (_battleHUD != null)
 			{
-				// 如果找到了Player，连接它
-				if (Player != null && Player is SamplePlayer samplePlayer)
+				if (Player != null)
 				{
-					_battleHUD.SetPlayer(samplePlayer);
-					_battleHUD.ConnectToPlayer(samplePlayer);
-					
-					// 初始化显示
-					_battleHUD.UpdateStats(
-						samplePlayer.CurrentHealth,
-						samplePlayer.MaxHealth,
-						0 // 初始分数
-					);
+					_battleHUD.AttachActor(Player);
 				}
 				else
 				{
-					// 即使没有Player，也显示默认的HUD
-					_battleHUD.UpdateStats(100, 100, 0);
+					_battleHUD.SetFallbackStats();
 					GameLogger.Info(nameof(BattleSceneManager), "HUD已加载，但未连接玩家数据。");
 				}
 			}
@@ -152,9 +142,9 @@ namespace Kuros.Scenes
 		{
 			if (UIManager.Instance == null) return;
 
-			if (_battleHUD != null && Player is SamplePlayer samplePlayer)
+			if (_battleHUD != null && Player != null)
 			{
-				_battleHUD.DisconnectFromPlayer(samplePlayer);
+				_battleHUD.DetachActor(Player);
 			}
 
 			// 断开信号连接
