@@ -21,7 +21,7 @@ namespace Kuros.Actors.Heroes.States
 		{
 			if (Input.IsActionJustPressed("attack") && Actor.AttackTimer <= 0)
 			{
-			Player.RequestAttackFromState(Name);
+				Player.RequestAttackFromState(Name);
 				ChangeState("Attack");
 				return;
 			}
