@@ -18,6 +18,7 @@
 [ext_resource type="Script" uid="uid://b6vgqpdrtg1lh" path="res://scripts/actors/heroes/PlayerInventoryComponent.cs" id="22_player_inventory"]
 [ext_resource type="Script" uid="uid://bsa4kolrnan6p" path="res://scripts/actors/heroes/states/PlayerDyingState.cs" id="23_player_dying"]
 [ext_resource type="Script" uid="uid://cp40kowtn1ho3" path="res://scripts/actors/heroes/states/PlayerDeadState.cs" id="24_player_dead"]
+[ext_resource type="PackedScene" path="res://scenes/actors/npc/NpcDialogueInteractable.tscn" id="25_npc_dialogue"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_attack"]
 size = Vector2(64.75629, 180.66397)
@@ -148,6 +149,8 @@ position = Vector2(1369, 456)
 DetectionRange = 1000.0
 Speed = 50.0
 
+[node name="FriendlyNPC" parent="." instance=ExtResource("25_npc_dialogue")]
+position = Vector2(600, 380)
 
 [node name="UI" type="CanvasLayer" parent="."]
 visible = false

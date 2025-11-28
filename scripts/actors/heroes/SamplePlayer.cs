@@ -25,6 +25,8 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 	
 	public event Action<int, int, int>? StatsUpdated;
 	public int Score => _score;
+	int IPlayerStatsSource.CurrentHealth => CurrentHealth;
+	int IPlayerStatsSource.MaxHealth => MaxHealth;
 
 	public override void _Ready()
 	{

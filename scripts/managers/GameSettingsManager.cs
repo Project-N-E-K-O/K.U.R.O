@@ -101,6 +101,11 @@ namespace Kuros.Managers
 			{
 				_currentPresetId = (string)config.GetValue(WindowSection, PresetKey, _currentPresetId);
 			}
+			else if (result == Error.FileNotFound)
+			{
+				GD.Print($"GameSettingsManager: 首次运行未找到配置，创建默认文件: {ConfigPath}");
+				SaveSettings();
+			}
 			else
 			{
 				GD.PushWarning($"GameSettingsManager: 无法加载配置文件 ({ConfigPath})，使用默认窗口模式。错误: {result}");
@@ -152,4 +157,3 @@ namespace Kuros.Managers
 		public readonly record struct WindowPreset(string Id, string DisplayName, DisplayServer.WindowMode Mode, Vector2I Size);
 	}
 }
-

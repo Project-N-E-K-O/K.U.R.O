@@ -72,6 +72,12 @@
 - 管理器与控制器：`scripts/controllers/*`、`scripts/managers/*`  
   - 如 `EnemySpawnController` 负责敌人生成；`CameraFollow`、`UIManager` 管理场景级别逻辑。
 
+- 地图互动体系：`scripts/core/interactions/*`、`scripts/actors/npc/*.cs`  
+  - `IInteractable` 定义统一交互接口；`InteractableArea` 可挂在场景中检测玩家进入、可选按键触发并支持高亮。  
+  - `BaseInteractable` 封装交互开关、次数限制与对话触发，可在 Inspector 绑定 `DialogueSequence` 与实现了 `IDialoguePlayer` 的节点。  
+  - `scripts/core/interactions/dialogue/*` 提供对白资源结构（`DialogueLine` / `DialogueSequence`）与 `IDialoguePlayer` 接口，方便接入 UI。  
+  - 示例 `NpcDialogueInteractable`（`scripts/actors/npc/NpcDialogueInteractable.cs`）展示如何构建可对话 NPC；`scenes/ExampleBattle.tscn` 已实例化 `FriendlyNPC` 供测试。
+
 - 工具与日志：`scripts/utils/GameLogger.cs` 等提供调试输出、通用辅助函数。
 
 ---
