@@ -57,3 +57,116 @@ grow_vertical = 0
 theme_override_font_sizes/font_size = 14
 text = "WASD: Move | Space: Attack | Shift: Run | F: Pick Up | G: Put Down | ESC: Menu"
 horizontal_alignment = 1
+
+[node name="QuickBarPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -350.0
+offset_top = -140.0
+offset_right = 350.0
+offset_bottom = -70.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="QuickBarTitle" type="Label" parent="QuickBarPanel"]
+layout_mode = 1
+anchors_preset = 10
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 0.0
+offset_left = 10.0
+offset_top = 6.0
+offset_right = -10.0
+offset_bottom = 34.0
+text = "快捷物品栏"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 18
+
+[node name="QuickBarContainer" type="HBoxContainer" parent="QuickBarPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 40.0
+offset_right = -20.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 18
+alignment = 1
+
+[node name="QuickSlot1" type="Panel" parent="QuickBarPanel/QuickBarContainer"]
+custom_minimum_size = Vector2(100, 60)
+
+[node name="QuickSlotLabel1" type="Label" parent="QuickBarPanel/QuickBarContainer/QuickSlot1"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "物品 1"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="QuickSlot2" type="Panel" parent="QuickBarPanel/QuickBarContainer"]
+custom_minimum_size = Vector2(100, 60)
+
+[node name="QuickSlotLabel2" type="Label" parent="QuickBarPanel/QuickBarContainer/QuickSlot2"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "物品 2"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="QuickSlot3" type="Panel" parent="QuickBarPanel/QuickBarContainer"]
+custom_minimum_size = Vector2(100, 60)
+
+[node name="QuickSlotLabel3" type="Label" parent="QuickBarPanel/QuickBarContainer/QuickSlot3"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "物品 3"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="QuickSlot4" type="Panel" parent="QuickBarPanel/QuickBarContainer"]
+custom_minimum_size = Vector2(100, 60)
+
+[node name="QuickSlotLabel4" type="Label" parent="QuickBarPanel/QuickBarContainer/QuickSlot4"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "物品 4"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="QuickSlot5" type="Panel" parent="QuickBarPanel/QuickBarContainer"]
+custom_minimum_size = Vector2(100, 60)
+
+[node name="QuickSlotLabel5" type="Label" parent="QuickBarPanel/QuickBarContainer/QuickSlot5"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "物品 5"
+horizontal_alignment = 1
+vertical_alignment = 1

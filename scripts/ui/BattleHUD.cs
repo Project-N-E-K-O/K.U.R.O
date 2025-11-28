@@ -1,5 +1,6 @@
 using Godot;
 using Kuros.Core;
+using Kuros.Systems.Inventory;
 
 namespace Kuros.UI
 {
@@ -20,8 +21,16 @@ namespace Kuros.UI
 		private int _maxHealth = 100;
 		private int _score = 0;
 
+		// 物品栏相关
+		private InventoryWindow? _inventoryWindow;
+		private InventoryContainer? _inventoryContainer;
+		private InventoryContainer? _quickBarContainer;
+		private const string InventoryScenePath = "res://scenes/ui/windows/InventoryWindow.tscn";
+		private PackedScene? _inventoryScene;
+
 		// 信号：用于通知外部系统
 		[Signal] public delegate void HUDReadyEventHandler();
+		[Signal] public delegate void BattleMenuRequestedEventHandler();
 
 		public override void _Ready()
 		{
@@ -46,68 +55,75 @@ namespace Kuros.UI
 				ScoreLabel = GetNodeOrNull<Label>("ScoreLabel");
 			}
 
+			// 初始化物品栏
+			InitializeInventory();
+
 			// 初始化UI显示
-			UpdateHealthDisplay();
-			UpdateScoreDisplay();
-			UpdateStatsLabel();
+			UpdateDisplay();
 
 			// 发出就绪信号
 			EmitSignal(SignalName.HUDReady);
 		}
 
-		/// <summary>
-		/// 更新玩家生命值显示
-		/// </summary>
-		public void UpdateHealth(int current, int max)
+		private void InitializeInventory()
 		{
-			_currentHealth = current;
-			_maxHealth = max;
-			UpdateHealthDisplay();
-			UpdateStatsLabel();
+			// 创建物品栏容器
+			_inventoryContainer = new InventoryContainer
+			{
+				Name = "PlayerInventory",
+				SlotCount = 16
+			};
+			AddChild(_inventoryContainer);
+
+			// 创建快捷栏容器
+			_quickBarContainer = new InventoryContainer
+			{
+				Name = "QuickBar",
+				SlotCount = 5
+			};
+			AddChild(_quickBarContainer);
+
+			// 加载物品栏窗口场景
+			_inventoryScene = GD.Load<PackedScene>(InventoryScenePath);
+			if (_inventoryScene != null)
+			{
+				_inventoryWindow = _inventoryScene.Instantiate<InventoryWindow>();
+				AddChild(_inventoryWindow);
+				_inventoryWindow.SetInventoryContainer(_inventoryContainer, _quickBarContainer);
+				_inventoryWindow.HideWindow();
+			}
 		}
 
 		/// <summary>
-		/// 更新分数显示
+		/// 供外部或UI控件调用以请求打开战斗菜单
 		/// </summary>
-		public void UpdateScore(int score)
+		public void RequestBattleMenu()
 		{
-			_score = score;
-			UpdateScoreDisplay();
-			UpdateStatsLabel();
+			EmitSignal(SignalName.BattleMenuRequested);
 		}
 
 		/// <summary>
-		/// 更新玩家状态（生命值和分数）
+		/// 更新玩家状态
 		/// </summary>
 		public void UpdateStats(int health, int maxHealth, int score)
 		{
 			_currentHealth = health;
 			_maxHealth = maxHealth;
 			_score = score;
-			UpdateHealthDisplay();
-			UpdateScoreDisplay();
-			UpdateStatsLabel();
+			UpdateDisplay();
 		}
 
-		private void UpdateHealthDisplay()
+		private void UpdateDisplay()
 		{
 			if (HealthBar != null)
 			{
 				HealthBar.MaxValue = _maxHealth;
 				HealthBar.Value = _currentHealth;
 			}
-		}
-
-		private void UpdateScoreDisplay()
-		{
 			if (ScoreLabel != null)
 			{
 				ScoreLabel.Text = $"Score: {_score}";
 			}
-		}
-
-		private void UpdateStatsLabel()
-		{
 			if (PlayerStatsLabel != null)
 			{
 				PlayerStatsLabel.Text = $"Player HP: {_currentHealth}/{_maxHealth}\nScore: {_score}";
@@ -158,6 +174,25 @@ namespace Kuros.UI
 			// 从玩家获取最大生命值
 			int maxHealth = _player?.MaxHealth ?? 100;
 			UpdateStats(health, maxHealth, score);
+		}
+
+		public override void _UnhandledInput(InputEvent @event)
+		{
+			if (@event.IsActionPressed("open_inventory"))
+			{
+				if (_inventoryWindow != null)
+				{
+					if (_inventoryWindow.Visible)
+					{
+						_inventoryWindow.HideWindow();
+					}
+					else
+					{
+						_inventoryWindow.ShowWindow();
+					}
+					GetViewport().SetInputAsHandled();
+				}
+			}
 		}
 	}
 }

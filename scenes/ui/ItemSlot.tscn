@@ -1,0 +1,52 @@
+[gd_scene load_steps=2 format=3 uid="uid://item_slot_ui"]
+
+[ext_resource type="Script" path="res://scripts/ui/ItemSlot.cs" id="1_item_slot_script"]
+
+[node name="ItemSlot" type="Panel"]
+custom_minimum_size = Vector2(80, 80)
+script = ExtResource("1_item_slot_script")
+
+[node name="ItemIcon" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+offset_left = 4.0
+offset_top = 4.0
+offset_right = -4.0
+offset_bottom = -4.0
+expand_mode = 1
+stretch_mode = 5
+
+[node name="QuantityLabel" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 2
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -30.0
+offset_top = -20.0
+offset_right = -4.0
+offset_bottom = -4.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "99"
+horizontal_alignment = 2
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 14
+
+[node name="SlotLabel" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "空"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 12
+

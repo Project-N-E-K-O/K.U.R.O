@@ -165,12 +165,18 @@ namespace Kuros.Scenes
 				_battleMenu.SettingsRequested -= OnMenuSettingsRequested;
 			}
 
+			if (_battleSettingsMenu != null && IsInstanceValid(_battleSettingsMenu))
+			{
+				_battleSettingsMenu.BackRequested -= OnSettingsBackRequested;
+			}
+
 			UIManager.Instance.UnloadBattleHUD();
 			UIManager.Instance.UnloadBattleMenu();
 			UIManager.Instance.UnloadSettingsMenu();
 
 			_battleHUD = null;
 			_battleMenu = null;
+			_battleSettingsMenu = null;
 		}
 
 		private void OnMenuResume()
@@ -192,6 +198,8 @@ namespace Kuros.Scenes
 			}
 		}
 
+		private SettingsMenu? _battleSettingsMenu;
+
 		private void OnMenuSettingsRequested()
 		{
 			// 打开设置界面
@@ -209,17 +217,26 @@ namespace Kuros.Scenes
 			if (settingsMenu != null)
 			{
 				settingsMenu.Visible = true;
-				// 当设置菜单返回时，重新显示战斗菜单
-				settingsMenu.BackRequested += OnSettingsBackRequested;
+				// 避免重复连接信号
+				if (_battleSettingsMenu != settingsMenu)
+				{
+					// 断开旧连接
+					if (_battleSettingsMenu != null && IsInstanceValid(_battleSettingsMenu))
+					{
+						_battleSettingsMenu.BackRequested -= OnSettingsBackRequested;
+					}
+					_battleSettingsMenu = settingsMenu;
+					_battleSettingsMenu.BackRequested += OnSettingsBackRequested;
+				}
 			}
 		}
 
 		private void OnSettingsBackRequested()
 		{
 			// 关闭设置菜单，重新显示战斗菜单
-			if (UIManager.Instance != null)
+			if (_battleSettingsMenu != null && IsInstanceValid(_battleSettingsMenu))
 			{
-				UIManager.Instance.SetUIVisible("SettingsMenu", false);
+				_battleSettingsMenu.Visible = false;
 			}
 
 			if (_battleMenu != null && IsInstanceValid(_battleMenu))

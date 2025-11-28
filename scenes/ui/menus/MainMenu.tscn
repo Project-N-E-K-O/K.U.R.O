@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://main_menu_ui"]
+[gd_scene load_steps=3 format=3 uid="uid://main_menu_ui"]
 
 [ext_resource type="Script" uid="uid://dykq2etjvxy2j" path="res://scripts/ui/MainMenu.cs" id="1_main_menu"]
+[ext_resource type="PackedScene" path="res://scenes/ui/windows/CompendiumWindow.tscn" id="2_compendium_window"]
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -75,6 +76,11 @@ layout_mode = 2
 text = "模式选择"
 theme_override_font_sizes/font_size = 24
 
+[node name="CompendiumButton" type="Button" parent="MenuPanel/VBoxContainer"]
+layout_mode = 2
+text = "图鉴系统"
+theme_override_font_sizes/font_size = 24
+
 [node name="LoadGameButton" type="Button" parent="MenuPanel/VBoxContainer"]
 layout_mode = 2
 text = "读取存档"
@@ -89,4 +95,7 @@ theme_override_font_sizes/font_size = 24
 layout_mode = 2
 text = "退出游戏"
 theme_override_font_sizes/font_size = 24
+
+[node name="CompendiumWindow" parent="." instance=ExtResource("2_compendium_window")]
+visible = false
 

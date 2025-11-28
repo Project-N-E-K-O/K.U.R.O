@@ -1,9 +1,13 @@
 # Godot 4+ specific ignores
 .godot/
 .import/
+*.import
+*.uid
 
 # IDE files
 .vscode/
+.vs/
+.idea/
 
 # Mono-specific ignores
 .mono/
@@ -19,19 +23,15 @@ obj/
 *.user
 *.suo
 *.userprefs
-.vs/
-.vscode/
 *.csproj.user
-*.unityproj
+*.csproj.old
 *.sln.iml
 
 # System/tool-specific ignores
 .DS_Store
 *.swp
-*.nblh
 *.bak
-*.gch
-*.pyc
 *.tmp
 *~
+Thumbs.db
 export_presets.cfg

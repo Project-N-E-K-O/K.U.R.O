@@ -1,7 +1,8 @@
-[gd_scene load_steps=25 format=3 uid="uid://d15hs7qpxqhf3"]
+[gd_scene load_steps=28 format=3 uid="uid://d15hs7qpxqhf3"]
 
 [ext_resource type="Script" uid="uid://btbsyf4hokvud" path="res://scripts/actors/heroes/SamplePlayer.cs" id="1_player"]
-[ext_resource type="PackedScene" path="res://scenes/environments/floor.tscn" id="1_sb658"]
+[ext_resource type="Script" path="res://scripts/scenes/BattleSceneManager.cs" id="2_battle_manager"]
+[ext_resource type="PackedScene" uid="uid://b1ljb2q212v3d" path="res://scenes/environments/floor.tscn" id="1_sb658"]
 [ext_resource type="Script" uid="uid://cenpuhlcgesin" path="res://scripts/systems/fsm/StateMachine.cs" id="3_ceqyr"]
 [ext_resource type="PackedScene" uid="uid://bg3ltu6fhm4pa" path="res://scenes/actors/heroes/jsmb_2.tscn" id="3_spine"]
 [ext_resource type="Script" uid="uid://0u5whf0qv6i5" path="res://scripts/actors/heroes/states/PlayerIdleState.cs" id="4_op3tf"]
@@ -38,6 +39,7 @@ size = Vector2(10, 1440)
 size = Vector2(2397, 16)
 
 [node name="BattleScene" type="Node2D"]
+script = ExtResource("2_battle_manager")
 
 [node name="Background" type="ColorRect" parent="."]
 offset_left = 7.0

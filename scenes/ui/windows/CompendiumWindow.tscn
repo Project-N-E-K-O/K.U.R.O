@@ -1,0 +1,520 @@
+ [gd_scene load_steps=2 format=3 uid="uid://compendium_window_ui"]
+ 
+ [ext_resource type="Script" path="res://scripts/ui/CompendiumWindow.cs" id="1_compendium_window_script"]
+ 
+ [node name="CompendiumWindow" type="Control"]
+ layout_mode = 3
+ anchors_preset = 15
+ anchor_right = 1.0
+ anchor_bottom = 1.0
+ grow_horizontal = 2
+ grow_vertical = 2
+ mouse_filter = 0
+ visible = false
+ script = ExtResource("1_compendium_window_script")
+ 
+ [node name="Background" type="ColorRect" parent="."]
+ layout_mode = 1
+ anchors_preset = 15
+ anchor_right = 1.0
+ anchor_bottom = 1.0
+ grow_horizontal = 2
+ grow_vertical = 2
+ color = Color(0, 0, 0, 0.85)
+ 
+ [node name="MainPanel" type="Panel" parent="."]
+ layout_mode = 1
+ anchors_preset = 15
+ anchor_right = 1.0
+ anchor_bottom = 1.0
+ grow_horizontal = 2
+ grow_vertical = 2
+ 
+ [node name="RootMargin" type="MarginContainer" parent="MainPanel"]
+ layout_mode = 1
+ anchors_preset = 15
+ anchor_right = 1.0
+ anchor_bottom = 1.0
+ grow_horizontal = 2
+ grow_vertical = 2
+ theme_override_constants/margin_left = 32
+ theme_override_constants/margin_top = 32
+ theme_override_constants/margin_right = 32
+ theme_override_constants/margin_bottom = 32
+ 
+ [node name="RootVBox" type="VBoxContainer" parent="MainPanel/RootMargin"]
+ layout_mode = 2
+ theme_override_constants/separation = 24
+ 
+ [node name="Header" type="HBoxContainer" parent="MainPanel/RootMargin/RootVBox"]
+ layout_mode = 2
+ theme_override_constants/separation = 16
+ 
+ [node name="Title" type="Label" parent="MainPanel/RootMargin/RootVBox/Header"]
+ layout_mode = 2
+ text = "图鉴系统"
+ theme_override_font_sizes/font_size = 36
+ size_flags_horizontal = 3
+ vertical_alignment = 1
+ 
+ [node name="CloseButton" type="Button" parent="MainPanel/RootMargin/RootVBox/Header"]
+ layout_mode = 2
+ text = "关闭"
+ theme_override_font_sizes/font_size = 20
+ 
+[node name="Tabs" type="TabContainer" parent="MainPanel/RootMargin/RootVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MonsterTab" type="Control" parent="MainPanel/RootMargin/RootVBox/Tabs"]
+layout_mode = 2
+
+[node name="MonsterBody" type="HBoxContainer" parent="MainPanel/RootMargin/RootVBox/Tabs/MonsterTab"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 24
+
+[node name="MonsterLeftPanel" type="MarginContainer" parent="MainPanel/RootMargin/RootVBox/Tabs/MonsterTab/MonsterBody"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="MonsterLeftVBox" type="VBoxContainer" parent="MainPanel/RootMargin/RootVBox/Tabs/MonsterTab/MonsterBody/MonsterLeftPanel"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="MonsterLeftTitle" type="Label" parent="MainPanel/RootMargin/RootVBox/Tabs/MonsterTab/MonsterBody/MonsterLeftPanel/MonsterLeftVBox"]
+layout_mode = 2
+text = "怪物列表"
+theme_override_font_sizes/font_size = 28
+
+[node name="MonsterLeftSeparator" type="HSeparator" parent="MainPanel/RootMargin/RootVBox/Tabs/MonsterTab/MonsterBody/MonsterLeftPanel/MonsterLeftVBox"]
+layout_mode = 2
+
+[node name="MonsterScroll" type="ScrollContainer" parent="MainPanel/RootMargin/RootVBox/Tabs/MonsterTab/MonsterBody/MonsterLeftPanel/MonsterLeftVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="MonsterGrid" type="GridContainer" parent="MainPanel/RootMargin/RootVBox/Tabs/MonsterTab/MonsterBody/MonsterLeftPanel/MonsterLeftVBox/MonsterScroll"]
+layout_mode = 2
+columns = 4
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 12
+
+[node name="MonsterRightPanel" type="MarginContainer" parent="MainPanel/RootMargin/RootVBox/Tabs/MonsterTab/MonsterBody"]
+layout_mode = 2
+size_flags_horizontal = 5
+size_flags_vertical = 3
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="MonsterRightVBox" type="VBoxContainer" parent="MainPanel/RootMargin/RootVBox/Tabs/MonsterTab/MonsterBody/MonsterRightPanel"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="MonsterName" type="Label" parent="MainPanel/RootMargin/RootVBox/Tabs/MonsterTab/MonsterBody/MonsterRightPanel/MonsterRightVBox"]
+layout_mode = 2
+text = "未选择"
+theme_override_font_sizes/font_size = 32
+
+[node name="MonsterImage" type="TextureRect" parent="MainPanel/RootMargin/RootVBox/Tabs/MonsterTab/MonsterBody/MonsterRightPanel/MonsterRightVBox"]
+layout_mode = 2
+size_flags_vertical = 1
+expand_mode = 2
+stretch_mode = 3
+custom_minimum_size = Vector2(0, 280)
+
+[node name="DescriptionSection" type="VBoxContainer" parent="MainPanel/RootMargin/RootVBox/Tabs/MonsterTab/MonsterBody/MonsterRightPanel/MonsterRightVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="DescriptionTitle" type="Label" parent="MainPanel/RootMargin/RootVBox/Tabs/MonsterTab/MonsterBody/MonsterRightPanel/MonsterRightVBox/DescriptionSection"]
+layout_mode = 2
+text = "怪物介绍"
+theme_override_font_sizes/font_size = 24
+
+[node name="DescriptionScroll" type="ScrollContainer" parent="MainPanel/RootMargin/RootVBox/Tabs/MonsterTab/MonsterBody/MonsterRightPanel/MonsterRightVBox/DescriptionSection"]
+layout_mode = 2
+size_flags_vertical = 1
+
+[node name="DescriptionText" type="RichTextLabel" parent="MainPanel/RootMargin/RootVBox/Tabs/MonsterTab/MonsterBody/MonsterRightPanel/MonsterRightVBox/DescriptionSection/DescriptionScroll"]
+layout_mode = 2
+size_flags_vertical = 3
+autowrap_mode = 3
+
+[node name="StatsSection" type="VBoxContainer" parent="MainPanel/RootMargin/RootVBox/Tabs/MonsterTab/MonsterBody/MonsterRightPanel/MonsterRightVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="StatsTitle" type="Label" parent="MainPanel/RootMargin/RootVBox/Tabs/MonsterTab/MonsterBody/MonsterRightPanel/MonsterRightVBox/StatsSection"]
+layout_mode = 2
+text = "基础属性"
+theme_override_font_sizes/font_size = 24
+
+[node name="StatsGrid" type="GridContainer" parent="MainPanel/RootMargin/RootVBox/Tabs/MonsterTab/MonsterBody/MonsterRightPanel/MonsterRightVBox/StatsSection"]
+layout_mode = 2
+columns = 2
+theme_override_constants/h_separation = 24
+theme_override_constants/v_separation = 6
+
+[node name="HpLabel" type="Label" parent="MainPanel/RootMargin/RootVBox/Tabs/MonsterTab/MonsterBody/MonsterRightPanel/MonsterRightVBox/StatsSection/StatsGrid"]
+layout_mode = 2
+text = "生命值："
+
+[node name="HpValue" type="Label" parent="MainPanel/RootMargin/RootVBox/Tabs/MonsterTab/MonsterBody/MonsterRightPanel/MonsterRightVBox/StatsSection/StatsGrid"]
+layout_mode = 2
+text = "-"
+
+[node name="DefenseLabel" type="Label" parent="MainPanel/RootMargin/RootVBox/Tabs/MonsterTab/MonsterBody/MonsterRightPanel/MonsterRightVBox/StatsSection/StatsGrid"]
+layout_mode = 2
+text = "防御力："
+
+[node name="DefenseValue" type="Label" parent="MainPanel/RootMargin/RootVBox/Tabs/MonsterTab/MonsterBody/MonsterRightPanel/MonsterRightVBox/StatsSection/StatsGrid"]
+layout_mode = 2
+text = "-"
+
+[node name="SpeedLabel" type="Label" parent="MainPanel/RootMargin/RootVBox/Tabs/MonsterTab/MonsterBody/MonsterRightPanel/MonsterRightVBox/StatsSection/StatsGrid"]
+layout_mode = 2
+text = "速度："
+
+[node name="SpeedValue" type="Label" parent="MainPanel/RootMargin/RootVBox/Tabs/MonsterTab/MonsterBody/MonsterRightPanel/MonsterRightVBox/StatsSection/StatsGrid"]
+layout_mode = 2
+text = "-"
+
+[node name="AttackLabel" type="Label" parent="MainPanel/RootMargin/RootVBox/Tabs/MonsterTab/MonsterBody/MonsterRightPanel/MonsterRightVBox/StatsSection/StatsGrid"]
+layout_mode = 2
+text = "攻击力："
+
+[node name="AttackValue" type="Label" parent="MainPanel/RootMargin/RootVBox/Tabs/MonsterTab/MonsterBody/MonsterRightPanel/MonsterRightVBox/StatsSection/StatsGrid"]
+layout_mode = 2
+text = "-"
+
+[node name="RangeLabel" type="Label" parent="MainPanel/RootMargin/RootVBox/Tabs/MonsterTab/MonsterBody/MonsterRightPanel/MonsterRightVBox/StatsSection/StatsGrid"]
+layout_mode = 2
+text = "攻击范围："
+
+[node name="RangeValue" type="Label" parent="MainPanel/RootMargin/RootVBox/Tabs/MonsterTab/MonsterBody/MonsterRightPanel/MonsterRightVBox/StatsSection/StatsGrid"]
+layout_mode = 2
+text = "-"
+
+[node name="SkillSection" type="VBoxContainer" parent="MainPanel/RootMargin/RootVBox/Tabs/MonsterTab/MonsterBody/MonsterRightPanel/MonsterRightVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SkillTitle" type="Label" parent="MainPanel/RootMargin/RootVBox/Tabs/MonsterTab/MonsterBody/MonsterRightPanel/MonsterRightVBox/SkillSection"]
+layout_mode = 2
+text = "技能介绍"
+theme_override_font_sizes/font_size = 24
+
+[node name="SkillScroll" type="ScrollContainer" parent="MainPanel/RootMargin/RootVBox/Tabs/MonsterTab/MonsterBody/MonsterRightPanel/MonsterRightVBox/SkillSection"]
+layout_mode = 2
+size_flags_vertical = 1
+
+[node name="SkillDescription" type="RichTextLabel" parent="MainPanel/RootMargin/RootVBox/Tabs/MonsterTab/MonsterBody/MonsterRightPanel/MonsterRightVBox/SkillSection/SkillScroll"]
+layout_mode = 2
+autowrap_mode = 3
+size_flags_vertical = 3
+
+[node name="NPCTab" type="Control" parent="MainPanel/RootMargin/RootVBox/Tabs"]
+layout_mode = 2
+
+[node name="NPCBody" type="HBoxContainer" parent="MainPanel/RootMargin/RootVBox/Tabs/NPCTab"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 24
+
+[node name="NPCLeftPanel" type="MarginContainer" parent="MainPanel/RootMargin/RootVBox/Tabs/NPCTab/NPCBody"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="NPCLeftVBox" type="VBoxContainer" parent="MainPanel/RootMargin/RootVBox/Tabs/NPCTab/NPCBody/NPCLeftPanel"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="NPCLeftTitle" type="Label" parent="MainPanel/RootMargin/RootVBox/Tabs/NPCTab/NPCBody/NPCLeftPanel/NPCLeftVBox"]
+layout_mode = 2
+text = "NPC列表"
+theme_override_font_sizes/font_size = 28
+
+[node name="NPCLeftSeparator" type="HSeparator" parent="MainPanel/RootMargin/RootVBox/Tabs/NPCTab/NPCBody/NPCLeftPanel/NPCLeftVBox"]
+layout_mode = 2
+
+[node name="NPCScroll" type="ScrollContainer" parent="MainPanel/RootMargin/RootVBox/Tabs/NPCTab/NPCBody/NPCLeftPanel/NPCLeftVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="NPCGrid" type="GridContainer" parent="MainPanel/RootMargin/RootVBox/Tabs/NPCTab/NPCBody/NPCLeftPanel/NPCLeftVBox/NPCScroll"]
+layout_mode = 2
+columns = 4
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 12
+
+[node name="NPCRightPanel" type="MarginContainer" parent="MainPanel/RootMargin/RootVBox/Tabs/NPCTab/NPCBody"]
+layout_mode = 2
+size_flags_horizontal = 5
+size_flags_vertical = 3
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="NPCRightVBox" type="VBoxContainer" parent="MainPanel/RootMargin/RootVBox/Tabs/NPCTab/NPCBody/NPCRightPanel"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="NPCName" type="Label" parent="MainPanel/RootMargin/RootVBox/Tabs/NPCTab/NPCBody/NPCRightPanel/NPCRightVBox"]
+layout_mode = 2
+text = "未选择"
+theme_override_font_sizes/font_size = 32
+
+[node name="NPCImageWrapper" type="Control" parent="MainPanel/RootMargin/RootVBox/Tabs/NPCTab/NPCBody/NPCRightPanel/NPCRightVBox"]
+layout_mode = 2
+size_flags_vertical = 1
+custom_minimum_size = Vector2(0, 280)
+
+[node name="NPCImage" type="TextureRect" parent="MainPanel/RootMargin/RootVBox/Tabs/NPCTab/NPCBody/NPCRightPanel/NPCRightVBox/NPCImageWrapper"]
+layout_mode = 2
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 2
+stretch_mode = 3
+
+[node name="NPCHearthIcon" type="Label" parent="MainPanel/RootMargin/RootVBox/Tabs/NPCTab/NPCBody/NPCRightPanel/NPCRightVBox/NPCImageWrapper"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 0.0
+offset_left = -60.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = 60.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "♥"
+theme_override_font_sizes/font_size = 42
+horizontal_alignment = 2
+
+[node name="NPCDescriptionSection" type="VBoxContainer" parent="MainPanel/RootMargin/RootVBox/Tabs/NPCTab/NPCBody/NPCRightPanel/NPCRightVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="NPCDescriptionTitle" type="Label" parent="MainPanel/RootMargin/RootVBox/Tabs/NPCTab/NPCBody/NPCRightPanel/NPCRightVBox/NPCDescriptionSection"]
+layout_mode = 2
+text = "NPC介绍"
+theme_override_font_sizes/font_size = 24
+
+[node name="NPCDescriptionScroll" type="ScrollContainer" parent="MainPanel/RootMargin/RootVBox/Tabs/NPCTab/NPCBody/NPCRightPanel/NPCRightVBox/NPCDescriptionSection"]
+layout_mode = 2
+size_flags_vertical = 1
+
+[node name="NPCDescriptionText" type="RichTextLabel" parent="MainPanel/RootMargin/RootVBox/Tabs/NPCTab/NPCBody/NPCRightPanel/NPCRightVBox/NPCDescriptionSection/NPCDescriptionScroll"]
+layout_mode = 2
+size_flags_vertical = 3
+autowrap_mode = 3
+
+[node name="NPCAffectionSection" type="VBoxContainer" parent="MainPanel/RootMargin/RootVBox/Tabs/NPCTab/NPCBody/NPCRightPanel/NPCRightVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="NPCAffectionTitle" type="Label" parent="MainPanel/RootMargin/RootVBox/Tabs/NPCTab/NPCBody/NPCRightPanel/NPCRightVBox/NPCAffectionSection"]
+layout_mode = 2
+text = "好感度"
+theme_override_font_sizes/font_size = 24
+
+[node name="NPCAffectionValue" type="Label" parent="MainPanel/RootMargin/RootVBox/Tabs/NPCTab/NPCBody/NPCRightPanel/NPCRightVBox/NPCAffectionSection"]
+layout_mode = 2
+text = "-"
+
+[node name="NPCQuestSection" type="VBoxContainer" parent="MainPanel/RootMargin/RootVBox/Tabs/NPCTab/NPCBody/NPCRightPanel/NPCRightVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="NPCQuestTitle" type="Label" parent="MainPanel/RootMargin/RootVBox/Tabs/NPCTab/NPCBody/NPCRightPanel/NPCRightVBox/NPCQuestSection"]
+layout_mode = 2
+text = "相关任务/状态"
+theme_override_font_sizes/font_size = 24
+
+[node name="NPCQuestScroll" type="ScrollContainer" parent="MainPanel/RootMargin/RootVBox/Tabs/NPCTab/NPCBody/NPCRightPanel/NPCRightVBox/NPCQuestSection"]
+layout_mode = 2
+size_flags_vertical = 1
+
+[node name="NPCQuestDescription" type="RichTextLabel" parent="MainPanel/RootMargin/RootVBox/Tabs/NPCTab/NPCBody/NPCRightPanel/NPCRightVBox/NPCQuestSection/NPCQuestScroll"]
+layout_mode = 2
+autowrap_mode = 3
+size_flags_vertical = 3
+
+[node name="WeaponTab" type="Control" parent="MainPanel/RootMargin/RootVBox/Tabs"]
+layout_mode = 2
+
+[node name="WeaponBody" type="HBoxContainer" parent="MainPanel/RootMargin/RootVBox/Tabs/WeaponTab"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 24
+
+[node name="WeaponLeftPanel" type="MarginContainer" parent="MainPanel/RootMargin/RootVBox/Tabs/WeaponTab/WeaponBody"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="WeaponLeftVBox" type="VBoxContainer" parent="MainPanel/RootMargin/RootVBox/Tabs/WeaponTab/WeaponBody/WeaponLeftPanel"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="WeaponLeftTitle" type="Label" parent="MainPanel/RootMargin/RootVBox/Tabs/WeaponTab/WeaponBody/WeaponLeftPanel/WeaponLeftVBox"]
+layout_mode = 2
+text = "武器列表"
+theme_override_font_sizes/font_size = 28
+
+[node name="WeaponLeftSeparator" type="HSeparator" parent="MainPanel/RootMargin/RootVBox/Tabs/WeaponTab/WeaponBody/WeaponLeftPanel/WeaponLeftVBox"]
+layout_mode = 2
+
+[node name="WeaponScroll" type="ScrollContainer" parent="MainPanel/RootMargin/RootVBox/Tabs/WeaponTab/WeaponBody/WeaponLeftPanel/WeaponLeftVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="WeaponGrid" type="GridContainer" parent="MainPanel/RootMargin/RootVBox/Tabs/WeaponTab/WeaponBody/WeaponLeftPanel/WeaponLeftVBox/WeaponScroll"]
+layout_mode = 2
+columns = 4
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 12
+
+[node name="WeaponRightPanel" type="MarginContainer" parent="MainPanel/RootMargin/RootVBox/Tabs/WeaponTab/WeaponBody"]
+layout_mode = 2
+size_flags_horizontal = 5
+size_flags_vertical = 3
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="WeaponRightVBox" type="VBoxContainer" parent="MainPanel/RootMargin/RootVBox/Tabs/WeaponTab/WeaponBody/WeaponRightPanel"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="WeaponName" type="Label" parent="MainPanel/RootMargin/RootVBox/Tabs/WeaponTab/WeaponBody/WeaponRightPanel/WeaponRightVBox"]
+layout_mode = 2
+text = "未选择"
+theme_override_font_sizes/font_size = 32
+
+[node name="WeaponImage" type="TextureRect" parent="MainPanel/RootMargin/RootVBox/Tabs/WeaponTab/WeaponBody/WeaponRightPanel/WeaponRightVBox"]
+layout_mode = 2
+size_flags_vertical = 1
+expand_mode = 2
+stretch_mode = 3
+custom_minimum_size = Vector2(0, 280)
+
+[node name="WeaponDescriptionSection" type="VBoxContainer" parent="MainPanel/RootMargin/RootVBox/Tabs/WeaponTab/WeaponBody/WeaponRightPanel/WeaponRightVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="WeaponDescriptionTitle" type="Label" parent="MainPanel/RootMargin/RootVBox/Tabs/WeaponTab/WeaponBody/WeaponRightPanel/WeaponRightVBox/WeaponDescriptionSection"]
+layout_mode = 2
+text = "武器介绍"
+theme_override_font_sizes/font_size = 24
+
+[node name="WeaponDescriptionScroll" type="ScrollContainer" parent="MainPanel/RootMargin/RootVBox/Tabs/WeaponTab/WeaponBody/WeaponRightPanel/WeaponRightVBox/WeaponDescriptionSection"]
+layout_mode = 2
+size_flags_vertical = 1
+
+[node name="WeaponDescriptionText" type="RichTextLabel" parent="MainPanel/RootMargin/RootVBox/Tabs/WeaponTab/WeaponBody/WeaponRightPanel/WeaponRightVBox/WeaponDescriptionSection/WeaponDescriptionScroll"]
+layout_mode = 2
+size_flags_vertical = 3
+autowrap_mode = 3
+
+[node name="WeaponStatsSection" type="VBoxContainer" parent="MainPanel/RootMargin/RootVBox/Tabs/WeaponTab/WeaponBody/WeaponRightPanel/WeaponRightVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="WeaponStatsTitle" type="Label" parent="MainPanel/RootMargin/RootVBox/Tabs/WeaponTab/WeaponBody/WeaponRightPanel/WeaponRightVBox/WeaponStatsSection"]
+layout_mode = 2
+text = "武器属性"
+theme_override_font_sizes/font_size = 24
+
+[node name="WeaponStatsGrid" type="GridContainer" parent="MainPanel/RootMargin/RootVBox/Tabs/WeaponTab/WeaponBody/WeaponRightPanel/WeaponRightVBox/WeaponStatsSection"]
+layout_mode = 2
+columns = 2
+theme_override_constants/h_separation = 24
+theme_override_constants/v_separation = 6
+
+[node name="WeaponAttackLabel" type="Label" parent="MainPanel/RootMargin/RootVBox/Tabs/WeaponTab/WeaponBody/WeaponRightPanel/WeaponRightVBox/WeaponStatsSection/WeaponStatsGrid"]
+layout_mode = 2
+text = "攻击力："
+
+[node name="WeaponAttackValue" type="Label" parent="MainPanel/RootMargin/RootVBox/Tabs/WeaponTab/WeaponBody/WeaponRightPanel/WeaponRightVBox/WeaponStatsSection/WeaponStatsGrid"]
+layout_mode = 2
+text = "-"
+
+[node name="WeaponElementLabel" type="Label" parent="MainPanel/RootMargin/RootVBox/Tabs/WeaponTab/WeaponBody/WeaponRightPanel/WeaponRightVBox/WeaponStatsSection/WeaponStatsGrid"]
+layout_mode = 2
+text = "元素属性："
+
+[node name="WeaponElementValue" type="Label" parent="MainPanel/RootMargin/RootVBox/Tabs/WeaponTab/WeaponBody/WeaponRightPanel/WeaponRightVBox/WeaponStatsSection/WeaponStatsGrid"]
+layout_mode = 2
+text = "-"
+
+[node name="WeaponWeightLabel" type="Label" parent="MainPanel/RootMargin/RootVBox/Tabs/WeaponTab/WeaponBody/WeaponRightPanel/WeaponRightVBox/WeaponStatsSection/WeaponStatsGrid"]
+layout_mode = 2
+text = "重量："
+
+[node name="WeaponWeightValue" type="Label" parent="MainPanel/RootMargin/RootVBox/Tabs/WeaponTab/WeaponBody/WeaponRightPanel/WeaponRightVBox/WeaponStatsSection/WeaponStatsGrid"]
+layout_mode = 2
+text = "-"
+
+[node name="WeaponRarityLabel" type="Label" parent="MainPanel/RootMargin/RootVBox/Tabs/WeaponTab/WeaponBody/WeaponRightPanel/WeaponRightVBox/WeaponStatsSection/WeaponStatsGrid"]
+layout_mode = 2
+text = "稀有度："
+
+[node name="WeaponRarityValue" type="Label" parent="MainPanel/RootMargin/RootVBox/Tabs/WeaponTab/WeaponBody/WeaponRightPanel/WeaponRightVBox/WeaponStatsSection/WeaponStatsGrid"]
+layout_mode = 2
+text = "-"
+
+[node name="WeaponSpecialLabel" type="Label" parent="MainPanel/RootMargin/RootVBox/Tabs/WeaponTab/WeaponBody/WeaponRightPanel/WeaponRightVBox/WeaponStatsSection/WeaponStatsGrid"]
+layout_mode = 2
+text = "特殊效果："
+
+[node name="WeaponSpecialValue" type="Label" parent="MainPanel/RootMargin/RootVBox/Tabs/WeaponTab/WeaponBody/WeaponRightPanel/WeaponRightVBox/WeaponStatsSection/WeaponStatsGrid"]
+layout_mode = 2
+text = "-"
+
+[node name="WeaponEffectSection" type="VBoxContainer" parent="MainPanel/RootMargin/RootVBox/Tabs/WeaponTab/WeaponBody/WeaponRightPanel/WeaponRightVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="WeaponEffectTitle" type="Label" parent="MainPanel/RootMargin/RootVBox/Tabs/WeaponTab/WeaponBody/WeaponRightPanel/WeaponRightVBox/WeaponEffectSection"]
+layout_mode = 2
+text = "技能/被动说明"
+theme_override_font_sizes/font_size = 24
+
+[node name="WeaponEffectScroll" type="ScrollContainer" parent="MainPanel/RootMargin/RootVBox/Tabs/WeaponTab/WeaponBody/WeaponRightPanel/WeaponRightVBox/WeaponEffectSection"]
+layout_mode = 2
+size_flags_vertical = 1
+
+[node name="WeaponEffectDescription" type="RichTextLabel" parent="MainPanel/RootMargin/RootVBox/Tabs/WeaponTab/WeaponBody/WeaponRightPanel/WeaponRightVBox/WeaponEffectSection/WeaponEffectScroll"]
+layout_mode = 2
+autowrap_mode = 3
+size_flags_vertical = 3
+ 
+
