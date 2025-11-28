@@ -1,0 +1,37 @@
+[gd_scene load_steps=6 format=3 uid="uid://example_world_item"]
+
+[ext_resource type="Script" path="res://scripts/items/world/WorldItemEntity.cs" id="1"]
+
+[sub_resource type="PlaceholderTexture2D" id="SpritePlaceholder"]
+size = Vector2(32, 32)
+color = Color(0.9, 0.3, 0.3, 1)
+
+[sub_resource type="CircleShape2D" id="BodyShape"]
+radius = 12.0
+
+[sub_resource type="CircleShape2D" id="TriggerShape"]
+radius = 24.0
+
+[node name="ExampleWorldItem" type="CharacterBody2D"]
+collision_layer = 4
+collision_mask = 1
+script = ExtResource("1")
+ItemDefinitionResourcePath = "res://resources/items/ExamplePotion.tres"
+Quantity = 3
+ThrowFriction = 400.0
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = SubResource("SpritePlaceholder")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("BodyShape")
+
+[node name="TriggerArea" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 1
+monitorable = true
+monitoring = true
+
+[node name="TriggerShape" type="CollisionShape2D" parent="TriggerArea"]
+shape = SubResource("TriggerShape")
+

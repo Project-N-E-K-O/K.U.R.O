@@ -28,6 +28,8 @@ namespace Kuros.Actors.Heroes
 
         public IReadOnlyDictionary<string, SpecialInventorySlot> SpecialSlots => _specialSlots;
         public SpecialInventorySlot? WeaponSlot => GetSpecialSlot(SpecialInventorySlotIds.PrimaryWeapon);
+        public event Action<ItemDefinition>? ItemPicked;
+        public event Action<string>? ItemRemoved;
 
         public override void _Ready()
         {
@@ -103,6 +105,7 @@ namespace Kuros.Actors.Heroes
             int inserted = Backpack.AddItem(stack.Item, stack.Quantity);
             if (inserted == stack.Quantity)
             {
+                NotifyItemRemoved(stack.Item.ItemId);
                 return true;
             }
 
@@ -111,6 +114,25 @@ namespace Kuros.Actors.Heroes
             {
                 var restoreStack = new InventoryItemStack(stack.Item, remaining);
                 slot.TryAssign(restoreStack, replaceExisting: true);
+            }
+
+            NotifyItemRemoved(stack.Item.ItemId);
+            return false;
+        }
+
+        public bool RemoveFirstItem(string itemId)
+        {
+            if (Backpack == null) return false;
+
+            for (int i = 0; i < Backpack.Slots.Count; i++)
+            {
+                var stack = Backpack.Slots[i];
+                if (stack == null || stack.Item.ItemId != itemId) continue;
+
+                Backpack.RemoveItem(itemId, stack.Quantity);
+            NotifyItemRemoved(itemId);
+            NotifyItemRemoved(itemId);
+                return true;
             }
 
             return false;
@@ -135,6 +157,26 @@ namespace Kuros.Actors.Heroes
         {
             if (string.IsNullOrWhiteSpace(slotId)) return null;
             return _specialSlots.TryGetValue(slotId, out var slot) ? slot : null;
+        }
+
+        internal void NotifyItemPicked(ItemDefinition item)
+        {
+            ItemPicked?.Invoke(item);
+            OnItemPicked(item);
+        }
+
+        protected virtual void OnItemPicked(ItemDefinition item)
+        {
+        }
+
+        internal void NotifyItemRemoved(string itemId)
+        {
+            ItemRemoved?.Invoke(itemId);
+            OnItemRemoved(itemId);
+        }
+
+        protected virtual void OnItemRemoved(string itemId)
+        {
         }
 
         private bool TryResolveSpecialSlot(string slotId, out SpecialInventorySlot slot)

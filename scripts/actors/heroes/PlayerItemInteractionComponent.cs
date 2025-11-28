@@ -103,6 +103,8 @@ namespace Kuros.Actors.Heroes
                 return false;
             }
 
+            InventoryComponent?.NotifyItemRemoved(extracted.Item.ItemId);
+
             if (disposition == DropDisposition.Throw)
             {
                 entity.ApplyThrowImpulse(GetFacingDirection() * ThrowImpulse);

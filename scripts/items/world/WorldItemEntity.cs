@@ -32,6 +32,10 @@ namespace Kuros.Items.World
 
         [ExportGroup("World Physics")]
         [Export(PropertyHint.Range, "0,4000,1")] public float ThrowFriction = 600f;
+        [Export] public uint BodyCollisionLayer { get; set; } = 1u << 2;
+        [Export] public uint BodyCollisionMask { get; set; } = 1u;
+        [Export] public uint TriggerCollisionLayer { get; set; } = 1u << 1;
+        [Export] public uint TriggerCollisionMask { get; set; } = 1u;
 
         public InventoryItemStack? CurrentStack { get; private set; }
         public string ItemId => !string.IsNullOrWhiteSpace(ItemIdOverride)
@@ -53,6 +57,7 @@ namespace Kuros.Items.World
             base._Ready();
             InitializeStack();
             ResolveTriggerArea();
+            ApplyCollisionSettings();
             SetProcess(true);
             SetPhysicsProcess(true);
         }
@@ -156,11 +161,19 @@ namespace Kuros.Items.World
 
             _initialMonitoring = TriggerArea.Monitoring;
             _initialMonitorable = TriggerArea.Monitorable;
-            _initialCollisionLayer = TriggerArea.CollisionLayer;
-            _initialCollisionMask = TriggerArea.CollisionMask;
-
             TriggerArea.BodyEntered += OnBodyEntered;
             TriggerArea.BodyExited += OnBodyExited;
+
+            TriggerArea.CollisionLayer = TriggerCollisionLayer;
+            TriggerArea.CollisionMask = TriggerCollisionMask;
+            _initialCollisionLayer = TriggerArea.CollisionLayer;
+            _initialCollisionMask = TriggerArea.CollisionMask;
+        }
+
+        private void ApplyCollisionSettings()
+        {
+            CollisionLayer = BodyCollisionLayer;
+            CollisionMask = BodyCollisionMask;
         }
 
         private void OnBodyEntered(Node2D body)
@@ -295,6 +308,7 @@ namespace Kuros.Items.World
             _lastTransferredAmount = stack.Quantity;
             CurrentStack = null;
             Quantity = 0;
+            inventory.NotifyItemPicked(stack.Item);
             return true;
         }
 

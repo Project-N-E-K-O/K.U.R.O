@@ -43,6 +43,12 @@
 - `scripts/items/tags/ItemTagIds.cs`、`ItemAttribute*`  
   - 定义常用标签/属性集合，背包和逻辑可通过标签快速筛选（如食物、武器）。
 
+- 交互/拾取/放下/投掷流程：  
+  - 地图物品：`WorldItemEntity` 挂在 tscn 中，触发 `take_up` 时会把 `InventoryItemStack` 写入玩家背包、触发 `PlayerInventoryComponent.ItemPicked`，并可在 `ItemDefinition.EffectEntries` 中配置拾取效果。  
+  - 快捷键：`PlayerItemInteractionComponent` 监听 `put_down` 与 `throw`，从背包槽位抽出物品，通过 `WorldItemSpawner` 生成地面实体；投掷会施加初速度。  
+  - 骨骼绑定：`PlayerItemAttachment` 订阅 `ItemPicked`/`ItemRemoved`，将最新拾取物品图标附着在指定骨骼或节点上，放下/投掷时自动清除。  
+  - 快捷栏：`QuickSlotBar` 订阅 `InventoryContainer.InventoryChanged`，实时展示前几格物品与数量，便于 Debug 与 UI 集成。
+
 ## 3. 战斗系统
 
 - `scripts/actors/heroes/SamplePlayer.cs`、`scripts/actors/enemies/*.cs`  
