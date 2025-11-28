@@ -5,6 +5,7 @@ using Kuros.Systems.FSM;
 using Kuros.Actors.Heroes.States;
 using Kuros.Actors.Heroes;
 using Kuros.Systems.Inventory;
+using Kuros.Utils;
 
 public partial class SamplePlayer : GameActor
 {
@@ -85,7 +86,7 @@ public partial class SamplePlayer : GameActor
 		// Reset timer just in case, though State usually manages cooldown entry
 		AttackTimer = AttackCooldown;
 		
-		GD.Print($"=== Player attacking frame! ===");
+		GameLogger.Info(nameof(SamplePlayer), "=== Player attacking frame! ===");
 		
 		int hitCount = 0;
 		
@@ -100,18 +101,18 @@ public partial class SamplePlayer : GameActor
                 {
                     enemy.TakeDamage((int)AttackDamage);
                     hitCount++;
-                    GD.Print($"Hit enemy: {enemy.Name}");
+                    GameLogger.Info(nameof(SamplePlayer), $"Hit enemy: {enemy.Name}");
                 }
             }
         }
         else
         {
-            GD.PrintErr("AttackArea is missing! Assign it in Inspector.");
+            GameLogger.Error(nameof(SamplePlayer), "AttackArea is missing! Assign it in Inspector.");
         }
         
         if (hitCount == 0)
         {
-            GD.Print("No enemies hit!");
+            GameLogger.Info(nameof(SamplePlayer), "No enemies hit!");
         }
     }
     
@@ -143,7 +144,7 @@ public partial class SamplePlayer : GameActor
     protected override void OnDeathFinalized()
     {
         EffectController?.ClearAll();
-        GD.Print("Player died! Game Over!");
+        GameLogger.Warn(nameof(SamplePlayer), "Player died! Game Over!");
         GetTree().ReloadCurrentScene();
     }
 }

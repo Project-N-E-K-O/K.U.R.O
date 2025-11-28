@@ -1,6 +1,7 @@
 using Godot;
 using System.Collections.Generic;
 using Kuros.UI;
+using Kuros.Utils;
 
 namespace Kuros.Managers
 {
@@ -78,16 +79,16 @@ namespace Kuros.Managers
 			var scene = GD.Load<PackedScene>(uiPath);
 			if (scene == null)
 			{
-				GD.PrintErr($"UIManager: 无法加载UI场景: {uiPath}");
-				GD.PrintErr($"UIManager: 请检查文件路径是否正确，文件是否存在");
+				GameLogger.Error(nameof(UIManager), $"无法加载UI场景: {uiPath}");
+				GameLogger.Error(nameof(UIManager), "请检查文件路径是否正确，文件是否存在");
 				return null!;
 			}
 
 			var uiNode = scene.Instantiate<T>();
 			if (uiNode == null)
 			{
-				GD.PrintErr($"UIManager: UI场景实例化失败: {uiPath}");
-				GD.PrintErr($"UIManager: 请检查场景文件的根节点类型是否与泛型类型T匹配");
+				GameLogger.Error(nameof(UIManager), $"UI场景实例化失败: {uiPath}");
+				GameLogger.Error(nameof(UIManager), "请检查场景文件的根节点类型是否与泛型类型T匹配");
 				return null!;
 			}
 
@@ -98,7 +99,7 @@ namespace Kuros.Managers
 			// 存储引用
 			_loadedUIs[key] = uiNode;
 
-			GD.Print($"UIManager: 已加载UI: {key} (Layer: {layer})");
+			GameLogger.Info(nameof(UIManager), $"已加载UI: {key} (Layer: {layer})");
 			return uiNode;
 		}
 
@@ -111,7 +112,7 @@ namespace Kuros.Managers
 			{
 				uiNode.QueueFree();
 				_loadedUIs.Remove(key);
-				GD.Print($"UIManager: 已卸载UI: {key}");
+				GameLogger.Info(nameof(UIManager), $"已卸载UI: {key}");
 			}
 		}
 

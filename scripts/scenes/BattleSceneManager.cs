@@ -2,6 +2,7 @@ using Godot;
 using Kuros.Core;
 using Kuros.Managers;
 using Kuros.UI;
+using Kuros.Utils;
 
 namespace Kuros.Scenes
 {
@@ -57,13 +58,13 @@ namespace Kuros.Scenes
 				
 				if (foundPlayer == null)
 				{
-					GD.Print("BattleSceneManager: 警告 - 未找到Player节点！UI将正常加载，但不会连接玩家数据。");
-					GD.Print("提示：可以在Inspector中手动指定Player节点，或确保场景中有名为'Player'的节点。");
+					GameLogger.Warn(nameof(BattleSceneManager), "未找到Player节点！UI将正常加载，但不会连接玩家数据。");
+					GameLogger.Warn(nameof(BattleSceneManager), "提示：可以在Inspector中手动指定Player节点，或确保场景中有名为'Player'的节点。");
 				}
 				else
 				{
 					Player = foundPlayer;
-					GD.Print($"BattleSceneManager: 找到Player节点: {Player.Name}");
+					GameLogger.Info(nameof(BattleSceneManager), $"找到Player节点: {Player.Name}");
 				}
 			}
 
@@ -92,7 +93,7 @@ namespace Kuros.Scenes
 		{
 			if (UIManager.Instance == null)
 			{
-				GD.PrintErr("BattleSceneManager: UIManager未初始化！请在project.godot中将UIManager添加为autoload。");
+				GameLogger.Error(nameof(BattleSceneManager), "UIManager未初始化！请在project.godot中将UIManager添加为autoload。");
 				return;
 			}
 
@@ -117,7 +118,7 @@ namespace Kuros.Scenes
 				{
 					// 即使没有Player，也显示默认的HUD
 					_battleHUD.UpdateStats(100, 100, 0);
-					GD.Print("BattleSceneManager: HUD已加载，但未连接玩家数据。");
+					GameLogger.Info(nameof(BattleSceneManager), "HUD已加载，但未连接玩家数据。");
 				}
 			}
 		}
@@ -129,7 +130,7 @@ namespace Kuros.Scenes
 		{
 			if (UIManager.Instance == null)
 			{
-				GD.PrintErr("BattleSceneManager: UIManager未初始化！");
+				GameLogger.Error(nameof(BattleSceneManager), "UIManager未初始化！");
 				return;
 			}
 
@@ -181,13 +182,13 @@ namespace Kuros.Scenes
 		private void OnMenuResume()
 		{
 			// 菜单关闭逻辑已在BattleMenu中处理
-			GD.Print("继续游戏");
+			GameLogger.Info(nameof(BattleSceneManager), "继续游戏");
 		}
 
 		private void OnMenuQuit()
 		{
 			// 返回主菜单
-			GD.Print("返回主菜单");
+			GameLogger.Info(nameof(BattleSceneManager), "返回主菜单");
 			var tree = GetTree();
 			if (tree != null)
 			{
@@ -202,7 +203,7 @@ namespace Kuros.Scenes
 		private void OnMenuSettingsRequested()
 		{
 			// 打开设置界面
-			GD.Print("打开设置菜单");
+			GameLogger.Info(nameof(BattleSceneManager), "打开设置菜单");
 			if (UIManager.Instance == null) return;
 
 			// 隐藏战斗菜单
