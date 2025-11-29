@@ -1,3 +1,5 @@
+using Kuros.Actors.Heroes;
+
 namespace Kuros.Actors.Heroes.Attacks
 {
     /// <summary>
@@ -8,6 +10,9 @@ namespace Kuros.Actors.Heroes.Attacks
     /// </summary>
     public partial class PlayerBasicMeleeAttack : PlayerAttackTemplate
     {
+        private PlayerWeaponSkillController? _weaponSkillController;
+        private string _defaultAnimation = "animations/attack";
+
         protected override void OnInitialized()
         {
             base.OnInitialized();
@@ -19,12 +24,27 @@ namespace Kuros.Actors.Heroes.Attacks
             ActiveDuration = 0.2f;
             RecoveryDuration = 0.35f;
             CooldownDuration = 0.5f;
-            AnimationName = "animations/attack";
+            AnimationName = _defaultAnimation;
+            _weaponSkillController = Player.GetNodeOrNull<PlayerWeaponSkillController>("WeaponSkillController");
         }
 
         protected override void OnAttackStarted()
         {
+            AnimationName = _defaultAnimation;
             DamageOverride = Player.AttackDamage;
+
+            if (_weaponSkillController != null)
+            {
+                var overrideAnim = _weaponSkillController.GetPrimarySkillAnimation();
+                if (!string.IsNullOrEmpty(overrideAnim))
+                {
+                    AnimationName = overrideAnim;
+                }
+
+                DamageOverride = _weaponSkillController.ModifyAttackDamage(DamageOverride);
+                _weaponSkillController.TriggerDefaultSkill();
+            }
+
             base.OnAttackStarted();
         }
 

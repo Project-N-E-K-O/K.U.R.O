@@ -23,6 +23,8 @@
 [ext_resource type="Script" path="res://scripts/actors/heroes/PlayerItemAttachment.cs" id="27_item_attachment"]
 [ext_resource type="Script" path="res://scripts/ui/QuickSlotBar.cs" id="28_quick_slot_bar"]
 [ext_resource type="Script" path="res://scripts/actors/heroes/PlayerItemInteractionComponent.cs" id="29_item_interaction"]
+[ext_resource type="Script" path="res://scripts/actors/heroes/PlayerWeaponSkillController.cs" id="30_weapon_skill_controller"]
+[ext_resource type="Script" path="res://scripts/actors/heroes/states/PlayerPickUpState.cs" id="31_player_pickup"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_attack"]
 size = Vector2(64.75629, 180.66397)
@@ -142,8 +144,15 @@ script = ExtResource("23_player_dying")
 [node name="Dead" type="Node" parent="Player/StateMachine"]
 script = ExtResource("24_player_dead")
 
+[node name="PickUp" type="Node" parent="Player/StateMachine"]
+script = ExtResource("31_player_pickup")
+
 [node name="Inventory" type="Node" parent="Player"]
 script = ExtResource("22_player_inventory")
+
+[node name="WeaponSkillController" type="Node" parent="Player"]
+script = ExtResource("30_weapon_skill_controller")
+Inventory = NodePath("..")
 
 [node name="ItemInteraction" type="Node" parent="Player"]
 script = ExtResource("29_item_interaction")

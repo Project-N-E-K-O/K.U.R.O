@@ -58,6 +58,7 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 	{
 		LastMovementStateName = stateName;
 	}
+
 	
 	// Override FlipFacing to handle AttackArea flipping correctly when turning
 	public override void FlipFacing(bool faceRight)

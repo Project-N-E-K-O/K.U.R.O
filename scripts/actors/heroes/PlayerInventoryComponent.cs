@@ -30,6 +30,8 @@ namespace Kuros.Actors.Heroes
         public SpecialInventorySlot? WeaponSlot => GetSpecialSlot(SpecialInventorySlotIds.PrimaryWeapon);
         public event Action<ItemDefinition>? ItemPicked;
         public event Action<string>? ItemRemoved;
+        public event Action<ItemDefinition>? WeaponEquipped;
+        public event Action? WeaponUnequipped;
 
         public override void _Ready()
         {
@@ -82,6 +84,10 @@ namespace Kuros.Actors.Heroes
 
             if (slot.TryAssign(extracted))
             {
+                if (specialSlotId == SpecialInventorySlotIds.PrimaryWeapon)
+                {
+                    WeaponEquipped?.Invoke(extracted.Item);
+                }
                 return true;
             }
 
@@ -106,6 +112,10 @@ namespace Kuros.Actors.Heroes
             if (inserted == stack.Quantity)
             {
                 NotifyItemRemoved(stack.Item.ItemId);
+                if (specialSlotId == SpecialInventorySlotIds.PrimaryWeapon)
+                {
+                    WeaponUnequipped?.Invoke();
+                }
                 return true;
             }
 
@@ -117,6 +127,10 @@ namespace Kuros.Actors.Heroes
             }
 
             NotifyItemRemoved(stack.Item.ItemId);
+            if (specialSlotId == SpecialInventorySlotIds.PrimaryWeapon)
+            {
+                WeaponUnequipped?.Invoke();
+            }
             return false;
         }
 
@@ -130,8 +144,7 @@ namespace Kuros.Actors.Heroes
                 if (stack == null || stack.Item.ItemId != itemId) continue;
 
                 Backpack.RemoveItem(itemId, stack.Quantity);
-            NotifyItemRemoved(itemId);
-            NotifyItemRemoved(itemId);
+                NotifyItemRemoved(itemId);
                 return true;
             }
 

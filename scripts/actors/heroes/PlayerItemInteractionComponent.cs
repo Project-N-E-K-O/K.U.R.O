@@ -24,6 +24,7 @@ namespace Kuros.Actors.Heroes
         [Export] public Vector2 ThrowOffset = new Vector2(48, -10);
         [Export(PropertyHint.Range, "0,2000,1")] public float ThrowImpulse = 800f;
         [Export] public bool EnableInput = true;
+        [Export] public string ThrowStateName { get; set; } = "Throw";
 
         private GameActor? _actor;
 
@@ -60,6 +61,11 @@ namespace Kuros.Actors.Heroes
             {
                 TryHandleDrop(DropDisposition.Throw);
             }
+
+            if (Input.IsActionJustPressed("take_up"))
+            {
+                TriggerPickupState();
+            }
         }
 
         public void SetActiveSlot(int slotIndex)
@@ -67,7 +73,17 @@ namespace Kuros.Actors.Heroes
             ActiveBackpackSlotIndex = Mathf.Clamp(slotIndex, 0, InventoryComponent?.Backpack?.Slots.Count - 1 ?? slotIndex);
         }
 
+        public bool TryTriggerThrowAfterAnimation()
+        {
+            return TryHandleDrop(DropDisposition.Throw, skipAnimation: true);
+        }
+
         private bool TryHandleDrop(DropDisposition disposition)
+        {
+            return TryHandleDrop(disposition, skipAnimation: false);
+        }
+
+        private bool TryHandleDrop(DropDisposition disposition, bool skipAnimation)
         {
             var backpack = InventoryComponent?.Backpack;
             if (backpack == null)
@@ -83,6 +99,12 @@ namespace Kuros.Actors.Heroes
             }
 
             int requestedAmount = DropAmountPerAction <= 0 ? stack.Quantity : Mathf.Min(DropAmountPerAction, stack.Quantity);
+
+            if (!skipAnimation && disposition == DropDisposition.Throw)
+            {
+                TriggerThrowState();
+                return false;
+            }
 
             if (!backpack.TryExtractFromSlot(ActiveBackpackSlotIndex, requestedAmount, out var extracted) ||
                 extracted == null || extracted.IsEmpty)
@@ -121,6 +143,43 @@ namespace Kuros.Actors.Heroes
             return origin + new Vector2(direction.X * offset.X, offset.Y);
         }
 
+        internal bool ExecutePickupAfterAnimation() => TryHandlePickup();
+
+        private void TriggerPickupState()
+        {
+            if (_actor?.StateMachine == null)
+            {
+                TryHandlePickup();
+                return;
+            }
+
+            _actor.StateMachine.ChangeState("PickUp");
+        }
+
+        private bool TryHandlePickup()
+        {
+            if (_actor == null)
+            {
+                return false;
+            }
+
+            var area = _actor.GetNodeOrNull<Area2D>("SpineCharacter/AttackArea");
+            if (area == null)
+            {
+                return false;
+            }
+
+            foreach (var body in area.GetOverlappingBodies())
+            {
+                if (body is WorldItemEntity entity && entity.TryPickupByActor(_actor))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         private Vector2 GetFacingDirection()
         {
             if (_actor == null)
@@ -129,6 +188,16 @@ namespace Kuros.Actors.Heroes
             }
 
             return _actor.FacingRight ? Vector2.Right : Vector2.Left;
+        }
+
+        private void TriggerThrowState()
+        {
+            if (_actor?.StateMachine == null)
+            {
+                return;
+            }
+
+            _actor.StateMachine.ChangeState(ThrowStateName);
         }
 
         private static T? FindChildComponent<T>(Node? root) where T : Node

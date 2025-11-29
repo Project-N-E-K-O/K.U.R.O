@@ -12,4 +12,6 @@ Icon = ExtResource("2")
 Category = "Consumable"
 MaxStackSize = 5
 WorldScenePath = "res://scenes/items/ExampleWorldItem.tscn"
+Tags = PackedStringArray("weapon")
+WeaponSkills = Array[Resource("res://resources/items/skills/ExampleSlashSkill.tres")]
 

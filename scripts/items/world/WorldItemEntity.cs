@@ -199,15 +199,22 @@ namespace Kuros.Items.World
 
         private void HandlePickupRequest(GameActor actor)
         {
+            if (!TryPickupByActor(actor))
+            {
+                EmitSignal(SignalName.ItemTransferFailed, this, actor);
+            }
+        }
+
+        public bool TryPickupByActor(GameActor actor)
+        {
             if (_isPicked)
             {
-                return;
+                return false;
             }
 
             if (!TryTransferToActor(actor))
             {
-                EmitSignal(SignalName.ItemTransferFailed, this, actor);
-                return;
+                return false;
             }
 
             ApplyItemEffects(actor, ItemEffectTrigger.OnPickup);
@@ -219,6 +226,7 @@ namespace Kuros.Items.World
             }
 
             OnPicked(actor);
+            return true;
         }
 
         private void DisableTriggerArea()

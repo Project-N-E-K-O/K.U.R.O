@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script="res://scripts/items/weapons/WeaponSkillDefinition.cs" load_steps=1 format=3 uid="uid://example_slash_skill"]
+
+[resource]
+SkillId = "example_slash"
+DisplayName = "示例斩击"
+SkillType = 1
+AnimationName = "animations/attack_strong"
+DamageMultiplier = 1.5
+CooldownSeconds = 0.8
+Description = "测试用的武器主动技能，提升伤害并可附带效果。"
+

@@ -48,6 +48,9 @@
   - 快捷键：`PlayerItemInteractionComponent` 监听 `put_down` 与 `throw`，从背包槽位抽出物品，通过 `WorldItemSpawner` 生成地面实体；投掷会施加初速度。  
   - 骨骼绑定：`PlayerItemAttachment` 订阅 `ItemPicked`/`ItemRemoved`，将最新拾取物品图标附着在指定骨骼或节点上，放下/投掷时自动清除。  
   - 快捷栏：`QuickSlotBar` 订阅 `InventoryContainer.InventoryChanged`，实时展示前几格物品与数量，便于 Debug 与 UI 集成。
+- 拾取/投掷动画链路：  
+  - `PlayerItemInteractionComponent` 会在 `take_up` 输入时切入 `PlayerPickUpState`，播放 `animations/pickup`（Spine/AnimationPlayer），动画结束后才实际执行拾取。  
+  - 投掷流程同理：按下 `throw` 时先切换到 `PlayerThrowState` 播放投掷动画，动画完成后 `TryTriggerThrowAfterAnimation()` 生成并抛出物品。
 
 ## 3. 战斗系统
 
@@ -57,6 +60,10 @@
 
 - `scripts/actors/enemies/attacks/*`、`EnemyAttackController.cs`  
   - 包含敌人的攻击定义与攻势调度逻辑；效果系统可与之协作（如冻结后重置攻击队列）。
+
+- 投掷动画链路  
+  - `PlayerItemInteractionComponent` 的 `ThrowStateName` 默认为 `PlayerThrowState`。按下投掷键会先切换状态，播放 `animations/throw`，动画结束后由 `TryTriggerThrowAfterAnimation()` 实际生成/投掷物品。  
+  - `PlayerThrowState` 驻留在玩家状态机中，负责播放动画、等待结束并通知交互组件执行投掷，再回到 Idle。
 
 ## 4. 动画与骨骼系统
 
@@ -83,6 +90,11 @@
   - `BaseInteractable` 封装交互开关、次数限制与对话触发，可在 Inspector 绑定 `DialogueSequence` 与实现了 `IDialoguePlayer` 的节点。  
   - `scripts/core/interactions/dialogue/*` 提供对白资源结构（`DialogueLine` / `DialogueSequence`）与 `IDialoguePlayer` 接口，方便接入 UI。  
   - 示例 `NpcDialogueInteractable`（`scripts/actors/npc/NpcDialogueInteractable.cs`）展示如何构建可对话 NPC；`scenes/ExampleBattle.tscn` 已实例化 `FriendlyNPC` 供测试。
+
+- 武器技能系统：`scripts/items/weapons/*`、`scripts/actors/heroes/PlayerWeaponSkillController.cs`  
+  - `WeaponSkillDefinition` 描述主动/被动技能的动画、伤害倍率、附带效果（复用 `ItemEffectEntry`），`ItemDefinition.WeaponSkills` 可在 Inspector 中配置一组技能。  
+  - `PlayerInventoryComponent` 在装备/卸下武器时触发 `WeaponEquipped`/`WeaponUnequipped`；`PlayerWeaponSkillController` 监听该事件，加载技能、施加被动效果并为攻击系统提供动画/伤害覆盖与技能触发接口。  
+  - `PlayerBasicMeleeAttack` 调用控制器以使用武器技能的动画与数值，并在攻击过程中触发默认技能。示例武器参见 `resources/items/ExamplePotion.tres` + `resources/items/skills/ExampleSlashSkill.tres`。
 
 - 工具与日志：`scripts/utils/GameLogger.cs` 等提供调试输出、通用辅助函数。
 
