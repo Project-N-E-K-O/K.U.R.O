@@ -46,6 +46,7 @@ namespace Kuros.UI
 		// 信号：用于通知外部系统
 		[Signal] public delegate void HUDReadyEventHandler();
 		[Signal] public delegate void BattleMenuRequestedEventHandler();
+		[Signal] public delegate void BattleMenuRequestedEventHandler();
 
 		public override void _Ready()
 		{
@@ -412,6 +413,7 @@ namespace Kuros.UI
 		}
 
 		private void UpdateDisplay()
+		private void UpdateDisplay()
 		{
 			if (HealthBar != null)
 			{
@@ -429,9 +431,9 @@ namespace Kuros.UI
 		}
 
 		/// <summary>
-		/// 连接到玩家信号（在外部调用）
+		/// 连接到任意 GameActor（可选实现 IPlayerStatsSource）
 		/// </summary>
-		public void ConnectToPlayer(GameActor player)
+		public void AttachActor(GameActor actor)
 		{
 			if (player is SamplePlayer samplePlayer)
 			{
@@ -481,10 +483,11 @@ namespace Kuros.UI
 		/// </summary>
 		public void SetPlayer(SamplePlayer playerRef)
 		{
-			_player = playerRef;
+			int score = _playerStatsSource?.Score ?? _score;
+			ApplyStatsSnapshot(health, maxHealth, score);
 		}
 
-		private void OnPlayerStatsChanged(int health, int score)
+		private void OnStatsSourceUpdated(int health, int maxHealth, int score)
 		{
 			// 从玩家获取最大生命值
 			int maxHealth = _player?.MaxHealth ?? 100;

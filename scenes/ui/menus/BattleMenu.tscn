@@ -11,8 +11,12 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 visible = false
+mouse_filter = 2
+visible = false
 script = ExtResource("1_battle_menu")
 
+[node name="Overlay" type="ColorRect" parent="."]
+layout_mode = 3
 [node name="Overlay" type="ColorRect" parent="."]
 layout_mode = 3
 anchors_preset = 15
@@ -22,7 +26,10 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 0.65)
 mouse_filter = 2
+color = Color(0, 0, 0, 0.65)
+mouse_filter = 2
 
+[node name="Window" type="Panel" parent="."]
 [node name="Window" type="Panel" parent="."]
 layout_mode = 1
 anchors_preset = 8
@@ -34,9 +41,14 @@ offset_left = -240.0
 offset_top = -220.0
 offset_right = 240.0
 offset_bottom = 220.0
+offset_left = -240.0
+offset_top = -220.0
+offset_right = 240.0
+offset_bottom = 220.0
 grow_horizontal = 2
 grow_vertical = 2
 
+[node name="WindowMargin" type="MarginContainer" parent="Window"]
 [node name="WindowMargin" type="MarginContainer" parent="Window"]
 layout_mode = 1
 anchors_preset = 15
@@ -54,8 +66,19 @@ layout_mode = 2
 theme_override_constants/separation = 20
 
 [node name="TitleLabel" type="Label" parent="Window/WindowMargin/WindowVBox"]
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 32
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 32
+
+[node name="WindowVBox" type="VBoxContainer" parent="Window/WindowMargin"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="TitleLabel" type="Label" parent="Window/WindowMargin/WindowVBox"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
+text = "暂停菜单"
 text = "暂停菜单"
 horizontal_alignment = 1
 
@@ -91,17 +114,28 @@ text = "读档"
 layout_mode = 2
 
 [node name="QuitButton" type="Button" parent="Window/WindowMargin/WindowVBox"]
+[node name="QuitButton" type="Button" parent="Window/WindowMargin/WindowVBox"]
 layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "返回主菜单"
 theme_override_font_sizes/font_size = 22
 text = "返回主菜单"
 
 [node name="ExitButton" type="Button" parent="Window/WindowMargin/WindowVBox"]
+[node name="ExitButton" type="Button" parent="Window/WindowMargin/WindowVBox"]
 layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "退出游戏"
 theme_override_font_sizes/font_size = 22
 text = "退出游戏"
 
 [node name="HintLabel" type="Label" parent="Window/WindowMargin/WindowVBox"]
+[node name="HintLabel" type="Label" parent="Window/WindowMargin/WindowVBox"]
 layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "提示：点击空白区域或按 ESC 可关闭"
+horizontal_alignment = 1
+
 theme_override_font_sizes/font_size = 16
 text = "提示：点击空白区域或按 ESC 可关闭"
 horizontal_alignment = 1

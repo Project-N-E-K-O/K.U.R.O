@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=3 format=3 uid="uid://example_potion"]
+
+[ext_resource type="Script" path="res://scripts/items/ItemDefinition.cs" id="1"]
+[ext_resource type="Texture2D" path="res://icon.svg" id="2"]
+
+[resource]
+script = ExtResource("1")
+ItemId = "item_example_potion"
+DisplayName = "示例药水"
+Description = "用于测试拾取与投掷流程的示例药水。"
+Icon = ExtResource("2")
+Category = "Consumable"
+MaxStackSize = 5
+WorldScenePath = "res://scenes/items/ExampleWorldItem.tscn"
+

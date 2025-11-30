@@ -9,7 +9,7 @@ using Kuros.Items;
 using Kuros.Managers;
 using Kuros.UI;
 
-public partial class SamplePlayer : GameActor
+public partial class SamplePlayer : GameActor, IPlayerStatsSource
 {
 	[ExportCategory("Combat")]
 	[Export] public Area2D AttackArea { get; private set; } = null!;
@@ -358,7 +358,7 @@ public partial class SamplePlayer : GameActor
 		// Reset timer just in case, though State usually manages cooldown entry
 		AttackTimer = AttackCooldown;
 		
-		GD.Print($"=== Player attacking frame! ===");
+		GameLogger.Info(nameof(SamplePlayer), "=== Player attacking frame! ===");
 		
 		int hitCount = 0;
 		
@@ -373,18 +373,18 @@ public partial class SamplePlayer : GameActor
                 {
                     enemy.TakeDamage((int)AttackDamage);
                     hitCount++;
-                    GD.Print($"Hit enemy: {enemy.Name}");
+                    GameLogger.Info(nameof(SamplePlayer), $"Hit enemy: {enemy.Name}");
                 }
             }
         }
         else
         {
-            GD.PrintErr("AttackArea is missing! Assign it in Inspector.");
+            GameLogger.Error(nameof(SamplePlayer), "AttackArea is missing! Assign it in Inspector.");
         }
         
         if (hitCount == 0)
         {
-            GD.Print("No enemies hit!");
+            GameLogger.Info(nameof(SamplePlayer), "No enemies hit!");
         }
     }
     
@@ -444,20 +444,23 @@ public partial class SamplePlayer : GameActor
     
     private void UpdateStatsUI()
     {
-        // Emit signal for decoupled UI systems
-        EmitSignal(SignalName.StatsChanged, CurrentHealth, _score);
-        
-        // Direct update if label is assigned (Simple approach)
+		NotifyStatsListeners();
+
         if (StatsLabel != null)
         {
             StatsLabel.Text = $"Player HP: {CurrentHealth}\nScore: {_score}";
         }
     }
+
+	private void NotifyStatsListeners()
+	{
+		StatsUpdated?.Invoke(CurrentHealth, MaxHealth, _score);
+	}
     
     protected override void OnDeathFinalized()
     {
         EffectController?.ClearAll();
-        GD.Print("Player died! Game Over!");
+        GameLogger.Warn(nameof(SamplePlayer), "Player died! Game Over!");
         GetTree().ReloadCurrentScene();
     }
 }

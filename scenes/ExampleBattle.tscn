@@ -10,7 +10,6 @@
 [ext_resource type="Script" uid="uid://d3ancpb5wo2ie" path="res://scripts/actors/heroes/states/PlayerAttackState.cs" id="6_bhpvs"]
 [ext_resource type="Script" uid="uid://l40es7irdvdw" path="res://scripts/actors/heroes/states/PlayerHitState.cs" id="7_w7wnm"]
 [ext_resource type="Script" uid="uid://ba1kd5qgh17ag" path="res://scripts/actors/heroes/states/PlayerRunState.cs" id="8_bhpvs"]
-[ext_resource type="PackedScene" uid="uid://ciwlpphli7o01" path="res://scenes/properties/DroppableExampleProperty.tscn" id="11_drop_example"]
 [ext_resource type="PackedScene" uid="uid://ceou8wonisj4d" path="res://scenes/environments/wall.tscn" id="12_v8do6"]
 [ext_resource type="Script" uid="uid://d1g4amacs13a3" path="res://scripts/actors/heroes/states/PlayerFrozenState.cs" id="17_player_frozen"]
 [ext_resource type="Script" uid="uid://c2pgsls8pb7oh" path="res://scripts/actors/heroes/attacks/PlayerBasicMeleeAttack.cs" id="19_player_basic_attack"]
@@ -176,7 +175,7 @@ AttachmentPointPath = NodePath("SpineCharacter/Skeleton2D/root/bone/bone2/bone3/
 position = Vector2(611, 711)
 
 [node name="UI" type="CanvasLayer" parent="."]
-visible = false
+visible = true
 
 [node name="PlayerStats" type="Label" parent="UI"]
 offset_left = 10.0
@@ -200,6 +199,14 @@ grow_horizontal = 2
 grow_vertical = 0
 text = "WASD: Move | Space: Attack | Shift: Run | F: Pick Up | G: Put Down"
 horizontal_alignment = 1
+
+[node name="QuickSlotBar" type="HBoxContainer" parent="UI"]
+offset_left = 20.0
+offset_top = 940.0
+offset_right = 300.0
+offset_bottom = 1020.0
+script = ExtResource("28_quick_slot_bar")
+InventoryPath = NodePath("../../Player/Inventory")
 
 [node name="ArillWall" type="StaticBody2D" parent="."]
 
