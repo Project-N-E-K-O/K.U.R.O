@@ -48,6 +48,12 @@ namespace Kuros.Actors.Heroes.States
 				}
 				return;
 			}
+
+			if (Input.IsActionJustPressed("take_up"))
+			{
+				ChangeState("PickUp");
+				return;
+			}
 			
 			if (Input.IsActionJustPressed("take_up"))
 			{

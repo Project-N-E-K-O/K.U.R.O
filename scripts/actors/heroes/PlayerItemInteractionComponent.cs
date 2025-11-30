@@ -71,6 +71,11 @@ namespace Kuros.Actors.Heroes
             return TryHandleDrop(DropDisposition.Throw, skipAnimation: true);
         }
 
+        public bool TryTriggerThrowAfterAnimation()
+        {
+            return TryHandleDrop(DropDisposition.Throw, skipAnimation: true);
+        }
+
         private bool TryHandleDrop(DropDisposition disposition)
         {
             return TryHandleDrop(disposition, skipAnimation: false);
