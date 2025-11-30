@@ -22,6 +22,20 @@ color = Color(0.1, 0.1, 0.15, 1)
 
 [node name="MenuPanel" type="Control" parent="."]
 layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -600.0
+offset_top = -400.0
+offset_right = 600.0
+offset_bottom = 400.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="Panel" parent="MenuPanel"]
+layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -35,6 +49,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/separation = 10
 
 [node name="Title" type="Label" parent="MenuPanel/VBoxContainer"]
 layout_mode = 2
@@ -45,13 +60,78 @@ theme_override_font_sizes/font_size = 32
 [node name="HSeparator" type="HSeparator" parent="MenuPanel/VBoxContainer"]
 layout_mode = 2
 
-[node name="ScrollContainer" type="ScrollContainer" parent="MenuPanel/VBoxContainer"]
+[node name="ContentContainer" type="HBoxContainer" parent="MenuPanel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 20
+
+[node name="LeftPanel" type="VBoxContainer" parent="MenuPanel/VBoxContainer/ContentContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MenuPanel/VBoxContainer/ContentContainer/LeftPanel"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="SlotGrid" type="GridContainer" parent="MenuPanel/VBoxContainer/ScrollContainer"]
+[node name="SlotGrid" type="GridContainer" parent="MenuPanel/VBoxContainer/ContentContainer/LeftPanel/ScrollContainer"]
 layout_mode = 2
-columns = 3
+columns = 4
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 10
+
+[node name="RightPanel" type="VBoxContainer" parent="MenuPanel/VBoxContainer/ContentContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(300, 0)
+size_flags_horizontal = 0
+
+[node name="DetailTitle" type="Label" parent="MenuPanel/VBoxContainer/ContentContainer/RightPanel"]
+layout_mode = 2
+text = "存档详情"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 24
+
+[node name="DetailSeparator" type="HSeparator" parent="MenuPanel/VBoxContainer/ContentContainer/RightPanel"]
+layout_mode = 2
+
+[node name="LocationImage" type="TextureRect" parent="MenuPanel/VBoxContainer/ContentContainer/RightPanel"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 200)
+expand_mode = 1
+stretch_mode = 5
+
+[node name="InfoContainer" type="VBoxContainer" parent="MenuPanel/VBoxContainer/ContentContainer/RightPanel"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="HealthLabel" type="Label" parent="MenuPanel/VBoxContainer/ContentContainer/RightPanel/InfoContainer"]
+layout_mode = 2
+text = "生命值: --/--"
+theme_override_font_sizes/font_size = 16
+
+[node name="WeaponLabel" type="Label" parent="MenuPanel/VBoxContainer/ContentContainer/RightPanel/InfoContainer"]
+layout_mode = 2
+text = "武器: --"
+theme_override_font_sizes/font_size = 16
+
+[node name="LevelLabel" type="Label" parent="MenuPanel/VBoxContainer/ContentContainer/RightPanel/InfoContainer"]
+layout_mode = 2
+text = "关卡进度: --"
+theme_override_font_sizes/font_size = 16
+
+[node name="PlayTimeLabel" type="Label" parent="MenuPanel/VBoxContainer/ContentContainer/RightPanel/InfoContainer"]
+layout_mode = 2
+text = "游戏时间: --"
+theme_override_font_sizes/font_size = 16
+
+[node name="SaveTimeLabel" type="Label" parent="MenuPanel/VBoxContainer/ContentContainer/RightPanel/InfoContainer"]
+layout_mode = 2
+text = "保存时间: --"
+theme_override_font_sizes/font_size = 16
+
+[node name="SwitchModeButton" type="Button" parent="MenuPanel/VBoxContainer"]
+layout_mode = 2
+text = "切换到存档"
+theme_override_font_sizes/font_size = 20
 
 [node name="BackButton" type="Button" parent="MenuPanel/VBoxContainer"]
 layout_mode = 2

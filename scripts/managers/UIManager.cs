@@ -20,12 +20,19 @@ namespace Kuros.Managers
 		private const string MODE_SELECTION_PATH = "res://scenes/ui/menus/ModeSelectionMenu.tscn";
 		private const string SETTINGS_MENU_PATH = "res://scenes/ui/menus/SettingsMenu.tscn";
 		private const string SAVE_SLOT_SELECTION_PATH = "res://scenes/ui/menus/SaveSlotSelection.tscn";
+		private const string DIALOGUE_WINDOW_PATH = "res://scenes/ui/windows/DialogueWindow.tscn";
+		private const string SKILL_WINDOW_PATH = "res://scenes/ui/windows/SkillWindow.tscn";
+		private const string INVENTORY_WINDOW_PATH = "res://scenes/ui/windows/InventoryWindow.tscn";
+		private const string LOADING_SCREEN_PATH = "res://scenes/ui/LoadingScreen.tscn";
+		private const string LEVEL_NAME_POPUP_PATH = "res://scenes/ui/LevelNamePopup.tscn";
+		private const string ITEM_OBTAINED_POPUP_PATH = "res://scenes/ui/ItemObtainedPopup.tscn";
 
 		// 当前加载的UI节点
 		private Dictionary<string, Node> _loadedUIs = new Dictionary<string, Node>();
 		
 		// UI容器 - 用于存放不同类型的UI层
 		private CanvasLayer _hudLayer = null!;
+		private CanvasLayer _gameUILayer = null!; // 游戏UI层（物品栏、技能栏等，在HUD之上）
 		private CanvasLayer _menuLayer = null!;
 
 		public override void _Ready()
@@ -35,12 +42,17 @@ namespace Kuros.Managers
 			// 创建UI层容器
 			_hudLayer = new CanvasLayer();
 			_hudLayer.Name = "HUDLayer";
-			_hudLayer.Layer = 1; // HUD层
+			_hudLayer.Layer = 1; // HUD层（玩家状态）
 			AddChild(_hudLayer);
+
+			_gameUILayer = new CanvasLayer();
+			_gameUILayer.Name = "GameUILayer";
+			_gameUILayer.Layer = 2; // 游戏UI层（物品栏、技能栏等，在HUD之上）
+			AddChild(_gameUILayer);
 
 			_menuLayer = new CanvasLayer();
 			_menuLayer.Name = "MenuLayer";
-			_menuLayer.Layer = 2; // 菜单层（在HUD之上）
+			_menuLayer.Layer = 3; // 菜单层（在游戏UI之上）
 			AddChild(_menuLayer);
 		}
 
@@ -48,7 +60,7 @@ namespace Kuros.Managers
 		/// 加载并显示UI场景
 		/// </summary>
 		/// <param name="uiPath">UI场景路径</param>
-		/// <param name="layer">UI层类型（HUD或Menu）</param>
+		/// <param name="layer">UI层类型（HUD、GameUI或Menu）</param>
 		/// <param name="key">UI的唯一标识符，用于后续引用和卸载</param>
 		/// <returns>加载的UI节点</returns>
 		public T LoadUI<T>(string uiPath, UILayer layer = UILayer.HUD, string? key = null) where T : Node
@@ -92,7 +104,13 @@ namespace Kuros.Managers
 			}
 
 			// 添加到对应的层
-			CanvasLayer targetLayer = layer == UILayer.HUD ? _hudLayer : _menuLayer;
+			CanvasLayer targetLayer = layer switch
+			{
+				UILayer.HUD => _hudLayer,
+				UILayer.GameUI => _gameUILayer,
+				UILayer.Menu => _menuLayer,
+				_ => _hudLayer
+			};
 			targetLayer.AddChild(uiNode);
 
 			// 存储引用
@@ -224,6 +242,78 @@ namespace Kuros.Managers
 		{
 			UnloadUI("SaveSlotSelection");
 		}
+
+		// 便捷方法：加载对话窗口
+		public DialogueWindow LoadDialogueWindow()
+		{
+			return LoadUI<DialogueWindow>(DIALOGUE_WINDOW_PATH, UILayer.Menu, "DialogueWindow");
+		}
+
+		// 便捷方法：卸载对话窗口
+		public void UnloadDialogueWindow()
+		{
+			UnloadUI("DialogueWindow");
+		}
+
+		// 便捷方法：加载技能窗口（放在GameUI层，在HUD之上）
+		public SkillWindow LoadSkillWindow()
+		{
+			return LoadUI<SkillWindow>(SKILL_WINDOW_PATH, UILayer.GameUI, "SkillWindow");
+		}
+
+		// 便捷方法：卸载技能窗口
+		public void UnloadSkillWindow()
+		{
+			UnloadUI("SkillWindow");
+		}
+
+		// 便捷方法：加载物品栏窗口（放在GameUI层，在HUD之上，和SkillWindow同一层）
+		public InventoryWindow LoadInventoryWindow()
+		{
+			return LoadUI<InventoryWindow>(INVENTORY_WINDOW_PATH, UILayer.GameUI, "InventoryWindow");
+		}
+
+		// 便捷方法：卸载物品栏窗口
+		public void UnloadInventoryWindow()
+		{
+			UnloadUI("InventoryWindow");
+		}
+		
+		// 便捷方法：加载加载屏幕
+		public LoadingScreen LoadLoadingScreen()
+		{
+			return LoadUI<LoadingScreen>(LOADING_SCREEN_PATH, UILayer.Menu, "LoadingScreen");
+		}
+		
+		// 便捷方法：卸载加载屏幕
+		public void UnloadLoadingScreen()
+		{
+			UnloadUI("LoadingScreen");
+		}
+		
+		// 便捷方法：加载关卡名称弹窗
+		public LevelNamePopup LoadLevelNamePopup()
+		{
+			return LoadUI<LevelNamePopup>(LEVEL_NAME_POPUP_PATH, UILayer.Menu, "LevelNamePopup");
+		}
+		
+		// 便捷方法：卸载关卡名称弹窗
+		public void UnloadLevelNamePopup()
+		{
+			UnloadUI("LevelNamePopup");
+		}
+		
+		// 便捷方法：加载获得物品弹窗
+		public ItemObtainedPopup LoadItemObtainedPopup()
+		{
+			return LoadUI<ItemObtainedPopup>(ITEM_OBTAINED_POPUP_PATH, UILayer.Menu, "ItemObtainedPopup");
+		}
+		
+		// 便捷方法：卸载获得物品弹窗
+		public void UnloadItemObtainedPopup()
+		{
+			UnloadUI("ItemObtainedPopup");
+		}
 	}
 
 	/// <summary>
@@ -231,7 +321,8 @@ namespace Kuros.Managers
 	/// </summary>
 	public enum UILayer
 	{
-		HUD,    // 游戏内HUD（血条、分数等）
-		Menu    // 菜单层（暂停菜单、设置等）
+		HUD,     // 游戏内HUD（血条、分数等）- Layer 1
+		GameUI,  // 游戏UI层（物品栏、技能栏等，在HUD之上）- Layer 2
+		Menu     // 菜单层（暂停菜单、设置等，在游戏UI之上）- Layer 3
 	}
 }

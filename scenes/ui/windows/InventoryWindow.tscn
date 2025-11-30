@@ -1,6 +1,9 @@
-[gd_scene load_steps=2 format=3 uid="uid://inventory_window_ui"]
+[gd_scene load_steps=3 format=3 uid="uid://inventory_window_ui"]
 
 [ext_resource type="Script" path="res://scripts/ui/InventoryWindow.cs" id="1_inventory_window_script"]
+
+[sub_resource type="StyleBoxFlat" id="PanelStyle_TrashBin"]
+bg_color = Color(0.5, 0.2, 0.2, 0.8)
 
 [node name="InventoryWindow" type="Control"]
 layout_mode = 3
@@ -54,6 +57,12 @@ text = "物品栏"
 horizontal_alignment = 1
 theme_override_font_sizes/font_size = 28
 
+[node name="GoldLabel" type="Label" parent="MainPanel/Header"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "金币: 0"
+theme_override_font_sizes/font_size = 18
+
 [node name="CloseButton" type="Button" parent="MainPanel/Header"]
 layout_mode = 2
 text = "关闭"
@@ -101,4 +110,21 @@ theme_override_font_sizes/font_size = 20
 layout_mode = 2
 alignment = 1
 theme_override_constants/separation = 8
+
+[node name="TrashBin" type="Panel" parent="MainPanel/Body"]
+layout_mode = 2
+custom_minimum_size = Vector2(80, 80)
+theme_override_styles/panel = SubResource("PanelStyle_TrashBin")
+
+[node name="TrashLabel" type="Label" parent="MainPanel/Body/TrashBin"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "垃圾桶"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 14
 

@@ -4,6 +4,9 @@
 *.import
 *.uid
 
+# 确保project.godot被跟踪（不忽略）
+!project.godot
+
 # IDE files
 .vscode/
 .vs/

@@ -96,6 +96,7 @@ namespace Kuros.Scenes
 				_modeSelectionMenu.Visible = true;
 				_modeSelectionMenu.ModeSelected += OnModeSelected;
 				_modeSelectionMenu.BackRequested += LoadMainMenu;
+				_modeSelectionMenu.TestLoadingRequested += OnTestLoadingRequested;
 			}
 		}
 
@@ -124,9 +125,9 @@ namespace Kuros.Scenes
 		}
 
 		/// <summary>
-		/// 加载存档选择菜单
+		/// 加载存档选择菜单（从主界面进入，只允许读档）
 		/// </summary>
-		public void LoadSaveSlotSelection()
+		public void LoadSaveSlotSelection(SaveLoadMode mode, bool allowSave = false)
 		{
 			if (UIManager.Instance == null) return;
 
@@ -136,6 +137,9 @@ namespace Kuros.Scenes
 			if (_saveSlotSelection != null && IsInstanceValid(_saveSlotSelection))
 			{
 				_saveSlotSelection.Visible = true;
+				_saveSlotSelection.SetMode(mode);
+				_saveSlotSelection.SetAllowSave(allowSave);
+				_saveSlotSelection.SetSource(false); // 从主菜单进入
 				_saveSlotSelection.RefreshSlots();
 				return;
 			}
@@ -144,8 +148,33 @@ namespace Kuros.Scenes
 			if (_saveSlotSelection != null)
 			{
 				_saveSlotSelection.Visible = true;
+				_saveSlotSelection.SetMode(mode);
+				_saveSlotSelection.SetAllowSave(allowSave);
+				_saveSlotSelection.SetSource(false); // 从主菜单进入
 				_saveSlotSelection.SlotSelected += OnSaveSlotSelected;
 				_saveSlotSelection.BackRequested += LoadMainMenu;
+				_saveSlotSelection.ModeSwitchRequested += OnSaveSlotSelectionModeSwitchRequested;
+			}
+		}
+
+		private void OnSaveSlotSelectionModeSwitchRequested(int newMode)
+		{
+			var mode = (SaveLoadMode)newMode;
+			// 从主界面进入时，不允许切换到存档模式
+			if (mode == SaveLoadMode.Save && _saveSlotSelection != null)
+			{
+				// 如果当前不允许存档，不允许切换
+				if (!_saveSlotSelection.AllowSave)
+				{
+					GD.Print("从主界面进入，不允许存档");
+					return;
+				}
+			}
+			
+			// 切换模式
+			if (_saveSlotSelection != null && IsInstanceValid(_saveSlotSelection))
+			{
+				_saveSlotSelection.SetMode(mode);
 			}
 		}
 
@@ -186,7 +215,7 @@ namespace Kuros.Scenes
 
 		private void OnLoadGameRequested()
 		{
-			LoadSaveSlotSelection();
+			LoadSaveSlotSelection(SaveLoadMode.Load, false); // 从主界面进入，禁用存档
 		}
 
 		private void OnSettingsRequested()
@@ -202,13 +231,46 @@ namespace Kuros.Scenes
 			// 根据模式加载不同的场景
 			tree.ChangeSceneToFile(BattleScenePath);
 		}
+		
+		private void OnTestLoadingRequested()
+		{
+			GD.Print("开始测试加载页面");
+			
+			// 创建加载测试管理器
+			var loadingTestManager = new LoadingTestManager();
+			loadingTestManager.Name = "LoadingTestManager";
+			GetTree().Root.AddChild(loadingTestManager);
+			
+			// 开始加载测试
+			loadingTestManager.StartLoadingTest();
+		}
 
 		private void OnSaveSlotSelected(int slotIndex)
 		{
+			if (_saveSlotSelection == null) return;
+
+			// 从主界面进入时，只允许读档
 			GD.Print($"加载存档槽位: {slotIndex}");
+			
+			// 实现实际的读档逻辑
+			if (SaveManager.Instance != null)
+			{
+				var gameData = SaveManager.Instance.LoadGame(slotIndex);
+				if (gameData != null)
+				{
+					GD.Print($"成功加载槽位 {slotIndex}");
+					// TODO: 应用游戏数据到游戏状态
+					// 例如：恢复玩家血量、等级、武器等
+				}
+				else
+				{
+					GD.PrintErr($"加载失败: 槽位 {slotIndex}");
+					return; // 加载失败，不切换场景
+				}
+			}
+			
 			var tree = GetTree();
 			CleanupUI();
-			// 这里应该加载存档数据
 			tree.ChangeSceneToFile(BattleScenePath);
 		}
 

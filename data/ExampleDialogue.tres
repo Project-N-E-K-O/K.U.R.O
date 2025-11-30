@@ -1,0 +1,42 @@
+[gd_resource type="Resource" script_class="DialogueData" load_steps=6 format=3 uid="uid://example_dialogue_data"]
+
+[ext_resource type="Script" path="res://scripts/data/DialogueData.cs" id="1_dialogue_data"]
+
+[sub_resource type="Resource" script_class="DialogueChoice" id="DialogueChoice_1"]
+Text = "了解更多信息"
+NextEntryIndex = 2
+OnSelectedAction = ""
+
+[sub_resource type="Resource" script_class="DialogueChoice" id="DialogueChoice_2"]
+Text = "谢谢，再见"
+NextEntryIndex = -1
+OnSelectedAction = ""
+
+[sub_resource type="Resource" script_class="DialogueEntry" id="DialogueEntry_1"]
+SpeakerName = "村民"
+Text = "你好，旅行者！欢迎来到我们的村庄。
+这里最近出现了一些怪物，请小心。"
+AutoAdvance = false
+Choices = [SubResource("DialogueChoice_1"), SubResource("DialogueChoice_2")]
+
+[sub_resource type="Resource" script_class="DialogueEntry" id="DialogueEntry_2"]
+SpeakerName = "村民"
+Text = "如果你需要帮助，随时可以来找我。
+我会告诉你一些有用的信息。"
+AutoAdvance = false
+
+[sub_resource type="Resource" script_class="DialogueEntry" id="DialogueEntry_3"]
+SpeakerName = "村民"
+Text = "这些怪物通常出现在村庄的东边。
+如果你要去那里，记得带上足够的装备。
+祝你好运！"
+AutoAdvance = false
+
+resource_name = "ExampleDialogue"
+script = ExtResource("1_dialogue_data")
+DialogueId = "example_villager_dialogue"
+DialogueName = "村民对话"
+StartEntryIndex = 0
+CanSkip = true
+Entries = [SubResource("DialogueEntry_1"), SubResource("DialogueEntry_2"), SubResource("DialogueEntry_3")]
+

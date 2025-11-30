@@ -1,0 +1,38 @@
+[gd_scene load_steps=4 format=3 uid="uid://simple_npc_scene"]
+
+[ext_resource type="Script" path="res://scripts/core/GameActor.cs" id="1_game_actor"]
+[ext_resource type="Script" path="res://scripts/actors/npc/NPCInteraction.cs" id="2_npc_interaction"]
+[ext_resource type="Script" path="res://scripts/core/effects/EffectController.cs" id="3_effect_controller"]
+
+[sub_resource type="PlaceholderTexture2D" id="1_npc_sprite"]
+size = Vector2(32, 64)
+
+[sub_resource type="CapsuleShape2D" id="2_npc_collision"]
+radius = 16.0
+height = 50.0
+
+[node name="SimpleNPC" type="CharacterBody2D"]
+collision_layer = 4
+collision_mask = 0
+motion_mode = 1
+script = ExtResource("1_game_actor")
+Speed = 0.0
+MaxHealth = 1000
+
+[node name="EffectController" type="Node" parent="."]
+script = ExtResource("3_effect_controller")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+modulate = Color(0.2, 0.6, 0.8, 1)
+scale = Vector2(2, 2)
+texture = SubResource("1_npc_sprite")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -10)
+shape = SubResource("2_npc_collision")
+
+[node name="NPCInteraction" type="Node2D" parent="."]
+script = ExtResource("2_npc_interaction")
+InteractionRange = 120.0
+InteractionPromptText = "按 [F] 对话"
+

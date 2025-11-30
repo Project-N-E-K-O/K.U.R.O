@@ -14,12 +14,18 @@ namespace Kuros.Scenes
 		[ExportCategory("References")]
 		[Export] public GameActor Player { get; private set; } = null!;
 
-		[ExportCategory("UI Settings")]
-		[Export] public bool AutoLoadHUD = true;
-		[Export] public bool AutoLoadMenu = true;
+	[ExportCategory("UI Settings")]
+	[Export] public bool AutoLoadHUD = true;
+	[Export] public bool AutoLoadMenu = true;
+	[Export] public bool AutoLoadSkillWindow = true;
+	[Export] public bool AutoShowLevelName = true;
+	[Export] public string LevelName = "关卡 1"; // 关卡名称，如果为空则使用场景名称
 
-		private BattleHUD? _battleHUD;
-		private BattleMenu? _battleMenu;
+	private BattleHUD? _battleHUD;
+	private BattleMenu? _battleMenu;
+	private SkillWindow? _skillWindow;
+	private SaveSlotSelection? _saveSlotSelection;
+	private LevelNamePopup? _levelNamePopup;
 
 		public override void _Ready()
 		{
@@ -69,6 +75,12 @@ namespace Kuros.Scenes
 
 			// 加载UI
 			LoadUIs();
+
+			// 显示关卡名称弹窗
+			if (AutoShowLevelName)
+			{
+				ShowLevelNamePopup();
+			}
 		}
 
 		private void LoadUIs()
@@ -82,6 +94,11 @@ namespace Kuros.Scenes
 			if (AutoLoadMenu)
 			{
 				LoadMenu();
+			}
+
+			if (AutoLoadSkillWindow)
+			{
+				LoadSkillWindow();
 			}
 		}
 
@@ -100,6 +117,12 @@ namespace Kuros.Scenes
 			
 			if (_battleHUD != null)
 			{
+				// 连接BattleMenuRequested信号
+				if (!_battleHUD.IsConnected(BattleHUD.SignalName.BattleMenuRequested, new Callable(this, MethodName.OnBattleMenuRequested)))
+				{
+					_battleHUD.BattleMenuRequested += OnBattleMenuRequested;
+				}
+
 				// 如果找到了Player，连接它
 				if (Player != null && Player is SamplePlayer samplePlayer)
 				{
@@ -141,6 +164,85 @@ namespace Kuros.Scenes
 				_battleMenu.ResumeRequested += OnMenuResume;
 				_battleMenu.QuitRequested += OnMenuQuit;
 				_battleMenu.SettingsRequested += OnMenuSettingsRequested;
+				_battleMenu.SaveRequested += OnMenuSaveRequested;
+				_battleMenu.LoadRequested += OnMenuLoadRequested;
+			}
+		}
+
+		/// <summary>
+		/// 处理BattleMenuRequested信号 - 打开战斗菜单
+		/// </summary>
+		private void OnBattleMenuRequested()
+		{
+			if (_battleMenu != null && IsInstanceValid(_battleMenu))
+			{
+				_battleMenu.OpenMenu();
+			}
+			else
+			{
+				// 如果菜单未加载，先加载它
+				LoadMenu();
+				if (_battleMenu != null)
+				{
+					_battleMenu.OpenMenu();
+				}
+			}
+		}
+
+		/// <summary>
+		/// 加载技能界面
+		/// </summary>
+		public void LoadSkillWindow()
+		{
+			if (UIManager.Instance == null)
+			{
+				GD.PrintErr("BattleSceneManager: UIManager未初始化！");
+				return;
+			}
+
+			_skillWindow = UIManager.Instance.LoadSkillWindow();
+			
+			if (_skillWindow != null)
+			{
+				GD.Print("BattleSceneManager: 技能界面已加载");
+			}
+		}
+
+		/// <summary>
+		/// 显示关卡名称弹窗
+		/// </summary>
+		public void ShowLevelNamePopup()
+		{
+			if (UIManager.Instance == null)
+			{
+				GD.PrintErr("BattleSceneManager: UIManager未初始化！");
+				return;
+			}
+
+			// 加载关卡名称弹窗
+			_levelNamePopup = UIManager.Instance.LoadLevelNamePopup();
+			
+			if (_levelNamePopup != null)
+			{
+				// 确定关卡名称
+				string levelName = LevelName;
+				if (string.IsNullOrEmpty(levelName))
+				{
+					// 如果未设置关卡名称，使用场景名称
+					var scene = GetTree().CurrentScene;
+					if (scene != null)
+					{
+						levelName = scene.Name;
+					}
+					else
+					{
+						levelName = "未知关卡";
+					}
+				}
+
+				// 显示关卡名称
+				_levelNamePopup.ShowLevelName(levelName);
+				GD.Print($"BattleSceneManager: 显示关卡名称: {levelName}");
 			}
 		}
 
@@ -157,11 +259,21 @@ namespace Kuros.Scenes
 			}
 
 			// 断开信号连接
+			if (_battleHUD != null && IsInstanceValid(_battleHUD))
+			{
+				if (_battleHUD.IsConnected(BattleHUD.SignalName.BattleMenuRequested, new Callable(this, MethodName.OnBattleMenuRequested)))
+				{
+					_battleHUD.BattleMenuRequested -= OnBattleMenuRequested;
+				}
+			}
+
 			if (_battleMenu != null && IsInstanceValid(_battleMenu))
 			{
 				_battleMenu.ResumeRequested -= OnMenuResume;
 				_battleMenu.QuitRequested -= OnMenuQuit;
 				_battleMenu.SettingsRequested -= OnMenuSettingsRequested;
+				_battleMenu.SaveRequested -= OnMenuSaveRequested;
+				_battleMenu.LoadRequested -= OnMenuLoadRequested;
 			}
 
 			if (_battleSettingsMenu != null && IsInstanceValid(_battleSettingsMenu))
@@ -169,13 +281,26 @@ namespace Kuros.Scenes
 				_battleSettingsMenu.BackRequested -= OnSettingsBackRequested;
 			}
 
+			if (_saveSlotSelection != null && IsInstanceValid(_saveSlotSelection))
+			{
+				_saveSlotSelection.SlotSelected -= OnSaveSlotSelected;
+				_saveSlotSelection.BackRequested -= OnSaveSlotSelectionBackRequested;
+				_saveSlotSelection.ModeSwitchRequested -= OnSaveSlotSelectionModeSwitchRequested;
+			}
+
 			UIManager.Instance.UnloadBattleHUD();
 			UIManager.Instance.UnloadBattleMenu();
 			UIManager.Instance.UnloadSettingsMenu();
+			UIManager.Instance.UnloadSkillWindow();
+			UIManager.Instance.UnloadSaveSlotSelection();
+			UIManager.Instance.UnloadLevelNamePopup();
 
 			_battleHUD = null;
 			_battleMenu = null;
 			_battleSettingsMenu = null;
+			_skillWindow = null;
+			_saveSlotSelection = null;
+			_levelNamePopup = null;
 		}
 
 		private void OnMenuResume()
@@ -241,6 +366,171 @@ namespace Kuros.Scenes
 			if (_battleMenu != null && IsInstanceValid(_battleMenu))
 			{
 				_battleMenu.Visible = true;
+			}
+		}
+
+		private void OnMenuSaveRequested()
+		{
+			// 打开存档界面
+			GD.Print("打开存档界面");
+			if (UIManager.Instance == null) return;
+
+			// 隐藏战斗菜单
+			if (_battleMenu != null && IsInstanceValid(_battleMenu))
+			{
+				_battleMenu.Visible = false;
+			}
+
+			// 加载存档选择菜单
+			if (_saveSlotSelection == null || !IsInstanceValid(_saveSlotSelection))
+			{
+				_saveSlotSelection = UIManager.Instance.LoadSaveSlotSelection();
+				if (_saveSlotSelection != null)
+				{
+					_saveSlotSelection.SetMode(SaveLoadMode.Save);
+					_saveSlotSelection.SetAllowSave(true);
+					_saveSlotSelection.SetSource(true); // 从战斗菜单进入
+					_saveSlotSelection.SlotSelected += OnSaveSlotSelected;
+					_saveSlotSelection.BackRequested += OnSaveSlotSelectionBackRequested;
+					_saveSlotSelection.ModeSwitchRequested += OnSaveSlotSelectionModeSwitchRequested;
+				}
+			}
+			else
+			{
+				_saveSlotSelection.SetMode(SaveLoadMode.Save);
+				_saveSlotSelection.SetAllowSave(true);
+				_saveSlotSelection.SetSource(true);
+				_saveSlotSelection.RefreshSlots();
+			}
+
+			if (_saveSlotSelection != null)
+			{
+				_saveSlotSelection.Visible = true;
+			}
+		}
+
+		private void OnMenuLoadRequested()
+		{
+			// 打开读档界面
+			GD.Print("打开读档界面");
+			if (UIManager.Instance == null) return;
+
+			// 隐藏战斗菜单
+			if (_battleMenu != null && IsInstanceValid(_battleMenu))
+			{
+				_battleMenu.Visible = false;
+			}
+
+			// 加载存档选择菜单
+			if (_saveSlotSelection == null || !IsInstanceValid(_saveSlotSelection))
+			{
+				_saveSlotSelection = UIManager.Instance.LoadSaveSlotSelection();
+				if (_saveSlotSelection != null)
+				{
+					_saveSlotSelection.SetMode(SaveLoadMode.Load);
+					_saveSlotSelection.SetAllowSave(true);
+					_saveSlotSelection.SetSource(true); // 从战斗菜单进入
+					_saveSlotSelection.SlotSelected += OnSaveSlotSelected;
+					_saveSlotSelection.BackRequested += OnSaveSlotSelectionBackRequested;
+					_saveSlotSelection.ModeSwitchRequested += OnSaveSlotSelectionModeSwitchRequested;
+				}
+			}
+			else
+			{
+				_saveSlotSelection.SetMode(SaveLoadMode.Load);
+				_saveSlotSelection.SetAllowSave(true);
+				_saveSlotSelection.SetSource(true);
+				_saveSlotSelection.RefreshSlots();
+			}
+
+			if (_saveSlotSelection != null)
+			{
+				_saveSlotSelection.Visible = true;
+			}
+		}
+
+		private void OnSaveSlotSelectionBackRequested()
+		{
+			// 关闭存档选择菜单，重新显示战斗菜单
+			if (_saveSlotSelection != null && IsInstanceValid(_saveSlotSelection))
+			{
+				_saveSlotSelection.Visible = false;
+			}
+
+			if (_battleMenu != null && IsInstanceValid(_battleMenu))
+			{
+				_battleMenu.Visible = true;
+			}
+		}
+
+		private void OnSaveSlotSelectionModeSwitchRequested(int newMode)
+		{
+			// 切换模式
+			if (_saveSlotSelection != null && IsInstanceValid(_saveSlotSelection))
+			{
+				_saveSlotSelection.SetMode((SaveLoadMode)newMode);
+			}
+		}
+
+		private void OnSaveSlotSelected(int slotIndex)
+		{
+			if (_saveSlotSelection == null) return;
+
+			if (_saveSlotSelection.Mode == SaveLoadMode.Save)
+			{
+				GD.Print($"保存到存档槽位: {slotIndex}");
+				
+				// 实现实际的存档逻辑
+				if (SaveManager.Instance != null)
+				{
+					var gameData = SaveManager.Instance.GetCurrentGameData();
+					gameData.SlotIndex = slotIndex;
+					
+					if (SaveManager.Instance.SaveGame(slotIndex, gameData))
+					{
+						GD.Print($"成功保存到槽位 {slotIndex}");
+						// 刷新存档列表
+						_saveSlotSelection.RefreshSlots();
+					}
+					else
+					{
+						GD.PrintErr($"保存失败: 槽位 {slotIndex}");
+					}
+				}
+				
+				// 存档完成后返回战斗菜单
+				OnSaveSlotSelectionBackRequested();
+			}
+			else
+			{
+				GD.Print($"加载存档槽位: {slotIndex}");
+				
+				// 实现实际的读档逻辑
+				if (SaveManager.Instance != null)
+				{
+					var gameData = SaveManager.Instance.LoadGame(slotIndex);
+					if (gameData != null)
+					{
+						GD.Print($"成功加载槽位 {slotIndex}");
+						// TODO: 应用游戏数据到游戏状态
+						// 例如：恢复玩家血量、等级、武器等
+					}
+					else
+					{
+						GD.PrintErr($"加载失败: 槽位 {slotIndex}");
+						return; // 加载失败，不关闭菜单
+					}
+				}
+				
+				// 读档完成后关闭所有菜单并继续游戏
+				if (_saveSlotSelection != null && IsInstanceValid(_saveSlotSelection))
+				{
+					_saveSlotSelection.Visible = false;
+				}
+				if (_battleMenu != null && IsInstanceValid(_battleMenu))
+				{
+					_battleMenu.CloseMenu();
+				}
 			}
 		}
 

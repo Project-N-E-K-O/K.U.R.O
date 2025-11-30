@@ -1,0 +1,82 @@
+[gd_scene load_steps=2 format=3 uid="uid://skill_detail_window_ui"]
+
+[ext_resource type="Script" path="res://scripts/ui/SkillDetailWindow.cs" id="1_skill_detail_window_script"]
+
+[node name="SkillDetailWindow" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+visible = false
+script = ExtResource("1_skill_detail_window_script")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.85)
+
+[node name="MainPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -500.0
+offset_top = -400.0
+offset_right = 500.0
+offset_bottom = 400.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Header" type="HBoxContainer" parent="MainPanel"]
+layout_mode = 1
+anchors_preset = 10
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -200.0
+offset_top = 8.0
+offset_right = 200.0
+offset_bottom = 40.0
+grow_horizontal = 2
+
+[node name="Title" type="Label" parent="MainPanel/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 28
+text = "技能详情"
+horizontal_alignment = 1
+
+[node name="CloseButton" type="Button" parent="MainPanel/Header"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "关闭"
+
+[node name="Body" type="MarginContainer" parent="MainPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 56.0
+offset_right = -16.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SkillsScroll" type="ScrollContainer" parent="MainPanel/Body"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="SkillsContainer" type="VBoxContainer" parent="MainPanel/Body/SkillsScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 16
+

@@ -1,0 +1,79 @@
+[gd_scene load_steps=2 format=3 uid="uid://item_obtained_popup"]
+
+[ext_resource type="Script" path="res://scripts/ui/ItemObtainedPopup.cs" id="1_item_obtained_popup_script"]
+
+[node name="ItemObtainedPopup" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_item_obtained_popup_script")
+
+[node name="ClickableArea" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+
+[node name="BackgroundPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -400.0
+offset_top = -300.0
+offset_right = 400.0
+offset_bottom = 300.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="BackgroundPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+theme_override_constants/separation = 20
+
+[node name="TitleLabel" type="Label" parent="BackgroundPanel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_font_sizes/font_size = 32
+text = "获得新物品"
+horizontal_alignment = 1
+
+[node name="ItemIconRect" type="TextureRect" parent="BackgroundPanel/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 3
+stretch_mode = 5
+texture_filter = 1
+
+[node name="ItemInfoLabel" type="RichTextLabel" parent="BackgroundPanel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "物品信息将显示在这里..."
+autowrap_mode = 2
+fit_content = true
+
+[node name="InstructionLabel" type="Label" parent="BackgroundPanel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_font_sizes/font_size = 14
+text = "按 [Space] 或点击空白处关闭 | 按 [Esc] 打开菜单"
+horizontal_alignment = 1
+

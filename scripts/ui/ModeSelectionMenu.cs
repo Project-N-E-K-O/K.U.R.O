@@ -11,12 +11,14 @@ namespace Kuros.UI
         [Export] public Button StoryModeButton { get; private set; } = null!;
         [Export] public Button ArcadeModeButton { get; private set; } = null!;
         [Export] public Button EndlessModeButton { get; private set; } = null!;
+        [Export] public Button TestLoadingButton { get; private set; } = null!;
         [Export] public Button BackButton { get; private set; } = null!;
         [Export] public Label TitleLabel { get; private set; } = null!;
 
         // 信号
         [Signal] public delegate void ModeSelectedEventHandler(string modeName);
         [Signal] public delegate void BackRequestedEventHandler();
+        [Signal] public delegate void TestLoadingRequestedEventHandler();
 
         public override void _Ready()
         {
@@ -41,6 +43,11 @@ namespace Kuros.UI
                 EndlessModeButton = GetNodeOrNull<Button>("MenuPanel/VBoxContainer/EndlessModeButton");
             }
 
+            if (TestLoadingButton == null)
+            {
+                TestLoadingButton = GetNodeOrNull<Button>("MenuPanel/VBoxContainer/TestLoadingButton");
+            }
+
             if (BackButton == null)
             {
                 BackButton = GetNodeOrNull<Button>("MenuPanel/VBoxContainer/BackButton");
@@ -62,6 +69,11 @@ namespace Kuros.UI
                 EndlessModeButton.Pressed += () => OnModeSelected("Endless");
             }
 
+            if (TestLoadingButton != null)
+            {
+                TestLoadingButton.Pressed += OnTestLoadingPressed;
+            }
+
             if (BackButton != null)
             {
                 BackButton.Pressed += OnBackPressed;
@@ -77,6 +89,11 @@ namespace Kuros.UI
         private void OnBackPressed()
         {
             EmitSignal(SignalName.BackRequested);
+        }
+        
+        private void OnTestLoadingPressed()
+        {
+            EmitSignal(SignalName.TestLoadingRequested);
         }
     }
 }

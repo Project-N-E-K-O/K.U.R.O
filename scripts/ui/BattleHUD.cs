@@ -1,6 +1,8 @@
 using Godot;
 using Kuros.Core;
 using Kuros.Systems.Inventory;
+using Kuros.Items;
+using Kuros.Managers;
 
 namespace Kuros.UI
 {
@@ -10,11 +12,17 @@ namespace Kuros.UI
 	/// </summary>
 	public partial class BattleHUD : Control
 	{
-		[ExportCategory("UI References")]
-		[Export] public Label PlayerStatsLabel { get; private set; } = null!;
-		[Export] public Label InstructionsLabel { get; private set; } = null!;
-		[Export] public ProgressBar HealthBar { get; private set; } = null!;
-		[Export] public Label ScoreLabel { get; private set; } = null!;
+	[ExportCategory("UI References")]
+	[Export] public Label PlayerStatsLabel { get; private set; } = null!;
+	[Export] public Label InstructionsLabel { get; private set; } = null!;
+	[Export] public ProgressBar HealthBar { get; private set; } = null!;
+	[Export] public Label ScoreLabel { get; private set; } = null!;
+	[Export] public Button PauseButton { get; private set; } = null!;
+	[Export] public Label GoldLabel { get; private set; } = null!;
+
+		[ExportCategory("Default Items")]
+		[Export] public ItemDefinition? DefaultSwordItem { get; set; } // 默认小木剑物品定义
+		private const string DefaultSwordItemPath = "res://data/DefaultSwordItem.tres";
 
 		// 当前显示的数据
 		private int _currentHealth = 100;
@@ -25,8 +33,15 @@ namespace Kuros.UI
 		private InventoryWindow? _inventoryWindow;
 		private InventoryContainer? _inventoryContainer;
 		private InventoryContainer? _quickBarContainer;
-		private const string InventoryScenePath = "res://scenes/ui/windows/InventoryWindow.tscn";
-		private PackedScene? _inventoryScene;
+		
+		// 快捷栏UI引用
+		private readonly Label[] _quickSlotLabels = new Label[5];
+		private readonly Panel[] _quickSlotPanels = new Panel[5];
+		
+		// 颜色定义
+		private static readonly Color LeftHandColor = new Color(0.2f, 0.5f, 1.0f, 1.0f); // 蓝色
+		private static readonly Color RightHandColor = new Color(1.0f, 0.8f, 0.0f, 1.0f); // 黄色
+		private static readonly Color DefaultColor = new Color(0.3f, 0.3f, 0.3f, 1.0f); // 默认灰色
 
 		// 信号：用于通知外部系统
 		[Signal] public delegate void HUDReadyEventHandler();
@@ -34,6 +49,9 @@ namespace Kuros.UI
 
 		public override void _Ready()
 		{
+			// 添加到 "ui" 组，方便其他脚本查找
+			AddToGroup("ui");
+			
 			// 如果没有在编辑器中分配，尝试自动查找
 			if (PlayerStatsLabel == null)
 			{
@@ -55,14 +73,73 @@ namespace Kuros.UI
 				ScoreLabel = GetNodeOrNull<Label>("ScoreLabel");
 			}
 
+			if (PauseButton == null)
+			{
+				PauseButton = GetNodeOrNull<Button>("PauseButton");
+			}
+
+			if (GoldLabel == null)
+			{
+				GoldLabel = GetNodeOrNull<Label>("GoldLabel");
+			}
+
+			// 连接暂停按钮信号
+			if (PauseButton != null)
+			{
+				PauseButton.Pressed += OnPauseButtonPressed;
+			}
+
+			// 缓存快捷栏Label引用（必须在初始化物品栏之前）
+			CacheQuickBarLabels();
+
 			// 初始化物品栏
 			InitializeInventory();
 
 			// 初始化UI显示
 			UpdateDisplay();
 
+			// 延迟更新快捷栏显示，确保所有节点都已准备好
+			CallDeferred(MethodName.UpdateQuickBarDisplay);
+
+			// 尝试自动连接玩家（如果场景中已有玩家）
+			CallDeferred(MethodName.TryAutoConnectPlayer);
+
 			// 发出就绪信号
 			EmitSignal(SignalName.HUDReady);
+		}
+
+		private void TryAutoConnectPlayer()
+		{
+			// 尝试在场景树中查找玩家
+			var player = GetTree().GetFirstNodeInGroup("player") as SamplePlayer;
+			if (player != null)
+			{
+				ConnectPlayerInventory(player);
+			}
+		}
+
+		private void CacheQuickBarLabels()
+		{
+			for (int i = 0; i < 5; i++)
+			{
+				_quickSlotLabels[i] = GetNodeOrNull<Label>($"QuickBarPanel/QuickBarContainer/QuickSlot{i + 1}/QuickSlotLabel{i + 1}");
+				_quickSlotPanels[i] = GetNodeOrNull<Panel>($"QuickBarPanel/QuickBarContainer/QuickSlot{i + 1}");
+				
+				if (_quickSlotLabels[i] == null)
+				{
+					GD.PrintErr($"CacheQuickBarLabels: Failed to find QuickSlotLabel{i + 1}");
+				}
+				
+				if (_quickSlotPanels[i] == null)
+				{
+					GD.PrintErr($"CacheQuickBarLabels: Failed to find QuickSlotPanel{i + 1}");
+				}
+				else
+				{
+					// 初始化默认边框颜色
+					UpdateSlotBorderColor(i, DefaultColor);
+				}
+			}
 		}
 
 		private void InitializeInventory()
@@ -83,14 +160,227 @@ namespace Kuros.UI
 			};
 			AddChild(_quickBarContainer);
 
-			// 加载物品栏窗口场景
-			_inventoryScene = GD.Load<PackedScene>(InventoryScenePath);
-			if (_inventoryScene != null)
+			// 连接快捷栏变化信号（确保不重复连接）
+			// 注意：使用 Callable 方式检查连接，因为信号可能已经被连接
+			_quickBarContainer.SlotChanged += OnQuickBarSlotChanged;
+			_quickBarContainer.InventoryChanged += OnQuickBarChanged;
+
+			// 在快捷栏1（索引0）放置默认小木剑占位符
+			ItemDefinition? swordItem = DefaultSwordItem;
+			
+			// 如果未设置，尝试加载默认资源
+			if (swordItem == null)
 			{
-				_inventoryWindow = _inventoryScene.Instantiate<InventoryWindow>();
-				AddChild(_inventoryWindow);
-				_inventoryWindow.SetInventoryContainer(_inventoryContainer, _quickBarContainer);
-				_inventoryWindow.HideWindow();
+				swordItem = GD.Load<ItemDefinition>(DefaultSwordItemPath);
+			}
+			
+			if (swordItem != null)
+			{
+				_quickBarContainer.TryAddItemToSlot(swordItem, 1, 0);
+				
+				// 立即更新快捷栏1的显示
+				CallDeferred(MethodName.UpdateQuickBarSlot, 0);
+			}
+			else
+			{
+				GD.PrintErr("InitializeInventory: DefaultSwordItem is null and could not load from resource file. Please set DefaultSwordItem in the inspector or create the resource file.");
+			}
+			
+			// 初始化空白道具：填充快捷栏和物品栏的空槽位
+			CallDeferred(MethodName.InitializeEmptyItems);
+
+			// 通过UIManager加载物品栏窗口（放在GameUI层，在HUD之上）
+			LoadInventoryWindow();
+		}
+
+		/// <summary>
+		/// 加载物品栏窗口
+		/// </summary>
+		private void LoadInventoryWindow()
+		{
+			if (UIManager.Instance == null)
+			{
+				GD.PrintErr("BattleHUD: UIManager未初始化！");
+				return;
+			}
+
+		_inventoryWindow = UIManager.Instance.LoadInventoryWindow();
+		
+		if (_inventoryWindow != null && _inventoryContainer != null && _quickBarContainer != null)
+		{
+			_inventoryWindow.SetInventoryContainer(_inventoryContainer, _quickBarContainer);
+			_inventoryWindow.HideWindow();
+		}
+		else if (_inventoryWindow != null)
+		{
+			GD.PrintErr("BattleHUD: 无法设置物品栏容器，_inventoryContainer 或 _quickBarContainer 为 null");
+		}
+		}
+
+		private void OnQuickBarSlotChanged(int slotIndex, string itemId, int quantity)
+		{
+			// 使用 CallDeferred 确保在下一帧更新，避免在信号处理过程中更新UI
+			CallDeferred(MethodName.UpdateQuickBarSlot, slotIndex);
+		}
+
+		private void OnQuickBarChanged()
+		{
+			UpdateQuickBarDisplay();
+		}
+
+		public void UpdateQuickBarDisplay()
+		{
+			if (_quickBarContainer == null)
+			{
+				GD.PrintErr("UpdateQuickBarDisplay: QuickBarContainer is null");
+				return;
+			}
+
+			for (int i = 0; i < 5; i++)
+			{
+				UpdateQuickBarSlot(i);
+			}
+		}
+
+		private void UpdateQuickBarSlot(int slotIndex)
+		{
+			if (slotIndex < 0 || slotIndex >= 5) return;
+			if (_quickBarContainer == null)
+			{
+				GD.PrintErr($"UpdateQuickBarSlot: QuickBarContainer is null for slot {slotIndex}");
+				return;
+			}
+			if (_quickSlotLabels[slotIndex] == null)
+			{
+				GD.PrintErr($"UpdateQuickBarSlot: QuickSlotLabel[{slotIndex}] is null");
+				return;
+			}
+
+			var stack = _quickBarContainer.GetStack(slotIndex);
+			if (stack == null || stack.IsEmpty)
+			{
+				_quickSlotLabels[slotIndex].Text = "空";
+			}
+			else
+			{
+				// 检查是否为空白道具（EmptyItem）
+				bool isEmptyItem = stack.Item.ItemId == "empty_item";
+				// 如果是空白道具，显示空文本；否则显示测试文本
+				_quickSlotLabels[slotIndex].Text = isEmptyItem ? "空" : "我是测试文本";
+			}
+		}
+		
+		/// <summary>
+		/// 更新快捷栏槽位的边框颜色
+		/// </summary>
+		private void UpdateSlotBorderColor(int slotIndex, Color color)
+		{
+			if (slotIndex < 0 || slotIndex >= 5) return;
+			if (_quickSlotPanels[slotIndex] == null) return;
+			
+			// 使用 StyleBoxFlat 来设置边框颜色
+			var styleBox = new StyleBoxFlat();
+			styleBox.BgColor = new Color(0.1f, 0.1f, 0.1f, 0.5f); // 背景色
+			styleBox.BorderColor = color;
+			styleBox.BorderWidthLeft = 3;
+			styleBox.BorderWidthTop = 3;
+			styleBox.BorderWidthRight = 3;
+			styleBox.BorderWidthBottom = 3;
+			styleBox.CornerRadiusTopLeft = 4;
+			styleBox.CornerRadiusTopRight = 4;
+			styleBox.CornerRadiusBottomLeft = 4;
+			styleBox.CornerRadiusBottomRight = 4;
+			
+			_quickSlotPanels[slotIndex].AddThemeStyleboxOverride("panel", styleBox);
+		}
+		
+		/// <summary>
+		/// 更新左右手选择的快捷栏边框颜色
+		/// </summary>
+		/// <param name="leftHandSlotIndex">左手选择的槽位索引（1-4，-1表示未选择）</param>
+		/// <param name="rightHandSlotIndex">右手选择的槽位索引（0，固定为小木剑）</param>
+		public void UpdateHandSlotHighlight(int leftHandSlotIndex, int rightHandSlotIndex = 0)
+		{
+			// 重置所有槽位为默认颜色
+			for (int i = 0; i < 5; i++)
+			{
+				UpdateSlotBorderColor(i, DefaultColor);
+			}
+			
+			// 设置右手颜色（槽位0，小木剑）
+			if (rightHandSlotIndex >= 0 && rightHandSlotIndex < 5)
+			{
+				UpdateSlotBorderColor(rightHandSlotIndex, RightHandColor);
+			}
+			
+			// 设置左手颜色（槽位1-4），无论槽位是否有物品都显示蓝色
+			if (leftHandSlotIndex >= 1 && leftHandSlotIndex < 5)
+			{
+				UpdateSlotBorderColor(leftHandSlotIndex, LeftHandColor);
+			}
+		}
+
+		/// <summary>
+		/// 初始化空白道具：填充快捷栏和物品栏的空槽位
+		/// </summary>
+		private void InitializeEmptyItems()
+		{
+			var emptyItem = GD.Load<ItemDefinition>("res://data/EmptyItem.tres");
+			if (emptyItem == null)
+			{
+				GD.PrintErr("BattleHUD.InitializeEmptyItems: Failed to load EmptyItem.tres");
+				return;
+			}
+			
+			// 填充快捷栏空槽位（跳过索引0，因为是小木剑）
+			if (_quickBarContainer != null)
+			{
+				for (int i = 1; i < 5; i++)
+				{
+					var stack = _quickBarContainer.GetStack(i);
+					if (stack == null || stack.IsEmpty)
+					{
+						_quickBarContainer.TryAddItemToSlot(emptyItem, 1, i);
+					}
+				}
+			}
+			
+			// 填充物品栏空槽位
+			if (_inventoryContainer != null)
+			{
+				for (int i = 0; i < _inventoryContainer.SlotCount; i++)
+				{
+					var stack = _inventoryContainer.GetStack(i);
+					if (stack == null || stack.IsEmpty)
+					{
+						_inventoryContainer.TryAddItemToSlot(emptyItem, 1, i);
+					}
+				}
+			}
+		}
+		
+		/// <summary>
+		/// 连接玩家物品栏组件，设置快捷栏引用
+		/// </summary>
+		public void ConnectPlayerInventory(SamplePlayer player)
+		{
+			if (player?.InventoryComponent != null && _quickBarContainer != null)
+			{
+				player.InventoryComponent.SetQuickBar(_quickBarContainer);
+				
+				// 确保玩家连接快捷栏信号，以便左手物品与选中槽位严格对应
+				player.ConnectQuickBarSignals();
+				
+				// 初始化左手选择（只在还没有选中时才初始化，避免覆盖用户选择）
+				// 注意：使用 CallDeferred 确保在快捷栏连接完成后再初始化
+				player.CallDeferred("InitializeLeftHandSelection");
+				
+				// 延迟更新高亮，确保初始化完成后再显示
+				CallDeferred(MethodName.UpdateHandSlotHighlight, player.LeftHandSlotIndex >= 1 && player.LeftHandSlotIndex < 5 ? player.LeftHandSlotIndex : 1, 0);
+			}
+			else
+			{
+				GD.PrintErr($"BattleHUD.ConnectPlayerInventory: Failed - Player={player != null}, InventoryComponent={player?.InventoryComponent != null}, QuickBarContainer={_quickBarContainer != null}");
 			}
 		}
 
@@ -100,6 +390,14 @@ namespace Kuros.UI
 		public void RequestBattleMenu()
 		{
 			EmitSignal(SignalName.BattleMenuRequested);
+		}
+
+		/// <summary>
+		/// 暂停按钮点击处理
+		/// </summary>
+		private void OnPauseButtonPressed()
+		{
+			RequestBattleMenu();
 		}
 
 		/// <summary>
@@ -142,6 +440,18 @@ namespace Kuros.UI
 				{
 					samplePlayer.StatsChanged += OnPlayerStatsChanged;
 				}
+				
+				// 连接玩家金币变化信号
+				if (!samplePlayer.IsConnected(SamplePlayer.SignalName.GoldChanged, new Callable(this, MethodName.OnPlayerGoldChanged)))
+				{
+					samplePlayer.GoldChanged += OnPlayerGoldChanged;
+				}
+				
+				// 初始化金币显示
+				UpdateGoldDisplay(samplePlayer.GetGold());
+				
+				// 连接玩家物品栏组件
+				ConnectPlayerInventory(samplePlayer);
 			}
 		}
 
@@ -155,6 +465,11 @@ namespace Kuros.UI
 				if (samplePlayer.IsConnected(SamplePlayer.SignalName.StatsChanged, new Callable(this, MethodName.OnPlayerStatsChanged)))
 				{
 					samplePlayer.StatsChanged -= OnPlayerStatsChanged;
+				}
+				
+				if (samplePlayer.IsConnected(SamplePlayer.SignalName.GoldChanged, new Callable(this, MethodName.OnPlayerGoldChanged)))
+				{
+					samplePlayer.GoldChanged -= OnPlayerGoldChanged;
 				}
 			}
 		}
@@ -174,6 +489,19 @@ namespace Kuros.UI
 			// 从玩家获取最大生命值
 			int maxHealth = _player?.MaxHealth ?? 100;
 			UpdateStats(health, maxHealth, score);
+		}
+		
+		private void OnPlayerGoldChanged(int gold)
+		{
+			UpdateGoldDisplay(gold);
+		}
+		
+		private void UpdateGoldDisplay(int gold)
+		{
+			if (GoldLabel != null)
+			{
+				GoldLabel.Text = $"金币: {gold}";
+			}
 		}
 
 		public override void _UnhandledInput(InputEvent @event)
