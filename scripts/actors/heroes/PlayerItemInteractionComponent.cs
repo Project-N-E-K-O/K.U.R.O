@@ -63,13 +63,11 @@ namespace Kuros.Actors.Heroes
             if (Input.IsActionJustPressed("item_select_right"))
             {
                 InventoryComponent?.SelectNextBackpackSlot();
-                GameLogger.Debug(nameof(PlayerItemInteractionComponent), "输入 item_select_right");
             }
 
             if (Input.IsActionJustPressed("item_select_left"))
             {
                 InventoryComponent?.SelectPreviousBackpackSlot();
-                GameLogger.Debug(nameof(PlayerItemInteractionComponent), "输入 item_select_left");
             }
 
             if (Input.IsActionJustPressed("take_up"))
@@ -98,14 +96,17 @@ namespace Kuros.Actors.Heroes
             var selectedStack = InventoryComponent.GetSelectedBackpackStack();
             if (selectedStack == null)
             {
-                GameLogger.Info(nameof(PlayerItemInteractionComponent), "当前选中栏位没有物品，无法执行丢弃/投掷。");
                 return false;
             }
 
             if (!skipAnimation && disposition == DropDisposition.Throw)
             {
-                TriggerThrowState();
-                return false;
+                if (TryTriggerThrowState())
+                {
+                    return false;
+                }
+
+                return TryHandleDrop(disposition, skipAnimation: true);
             }
 
             if (!InventoryComponent.TryExtractFromSelectedSlot(selectedStack.Quantity, out var extracted) || extracted == null || extracted.IsEmpty)
@@ -196,14 +197,20 @@ namespace Kuros.Actors.Heroes
             return _actor.FacingRight ? Vector2.Right : Vector2.Left;
         }
 
-        private void TriggerThrowState()
+        private bool TryTriggerThrowState()
         {
             if (_actor?.StateMachine == null)
             {
-                return;
+                return false;
+            }
+
+            if (!_actor.StateMachine.HasState(ThrowStateName))
+            {
+                return false;
             }
 
             _actor.StateMachine.ChangeState(ThrowStateName);
+            return true;
         }
 
         private static T? FindChildComponent<T>(Node? root) where T : Node

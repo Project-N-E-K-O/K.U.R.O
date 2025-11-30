@@ -33,8 +33,8 @@
   - `InventoryItemStack` 封装单个栈的数量、属性查询、标签判定。
 
 - `scripts/actors/heroes/PlayerInventoryComponent.cs` + `PlayerItemInteractionComponent.cs`  
-  - `PlayerInventoryComponent` 负责维护背包指针 `SelectedBackpackSlot`（通过 `ActiveBackpackSlotChanged` 广播），所有拾取/放下/投掷操作都围绕该槽位进行：拾取会尝试把物品直接放入当前槽位，放下/投掷则从该槽位抽出整栈。事件 `ItemPicked` / `ItemRemoved` 仍负责驱动骨骼附件与 UI。  
-  - `PlayerItemInteractionComponent` 监听 `take_up`/`put_down`/`throw`，只有当当前选中栏位为空时才允许拾取，当栏位存在物品时才允许放下/投掷；`item_select_left` / `item_select_right` 仅改变指针位置（不会搬运物品），但会直接影响后续拾取/投掷的目标栏位。
+  - `PlayerInventoryComponent` 负责维护背包指针 `SelectedBackpackSlot`（通过 `ActiveBackpackSlotChanged` 广播），所有拾取/放下/投掷操作都围绕该槽位进行：拾取会尝试把物品直接放入当前槽位，放下/投掷则从该槽位抽出整栈；不再包含任何 Held 槽或额外日志。事件 `ItemPicked` / `ItemRemoved` 仍负责驱动骨骼附件与 UI。  
+  - `PlayerItemInteractionComponent` 监听 `take_up`/`put_down`/`throw`，只有当当前选中栏位为空时才允许拾取，当栏位存在物品时才允许放下/投掷；`item_select_left` / `item_select_right` 仅改变指针位置（不会搬运物品或输出日志），直接影响后续操作的目标栏位。如缺少 `Throw` 状态则跳过动画直接执行投掷。
 
 - `scripts/items/world/WorldItemEntity.cs`、`WorldItemSpawner.cs`  
   - `WorldItemEntity` 继承 `CharacterBody2D`，负责地面物品的触发检测、拾取、属性/效果传播、投掷阻尼。  
@@ -47,7 +47,7 @@
   - 地图物品：`WorldItemEntity` 挂在 tscn 中，`TryTransferToActor()` 只会把物品写入玩家当前选中栏位（若不可用则直接拒绝），随后触发 `PlayerInventoryComponent.ItemPicked` 并按 `ItemDefinition.EffectEntries` 应用拾取效果。  
   - 快捷键：`PlayerItemInteractionComponent` 监听 `put_down` / `throw`，仅当当前栏位存在物品时才会通过 `WorldItemSpawner` 生成实体；`item_select_left` / `item_select_right` 循环调整指针但不会移动物品。  
   - 骨骼绑定：`PlayerItemAttachment` 订阅 `ItemPicked`/`ItemRemoved` 以及 `ActiveBackpackSlotChanged`，始终展示当前指针对应物品，放下/投掷时自动清除。  
-  - 快捷栏：`QuickSlotBar` 订阅 `InventoryContainer.InventoryChanged` 以及 `ActiveBackpackSlotChanged`，在 UI 中展示背包前几格物品，并用 Held 面板镜像指针所指内容。
+  - 快捷栏：`QuickSlotBar` 订阅 `InventoryContainer.InventoryChanged` 以及 `ActiveBackpackSlotChanged`，只显示有限数量槽位，并通过标题/红色边框高亮当前指针。
 - 拾取/投掷动画链路：  
   - `PlayerItemInteractionComponent` 会在 `take_up` 输入时切入 `PlayerPickUpState`，播放 `animations/pickup`（Spine/AnimationPlayer），动画结束后才实际执行拾取。  
   - 投掷流程同理：按下 `throw` 时先切换到 `PlayerThrowState` 播放投掷动画，动画完成后 `TryTriggerThrowAfterAnimation()` 生成并抛出物品。

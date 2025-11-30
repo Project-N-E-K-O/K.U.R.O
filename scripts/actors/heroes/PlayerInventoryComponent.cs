@@ -293,7 +293,6 @@ namespace Kuros.Actors.Heroes
             if (normalized == SelectedBackpackSlot) return;
 
             SelectedBackpackSlot = normalized;
-            GameLogger.Debug(nameof(PlayerInventoryComponent), $"选中背包槽位 -> {SelectedBackpackSlot}");
             ActiveBackpackSlotChanged?.Invoke(SelectedBackpackSlot);
         }
 

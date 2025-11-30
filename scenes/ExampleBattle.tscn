@@ -1,4 +1,4 @@
-[gd_scene load_steps=32 format=3 uid="uid://d15hs7qpxqhf3"]
+[gd_scene load_steps=33 format=3 uid="uid://d15hs7qpxqhf3"]
 
 [ext_resource type="Script" uid="uid://btbsyf4hokvud" path="res://scripts/actors/heroes/SamplePlayer.cs" id="1_player"]
 [ext_resource type="PackedScene" uid="uid://b1ljb2q212v3d" path="res://scenes/environments/floor.tscn" id="1_sb658"]
@@ -25,6 +25,7 @@
 [ext_resource type="Script" uid="uid://b0t8cfl3khjix" path="res://scripts/actors/heroes/PlayerItemInteractionComponent.cs" id="29_item_interaction"]
 [ext_resource type="Script" uid="uid://b8o8wks2ab8sm" path="res://scripts/actors/heroes/PlayerWeaponSkillController.cs" id="30_weapon_skill_controller"]
 [ext_resource type="Script" uid="uid://clkd1wiixwlbh" path="res://scripts/actors/heroes/states/PlayerPickUpState.cs" id="31_player_pickup"]
+[ext_resource type="Script" path="res://scripts/actors/heroes/states/PlayerThrowState.cs" id="32_player_throw"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_attack"]
 size = Vector2(64.75629, 180.66397)
@@ -146,6 +147,9 @@ script = ExtResource("24_player_dead")
 
 [node name="PickUp" type="Node" parent="Player/StateMachine"]
 script = ExtResource("31_player_pickup")
+
+[node name="Throw" type="Node" parent="Player/StateMachine"]
+script = ExtResource("32_player_throw")
 
 [node name="Inventory" type="Node" parent="Player"]
 script = ExtResource("22_player_inventory")
