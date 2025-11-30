@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Godot;
 using Kuros.Items;
 using Kuros.Systems.Inventory;
+using Kuros.Utils;
 
 namespace Kuros.Actors.Heroes
 {
@@ -12,7 +13,7 @@ namespace Kuros.Actors.Heroes
     public partial class PlayerInventoryComponent : Node
     {
         [Export(PropertyHint.Range, "1,200,1")]
-        public int BackpackSlots { get; set; } = 24;
+        public int BackpackSlots { get; set; } = 4;
 
         public InventoryContainer Backpack { get; private set; } = null!;
 
@@ -28,12 +29,13 @@ namespace Kuros.Actors.Heroes
 
         public IReadOnlyDictionary<string, SpecialInventorySlot> SpecialSlots => _specialSlots;
         public SpecialInventorySlot? WeaponSlot => GetSpecialSlot(SpecialInventorySlotIds.PrimaryWeapon);
-        public SpecialInventorySlot? HeldItemSlot => GetSpecialSlot(SpecialInventorySlotIds.CurrentHeldItem);
-        public bool HasHeldItem => HeldItemSlot?.IsEmpty == false;
+        public int SelectedBackpackSlot { get; private set; }
+        public bool HasSelectedItem => GetSelectedBackpackStack() != null;
         public event Action<ItemDefinition>? ItemPicked;
         public event Action<string>? ItemRemoved;
         public event Action<ItemDefinition>? WeaponEquipped;
         public event Action? WeaponUnequipped;
+        public event Action<int>? ActiveBackpackSlotChanged;
 
         public override void _Ready()
         {
@@ -41,8 +43,10 @@ namespace Kuros.Actors.Heroes
 
             Backpack = GetNodeOrNull<InventoryContainer>("Backpack") ?? CreateBackpack();
             Backpack.SlotCount = BackpackSlots;
+            Backpack.InventoryChanged += OnBackpackInventoryChanged;
 
             InitializeSpecialSlots();
+            InitializeSelection();
         }
 
         private InventoryContainer CreateBackpack()
@@ -158,56 +162,47 @@ namespace Kuros.Actors.Heroes
             return TryUnequipSpecialSlotToBackpack(SpecialInventorySlotIds.PrimaryWeapon);
         }
 
-        public bool TryAssignHeldItem(ItemDefinition item, int quantity, out int acceptedQuantity)
+        public bool TryExtractFromSelectedSlot(int amount, out InventoryItemStack? extracted)
         {
-            acceptedQuantity = 0;
-            if (item == null) return false;
-
-            var slot = HeldItemSlot;
-            if (slot == null || !slot.IsEmpty) return false;
-            if (!slot.CanAccept(item)) return false;
-
-            int clamped = slot.ClampQuantity(quantity);
-            if (clamped <= 0) return false;
-
-            var stack = new InventoryItemStack(item, clamped);
-            if (!slot.TryAssign(stack, replaceExisting: true))
-            {
-                return false;
-            }
-
-            acceptedQuantity = clamped;
-            NotifyItemPicked(item);
-            return true;
+            extracted = null;
+            if (Backpack == null) return false;
+            return Backpack.TryExtractFromSlot(SelectedBackpackSlot, amount, out extracted);
         }
 
-        public InventoryItemStack? TakeHeldItemStack()
+        public bool TryReturnStackToSelectedSlot(InventoryItemStack stack)
         {
-            var slot = HeldItemSlot;
-            if (slot == null || slot.IsEmpty) return null;
-
-            var stack = slot.TakeStack();
-            if (stack != null)
-            {
-                NotifyItemRemoved(stack.Item.ItemId);
-            }
-
-            return stack;
+            if (Backpack == null || stack == null) return false;
+            return Backpack.TryAddToSlot(SelectedBackpackSlot, stack.Item, stack.Quantity, out var accepted) && accepted == stack.Quantity;
         }
 
-        public bool TryReturnHeldItem(InventoryItemStack stack)
+        public int TryAddItemToSelectedSlot(ItemDefinition item, int quantity)
         {
-            var slot = HeldItemSlot;
-            if (slot == null || stack == null) return false;
-            if (!slot.IsEmpty) return false;
+            if (Backpack == null || item == null || quantity <= 0) return 0;
 
-            if (!slot.TryAssign(stack, replaceExisting: true))
+            if (Backpack.TryAddToSlot(SelectedBackpackSlot, item, quantity, out var accepted) && accepted > 0)
             {
-                return false;
+                NotifyItemPicked(item);
+                return accepted;
             }
 
-            NotifyItemPicked(stack.Item);
-            return true;
+            return 0;
+        }
+
+        public void SelectNextBackpackSlot()
+        {
+            if (Backpack == null || Backpack.Slots.Count == 0) return;
+            SetSelectedBackpackSlot(SelectedBackpackSlot + 1);
+        }
+
+        public void SelectPreviousBackpackSlot()
+        {
+            if (Backpack == null || Backpack.Slots.Count == 0) return;
+            SetSelectedBackpackSlot(SelectedBackpackSlot - 1);
+        }
+
+        public InventoryItemStack? GetSelectedBackpackStack()
+        {
+            return Backpack?.GetStack(SelectedBackpackSlot);
         }
 
         public float GetBackpackAttributeValue(string attributeId, float baseValue = 0f)
@@ -259,7 +254,6 @@ namespace Kuros.Actors.Heroes
         {
             _specialSlots.Clear();
             bool hasWeaponSlot = false;
-            bool hasHeldItemSlot = false;
 
             foreach (var config in _specialSlotConfigs)
             {
@@ -270,10 +264,6 @@ namespace Kuros.Actors.Heroes
                 {
                     hasWeaponSlot = true;
                 }
-                else if (slot.SlotId == SpecialInventorySlotIds.CurrentHeldItem)
-                {
-                    hasHeldItemSlot = true;
-                }
             }
 
             if (!hasWeaponSlot)
@@ -281,11 +271,45 @@ namespace Kuros.Actors.Heroes
                 var defaultWeapon = new SpecialInventorySlot(SpecialInventorySlotConfig.CreateDefaultWeapon());
                 _specialSlots[defaultWeapon.SlotId] = defaultWeapon;
             }
+        }
 
-            if (!hasHeldItemSlot)
+        private void InitializeSelection()
+        {
+            if (Backpack == null || Backpack.Slots.Count == 0)
             {
-                var heldSlot = new SpecialInventorySlot(SpecialInventorySlotConfig.CreateHeldItemSlot());
-                _specialSlots[heldSlot.SlotId] = heldSlot;
+                SelectedBackpackSlot = 0;
+                ActiveBackpackSlotChanged?.Invoke(SelectedBackpackSlot);
+                return;
+            }
+
+            SetSelectedBackpackSlot(0);
+        }
+
+        private void SetSelectedBackpackSlot(int index)
+        {
+            if (Backpack == null || Backpack.Slots.Count == 0) return;
+            int count = Backpack.Slots.Count;
+            int normalized = ((index % count) + count) % count;
+            if (normalized == SelectedBackpackSlot) return;
+
+            SelectedBackpackSlot = normalized;
+            GameLogger.Debug(nameof(PlayerInventoryComponent), $"选中背包槽位 -> {SelectedBackpackSlot}");
+            ActiveBackpackSlotChanged?.Invoke(SelectedBackpackSlot);
+        }
+
+        private void OnBackpackInventoryChanged()
+        {
+            if (Backpack == null || Backpack.Slots.Count == 0)
+            {
+                SelectedBackpackSlot = 0;
+                ActiveBackpackSlotChanged?.Invoke(SelectedBackpackSlot);
+                return;
+            }
+
+            if (SelectedBackpackSlot >= Backpack.Slots.Count)
+            {
+                SelectedBackpackSlot = Backpack.Slots.Count - 1;
+                ActiveBackpackSlotChanged?.Invoke(SelectedBackpackSlot);
             }
         }
     }

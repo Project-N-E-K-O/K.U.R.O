@@ -294,9 +294,10 @@ namespace Kuros.Items.World
                 return false;
             }
 
-            if (!inventory.TryAssignHeldItem(stack.Item, stack.Quantity, out var accepted) || accepted <= 0)
+            int accepted = inventory.TryAddItemToSelectedSlot(stack.Item, stack.Quantity);
+            if (accepted <= 0)
             {
-                GameLogger.Info(nameof(WorldItemEntity), $"Actor {actor.Name} 当前持有栏位已被占用，无法拾取 {ItemId}。");
+                GameLogger.Info(nameof(WorldItemEntity), $"Actor {actor.Name} 的当前选中栏位无法拾取 {ItemId}。");
                 return false;
             }
 
@@ -306,7 +307,7 @@ namespace Kuros.Items.World
                 Quantity = stack.Quantity;
                 _lastTransferredItem = stack.Item;
                 _lastTransferredAmount = accepted;
-                GameLogger.Info(nameof(WorldItemEntity), $"{actor.Name} 只拾取了 {accepted} 个 {ItemId}，剩余 {Quantity} 个留在地面。");
+                GameLogger.Info(nameof(WorldItemEntity), $"{actor.Name} 仅拾取了 {accepted} 个 {ItemId}，剩余 {Quantity} 个保留在地面。");
                 RestoreTriggerArea();
                 _isPicked = false;
                 return false;

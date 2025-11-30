@@ -31,16 +31,6 @@ namespace Kuros.Systems.Inventory
             };
         }
 
-        public static SpecialInventorySlotConfig CreateHeldItemSlot()
-        {
-            return new SpecialInventorySlotConfig
-            {
-                SlotId = SpecialInventorySlotIds.CurrentHeldItem,
-                DisplayName = "Held Item",
-                Capacity = 1,
-                AllowedTags = new Godot.Collections.Array<string>()
-            };
-        }
     }
 }
 

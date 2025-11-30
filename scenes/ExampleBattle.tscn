@@ -1,4 +1,4 @@
-[gd_scene load_steps=27 format=3 uid="uid://d15hs7qpxqhf3"]
+[gd_scene load_steps=32 format=3 uid="uid://d15hs7qpxqhf3"]
 
 [ext_resource type="Script" uid="uid://btbsyf4hokvud" path="res://scripts/actors/heroes/SamplePlayer.cs" id="1_player"]
 [ext_resource type="PackedScene" uid="uid://b1ljb2q212v3d" path="res://scenes/environments/floor.tscn" id="1_sb658"]
@@ -20,11 +20,11 @@
 [ext_resource type="Script" uid="uid://cp40kowtn1ho3" path="res://scripts/actors/heroes/states/PlayerDeadState.cs" id="24_player_dead"]
 [ext_resource type="PackedScene" uid="uid://1dh24pm5p3id" path="res://scenes/actors/npc/NpcDialogueInteractable.tscn" id="25_npc_dialogue"]
 [ext_resource type="PackedScene" path="res://scenes/items/ExampleWorldItem.tscn" id="26_example_item"]
-[ext_resource type="Script" path="res://scripts/actors/heroes/PlayerItemAttachment.cs" id="27_item_attachment"]
-[ext_resource type="Script" path="res://scripts/ui/QuickSlotBar.cs" id="28_quick_slot_bar"]
-[ext_resource type="Script" path="res://scripts/actors/heroes/PlayerItemInteractionComponent.cs" id="29_item_interaction"]
-[ext_resource type="Script" path="res://scripts/actors/heroes/PlayerWeaponSkillController.cs" id="30_weapon_skill_controller"]
-[ext_resource type="Script" path="res://scripts/actors/heroes/states/PlayerPickUpState.cs" id="31_player_pickup"]
+[ext_resource type="Script" uid="uid://6pyy6oo1abq7" path="res://scripts/actors/heroes/PlayerItemAttachment.cs" id="27_item_attachment"]
+[ext_resource type="Script" uid="uid://copvnatg446ec" path="res://scripts/ui/QuickSlotBar.cs" id="28_quick_slot_bar"]
+[ext_resource type="Script" uid="uid://b0t8cfl3khjix" path="res://scripts/actors/heroes/PlayerItemInteractionComponent.cs" id="29_item_interaction"]
+[ext_resource type="Script" uid="uid://b8o8wks2ab8sm" path="res://scripts/actors/heroes/PlayerWeaponSkillController.cs" id="30_weapon_skill_controller"]
+[ext_resource type="Script" uid="uid://clkd1wiixwlbh" path="res://scripts/actors/heroes/states/PlayerPickUpState.cs" id="31_player_pickup"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_attack"]
 size = Vector2(64.75629, 180.66397)
@@ -152,7 +152,6 @@ script = ExtResource("22_player_inventory")
 
 [node name="WeaponSkillController" type="Node" parent="Player"]
 script = ExtResource("30_weapon_skill_controller")
-Inventory = NodePath("..")
 
 [node name="ItemInteraction" type="Node" parent="Player"]
 script = ExtResource("29_item_interaction")
@@ -160,7 +159,6 @@ script = ExtResource("29_item_interaction")
 [node name="ItemAttachment" type="Node" parent="Player"]
 script = ExtResource("27_item_attachment")
 AttachmentParentPath = NodePath("SpineCharacter/Skeleton2D/root/bone/bone2/bone3/bone14/bone15/bone16")
-SpineSlotNodePath = NodePath("")
 IconOffset = Vector2(0, 0)
 
 [node name="EnemySpawnController" type="Node2D" parent="."]
@@ -173,12 +171,11 @@ Speed = 50.0
 
 [node name="FriendlyNPC" parent="." instance=ExtResource("25_npc_dialogue")]
 position = Vector2(600, 380)
+
 [node name="ExampleItemPickup" parent="." instance=ExtResource("26_example_item")]
 position = Vector2(528, 801)
-ItemDefinitionResourcePath = ""
 
 [node name="UI" type="CanvasLayer" parent="."]
-visible = true
 
 [node name="PlayerStats" type="Label" parent="UI"]
 offset_left = 10.0

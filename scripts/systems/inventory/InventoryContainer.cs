@@ -232,6 +232,49 @@ namespace Kuros.Systems.Inventory
             return true;
         }
 
+        public bool TryAddToSlot(int slotIndex, ItemDefinition item, int amount, out int accepted)
+        {
+            accepted = 0;
+            if (item == null || amount <= 0)
+            {
+                return false;
+            }
+
+            EnsureCapacity();
+            if (slotIndex < 0 || slotIndex >= _slots.Count)
+            {
+                return false;
+            }
+
+            var stack = _slots[slotIndex];
+            if (stack == null)
+            {
+                int toAdd = Math.Min(amount, item.MaxStackSize);
+                var newStack = new InventoryItemStack(item, toAdd);
+                _slots[slotIndex] = newStack;
+                accepted = toAdd;
+                EmitSignal(SignalName.SlotChanged, slotIndex, item.ItemId, newStack.Quantity);
+                EmitSignal(SignalName.InventoryChanged);
+                return accepted > 0;
+            }
+
+            if (stack.Item != item || stack.IsFull)
+            {
+                return false;
+            }
+
+            int added = stack.Add(amount);
+            if (added <= 0)
+            {
+                return false;
+            }
+
+            accepted = added;
+            EmitSignal(SignalName.SlotChanged, slotIndex, stack.Item.ItemId, stack.Quantity);
+            EmitSignal(SignalName.InventoryChanged);
+            return true;
+        }
+
         private int AddInternal(ItemDefinition item, int amount)
         {
             EnsureCapacity();

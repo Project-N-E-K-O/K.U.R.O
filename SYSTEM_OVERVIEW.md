@@ -33,8 +33,8 @@
   - `InventoryItemStack` 封装单个栈的数量、属性查询、标签判定。
 
 - `scripts/actors/heroes/PlayerInventoryComponent.cs` + `PlayerItemInteractionComponent.cs`  
-  - `PlayerInventoryComponent` 除了管理背包/主武器槽外，还会自动创建唯一的 “Held Item” 槽（`SpecialInventorySlotIds.CurrentHeldItem`），并通过 `TryAssignHeldItem()`、`TakeHeldItemStack()`、`TryReturnHeldItem()` 在拾取/放下之间搬运栈；事件 `ItemPicked` / `ItemRemoved` 仍同步通知骨骼附件与 UI。  
-  - `PlayerItemInteractionComponent` 监听 `take_up`/`put_down`/`throw`，只有在 Held 槽为空时才允许拾取，只有槽内有物品时才允许放下/投掷；真正生成地面实体时直接从 Held 槽取出栈并交给 `WorldItemSpawner`，投掷则在动画完成后施加初速度。
+  - `PlayerInventoryComponent` 负责维护背包指针 `SelectedBackpackSlot`（通过 `ActiveBackpackSlotChanged` 广播），所有拾取/放下/投掷操作都围绕该槽位进行：拾取会尝试把物品直接放入当前槽位，放下/投掷则从该槽位抽出整栈。事件 `ItemPicked` / `ItemRemoved` 仍负责驱动骨骼附件与 UI。  
+  - `PlayerItemInteractionComponent` 监听 `take_up`/`put_down`/`throw`，只有当当前选中栏位为空时才允许拾取，当栏位存在物品时才允许放下/投掷；`item_select_left` / `item_select_right` 仅改变指针位置（不会搬运物品），但会直接影响后续拾取/投掷的目标栏位。
 
 - `scripts/items/world/WorldItemEntity.cs`、`WorldItemSpawner.cs`  
   - `WorldItemEntity` 继承 `CharacterBody2D`，负责地面物品的触发检测、拾取、属性/效果传播、投掷阻尼。  
@@ -44,10 +44,10 @@
   - 定义常用标签/属性集合，背包和逻辑可通过标签快速筛选（如食物、武器）。
 
 - 交互/拾取/放下/投掷流程：  
-  - 地图物品：`WorldItemEntity` 挂在 tscn 中，`TryTransferToActor()` 只会把 `InventoryItemStack` 写入玩家的 Held 槽（若槽已占用则直接拒绝），随后触发 `PlayerInventoryComponent.ItemPicked` 并按 `ItemDefinition.EffectEntries` 应用拾取效果。  
-  - 快捷键：`PlayerItemInteractionComponent` 监听 `put_down` / `throw`，仅当 Held 槽存在物品时才会通过 `WorldItemSpawner` 生成实体；槽为空时直接提示不可用。投掷流程依旧会在动画完成后来到真正释放阶段。  
-  - 骨骼绑定：`PlayerItemAttachment` 订阅 `ItemPicked`/`ItemRemoved`，将最新拾取物品图标附着在指定骨骼或节点上，放下/投掷时自动清除。  
-  - 快捷栏：`QuickSlotBar` 订阅 `InventoryContainer.InventoryChanged`，实时展示前几格物品与数量，便于 Debug 与 UI 集成。
+  - 地图物品：`WorldItemEntity` 挂在 tscn 中，`TryTransferToActor()` 只会把物品写入玩家当前选中栏位（若不可用则直接拒绝），随后触发 `PlayerInventoryComponent.ItemPicked` 并按 `ItemDefinition.EffectEntries` 应用拾取效果。  
+  - 快捷键：`PlayerItemInteractionComponent` 监听 `put_down` / `throw`，仅当当前栏位存在物品时才会通过 `WorldItemSpawner` 生成实体；`item_select_left` / `item_select_right` 循环调整指针但不会移动物品。  
+  - 骨骼绑定：`PlayerItemAttachment` 订阅 `ItemPicked`/`ItemRemoved` 以及 `ActiveBackpackSlotChanged`，始终展示当前指针对应物品，放下/投掷时自动清除。  
+  - 快捷栏：`QuickSlotBar` 订阅 `InventoryContainer.InventoryChanged` 以及 `ActiveBackpackSlotChanged`，在 UI 中展示背包前几格物品，并用 Held 面板镜像指针所指内容。
 - 拾取/投掷动画链路：  
   - `PlayerItemInteractionComponent` 会在 `take_up` 输入时切入 `PlayerPickUpState`，播放 `animations/pickup`（Spine/AnimationPlayer），动画结束后才实际执行拾取。  
   - 投掷流程同理：按下 `throw` 时先切换到 `PlayerThrowState` 播放投掷动画，动画完成后 `TryTriggerThrowAfterAnimation()` 生成并抛出物品。
@@ -104,7 +104,7 @@
 
 1. **定位代码**：根据功能模块到对应目录查找（如效果系统集中在 `scripts/core/effects`）。使用 `ItemDefinition`/`CharacterStatProfile` 时，可直接在 Godot Inspector 中拖拽资源。
 2. **扩展属性/效果**：新增属性时扩展 `StatModifier`/`ApplyStatModifier`；新增效果时继承 `ActorEffect` 并在物品或角色配置中引用对应 scene。
-3. **拾取流程**：地面物品挂 `WorldItemEntity`；玩家通过 `PlayerItemInteractionComponent` 操作 Held 槽拾取/放下；拾取成功会把栈写入 Held 槽并触发 `PlayerInventoryComponent` 事件，放下/投掷则先清空 Held 槽再生成实体。
+3. **拾取流程**：地面物品挂 `WorldItemEntity`；玩家通过 `PlayerItemInteractionComponent` 操作背包指针拾取/放下；拾取成功会把栈写入当前选中槽位并触发 `PlayerInventoryComponent` 事件，放下/投掷则从该槽位取出后生成实体。
 4. **状态机与动画**：新状态继承已有状态基类，并在相应 `StateMachine` 节点下注册；动画通过 Spine 或 Godot AnimationPlayer 统一驱动，与 `GameActor.FlipFacing()` 保持兼容。
 
 如需更新本概览，请同步维护系统路径与简介，确保团队成员快速了解代码架构。*** End Patch

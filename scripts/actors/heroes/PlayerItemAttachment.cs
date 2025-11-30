@@ -41,6 +41,9 @@ namespace Kuros.Actors.Heroes
             _spineSlotNode = ResolveSpineSlotNode();
             Inventory.ItemPicked += OnItemPicked;
             Inventory.ItemRemoved += OnItemRemoved;
+            Inventory.ActiveBackpackSlotChanged += OnActiveSlotChanged;
+            Inventory.Backpack.InventoryChanged += OnInventoryChanged;
+            UpdateAttachmentIcon();
         }
 
         public override void _ExitTree()
@@ -49,13 +52,18 @@ namespace Kuros.Actors.Heroes
             {
                 Inventory.ItemPicked -= OnItemPicked;
                 Inventory.ItemRemoved -= OnItemRemoved;
+                Inventory.ActiveBackpackSlotChanged -= OnActiveSlotChanged;
+                if (Inventory.Backpack != null)
+                {
+                    Inventory.Backpack.InventoryChanged -= OnInventoryChanged;
+                }
             }
             base._ExitTree();
         }
 
         private void OnItemPicked(ItemDefinition item)
         {
-            ShowItemIcon(item.Icon);
+            UpdateAttachmentIcon();
         }
 
         private void ShowItemIcon(Texture2D? texture)
@@ -84,12 +92,23 @@ namespace Kuros.Actors.Heroes
 
         private void OnItemRemoved(string itemId)
         {
-            ClearSpineSlot();
-            if (_iconSprite != null)
-            {
-                _iconSprite.QueueFree();
-                _iconSprite = null;
-            }
+            UpdateAttachmentIcon();
+        }
+
+        private void OnActiveSlotChanged(int _)
+        {
+            UpdateAttachmentIcon();
+        }
+
+        private void OnInventoryChanged()
+        {
+            UpdateAttachmentIcon();
+        }
+
+        private void UpdateAttachmentIcon()
+        {
+            var stack = Inventory?.GetSelectedBackpackStack();
+            ShowItemIcon(stack?.Item.Icon);
         }
 
         private void ShowOnSpineSlot(Texture2D? texture)

@@ -6,7 +6,6 @@ namespace Kuros.Systems.Inventory
     public static class SpecialInventorySlotIds
     {
         public const string PrimaryWeapon = "slot_weapon_primary";
-        public const string CurrentHeldItem = "slot_item_current";
     }
 }
 

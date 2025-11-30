@@ -60,15 +60,22 @@ namespace Kuros.Actors.Heroes
                 TryHandleDrop(DropDisposition.Throw);
             }
 
+            if (Input.IsActionJustPressed("item_select_right"))
+            {
+                InventoryComponent?.SelectNextBackpackSlot();
+                GameLogger.Debug(nameof(PlayerItemInteractionComponent), "输入 item_select_right");
+            }
+
+            if (Input.IsActionJustPressed("item_select_left"))
+            {
+                InventoryComponent?.SelectPreviousBackpackSlot();
+                GameLogger.Debug(nameof(PlayerItemInteractionComponent), "输入 item_select_left");
+            }
+
             if (Input.IsActionJustPressed("take_up"))
             {
                 TriggerPickupState();
             }
-        }
-
-        public bool TryTriggerThrowAfterAnimation()
-        {
-            return TryHandleDrop(DropDisposition.Throw, skipAnimation: true);
         }
 
         public bool TryTriggerThrowAfterAnimation()
@@ -88,9 +95,10 @@ namespace Kuros.Actors.Heroes
                 return false;
             }
 
-            if (!InventoryComponent.HasHeldItem)
+            var selectedStack = InventoryComponent.GetSelectedBackpackStack();
+            if (selectedStack == null)
             {
-                GameLogger.Info(nameof(PlayerItemInteractionComponent), "当前没有持有物品，无法执行丢弃/投掷。");
+                GameLogger.Info(nameof(PlayerItemInteractionComponent), "当前选中栏位没有物品，无法执行丢弃/投掷。");
                 return false;
             }
 
@@ -100,18 +108,17 @@ namespace Kuros.Actors.Heroes
                 return false;
             }
 
-            var stack = InventoryComponent.TakeHeldItemStack();
-            if (stack == null || stack.IsEmpty)
+            if (!InventoryComponent.TryExtractFromSelectedSlot(selectedStack.Quantity, out var extracted) || extracted == null || extracted.IsEmpty)
             {
                 return false;
             }
 
             var spawnPosition = ComputeSpawnPosition(disposition);
-            var entity = WorldItemSpawner.SpawnFromStack(this, stack, spawnPosition);
+            var entity = WorldItemSpawner.SpawnFromStack(this, extracted, spawnPosition);
 
             if (entity == null)
             {
-                InventoryComponent.TryReturnHeldItem(stack);
+                InventoryComponent.TryReturnStackToSelectedSlot(extracted);
                 return false;
             }
 
@@ -120,6 +127,7 @@ namespace Kuros.Actors.Heroes
                 entity.ApplyThrowImpulse(GetFacingDirection() * ThrowImpulse);
             }
 
+            InventoryComponent.NotifyItemRemoved(extracted.Item.ItemId);
             return true;
         }
 
@@ -135,9 +143,8 @@ namespace Kuros.Actors.Heroes
 
         private void TriggerPickupState()
         {
-            if (InventoryComponent?.HasHeldItem == true)
+            if (InventoryComponent?.HasSelectedItem == true)
             {
-                GameLogger.Info(nameof(PlayerItemInteractionComponent), "已持有物品，无法重复拾取。");
                 return;
             }
 
@@ -157,9 +164,8 @@ namespace Kuros.Actors.Heroes
                 return false;
             }
 
-            if (InventoryComponent?.HasHeldItem == true)
+            if (InventoryComponent?.HasSelectedItem == true)
             {
-                GameLogger.Info(nameof(PlayerItemInteractionComponent), "已持有物品，无法拾取新的物品。");
                 return false;
             }
 

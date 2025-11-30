@@ -1,7 +1,9 @@
-[gd_resource type="Resource" load_steps=4 format=3 uid="uid://example_potion"]
+[gd_resource type="Resource" load_steps=6 format=3 uid="uid://4cn6dlnysx75"]
 
-[ext_resource type="Script" path="res://scripts/items/ItemDefinition.cs" id="1"]
-[ext_resource type="Texture2D" path="res://icon.svg" id="2"]
+[ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="1"]
+[ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="1_47noo"]
+[ext_resource type="Texture2D" uid="uid://dccrl4lpl0t2h" path="res://icon.svg" id="2"]
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="2_k6ymq"]
 [ext_resource type="Resource" path="res://resources/items/skills/ExampleSlashSkill.tres" id="3"]
 
 [resource]
@@ -12,7 +14,5 @@ Description = "用于测试拾取与投掷流程的示例药水。"
 Icon = ExtResource("2")
 Category = "Consumable"
 MaxStackSize = 5
+WeaponSkillResources = Array[Resource]([ExtResource("3")])
 WorldScenePath = "res://scenes/items/ExampleWorldItem.tscn"
-Tags = PackedStringArray("weapon")
-WeaponSkillResources = [ExtResource("3")]
-
