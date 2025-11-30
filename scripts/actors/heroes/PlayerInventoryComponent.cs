@@ -16,9 +16,6 @@ namespace Kuros.Actors.Heroes
 
         public InventoryContainer Backpack { get; private set; } = null!;
         public InventoryContainer? QuickBar { get; set; }
-
-        // 记录下一个要填充的快捷栏槽位索引（从1开始，因为0是默认小木剑）
-        private int _nextQuickBarSlot = 1;
         
         // 空白道具资源缓存
         private ItemDefinition? _emptyItem;
@@ -62,24 +59,6 @@ namespace Kuros.Actors.Heroes
                 _emptyItem = GD.Load<ItemDefinition>("res://data/EmptyItem.tres");
             }
             return _emptyItem;
-        }
-        
-        /// <summary>
-        /// 在指定槽位添加空白道具（如果槽位为空）
-        /// </summary>
-        private void AddEmptyItemToSlot(InventoryContainer container, int slotIndex)
-        {
-            if (container == null || slotIndex < 0 || slotIndex >= container.SlotCount) return;
-            
-            var emptyItem = GetEmptyItem();
-            if (emptyItem == null) return;
-            
-            var stack = container.GetStack(slotIndex);
-            if (stack == null || stack.IsEmpty)
-            {
-                container.TryAddItemToSlot(emptyItem, 1, slotIndex);
-                GD.Print($"PlayerInventoryComponent: Added empty item to slot {slotIndex}");
-            }
         }
 
         private InventoryContainer CreateBackpack()
@@ -170,9 +149,6 @@ namespace Kuros.Actors.Heroes
                             {
                                 GD.Print($"AddItemSmart: Added {added} x {item.DisplayName} to slot {i} (replaced empty item if present)");
                                 remaining -= added;
-                                // 更新下一个要填充的槽位
-                                _nextQuickBarSlot = ((i - 1) % 4) + 1;
-                                if (_nextQuickBarSlot == 0) _nextQuickBarSlot = 1;
                                 break;
                             }
                         }

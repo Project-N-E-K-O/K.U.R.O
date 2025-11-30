@@ -260,6 +260,7 @@ namespace Kuros.UI
 
             Visible = false;
             SetProcessInput(false);
+            SetProcessUnhandledInput(false);
             _isOpen = false;
             
             // 取消暂停，恢复游戏时间

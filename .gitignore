@@ -4,9 +4,6 @@
 *.import
 *.uid
 
-# 确保project.godot被跟踪（不忽略）
-!project.godot
-
 # IDE files
 .vscode/
 .vs/
@@ -20,6 +17,9 @@ mono_crash.*.json
 # Godot export / build output
 export/
 build/
+
+# User save data
+saves/
 
 # .NET ignores
 obj/

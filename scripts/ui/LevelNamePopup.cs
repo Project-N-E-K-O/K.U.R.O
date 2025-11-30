@@ -19,6 +19,7 @@ namespace Kuros.UI
 
 		private Tween? _fadeTween;
 		private bool _isShowing = false;
+		private SceneTreeTimer? _displayTimer;
 
 		public override void _Ready()
 		{
@@ -89,12 +90,18 @@ namespace Kuros.UI
 			Modulate = new Color(1, 1, 1, 0); // 从透明开始
 
 			_fadeTween = CreateTween();
-			_fadeTween.SetParallel(true);
 			_fadeTween.TweenProperty(this, "modulate:a", 1.0f, FadeInDuration);
 			_fadeTween.TweenCallback(Callable.From(() =>
 			{
 				// 淡入完成后，等待显示时间，然后淡出
-				GetTree().CreateTimer(DisplayDuration).Timeout += FadeOut;
+				// 先断开之前的定时器（如果存在）
+				if (_displayTimer != null && IsInstanceValid(_displayTimer))
+				{
+					_displayTimer.Timeout -= FadeOut;
+				}
+				
+				_displayTimer = GetTree().CreateTimer(DisplayDuration);
+				_displayTimer.Timeout += FadeOut;
 			}));
 		}
 
@@ -129,6 +136,13 @@ namespace Kuros.UI
 			{
 				_fadeTween.Kill();
 				_fadeTween = null;
+			}
+			
+			// 断开并清除显示定时器
+			if (_displayTimer != null && IsInstanceValid(_displayTimer))
+			{
+				_displayTimer.Timeout -= FadeOut;
+				_displayTimer = null;
 			}
 		}
 

@@ -44,8 +44,9 @@ namespace Kuros.Actors.NPC
 		private void InitializeNPCInteraction()
 		{
 			// 如果对话数据为空，创建默认对话数据
-			if (DialogueData == null)
+			if (DialogueData == null && !_hasTriedLoadDialogue)
 			{
+				_hasTriedLoadDialogue = true;
 				CreateDefaultDialogue();
 			}
 			
@@ -188,8 +189,9 @@ namespace Kuros.Actors.NPC
 		public override void _Process(double delta)
 		{
 			// 如果对话数据仍然为空，创建默认对话数据（可能在_Ready时场景属性还未覆盖）
-			if (DialogueData == null)
+			if (DialogueData == null && !_hasTriedLoadDialogue)
 			{
+				_hasTriedLoadDialogue = true;
 				CreateDefaultDialogue();
 			}
 			
@@ -204,8 +206,9 @@ namespace Kuros.Actors.NPC
 			else if (_playerInRange != null && Input.IsActionJustPressed("take_up"))
 			{
 				// 如果对话数据为空，创建默认对话数据
-				if (DialogueData == null)
+				if (DialogueData == null && !_hasTriedLoadDialogue)
 				{
+					_hasTriedLoadDialogue = true;
 					CreateDefaultDialogue();
 					if (DialogueData != null)
 					{

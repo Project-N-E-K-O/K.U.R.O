@@ -19,6 +19,7 @@ namespace Kuros.UI
         private bool _isOpen = false;
         private SkillDetailWindow? _skillDetailWindow;
         private const string SkillDetailWindowPath = "res://scenes/ui/windows/SkillDetailWindow.tscn";
+        private InventoryWindow? _cachedInventoryWindow;
 
         // 技能数据（占位数据，等待接入真实技能接口）
         private readonly List<SkillData> _activeSkills = new();
@@ -154,6 +155,9 @@ namespace Kuros.UI
                     child.QueueFree();
                 }
             }
+
+            // 清空技能卡片引用，避免引用已释放的节点
+            _skillCards.Clear();
 
             // 显示主技能
             if (ActiveSkillsContainer != null)
@@ -335,17 +339,28 @@ namespace Kuros.UI
         /// </summary>
         private bool IsInventoryWindowOpen()
         {
+            // Try cached reference first
+            if (_cachedInventoryWindow != null && IsInstanceValid(_cachedInventoryWindow))
+            {
+                return _cachedInventoryWindow.Visible;
+            }
+            
+            // Fallback: Find via group (requires InventoryWindow to be added to "inventory_window" group)
+            _cachedInventoryWindow = GetTree().GetFirstNodeInGroup("inventory_window") as InventoryWindow;
+            if (_cachedInventoryWindow != null)
+            {
+                return _cachedInventoryWindow.Visible;
+            }
+            
+            // Final fallback: Simple search without full tree traversal
+            // This is still more efficient than recursive traversal
             var root = GetTree().Root;
             if (root != null)
             {
-                var inventoryWindows = FindAllInventoryWindowsInTree(root);
-                
-                foreach (var inventoryWindow in inventoryWindows)
+                _cachedInventoryWindow = FindInventoryWindowInNode(root);
+                if (_cachedInventoryWindow != null)
                 {
-                    if (inventoryWindow.Visible)
-                    {
-                        return true;
-                    }
+                    return _cachedInventoryWindow.Visible;
                 }
             }
             
@@ -353,25 +368,26 @@ namespace Kuros.UI
         }
 
         /// <summary>
-        /// 在场景树中查找所有物品栏窗口
+        /// 在节点及其直接子节点中查找物品栏窗口（非递归，性能更好）
         /// </summary>
-        private System.Collections.Generic.List<InventoryWindow> FindAllInventoryWindowsInTree(Node node)
+        private InventoryWindow? FindInventoryWindowInNode(Node node)
         {
-            var result = new System.Collections.Generic.List<InventoryWindow>();
-            
             // 检查当前节点
             if (node is InventoryWindow inventoryWindow)
             {
-                result.Add(inventoryWindow);
+                return inventoryWindow;
             }
             
-            // 递归检查子节点
+            // 只检查直接子节点，不递归
             foreach (Node child in node.GetChildren())
             {
-                result.AddRange(FindAllInventoryWindowsInTree(child));
+                if (child is InventoryWindow childInventoryWindow)
+                {
+                    return childInventoryWindow;
+                }
             }
             
-            return result;
+            return null;
         }
 
         /// <summary>
