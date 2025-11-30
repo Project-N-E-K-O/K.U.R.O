@@ -282,7 +282,8 @@ namespace Kuros.Actors.Heroes
                 return;
             }
 
-            SetSelectedBackpackSlot(0);
+            SelectedBackpackSlot = 0;
+            ActiveBackpackSlotChanged?.Invoke(SelectedBackpackSlot);
         }
 
         private void SetSelectedBackpackSlot(int index)
