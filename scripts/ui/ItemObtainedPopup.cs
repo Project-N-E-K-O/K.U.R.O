@@ -202,7 +202,7 @@ namespace Kuros.UI
 				var battleMenu = Kuros.Managers.UIManager.Instance?.GetUI<BattleMenu>("BattleMenu");
 				if (battleMenu != null && battleMenu.Visible && battleMenu.GetParent() == parent)
 				{
-					// 菜单已打开，将弹窗移到菜单之前（但仍在最后，因为菜单会在弹窗之后）
+					// 菜单已打开，将弹窗移到菜单之前
 					var menuIndex = battleMenu.GetIndex();
 					var popupIndex = GetIndex();
 					if (popupIndex >= menuIndex)
@@ -213,12 +213,37 @@ namespace Kuros.UI
 				}
 				else
 				{
-					// 菜单未打开，移到父节点的最后，确保输入处理优先级最高
-					// 在Godot中，_Input()是从后往前调用的，所以最后面的节点会先处理输入
-					// 这样ESC键会被弹窗优先捕获并禁用
-					var lastIndex = parent.GetChildCount() - 1;
-					parent.MoveChild(this, lastIndex);
-					GD.Print("ItemObtainedPopup: 已将弹窗移到最后，确保ESC键优先处理");
+					// 菜单未打开，移到所有其他弹窗之后，但确保在菜单之前
+					// 首先找到所有其他 ItemObtainedPopup 实例
+					int targetIndex = -1;
+					for (int i = parent.GetChildCount() - 1; i >= 0; i--)
+					{
+						var child = parent.GetChild(i);
+						if (child is ItemObtainedPopup otherPopup && otherPopup != this && otherPopup.Visible)
+						{
+							targetIndex = i + 1;
+							break;
+						}
+					}
+					
+					// 如果没有找到其他弹窗，移到最后
+					if (targetIndex < 0)
+					{
+						targetIndex = parent.GetChildCount() - 1;
+					}
+					
+					// 确保不超过父节点的子节点数量
+					if (targetIndex >= parent.GetChildCount())
+					{
+						targetIndex = parent.GetChildCount() - 1;
+					}
+					
+					var currentIndex = GetIndex();
+					if (currentIndex != targetIndex)
+					{
+						parent.MoveChild(this, targetIndex);
+						GD.Print($"ItemObtainedPopup: 已将弹窗移到索引 {targetIndex}，确保正确的显示顺序");
+					}
 				}
 			}
 		}

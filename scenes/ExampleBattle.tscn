@@ -22,7 +22,6 @@
 [ext_resource type="PackedScene" path="res://scenes/properties/DroppableExampleProperty.tscn" id="11_drop_example"]
 [ext_resource type="Resource" path="res://data/TestItem2.tres" id="27_test_item_2"]
 [ext_resource type="Resource" path="res://data/TestItem3.tres" id="28_test_item_3"]
-[ext_resource type="Script" path="res://scripts/ui/QuickSlotBar.cs" id="29_quick_slot_bar"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_attack"]
 size = Vector2(64.75629, 180.66397)
@@ -201,14 +200,6 @@ grow_horizontal = 2
 grow_vertical = 0
 text = "WASD: Move | Space: Attack | Shift: Run | F: Pick Up | G: Put Down"
 horizontal_alignment = 1
-
-[node name="QuickSlotBar" type="HBoxContainer" parent="UI"]
-offset_left = 20.0
-offset_top = 940.0
-offset_right = 300.0
-offset_bottom = 1020.0
-script = ExtResource("29_quick_slot_bar")
-InventoryPath = NodePath("../../Player/Inventory")
 
 [node name="ArillWall" type="StaticBody2D" parent="."]
 

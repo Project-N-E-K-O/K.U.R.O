@@ -19,6 +19,8 @@ namespace Kuros.UI
 	[Export] public Label ScoreLabel { get; private set; } = null!;
 	[Export] public Button PauseButton { get; private set; } = null!;
 	[Export] public Label GoldLabel { get; private set; } = null!;
+	[Export] public Control MinimapContainer { get; private set; } = null!;
+	[Export] public ColorRect PlayerMarker { get; private set; } = null!;
 
 		[ExportCategory("Default Items")]
 		[Export] public ItemDefinition? DefaultSwordItem { get; set; } // 默认小木剑物品定义
@@ -37,6 +39,10 @@ namespace Kuros.UI
 		// 快捷栏UI引用
 		private readonly Label[] _quickSlotLabels = new Label[5];
 		private readonly Panel[] _quickSlotPanels = new Panel[5];
+		
+		// 小地图相关
+		private Vector2 _mapSize = new Vector2(2000, 1500); // 地图总大小（可以根据实际地图调整）
+		private Vector2 _minimapSize = new Vector2(200, 200); // 小地图显示大小
 		
 		// 颜色定义
 		private static readonly Color LeftHandColor = new Color(0.2f, 0.5f, 1.0f, 1.0f); // 蓝色
@@ -81,6 +87,17 @@ namespace Kuros.UI
 			if (GoldLabel == null)
 			{
 				GoldLabel = GetNodeOrNull<Label>("GoldLabel");
+			}
+
+			// 初始化小地图引用
+			if (MinimapContainer == null)
+			{
+				MinimapContainer = GetNodeOrNull<Control>("MinimapPanel/MinimapContainer");
+			}
+
+			if (PlayerMarker == null)
+			{
+				PlayerMarker = GetNodeOrNull<ColorRect>("MinimapPanel/MinimapContainer/PlayerMarker");
 			}
 
 			// 连接暂停按钮信号
@@ -548,6 +565,58 @@ namespace Kuros.UI
 					GetViewport().SetInputAsHandled();
 				}
 			}
+		}
+
+		public override void _Process(double delta)
+		{
+			base._Process(delta);
+			UpdateMinimap();
+		}
+
+		/// <summary>
+		/// 更新小地图上的玩家位置
+		/// </summary>
+		private void UpdateMinimap()
+		{
+			if (MinimapContainer == null || PlayerMarker == null)
+			{
+				return;
+			}
+
+			// 获取玩家位置
+			Vector2 playerPosition = Vector2.Zero;
+			if (_player != null && GodotObject.IsInstanceValid(_player))
+			{
+				playerPosition = _player.GlobalPosition;
+			}
+			else
+			{
+				// 如果玩家不存在，尝试从场景中查找
+				var player = GetTree().GetFirstNodeInGroup("player") as Node2D;
+				if (player != null)
+				{
+					playerPosition = player.GlobalPosition;
+				}
+			}
+
+			// 将玩家世界坐标转换为小地图坐标
+			// 假设地图范围从 (0, 0) 到 _mapSize
+			float normalizedX = Mathf.Clamp(playerPosition.X / _mapSize.X, 0.0f, 1.0f);
+			float normalizedY = Mathf.Clamp(playerPosition.Y / _mapSize.Y, 0.0f, 1.0f);
+
+			// 获取小地图容器的实际大小
+			var containerSize = MinimapContainer.Size;
+			if (containerSize.X <= 0 || containerSize.Y <= 0)
+			{
+				return;
+			}
+
+			// 计算玩家标记在小地图中的位置
+			float markerX = normalizedX * containerSize.X;
+			float markerY = normalizedY * containerSize.Y;
+
+			// 更新玩家标记位置（相对于小地图容器）
+			PlayerMarker.Position = new Vector2(markerX - PlayerMarker.Size.X / 2, markerY - PlayerMarker.Size.Y / 2);
 		}
 	}
 }

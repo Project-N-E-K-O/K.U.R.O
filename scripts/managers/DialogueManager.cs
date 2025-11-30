@@ -18,6 +18,8 @@ namespace Kuros.Managers
 		private DialogueWindow? _dialogueWindow;
 		private DialogueData? _currentDialogue;
 		private bool _isDialogueActive = false;
+		private double _dialogueEndTime = 0.0; // 对话结束的时间戳
+		private const double INPUT_BLOCK_DURATION = 0.15; // 对话结束后阻止输入的时间（秒）
 		
 		// 信号
 		[Signal] public delegate void DialogueStartedEventHandler(string dialogueId);
@@ -201,6 +203,13 @@ namespace Kuros.Managers
 				// 标记为非激活状态
 				_isDialogueActive = false;
 				
+				// 记录对话结束时间，用于阻止输入
+				_dialogueEndTime = Time.GetTicksMsec() / 1000.0;
+				
+				// 立即清除输入状态，防止Space键传播到玩家角色
+				Input.ActionRelease("attack");
+				Input.ActionRelease("ui_accept");
+				
 				// 清理对话数据
 				_currentDialogue = null;
 				
@@ -256,6 +265,34 @@ namespace Kuros.Managers
 		/// 检查是否有对话正在进行
 		/// </summary>
 		public bool IsDialogueActive => _isDialogueActive;
+		
+		/// <summary>
+		/// 检查是否应该阻止玩家输入（对话正在进行或刚刚结束）
+		/// </summary>
+		public bool ShouldBlockPlayerInput()
+		{
+			if (_isDialogueActive)
+			{
+				return true;
+			}
+			
+			// 如果对话刚刚结束，在短时间内阻止输入
+			if (_dialogueEndTime > 0.0)
+			{
+				double currentTime = Time.GetTicksMsec() / 1000.0;
+				if (currentTime - _dialogueEndTime < INPUT_BLOCK_DURATION)
+				{
+					return true;
+				}
+				else
+				{
+					// 时间已过，清除时间戳
+					_dialogueEndTime = 0.0;
+				}
+			}
+			
+			return false;
+		}
 		
 		/// <summary>
 		/// 获取当前对话数据

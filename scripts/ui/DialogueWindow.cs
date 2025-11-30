@@ -514,6 +514,10 @@ namespace Kuros.UI
 				_currentEntry = null;
 				_currentEntryIndex = -1;
 				
+				// 立即清除输入状态，防止Space键传播到玩家角色
+				Input.ActionRelease("attack");
+				Input.ActionRelease("ui_accept");
+				
 				// 隐藏窗口
 				HideWindow();
 				
@@ -748,9 +752,22 @@ namespace Kuros.UI
 			// 空格键继续/跳过
 			if (@event.IsActionPressed("attack") || @event.IsActionPressed("ui_accept"))
 			{
-				HandleSpaceKey();
-				GetViewport().SetInputAsHandled();
-				return;
+				// 如果对话已激活，处理Space键
+				if (IsDialogueActive())
+				{
+					HandleSpaceKey();
+					GetViewport().SetInputAsHandled();
+					AcceptEvent();
+					return;
+				}
+				else
+				{
+					// 即使对话已结束，也要处理Space键，防止它传播到玩家角色
+					// 这可以防止在对话结束时按下Space键触发攻击
+					GetViewport().SetInputAsHandled();
+					AcceptEvent();
+					return;
+				}
 			}
 		}
 		
@@ -795,6 +812,13 @@ namespace Kuros.UI
 			// 检查对话是否激活
 			if (!IsDialogueActive())
 			{
+				// 即使对话已结束，也要处理Space键，防止它传播到玩家角色
+				// 这可以防止在对话结束时按下Space键触发攻击
+				if (@event.IsActionPressed("attack") || @event.IsActionPressed("ui_accept"))
+				{
+					GetViewport().SetInputAsHandled();
+					return;
+				}
 				return;
 			}
 			
@@ -860,6 +884,14 @@ namespace Kuros.UI
 			{
 				// 文本已显示完成，继续到下一句
 				OnContinueButtonPressed();
+				
+				// 如果对话已结束，立即清除输入状态，防止Space键传播到玩家角色
+				if (!IsDialogueActive())
+				{
+					// 立即清除输入状态
+					Input.ActionRelease("attack");
+					Input.ActionRelease("ui_accept");
+				}
 			}
 		}
 	}

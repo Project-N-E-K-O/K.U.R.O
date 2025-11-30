@@ -121,6 +121,16 @@ namespace Kuros.UI
                     GD.Print("BattleMenu._Input: 图鉴窗口打开，ESC键由图鉴窗口处理，不拦截");
                     return; // 不处理，也不调用SetInputAsHandled，让图鉴窗口处理
                 }
+                
+                // 检查技能详情窗口是否打开
+                bool skillDetailOpen = IsSkillDetailWindowOpen();
+                
+                if (skillDetailOpen)
+                {
+                    // 技能详情窗口打开时，ESC键会被技能详情窗口处理，这里不处理
+                    GD.Print("BattleMenu._Input: 技能详情窗口打开，ESC键由技能详情窗口处理，不拦截");
+                    return; // 不处理，也不调用SetInputAsHandled，让技能详情窗口处理
+                }
             }
             
             // 处理Return键（Enter）和ui_cancel（ESC）来打开/关闭菜单
@@ -229,6 +239,47 @@ namespace Kuros.UI
             foreach (Node child in node.GetChildren())
             {
                 result.AddRange(FindAllCompendiumWindowsInTree(child));
+            }
+            
+            return result;
+        }
+
+        private bool IsSkillDetailWindowOpen()
+        {
+            // 直接在整个场景树中查找所有 SkillDetailWindow
+            var root = GetTree().Root;
+            if (root != null)
+            {
+                var skillDetailWindows = FindAllSkillDetailWindowsInTree(root);
+                
+                foreach (var skillDetailWindow in skillDetailWindows)
+                {
+                    if (skillDetailWindow.Visible && skillDetailWindow.IsOpen)
+                    {
+                        GD.Print($"BattleMenu.IsSkillDetailWindowOpen: 找到打开的技能详情窗口，Visible={skillDetailWindow.Visible}, IsOpen={skillDetailWindow.IsOpen}");
+                        return true;
+                    }
+                }
+            }
+            
+            GD.Print("BattleMenu.IsSkillDetailWindowOpen: 未找到打开的技能详情窗口");
+            return false;
+        }
+
+        private System.Collections.Generic.List<SkillDetailWindow> FindAllSkillDetailWindowsInTree(Node node)
+        {
+            var result = new System.Collections.Generic.List<SkillDetailWindow>();
+            
+            // 检查当前节点
+            if (node is SkillDetailWindow skillDetailWindow)
+            {
+                result.Add(skillDetailWindow);
+            }
+            
+            // 递归检查子节点
+            foreach (Node child in node.GetChildren())
+            {
+                result.AddRange(FindAllSkillDetailWindowsInTree(child));
             }
             
             return result;

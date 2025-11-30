@@ -17,15 +17,19 @@ namespace Kuros.Actors.Heroes.States
         
         /// <summary>
         /// 检查是否应该处理玩家输入（移动和攻击）
-        /// 如果对话正在进行，则返回false，阻止移动和攻击输入
+        /// 如果对话正在进行或刚刚结束，则返回false，阻止移动和攻击输入
         /// 但保留ESC和Space等对话功能键
         /// </summary>
         protected bool ShouldProcessPlayerInput()
         {
-            // 如果对话管理器存在且对话正在进行，则阻止玩家输入
-            if (DialogueManager.Instance != null && DialogueManager.Instance.IsDialogueActive)
+            // 如果对话管理器存在，检查是否应该阻止输入
+            if (DialogueManager.Instance != null)
             {
-                return false;
+                // 检查对话是否正在进行或刚刚结束
+                if (DialogueManager.Instance.ShouldBlockPlayerInput())
+                {
+                    return false;
+                }
             }
             return true;
         }

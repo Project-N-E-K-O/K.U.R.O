@@ -1,21 +1,28 @@
-[gd_scene load_steps=5 format=3 uid="uid://ciwlpphli7o01"]
+[gd_scene load_steps=6 format=3 uid="uid://ciwlpphli7o01"]
 
-[ext_resource type="PackedScene" path="res://scenes/core/DroppablePickupProperty.tscn" id="1_core_drop"]
-[ext_resource type="Script" uid="uid://dnv7cdxwx3lj2" path="res://scripts/properties/DroppableExampleProperty.cs" id="2_drop_example"]
-[ext_resource type="Resource" path="res://data/TestItem.tres" id="3_test_item"]
-[ext_resource type="Texture2D" uid="uid://dccrl4lpl0t2h" path="res://icon.svg" id="4_icon"]
+[ext_resource type="Script" uid="uid://dnv7cdxwx3lj2" path="res://scripts/properties/DroppableExampleProperty.cs" id="1_drop_example"]
+[ext_resource type="Resource" path="res://data/TestItem.tres" id="2_test_item"]
+[ext_resource type="Texture2D" uid="uid://dccrl4lpl0t2h" path="res://icon.svg" id="3_icon"]
 
-[node name="DroppableExampleProperty" instance=ExtResource("1_core_drop")]
-script = ExtResource("2_drop_example")
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_trigger"]
+size = Vector2(32, 32)
+
+[node name="DroppableExampleProperty" type="Node2D"]
+script = ExtResource("1_drop_example")
 EnergyValue = 25
 PickedColor = Color(0.19607843, 0.8039216, 0.19607843, 1)
-Item = ExtResource("3_test_item")
+Item = ExtResource("2_test_item")
 ItemQuantity = 1
 DropWorldOffset = Vector2(0, 25)
 
-[node name="TriggerArea" parent="." index="0"]
+[node name="TriggerArea" type="Area2D" parent="."]
 visible = false
+collision_layer = 0
+collision_mask = 1
 
-[node name="Sprite2D" type="Sprite2D" parent="." index="1"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TriggerArea"]
+shape = SubResource("RectangleShape2D_trigger")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
 scale = Vector2(1.4755288, 1.4755288)
-texture = ExtResource("4_icon")
+texture = ExtResource("3_icon")

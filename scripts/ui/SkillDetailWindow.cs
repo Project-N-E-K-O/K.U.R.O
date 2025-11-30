@@ -241,7 +241,6 @@ namespace Kuros.UI
             if (tree != null)
             {
                 tree.Paused = true;
-                GD.Print($"SkillDetailWindow.ShowWindow: 已设置暂停，Paused={tree.Paused}");
             }
             
             // 尝试将窗口移到父节点的最后，确保输入处理优先级
@@ -249,10 +248,7 @@ namespace Kuros.UI
             if (parent != null)
             {
                 parent.MoveChild(this, parent.GetChildCount() - 1);
-                GD.Print($"SkillDetailWindow.ShowWindow: 已将技能详情窗口移到父节点最后");
             }
-            
-            GD.Print("SkillDetailWindow.ShowWindow: 技能详情窗口已打开");
         }
 
         /// <summary>
@@ -270,15 +266,11 @@ namespace Kuros.UI
             var tree = GetTree();
             if (tree != null)
             {
-                // 检查是否有其他窗口打开（如物品栏或技能窗口）
-                if (!IsInventoryWindowOpen() && !IsSkillWindowOpen())
+                // 检查是否有其他UI需要保持暂停
+                bool shouldKeepPaused = ShouldKeepPaused();
+                if (!shouldKeepPaused)
                 {
                     tree.Paused = false;
-                    GD.Print($"SkillDetailWindow.HideWindow: 已取消暂停，Paused={tree.Paused}");
-                }
-                else
-                {
-                    GD.Print("SkillDetailWindow.HideWindow: 其他窗口仍打开，保持暂停状态");
                 }
             }
             
@@ -290,8 +282,22 @@ namespace Kuros.UI
             // 检查窗口是否打开
             if (!Visible || !_isOpen) return;
 
-            // ESC键关闭窗口
+            // ESC键关闭窗口（同时检查action和keycode，确保能捕获ESC键）
+            bool isEscKey = false;
             if (@event.IsActionPressed("ui_cancel"))
+            {
+                isEscKey = true;
+            }
+            else if (@event is InputEventKey keyEvent && keyEvent.Pressed)
+            {
+                // 直接检查ESC键的keycode（备用方法）
+                if (keyEvent.Keycode == Key.Escape)
+                {
+                    isEscKey = true;
+                }
+            }
+
+            if (isEscKey)
             {
                 HideWindow();
                 GetViewport().SetInputAsHandled();
@@ -306,10 +312,52 @@ namespace Kuros.UI
             if (!Visible || !_isOpen) return;
 
             // ESC键关闭窗口（GUI输入备用处理）
+            bool isEscKey = false;
             if (@event.IsActionPressed("ui_cancel"))
+            {
+                isEscKey = true;
+            }
+            else if (@event is InputEventKey keyEvent && keyEvent.Pressed)
+            {
+                // 直接检查ESC键的keycode（备用方法）
+                if (keyEvent.Keycode == Key.Escape)
+                {
+                    isEscKey = true;
+                }
+            }
+
+            if (isEscKey)
             {
                 HideWindow();
                 AcceptEvent();
+                return;
+            }
+        }
+
+        public override void _UnhandledInput(InputEvent @event)
+        {
+            // 检查窗口是否打开
+            if (!Visible || !_isOpen) return;
+
+            // ESC键关闭窗口（未处理输入的备用处理）
+            bool isEscKey = false;
+            if (@event.IsActionPressed("ui_cancel"))
+            {
+                isEscKey = true;
+            }
+            else if (@event is InputEventKey keyEvent && keyEvent.Pressed)
+            {
+                // 直接检查ESC键的keycode（备用方法）
+                if (keyEvent.Keycode == Key.Escape)
+                {
+                    isEscKey = true;
+                }
+            }
+
+            if (isEscKey)
+            {
+                HideWindow();
+                GetViewport().SetInputAsHandled();
                 return;
             }
         }
@@ -356,6 +404,43 @@ namespace Kuros.UI
             }
             
             return result;
+        }
+
+        /// <summary>
+        /// 检查是否应该保持暂停状态
+        /// </summary>
+        private bool ShouldKeepPaused()
+        {
+            // 检查物品获得弹窗是否打开
+            var itemPopup = Kuros.Managers.UIManager.Instance?.GetUI<ItemObtainedPopup>("ItemObtainedPopup");
+            if (itemPopup != null && itemPopup.Visible)
+            {
+                return true;
+            }
+
+            // 检查物品栏是否打开
+            if (IsInventoryWindowOpen())
+            {
+                return true;
+            }
+
+            // 检查菜单是否打开
+            var battleMenu = Kuros.Managers.UIManager.Instance?.GetUI<BattleMenu>("BattleMenu");
+            if (battleMenu != null && battleMenu.Visible)
+            {
+                return true;
+            }
+
+            // 检查对话是否激活
+            if (Managers.DialogueManager.Instance != null && Managers.DialogueManager.Instance.IsDialogueActive)
+            {
+                return true;
+            }
+
+            // 注意：不检查技能窗口（SkillWindow），因为技能窗口本身不暂停游戏
+            // SkillWindow 默认是打开的，但它不管理暂停状态
+
+            return false;
         }
 
         /// <summary>

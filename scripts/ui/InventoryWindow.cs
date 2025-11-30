@@ -1,6 +1,7 @@
 using Godot;
 using Kuros.Systems.Inventory;
 using Kuros.Core;
+using Kuros.Managers;
 
 namespace Kuros.UI
 {
@@ -52,7 +53,10 @@ namespace Kuros.UI
             
             CacheNodeReferences();
             InitializeSlots();
-            HideWindow();
+            
+            // 使用 CallDeferred 确保在 UIManager 设置可见性之后执行
+            // 这样可以确保窗口默认是隐藏的
+            CallDeferred(MethodName.HideWindow);
         }
 
         public override void _Process(double delta)
@@ -614,7 +618,11 @@ namespace Kuros.UI
 
         public void HideWindow()
         {
-            if (!_isOpen) return;
+            if (!_isOpen && !Visible)
+            {
+                // 如果已经关闭且不可见，直接返回
+                return;
+            }
 
             // 清理拖拽状态
             DestroyDragPreview();
@@ -632,17 +640,57 @@ namespace Kuros.UI
 
             Visible = false;
             SetProcessInput(false);
+            SetProcessUnhandledInput(false);
             _isOpen = false;
             
             // 取消暂停，恢复游戏时间
+            // 但需要检查是否有其他UI需要保持暂停（如物品获得弹窗、菜单等）
             _shouldBePaused = false;
             var tree = GetTree();
             if (tree != null)
             {
-                tree.Paused = false;
+                // 检查是否有其他UI需要保持暂停
+                bool shouldKeepPaused = ShouldKeepPaused();
+                if (!shouldKeepPaused)
+                {
+                    tree.Paused = false;
+                    GD.Print("InventoryWindow.HideWindow: 已恢复游戏时间");
+                }
+                else
+                {
+                    GD.Print("InventoryWindow.HideWindow: 其他UI需要保持暂停，不恢复游戏时间");
+                }
             }
             
             EmitSignal(SignalName.InventoryClosed);
+        }
+        
+        /// <summary>
+        /// 检查是否应该保持暂停状态（当物品栏关闭时）
+        /// </summary>
+        private bool ShouldKeepPaused()
+        {
+            // 检查物品获得弹窗是否打开
+            var itemPopup = Kuros.Managers.UIManager.Instance?.GetUI<ItemObtainedPopup>("ItemObtainedPopup");
+            if (itemPopup != null && itemPopup.Visible)
+            {
+                return true;
+            }
+
+            // 检查菜单是否打开
+            var battleMenu = Kuros.Managers.UIManager.Instance?.GetUI<BattleMenu>("BattleMenu");
+            if (battleMenu != null && battleMenu.Visible)
+            {
+                return true;
+            }
+
+            // 检查对话是否激活
+            if (DialogueManager.Instance != null && DialogueManager.Instance.IsDialogueActive)
+            {
+                return true;
+            }
+
+            return false;
         }
 
         public override void _Input(InputEvent @event)

@@ -6,6 +6,7 @@ using Kuros.Actors.Heroes;
 using Kuros.Core;
 using Kuros.Items.Effects;
 using Kuros.Items;
+using Kuros.Managers;
 using Kuros.Systems.Inventory;
 using Kuros.Utils;
 
@@ -75,21 +76,41 @@ namespace Kuros.Items.World
         public override void _Process(double delta)
         {
             base._Process(delta);
+            // 输入处理已移至 _UnhandledInput 方法
+        }
 
-            if (_isPicked || _focusedActor == null)
+        public override void _UnhandledInput(InputEvent @event)
+        {
+            // 如果物品已被拾取，不处理输入
+            if (_isPicked)
             {
                 return;
             }
 
+            // 如果没有聚焦的演员，不处理输入
+            if (_focusedActor == null)
+            {
+                return;
+            }
+
+            // 检查聚焦的演员是否仍然有效
             if (!GodotObject.IsInstanceValid(_focusedActor))
             {
                 _focusedActor = null;
                 return;
             }
 
-            if (Input.IsActionJustPressed("take_up"))
+            // 检查对话是否激活，如果激活则不处理拾取（让NPC交互优先）
+            if (Managers.DialogueManager.Instance != null && Managers.DialogueManager.Instance.IsDialogueActive)
+            {
+                return;
+            }
+
+            // 检查是否按下拾取键（F键）
+            if (@event.IsActionPressed("take_up"))
             {
                 HandlePickupRequest(_focusedActor);
+                GetViewport().SetInputAsHandled();
             }
         }
 
