@@ -1,4 +1,5 @@
 using Godot;
+using System.Threading;
 
 namespace Kuros.Managers
 {
@@ -28,29 +29,37 @@ namespace Kuros.Managers
 
 		/// <summary>
 		/// 请求暂停游戏（增加暂停计数）
+		/// 使用原子操作确保线程安全
 		/// </summary>
 		public void PushPause()
 		{
-			_pauseCount++;
-			UpdatePauseState();
+			int newValue = Interlocked.Increment(ref _pauseCount);
+			UpdatePauseState(newValue);
 		}
 
 		/// <summary>
 		/// 取消暂停请求（减少暂停计数）
+		/// 使用原子操作确保线程安全，并防止计数器变为负数
 		/// </summary>
 		public void PopPause()
 		{
-			if (_pauseCount > 0)
+			int newValue = Interlocked.Decrement(ref _pauseCount);
+			
+			// 如果计数器变为负数，重置为零
+			if (newValue < 0)
 			{
-				_pauseCount--;
+				Interlocked.Exchange(ref _pauseCount, 0);
+				newValue = 0;
 			}
-			UpdatePauseState();
+			
+			UpdatePauseState(newValue);
 		}
 
 		/// <summary>
 		/// 更新实际的暂停状态
 		/// </summary>
-		private void UpdatePauseState()
+		/// <param name="pauseCount">当前的暂停计数值（用于避免重复读取）</param>
+		private void UpdatePauseState(int pauseCount)
 		{
 			if (_tree == null)
 			{
@@ -59,27 +68,30 @@ namespace Kuros.Managers
 
 			if (_tree != null)
 			{
-				_tree.Paused = _pauseCount > 0;
+				_tree.Paused = pauseCount > 0;
 			}
 		}
 
 		/// <summary>
 		/// 检查当前是否处于暂停状态
+		/// 使用易失性读取确保线程安全
 		/// </summary>
-		public bool IsPaused => _pauseCount > 0;
+		public bool IsPaused => Volatile.Read(ref _pauseCount) > 0;
 
 		/// <summary>
 		/// 获取当前暂停计数（用于调试）
+		/// 使用易失性读取确保线程安全
 		/// </summary>
-		public int PauseCount => _pauseCount;
+		public int PauseCount => Volatile.Read(ref _pauseCount);
 
 		/// <summary>
 		/// 强制清除所有暂停请求（用于场景切换等特殊情况）
+		/// 使用原子操作确保线程安全
 		/// </summary>
 		public void ClearAllPauses()
 		{
-			_pauseCount = 0;
-			UpdatePauseState();
+			Interlocked.Exchange(ref _pauseCount, 0);
+			UpdatePauseState(0);
 		}
 	}
 }

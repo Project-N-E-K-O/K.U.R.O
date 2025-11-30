@@ -1,5 +1,4 @@
 using Godot;
-using Kuros.Core;
 
 namespace Kuros.Core
 {

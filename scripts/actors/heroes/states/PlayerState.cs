@@ -33,6 +33,27 @@ namespace Kuros.Actors.Heroes.States
             }
             return true;
         }
+        
+        /// <summary>
+        /// 处理对话门控逻辑：如果对话正在进行，减速并切换到Idle状态
+        /// </summary>
+        /// <param name="delta">帧时间增量</param>
+        /// <returns>如果输入被阻止（对话中）返回true，否则返回false</returns>
+        protected bool HandleDialogueGating(double delta)
+        {
+            if (!ShouldProcessPlayerInput())
+            {
+                // 对话中时，停止移动并切换到Idle状态
+                Actor.Velocity = Actor.Velocity.MoveToward(Vector2.Zero, Actor.Speed * 2 * (float)delta);
+                Actor.MoveAndSlide();
+                if (Actor.Velocity.Length() < 1.0f && Name != "Idle")
+                {
+                    ChangeState("Idle");
+                }
+                return true;
+            }
+            return false;
+        }
     }
 }
 

@@ -27,14 +27,7 @@ namespace Kuros.Actors.Heroes.States
 
 		public override void PhysicsUpdate(double delta)
 		{
-			// 如果对话正在进行，不处理玩家输入（但保留ESC和Space键给对话系统）
-			if (!ShouldProcessPlayerInput())
-			{
-				// 对话中时，停止移动
-				Actor.Velocity = Actor.Velocity.MoveToward(Vector2.Zero, Actor.Speed * 2 * (float)delta);
-				Actor.MoveAndSlide();
-				return;
-			}
+			if (HandleDialogueGating(delta)) return;
 			
 			// Check for transitions
 			if (Input.IsActionJustPressed("attack") && Actor.AttackTimer <= 0)

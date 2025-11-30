@@ -201,11 +201,13 @@ namespace Kuros.UI
                 }
 
                 // 如果没有选中的条目，检查是否在非第一个标签页
-                if (Tabs != null && Tabs.CurrentTab > 0)
+                int currentTab = Tabs?.CurrentTab ?? -1;
+                if (Tabs != null && currentTab > 0)
                 {
                     // 切换到上一个标签页
-                    GD.Print($"CompendiumWindow._UnhandledInput: 切换到上一个标签页，从{Tabs.CurrentTab}到{Tabs.CurrentTab - 1}");
-                    Tabs.CurrentTab = Tabs.CurrentTab - 1;
+                    int newTab = currentTab - 1;
+                    GD.Print($"CompendiumWindow._UnhandledInput: 切换到上一个标签页，从{currentTab}到{newTab}");
+                    Tabs.CurrentTab = newTab;
                     GetViewport().SetInputAsHandled();
                 }
                 else
@@ -264,11 +266,13 @@ namespace Kuros.UI
                 }
 
                 // 如果没有选中的条目，检查是否在非第一个标签页
-                if (Tabs != null && Tabs.CurrentTab > 0)
+                int currentTab = Tabs?.CurrentTab ?? -1;
+                if (Tabs != null && currentTab > 0)
                 {
                     // 切换到上一个标签页
-                    GD.Print($"CompendiumWindow._GuiInput: 切换到上一个标签页，从{Tabs.CurrentTab}到{Tabs.CurrentTab - 1}");
-                    Tabs.CurrentTab = Tabs.CurrentTab - 1;
+                    int newTab = currentTab - 1;
+                    GD.Print($"CompendiumWindow._GuiInput: 切换到上一个标签页，从{currentTab}到{newTab}");
+                    Tabs.CurrentTab = newTab;
                     AcceptEvent();
                 }
                 else
@@ -328,11 +332,13 @@ namespace Kuros.UI
                 }
 
                 // 如果没有选中的条目，检查是否在非第一个标签页
-                if (Tabs != null && Tabs.CurrentTab > 0)
+                int currentTab = Tabs?.CurrentTab ?? -1;
+                if (Tabs != null && currentTab > 0)
                 {
                     // 切换到上一个标签页
-                    GD.Print($"CompendiumWindow._Input: 切换到上一个标签页，从{Tabs.CurrentTab}到{Tabs.CurrentTab - 1}");
-                    Tabs.CurrentTab = Tabs.CurrentTab - 1;
+                    int newTab = currentTab - 1;
+                    GD.Print($"CompendiumWindow._Input: 切换到上一个标签页，从{currentTab}到{newTab}");
+                    Tabs.CurrentTab = newTab;
                     GetViewport().SetInputAsHandled();
                     AcceptEvent();
                 }

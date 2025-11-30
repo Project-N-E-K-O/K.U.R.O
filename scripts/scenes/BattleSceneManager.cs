@@ -1,5 +1,7 @@
 using Godot;
+using System;
 using Kuros.Core;
+using Kuros.Items;
 using Kuros.Managers;
 using Kuros.UI;
 using Kuros.Utils;
@@ -168,6 +170,177 @@ namespace Kuros.Scenes
 			// 应用数据后清除待应用标记（数据已应用，但保留在 SaveManager 中供其他系统使用）
 			// 注意：不清除 CurrentGameData，因为可能还有其他系统需要使用
 			GameLogger.Info(nameof(BattleSceneManager), "游戏数据已应用到玩家");
+		}
+
+		/// <summary>
+		/// 应用加载的游戏数据到当前游戏状态（从读档菜单调用）
+		/// </summary>
+		/// <param name="gameData">要应用的游戏数据</param>
+		/// <returns>是否成功应用</returns>
+		private bool ApplyLoadedData(GameSaveData gameData)
+		{
+			if (gameData == null)
+			{
+				GameLogger.Error(nameof(BattleSceneManager), "游戏数据为空，无法应用");
+				return false;
+			}
+
+			if (Player == null)
+			{
+				GameLogger.Error(nameof(BattleSceneManager), "玩家节点为空，无法应用游戏数据");
+				return false;
+			}
+
+			try
+			{
+				// 1. 应用玩家血量
+				int targetHealth = gameData.CurrentHealth > 0 ? gameData.CurrentHealth : gameData.MaxHealth;
+				int targetMaxHealth = gameData.MaxHealth > 0 ? gameData.MaxHealth : Player.MaxHealth;
+				Player.RestoreHealth(targetHealth, targetMaxHealth);
+				GameLogger.Info(nameof(BattleSceneManager), $"恢复玩家血量: {Player.CurrentHealth}/{Player.MaxHealth}");
+
+				// 2. 如果玩家是 SamplePlayer，应用额外属性
+				if (Player is SamplePlayer samplePlayer)
+				{
+					// 应用武器（如果 WeaponName 不为空）
+					if (!string.IsNullOrEmpty(gameData.WeaponName))
+					{
+						ApplyWeapon(samplePlayer, gameData.WeaponName);
+					}
+
+					// 注意：GameSaveData 目前没有 Score、Gold、Inventory 等字段
+					// 如果需要，可以在 GameSaveData 中添加这些字段并在此处应用
+					// samplePlayer.AddScore(...);
+					// samplePlayer.SetGold(...);
+					// ApplyInventory(samplePlayer, gameData);
+				}
+
+				// 3. 应用玩家位置（如果有保存位置数据）
+				// 注意：当前 GameSaveData 没有位置字段，如果需要可以后续添加
+				// if (gameData.PlayerPosition != Vector2.Zero)
+				// {
+				//     Player.GlobalPosition = gameData.PlayerPosition;
+				// }
+
+				// 4. 更新UI
+				RefreshUI();
+
+				// 5. 触发物理/状态刷新
+				// 确保玩家状态机处于正确状态
+				if (Player.StateMachine != null && Player.CurrentHealth > 0)
+				{
+					// 如果玩家已死亡，可能需要特殊处理
+					if (Player.IsDead)
+					{
+						GameLogger.Warn(nameof(BattleSceneManager), "玩家处于死亡状态，可能需要重新初始化");
+					}
+					else
+					{
+						// 确保玩家处于正常状态（Idle 或当前状态）
+						// 不强制改变状态，让状态机自然处理
+					}
+				}
+
+				GameLogger.Info(nameof(BattleSceneManager), $"成功应用游戏数据: 等级 {gameData.Level}, 武器 {gameData.WeaponName}");
+				return true;
+			}
+			catch (Exception ex)
+			{
+				GameLogger.Error(nameof(BattleSceneManager), $"应用游戏数据时发生错误: {ex.Message}");
+				return false;
+			}
+		}
+
+		/// <summary>
+		/// 应用武器到玩家
+		/// </summary>
+		private void ApplyWeapon(SamplePlayer player, string weaponName)
+		{
+			if (player == null || string.IsNullOrEmpty(weaponName))
+			{
+				return;
+			}
+
+			// 尝试通过资源路径加载物品
+			// 假设 weaponName 可能是资源路径或 ItemId
+			ItemDefinition? weaponItem = null;
+
+			// 首先尝试作为资源路径加载
+			if (weaponName.StartsWith("res://"))
+			{
+				weaponItem = GD.Load<ItemDefinition>(weaponName);
+			}
+			else
+			{
+				// 尝试在常见路径中查找
+				string[] possiblePaths = {
+					$"res://data/{weaponName}.tres",
+					$"res://resources/items/{weaponName}.tres",
+					$"res://data/DefaultSwordItem.tres" // 默认武器
+				};
+
+				foreach (var path in possiblePaths)
+				{
+					weaponItem = GD.Load<ItemDefinition>(path);
+					if (weaponItem != null)
+					{
+						break;
+					}
+				}
+			}
+
+			if (weaponItem != null)
+			{
+				// 尝试将武器添加到快捷栏或装备栏
+				if (player.InventoryComponent != null)
+				{
+					// 尝试添加到快捷栏（如果快捷栏存在）
+					if (player.InventoryComponent.QuickBar != null)
+					{
+						// 尝试添加到快捷栏的第一个可用槽位（索引1-4，索引0是默认小木剑）
+						for (int i = 1; i < 5; i++)
+						{
+							if (player.InventoryComponent.QuickBar.TryAddItemToSlot(weaponItem, 1, i) > 0)
+							{
+								GameLogger.Info(nameof(BattleSceneManager), $"武器 {weaponName} 已添加到快捷栏槽位 {i}");
+								// 可选：自动切换到该武器
+								// player.SwitchToQuickBarSlot(i);
+								return;
+							}
+						}
+					}
+
+					// 如果快捷栏添加失败，尝试添加到背包
+					if (player.InventoryComponent.Backpack != null)
+					{
+						player.InventoryComponent.Backpack.AddItem(weaponItem, 1);
+						GameLogger.Info(nameof(BattleSceneManager), $"武器 {weaponName} 已添加到背包");
+					}
+				}
+			}
+			else
+			{
+				GameLogger.Warn(nameof(BattleSceneManager), $"无法加载武器: {weaponName}");
+			}
+		}
+
+		/// <summary>
+		/// 刷新UI以反映当前游戏状态
+		/// </summary>
+		private void RefreshUI()
+		{
+			// 刷新 BattleHUD
+			if (_battleHUD != null && IsInstanceValid(_battleHUD) && Player != null)
+			{
+				// 重新连接玩家数据以更新UI
+				if (Player is SamplePlayer samplePlayer)
+				{
+					_battleHUD.AttachActor(Player);
+				}
+			}
+
+			// 注意：SamplePlayer 的血量变化会通过 HealthChanged 事件自动更新UI
+			// 不需要手动调用 UpdateStatsUI（它是私有方法）
 		}
 
 		/// <summary>
@@ -550,24 +723,37 @@ namespace Kuros.Scenes
 					if (gameData != null)
 					{
 						GD.Print($"成功加载槽位 {slotIndex}");
-						// TODO: 应用游戏数据到游戏状态
-						// 例如：恢复玩家血量、等级、武器等
+						
+						// 存储游戏数据到 SaveManager，供后续使用
+						SaveManager.Instance.SetCurrentGameData(gameData);
+						
+						// 应用游戏数据到当前游戏状态
+						if (ApplyLoadedData(gameData))
+						{
+							GameLogger.Info(nameof(BattleSceneManager), $"成功应用游戏数据，槽位 {slotIndex}");
+							
+							// 读档成功后关闭所有菜单并继续游戏
+							if (_saveSlotSelection != null && IsInstanceValid(_saveSlotSelection))
+							{
+								_saveSlotSelection.Visible = false;
+							}
+							if (_battleMenu != null && IsInstanceValid(_battleMenu))
+							{
+								_battleMenu.CloseMenu();
+							}
+						}
+						else
+						{
+							GD.PrintErr($"应用游戏数据失败: 槽位 {slotIndex}");
+							// 应用失败，不关闭菜单
+							return;
+						}
 					}
 					else
 					{
 						GD.PrintErr($"加载失败: 槽位 {slotIndex}");
 						return; // 加载失败，不关闭菜单
 					}
-				}
-				
-				// 读档完成后关闭所有菜单并继续游戏
-				if (_saveSlotSelection != null && IsInstanceValid(_saveSlotSelection))
-				{
-					_saveSlotSelection.Visible = false;
-				}
-				if (_battleMenu != null && IsInstanceValid(_battleMenu))
-				{
-					_battleMenu.CloseMenu();
 				}
 			}
 		}

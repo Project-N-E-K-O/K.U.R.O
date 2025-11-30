@@ -1,6 +1,8 @@
 using Godot;
 using System;
 using System.IO;
+using Kuros.Scenes;
+using Kuros.Systems.Inventory;
 
 namespace Kuros.Managers
 {
@@ -14,7 +16,12 @@ namespace Kuros.Managers
         private const string SaveDirectoryName = "saves";
         private const string SaveFilePrefix = "save_";
         private const string SaveFileExtension = ".save";
+        private const int SAVE_FORMAT_VERSION = 1;
         private string _saveDirectory = "";
+        
+        // 游戏时间追踪
+        private int _totalPlayTimeSeconds = 0;
+        private double _accumulatedDelta = 0.0;
 
         /// <summary>
         /// 当前加载的游戏数据（从存档加载后存储，供场景使用）
@@ -34,8 +41,29 @@ namespace Kuros.Managers
             // 确保存档目录存在
             EnsureSaveDirectoryExists();
             
-            // 创建测试存档（槽位0，所有信息都是1）
+            // 初始化游戏时间追踪
+            _accumulatedDelta = 0.0;
+            
+#if DEBUG
+            // 创建测试存档（槽位0，所有信息都是1）- 仅在调试模式下执行
             CreateTestSave(0);
+#endif
+        }
+        
+        public override void _Process(double delta)
+        {
+            // 更新游戏时间（仅在游戏未暂停时）
+            if (PauseManager.Instance == null || !PauseManager.Instance.IsPaused)
+            {
+                _accumulatedDelta += delta;
+                // 当累积的 delta 达到或超过 1 秒时，增加游戏时间
+                if (_accumulatedDelta >= 1.0)
+                {
+                    int secondsToAdd = (int)_accumulatedDelta;
+                    _totalPlayTimeSeconds += secondsToAdd;
+                    _accumulatedDelta -= secondsToAdd;
+                }
+            }
         }
 
         /// <summary>
@@ -105,8 +133,13 @@ namespace Kuros.Managers
                 return false;
             }
 
-            // 保存数据为JSON格式
-            var json = Json.Stringify(data.ToDictionary());
+            // 保存数据为JSON格式，包含版本号以支持未来迁移
+            var savePayload = new Godot.Collections.Dictionary<string, Variant>
+            {
+                { "version", SAVE_FORMAT_VERSION },
+                { "data", data.ToDictionary() }
+            };
+            var json = Json.Stringify(savePayload);
             file.StoreString(json);
             file.Close();
 
@@ -163,8 +196,44 @@ namespace Kuros.Managers
                 typedDict[key.AsString()] = dict[key];
             }
 
-            var data = GameSaveData.FromDictionary(typedDict);
-            GD.Print($"SaveManager: 成功加载槽位 {slotIndex}: {filePath}");
+            // 读取版本号（如果存在），支持向后兼容旧格式
+            int version = 0;
+            if (typedDict.ContainsKey("version"))
+            {
+                version = typedDict["version"].AsInt32();
+            }
+
+            // 根据版本号提取数据
+            Godot.Collections.Dictionary<string, Variant> dataDict;
+            if (version > 0)
+            {
+                // 新格式：包含版本号和data字段
+                if (!typedDict.ContainsKey("data"))
+                {
+                    GD.PrintErr($"SaveManager: 存档文件格式错误（缺少data字段）: {filePath}");
+                    return null;
+                }
+                var dataVariant = typedDict["data"];
+                if (dataVariant.VariantType != Variant.Type.Dictionary)
+                {
+                    GD.PrintErr($"SaveManager: 存档文件格式错误（data字段类型错误）: {filePath}");
+                    return null;
+                }
+                var dataDictRaw = dataVariant.AsGodotDictionary();
+                dataDict = new Godot.Collections.Dictionary<string, Variant>();
+                foreach (var key in dataDictRaw.Keys)
+                {
+                    dataDict[key.AsString()] = dataDictRaw[key];
+                }
+            }
+            else
+            {
+                // 旧格式：直接是GameSaveData字典（向后兼容）
+                dataDict = typedDict;
+            }
+
+            var data = GameSaveData.FromDictionary(dataDict);
+            GD.Print($"SaveManager: 成功加载槽位 {slotIndex} (格式版本: {version}): {filePath}");
             return data;
         }
 
@@ -253,12 +322,24 @@ namespace Kuros.Managers
             CurrentGameData = data;
             if (data != null)
             {
+                // 恢复游戏时间
+                _totalPlayTimeSeconds = data.PlayTimeSeconds;
+                _accumulatedDelta = 0.0;
                 GD.Print($"SaveManager: 已设置当前游戏数据，槽位: {data.SlotIndex}");
             }
             else
             {
                 GD.Print("SaveManager: 已清除当前游戏数据");
             }
+        }
+        
+        /// <summary>
+        /// 重置游戏时间（新游戏开始时调用）
+        /// </summary>
+        public void ResetPlayTime()
+        {
+            _totalPlayTimeSeconds = 0;
+            _accumulatedDelta = 0.0;
         }
 
         /// <summary>
@@ -274,18 +355,94 @@ namespace Kuros.Managers
         /// </summary>
         public GameSaveData GetCurrentGameData()
         {
-            // TODO: 从实际的游戏状态获取数据
-            // 现在返回默认数据
+            // 获取玩家实例
+            SamplePlayer? player = null;
+            if (GetTree() != null)
+            {
+                player = GetTree().GetFirstNodeInGroup("player") as SamplePlayer;
+            }
+            
+            // 获取玩家生命值
+            int currentHealth = 1;
+            int maxHealth = 1;
+            if (player != null)
+            {
+                currentHealth = player.CurrentHealth;
+                maxHealth = player.MaxHealth;
+            }
+            
+            // 获取装备的武器名称
+            string weaponName = "无";
+            if (player != null && player.InventoryComponent != null)
+            {
+                var weaponSlot = player.InventoryComponent.GetSpecialSlot(SpecialInventorySlotIds.PrimaryWeapon);
+                if (weaponSlot != null && !weaponSlot.IsEmpty && weaponSlot.Stack != null)
+                {
+                    weaponName = weaponSlot.Stack.Item.DisplayName;
+                }
+            }
+            
+            // 获取关卡名称
+            string levelName = "未知关卡";
+            int level = 1;
+            string levelProgress = "未知";
+            
+            if (GetTree() != null)
+            {
+                // 尝试查找 BattleSceneManager
+                BattleSceneManager? sceneManager = null;
+                
+                // 首先尝试从当前场景根节点查找
+                if (GetTree().CurrentScene != null)
+                {
+                    sceneManager = GetTree().CurrentScene.GetNodeOrNull<BattleSceneManager>(".");
+                }
+                
+                // 如果没找到，尝试在整个场景树中查找
+                if (sceneManager == null)
+                {
+                    var allNodes = GetTree().GetNodesInGroup("scene_manager");
+                    foreach (var node in allNodes)
+                    {
+                        if (node is BattleSceneManager bsm)
+                        {
+                            sceneManager = bsm;
+                            break;
+                        }
+                    }
+                }
+                
+                // 如果还是没找到，尝试递归查找
+                if (sceneManager == null && GetTree().CurrentScene != null)
+                {
+                    sceneManager = GetTree().CurrentScene.GetNodeOrNull<BattleSceneManager>("BattleSceneManager");
+                }
+                
+                if (sceneManager != null && !string.IsNullOrEmpty(sceneManager.LevelName))
+                {
+                    levelName = sceneManager.LevelName;
+                    levelProgress = levelName;
+                }
+                else if (GetTree().CurrentScene != null)
+                {
+                    // 使用场景名称作为关卡名称
+                    levelName = GetTree().CurrentScene.Name;
+                    levelProgress = levelName;
+                }
+            }
+            
+            // 游戏时间已在 _Process 中持续更新，这里不需要额外处理
+            
             return new GameSaveData
             {
-                SlotIndex = -1,
+                SlotIndex = -1, // 将在保存时设置
                 SaveTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
-                PlayTimeSeconds = 1,
-                Level = 1,
-                CurrentHealth = 1,
-                MaxHealth = 1,
-                WeaponName = "1",
-                LevelProgress = "1"
+                PlayTimeSeconds = _totalPlayTimeSeconds,
+                Level = level,
+                CurrentHealth = currentHealth,
+                MaxHealth = maxHealth,
+                WeaponName = weaponName,
+                LevelProgress = levelProgress
             };
         }
     }

@@ -1,6 +1,7 @@
 using Godot;
 using Kuros.Items;
 using Kuros.Managers;
+using System.Collections.Generic;
 
 namespace Kuros.UI
 {
@@ -22,6 +23,7 @@ namespace Kuros.UI
 		private ItemDefinition? _currentItem;
 		private bool _isShowing = false;
 		private bool _wasPausedBefore = false;
+		private readonly Queue<ItemDefinition> _pendingItems = new Queue<ItemDefinition>();
 
 		// 信号
 		[Signal] public delegate void PopupClosedEventHandler();
@@ -68,7 +70,7 @@ namespace Kuros.UI
 		}
 
 		/// <summary>
-		/// 显示物品信息弹窗
+		/// 显示物品信息弹窗（将物品加入队列，如果当前没有显示则立即开始显示）
 		/// </summary>
 		/// <param name="item">物品定义</param>
 		public void ShowItem(ItemDefinition item)
@@ -79,14 +81,84 @@ namespace Kuros.UI
 				return;
 			}
 
-			if (_isShowing)
+			// 将物品加入队列
+			_pendingItems.Enqueue(item);
+			GD.Print($"ItemObtainedPopup: 物品已加入队列: {item.DisplayName}，队列长度: {_pendingItems.Count}");
+
+			// 如果当前没有显示，立即开始显示流程
+			if (!_isShowing)
 			{
-				GD.PrintErr("ItemObtainedPopup: 弹窗已在显示中，无法显示新物品");
+				ProcessNextItem();
+			}
+		}
+
+		/// <summary>
+		/// 立即显示物品（清空队列并立即显示新物品）
+		/// </summary>
+		/// <param name="item">物品定义</param>
+		public void ShowItemImmediate(ItemDefinition item)
+		{
+			if (item == null)
+			{
+				GD.PrintErr("ItemObtainedPopup: 物品为空！");
 				return;
 			}
 
+			// 清空队列
+			_pendingItems.Clear();
+			GD.Print("ItemObtainedPopup: 队列已清空，立即显示新物品");
+
+			// 如果当前正在显示，先关闭（但不处理队列，因为我们已经清空了）
+			if (_isShowing)
+			{
+				// 直接关闭当前显示
+				Visible = false;
+				_isShowing = false;
+				_currentItem = null;
+				SetProcessInput(false);
+				SetProcessUnhandledInput(false);
+				
+				// 发送关闭信号，但不恢复游戏状态（因为我们要立即显示新物品）
+				EmitSignal(SignalName.PopupClosed);
+				
+				// 使用短暂延迟确保UI状态清理完成，然后立即显示新物品
+				var tree = GetTree();
+				if (tree != null)
+				{
+					var timer = tree.CreateTimer(0.1);
+					timer.Timeout += () =>
+					{
+						if (IsInstanceValid(this))
+						{
+							// 立即显示新物品
+							_pendingItems.Enqueue(item);
+							ProcessNextItem();
+						}
+					};
+					return;
+				}
+			}
+
+			// 如果当前没有显示，立即显示新物品
+			_pendingItems.Enqueue(item);
+			ProcessNextItem();
+		}
+
+		/// <summary>
+		/// 处理队列中的下一个物品（在主线程上执行）
+		/// </summary>
+		private void ProcessNextItem()
+		{
+			if (_pendingItems.Count == 0)
+			{
+				return;
+			}
+
+			var item = _pendingItems.Dequeue();
 			_currentItem = item;
 			_isShowing = true;
+
+			GD.Print($"ItemObtainedPopup: 开始显示物品: {item.DisplayName}，剩余队列: {_pendingItems.Count}");
 
 			// 更新UI显示
 			UpdateItemDisplay(item);
@@ -297,6 +369,8 @@ namespace Kuros.UI
 						if (ShouldKeepPaused())
 						{
 							// 有其他UI需要保持暂停，不取消暂停请求
+							// 但继续处理队列中的下一个物品
+							ProcessNextItemFromQueue();
 							return;
 						}
 						
@@ -305,8 +379,23 @@ namespace Kuros.UI
 						{
 							PauseManager.Instance.PopPause();
 						}
+
+						// 处理队列中的下一个物品（如果有）
+						ProcessNextItemFromQueue();
 					}
 				};
+			}
+		}
+
+		/// <summary>
+		/// 从队列中处理下一个物品（在主线程上执行）
+		/// </summary>
+		private void ProcessNextItemFromQueue()
+		{
+			if (_pendingItems.Count > 0)
+			{
+				// 使用 CallDeferred 确保在主线程上执行
+				CallDeferred(MethodName.ProcessNextItem);
 			}
 		}
 
@@ -451,6 +540,7 @@ namespace Kuros.UI
 			_currentItem = null;
 			
 			// 延迟恢复游戏状态，确保输入事件完全过期
+			// RestoreGameState 会自动处理队列中的下一个物品
 			CallDeferred(MethodName.RestoreGameState);
 		}
 
