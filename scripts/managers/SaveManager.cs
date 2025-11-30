@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.IO;
 
 namespace Kuros.Managers
 {
@@ -14,6 +15,16 @@ namespace Kuros.Managers
         private const string SaveFilePrefix = "save_";
         private const string SaveFileExtension = ".save";
         private string _saveDirectory = "";
+
+        /// <summary>
+        /// 当前加载的游戏数据（从存档加载后存储，供场景使用）
+        /// </summary>
+        public GameSaveData? CurrentGameData { get; private set; }
+
+        /// <summary>
+        /// 是否有待应用的游戏数据（从存档加载但尚未应用到游戏状态）
+        /// </summary>
+        public bool HasPendingGameData => CurrentGameData != null;
 
         public override void _Ready()
         {
@@ -32,15 +43,15 @@ namespace Kuros.Managers
         /// </summary>
         private string GetProjectRootPath()
         {
-            // 获取项目资源路径（res://）
-            string projectPath = ProjectSettings.GlobalizePath("res://");
+            // 获取用户数据路径（user://），在导出构建中可写
+            string userPath = ProjectSettings.GlobalizePath("user://");
             // 移除末尾的斜杠（如果有）
-            if (projectPath.EndsWith("/") || projectPath.EndsWith("\\"))
+            if (userPath.EndsWith("/") || userPath.EndsWith("\\"))
             {
-                projectPath = projectPath.Substring(0, projectPath.Length - 1);
+                userPath = userPath.Substring(0, userPath.Length - 1);
             }
-            // 返回项目根目录下的 saves 目录
-            return $"{projectPath}/{SaveDirectoryName}";
+            // 返回用户数据目录下的 saves 目录，使用 Path.Combine 确保跨平台路径分隔符正确
+            return Path.Combine(userPath, SaveDirectoryName);
         }
 
         /// <summary>
@@ -60,7 +71,8 @@ namespace Kuros.Managers
         /// </summary>
         private string GetSaveFilePath(int slotIndex)
         {
-            return $"{_saveDirectory}/{SaveFilePrefix}{slotIndex}{SaveFileExtension}";
+            string fileName = $"{SaveFilePrefix}{slotIndex}{SaveFileExtension}";
+            return Path.Combine(_saveDirectory, fileName);
         }
 
         /// <summary>
@@ -231,6 +243,30 @@ namespace Kuros.Managers
 
             SaveGame(slotIndex, testData);
             GD.Print($"SaveManager: 创建测试存档，槽位 {slotIndex}，所有信息都是1");
+        }
+
+        /// <summary>
+        /// 设置当前游戏数据（从存档加载后调用）
+        /// </summary>
+        public void SetCurrentGameData(GameSaveData? data)
+        {
+            CurrentGameData = data;
+            if (data != null)
+            {
+                GD.Print($"SaveManager: 已设置当前游戏数据，槽位: {data.SlotIndex}");
+            }
+            else
+            {
+                GD.Print("SaveManager: 已清除当前游戏数据");
+            }
+        }
+
+        /// <summary>
+        /// 清除当前游戏数据（场景切换或新游戏开始时调用）
+        /// </summary>
+        public void ClearCurrentGameData()
+        {
+            CurrentGameData = null;
         }
 
         /// <summary>

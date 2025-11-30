@@ -510,6 +510,7 @@ namespace Kuros.UI
 		}
 
 		private SamplePlayer? _player;
+		private Vector2 _lastPlayerPosition = Vector2.Zero; // 上次的玩家位置，用于小地图更新优化
 		
 		/// <summary>
 		/// 设置玩家引用（用于获取最大生命值等属性）
@@ -522,6 +523,8 @@ namespace Kuros.UI
 				int maxHealth = _player.MaxHealth;
 				int score = _player is IPlayerStatsSource statsSource ? statsSource.Score : _score;
 				UpdateStats(_player.CurrentHealth, maxHealth, score);
+				// 重置位置缓存，强制下次更新
+				_lastPlayerPosition = Vector2.Zero;
 			}
 		}
 
@@ -585,19 +588,42 @@ namespace Kuros.UI
 
 			// 获取玩家位置
 			Vector2 playerPosition = Vector2.Zero;
+			Node2D? playerNode = null;
+			
+			// 如果缓存的玩家引用有效，使用它
 			if (_player != null && GodotObject.IsInstanceValid(_player))
 			{
+				playerNode = _player;
 				playerPosition = _player.GlobalPosition;
 			}
 			else
 			{
-				// 如果玩家不存在，尝试从场景中查找
-				var player = GetTree().GetFirstNodeInGroup("player") as Node2D;
-				if (player != null)
+				// 如果玩家不存在，尝试从场景中查找并缓存
+				playerNode = GetTree().GetFirstNodeInGroup("player") as Node2D;
+				if (playerNode != null)
 				{
-					playerPosition = player.GlobalPosition;
+					playerPosition = playerNode.GlobalPosition;
+					// 缓存玩家引用（如果是 SamplePlayer）
+					if (playerNode is SamplePlayer samplePlayer)
+					{
+						_player = samplePlayer;
+					}
+				}
+				else
+				{
+					// 没有找到玩家，提前返回
+					return;
 				}
 			}
+
+			// 位置变化检测：如果位置没有改变，提前返回
+			if (playerPosition == _lastPlayerPosition)
+			{
+				return;
+			}
+			
+			// 更新缓存的位置
+			_lastPlayerPosition = playerPosition;
 
 			// 将玩家世界坐标转换为小地图坐标
 			// 假设地图范围从 (0, 0) 到 _mapSize

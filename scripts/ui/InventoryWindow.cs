@@ -38,7 +38,6 @@ namespace Kuros.UI
 
         // 窗口状态
         private bool _isOpen = false;
-        private bool _shouldBePaused = false; // 标记是否应该处于暂停状态
         
         // 玩家引用（用于监听金币变化）
         private SamplePlayer? _player;
@@ -62,19 +61,13 @@ namespace Kuros.UI
             CallDeferred(MethodName.HideWindow);
         }
 
-        public override void _Process(double delta)
+        public override void _ExitTree()
         {
-            // 如果物品栏应该打开，确保游戏处于暂停状态
-            if (_isOpen && _shouldBePaused)
-            {
-                var tree = GetTree();
-                if (tree != null && !tree.Paused)
-                {
-                    GD.PrintErr("InventoryWindow._Process: 检测到暂停状态被意外取消，重新设置暂停");
-                    tree.Paused = true;
-                }
-            }
+            // 清理玩家金币变化信号连接，防止内存泄漏
+            DisconnectPlayerGoldSignal();
+            base._ExitTree();
         }
+
 
         private void CacheNodeReferences()
         {
@@ -544,15 +537,10 @@ namespace Kuros.UI
             // 更新金币显示
             UpdateGoldDisplay();
             
-            // 设置暂停，确保游戏时间停止
-            var tree = GetTree();
-            if (tree != null)
+            // 请求暂停游戏
+            if (PauseManager.Instance != null)
             {
-                _shouldBePaused = true;
-                tree.Paused = true;
-                
-                // 延迟验证暂停状态，确保暂停生效
-                CallDeferred(MethodName.VerifyPauseState);
+                PauseManager.Instance.PushPause();
             }
             
             // 尝试将窗口移到父节点的最后，确保输入处理优先级（后调用的 _Input 会先处理）
@@ -569,10 +557,7 @@ namespace Kuros.UI
         private void ConnectPlayerGoldSignal()
         {
             // 断开之前的连接
-            if (_player != null && _player.IsConnected(SamplePlayer.SignalName.GoldChanged, new Callable(this, MethodName.OnPlayerGoldChanged)))
-            {
-                _player.GoldChanged -= OnPlayerGoldChanged;
-            }
+            DisconnectPlayerGoldSignal();
             
             // 获取玩家引用
             _player = GetTree().GetFirstNodeInGroup("player") as SamplePlayer;
@@ -581,6 +566,22 @@ namespace Kuros.UI
             if (_player != null)
             {
                 _player.GoldChanged += OnPlayerGoldChanged;
+            }
+        }
+
+        /// <summary>
+        /// 断开玩家金币变化信号连接，防止内存泄漏
+        /// </summary>
+        private void DisconnectPlayerGoldSignal()
+        {
+            if (_player != null)
+            {
+                // 检查是否已连接，然后断开连接
+                if (_player.IsConnected(SamplePlayer.SignalName.GoldChanged, new Callable(this, MethodName.OnPlayerGoldChanged)))
+                {
+                    _player.GoldChanged -= OnPlayerGoldChanged;
+                }
+                _player = null;
             }
         }
         
@@ -606,18 +607,6 @@ namespace Kuros.UI
             }
         }
 
-        private void VerifyPauseState()
-        {
-            var tree = GetTree();
-            if (tree != null && _isOpen)
-            {
-                if (!tree.Paused)
-                {
-                    GD.PrintErr("InventoryWindow.VerifyPauseState: 警告 - 暂停状态被意外取消，重新设置暂停");
-                    tree.Paused = true;
-                }
-            }
-        }
 
         public void HideWindow()
         {
@@ -635,99 +624,76 @@ namespace Kuros.UI
             _selectedSlotIndex = -1;
             
             // 断开玩家金币变化信号
-            if (_player != null && _player.IsConnected(SamplePlayer.SignalName.GoldChanged, new Callable(this, MethodName.OnPlayerGoldChanged)))
-            {
-                _player.GoldChanged -= OnPlayerGoldChanged;
-            }
-            _player = null;
+            DisconnectPlayerGoldSignal();
 
             Visible = false;
             SetProcessInput(false);
             SetProcessUnhandledInput(false);
             _isOpen = false;
             
-            // 取消暂停，恢复游戏时间
-            // 但需要检查是否有其他UI需要保持暂停（如物品获得弹窗、菜单等）
-            _shouldBePaused = false;
-            var tree = GetTree();
-            if (tree != null)
+            // 取消暂停请求
+            if (PauseManager.Instance != null)
             {
-                // 检查是否有其他UI需要保持暂停
-                bool shouldKeepPaused = ShouldKeepPaused();
-                if (!shouldKeepPaused)
-                {
-                    tree.Paused = false;
-                    GD.Print("InventoryWindow.HideWindow: 已恢复游戏时间");
-                }
-                else
-                {
-                    GD.Print("InventoryWindow.HideWindow: 其他UI需要保持暂停，不恢复游戏时间");
-                }
+                PauseManager.Instance.PopPause();
             }
             
             EmitSignal(SignalName.InventoryClosed);
         }
-        
+
         /// <summary>
-        /// 检查是否应该保持暂停状态（当物品栏关闭时）
+        /// 检查输入事件是否为 ESC 键（通过 action "ui_cancel" 或 Key.Escape）
         /// </summary>
-        private bool ShouldKeepPaused()
+        private bool IsEscEvent(InputEvent @event)
         {
-            // 检查物品获得弹窗是否打开
-            var itemPopup = Kuros.Managers.UIManager.Instance?.GetUI<ItemObtainedPopup>("ItemObtainedPopup");
-            if (itemPopup != null && itemPopup.Visible)
+            if (@event.IsActionPressed("ui_cancel"))
             {
                 return true;
             }
-
-            // 检查菜单是否打开
-            var battleMenu = Kuros.Managers.UIManager.Instance?.GetUI<BattleMenu>("BattleMenu");
-            if (battleMenu != null && battleMenu.Visible)
+            
+            if (@event is InputEventKey keyEvent && keyEvent.Pressed)
             {
-                return true;
+                // 直接检查ESC键的keycode（备用方法）
+                if (keyEvent.Keycode == Key.Escape)
+                {
+                    return true;
+                }
             }
-
-            // 检查对话是否激活
-            if (DialogueManager.Instance != null && DialogueManager.Instance.IsDialogueActive)
-            {
-                return true;
-            }
-
+            
             return false;
         }
 
-        public override void _Input(InputEvent @event)
+        /// <summary>
+        /// 检查是否应该处理 ESC 键（物品栏打开且没有 ItemObtainedPopup 激活）
+        /// </summary>
+        private bool ShouldHandleEsc()
         {
             // 检查物品栏是否打开
-            if (!Visible || !_isOpen) return;
+            if (!Visible || !_isOpen)
+            {
+                return false;
+            }
 
             // 检查物品获得弹窗是否打开（ESC键在弹窗显示时被完全禁用）
             var itemPopup = Kuros.Managers.UIManager.Instance?.GetUI<ItemObtainedPopup>("ItemObtainedPopup");
             if (itemPopup != null && itemPopup.Visible)
             {
                 // 物品获得弹窗打开时，ESC键被完全禁用，这里不处理
-                // 直接返回，让弹窗处理（禁用）
+                return false;
+            }
+
+            return true;
+        }
+
+        public override void _Input(InputEvent @event)
+        {
+            // 检查是否应该处理 ESC（包括弹窗检查）
+            if (!ShouldHandleEsc())
+            {
                 return;
             }
 
-            // 在物品栏打开时，ESC键关闭物品栏
-            // 同时检查action和keycode，确保能捕获ESC键
-            bool isEscKey = false;
-            
-            if (@event.IsActionPressed("ui_cancel"))
-            {
-                isEscKey = true;
-            }
-            else if (@event is InputEventKey keyEvent && keyEvent.Pressed)
-            {
-                // 直接检查ESC键的keycode（备用方法）
-                if (keyEvent.Keycode == Key.Escape)
-                {
-                    isEscKey = true;
-                }
-            }
-
-            if (isEscKey)
+            // 检查是否为 ESC 事件
+            if (IsEscEvent(@event))
             {
                 HideWindow();
                 GetViewport().SetInputAsHandled();
@@ -750,23 +716,8 @@ namespace Kuros.UI
             // 检查物品栏是否打开
             if (!Visible || !_isOpen) return;
 
-            // 在物品栏打开时，ESC键关闭物品栏（GUI输入备用处理）
-            bool isEscKey = false;
-            
-            if (@event.IsActionPressed("ui_cancel"))
-            {
-                isEscKey = true;
-            }
-            else if (@event is InputEventKey keyEvent && keyEvent.Pressed)
-            {
-                // 直接检查ESC键的keycode（备用方法）
-                if (keyEvent.Keycode == Key.Escape)
-                {
-                    isEscKey = true;
-                }
-            }
-
-            if (isEscKey)
+            // 检查是否为 ESC 事件
+            if (IsEscEvent(@event))
             {
                 HideWindow();
                 AcceptEvent();
@@ -779,23 +730,8 @@ namespace Kuros.UI
             // 检查物品栏是否打开
             if (!Visible || !_isOpen) return;
             
-            // 在物品栏打开时，ESC键关闭物品栏（未处理输入的备用处理）
-            bool isEscKey = false;
-            
-            if (@event.IsActionPressed("ui_cancel"))
-            {
-                isEscKey = true;
-            }
-            else if (@event is InputEventKey keyEvent && keyEvent.Pressed)
-            {
-                // 直接检查ESC键的keycode（备用方法）
-                if (keyEvent.Keycode == Key.Escape)
-                {
-                    isEscKey = true;
-                }
-            }
-
-            if (isEscKey)
+            // 检查是否为 ESC 事件
+            if (IsEscEvent(@event))
             {
                 HideWindow();
                 GetViewport().SetInputAsHandled();

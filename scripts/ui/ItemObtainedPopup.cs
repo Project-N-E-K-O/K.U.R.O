@@ -168,13 +168,17 @@ namespace Kuros.UI
 			SetProcessInput(true);
 			SetProcessUnhandledInput(true);
 
-			// 保存当前暂停状态
+			// 保存当前暂停状态（用于兼容性，但不再需要）
 			var tree = GetTree();
 			if (tree != null)
 			{
 				_wasPausedBefore = tree.Paused;
-				// 暂停游戏
-				tree.Paused = true;
+			}
+			
+			// 请求暂停游戏
+			if (PauseManager.Instance != null)
+			{
+				PauseManager.Instance.PushPause();
 			}
 
 			// 设置较低的ZIndex，确保菜单栏可以在弹窗之上显示
@@ -287,11 +291,20 @@ namespace Kuros.UI
 				var timer = tree.CreateTimer(0.2);
 				timer.Timeout += () =>
 				{
-					if (IsInstanceValid(this) && tree != null)
+					if (IsInstanceValid(this))
 					{
-						// 检查是否有其他UI需要保持暂停（如菜单栏）
-						bool shouldPause = ShouldKeepPaused();
-						tree.Paused = shouldPause || _wasPausedBefore;
+						// 检查是否有其他UI需要保持暂停（如菜单栏、物品栏、对话）
+						if (ShouldKeepPaused())
+						{
+							// 有其他UI需要保持暂停，不取消暂停请求
+							return;
+						}
+						
+						// 取消暂停请求
+						if (PauseManager.Instance != null)
+						{
+							PauseManager.Instance.PopPause();
+						}
 					}
 				};
 			}
@@ -316,8 +329,15 @@ namespace Kuros.UI
 				return true;
 			}
 
+			// 检查对话是否激活
+			if (DialogueManager.Instance != null && DialogueManager.Instance.IsDialogueActive)
+			{
+				return true;
+			}
+
 			return false;
 		}
+
 
 		/// <summary>
 		/// 处理输入事件
@@ -473,10 +493,10 @@ namespace Kuros.UI
 			// 确保恢复游戏状态
 			if (_isShowing)
 			{
-				var tree = GetTree();
-				if (tree != null)
+				// 取消暂停请求
+				if (PauseManager.Instance != null)
 				{
-					tree.Paused = _wasPausedBefore;
+					PauseManager.Instance.PopPause();
 				}
 			}
 

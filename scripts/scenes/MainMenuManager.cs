@@ -219,8 +219,11 @@ namespace Kuros.Scenes
 				return;
 			}
 			
-			// 确保游戏未暂停
-			tree.Paused = false;
+			// 清除所有暂停请求，确保场景切换时游戏未暂停
+			if (PauseManager.Instance != null)
+			{
+				PauseManager.Instance.ClearAllPauses();
+			}
 			
 			CleanupUI();
 			
@@ -319,25 +322,27 @@ namespace Kuros.Scenes
 			if (_saveSlotSelection == null) return;
 
 			// 从主界面进入时，只允许读档
-			GD.Print($"加载存档槽位: {slotIndex}");
+			GameLogger.Info(nameof(MainMenuManager), $"加载存档槽位: {slotIndex}");
 			
 			// 实现实际的读档逻辑
-			if (SaveManager.Instance != null)
+			if (SaveManager.Instance == null)
 			{
-				var gameData = SaveManager.Instance.LoadGame(slotIndex);
-				if (gameData != null)
-				{
-					GD.Print($"成功加载槽位 {slotIndex}");
-					// TODO: 应用游戏数据到游戏状态
-					// 例如：恢复玩家血量、等级、武器等
-				}
-				else
-				{
-					GD.PrintErr($"加载失败: 槽位 {slotIndex}");
-					return; // 加载失败，不切换场景
-				}
+				GameLogger.Error(nameof(MainMenuManager), "SaveManager.Instance 为空，无法加载存档");
+				return;
 			}
 			
+			var gameData = SaveManager.Instance.LoadGame(slotIndex);
+			if (gameData == null)
+			{
+				GameLogger.Error(nameof(MainMenuManager), $"加载失败: 槽位 {slotIndex}");
+				return; // 加载失败，不切换场景
+			}
+			
+			// 将加载的游戏数据存储到 SaveManager，供战斗场景使用
+			SaveManager.Instance.SetCurrentGameData(gameData);
+			GameLogger.Info(nameof(MainMenuManager), $"成功加载槽位 {slotIndex}，数据已存储，准备切换场景");
+			
+			// 只有在数据成功存储后才切换场景
 			PerformSceneChange(BattleScenePath);
 		}
 

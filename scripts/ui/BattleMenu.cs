@@ -1,5 +1,6 @@
 using Godot;
 using Kuros.Managers;
+using Kuros.Utils;
 
 namespace Kuros.UI
 {
@@ -31,6 +32,11 @@ namespace Kuros.UI
         private bool _isOpen = false;
         private CompendiumWindow? _compendiumWindow;
         private PackedScene? _compendiumScene;
+
+        // 缓存的窗口引用，避免每次ESC都遍历场景树
+        private InventoryWindow? _cachedInventoryWindow;
+        private CompendiumWindow? _cachedCompendiumWindow;
+        private SkillDetailWindow? _cachedSkillDetailWindow;
 
         public bool IsOpen => _isOpen;
 
@@ -65,6 +71,9 @@ namespace Kuros.UI
                 ExitButton.Pressed += OnExitGamePressed;
 
             LoadCompendiumWindow();
+
+            // 缓存窗口引用，避免每次ESC都遍历场景树
+            CacheWindowReferences();
 
             // 延迟确保隐藏（在UIManager设置可见之后）
             CallDeferred(MethodName.EnsureHidden);
@@ -141,148 +150,126 @@ namespace Kuros.UI
             }
         }
 
+        /// <summary>
+        /// 缓存窗口引用，避免每次ESC都遍历场景树
+        /// </summary>
+        private void CacheWindowReferences()
+        {
+            var root = GetTree().Root;
+            if (root == null) return;
+
+            // 尝试从 UIManager 获取 InventoryWindow
+            _cachedInventoryWindow = UIManager.Instance?.GetUI<InventoryWindow>("InventoryWindow");
+            if (_cachedInventoryWindow == null)
+            {
+                // 如果 UIManager 中没有，则从场景树中查找
+                var inventoryWindows = FindAllNodesOfType<InventoryWindow>(root);
+                _cachedInventoryWindow = inventoryWindows.Count > 0 ? inventoryWindows[0] : null;
+            }
+
+            // CompendiumWindow 已经在 _compendiumWindow 中缓存了
+            _cachedCompendiumWindow = _compendiumWindow;
+
+            // 查找 SkillDetailWindow
+            var skillDetailWindows = FindAllNodesOfType<SkillDetailWindow>(root);
+            _cachedSkillDetailWindow = skillDetailWindows.Count > 0 ? skillDetailWindows[0] : null;
+        }
+
+        /// <summary>
+        /// 通用的泛型方法：在场景树中查找所有指定类型的节点
+        /// </summary>
+        /// <typeparam name="T">要查找的节点类型</typeparam>
+        /// <param name="root">根节点</param>
+        /// <param name="filter">可选的过滤条件</param>
+        /// <returns>找到的所有节点列表</returns>
+        private System.Collections.Generic.List<T> FindAllNodesOfType<T>(Node root, System.Func<T, bool>? filter = null) where T : class
+        {
+            var result = new System.Collections.Generic.List<T>();
+            
+            // 检查当前节点
+            if (root is T node)
+            {
+                if (filter == null || filter(node))
+                {
+                    result.Add(node);
+                }
+            }
+            
+            // 递归检查子节点
+            foreach (Node child in root.GetChildren())
+            {
+                result.AddRange(FindAllNodesOfType<T>(child, filter));
+            }
+            
+            return result;
+        }
+
+        /// <summary>
+        /// 检查物品栏窗口是否打开（使用缓存）
+        /// </summary>
         private bool IsInventoryWindowOpen()
         {
-            // 直接在整个场景树中查找所有 InventoryWindow
-            var root = GetTree().Root;
-            if (root != null)
+            // 如果缓存无效，尝试重新查找
+            if (_cachedInventoryWindow == null || !IsInstanceValid(_cachedInventoryWindow))
             {
-                var inventoryWindows = FindAllInventoryWindowsInTree(root);
-                
-                foreach (var inventoryWindow in inventoryWindows)
+                var root = GetTree().Root;
+                if (root != null)
                 {
-                    if (inventoryWindow.Visible)
-                    {
-                        GD.Print($"BattleMenu.IsInventoryWindowOpen: 找到打开的物品栏，Visible={inventoryWindow.Visible}");
-                        return true;
-                    }
+                    var inventoryWindows = FindAllNodesOfType<InventoryWindow>(root);
+                    _cachedInventoryWindow = inventoryWindows.Count > 0 ? inventoryWindows[0] : null;
                 }
+            }
+
+            if (_cachedInventoryWindow != null && _cachedInventoryWindow.Visible)
+            {
+                GD.Print($"BattleMenu.IsInventoryWindowOpen: 找到打开的物品栏，Visible={_cachedInventoryWindow.Visible}");
+                return true;
             }
             
             GD.Print("BattleMenu.IsInventoryWindowOpen: 未找到打开的物品栏");
             return false;
         }
 
-        private System.Collections.Generic.List<InventoryWindow> FindAllInventoryWindowsInTree(Node node)
-        {
-            var result = new System.Collections.Generic.List<InventoryWindow>();
-            
-            // 检查当前节点
-            if (node is InventoryWindow inventoryWindow)
-            {
-                result.Add(inventoryWindow);
-            }
-            
-            // 递归检查子节点
-            foreach (Node child in node.GetChildren())
-            {
-                result.AddRange(FindAllInventoryWindowsInTree(child));
-            }
-            
-            return result;
-        }
-
-        private InventoryWindow? FindInventoryWindowInTree(Node node)
-        {
-            // 检查当前节点
-            if (node is InventoryWindow inventoryWindow)
-            {
-                return inventoryWindow;
-            }
-            
-            // 递归检查子节点
-            foreach (Node child in node.GetChildren())
-            {
-                var found = FindInventoryWindowInTree(child);
-                if (found != null)
-                {
-                    return found;
-                }
-            }
-            
-            return null;
-        }
-
+        /// <summary>
+        /// 检查图鉴窗口是否打开（使用缓存）
+        /// </summary>
         private bool IsCompendiumWindowOpen()
         {
-            // 直接在整个场景树中查找所有 CompendiumWindow
-            var root = GetTree().Root;
-            if (root != null)
+            // CompendiumWindow 已经在 _compendiumWindow 中缓存了
+            if (_cachedCompendiumWindow != null && IsInstanceValid(_cachedCompendiumWindow) && _cachedCompendiumWindow.Visible)
             {
-                var compendiumWindows = FindAllCompendiumWindowsInTree(root);
-                
-                foreach (var compendiumWindow in compendiumWindows)
-                {
-                    if (compendiumWindow.Visible)
-                    {
-                        GD.Print($"BattleMenu.IsCompendiumWindowOpen: 找到打开的图鉴窗口，Visible={compendiumWindow.Visible}");
-                        return true;
-                    }
-                }
+                GD.Print($"BattleMenu.IsCompendiumWindowOpen: 找到打开的图鉴窗口，Visible={_cachedCompendiumWindow.Visible}");
+                return true;
             }
             
             GD.Print("BattleMenu.IsCompendiumWindowOpen: 未找到打开的图鉴窗口");
             return false;
         }
 
-        private System.Collections.Generic.List<CompendiumWindow> FindAllCompendiumWindowsInTree(Node node)
-        {
-            var result = new System.Collections.Generic.List<CompendiumWindow>();
-            
-            // 检查当前节点
-            if (node is CompendiumWindow compendiumWindow)
-            {
-                result.Add(compendiumWindow);
-            }
-            
-            // 递归检查子节点
-            foreach (Node child in node.GetChildren())
-            {
-                result.AddRange(FindAllCompendiumWindowsInTree(child));
-            }
-            
-            return result;
-        }
-
+        /// <summary>
+        /// 检查技能详情窗口是否打开（使用缓存）
+        /// </summary>
         private bool IsSkillDetailWindowOpen()
         {
-            // 直接在整个场景树中查找所有 SkillDetailWindow
-            var root = GetTree().Root;
-            if (root != null)
+            // 如果缓存无效，尝试重新查找
+            if (_cachedSkillDetailWindow == null || !IsInstanceValid(_cachedSkillDetailWindow))
             {
-                var skillDetailWindows = FindAllSkillDetailWindowsInTree(root);
-                
-                foreach (var skillDetailWindow in skillDetailWindows)
+                var root = GetTree().Root;
+                if (root != null)
                 {
-                    if (skillDetailWindow.Visible && skillDetailWindow.IsOpen)
-                    {
-                        GD.Print($"BattleMenu.IsSkillDetailWindowOpen: 找到打开的技能详情窗口，Visible={skillDetailWindow.Visible}, IsOpen={skillDetailWindow.IsOpen}");
-                        return true;
-                    }
+                    var skillDetailWindows = FindAllNodesOfType<SkillDetailWindow>(root);
+                    _cachedSkillDetailWindow = skillDetailWindows.Count > 0 ? skillDetailWindows[0] : null;
                 }
+            }
+
+            if (_cachedSkillDetailWindow != null && _cachedSkillDetailWindow.Visible && _cachedSkillDetailWindow.IsOpen)
+            {
+                GD.Print($"BattleMenu.IsSkillDetailWindowOpen: 找到打开的技能详情窗口，Visible={_cachedSkillDetailWindow.Visible}, IsOpen={_cachedSkillDetailWindow.IsOpen}");
+                return true;
             }
             
             GD.Print("BattleMenu.IsSkillDetailWindowOpen: 未找到打开的技能详情窗口");
             return false;
-        }
-
-        private System.Collections.Generic.List<SkillDetailWindow> FindAllSkillDetailWindowsInTree(Node node)
-        {
-            var result = new System.Collections.Generic.List<SkillDetailWindow>();
-            
-            // 检查当前节点
-            if (node is SkillDetailWindow skillDetailWindow)
-            {
-                result.Add(skillDetailWindow);
-            }
-            
-            // 递归检查子节点
-            foreach (Node child in node.GetChildren())
-            {
-                result.AddRange(FindAllSkillDetailWindowsInTree(child));
-            }
-            
-            return result;
         }
 
         private void LoadCompendiumWindow()
@@ -313,7 +300,12 @@ namespace Kuros.UI
 
             Visible = true;
             _isOpen = true;
-            GetTree().Paused = true;
+            
+            // 请求暂停游戏
+            if (PauseManager.Instance != null)
+            {
+                PauseManager.Instance.PushPause();
+            }
 
             // 确保菜单在弹窗之上显示
             EnsureMenuOnTop();
@@ -351,39 +343,11 @@ namespace Kuros.UI
             Visible = false;
             _isOpen = false;
             
-            // 检查是否有其他UI需要保持暂停（如物品获得弹窗）
-            if (!ShouldKeepPaused())
+            // 取消暂停请求
+            if (PauseManager.Instance != null)
             {
-                GetTree().Paused = false;
+                PauseManager.Instance.PopPause();
             }
-        }
-
-        /// <summary>
-        /// 检查是否应该保持暂停状态
-        /// </summary>
-        private bool ShouldKeepPaused()
-        {
-            // 检查物品获得弹窗是否打开
-            var itemPopup = Kuros.Managers.UIManager.Instance?.GetUI<ItemObtainedPopup>("ItemObtainedPopup");
-            if (itemPopup != null && itemPopup.Visible)
-            {
-                return true;
-            }
-
-            // 检查物品栏是否打开
-            var inventoryWindow = Kuros.Managers.UIManager.Instance?.GetUI<InventoryWindow>("InventoryWindow");
-            if (inventoryWindow != null && inventoryWindow.Visible)
-            {
-                return true;
-            }
-
-            // 检查对话是否激活
-            if (DialogueManager.Instance != null && DialogueManager.Instance.IsDialogueActive)
-            {
-                return true;
-            }
-
-            return false;
         }
 
         public void ToggleMenu()
@@ -454,13 +418,13 @@ namespace Kuros.UI
         private void OnSavePressed()
         {
             EmitSignal(SignalName.SaveRequested);
-            GD.Print("打开存档界面");
+            GameLogger.Info(nameof(BattleMenu), "打开存档界面");
         }
 
         private void OnLoadPressed()
         {
             EmitSignal(SignalName.LoadRequested);
-            GD.Print("打开读档界面");
+            GameLogger.Info(nameof(BattleMenu), "打开读档界面");
         }
     }
 }

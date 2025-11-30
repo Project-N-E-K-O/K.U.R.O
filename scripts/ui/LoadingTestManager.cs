@@ -12,6 +12,29 @@ namespace Kuros.UI
 		private LoadingScreen? _loadingScreen;
 		private bool _isLoading = false;
 		
+		// 存储 Callable 实例，用于 IsConnected 检查和 Connect/Disconnect
+		// 在 _Ready 中初始化，使用延迟初始化模式
+		private Callable? _onLoadingScreenCompleteCallable;
+		
+		public override void _Ready()
+		{
+			// 初始化 Callable 实例，用于信号连接检查
+			_onLoadingScreenCompleteCallable = new Callable(this, MethodName.OnLoadingScreenComplete);
+		}
+		
+		/// <summary>
+		/// 获取或创建 Callable 实例（延迟初始化）
+		/// </summary>
+		private Callable GetOnLoadingScreenCompleteCallable()
+		{
+			if (_onLoadingScreenCompleteCallable == null)
+			{
+				_onLoadingScreenCompleteCallable = new Callable(this, MethodName.OnLoadingScreenComplete);
+			}
+			// 使用显式转换，因为上面已经确保不为空
+			return (Callable)_onLoadingScreenCompleteCallable;
+		}
+		
 		/// <summary>
 		/// 开始加载测试
 		/// </summary>
@@ -52,10 +75,11 @@ namespace Kuros.UI
 			{
 				_loadingScreen.ShowLoading();
 				
-				// 连接完成信号
-				if (!_loadingScreen.IsConnected(LoadingScreen.SignalName.LoadingComplete, new Callable(this, MethodName.OnLoadingScreenComplete)))
+				// 连接完成信号（使用存储的 Callable 实例进行 IsConnected 检查和 Connect）
+				var callable = GetOnLoadingScreenCompleteCallable();
+				if (!_loadingScreen.IsConnected(LoadingScreen.SignalName.LoadingComplete, callable))
 				{
-					_loadingScreen.LoadingComplete += OnLoadingScreenComplete;
+					_loadingScreen.Connect(LoadingScreen.SignalName.LoadingComplete, callable);
 				}
 			}
 			else

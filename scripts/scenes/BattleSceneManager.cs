@@ -30,15 +30,28 @@ namespace Kuros.Scenes
 
 		public override void _Ready()
 		{
-			// 确保游戏未暂停
-			var tree = GetTree();
-			if (tree != null)
-			{
-				tree.Paused = false;
-			}
-			
 			// 延迟查找Player和加载UI，确保场景树完全构建
 			CallDeferred(MethodName.InitializeBattleScene);
+			
+			// 延迟检查并恢复游戏状态，确保UI已加载完成
+			CallDeferred(MethodName.EnsureGameResumed);
+		}
+
+		/// <summary>
+		/// 确保游戏恢复运行（场景加载后，如果PauseManager没有暂停请求，确保游戏未暂停）
+		/// </summary>
+		private void EnsureGameResumed()
+		{
+			// 使用 PauseManager 管理暂停状态，这里不需要额外操作
+			// 如果 PauseManager 的计数为0，游戏应该已经恢复运行
+			if (PauseManager.Instance != null && PauseManager.Instance.IsPaused)
+			{
+				GameLogger.Info(nameof(BattleSceneManager), "检测到PauseManager有暂停请求，保持暂停状态");
+			}
+			else
+			{
+				GameLogger.Info(nameof(BattleSceneManager), "游戏已恢复运行");
+			}
 		}
 
 		private void InitializeBattleScene()
@@ -81,6 +94,9 @@ namespace Kuros.Scenes
 				}
 			}
 
+			// 应用加载的游戏数据（如果有）
+			ApplyLoadedGameData();
+
 			// 加载UI
 			LoadUIs();
 
@@ -108,6 +124,50 @@ namespace Kuros.Scenes
 			{
 				LoadSkillWindow();
 			}
+		}
+
+		/// <summary>
+		/// 应用加载的游戏数据到玩家
+		/// </summary>
+		private void ApplyLoadedGameData()
+		{
+			if (SaveManager.Instance == null)
+			{
+				GameLogger.Info(nameof(BattleSceneManager), "SaveManager未初始化，跳过应用游戏数据");
+				return;
+			}
+
+			var gameData = SaveManager.Instance.CurrentGameData;
+			if (gameData == null)
+			{
+				GameLogger.Info(nameof(BattleSceneManager), "没有待应用的游戏数据，使用默认值");
+				return;
+			}
+
+			if (Player == null)
+			{
+				GameLogger.Warn(nameof(BattleSceneManager), "玩家节点为空，无法应用游戏数据");
+				return;
+			}
+
+			// 应用基础属性
+			int targetHealth = gameData.CurrentHealth > 0 ? gameData.CurrentHealth : gameData.MaxHealth;
+			int targetMaxHealth = gameData.MaxHealth > 0 ? gameData.MaxHealth : Player.MaxHealth;
+			Player.RestoreHealth(targetHealth, targetMaxHealth);
+			
+			GameLogger.Info(nameof(BattleSceneManager), $"应用游戏数据: 血量 {Player.CurrentHealth}/{Player.MaxHealth}, 等级 {gameData.Level}");
+
+			// 如果玩家是 SamplePlayer，应用额外属性
+			if (Player is SamplePlayer samplePlayer)
+			{
+				// 注意：GameSaveData 目前没有 Score 和 Gold 字段，如果需要可以后续添加
+				// samplePlayer.AddScore(...);
+				// samplePlayer.SetGold(...);
+			}
+
+			// 应用数据后清除待应用标记（数据已应用，但保留在 SaveManager 中供其他系统使用）
+			// 注意：不清除 CurrentGameData，因为可能还有其他系统需要使用
+			GameLogger.Info(nameof(BattleSceneManager), "游戏数据已应用到玩家");
 		}
 
 		/// <summary>
@@ -316,7 +376,11 @@ namespace Kuros.Scenes
 			if (tree != null)
 			{
 				UnloadAllUI();
-				tree.Paused = false;
+				// 清除所有暂停请求，确保场景切换时游戏未暂停
+				if (PauseManager.Instance != null)
+				{
+					PauseManager.Instance.ClearAllPauses();
+				}
 				tree.ChangeSceneToFile("res://scenes/MainMenu.tscn");
 			}
 		}
@@ -368,10 +432,15 @@ namespace Kuros.Scenes
 			}
 		}
 
-		private void OnMenuSaveRequested()
+		/// <summary>
+		/// 打开存档/读档选择界面
+		/// </summary>
+		/// <param name="mode">存档模式（Save或Load）</param>
+		private void OpenSaveSlotSelection(SaveLoadMode mode)
 		{
-			// 打开存档界面
-			GD.Print("打开存档界面");
+			string modeText = mode == SaveLoadMode.Save ? "存档" : "读档";
+			GameLogger.Info(nameof(BattleSceneManager), $"打开{modeText}界面");
+			
 			if (UIManager.Instance == null) return;
 
 			// 隐藏战斗菜单
@@ -386,7 +455,7 @@ namespace Kuros.Scenes
 				_saveSlotSelection = UIManager.Instance.LoadSaveSlotSelection();
 				if (_saveSlotSelection != null)
 				{
-					_saveSlotSelection.SetMode(SaveLoadMode.Save);
+					_saveSlotSelection.SetMode(mode);
 					_saveSlotSelection.SetAllowSave(true);
 					_saveSlotSelection.SetSource(true); // 从战斗菜单进入
 					_saveSlotSelection.SlotSelected += OnSaveSlotSelected;
@@ -396,7 +465,7 @@ namespace Kuros.Scenes
 			}
 			else
 			{
-				_saveSlotSelection.SetMode(SaveLoadMode.Save);
+				_saveSlotSelection.SetMode(mode);
 				_saveSlotSelection.SetAllowSave(true);
 				_saveSlotSelection.SetSource(true);
 				_saveSlotSelection.RefreshSlots();
@@ -408,44 +477,14 @@ namespace Kuros.Scenes
 			}
 		}
 
+		private void OnMenuSaveRequested()
+		{
+			OpenSaveSlotSelection(SaveLoadMode.Save);
+		}
+
 		private void OnMenuLoadRequested()
 		{
-			// 打开读档界面
-			GD.Print("打开读档界面");
-			if (UIManager.Instance == null) return;
-
-			// 隐藏战斗菜单
-			if (_battleMenu != null && IsInstanceValid(_battleMenu))
-			{
-				_battleMenu.Visible = false;
-			}
-
-			// 加载存档选择菜单
-			if (_saveSlotSelection == null || !IsInstanceValid(_saveSlotSelection))
-			{
-				_saveSlotSelection = UIManager.Instance.LoadSaveSlotSelection();
-				if (_saveSlotSelection != null)
-				{
-					_saveSlotSelection.SetMode(SaveLoadMode.Load);
-					_saveSlotSelection.SetAllowSave(true);
-					_saveSlotSelection.SetSource(true); // 从战斗菜单进入
-					_saveSlotSelection.SlotSelected += OnSaveSlotSelected;
-					_saveSlotSelection.BackRequested += OnSaveSlotSelectionBackRequested;
-					_saveSlotSelection.ModeSwitchRequested += OnSaveSlotSelectionModeSwitchRequested;
-				}
-			}
-			else
-			{
-				_saveSlotSelection.SetMode(SaveLoadMode.Load);
-				_saveSlotSelection.SetAllowSave(true);
-				_saveSlotSelection.SetSource(true);
-				_saveSlotSelection.RefreshSlots();
-			}
-
-			if (_saveSlotSelection != null)
-			{
-				_saveSlotSelection.Visible = true;
-			}
+			OpenSaveSlotSelection(SaveLoadMode.Load);
 		}
 
 		private void OnSaveSlotSelectionBackRequested()

@@ -125,6 +125,20 @@ namespace Kuros.Core
             }
         }
 
+        /// <summary>
+        /// 恢复或设置血量（用于加载存档等场景）
+        /// </summary>
+        public void RestoreHealth(int health, int maxHealth = -1)
+        {
+            if (maxHealth > 0)
+            {
+                MaxHealth = maxHealth;
+            }
+            CurrentHealth = Mathf.Clamp(health, 0, MaxHealth);
+            NotifyHealthChanged();
+            GameLogger.Info(nameof(GameActor), $"{Name} health restored to {CurrentHealth}/{MaxHealth}");
+        }
+
         protected virtual void Die()
         {
             if (_deathStarted) return;

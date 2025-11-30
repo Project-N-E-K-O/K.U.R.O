@@ -64,22 +64,35 @@ namespace Kuros.UI
         {
             if (ItemStack == null || ItemStack.IsEmpty)
             {
-                // 槽位为空时，隐藏图标和数量标签
+                // 槽位为空时，使用占位符图标（如果已设置）
                 if (ItemIcon != null)
                 {
-                    ItemIcon.Texture = null;
-                    ItemIcon.Visible = false;
-                    ItemIcon.Modulate = Colors.White;
+                    if (PlaceholderIcon != null)
+                    {
+                        // 如果设置了占位符图标，显示它
+                        ItemIcon.Texture = PlaceholderIcon;
+                        ItemIcon.Visible = true;
+                        ItemIcon.Modulate = Colors.White;
+                    }
+                    else
+                    {
+                        // 如果没有占位符图标，隐藏图标
+                        ItemIcon.Texture = null;
+                        ItemIcon.Visible = false;
+                        ItemIcon.Modulate = Colors.White;
+                    }
                 }
+                // 隐藏数量标签
                 if (QuantityLabel != null)
                 {
                     QuantityLabel.Text = string.Empty;
                     QuantityLabel.Visible = false;
                 }
+                // 隐藏槽位标签（空槽位时不需要显示文本）
                 if (SlotLabel != null)
                 {
-                    SlotLabel.Text = "空";
-                    SlotLabel.Visible = true;
+                    SlotLabel.Text = string.Empty;
+                    SlotLabel.Visible = false;
                 }
             }
             else

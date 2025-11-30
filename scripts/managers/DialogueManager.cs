@@ -95,6 +95,7 @@ namespace Kuros.Managers
 			
 			_currentDialogue = dialogue;
 			_isDialogueActive = true;
+			_dialogueEndTime = 0.0; // 重置对话结束时间戳，防止之前的结束时间影响新对话
 			
 			// 加载对话UI
 			LoadDialogueWindow();
@@ -133,20 +134,18 @@ namespace Kuros.Managers
 			// 保存对话ID
 			string dialogueId = _currentDialogue?.DialogueId ?? "";
 			
-			// 先标记为非激活状态，防止重复调用
-			_isDialogueActive = false;
-			
 			// 隐藏对话窗口（窗口会发送信号，OnDialogueEnded会被调用）
 			if (_dialogueWindow != null && IsInstanceValid(_dialogueWindow))
 			{
 				_dialogueWindow.EndDialogue();
-				// 注意：不要在这里清理数据，让OnDialogueEnded来处理
-				// 这样可以避免重复清理和重复发送信号
+				// 注意：不要在这里设置 _isDialogueActive = false，让OnDialogueEnded来处理
+				// 这样可以确保清理逻辑在OnDialogueEnded中统一执行
 			}
 			else
 			{
 				GD.PrintErr("DialogueManager: 对话窗口无效或为空，直接清理状态");
 				// 如果窗口无效，直接清理
+				_isDialogueActive = false;
 				_currentDialogue = null;
 				EmitSignal(SignalName.DialogueEnded, dialogueId);
 			}
@@ -194,37 +193,33 @@ namespace Kuros.Managers
 		/// </summary>
 		private void OnDialogueEnded()
 		{
-			// 如果对话仍然标记为激活，清理状态
-			if (_isDialogueActive)
+			// 先保存对话ID，然后再清理
+			string dialogueId = _currentDialogue?.DialogueId ?? "";
+			
+			// 标记为非激活状态
+			_isDialogueActive = false;
+			
+			// 记录对话结束时间，用于阻止输入
+			_dialogueEndTime = Time.GetTicksMsec() / 1000.0;
+			
+			// 立即清除输入状态，防止Space键传播到玩家角色
+			Input.ActionRelease("attack");
+			Input.ActionRelease("ui_accept");
+			
+			// 清理对话数据
+			_currentDialogue = null;
+			
+			// 断开信号连接，避免重复调用
+			if (_dialogueWindow != null && IsInstanceValid(_dialogueWindow))
 			{
-				// 先保存对话ID，然后再清理
-				string dialogueId = _currentDialogue?.DialogueId ?? "";
-				
-				// 标记为非激活状态
-				_isDialogueActive = false;
-				
-				// 记录对话结束时间，用于阻止输入
-				_dialogueEndTime = Time.GetTicksMsec() / 1000.0;
-				
-				// 立即清除输入状态，防止Space键传播到玩家角色
-				Input.ActionRelease("attack");
-				Input.ActionRelease("ui_accept");
-				
-				// 清理对话数据
-				_currentDialogue = null;
-				
-				// 断开信号连接，避免重复调用
-				if (_dialogueWindow != null && IsInstanceValid(_dialogueWindow))
+				if (_dialogueWindow.IsConnected(DialogueWindow.SignalName.DialogueEnded, new Callable(this, MethodName.OnDialogueEnded)))
 				{
-					if (_dialogueWindow.IsConnected(DialogueWindow.SignalName.DialogueEnded, new Callable(this, MethodName.OnDialogueEnded)))
-					{
-						_dialogueWindow.DialogueEnded -= OnDialogueEnded;
-					}
+					_dialogueWindow.DialogueEnded -= OnDialogueEnded;
 				}
-				
-				// 发送结束信号（给外部监听者，如NPCInteraction）
-				EmitSignal(SignalName.DialogueEnded, dialogueId);
 			}
+			
+			// 发送结束信号（给外部监听者，如NPCInteraction）
+			EmitSignal(SignalName.DialogueEnded, dialogueId);
 		}
 		
 		/// <summary>

@@ -419,6 +419,7 @@ namespace Kuros.UI
             if (@event.IsActionPressed("ui_cancel"))
             {
                 OnBackPressed();
+                GetViewport().SetInputAsHandled();
             }
         }
     }

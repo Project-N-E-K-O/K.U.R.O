@@ -111,7 +111,7 @@ namespace Kuros.UI
 		private void OnLoadGamePressed()
 		{
 			EmitSignal(SignalName.LoadGameRequested);
-			GameLogger.Info(nameof(MainMenu), "打开读档界面");
+			GameLogger.Info(nameof(MainMenu), "打开存档管理界面");
 		}
 
 		private void OnSettingsPressed()

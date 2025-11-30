@@ -1,5 +1,6 @@
 using Godot;
 using System.Collections.Generic;
+using Kuros.Managers;
 
 namespace Kuros.UI
 {
@@ -236,11 +237,10 @@ namespace Kuros.UI
             SetProcessUnhandledInput(true);
             _isOpen = true;
             
-            // 设置暂停，确保游戏时间停止（与物品栏相同）
-            var tree = GetTree();
-            if (tree != null)
+            // 请求暂停游戏
+            if (PauseManager.Instance != null)
             {
-                tree.Paused = true;
+                PauseManager.Instance.PushPause();
             }
             
             // 尝试将窗口移到父节点的最后，确保输入处理优先级
@@ -263,16 +263,10 @@ namespace Kuros.UI
             SetProcessUnhandledInput(false);
             _isOpen = false;
             
-            // 取消暂停，恢复游戏时间
-            var tree = GetTree();
-            if (tree != null)
+            // 取消暂停请求
+            if (PauseManager.Instance != null)
             {
-                // 检查是否有其他UI需要保持暂停
-                bool shouldKeepPaused = ShouldKeepPaused();
-                if (!shouldKeepPaused)
-                {
-                    tree.Paused = false;
-                }
+                PauseManager.Instance.PopPause();
             }
             
             EmitSignal(SignalName.SkillDetailClosed);
@@ -384,42 +378,6 @@ namespace Kuros.UI
             return result;
         }
 
-        /// <summary>
-        /// 检查是否应该保持暂停状态
-        /// </summary>
-        private bool ShouldKeepPaused()
-        {
-            // 检查物品获得弹窗是否打开
-            var itemPopup = Kuros.Managers.UIManager.Instance?.GetUI<ItemObtainedPopup>("ItemObtainedPopup");
-            if (itemPopup != null && itemPopup.Visible)
-            {
-                return true;
-            }
-
-            // 检查物品栏是否打开
-            if (IsInventoryWindowOpen())
-            {
-                return true;
-            }
-
-            // 检查菜单是否打开
-            var battleMenu = Kuros.Managers.UIManager.Instance?.GetUI<BattleMenu>("BattleMenu");
-            if (battleMenu != null && battleMenu.Visible)
-            {
-                return true;
-            }
-
-            // 检查对话是否激活
-            if (Managers.DialogueManager.Instance != null && Managers.DialogueManager.Instance.IsDialogueActive)
-            {
-                return true;
-            }
-
-            // 注意：不检查技能窗口（SkillWindow），因为技能窗口本身不暂停游戏
-            // SkillWindow 默认是打开的，但它不管理暂停状态
-
-            return false;
-        }
 
         /// <summary>
         /// 检查技能窗口是否打开
