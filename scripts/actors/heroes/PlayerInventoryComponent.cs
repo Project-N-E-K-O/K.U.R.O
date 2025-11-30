@@ -28,6 +28,8 @@ namespace Kuros.Actors.Heroes
 
         public IReadOnlyDictionary<string, SpecialInventorySlot> SpecialSlots => _specialSlots;
         public SpecialInventorySlot? WeaponSlot => GetSpecialSlot(SpecialInventorySlotIds.PrimaryWeapon);
+        public SpecialInventorySlot? HeldItemSlot => GetSpecialSlot(SpecialInventorySlotIds.CurrentHeldItem);
+        public bool HasHeldItem => HeldItemSlot?.IsEmpty == false;
         public event Action<ItemDefinition>? ItemPicked;
         public event Action<string>? ItemRemoved;
         public event Action<ItemDefinition>? WeaponEquipped;
@@ -156,6 +158,58 @@ namespace Kuros.Actors.Heroes
             return TryUnequipSpecialSlotToBackpack(SpecialInventorySlotIds.PrimaryWeapon);
         }
 
+        public bool TryAssignHeldItem(ItemDefinition item, int quantity, out int acceptedQuantity)
+        {
+            acceptedQuantity = 0;
+            if (item == null) return false;
+
+            var slot = HeldItemSlot;
+            if (slot == null || !slot.IsEmpty) return false;
+            if (!slot.CanAccept(item)) return false;
+
+            int clamped = slot.ClampQuantity(quantity);
+            if (clamped <= 0) return false;
+
+            var stack = new InventoryItemStack(item, clamped);
+            if (!slot.TryAssign(stack, replaceExisting: true))
+            {
+                return false;
+            }
+
+            acceptedQuantity = clamped;
+            NotifyItemPicked(item);
+            return true;
+        }
+
+        public InventoryItemStack? TakeHeldItemStack()
+        {
+            var slot = HeldItemSlot;
+            if (slot == null || slot.IsEmpty) return null;
+
+            var stack = slot.TakeStack();
+            if (stack != null)
+            {
+                NotifyItemRemoved(stack.Item.ItemId);
+            }
+
+            return stack;
+        }
+
+        public bool TryReturnHeldItem(InventoryItemStack stack)
+        {
+            var slot = HeldItemSlot;
+            if (slot == null || stack == null) return false;
+            if (!slot.IsEmpty) return false;
+
+            if (!slot.TryAssign(stack, replaceExisting: true))
+            {
+                return false;
+            }
+
+            NotifyItemPicked(stack.Item);
+            return true;
+        }
+
         public float GetBackpackAttributeValue(string attributeId, float baseValue = 0f)
         {
             return Backpack?.GetAttributeValue(attributeId, baseValue) ?? baseValue;
@@ -205,6 +259,7 @@ namespace Kuros.Actors.Heroes
         {
             _specialSlots.Clear();
             bool hasWeaponSlot = false;
+            bool hasHeldItemSlot = false;
 
             foreach (var config in _specialSlotConfigs)
             {
@@ -215,12 +270,22 @@ namespace Kuros.Actors.Heroes
                 {
                     hasWeaponSlot = true;
                 }
+                else if (slot.SlotId == SpecialInventorySlotIds.CurrentHeldItem)
+                {
+                    hasHeldItemSlot = true;
+                }
             }
 
             if (!hasWeaponSlot)
             {
                 var defaultWeapon = new SpecialInventorySlot(SpecialInventorySlotConfig.CreateDefaultWeapon());
                 _specialSlots[defaultWeapon.SlotId] = defaultWeapon;
+            }
+
+            if (!hasHeldItemSlot)
+            {
+                var heldSlot = new SpecialInventorySlot(SpecialInventorySlotConfig.CreateHeldItemSlot());
+                _specialSlots[heldSlot.SlotId] = heldSlot;
             }
         }
     }

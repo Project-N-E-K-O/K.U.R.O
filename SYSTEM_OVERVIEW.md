@@ -33,8 +33,8 @@
   - `InventoryItemStack` 封装单个栈的数量、属性查询、标签判定。
 
 - `scripts/actors/heroes/PlayerInventoryComponent.cs` + `PlayerItemInteractionComponent.cs`  
-  - `PlayerInventoryComponent` 管理玩家背包及特殊槽位（如主武器），允许装备/卸下、查询背包属性快照等。  
-  - `PlayerItemInteractionComponent` 监听输入（`put_down`/`throw`），从背包中取出物品并通过 `WorldItemSpawner` 生成地面实体，同时支持扔出赋予初速度。
+  - `PlayerInventoryComponent` 除了管理背包/主武器槽外，还会自动创建唯一的 “Held Item” 槽（`SpecialInventorySlotIds.CurrentHeldItem`），并通过 `TryAssignHeldItem()`、`TakeHeldItemStack()`、`TryReturnHeldItem()` 在拾取/放下之间搬运栈；事件 `ItemPicked` / `ItemRemoved` 仍同步通知骨骼附件与 UI。  
+  - `PlayerItemInteractionComponent` 监听 `take_up`/`put_down`/`throw`，只有在 Held 槽为空时才允许拾取，只有槽内有物品时才允许放下/投掷；真正生成地面实体时直接从 Held 槽取出栈并交给 `WorldItemSpawner`，投掷则在动画完成后施加初速度。
 
 - `scripts/items/world/WorldItemEntity.cs`、`WorldItemSpawner.cs`  
   - `WorldItemEntity` 继承 `CharacterBody2D`，负责地面物品的触发检测、拾取、属性/效果传播、投掷阻尼。  
@@ -44,8 +44,8 @@
   - 定义常用标签/属性集合，背包和逻辑可通过标签快速筛选（如食物、武器）。
 
 - 交互/拾取/放下/投掷流程：  
-  - 地图物品：`WorldItemEntity` 挂在 tscn 中，触发 `take_up` 时会把 `InventoryItemStack` 写入玩家背包、触发 `PlayerInventoryComponent.ItemPicked`，并可在 `ItemDefinition.EffectEntries` 中配置拾取效果。  
-  - 快捷键：`PlayerItemInteractionComponent` 监听 `put_down` 与 `throw`，从背包槽位抽出物品，通过 `WorldItemSpawner` 生成地面实体；投掷会施加初速度。  
+  - 地图物品：`WorldItemEntity` 挂在 tscn 中，`TryTransferToActor()` 只会把 `InventoryItemStack` 写入玩家的 Held 槽（若槽已占用则直接拒绝），随后触发 `PlayerInventoryComponent.ItemPicked` 并按 `ItemDefinition.EffectEntries` 应用拾取效果。  
+  - 快捷键：`PlayerItemInteractionComponent` 监听 `put_down` / `throw`，仅当 Held 槽存在物品时才会通过 `WorldItemSpawner` 生成实体；槽为空时直接提示不可用。投掷流程依旧会在动画完成后来到真正释放阶段。  
   - 骨骼绑定：`PlayerItemAttachment` 订阅 `ItemPicked`/`ItemRemoved`，将最新拾取物品图标附着在指定骨骼或节点上，放下/投掷时自动清除。  
   - 快捷栏：`QuickSlotBar` 订阅 `InventoryContainer.InventoryChanged`，实时展示前几格物品与数量，便于 Debug 与 UI 集成。
 - 拾取/投掷动画链路：  
@@ -92,7 +92,7 @@
   - 示例 `NpcDialogueInteractable`（`scripts/actors/npc/NpcDialogueInteractable.cs`）展示如何构建可对话 NPC；`scenes/ExampleBattle.tscn` 已实例化 `FriendlyNPC` 供测试。
 
 - 武器技能系统：`scripts/items/weapons/*`、`scripts/actors/heroes/PlayerWeaponSkillController.cs`  
-  - `WeaponSkillDefinition` 描述主动/被动技能的动画、伤害倍率、附带效果（复用 `ItemEffectEntry`），`ItemDefinition.WeaponSkills` 可在 Inspector 中配置一组技能。  
+  - `WeaponSkillDefinition` 描述主动/被动技能的动画、伤害倍率、附带效果（复用 `ItemEffectEntry`），通过 `ItemDefinition.WeaponSkillResources` 在 Inspector 中配置引用，再由 `GetWeaponSkillDefinitions()` 进行强类型访问。  
   - `PlayerInventoryComponent` 在装备/卸下武器时触发 `WeaponEquipped`/`WeaponUnequipped`；`PlayerWeaponSkillController` 监听该事件，加载技能、施加被动效果并为攻击系统提供动画/伤害覆盖与技能触发接口。  
   - `PlayerBasicMeleeAttack` 调用控制器以使用武器技能的动画与数值，并在攻击过程中触发默认技能。示例武器参见 `resources/items/ExamplePotion.tres` + `resources/items/skills/ExampleSlashSkill.tres`。
 
@@ -104,7 +104,7 @@
 
 1. **定位代码**：根据功能模块到对应目录查找（如效果系统集中在 `scripts/core/effects`）。使用 `ItemDefinition`/`CharacterStatProfile` 时，可直接在 Godot Inspector 中拖拽资源。
 2. **扩展属性/效果**：新增属性时扩展 `StatModifier`/`ApplyStatModifier`；新增效果时继承 `ActorEffect` 并在物品或角色配置中引用对应 scene。
-3. **拾取流程**：地面物品挂 `WorldItemEntity`；玩家通过 `PlayerItemInteractionComponent` 放下/扔出；拾取成功会调用 `PlayerInventoryComponent` 并触发配置效果。
+3. **拾取流程**：地面物品挂 `WorldItemEntity`；玩家通过 `PlayerItemInteractionComponent` 操作 Held 槽拾取/放下；拾取成功会把栈写入 Held 槽并触发 `PlayerInventoryComponent` 事件，放下/投掷则先清空 Held 槽再生成实体。
 4. **状态机与动画**：新状态继承已有状态基类，并在相应 `StateMachine` 节点下注册；动画通过 Spine 或 Godot AnimationPlayer 统一驱动，与 `GameActor.FlipFacing()` 保持兼容。
 
 如需更新本概览，请同步维护系统路径与简介，确保团队成员快速了解代码架构。*** End Patch

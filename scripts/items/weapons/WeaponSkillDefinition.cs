@@ -6,7 +6,6 @@ namespace Kuros.Items.Weapons
     /// <summary>
     /// 武器技能定义，可配置主动/被动效果、动画、数值等。
     /// </summary>
-    [GlobalClass]
     public partial class WeaponSkillDefinition : Resource
     {
         [Export] public string SkillId { get; set; } = string.Empty;

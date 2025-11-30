@@ -18,8 +18,6 @@ namespace Kuros.Actors.Heroes
         }
 
         [Export] public PlayerInventoryComponent? InventoryComponent { get; private set; }
-        [Export(PropertyHint.Range, "0,199,1")] public int ActiveBackpackSlotIndex { get; private set; }
-        [Export(PropertyHint.Range, "0,999,1")] public int DropAmountPerAction { get; set; } = 0;
         [Export] public Vector2 DropOffset = new Vector2(32, 0);
         [Export] public Vector2 ThrowOffset = new Vector2(48, -10);
         [Export(PropertyHint.Range, "0,2000,1")] public float ThrowImpulse = 800f;
@@ -68,11 +66,6 @@ namespace Kuros.Actors.Heroes
             }
         }
 
-        public void SetActiveSlot(int slotIndex)
-        {
-            ActiveBackpackSlotIndex = Mathf.Clamp(slotIndex, 0, InventoryComponent?.Backpack?.Slots.Count - 1 ?? slotIndex);
-        }
-
         public bool TryTriggerThrowAfterAnimation()
         {
             return TryHandleDrop(DropDisposition.Throw, skipAnimation: true);
@@ -85,20 +78,16 @@ namespace Kuros.Actors.Heroes
 
         private bool TryHandleDrop(DropDisposition disposition, bool skipAnimation)
         {
-            var backpack = InventoryComponent?.Backpack;
-            if (backpack == null)
+            if (InventoryComponent == null)
             {
                 return false;
             }
 
-            var stack = backpack.GetStack(ActiveBackpackSlotIndex);
-            if (stack == null)
+            if (!InventoryComponent.HasHeldItem)
             {
-                GameLogger.Info(nameof(PlayerItemInteractionComponent), $"背包槽 {ActiveBackpackSlotIndex} 没有物品可丢弃。");
+                GameLogger.Info(nameof(PlayerItemInteractionComponent), "当前没有持有物品，无法执行丢弃/投掷。");
                 return false;
             }
-
-            int requestedAmount = DropAmountPerAction <= 0 ? stack.Quantity : Mathf.Min(DropAmountPerAction, stack.Quantity);
 
             if (!skipAnimation && disposition == DropDisposition.Throw)
             {
@@ -106,26 +95,20 @@ namespace Kuros.Actors.Heroes
                 return false;
             }
 
-            if (!backpack.TryExtractFromSlot(ActiveBackpackSlotIndex, requestedAmount, out var extracted) ||
-                extracted == null || extracted.IsEmpty)
+            var stack = InventoryComponent.TakeHeldItemStack();
+            if (stack == null || stack.IsEmpty)
             {
                 return false;
             }
 
             var spawnPosition = ComputeSpawnPosition(disposition);
-            var entity = WorldItemSpawner.SpawnFromStack(this, extracted, spawnPosition);
+            var entity = WorldItemSpawner.SpawnFromStack(this, stack, spawnPosition);
 
             if (entity == null)
             {
-                int restored = backpack.AddItem(extracted.Item, extracted.Quantity);
-                if (restored < extracted.Quantity)
-                {
-                    GameLogger.Error(nameof(PlayerItemInteractionComponent), $"尝试恢复 {extracted.Item.ItemId} 失败，剩余 {extracted.Quantity - restored} 个物品无法找回。");
-                }
+                InventoryComponent.TryReturnHeldItem(stack);
                 return false;
             }
-
-            InventoryComponent?.NotifyItemRemoved(extracted.Item.ItemId);
 
             if (disposition == DropDisposition.Throw)
             {
@@ -147,6 +130,12 @@ namespace Kuros.Actors.Heroes
 
         private void TriggerPickupState()
         {
+            if (InventoryComponent?.HasHeldItem == true)
+            {
+                GameLogger.Info(nameof(PlayerItemInteractionComponent), "已持有物品，无法重复拾取。");
+                return;
+            }
+
             if (_actor?.StateMachine == null)
             {
                 TryHandlePickup();
@@ -160,6 +149,12 @@ namespace Kuros.Actors.Heroes
         {
             if (_actor == null)
             {
+                return false;
+            }
+
+            if (InventoryComponent?.HasHeldItem == true)
+            {
+                GameLogger.Info(nameof(PlayerItemInteractionComponent), "已持有物品，无法拾取新的物品。");
                 return false;
             }
 

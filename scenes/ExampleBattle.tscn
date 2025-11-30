@@ -173,9 +173,9 @@ Speed = 50.0
 
 [node name="FriendlyNPC" parent="." instance=ExtResource("25_npc_dialogue")]
 position = Vector2(600, 380)
-
 [node name="ExampleItemPickup" parent="." instance=ExtResource("26_example_item")]
 position = Vector2(528, 801)
+ItemDefinitionResourcePath = ""
 
 [node name="UI" type="CanvasLayer" parent="."]
 visible = true

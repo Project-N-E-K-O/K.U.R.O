@@ -52,17 +52,17 @@ namespace Kuros.Items
         }
 
         [ExportGroup("Weapon")]
-        [Export] public Godot.Collections.Array<WeaponSkillDefinition> WeaponSkills
+        [Export] public Godot.Collections.Array<Resource> WeaponSkillResources
         {
-            get => _weaponSkills;
-            set => _weaponSkills = value ?? new();
+            get => _weaponSkillResources;
+            set => _weaponSkillResources = value ?? new();
         }
 
         private Godot.Collections.Array<string> _tags = new();
         private HashSet<string>? _tagCache;
         private Godot.Collections.Array<ItemAttributeEntry> _attributeEntries = new();
         private Godot.Collections.Array<ItemEffectEntry> _effectEntries = new();
-        private Godot.Collections.Array<WeaponSkillDefinition> _weaponSkills = new();
+        private Godot.Collections.Array<Resource> _weaponSkillResources = new();
         private ItemAttributeSet? _attributeCache;
 
         private const string DefaultWorldSceneDirectory = "res://scenes/properties/";
@@ -131,10 +131,12 @@ namespace Kuros.Items
 
         public IEnumerable<WeaponSkillDefinition> GetWeaponSkillDefinitions()
         {
-            foreach (var skill in _weaponSkills)
+            foreach (var skillResource in _weaponSkillResources)
             {
-                if (skill == null) continue;
-                yield return skill;
+                if (skillResource is WeaponSkillDefinition skill)
+                {
+                    yield return skill;
+                }
             }
         }
 

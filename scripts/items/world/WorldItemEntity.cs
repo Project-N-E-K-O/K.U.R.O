@@ -288,35 +288,34 @@ namespace Kuros.Items.World
             }
 
             var inventory = ResolveInventoryComponent(actor);
-            if (inventory?.Backpack == null)
+            if (inventory == null)
             {
                 GameLogger.Warn(nameof(WorldItemEntity), $"Actor {actor.Name} 缺少 PlayerInventoryComponent，无法拾取 {ItemId}。");
                 return false;
             }
 
-            int inserted = inventory.Backpack.AddItem(stack.Item, stack.Quantity);
-
-            if (inserted <= 0)
+            if (!inventory.TryAssignHeldItem(stack.Item, stack.Quantity, out var accepted) || accepted <= 0)
             {
-                GameLogger.Info(nameof(WorldItemEntity), $"Actor {actor.Name} 的背包没有空间放置 {ItemId}。");
+                GameLogger.Info(nameof(WorldItemEntity), $"Actor {actor.Name} 当前持有栏位已被占用，无法拾取 {ItemId}。");
                 return false;
             }
 
-            if (inserted < stack.Quantity)
+            if (accepted < stack.Quantity)
             {
-                stack.Remove(inserted);
+                stack.Remove(accepted);
                 Quantity = stack.Quantity;
-                GameLogger.Info(nameof(WorldItemEntity), $"{actor.Name} 只拾取了 {inserted} 个 {ItemId}，剩余 {Quantity} 个留在地面。");
+                _lastTransferredItem = stack.Item;
+                _lastTransferredAmount = accepted;
+                GameLogger.Info(nameof(WorldItemEntity), $"{actor.Name} 只拾取了 {accepted} 个 {ItemId}，剩余 {Quantity} 个留在地面。");
                 RestoreTriggerArea();
                 _isPicked = false;
                 return false;
             }
 
             _lastTransferredItem = stack.Item;
-            _lastTransferredAmount = stack.Quantity;
+            _lastTransferredAmount = accepted;
             CurrentStack = null;
             Quantity = 0;
-            inventory.NotifyItemPicked(stack.Item);
             return true;
         }
 

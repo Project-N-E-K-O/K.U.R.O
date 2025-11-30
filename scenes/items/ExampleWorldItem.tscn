@@ -1,6 +1,7 @@
-[gd_scene load_steps=6 format=3 uid="uid://example_world_item"]
+[gd_scene load_steps=7 format=3 uid="uid://example_world_item"]
 
 [ext_resource type="Script" path="res://scripts/items/world/WorldItemEntity.cs" id="1"]
+[ext_resource type="Resource" path="res://resources/items/ExamplePotion.tres" id="2"]
 
 [sub_resource type="PlaceholderTexture2D" id="SpritePlaceholder"]
 size = Vector2(32, 32)
@@ -16,7 +17,8 @@ radius = 24.0
 collision_layer = 4
 collision_mask = 1
 script = ExtResource("1")
-ItemDefinitionResourcePath = "res://resources/items/ExamplePotion.tres"
+ItemDefinition = ExtResource("2")
+ItemDefinitionResourcePath = ""
 Quantity = 3
 ThrowFriction = 400.0
 

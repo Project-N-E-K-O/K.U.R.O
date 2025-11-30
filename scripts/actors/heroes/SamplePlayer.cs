@@ -97,61 +97,61 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 		if (AttackArea != null)
 		{
 			// REMOVED: Manual Position flipping here. It's now handled in FlipFacing or via Scene Hierarchy.
-            
-            var bodies = AttackArea.GetOverlappingBodies();
-            foreach (var body in bodies)
-            {
-                if (body is SampleEnemy enemy)
-                {
-                    enemy.TakeDamage((int)AttackDamage);
-                    hitCount++;
-                    GameLogger.Info(nameof(SamplePlayer), $"Hit enemy: {enemy.Name}");
-                }
-            }
-        }
-        else
-        {
-            GameLogger.Error(nameof(SamplePlayer), "AttackArea is missing! Assign it in Inspector.");
-        }
-        
-        if (hitCount == 0)
-        {
-            GameLogger.Info(nameof(SamplePlayer), "No enemies hit!");
-        }
-    }
-    
-    public override void TakeDamage(int damage)
-    {
+			
+			var bodies = AttackArea.GetOverlappingBodies();
+			foreach (var body in bodies)
+			{
+				if (body is SampleEnemy enemy)
+				{
+					enemy.TakeDamage((int)AttackDamage);
+					hitCount++;
+					GameLogger.Info(nameof(SamplePlayer), $"Hit enemy: {enemy.Name}");
+				}
+			}
+		}
+		else
+		{
+			GameLogger.Error(nameof(SamplePlayer), "AttackArea is missing! Assign it in Inspector.");
+		}
+		
+		if (hitCount == 0)
+		{
+			GameLogger.Info(nameof(SamplePlayer), "No enemies hit!");
+		}
+	}
+	
+	public override void TakeDamage(int damage)
+	{
 		_pendingAttackSourceState = string.Empty;
-        base.TakeDamage(damage);
-        UpdateStatsUI();
-    }
-    
-    public void AddScore(int points)
-    {
-        _score += points;
-        UpdateStatsUI();
-    }
-    
-    private void UpdateStatsUI()
-    {
+		base.TakeDamage(damage);
+		UpdateStatsUI();
+	}
+	
+	public void AddScore(int points)
+	{
+		_score += points;
+		UpdateStatsUI();
+	}
+	
+	private void UpdateStatsUI()
+	{
 		NotifyStatsListeners();
 
-        if (StatsLabel != null)
-        {
-            StatsLabel.Text = $"Player HP: {CurrentHealth}\nScore: {_score}";
-        }
-    }
+		if (StatsLabel != null)
+		{
+			StatsLabel.Text = $"Player HP: {CurrentHealth}\nScore: {_score}";
+		}
+	}
 
 	private void NotifyStatsListeners()
 	{
 		StatsUpdated?.Invoke(CurrentHealth, MaxHealth, _score);
 	}
-    
-    protected override void OnDeathFinalized()
-    {
-        EffectController?.ClearAll();
-        GameLogger.Warn(nameof(SamplePlayer), "Player died! Game Over!");
-        GetTree().ReloadCurrentScene();
-    }
+	
+	protected override void OnDeathFinalized()
+	{
+		EffectController?.ClearAll();
+		GameLogger.Warn(nameof(SamplePlayer), "Player died! Game Over!");
+		GetTree().ReloadCurrentScene();
+	}
 }
