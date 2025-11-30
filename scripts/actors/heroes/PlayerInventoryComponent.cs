@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Godot;
 using Kuros.Items;
 using Kuros.Systems.Inventory;
-using System.Collections.Generic;
 
 namespace Kuros.Actors.Heroes
 {
@@ -27,6 +26,14 @@ namespace Kuros.Actors.Heroes
         // 跟踪已获得的物品ID（用于判断是否是第一次获得）
         private HashSet<string> _obtainedItemIds = new HashSet<string>();
 
+        // 特殊槽位相关
+        private Dictionary<string, SpecialInventorySlot> _specialSlots = new Dictionary<string, SpecialInventorySlot>();
+        [Export] public Godot.Collections.Array<SpecialInventorySlotConfig> SpecialSlotConfigs { get; set; } = new();
+
+        // 事件
+        public event Action<ItemDefinition>? ItemPicked;
+        public event Action<string>? ItemRemoved;
+
         public override void _Ready()
         {
             base._Ready();
@@ -40,6 +47,9 @@ namespace Kuros.Actors.Heroes
             {
                 GD.PrintErr("PlayerInventoryComponent: Failed to load EmptyItem.tres");
             }
+
+            // 初始化特殊槽位
+            InitializeSpecialSlots();
         }
         
         /// <summary>
@@ -304,8 +314,7 @@ namespace Kuros.Actors.Heroes
                 if (stack == null || stack.Item.ItemId != itemId) continue;
 
                 Backpack.RemoveItem(itemId, stack.Quantity);
-            NotifyItemRemoved(itemId);
-            NotifyItemRemoved(itemId);
+                NotifyItemRemoved(itemId);
                 return true;
             }
 
@@ -367,7 +376,7 @@ namespace Kuros.Actors.Heroes
             _specialSlots.Clear();
             bool hasWeaponSlot = false;
 
-            foreach (var config in _specialSlotConfigs)
+            foreach (var config in SpecialSlotConfigs)
             {
                 if (config == null || string.IsNullOrWhiteSpace(config.SlotId)) continue;
                 var slot = new SpecialInventorySlot(config);

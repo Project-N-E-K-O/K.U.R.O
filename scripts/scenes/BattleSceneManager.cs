@@ -30,6 +30,13 @@ namespace Kuros.Scenes
 
 		public override void _Ready()
 		{
+			// 确保游戏未暂停
+			var tree = GetTree();
+			if (tree != null)
+			{
+				tree.Paused = false;
+			}
+			
 			// 延迟查找Player和加载UI，确保场景树完全构建
 			CallDeferred(MethodName.InitializeBattleScene);
 		}
@@ -316,8 +323,6 @@ namespace Kuros.Scenes
 
 		private SettingsMenu? _battleSettingsMenu;
 
-		private SettingsMenu? _battleSettingsMenu;
-
 		private void OnMenuSettingsRequested()
 		{
 			// 打开设置界面
@@ -335,17 +340,6 @@ namespace Kuros.Scenes
 			if (settingsMenu != null)
 			{
 				settingsMenu.Visible = true;
-				// 避免重复连接信号
-				if (_battleSettingsMenu != settingsMenu)
-				{
-					// 断开旧连接
-					if (_battleSettingsMenu != null && IsInstanceValid(_battleSettingsMenu))
-					{
-						_battleSettingsMenu.BackRequested -= OnSettingsBackRequested;
-					}
-					_battleSettingsMenu = settingsMenu;
-					_battleSettingsMenu.BackRequested += OnSettingsBackRequested;
-				}
 				// 避免重复连接信号
 				if (_battleSettingsMenu != settingsMenu)
 				{

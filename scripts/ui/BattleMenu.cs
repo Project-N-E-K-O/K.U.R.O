@@ -6,8 +6,6 @@ namespace Kuros.UI
     /// <summary>
     /// 战斗菜单 - 暂停菜单
     /// 通过ESC键打开/关闭
-    /// 战斗菜单 - 暂停菜单
-    /// 通过ESC键打开/关闭
     /// </summary>
     public partial class BattleMenu : Control
     {
@@ -29,13 +27,8 @@ namespace Kuros.UI
         [Export] public Button LoadButton { get; private set; } = null!;
         [Export] public Button QuitButton { get; private set; } = null!;
         [Export] public Button ExitButton { get; private set; } = null!;
-        [Export] public Button ExitButton { get; private set; } = null!;
 
         private bool _isOpen = false;
-        private CompendiumWindow? _compendiumWindow;
-        private PackedScene? _compendiumScene;
-
-        public bool IsOpen => _isOpen;
         private CompendiumWindow? _compendiumWindow;
         private PackedScene? _compendiumScene;
 
@@ -43,7 +36,6 @@ namespace Kuros.UI
 
         public override void _Ready()
         {
-            // 暂停时也要接收输入
             // 暂停时也要接收输入
             ProcessMode = ProcessModeEnum.Always;
 
@@ -73,13 +65,7 @@ namespace Kuros.UI
                 ExitButton.Pressed += OnExitGamePressed;
 
             LoadCompendiumWindow();
-            if (ExitButton != null)
-                ExitButton.Pressed += OnExitGamePressed;
 
-            LoadCompendiumWindow();
-
-            // 延迟确保隐藏（在UIManager设置可见之后）
-            CallDeferred(MethodName.EnsureHidden);
             // 延迟确保隐藏（在UIManager设置可见之后）
             CallDeferred(MethodName.EnsureHidden);
         }
@@ -312,7 +298,6 @@ namespace Kuros.UI
             if (!_isOpen) return;
 
             Visible = false;
-            Visible = false;
             _isOpen = false;
             
             // 检查是否有其他UI需要保持暂停（如物品获得弹窗）
@@ -366,12 +351,9 @@ namespace Kuros.UI
         }
 
         private void EnsureHidden()
-        private void EnsureHidden()
         {
             if (!_isOpen)
-            if (!_isOpen)
             {
-                Visible = false;
                 Visible = false;
             }
         }
@@ -389,8 +371,6 @@ namespace Kuros.UI
 
         private void OnQuitPressed()
         {
-            // 先关闭菜单并取消暂停
-            CloseMenu();
             // 先关闭菜单并取消暂停
             CloseMenu();
             EmitSignal(SignalName.QuitRequested);

@@ -1,6 +1,5 @@
 using Godot;
 using System;
-using System.Linq;
 
 namespace Kuros.Managers
 {
@@ -68,7 +67,12 @@ namespace Kuros.Managers
 			}
 		}
 
-		public int GetPresetIndex(string presetId)
+		private WindowPreset GetDefaultPreset()
+		{
+			return _presets[0];
+		}
+
+		private int FindPresetIndex(string presetId)
 		{
 			for (int i = 0; i < _presets.Length; i++)
 			{
@@ -77,16 +81,28 @@ namespace Kuros.Managers
 					return i;
 				}
 			}
-			return 0;
+			return -1;
+		}
+
+		public int GetPresetIndex(string presetId)
+		{
+			var index = FindPresetIndex(presetId);
+			return index >= 0 ? index : 0;
 		}
 
 		public WindowPreset GetPresetByIndex(int index)
 		{
 			if (index < 0 || index >= _presets.Length)
 			{
-				return _presets[0];
+				return GetDefaultPreset();
 			}
 			return _presets[index];
+		}
+
+		private WindowPreset GetPresetById(string presetId)
+		{
+			var index = FindPresetIndex(presetId);
+			return index >= 0 ? _presets[index] : GetDefaultPreset();
 		}
 
 		private void LoadSettings()
@@ -131,12 +147,6 @@ namespace Kuros.Managers
 			ProjectSettings.SetSetting("display/window/size/viewport_height", preset.Size.Y);
 			ProjectSettings.SetSetting("display/window/size/initial_position_type", 2);
 			ProjectSettings.SetSetting("display/window/size/resizable", true);
-		}
-
-		private WindowPreset GetPresetById(string presetId)
-		{
-			var preset = _presets.FirstOrDefault(p => p.Id == presetId);
-			return preset.Id == null ? _presets[0] : preset;
 		}
 
 		public readonly record struct WindowPreset(string Id, string DisplayName, DisplayServer.WindowMode Mode, Vector2I Size);

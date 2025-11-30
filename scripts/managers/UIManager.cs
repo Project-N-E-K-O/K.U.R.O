@@ -44,16 +44,19 @@ namespace Kuros.Managers
 			_hudLayer = new CanvasLayer();
 			_hudLayer.Name = "HUDLayer";
 			_hudLayer.Layer = 1; // HUD层（玩家状态）
+			_hudLayer.Visible = true; // 确保HUD层可见
 			AddChild(_hudLayer);
 
 			_gameUILayer = new CanvasLayer();
 			_gameUILayer.Name = "GameUILayer";
 			_gameUILayer.Layer = 2; // 游戏UI层（物品栏、技能栏等，在HUD之上）
+			_gameUILayer.Visible = true; // 确保游戏UI层可见
 			AddChild(_gameUILayer);
 
 			_menuLayer = new CanvasLayer();
 			_menuLayer.Name = "MenuLayer";
 			_menuLayer.Layer = 3; // 菜单层（在游戏UI之上）
+			_menuLayer.Visible = true; // 确保菜单层可见
 			AddChild(_menuLayer);
 		}
 
@@ -79,9 +82,9 @@ namespace Kuros.Managers
 				if (existing is T typedNode)
 				{
 					// 如果是CanvasItem，设置可见性
-					if (existing is CanvasItem canvasItem)
+					if (existing is CanvasItem existingCanvasItem)
 					{
-						canvasItem.Visible = true;
+						existingCanvasItem.Visible = true;
 					}
 					return typedNode;
 				}
@@ -113,6 +116,12 @@ namespace Kuros.Managers
 				_ => _hudLayer
 			};
 			targetLayer.AddChild(uiNode);
+
+			// 确保UI节点是可见的（如果它是CanvasItem）
+			if (uiNode is CanvasItem newCanvasItem)
+			{
+				newCanvasItem.Visible = true;
+			}
 
 			// 存储引用
 			_loadedUIs[key] = uiNode;
@@ -153,9 +162,9 @@ namespace Kuros.Managers
 		{
 			if (_loadedUIs.TryGetValue(key, out var uiNode))
 			{
-				if (uiNode is CanvasItem canvasItem)
+				if (uiNode is CanvasItem targetCanvasItem)
 				{
-					canvasItem.Visible = visible;
+					targetCanvasItem.Visible = visible;
 				}
 			}
 		}

@@ -46,7 +46,6 @@ namespace Kuros.UI
 		// 信号：用于通知外部系统
 		[Signal] public delegate void HUDReadyEventHandler();
 		[Signal] public delegate void BattleMenuRequestedEventHandler();
-		[Signal] public delegate void BattleMenuRequestedEventHandler();
 
 		public override void _Ready()
 		{
@@ -413,7 +412,6 @@ namespace Kuros.UI
 		}
 
 		private void UpdateDisplay()
-		private void UpdateDisplay()
 		{
 			if (HealthBar != null)
 			{
@@ -435,8 +433,10 @@ namespace Kuros.UI
 		/// </summary>
 		public void AttachActor(GameActor actor)
 		{
-			if (player is SamplePlayer samplePlayer)
+			if (actor is SamplePlayer samplePlayer)
 			{
+				_player = samplePlayer;
+				
 				// 连接玩家状态变化信号
 				if (!samplePlayer.IsConnected(SamplePlayer.SignalName.StatsChanged, new Callable(this, MethodName.OnPlayerStatsChanged)))
 				{
@@ -476,6 +476,22 @@ namespace Kuros.UI
 			}
 		}
 
+		/// <summary>
+		/// 断开与角色的连接（别名方法，用于兼容性）
+		/// </summary>
+		public void DetachActor(GameActor actor)
+		{
+			DisconnectFromPlayer(actor);
+		}
+
+		/// <summary>
+		/// 设置回退状态（当没有连接玩家时使用）
+		/// </summary>
+		public void SetFallbackStats()
+		{
+			UpdateStats(100, 100, 0);
+		}
+
 		private SamplePlayer? _player;
 		
 		/// <summary>
@@ -483,11 +499,19 @@ namespace Kuros.UI
 		/// </summary>
 		public void SetPlayer(SamplePlayer playerRef)
 		{
-			int score = _playerStatsSource?.Score ?? _score;
-			ApplyStatsSnapshot(health, maxHealth, score);
+			_player = playerRef;
+			if (_player != null)
+			{
+				int maxHealth = _player.MaxHealth;
+				int score = _player is IPlayerStatsSource statsSource ? statsSource.Score : _score;
+				UpdateStats(_player.CurrentHealth, maxHealth, score);
+			}
 		}
 
-		private void OnStatsSourceUpdated(int health, int maxHealth, int score)
+		/// <summary>
+		/// 处理玩家状态变化信号
+		/// </summary>
+		private void OnPlayerStatsChanged(int health, int score)
 		{
 			// 从玩家获取最大生命值
 			int maxHealth = _player?.MaxHealth ?? 100;

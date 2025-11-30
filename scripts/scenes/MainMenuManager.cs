@@ -204,9 +204,80 @@ namespace Kuros.Scenes
 		private void OnStartGame()
 		{
 			GameLogger.Info(nameof(MainMenuManager), "开始新游戏");
+			PerformSceneChange(BattleScenePath);
+		}
+		
+		/// <summary>
+		/// 执行场景切换的统一方法
+		/// </summary>
+		private void PerformSceneChange(string scenePath)
+		{
 			var tree = GetTree();
+			if (tree == null)
+			{
+				GameLogger.Error(nameof(MainMenuManager), "无法获取场景树！");
+				return;
+			}
+			
+			// 确保游戏未暂停
+			tree.Paused = false;
+			
 			CleanupUI();
-			tree.ChangeSceneToFile(BattleScenePath);
+			
+			// 检查场景路径是否存在
+			if (!ResourceLoader.Exists(scenePath))
+			{
+				GameLogger.Error(nameof(MainMenuManager), $"场景文件不存在: {scenePath}");
+				return;
+			}
+			
+			// 尝试预加载场景以检查是否有问题
+			var scene = ResourceLoader.Load<PackedScene>(scenePath);
+			if (scene == null)
+			{
+				GameLogger.Error(nameof(MainMenuManager), $"无法加载场景资源: {scenePath}");
+				GameLogger.Error(nameof(MainMenuManager), "请检查场景文件是否损坏或引用的资源是否存在");
+				return;
+			}
+			
+			// 尝试实例化场景以验证完整性
+			var testInstance = scene.Instantiate();
+			if (testInstance == null)
+			{
+				GameLogger.Error(nameof(MainMenuManager), $"场景实例化失败: {scenePath}");
+				GameLogger.Error(nameof(MainMenuManager), "场景文件可能损坏或包含无效节点");
+				return;
+			}
+			testInstance.QueueFree(); // 清理测试实例
+			
+			// 使用 ChangeSceneToFile 方法（Godot 4.x 推荐）
+			var error = tree.ChangeSceneToFile(scenePath);
+			if (error != Error.Ok)
+			{
+				GameLogger.Error(nameof(MainMenuManager), $"切换场景失败: {error}, 路径: {scenePath}");
+				GameLogger.Error(nameof(MainMenuManager), $"错误详情: {GetErrorDescription(error)}");
+				GameLogger.Error(nameof(MainMenuManager), $"错误代码值: {(int)error}");
+			}
+			else
+			{
+				GameLogger.Info(nameof(MainMenuManager), $"成功切换到场景: {scenePath}");
+			}
+		}
+		
+		private string GetErrorDescription(Error error)
+		{
+			return error switch
+			{
+				Error.Ok => "成功",
+				Error.Failed => "操作失败",
+				Error.OutOfMemory => "内存不足",
+				Error.FileNotFound => "文件未找到",
+				Error.FileAlreadyInUse => "文件正在使用",
+				Error.FileCantOpen => "无法打开文件",
+				Error.FileCantWrite => "无法写入文件",
+				Error.FileCantRead => "无法读取文件",
+				_ => $"未知错误: {error}"
+			};
 		}
 
 		private void OnModeSelectionRequested()
@@ -227,10 +298,7 @@ namespace Kuros.Scenes
 		private void OnModeSelected(string modeName)
 		{
 			GameLogger.Info(nameof(MainMenuManager), $"选择了模式: {modeName}");
-			var tree = GetTree();
-			CleanupUI();
-			// 根据模式加载不同的场景
-			tree.ChangeSceneToFile(BattleScenePath);
+			PerformSceneChange(BattleScenePath);
 		}
 		
 		private void OnTestLoadingRequested()
@@ -270,9 +338,7 @@ namespace Kuros.Scenes
 				}
 			}
 			
-			var tree = GetTree();
-			CleanupUI();
-			tree.ChangeSceneToFile(BattleScenePath);
+			PerformSceneChange(BattleScenePath);
 		}
 
 		private void OnQuit()

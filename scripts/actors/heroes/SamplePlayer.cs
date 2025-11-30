@@ -8,6 +8,7 @@ using Kuros.Systems.Inventory;
 using Kuros.Items;
 using Kuros.Managers;
 using Kuros.UI;
+using Kuros.Utils;
 
 public partial class SamplePlayer : GameActor, IPlayerStatsSource
 {
@@ -37,6 +38,21 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 	private int _gold = 0; // 金币数量
 	private string _pendingAttackSourceState = string.Empty;
 	public string LastMovementStateName { get; private set; } = "Idle";
+	
+	// IPlayerStatsSource interface implementation
+	public event Action<int, int, int>? StatsUpdated;
+	
+	// CurrentHealth property for IPlayerStatsSource
+	int IPlayerStatsSource.CurrentHealth => CurrentHealth;
+	
+	// MaxHealth property for IPlayerStatsSource (wraps base class field)
+	int IPlayerStatsSource.MaxHealth => MaxHealth;
+	
+	// Score property for IPlayerStatsSource
+	int IPlayerStatsSource.Score => _score;
+	
+	// Public properties for convenience
+	public int Score => _score;
 	
 	// Signal for UI updates (Alternative to direct reference)
 	[Signal] public delegate void StatsChangedEventHandler(int health, int score);
