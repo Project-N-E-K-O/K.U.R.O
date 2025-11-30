@@ -169,10 +169,23 @@ namespace Kuros.Actors.Heroes
             return Backpack.TryExtractFromSlot(SelectedBackpackSlot, amount, out extracted);
         }
 
-        public bool TryReturnStackToSelectedSlot(InventoryItemStack stack)
+        public bool TryReturnStackToSelectedSlot(InventoryItemStack? stack, out int acceptedQuantity)
         {
-            if (Backpack == null || stack == null) return false;
-            return Backpack.TryAddToSlot(SelectedBackpackSlot, stack.Item, stack.Quantity, out var accepted) && accepted == stack.Quantity;
+            acceptedQuantity = 0;
+            if (Backpack == null || stack == null || stack.IsEmpty) return false;
+
+            if (!Backpack.TryAddToSlot(SelectedBackpackSlot, stack.Item, stack.Quantity, out var accepted) || accepted <= 0)
+            {
+                return false;
+            }
+
+            acceptedQuantity = Math.Min(accepted, stack.Quantity);
+            if (acceptedQuantity > 0)
+            {
+                stack.Remove(acceptedQuantity);
+            }
+
+            return true;
         }
 
         public int TryAddItemToSelectedSlot(ItemDefinition item, int quantity)

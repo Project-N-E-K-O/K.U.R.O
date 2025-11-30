@@ -167,9 +167,14 @@ namespace Kuros.UI
 
 				if (slot.Caption != null)
 				{
-					slot.Caption.Text = isHeld
-						? $"{HeldSlotTitle} ({i + 1})"
-						: $"Slot {i + 1}";
+					if (isHeld && ShowHeldSlot)
+					{
+						slot.Caption.Text = $"{HeldSlotTitle} ({i + 1})";
+					}
+					else
+					{
+						slot.Caption.Text = $"Slot {i + 1}";
+					}
 				}
 			}
 		}
@@ -189,17 +194,13 @@ namespace Kuros.UI
 				Alignment = BoxContainer.AlignmentMode.Center
 			};
 
-			Label? caption = null;
-			if (!string.IsNullOrEmpty(title))
+			var caption = new Label
 			{
-				caption = new Label
-				{
-					Text = title,
-					HorizontalAlignment = HorizontalAlignment.Center,
-					ThemeTypeVariation = "QuickSlotCaption"
-				};
-				vbox.AddChild(caption);
-			}
+				Text = title,
+				HorizontalAlignment = HorizontalAlignment.Center,
+				ThemeTypeVariation = "QuickSlotCaption"
+			};
+			vbox.AddChild(caption);
 
 			var icon = new TextureRect
 			{

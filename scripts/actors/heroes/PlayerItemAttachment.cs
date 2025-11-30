@@ -42,7 +42,15 @@ namespace Kuros.Actors.Heroes
             Inventory.ItemPicked += OnItemPicked;
             Inventory.ItemRemoved += OnItemRemoved;
             Inventory.ActiveBackpackSlotChanged += OnActiveSlotChanged;
-            Inventory.Backpack.InventoryChanged += OnInventoryChanged;
+            if (Inventory.Backpack != null)
+            {
+                Inventory.Backpack.InventoryChanged += OnInventoryChanged;
+            }
+            else
+            {
+                GD.PushWarning($"{Name}: PlayerInventoryComponent.Backpack 尚未初始化，无法订阅背包事件。");
+            }
+
             UpdateAttachmentIcon();
         }
 

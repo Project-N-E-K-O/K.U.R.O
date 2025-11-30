@@ -119,7 +119,20 @@ namespace Kuros.Actors.Heroes
 
             if (entity == null)
             {
-                InventoryComponent.TryReturnStackToSelectedSlot(extracted);
+                if (InventoryComponent.TryReturnStackToSelectedSlot(extracted, out var returned) && returned > 0 && extracted != null)
+                {
+                    if (!extracted.IsEmpty)
+                    {
+                        InventoryComponent.TryAddItem(extracted.Item, extracted.Quantity);
+                        extracted.Remove(extracted.Quantity);
+                    }
+                }
+                else if (extracted != null && !extracted.IsEmpty)
+                {
+                    InventoryComponent.TryAddItem(extracted.Item, extracted.Quantity);
+                    extracted.Remove(extracted.Quantity);
+                }
+
                 return false;
             }
 
