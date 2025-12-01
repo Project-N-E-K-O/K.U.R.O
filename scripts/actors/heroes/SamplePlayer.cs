@@ -276,7 +276,7 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 		}
 		
 		// 方法1：嘗試使用編輯器設置的路徑
-		if (LeftHandAttachmentPath != null && !LeftHandAttachmentPath.IsEmpty)
+		if (LeftHandAttachmentPath?.IsEmpty == false)
 		{
 			var nodeFromPath = GetNodeOrNull<Node2D>(LeftHandAttachmentPath);
 			if (nodeFromPath != null)
