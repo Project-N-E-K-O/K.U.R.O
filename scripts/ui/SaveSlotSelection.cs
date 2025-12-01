@@ -396,27 +396,12 @@ namespace Kuros.UI
                     GD.PushWarning($"SaveSlotSelection: 槽位 {i} 的卡片无效，重新创建");
                     if (SlotGrid != null)
                     {
-                        var oldCard = _slotCards[i];
-                        int targetIndex = i; // 預設使用循環索引作為目標位置
-                        
-                        // 步驟 1：先處理舊卡片（如果有效則獲取索引並移除）
-                        if (oldCard != null && IsInstanceValid(oldCard))
-                        {
-                            // 獲取舊卡片在 SlotGrid 中的實際索引
-                            targetIndex = oldCard.GetIndex();
-                            // 先移除舊卡片
-                            SlotGrid.RemoveChild(oldCard);
-                            oldCard.QueueFree();
-                        }
-                        
-                        // 步驟 2：創建新卡片
                         var newCard = CreateSaveSlotCard(i);
                         if (newCard != null)
                         {
-                            // 步驟 3：添加新卡片並移動到正確位置
                             SlotGrid.AddChild(newCard);
-                            // 確保索引在有效範圍內（移除舊卡片後索引可能需要調整）
-                            int validIndex = Mathf.Clamp(targetIndex, 0, Mathf.Max(0, SlotGrid.GetChildCount() - 1));
+                            // 計算安全的目標索引（使用 i 限制在有效範圍內）
+                            int validIndex = Mathf.Clamp(i, 0, Mathf.Max(0, SlotGrid.GetChildCount() - 1));
                             SlotGrid.MoveChild(newCard, validIndex);
                             _slotCards[i] = newCard;
                         }
