@@ -23,6 +23,23 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 	
 	[ExportCategory("Equipment")]
 	/// <summary>
+	/// 左手附件點的節點路徑（可在編輯器中設置）
+	/// 如果未設置或路徑無效，會嘗試使用 LeftHandAttachmentName 進行搜索
+	/// </summary>
+	[Export] public NodePath? LeftHandAttachmentPath { get; set; }
+	
+	/// <summary>
+	/// 左手附件點的節點名稱（用於後備搜索）
+	/// 當 LeftHandAttachmentPath 無效時，會使用此名稱在子節點中搜索
+	/// </summary>
+	[Export] public string LeftHandAttachmentName { get; set; } = "left_hand_attachment";
+	
+	/// <summary>
+	/// 缓存的左手附件点节点引用
+	/// </summary>
+	private Node2D? _cachedLeftHandAttachment;
+	
+	/// <summary>
 	/// 当前左手装备的物品（从快捷栏获取）
 	/// 右手保持小木剑（快捷栏索引0）
 	/// </summary>
@@ -221,9 +238,8 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 	/// </summary>
 	public void UpdateHandItemVisual()
 	{
-		// 查找玩家场景中左手附件点
-		// 根据 AttachmentPointPath 或 AttachmentSlot.LeftHand 来显示/隐藏物品
-		var leftHandAttachment = GetNodeOrNull<Node2D>("SpineCharacter/Skeleton2D/root/bone/bone2/bone3/bone14/bone15/bone16");
+		// 獲取左手附件點（使用緩存和後備機制）
+		var leftHandAttachment = GetLeftHandAttachment();
 		
 		if (leftHandAttachment != null)
 		{
@@ -241,8 +257,77 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 		}
 		else
 		{
-			GD.PrintErr("UpdateHandItemVisual: Could not find left hand attachment point");
+			GD.PrintErr("UpdateHandItemVisual: Could not find left hand attachment point. " +
+				$"Please set 'LeftHandAttachmentPath' in the editor or ensure a node named '{LeftHandAttachmentName}' exists in the scene hierarchy.");
 		}
+	}
+	
+	/// <summary>
+	/// 獲取左手附件點節點，使用緩存和健壯的後備機制
+	/// 優先使用編輯器設置的路徑，然後嘗試按名稱搜索
+	/// </summary>
+	/// <returns>左手附件點節點，如果找不到則返回 null</returns>
+	private Node2D? GetLeftHandAttachment()
+	{
+		// 如果已經緩存了有效的節點引用，直接返回
+		if (_cachedLeftHandAttachment != null && IsInstanceValid(_cachedLeftHandAttachment))
+		{
+			return _cachedLeftHandAttachment;
+		}
+		
+		// 方法1：嘗試使用編輯器設置的路徑
+		if (LeftHandAttachmentPath != null && !LeftHandAttachmentPath.IsEmpty)
+		{
+			var nodeFromPath = GetNodeOrNull<Node2D>(LeftHandAttachmentPath);
+			if (nodeFromPath != null)
+			{
+				_cachedLeftHandAttachment = nodeFromPath;
+				GD.Print($"GetLeftHandAttachment: Found attachment point via editor path: {LeftHandAttachmentPath}");
+				return _cachedLeftHandAttachment;
+			}
+			else
+			{
+				GD.PrintErr($"GetLeftHandAttachment: Editor-assigned path '{LeftHandAttachmentPath}' did not resolve to a valid node. Attempting fallback search...");
+			}
+		}
+		
+		// 方法2：使用 FindChild 按名稱搜索（後備機制）
+		if (!string.IsNullOrEmpty(LeftHandAttachmentName))
+		{
+			var nodeByName = FindChild(LeftHandAttachmentName, recursive: true, owned: false) as Node2D;
+			if (nodeByName != null)
+			{
+				_cachedLeftHandAttachment = nodeByName;
+				GD.Print($"GetLeftHandAttachment: Found attachment point via FindChild with name: '{LeftHandAttachmentName}'");
+				return _cachedLeftHandAttachment;
+			}
+		}
+		
+		// 方法3：搜索帶有 "left_hand" 組的節點
+		var nodesInGroup = GetTree().GetNodesInGroup("left_hand_attachment");
+		foreach (var node in nodesInGroup)
+		{
+			// 檢查是否是此玩家的子節點
+			if (node is Node2D node2d && IsAncestorOf(node2d))
+			{
+				_cachedLeftHandAttachment = node2d;
+				GD.Print($"GetLeftHandAttachment: Found attachment point via group 'left_hand_attachment': {node2d.GetPath()}");
+				return _cachedLeftHandAttachment;
+			}
+		}
+		
+		// 所有方法都失敗
+		GD.PrintErr("GetLeftHandAttachment: All methods to find left hand attachment point failed. " +
+			$"Tried: (1) Editor path '{LeftHandAttachmentPath}', (2) FindChild with name '{LeftHandAttachmentName}', (3) Group 'left_hand_attachment'");
+		return null;
+	}
+	
+	/// <summary>
+	/// 清除左手附件點的緩存（當場景結構改變時調用）
+	/// </summary>
+	public void InvalidateLeftHandAttachmentCache()
+	{
+		_cachedLeftHandAttachment = null;
 	}
 	
 	/// <summary>

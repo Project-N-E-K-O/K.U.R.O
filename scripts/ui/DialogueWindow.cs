@@ -458,24 +458,24 @@ namespace Kuros.UI
 				return;
 			}
 			
-			// 触发当前条目的结束行为
+		// 移动到下一个条目（简单递增索引）
+		int nextIndex = _currentEntryIndex + 1;
+		var nextEntry = _currentDialogue.GetEntry(nextIndex);
+		
+		if (nextEntry != null)
+		{
+			// 触发当前条目的结束行为（只在有下一条目时触发，最终条目由EndDialogue处理）
 			if (_currentEntry != null && !string.IsNullOrEmpty(_currentEntry.OnDialogueEndAction))
 			{
 				EmitSignal(SignalName.DialogueActionTriggered, _currentEntry.OnDialogueEndAction);
 			}
-			
-			// 移动到下一个条目（简单递增索引）
-			int nextIndex = _currentEntryIndex + 1;
-			var nextEntry = _currentDialogue.GetEntry(nextIndex);
-			
-			if (nextEntry != null)
-			{
-				DisplayEntry(nextIndex);
-			}
-			else
-			{
-				EndDialogue();
-			}
+			DisplayEntry(nextIndex);
+		}
+		else
+		{
+			// 没有下一条目，让EndDialogue负责触发最终条目的结束行为
+			EndDialogue();
+		}
 		}
 		
 		/// <summary>
