@@ -13,7 +13,10 @@ Item = ExtResource("2_test_item")
 DropWorldOffset = Vector2(0, 25)
 
 [node name="TriggerArea" type="Area2D" parent="."]
-collision_layer = 0
+collision_layer = 2
+collision_mask = 1
+monitorable = true
+monitoring = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="TriggerArea"]
 position = Vector2(-0.5, 0)
