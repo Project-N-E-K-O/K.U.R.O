@@ -156,8 +156,12 @@ namespace Kuros.Actors.NPC
 			{
 				if (actor.IsInGroup("player"))
 				{
-					_playerInRange = actor;
-					UpdatePromptVisibility();
+					// 只有在没有聚焦玩家时才设置新的，避免多人模式下焦点被抢夺
+					if (_playerInRange == null)
+					{
+						_playerInRange = actor;
+						UpdatePromptVisibility();
+					}
 				}
 			}
 		}

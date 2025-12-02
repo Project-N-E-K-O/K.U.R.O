@@ -43,6 +43,10 @@ namespace Kuros.Core.Interactions
         private void OnBodyEntered(Node2D body)
         {
             if (body is not GameActor actor) return;
+            
+            // 只有在没有聚焦 actor 时才设置新的，避免多人模式下焦点被抢夺
+            if (_focusedActor != null) return;
+            
             _focusedActor = actor;
             UpdateHighlight(true);
 

@@ -1,3 +1,4 @@
+using System;
 using Godot;
 using Kuros.Managers;
 using Kuros.Utils;
@@ -208,7 +209,10 @@ namespace Kuros.UI
                     }
                 }
             }
-            catch { /* Ignore type check errors for wrapper-less objects */ }
+            catch (Exception ex) 
+            { 
+                GD.Print($"FindAllNodesOfType: Type check error for {root.Name}: {ex.Message}");
+            }
             
             // Recursively check children safely
             // Use index loop instead of foreach to catch exceptions per child fetch

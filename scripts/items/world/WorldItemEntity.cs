@@ -226,7 +226,11 @@ namespace Kuros.Items.World
         {
             if (body is GameActor actor)
             {
-                _focusedActor = actor;
+                // 只有在没有聚焦 actor 时才设置新的，避免多人模式下焦点被抢夺
+                if (_focusedActor == null)
+                {
+                    _focusedActor = actor;
+                }
             }
         }
 
