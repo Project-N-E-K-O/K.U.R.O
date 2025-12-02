@@ -169,6 +169,63 @@ namespace Kuros.Systems.Inventory
             return amount - remaining;
         }
 
+        /// <summary>
+        /// 尝试在指定槽位添加物品（如果槽位为空或可合并）
+        /// 返回实际添加的数量
+        /// 注意：空白道具（empty_item）可以被任何道具覆盖
+        /// </summary>
+        public int TryAddItemToSlot(ItemDefinition item, int amount, int slotIndex)
+        {
+            if (slotIndex < 0 || slotIndex >= SlotCount) return 0;
+            EnsureCapacity();
+
+            var stack = _slots[slotIndex];
+            
+            // 如果槽位为空，直接添加
+            if (stack == null)
+            {
+                var newStack = new InventoryItemStack(item, 0);
+                int added = newStack.Add(amount);
+                if (added > 0)
+                {
+                    _slots[slotIndex] = newStack;
+                    EmitSignal(SignalName.SlotChanged, slotIndex, item.ItemId, newStack.Quantity);
+                    EmitSignal(SignalName.InventoryChanged);
+                    return added;
+                }
+                return 0;
+            }
+
+            // 如果槽位是空白道具，可以被任何道具覆盖
+            if (stack.Item.ItemId == "empty_item")
+            {
+                var newStack = new InventoryItemStack(item, 0);
+                int added = newStack.Add(amount);
+                if (added > 0)
+                {
+                    _slots[slotIndex] = newStack;
+                    EmitSignal(SignalName.SlotChanged, slotIndex, item.ItemId, newStack.Quantity);
+                    EmitSignal(SignalName.InventoryChanged);
+                    return added;
+                }
+                return 0;
+            }
+
+            // 如果槽位已有相同物品且未满，尝试合并
+            if (stack.Item == item && !stack.IsFull)
+            {
+                int added = stack.Add(amount);
+                if (added > 0)
+                {
+                    EmitSignal(SignalName.SlotChanged, slotIndex, item.ItemId, stack.Quantity);
+                    EmitSignal(SignalName.InventoryChanged);
+                    return added;
+                }
+            }
+
+            return 0;
+        }
+
         public int RemoveItem(string itemId, int amount)
         {
             if (amount <= 0) return 0;
@@ -194,6 +251,60 @@ namespace Kuros.Systems.Inventory
 
             if (removed > 0) EmitSignal(SignalName.InventoryChanged);
             return removed;
+        }
+
+        /// <summary>
+        /// 从指定槽位移除物品
+        /// </summary>
+        /// <param name="slotIndex">槽位索引</param>
+        /// <param name="amount">要移除的数量</param>
+        /// <returns>实际移除的数量</returns>
+        public int RemoveItemFromSlot(int slotIndex, int amount)
+        {
+            if (slotIndex < 0 || slotIndex >= SlotCount || amount <= 0) return 0;
+            EnsureCapacity();
+
+            var stack = _slots[slotIndex];
+            if (stack == null || stack.IsEmpty) return 0;
+
+            int removed = stack.Remove(amount);
+            if (removed > 0)
+            {
+                if (stack.IsEmpty)
+                {
+                    _slots[slotIndex] = null;
+                    EmitSignal(SignalName.SlotChanged, slotIndex, string.Empty, 0);
+                }
+                else
+                {
+                    EmitSignal(SignalName.SlotChanged, slotIndex, stack.Item.ItemId, stack.Quantity);
+                }
+                EmitSignal(SignalName.InventoryChanged);
+            }
+
+            return removed;
+        }
+
+        /// <summary>
+        /// 直接设置指定槽位的物品堆叠（用于交换和移动）
+        /// </summary>
+        /// <param name="slotIndex">槽位索引</param>
+        /// <param name="stack">要设置的物品堆叠，null表示清空槽位</param>
+        public void SetStack(int slotIndex, InventoryItemStack? stack)
+        {
+            if (slotIndex < 0 || slotIndex >= SlotCount) return;
+            EnsureCapacity();
+
+            _slots[slotIndex] = stack;
+            if (stack == null || stack.IsEmpty)
+            {
+                EmitSignal(SignalName.SlotChanged, slotIndex, string.Empty, 0);
+            }
+            else
+            {
+                EmitSignal(SignalName.SlotChanged, slotIndex, stack.Item.ItemId, stack.Quantity);
+            }
+            EmitSignal(SignalName.InventoryChanged);
         }
 
         public bool MoveTo(InventoryContainer target, int slotIndex, int amount)

@@ -35,6 +35,9 @@ namespace Kuros.Core
         protected AnimationPlayer _animationPlayer = null!;
         private Color _spineDefaultModulate = Colors.White;
         private Color _spriteDefaultModulate = Colors.White;
+        
+        // GDScript Helper to bypass C# wrapper issues with GDExtension
+        private Node _spineHelper = null!;
 
         private bool _deathStarted = false;
         private bool _deathFinalized = false;
@@ -46,16 +49,51 @@ namespace Kuros.Core
         {
             CurrentHealth = MaxHealth;
             
-            // Node fetching
-            _spineCharacter = GetNodeOrNull<Node2D>("SpineCharacter");
-            if (_spineCharacter == null)
+            // Load Spine helper script
+            var spineScript = GD.Load<GDScript>("res://scripts/utils/SpineWrapper.gd");
+            if (spineScript != null)
             {
-                _spineCharacter = GetNodeOrNull<Node2D>("SpineSprite");
+                _spineHelper = (Node)spineScript.New();
+                AddChild(_spineHelper);
             }
+            
+            // Node fetching - DO NOT attempt to cast SpineSprite to Node2D or GodotObject directly
+            // checking for existence is fine
+            bool hasSpine = HasNode("SpineCharacter") || HasNode("SpineSprite");
+            
+            // Try to fetch if it's a Node2D wrapper (rare case if GDExtension is missing bindings)
+            if (HasNode("SpineCharacter"))
+            {
+                var variant = Call("get_node", "SpineCharacter");
+                if (variant.VariantType == Variant.Type.Object)
+                {
+                    try 
+                    { 
+                        // Only assign if it successfully casts, otherwise leave null
+                        // Catching generic exception to silence potential wrapper errors if possible
+                        var obj = variant.As<GodotObject>();
+                        if (obj is Node2D n2d) _spineCharacter = n2d;
+                    } 
+                    catch { }
+                }
+            }
+            
+            if (_spineCharacter == null && HasNode("SpineSprite"))
+            {
+                 var variant = Call("get_node", "SpineSprite");
+                 try 
+                 { 
+                     var obj = variant.As<GodotObject>();
+                     if (obj is Node2D n2d) _spineCharacter = n2d;
+                 } 
+                 catch { }
+            }
+
             if (_spineCharacter != null)
             {
                 _spineDefaultModulate = _spineCharacter.Modulate;
             }
+            
             _sprite = GetNodeOrNull<Sprite2D>("Sprite2D");
             if (_sprite != null)
             {
@@ -123,6 +161,20 @@ namespace Kuros.Core
                     StateMachine.ChangeState("Hit");
                 }
             }
+        }
+
+        /// <summary>
+        /// 恢复或设置血量（用于加载存档等场景）
+        /// </summary>
+        public void RestoreHealth(int health, int maxHealth = -1)
+        {
+            if (maxHealth > 0)
+            {
+                MaxHealth = maxHealth;
+            }
+            CurrentHealth = Mathf.Clamp(health, 0, MaxHealth);
+            NotifyHealthChanged();
+            GameLogger.Info(nameof(GameActor), $"{Name} health restored to {CurrentHealth}/{MaxHealth}");
         }
 
         protected virtual void Die()
@@ -224,20 +276,41 @@ namespace Kuros.Core
 
         protected virtual void FlashDamageEffect()
         {
-            Node2D? visualNode = _spineCharacter ?? _sprite;
-            if (visualNode == null) return;
-
-            Color baseColor = visualNode == _spineCharacter ? _spineDefaultModulate : _spriteDefaultModulate;
-            visualNode.Modulate = new Color(1f, 0f, 0f);
-
-            var tween = CreateTween();
-            tween.TweenInterval(0.1);
-            Node2D targetNode = visualNode;
-            tween.TweenCallback(Callable.From(() =>
+            // Use GDScript helper for Spine
+            if (_spineHelper != null)
             {
-                if (!GodotObject.IsInstanceValid(targetNode)) return;
-                targetNode.Modulate = baseColor;
-            }));
+                _spineHelper.Call("flash_damage", this, new Color(1f, 0f, 0f));
+            }
+            // Fallback or legacy handling if wrapper exists
+            else if (_spineCharacter != null)
+            {
+                var visualNode = _spineCharacter;
+                Color baseColor = _spineDefaultModulate;
+                visualNode.Modulate = new Color(1f, 0f, 0f);
+
+                var tween = CreateTween();
+                tween.TweenInterval(0.1);
+                tween.TweenCallback(Callable.From(() =>
+                {
+                    if (!GodotObject.IsInstanceValid(visualNode)) return;
+                    visualNode.Modulate = baseColor;
+                }));
+            }
+
+            if (_sprite != null)
+            {
+                Color baseColor = _spriteDefaultModulate;
+                _sprite.Modulate = new Color(1f, 0f, 0f);
+
+                var tween = CreateTween();
+                tween.TweenInterval(0.1);
+                Node2D targetNode = _sprite;
+                tween.TweenCallback(Callable.From(() =>
+                {
+                    if (!GodotObject.IsInstanceValid(targetNode)) return;
+                    targetNode.Modulate = baseColor;
+                }));
+            }
         }
 
         public virtual void FlipFacing(bool faceRight)
@@ -246,14 +319,16 @@ namespace Kuros.Core
             
             FacingRight = faceRight;
             
-            // Calculate the correct X scale sign based on direction and default facing
-            // If faceRight is requested:
-            //   - Default Right: Scale should be positive
-            //   - Default Left: Scale should be negative
             float sign = faceRight ? 1.0f : -1.0f;
             if (FaceLeftByDefault) sign *= -1.0f;
             
-            if (_spineCharacter != null)
+            // Use GDScript helper to flip
+            if (_spineHelper != null)
+            {
+                _spineHelper.Call("flip_facing", this, faceRight, FaceLeftByDefault);
+            }
+            // Legacy handling
+            else if (_spineCharacter != null)
             {
                 var scale = _spineCharacter.Scale;
                 float absX = Mathf.Abs(scale.X);
@@ -262,7 +337,6 @@ namespace Kuros.Core
 
             if (_sprite != null)
             {
-                // Prefer Scale flipping over FlipH, so children (like AttackArea) flip too
                 var scale = _sprite.Scale;
                 float absX = Mathf.Abs(scale.X);
                 _sprite.Scale = new Vector2(absX * sign, scale.Y);

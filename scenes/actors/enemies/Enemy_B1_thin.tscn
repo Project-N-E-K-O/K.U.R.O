@@ -36,7 +36,6 @@ height = 55.0
 collision_layer = 2
 motion_mode = 1
 script = ExtResource("1")
-DetectionRange = 350.0
 AttackArea = NodePath("Sprite2D/AttackArea")
 
 [node name="EffectController" type="Node" parent="."]

@@ -1,0 +1,27 @@
+[gd_scene load_steps=5 format=3 uid="uid://ciwlpphli7o01"]
+
+[ext_resource type="Script" uid="uid://yanea4ugodh6" path="res://scripts/properties/DroppableExampleProperty.cs" id="1_drop_example"]
+[ext_resource type="Resource" path="res://data/TestItem.tres" id="2_test_item"]
+[ext_resource type="Texture2D" uid="uid://dccrl4lpl0t2h" path="res://icon.svg" id="3_icon"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_5p5g5"]
+size = Vector2(200, 200)
+
+[node name="DroppableExampleProperty" type="Node2D"]
+script = ExtResource("1_drop_example")
+Item = ExtResource("2_test_item")
+DropWorldOffset = Vector2(0, 25)
+
+[node name="TriggerArea" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 1
+monitorable = true
+monitoring = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TriggerArea"]
+position = Vector2(-0.5, 0)
+shape = SubResource("RectangleShape2D_5p5g5")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(1.4755288, 1.4755288)
+texture = ExtResource("3_icon")

@@ -18,6 +18,9 @@ mono_crash.*.json
 export/
 build/
 
+# User save data
+saves/
+
 # .NET ignores
 obj/
 *.user

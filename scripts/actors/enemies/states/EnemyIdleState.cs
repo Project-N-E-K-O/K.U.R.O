@@ -16,14 +16,14 @@ namespace Kuros.Actors.Enemies.States
             Enemy.Velocity = Enemy.Velocity.MoveToward(Vector2.Zero, Enemy.Speed * 2.0f * (float)delta);
             Enemy.MoveAndSlide();
 
-            if (!HasPlayer) return;
-
+            // 先检查玩家是否在攻击范围内（这会刷新玩家引用）
             if (Enemy.IsPlayerInAttackRange() && Enemy.AttackTimer <= 0)
             {
                 ChangeState("Attack");
                 return;
             }
 
+            // 检查玩家是否在检测范围内（这也会刷新玩家引用）
             if (Enemy.IsPlayerWithinDetectionRange())
             {
                 ChangeState("Walk");

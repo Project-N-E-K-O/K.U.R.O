@@ -1,5 +1,8 @@
 using Godot;
 using Kuros.Systems.Inventory;
+using Kuros.Core;
+using Kuros.Managers;
+using Kuros.Items.World;
 
 namespace Kuros.UI
 {
@@ -11,6 +14,9 @@ namespace Kuros.UI
         [Export] public Button CloseButton { get; private set; } = null!;
         [Export] public GridContainer InventoryGrid { get; private set; } = null!;
         [Export] public HBoxContainer QuickBarContainer { get; private set; } = null!;
+        [Export] public Control TrashBin { get; private set; } = null!;
+        [Export] public Label GoldLabel { get; private set; } = null!;
+        [Export] public ConfirmationDialog DeleteConfirmDialog { get; private set; } = null!;
 
         private const int InventorySlotCount = 16; // 4x4 网格
         private const int QuickBarSlotCount = 5;
@@ -25,13 +31,23 @@ namespace Kuros.UI
         private int _draggingSlotIndex = -1;
         private bool _isDraggingFromInventory = true;
         private Vector2 _dragOffset = Vector2.Zero;
+        private Control? _dragPreview; // 拖拽时的预览控件
+        private InventoryItemStack? _draggingStack; // 正在拖拽的物品堆叠
 
         // 精确换位状态
         private int _selectedSlotIndex = -1;
         private bool _isSelectedFromInventory = true;
 
+        // 待删除物品状态（用于确认对话框）
+        private int _pendingDeleteSlotIndex = -1;
+        private bool _pendingDeleteFromInventory = true;
+        private InventoryItemStack? _pendingDeleteStack;
+
         // 窗口状态
         private bool _isOpen = false;
+        
+        // 玩家引用（用于监听金币变化）
+        private SamplePlayer? _player;
 
         [Signal] public delegate void InventoryClosedEventHandler();
 
@@ -41,9 +57,37 @@ namespace Kuros.UI
             // 暂停时也要接收输入
             ProcessMode = ProcessModeEnum.Always;
             
+            // 添加到组以便其他组件可以通过组查找找到此窗口
+            AddToGroup("inventory_window");
+            
             CacheNodeReferences();
             InitializeSlots();
-            HideWindow();
+            
+            // 使用 CallDeferred 确保在 UIManager 设置可见性之后执行
+            // 这样可以确保窗口默认是隐藏的
+            CallDeferred(MethodName.HideWindow);
+        }
+
+        public override void _ExitTree()
+        {
+            // 清理玩家金币变化信号连接，防止内存泄漏
+            DisconnectPlayerGoldSignal();
+            base._ExitTree();
+        }
+
+
+        /// <summary>
+        /// 使用 Godot 原生 Connect 方法连接按钮信号
+        /// 这种方式在导出版本中比 C# 委托方式更可靠
+        /// </summary>
+        private void ConnectButtonSignal(Button? button, string methodName)
+        {
+            if (button == null) return;
+            var callable = new Callable(this, methodName);
+            if (!button.IsConnected(Button.SignalName.Pressed, callable))
+            {
+                button.Connect(Button.SignalName.Pressed, callable);
+            }
         }
 
         private void CacheNodeReferences()
@@ -51,10 +95,34 @@ namespace Kuros.UI
             CloseButton ??= GetNodeOrNull<Button>("MainPanel/Header/CloseButton");
             InventoryGrid ??= GetNodeOrNull<GridContainer>("MainPanel/Body/InventorySection/InventoryGrid");
             QuickBarContainer ??= GetNodeOrNull<HBoxContainer>("MainPanel/Body/QuickBarSection/QuickBarContainer");
+            TrashBin ??= GetNodeOrNull<Control>("MainPanel/Body/TrashBin");
+            GoldLabel ??= GetNodeOrNull<Label>("MainPanel/Header/GoldLabel");
 
-            if (CloseButton != null)
+            // 使用 Godot 原生 Connect 方法连接信号，在导出版本中更可靠
+            ConnectButtonSignal(CloseButton, nameof(HideWindow));
+
+            if (TrashBin != null)
             {
-                CloseButton.Pressed += HideWindow;
+                var guiInputCallable = new Callable(this, nameof(_OnTrashBinGuiInput));
+                if (!TrashBin.IsConnected(Control.SignalName.GuiInput, guiInputCallable))
+                {
+                    TrashBin.Connect(Control.SignalName.GuiInput, guiInputCallable);
+                }
+            }
+
+            DeleteConfirmDialog ??= GetNodeOrNull<ConfirmationDialog>("DeleteConfirmDialog");
+            if (DeleteConfirmDialog != null)
+            {
+                var confirmedCallable = new Callable(this, nameof(OnDeleteConfirmed));
+                if (!DeleteConfirmDialog.IsConnected(ConfirmationDialog.SignalName.Confirmed, confirmedCallable))
+                {
+                    DeleteConfirmDialog.Connect(ConfirmationDialog.SignalName.Confirmed, confirmedCallable);
+                }
+                var canceledCallable = new Callable(this, nameof(OnDeleteCanceled));
+                if (!DeleteConfirmDialog.IsConnected(ConfirmationDialog.SignalName.Canceled, canceledCallable))
+                {
+                    DeleteConfirmDialog.Connect(ConfirmationDialog.SignalName.Canceled, canceledCallable);
+                }
             }
         }
 
@@ -94,6 +162,7 @@ namespace Kuros.UI
             slot.SlotDoubleClicked += (slotIdx) => OnSlotDoubleClicked(slotIdx, isInventory);
             slot.SlotDragStarted += (slotIdx, pos) => OnSlotDragStarted(slotIdx, pos, isInventory);
             slot.SlotDragEnded += (slotIdx, pos) => OnSlotDragEnded(slotIdx, pos, isInventory);
+            slot.SlotDragUpdate += (slotIdx, pos) => OnSlotDragUpdate(slotIdx, pos);
 
             return slot;
         }
@@ -182,6 +251,33 @@ namespace Kuros.UI
             }
         }
 
+        private void _OnTrashBinGuiInput(InputEvent @event)
+        {
+            if (@event is InputEventMouseButton mouseEvent && 
+                mouseEvent.ButtonIndex == MouseButton.Left && 
+                mouseEvent.Pressed)
+            {
+                // 如果处于精确换位模式，显示确认对话框
+                if (_selectedSlotIndex >= 0)
+                {
+                    var container = _isSelectedFromInventory ? _inventoryContainer : _quickBarContainer;
+                    if (container != null)
+                    {
+                        var stack = container.GetStack(_selectedSlotIndex);
+                        if (stack != null && !stack.IsEmpty)
+                        {
+                            // 保存待删除信息并显示确认对话框
+                            ShowDeleteConfirmDialog(_selectedSlotIndex, _isSelectedFromInventory, stack);
+                        }
+                    }
+                    
+                    ClearAllSelections();
+                    _selectedSlotIndex = -1;
+                    GetViewport().SetInputAsHandled();
+                }
+            }
+        }
+
         private void OnSlotDoubleClicked(int slotIndex, bool isInventory)
         {
             // 清除之前的选中状态
@@ -194,11 +290,11 @@ namespace Kuros.UI
             // 设置当前槽位为选中状态
             if (isInventory && slotIndex >= 0 && slotIndex < _inventorySlots.Length)
             {
-                // 选中状态在 ItemSlot 内部管理
+                _inventorySlots[slotIndex]?.SetSelected(true);
             }
             else if (!isInventory && slotIndex >= 0 && slotIndex < _quickBarSlots.Length)
             {
-                // 选中状态在 ItemSlot 内部管理
+                _quickBarSlots[slotIndex]?.SetSelected(true);
             }
         }
 
@@ -219,11 +315,96 @@ namespace Kuros.UI
             _draggingSlotIndex = slotIndex;
             _isDraggingFromInventory = isInventory;
             _dragOffset = position;
+
+            // 获取正在拖拽的物品
+            var container = isInventory ? _inventoryContainer : _quickBarContainer;
+            if (container != null)
+            {
+                _draggingStack = container.GetStack(slotIndex);
+                if (_draggingStack != null && !_draggingStack.IsEmpty)
+                {
+                    CreateDragPreview(_draggingStack, position);
+                }
+            }
+        }
+
+        private void OnSlotDragUpdate(int slotIndex, Vector2 position)
+        {
+            if (_dragPreview != null)
+            {
+                _dragPreview.GlobalPosition = position - new Vector2(40, 40); // 居中显示
+            }
+        }
+
+        private void CreateDragPreview(InventoryItemStack stack, Vector2 position)
+        {
+            // 创建拖拽预览控件
+            _dragPreview = new Panel
+            {
+                Size = new Vector2(80, 80),
+                GlobalPosition = position - new Vector2(40, 40),
+                MouseFilter = Control.MouseFilterEnum.Ignore
+            };
+
+            var label = new Label
+            {
+                Text = stack.Item.DisplayName + (stack.Quantity > 1 ? $" x{stack.Quantity}" : ""),
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                Size = new Vector2(80, 80)
+            };
+            _dragPreview.AddChild(label);
+
+            // 添加到场景树
+            AddChild(_dragPreview);
+            _dragPreview.SetAsTopLevel(true);
+        }
+
+        private void DestroyDragPreview()
+        {
+            if (_dragPreview != null)
+            {
+                _dragPreview.QueueFree();
+                _dragPreview = null;
+            }
         }
 
         private void OnSlotDragEnded(int slotIndex, Vector2 position, bool isInventory)
         {
-            if (_draggingSlotIndex < 0) return;
+            if (_draggingSlotIndex < 0)
+            {
+                DestroyDragPreview();
+                return;
+            }
+
+            // 检查是否拖拽到垃圾桶
+            if (TrashBin != null && IsPointInControl(TrashBin, position))
+            {
+                // 显示确认对话框
+                var container = _isDraggingFromInventory ? _inventoryContainer : _quickBarContainer;
+                if (container != null && _draggingStack != null && !_draggingStack.IsEmpty)
+                {
+                    ShowDeleteConfirmDialog(_draggingSlotIndex, _isDraggingFromInventory, _draggingStack);
+                }
+                DestroyDragPreview();
+                _draggingSlotIndex = -1;
+                _draggingStack = null;
+                return;
+            }
+
+            // 检查是否拖拽到界面外（丢弃物品）
+            if (!IsPointInMainPanel(position))
+            {
+                // 嘗試在世界中生成掉落物，如果失敗則顯示確認對話框
+                if (_draggingStack != null && !_draggingStack.IsEmpty)
+                {
+                    TryDropItemToWorld(_draggingSlotIndex, _isDraggingFromInventory, _draggingStack);
+                }
+                DestroyDragPreview();
+                _draggingSlotIndex = -1;
+                _draggingStack = null;
+                return;
+            }
 
             // 查找拖拽结束位置的槽位
             var targetSlot = FindSlotAtPosition(position);
@@ -252,7 +433,23 @@ namespace Kuros.UI
                 }
             }
 
+            DestroyDragPreview();
             _draggingSlotIndex = -1;
+            _draggingStack = null;
+        }
+
+        private bool IsPointInControl(Control control, Vector2 globalPosition)
+        {
+            var rect = new Rect2(control.GlobalPosition, control.Size);
+            return rect.HasPoint(globalPosition);
+        }
+
+        private bool IsPointInMainPanel(Vector2 globalPosition)
+        {
+            var mainPanel = GetNodeOrNull<Control>("MainPanel");
+            if (mainPanel == null) return false;
+            var rect = new Rect2(mainPanel.GlobalPosition, mainPanel.Size);
+            return rect.HasPoint(globalPosition);
         }
 
         private ItemSlot? FindSlotAtPosition(Vector2 globalPosition)
@@ -311,43 +508,24 @@ namespace Kuros.UI
             // 如果目标槽位为空，直接移动
             if (toStack == null || toStack.IsEmpty)
             {
-                // 移动到目标槽位的指定位置（需要特殊处理，因为 AddItem 会自动填充）
-                // 先移除源槽位物品
-                var item = fromStack.Item;
-                var quantity = fromStack.Quantity;
-                fromContainer.RemoveItem(item.ItemId, quantity);
+                // 创建新的堆叠副本
+                var newStack = new InventoryItemStack(fromStack.Item, fromStack.Quantity);
                 
-                // 直接设置目标槽位（需要扩展 InventoryContainer 或使用 MoveTo）
-                // 暂时使用 MoveTo 方法，但需要确保目标槽位为空
-                // 如果 MoveTo 不支持指定槽位，我们需要手动处理
-                // 这里简化处理：先移除，再添加到指定位置
-                if (toContainer.GetStack(toIndex) == null || toContainer.GetStack(toIndex)!.IsEmpty)
-                {
-                    // 临时存储目标槽位索引，通过 MoveTo 移动到第一个空槽位，然后交换
-                    // 由于 InventoryContainer 的限制，我们使用一个变通方法
-                    // 先移除源物品
-                    fromContainer.RemoveItem(item.ItemId, quantity);
-                    // 添加到目标容器（会自动填充到第一个空槽位）
-                    int added = toContainer.AddItem(item, quantity);
-                    // 如果目标容器有多个空槽位，我们需要手动调整
-                    // 这里简化：如果添加成功，就认为移动成功
-                }
+                // 清空源槽位
+                fromContainer.SetStack(fromIndex, null);
+                
+                // 设置目标槽位
+                toContainer.SetStack(toIndex, newStack);
             }
             else
             {
                 // 交换两个槽位的内容
-                var tempItem = fromStack.Item;
-                var tempQuantity = fromStack.Quantity;
-                var toItem = toStack.Item;
-                var toQuantity = toStack.Quantity;
+                var tempStack = new InventoryItemStack(fromStack.Item, fromStack.Quantity);
+                var toStackCopy = new InventoryItemStack(toStack.Item, toStack.Quantity);
 
-                // 移除两个槽位的物品
-                fromContainer.RemoveItem(tempItem.ItemId, tempQuantity);
-                toContainer.RemoveItem(toItem.ItemId, toQuantity);
-
-                // 交换添加
-                fromContainer.AddItem(toItem, toQuantity);
-                toContainer.AddItem(tempItem, tempQuantity);
+                // 交换设置
+                fromContainer.SetStack(fromIndex, toStackCopy);
+                toContainer.SetStack(toIndex, tempStack);
             }
         }
 
@@ -361,32 +539,163 @@ namespace Kuros.UI
             // 如果两个槽位都为空或相同，直接返回
             if ((stack1 == null || stack1.IsEmpty) && (stack2 == null || stack2.IsEmpty)) return;
 
-            // 临时存储
-            var tempItem1 = stack1?.Item;
-            var tempQuantity1 = stack1?.Quantity ?? 0;
-            var tempItem2 = stack2?.Item;
-            var tempQuantity2 = stack2?.Quantity ?? 0;
+            // 创建副本进行交换
+            InventoryItemStack? stack1Copy = null;
+            InventoryItemStack? stack2Copy = null;
 
-            // 清空两个槽位
             if (stack1 != null && !stack1.IsEmpty)
             {
-                container.RemoveItem(stack1.Item.ItemId, stack1.Quantity);
+                stack1Copy = new InventoryItemStack(stack1.Item, stack1.Quantity);
             }
             if (stack2 != null && !stack2.IsEmpty)
             {
-                container.RemoveItem(stack2.Item.ItemId, stack2.Quantity);
+                stack2Copy = new InventoryItemStack(stack2.Item, stack2.Quantity);
             }
 
-            // 交换添加（由于 AddItem 会自动填充，我们需要确保先添加到目标槽位）
-            // 这里简化处理：先添加 stack2 到 index1 的位置，再添加 stack1 到 index2 的位置
-            // 但由于 AddItem 的限制，我们只能尽力而为
-            if (tempItem2 != null && tempQuantity2 > 0)
+            // 交换设置
+            container.SetStack(index1, stack2Copy);
+            container.SetStack(index2, stack1Copy);
+        }
+
+        /// <summary>
+        /// 显示删除确认对话框
+        /// </summary>
+        private void ShowDeleteConfirmDialog(int slotIndex, bool isFromInventory, InventoryItemStack stack)
+        {
+            if (DeleteConfirmDialog == null) 
             {
-                container.AddItem(tempItem2, tempQuantity2);
+                // 如果没有对话框，直接删除（向后兼容）
+                PerformDelete(slotIndex, isFromInventory, stack.Quantity);
+                return;
             }
-            if (tempItem1 != null && tempQuantity1 > 0)
+
+            // 保存待删除信息
+            _pendingDeleteSlotIndex = slotIndex;
+            _pendingDeleteFromInventory = isFromInventory;
+            _pendingDeleteStack = stack;
+
+            // 更新对话框文本，显示物品名称和数量
+            string itemInfo = stack.Quantity > 1 
+                ? $"{stack.Item.DisplayName} x{stack.Quantity}" 
+                : stack.Item.DisplayName;
+            DeleteConfirmDialog.DialogText = $"确定要删除 [{itemInfo}] 吗？\n此操作无法撤销。";
+
+            // 显示对话框
+            DeleteConfirmDialog.PopupCentered();
+        }
+
+        /// <summary>
+        /// 确认删除回调
+        /// </summary>
+        private void OnDeleteConfirmed()
+        {
+            if (_pendingDeleteSlotIndex >= 0 && _pendingDeleteStack != null)
             {
-                container.AddItem(tempItem1, tempQuantity1);
+                PerformDelete(_pendingDeleteSlotIndex, _pendingDeleteFromInventory, _pendingDeleteStack.Quantity);
+            }
+            ClearPendingDelete();
+        }
+
+        /// <summary>
+        /// 取消删除回调
+        /// </summary>
+        private void OnDeleteCanceled()
+        {
+            ClearPendingDelete();
+        }
+
+        /// <summary>
+        /// 执行删除操作
+        /// </summary>
+        private void PerformDelete(int slotIndex, bool isFromInventory, int quantity)
+        {
+            var container = isFromInventory ? _inventoryContainer : _quickBarContainer;
+            if (container != null)
+            {
+                container.RemoveItemFromSlot(slotIndex, quantity);
+                GD.Print($"已删除物品，槽位: {slotIndex}, 数量: {quantity}");
+            }
+        }
+
+        /// <summary>
+        /// 清除待删除状态
+        /// </summary>
+        private void ClearPendingDelete()
+        {
+            _pendingDeleteSlotIndex = -1;
+            _pendingDeleteStack = null;
+        }
+
+        /// <summary>
+        /// 在玩家位置附近生成世界掉落物
+        /// </summary>
+        /// <param name="stack">要掉落的物品堆疊</param>
+        /// <returns>如果生成成功返回 true，否則返回 false</returns>
+        private bool SpawnWorldDropAtPlayer(InventoryItemStack stack)
+        {
+            if (stack == null || stack.IsEmpty)
+            {
+                return false;
+            }
+
+            // 獲取玩家位置
+            var player = GetTree().GetFirstNodeInGroup("player") as Node2D;
+            if (player == null)
+            {
+                GD.PrintErr("無法找到玩家，無法生成世界掉落物");
+                return false;
+            }
+
+            // 在玩家前方稍微偏移的位置生成掉落物
+            var dropPosition = player.GlobalPosition + new Vector2(50, 0);
+
+            // 使用 WorldItemSpawner 生成掉落物
+            var entity = WorldItemSpawner.SpawnFromStack(this, stack, dropPosition);
+            if (entity != null)
+            {
+                // 給掉落物一個隨機的拋出速度
+                var random = new RandomNumberGenerator();
+                random.Randomize();
+                var throwVelocity = new Vector2(
+                    random.RandfRange(-100, 100),
+                    random.RandfRange(-150, -50)
+                );
+                entity.ApplyThrowImpulse(throwVelocity);
+                
+                GD.Print($"已丟棄物品至世界: {stack.Item.DisplayName} x{stack.Quantity}");
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// 嘗試丟棄物品到世界，如果失敗則顯示確認對話框
+        /// </summary>
+        private void TryDropItemToWorld(int slotIndex, bool isFromInventory, InventoryItemStack stack)
+        {
+            if (stack == null || stack.IsEmpty)
+            {
+                return;
+            }
+
+            var container = isFromInventory ? _inventoryContainer : _quickBarContainer;
+            if (container == null)
+            {
+                return;
+            }
+
+            // 嘗試在世界中生成掉落物
+            if (SpawnWorldDropAtPlayer(stack))
+            {
+                // 生成成功，從背包中移除物品
+                container.RemoveItemFromSlot(slotIndex, stack.Quantity);
+            }
+            else
+            {
+                // 生成失敗（例如沒有定義世界場景），顯示確認對話框讓玩家決定是否永久刪除
+                GD.Print($"無法生成世界掉落物，顯示刪除確認對話框");
+                ShowDeleteConfirmDialog(slotIndex, isFromInventory, stack);
             }
         }
 
@@ -395,30 +704,244 @@ namespace Kuros.UI
             if (_isOpen) return;
 
             Visible = true;
+            ProcessMode = ProcessModeEnum.Always; // 确保暂停时也能接收输入
             SetProcessInput(true);
+            SetProcessUnhandledInput(true);
             _isOpen = true;
-            GetTree().Paused = true;
+            
+            // 连接玩家金币变化信号
+            ConnectPlayerGoldSignal();
+            
+            // 更新金币显示
+            UpdateGoldDisplay();
+            
+            // 请求暂停游戏
+            if (PauseManager.Instance != null)
+            {
+                PauseManager.Instance.PushPause();
+            }
+            
+            // 尝试将窗口移到父节点的最后，确保输入处理优先级（后调用的 _Input 会先处理）
+            var parent = GetParent();
+            if (parent != null)
+            {
+                parent.MoveChild(this, parent.GetChildCount() - 1);
+            }
         }
+        
+        /// <summary>
+        /// 连接玩家金币变化信号
+        /// </summary>
+        private void ConnectPlayerGoldSignal()
+        {
+            // 断开之前的连接
+            DisconnectPlayerGoldSignal();
+            
+            // 获取玩家引用
+            _player = GetTree().GetFirstNodeInGroup("player") as SamplePlayer;
+            
+            // 连接信号
+            if (_player != null)
+            {
+                _player.GoldChanged += OnPlayerGoldChanged;
+            }
+        }
+
+        /// <summary>
+        /// 断开玩家金币变化信号连接，防止内存泄漏
+        /// </summary>
+        private void DisconnectPlayerGoldSignal()
+        {
+            if (_player != null)
+            {
+                // 直接取消订阅（C# 中取消订阅不存在的处理器是安全的）
+                _player.GoldChanged -= OnPlayerGoldChanged;
+                _player = null;
+            }
+        }
+        
+        /// <summary>
+        /// 玩家金币变化回调
+        /// </summary>
+        private void OnPlayerGoldChanged(int gold)
+        {
+            UpdateGoldDisplay();
+        }
+        
+        /// <summary>
+        /// 更新金币显示
+        /// </summary>
+        private void UpdateGoldDisplay()
+        {
+            // 尝试从场景中获取玩家
+            var player = GetTree().GetFirstNodeInGroup("player") as SamplePlayer;
+            if (player != null && GoldLabel != null)
+            {
+                int gold = player.GetGold();
+                GoldLabel.Text = $"金币: {gold}";
+            }
+        }
+
 
         public void HideWindow()
         {
-            if (!_isOpen) return;
+            if (!_isOpen && !Visible)
+            {
+                // 如果已经关闭且不可见，直接返回
+                return;
+            }
+
+            // 清理拖拽状态
+            DestroyDragPreview();
+            _draggingSlotIndex = -1;
+            _draggingStack = null;
+            ClearAllSelections();
+            _selectedSlotIndex = -1;
+            
+            // 清理待删除状态
+            ClearPendingDelete();
+            if (DeleteConfirmDialog != null && DeleteConfirmDialog.Visible)
+            {
+                DeleteConfirmDialog.Hide();
+            }
+            
+            // 断开玩家金币变化信号
+            DisconnectPlayerGoldSignal();
 
             Visible = false;
             SetProcessInput(false);
+            SetProcessUnhandledInput(false);
             _isOpen = false;
-            GetTree().Paused = false;
+            
+            // 取消暂停请求
+            if (PauseManager.Instance != null)
+            {
+                PauseManager.Instance.PopPause();
+            }
+            
             EmitSignal(SignalName.InventoryClosed);
+        }
+
+        /// <summary>
+        /// 检查输入事件是否为 ESC 键（通过 action "ui_cancel" 或 Key.Escape）
+        /// </summary>
+        private bool IsEscEvent(InputEvent @event)
+        {
+            if (@event.IsActionPressed("ui_cancel"))
+            {
+                return true;
+            }
+            
+            if (@event is InputEventKey keyEvent && keyEvent.Pressed)
+            {
+                // 直接检查ESC键的keycode（备用方法）
+                if (keyEvent.Keycode == Key.Escape)
+                {
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+
+        /// <summary>
+        /// 检查是否应该处理 ESC 键（物品栏打开且没有 ItemObtainedPopup 激活）
+        /// </summary>
+        private bool ShouldHandleEsc()
+        {
+            // 检查物品栏是否打开
+            if (!Visible || !_isOpen)
+            {
+                return false;
+            }
+
+            // 检查物品获得弹窗是否打开（ESC键在弹窗显示时被完全禁用）
+            var itemPopup = Kuros.Managers.UIManager.Instance?.GetUI<ItemObtainedPopup>("ItemObtainedPopup");
+            if (itemPopup != null && itemPopup.Visible)
+            {
+                // 物品获得弹窗打开时，ESC键被完全禁用，这里不处理
+                return false;
+            }
+
+            return true;
+        }
+
+        public override void _Input(InputEvent @event)
+        {
+            // 检查是否应该处理 ESC（包括弹窗检查）
+            if (!ShouldHandleEsc())
+            {
+                return;
+            }
+
+            // 检查是否为 ESC 事件
+            if (IsEscEvent(@event))
+            {
+                HideWindow();
+                GetViewport().SetInputAsHandled();
+                AcceptEvent(); // 确保事件被接受，防止其他系统处理
+                return;
+            }
+
+            // 处理 M 键（open_inventory）关闭物品栏
+            if (@event.IsActionPressed("open_inventory"))
+            {
+                HideWindow();
+                GetViewport().SetInputAsHandled();
+                AcceptEvent(); // 确保事件被接受，防止其他系统处理
+                return;
+            }
+        }
+
+        public override void _GuiInput(InputEvent @event)
+        {
+            // 检查是否应该处理 ESC（包括弹窗检查）
+            if (!ShouldHandleEsc()) return;
+
+            // 检查是否为 ESC 事件
+            if (IsEscEvent(@event))
+            {
+                HideWindow();
+                AcceptEvent();
+                return;
+            }
         }
 
         public override void _UnhandledInput(InputEvent @event)
         {
-            if (!Visible) return;
-
-            if (@event.IsActionPressed("ui_cancel") || @event.IsActionPressed("open_inventory"))
+            // 检查物品栏是否打开
+            if (!Visible || !_isOpen) return;
+            
+            // 检查是否为 ESC 事件，需要同时检查弹窗状态
+            if (ShouldHandleEsc() && IsEscEvent(@event))
             {
                 HideWindow();
                 GetViewport().SetInputAsHandled();
+                return;
+            }
+            
+            // 如果处于精确换位模式，点击界面外取消选择
+            if (_selectedSlotIndex >= 0 && @event is InputEventMouseButton mouseEvent && 
+                mouseEvent.ButtonIndex == MouseButton.Left && mouseEvent.Pressed)
+            {
+                var globalPos = GetGlobalMousePosition();
+                if (!IsPointInMainPanel(globalPos))
+                {
+                    // 点击界面外，嘗試丟棄選中的物品到世界
+                    var container = _isSelectedFromInventory ? _inventoryContainer : _quickBarContainer;
+                    if (container != null)
+                    {
+                        var stack = container.GetStack(_selectedSlotIndex);
+                        if (stack != null && !stack.IsEmpty)
+                        {
+                            TryDropItemToWorld(_selectedSlotIndex, _isSelectedFromInventory, stack);
+                        }
+                    }
+                    
+                    ClearAllSelections();
+                    _selectedSlotIndex = -1;
+                    GetViewport().SetInputAsHandled();
+                }
             }
         }
     }

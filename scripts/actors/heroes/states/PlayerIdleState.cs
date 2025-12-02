@@ -27,6 +27,8 @@ namespace Kuros.Actors.Heroes.States
 
 		public override void PhysicsUpdate(double delta)
 		{
+			if (HandleDialogueGating(delta)) return;
+			
 			// Check for transitions
 			if (Input.IsActionJustPressed("attack") && Actor.AttackTimer <= 0)
 			{

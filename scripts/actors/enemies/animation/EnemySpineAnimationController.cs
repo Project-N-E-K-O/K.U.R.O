@@ -10,8 +10,7 @@ namespace Kuros.Actors.Enemies.Animation
     }
 
     /// <summary>
-    /// 敌人 Spine 动画控制基础模板，负责统一处理 SpineSprite 的查找与播放。
-    /// 继承该类即可专注于具体敌人的动画切换规则。
+    /// 敌人 Spine 动画控制基础模板，使用 GDScript Helper 绕过 C# GDExtension 绑定问题。
     /// </summary>
     public abstract partial class EnemySpineAnimationController : Node
     {
@@ -21,17 +20,24 @@ namespace Kuros.Actors.Enemies.Animation
         [Export] public string DefaultLoopAnimation { get; set; } = string.Empty;
 
         protected SampleEnemy? Enemy { get; private set; }
-        protected Node? SpineSprite { get; private set; }
-        protected GodotObject? AnimationState => _animationState;
-
-        private GodotObject? _animationState;
+        
+        // GDScript Helper
+        private Node _spineHelper = null!;
 
         public override void _Ready()
         {
             SetProcess(true);
             base._Ready();
             Enemy = Owner as SampleEnemy ?? GetParent() as SampleEnemy ?? GetNodeOrNull<SampleEnemy>("..");
-            RefreshSpineSpriteReference();
+            
+            // Load helper
+            var spineScript = GD.Load<GDScript>("res://scripts/utils/SpineWrapper.gd");
+            if (spineScript != null)
+            {
+                _spineHelper = (Node)spineScript.New();
+                AddChild(_spineHelper);
+            }
+            
             OnControllerReady();
         }
 
@@ -47,15 +53,11 @@ namespace Kuros.Actors.Enemies.Animation
         }
 
         /// <summary>
-        /// 重新查找 SpineSprite，并刷新 AnimationState。
+        /// 为了保持 API 兼容性保留此方法，但实际上不再需要手动刷新引用，因为每次调用 helper 都会重新查找。
         /// </summary>
         protected bool RefreshSpineSpriteReference()
         {
-            var resolvedSprite = ResolveSpineSprite();
-            SpineSprite = resolvedSprite;
-            _animationState = ResolveAnimationState(SpineSprite);
-
-            return SpineSprite != null || _animationState != null;
+            return true; 
         }
 
         protected bool PlayLoop(string animationName, float mixDuration = 0.1f, float timeScale = 1f)
@@ -81,232 +83,63 @@ namespace Kuros.Actors.Enemies.Animation
 
         protected bool QueueAnimation(string animationName, SpineAnimationPlaybackMode mode, float delaySeconds = 0f, float mixDuration = 0.1f, float timeScale = 1f)
         {
-            if (string.IsNullOrEmpty(animationName))
+            if (string.IsNullOrEmpty(animationName) || _spineHelper == null)
             {
                 return false;
             }
 
-            if (!EnsureAnimationInterface())
+            // Call GDScript helper: add_animation(root, anim_name, loop, delay, mix_duration, time_scale)
+            // Pass 'Owner' or 'Enemy' as the root to search for SpineSprite
+            Node targetRoot = Owner ?? (Node?)Enemy ?? this;
+            
+            try
             {
+                var result = _spineHelper.Call("add_animation", targetRoot, animationName, mode == SpineAnimationPlaybackMode.Loop, delaySeconds, mixDuration, timeScale);
+                return result.AsBool();
+            }
+            catch (Exception ex)
+            {
+                GD.PushWarning($"[{Name}] QueueAnimation Failed: {ex.Message}");
                 return false;
             }
-
-            if (!TryCallAddAnimation(animationName, mode == SpineAnimationPlaybackMode.Loop, delaySeconds, mixDuration, timeScale))
-            {
-                GD.PushWarning($"[{Name}] 无法队列 Spine 动画 '{animationName}'。");
-                return false;
-            }
-
-            return true;
         }
 
         protected bool PlayEmpty(float mixDuration = 0.1f)
         {
-            if (!EnsureAnimationInterface())
+            if (_spineHelper == null) return false;
+            
+            Node targetRoot = Owner ?? (Node?)Enemy ?? this;
+            try
+            {
+                var result = _spineHelper.Call("set_empty_animation", targetRoot, TrackIndex, mixDuration);
+                return result.AsBool();
+            }
+            catch
             {
                 return false;
             }
-
-            if (TryCallEmptyAnimation(mixDuration))
-            {
-                return true;
-            }
-
-            GD.PushWarning($"[{Name}] 无法播放空动画。");
-            return false;
         }
 
         private bool PlayInternal(string animationName, SpineAnimationPlaybackMode mode, float mixDuration, float timeScale)
         {
-            if (string.IsNullOrEmpty(animationName))
+            if (string.IsNullOrEmpty(animationName) || _spineHelper == null)
             {
                 return false;
             }
 
-            if (!EnsureAnimationInterface())
-            {
-                return false;
-            }
-
-            if (!TryCallSetAnimation(animationName, mode == SpineAnimationPlaybackMode.Loop, mixDuration, timeScale))
-            {
-                GD.PushWarning($"[{Name}] 无法播放 Spine 动画 '{animationName}'。");
-                return false;
-            }
-
-            return true;
-        }
-
-        private void ApplyTrackEntrySettings(Variant entryVariant, float mixDuration, float timeScale)
-        {
-            if (entryVariant.VariantType != Variant.Type.Object)
-            {
-                return;
-            }
-
-            var entry = entryVariant.AsGodotObject();
-            entry?.Set("mix_duration", mixDuration);
-            entry?.Set("time_scale", timeScale);
-        }
-
-        private Node? ResolveSpineSprite()
-        {
-            Node? sprite = null;
-            if (!SpineSpritePath.IsEmpty)
-            {
-                sprite = GetNodeOrNull<Node>(SpineSpritePath);
-                if (sprite == null && Owner is Node ownerNode)
-                {
-                    sprite = ownerNode.GetNodeOrNull<Node>(SpineSpritePath);
-                }
-            }
-
-            sprite ??= GetNodeOrNull<Node>("SpineSprite");
-            if (sprite == null && Owner is Node owner)
-            {
-                sprite = owner.GetNodeOrNull<Node>("SpineSprite");
-            }
-
-            return sprite;
-        }
-
-        private GodotObject? ResolveAnimationState(Node? sprite)
-        {
-            if (sprite == null)
-            {
-                return null;
-            }
-
+            Node targetRoot = Owner ?? (Node?)Enemy ?? this;
+            
             try
             {
-                if (sprite.HasMethod("get_animation_state"))
-                {
-                    var result = sprite.Call("get_animation_state");
-                    return result.VariantType == Variant.Type.Nil ? null : result.AsGodotObject();
-                }
-
-                Variant stateVariant = sprite.Get("animation_state");
-                return stateVariant.VariantType == Variant.Type.Nil ? null : stateVariant.AsGodotObject();
+                // Call GDScript helper: play_animation(root, anim_name, loop, mix_duration, time_scale)
+                var result = _spineHelper.Call("play_animation", targetRoot, animationName, mode == SpineAnimationPlaybackMode.Loop, mixDuration, timeScale);
+                return result.AsBool();
             }
             catch (Exception ex)
             {
-                GD.PushWarning($"[{Name}] 无法获取 Spine animation_state: {ex.Message}");
-                return null;
+                GD.PushWarning($"[{Name}] PlayInternal Failed: {ex.Message}");
+                return false;
             }
-        }
-
-        private bool EnsureAnimationInterface()
-        {
-            if (SpineSprite != null)
-            {
-                if (_animationState == null)
-                {
-                    _animationState = ResolveAnimationState(SpineSprite);
-                }
-
-                return true;
-            }
-
-            return RefreshSpineSpriteReference();
-        }
-
-        private bool TryCallSetAnimation(string animationName, bool loop, float mixDuration, float timeScale)
-        {
-            if (_animationState != null && _animationState.HasMethod("set_animation"))
-            {
-                try
-                {
-                    Variant result = _animationState.Call("set_animation", animationName, loop);
-                    ApplyTrackEntrySettings(result, mixDuration, timeScale);
-                    return true;
-                }
-                catch (Exception ex)
-                {
-                    GD.PushWarning($"[{Name}] 调用 animation_state.set_animation 失败: {ex.Message}");
-                }
-            }
-
-            if (SpineSprite != null && SpineSprite.HasMethod("set_animation"))
-            {
-                try
-                {
-                    Variant result = SpineSprite.Call("set_animation", animationName, loop);
-                    ApplyTrackEntrySettings(result, mixDuration, timeScale);
-                    return true;
-                }
-                catch (Exception ex)
-                {
-                    GD.PushWarning($"[{Name}] 调用 SpineSprite.set_animation 失败: {ex.Message}");
-                }
-            }
-
-            return false;
-        }
-
-        private bool TryCallAddAnimation(string animationName, bool loop, float delaySeconds, float mixDuration, float timeScale)
-        {
-            if (_animationState != null && _animationState.HasMethod("add_animation"))
-            {
-                try
-                {
-                    Variant result = _animationState.Call("add_animation", animationName, loop, delaySeconds);
-                    ApplyTrackEntrySettings(result, mixDuration, timeScale);
-                    return true;
-                }
-                catch (Exception ex)
-                {
-                    GD.PushWarning($"[{Name}] 调用 animation_state.add_animation 失败: {ex.Message}");
-                }
-            }
-
-            if (SpineSprite != null && SpineSprite.HasMethod("add_animation"))
-            {
-                try
-                {
-                    Variant result = SpineSprite.Call("add_animation", animationName, loop, delaySeconds);
-                    ApplyTrackEntrySettings(result, mixDuration, timeScale);
-                    return true;
-                }
-                catch (Exception ex)
-                {
-                    GD.PushWarning($"[{Name}] 调用 SpineSprite.add_animation 失败: {ex.Message}");
-                }
-            }
-
-            return false;
-        }
-
-        private bool TryCallEmptyAnimation(float mixDuration)
-        {
-            if (_animationState != null && _animationState.HasMethod("set_empty_animation"))
-            {
-                try
-                {
-                    _animationState.Call("set_empty_animation", mixDuration);
-                    return true;
-                }
-                catch (Exception ex)
-                {
-                    GD.PushWarning($"[{Name}] 调用 animation_state.set_empty_animation 失败: {ex.Message}");
-                }
-            }
-
-            if (SpineSprite != null && SpineSprite.HasMethod("set_empty_animation"))
-            {
-                try
-                {
-                    SpineSprite.Call("set_empty_animation", mixDuration);
-                    return true;
-                }
-                catch (Exception ex)
-                {
-                    GD.PushWarning($"[{Name}] 调用 SpineSprite.set_empty_animation 失败: {ex.Message}");
-                }
-            }
-
-            return false;
         }
     }
 }
-
-

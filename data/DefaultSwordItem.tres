@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/ItemDefinition.cs" id="1_item_def"]
+[ext_resource type="Texture2D" path="res://icon.svg" id="2_icon"]
+
+[resource]
+script = ExtResource("1_item_def")
+ItemId = "default_wooden_sword"
+DisplayName = "小木剑"
+Description = "一把普通的小木剑，默认装备在快捷栏1"
+Icon = ExtResource("2_icon")
+Category = "Weapon"
+MaxStackSize = 1
+

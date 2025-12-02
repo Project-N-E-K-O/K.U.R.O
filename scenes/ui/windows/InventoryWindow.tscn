@@ -1,16 +1,18 @@
-[gd_scene load_steps=2 format=3 uid="uid://inventory_window_ui"]
+[gd_scene load_steps=3 format=3 uid="uid://bpad88uh6vf2y"]
 
-[ext_resource type="Script" path="res://scripts/ui/InventoryWindow.cs" id="1_inventory_window_script"]
+[ext_resource type="Script" uid="uid://w3ehegcj4w8s" path="res://scripts/ui/InventoryWindow.cs" id="1_inventory_window_script"]
+
+[sub_resource type="StyleBoxFlat" id="PanelStyle_TrashBin"]
+bg_color = Color(0.5, 0.2, 0.2, 0.8)
 
 [node name="InventoryWindow" type="Control"]
+visible = false
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 0
-visible = false
 script = ExtResource("1_inventory_window_script")
 
 [node name="Background" type="ColorRect" parent="."]
@@ -24,7 +26,7 @@ color = Color(0, 0, 0, 0.85)
 
 [node name="MainPanel" type="Panel" parent="."]
 layout_mode = 1
-anchors_preset = 7
+anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
@@ -38,7 +40,7 @@ grow_vertical = 2
 
 [node name="Header" type="HBoxContainer" parent="MainPanel"]
 layout_mode = 1
-anchors_preset = 10
+anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -180.0
@@ -50,14 +52,20 @@ grow_horizontal = 2
 [node name="Title" type="Label" parent="MainPanel/Header"]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 28
 text = "物品栏"
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 28
+
+[node name="GoldLabel" type="Label" parent="MainPanel/Header"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 18
+text = "金币: 0"
 
 [node name="CloseButton" type="Button" parent="MainPanel/Header"]
 layout_mode = 2
-text = "关闭"
 theme_override_font_sizes/font_size = 18
+text = "关闭"
 
 [node name="Body" type="VBoxContainer" parent="MainPanel"]
 layout_mode = 1
@@ -78,15 +86,15 @@ theme_override_constants/separation = 8
 
 [node name="InventoryTitle" type="Label" parent="MainPanel/Body/InventorySection"]
 layout_mode = 2
-text = "物品栏"
 theme_override_font_sizes/font_size = 20
+text = "物品栏"
 
 [node name="InventoryGrid" type="GridContainer" parent="MainPanel/Body/InventorySection"]
 layout_mode = 2
 size_flags_vertical = 3
-columns = 4
 theme_override_constants/h_separation = 8
 theme_override_constants/v_separation = 8
+columns = 4
 
 [node name="QuickBarSection" type="VBoxContainer" parent="MainPanel/Body"]
 layout_mode = 2
@@ -94,11 +102,35 @@ theme_override_constants/separation = 8
 
 [node name="QuickBarTitle" type="Label" parent="MainPanel/Body/QuickBarSection"]
 layout_mode = 2
-text = "快捷栏"
 theme_override_font_sizes/font_size = 20
+text = "快捷栏"
 
 [node name="QuickBarContainer" type="HBoxContainer" parent="MainPanel/Body/QuickBarSection"]
 layout_mode = 2
-alignment = 1
 theme_override_constants/separation = 8
+alignment = 1
 
+[node name="TrashBin" type="Panel" parent="MainPanel/Body"]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+theme_override_styles/panel = SubResource("PanelStyle_TrashBin")
+
+[node name="TrashLabel" type="Label" parent="MainPanel/Body/TrashBin"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 14
+text = "垃圾桶"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DeleteConfirmDialog" type="ConfirmationDialog" parent="."]
+title = "确认删除"
+initial_position = 2
+size = Vector2i(300, 120)
+ok_button_text = "确认删除"
+cancel_button_text = "取消"
+dialog_text = "确定要删除这个物品吗？此操作无法撤销。"

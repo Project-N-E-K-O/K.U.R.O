@@ -1,3 +1,4 @@
+using System;
 using Godot;
 using Kuros.Core;
 using Kuros.Items.World;
@@ -119,18 +120,52 @@ namespace Kuros.Actors.Heroes
 
             if (entity == null)
             {
-                if (InventoryComponent.TryReturnStackToSelectedSlot(extracted, out var returned) && returned > 0 && extracted != null)
+                // Recovery path: spawn failed, try to return extracted items to inventory
+                if (extracted == null || extracted.IsEmpty)
                 {
-                    if (!extracted.IsEmpty)
+                    return false;
+                }
+
+                int originalQuantity = extracted.Quantity;
+                int totalRecovered = 0;
+
+                // Step 1: Try to return items to the selected slot first
+                // Note: TryReturnStackToSelectedSlot already removes accepted items from extracted
+                if (InventoryComponent.TryReturnStackToSelectedSlot(extracted, out var returnedToSlot))
+                {
+                    totalRecovered += returnedToSlot;
+                }
+
+                // Step 2: If there are remaining items, try to add them to any available inventory slot
+                if (!extracted.IsEmpty && InventoryComponent.Backpack != null)
+                {
+                    int remainingQuantity = extracted.Quantity;
+                    int addedToBackpack = InventoryComponent.Backpack.AddItem(extracted.Item, remainingQuantity);
+
+                    if (addedToBackpack > 0)
                     {
-                        InventoryComponent.TryAddItem(extracted.Item, extracted.Quantity);
-                        extracted.Remove(extracted.Quantity);
+                        totalRecovered += addedToBackpack;
+                        // Only remove the amount that was successfully added (with safety clamp)
+                        int safeRemove = Math.Min(addedToBackpack, extracted.Quantity);
+                        if (safeRemove > 0)
+                        {
+                            extracted.Remove(safeRemove);
+                        }
                     }
                 }
-                else if (extracted != null && !extracted.IsEmpty)
+
+                // Step 3: Handle any remaining items that couldn't be recovered
+                if (!extracted.IsEmpty)
                 {
-                    InventoryComponent.TryAddItem(extracted.Item, extracted.Quantity);
-                    extracted.Remove(extracted.Quantity);
+                    int lostQuantity = extracted.Quantity;
+                    GameLogger.Error(
+                        nameof(PlayerItemInteractionComponent),
+                        $"[Item Recovery] Failed to recover {lostQuantity}x '{extracted.Item?.ItemId ?? "unknown"}' " +
+                        $"(recovered {totalRecovered}/{originalQuantity}). Items lost due to spawn failure and full inventory.");
+
+                    // Clear the extracted stack to maintain consistency
+                    // Note: These items are lost - inventory is full
+                    extracted.Remove(lostQuantity);
                 }
 
                 return false;
@@ -168,7 +203,15 @@ namespace Kuros.Actors.Heroes
                 return;
             }
 
-            _actor.StateMachine.ChangeState("PickUp");
+            if (_actor.StateMachine.HasState("PickUp"))
+            {
+                _actor.StateMachine.ChangeState("PickUp");
+            }
+            else
+            {
+                GameLogger.Warn(nameof(PlayerItemInteractionComponent), "StateMachine 中未找到 'PickUp' 状态，直接执行拾取逻辑。");
+                TryHandlePickup();
+            }
         }
 
         private bool TryHandlePickup()
@@ -254,4 +297,3 @@ namespace Kuros.Actors.Heroes
         }
     }
 }
-

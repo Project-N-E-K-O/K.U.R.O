@@ -24,6 +24,46 @@ namespace Kuros.UI
 		private bool _suppressWindowSelection = false;
 		private int _pendingPresetIndex = -1;
 
+        /// <summary>
+        /// 使用 Godot 原生 Connect 方法连接按钮信号
+        /// 这种方式在导出版本中比 C# 委托方式更可靠
+        /// </summary>
+        private void ConnectButtonSignal(Button? button, string methodName)
+        {
+            if (button == null) return;
+            var callable = new Callable(this, methodName);
+            if (!button.IsConnected(Button.SignalName.Pressed, callable))
+            {
+                button.Connect(Button.SignalName.Pressed, callable);
+            }
+        }
+
+        /// <summary>
+        /// 使用 Godot 原生 Connect 方法连接滑块信号
+        /// </summary>
+        private void ConnectSliderSignal(Slider? slider, string methodName)
+        {
+            if (slider == null) return;
+            var callable = new Callable(this, methodName);
+            if (!slider.IsConnected(Slider.SignalName.ValueChanged, callable))
+            {
+                slider.Connect(Slider.SignalName.ValueChanged, callable);
+            }
+        }
+
+        /// <summary>
+        /// 使用 Godot 原生 Connect 方法连接选项按钮信号
+        /// </summary>
+        private void ConnectOptionButtonSignal(OptionButton? optionButton, string methodName)
+        {
+            if (optionButton == null) return;
+            var callable = new Callable(this, methodName);
+            if (!optionButton.IsConnected(OptionButton.SignalName.ItemSelected, callable))
+            {
+                optionButton.Connect(OptionButton.SignalName.ItemSelected, callable);
+            }
+        }
+
         public override void _Ready()
         {
             // 确保在游戏暂停时也能接收输入
@@ -41,7 +81,7 @@ namespace Kuros.UI
             }
             if (MasterVolumeSlider != null)
             {
-                MasterVolumeSlider.ValueChanged += OnMasterVolumeChanged;
+                ConnectSliderSignal(MasterVolumeSlider, nameof(OnMasterVolumeChanged));
                 MasterVolumeSlider.Value = 100.0;
             }
 
@@ -51,7 +91,7 @@ namespace Kuros.UI
             }
             if (MusicVolumeSlider != null)
             {
-                MusicVolumeSlider.ValueChanged += OnMusicVolumeChanged;
+                ConnectSliderSignal(MusicVolumeSlider, nameof(OnMusicVolumeChanged));
                 MusicVolumeSlider.Value = 100.0;
             }
 
@@ -61,7 +101,7 @@ namespace Kuros.UI
             }
             if (SFXVolumeSlider != null)
             {
-                SFXVolumeSlider.ValueChanged += OnSFXVolumeChanged;
+                ConnectSliderSignal(SFXVolumeSlider, nameof(OnSFXVolumeChanged));
                 SFXVolumeSlider.Value = 100.0;
             }
 
@@ -75,15 +115,13 @@ namespace Kuros.UI
             if (LanguageOption != null)
             {
                 LanguageOption.Clear();
-                LanguageOption.ItemSelected += OnLanguageSelected;
+                ConnectOptionButtonSignal(LanguageOption, nameof(OnLanguageSelected));
                 LanguageOption.AddItem("简体中文");
                 LanguageOption.AddItem("English");
             }
 
-            if (BackButton != null)
-            {
-                BackButton.Pressed += OnBackPressed;
-            }
+            // 使用 Godot 原生 Connect 方法连接信号，在导出版本中更可靠
+            ConnectButtonSignal(BackButton, nameof(OnBackPressed));
         }
 
         private void OnMasterVolumeChanged(double value)
@@ -120,7 +158,7 @@ namespace Kuros.UI
 			{
 				WindowModeOption.AddItem(presets[i].DisplayName, i);
 			}
-			WindowModeOption.ItemSelected += OnWindowModeSelected;
+			ConnectOptionButtonSignal(WindowModeOption, nameof(OnWindowModeSelected));
 
 			RestoreSelectedPreset();
 		}
@@ -134,8 +172,17 @@ namespace Kuros.UI
 
 			if (RestartDialog == null) return;
 
-			RestartDialog.Confirmed += OnRestartConfirmed;
-			RestartDialog.Canceled += OnRestartCanceled;
+			// 使用 Godot 原生 Connect 方法连接对话框信号
+			var confirmedCallable = new Callable(this, nameof(OnRestartConfirmed));
+			if (!RestartDialog.IsConnected(ConfirmationDialog.SignalName.Confirmed, confirmedCallable))
+			{
+				RestartDialog.Connect(ConfirmationDialog.SignalName.Confirmed, confirmedCallable);
+			}
+			var canceledCallable = new Callable(this, nameof(OnRestartCanceled));
+			if (!RestartDialog.IsConnected(ConfirmationDialog.SignalName.Canceled, canceledCallable))
+			{
+				RestartDialog.Connect(ConfirmationDialog.SignalName.Canceled, canceledCallable);
+			}
 		}
 
 		private void OnWindowModeSelected(long index)

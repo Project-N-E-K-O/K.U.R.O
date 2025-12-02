@@ -11,6 +11,7 @@ namespace Kuros.UI
         [Export] public TextureRect ItemIcon { get; private set; } = null!;
         [Export] public Label QuantityLabel { get; private set; } = null!;
         [Export] public Label SlotLabel { get; private set; } = null!;
+        [Export] public Texture2D? PlaceholderIcon { get; set; } // 占位符图标
 
         public int SlotIndex { get; set; } = -1;
         public InventoryItemStack? ItemStack { get; private set; }
@@ -19,6 +20,7 @@ namespace Kuros.UI
         private bool _isSelected = false; // 用于双击选择
         private double _lastClickTime = 0;
         private const double DoubleClickTime = 0.3; // 双击时间间隔（秒）
+        private Vector2 _dragStartPosition = Vector2.Zero;
 
         public void ClearSelection()
         {
@@ -26,10 +28,17 @@ namespace Kuros.UI
             QueueRedraw();
         }
 
+        public void SetSelected(bool selected)
+        {
+            _isSelected = selected;
+            QueueRedraw();
+        }
+
         [Signal] public delegate void SlotClickedEventHandler(int slotIndex);
         [Signal] public delegate void SlotDragStartedEventHandler(int slotIndex, Vector2 position);
         [Signal] public delegate void SlotDragEndedEventHandler(int slotIndex, Vector2 position);
         [Signal] public delegate void SlotDoubleClickedEventHandler(int slotIndex);
+        [Signal] public delegate void SlotDragUpdateEventHandler(int slotIndex, Vector2 position);
 
         public override void _Ready()
         {
@@ -55,27 +64,45 @@ namespace Kuros.UI
         {
             if (ItemStack == null || ItemStack.IsEmpty)
             {
+                // 槽位为空时，使用占位符图标（如果已设置）
                 if (ItemIcon != null)
                 {
-                    ItemIcon.Texture = null;
-                    ItemIcon.Visible = false;
+                    if (PlaceholderIcon != null)
+                    {
+                        // 如果设置了占位符图标，显示它
+                        ItemIcon.Texture = PlaceholderIcon;
+                        ItemIcon.Visible = true;
+                        ItemIcon.Modulate = Colors.White;
+                    }
+                    else
+                    {
+                        // 如果没有占位符图标，隐藏图标
+                        ItemIcon.Texture = null;
+                        ItemIcon.Visible = false;
+                        ItemIcon.Modulate = Colors.White;
+                    }
                 }
+                // 隐藏数量标签
                 if (QuantityLabel != null)
                 {
                     QuantityLabel.Text = string.Empty;
                     QuantityLabel.Visible = false;
                 }
+                // 隐藏槽位标签（空槽位时不需要显示文本）
                 if (SlotLabel != null)
                 {
-                    SlotLabel.Visible = true;
+                    SlotLabel.Text = string.Empty;
+                    SlotLabel.Visible = false;
                 }
             }
             else
             {
+                // 槽位有物品时，显示图标和数量
                 if (ItemIcon != null)
                 {
                     ItemIcon.Texture = ItemStack.Item.Icon;
-                    ItemIcon.Visible = ItemStack.Item.Icon != null;
+                    ItemIcon.Visible = ItemIcon.Texture != null;
+                    ItemIcon.Modulate = Colors.White;
                 }
                 if (QuantityLabel != null)
                 {
@@ -117,7 +144,8 @@ namespace Kuros.UI
                     if (ItemStack != null && !ItemStack.IsEmpty)
                     {
                         _isDragging = true;
-                        EmitSignal(SignalName.SlotDragStarted, SlotIndex, GetGlobalMousePosition());
+                        _dragStartPosition = GetGlobalMousePosition();
+                        EmitSignal(SignalName.SlotDragStarted, SlotIndex, _dragStartPosition);
                         GetViewport().SetInputAsHandled();
                     }
                     else
@@ -135,6 +163,11 @@ namespace Kuros.UI
                     EmitSignal(SignalName.SlotDragEnded, SlotIndex, GetGlobalMousePosition());
                     GetViewport().SetInputAsHandled();
                 }
+            }
+            else if (@event is InputEventMouseMotion motionEvent && _isDragging)
+            {
+                // 拖拽过程中持续发送位置更新
+                EmitSignal(SignalName.SlotDragUpdate, SlotIndex, GetGlobalMousePosition());
             }
         }
 

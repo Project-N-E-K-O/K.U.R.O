@@ -19,11 +19,15 @@ config/icon="res://icon.svg"
 
 UIManager="*res://scripts/managers/UIManager.cs"
 GameSettingsManager="*res://scripts/managers/GameSettingsManager.cs"
+DialogueManager="*res://scripts/managers/DialogueManager.cs"
+SaveManager="*res://scripts/managers/SaveManager.cs"
+PauseManager="*res://scripts/managers/PauseManager.cs"
 
 [display]
 
 window/size/viewport_width=1920
 window/size/viewport_height=1080
+window/size/mode=2
 window/size/initial_position_type=2
 window/stretch/mode="canvas_items"
 
@@ -35,7 +39,7 @@ project/assembly_name="Kuros"
 
 ui_cancel={
 "deadzone": 0.5,
-"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":4194309,"key_label":0,"unicode":0,"location":0,"echo":false,"script":null)
+"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":4194309,"physical_keycode":4194309,"key_label":0,"unicode":0,"location":0,"echo":false,"script":null)
 ]
 }
 move_left={

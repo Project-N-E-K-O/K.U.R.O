@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://dtsmttnniddo0"]
+
+[ext_resource type="Script" path="res://scripts/properties/ExampleProperty.cs" id="2_a1o0p"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_bqvme"]
+size = Vector2(20, 20)
+
+[node name="ExampleProperty" type="Node2D"]
+script = ExtResource("2_a1o0p")
+ScoreBonus = 10
+
+[node name="Sprite2D" type="Sprite2D" parent="." index="1"]
+texture = SubResource("PlaceholderTexture2D_bqvme")

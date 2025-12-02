@@ -19,6 +19,8 @@ namespace Kuros.Actors.Heroes.States
 
 		public override void PhysicsUpdate(double delta)
 		{
+			if (HandleDialogueGating(delta)) return;
+			
 			if (Input.IsActionJustPressed("attack") && Actor.AttackTimer <= 0)
 			{
 				Player.RequestAttackFromState(Name);

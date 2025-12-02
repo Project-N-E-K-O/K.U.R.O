@@ -26,7 +26,6 @@ namespace Kuros.Actors.Enemies.Attacks
         [Export(PropertyHint.Range, "0,10,0.01")] public float CooldownDuration = 1.0f;
 
         [ExportCategory("Combat")]
-        [Export(PropertyHint.Range, "0,500,1")] public float DetectionRangeBonus = 0.0f;
         [Export(PropertyHint.Range, "0,180,1")] public float MaxAllowedAngleToPlayer = 135.0f;
         [Export] public string AnimationName = "animations/attack";
         [Export] public NodePath AttackAreaPath = new NodePath();
@@ -67,7 +66,7 @@ namespace Kuros.Actors.Enemies.Attacks
             if (IsRunning || IsOnCooldown) return false;
             if (Enemy.AttackTimer > 0) return false;
 
-            if (!Enemy.IsPlayerWithinDetectionRange(DetectionRangeBonus))
+            if (!Enemy.IsPlayerWithinDetectionRange())
             {
                 return false;
             }

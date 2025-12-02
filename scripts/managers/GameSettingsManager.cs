@@ -1,6 +1,5 @@
 using Godot;
 using System;
-using System.Linq;
 
 namespace Kuros.Managers
 {
@@ -11,9 +10,7 @@ namespace Kuros.Managers
 	{
 		public static GameSettingsManager Instance { get; private set; } = null!;
 
-		private const string ConfigDirectory = "user://config";
-		private const string ConfigFileName = "window_settings.cfg";
-		private static readonly string ConfigPath = $"{ConfigDirectory}/{ConfigFileName}";
+		private const string ConfigPath = "user://config/window_settings.cfg";
 		private const string WindowSection = "Window";
 		private const string PresetKey = "Preset";
 
@@ -38,8 +35,35 @@ namespace Kuros.Managers
 			}
 
 			Instance = this;
+			EnsureConfigDirectoryExists();
 			LoadSettings();
 			ApplyCurrentPreset();
+		}
+
+		/// <summary>
+		/// 确保配置目录存在
+		/// </summary>
+		private void EnsureConfigDirectoryExists()
+		{
+			var dirAccess = DirAccess.Open("user://");
+			if (dirAccess == null)
+			{
+				GD.PrintErr("GameSettingsManager: 无法打开 user:// 目录");
+				return;
+			}
+
+			if (!dirAccess.DirExists("config"))
+			{
+				var err = dirAccess.MakeDir("config");
+				if (err != Error.Ok)
+				{
+					GD.PrintErr($"GameSettingsManager: 无法创建 config 目录，错误: {err}");
+				}
+				else
+				{
+					GD.Print("GameSettingsManager: 已创建 config 目录");
+				}
+			}
 		}
 
 		public void ApplyCurrentPreset()
@@ -70,7 +94,12 @@ namespace Kuros.Managers
 			}
 		}
 
-		public int GetPresetIndex(string presetId)
+		private WindowPreset GetDefaultPreset()
+		{
+			return _presets[0];
+		}
+
+		private int FindPresetIndex(string presetId)
 		{
 			for (int i = 0; i < _presets.Length; i++)
 			{
@@ -79,32 +108,38 @@ namespace Kuros.Managers
 					return i;
 				}
 			}
-			return 0;
+			return -1;
+		}
+
+		public int GetPresetIndex(string presetId)
+		{
+			var index = FindPresetIndex(presetId);
+			return index >= 0 ? index : 0;
 		}
 
 		public WindowPreset GetPresetByIndex(int index)
 		{
 			if (index < 0 || index >= _presets.Length)
 			{
-				return _presets[0];
+				return GetDefaultPreset();
 			}
 			return _presets[index];
+		}
+
+		private WindowPreset GetPresetById(string presetId)
+		{
+			var index = FindPresetIndex(presetId);
+			return index >= 0 ? _presets[index] : GetDefaultPreset();
 		}
 
 		private void LoadSettings()
 		{
 			var config = new ConfigFile();
-			EnsureConfigDirectory();
 			var result = config.Load(ConfigPath);
 
 			if (result == Error.Ok)
 			{
 				_currentPresetId = (string)config.GetValue(WindowSection, PresetKey, _currentPresetId);
-			}
-			else if (result == Error.FileNotFound)
-			{
-				GD.Print($"GameSettingsManager: 首次运行未找到配置，创建默认文件: {ConfigPath}");
-				SaveSettings();
 			}
 			else
 			{
@@ -118,18 +153,11 @@ namespace Kuros.Managers
 			var config = new ConfigFile();
 			config.SetValue(WindowSection, PresetKey, _currentPresetId);
 
-			EnsureConfigDirectory();
 			var err = config.Save(ConfigPath);
 			if (err != Error.Ok)
 			{
 				GD.PushWarning($"GameSettingsManager: 保存配置失败 ({err})，路径: {ConfigPath}");
 			}
-		}
-
-		private static void EnsureConfigDirectory()
-		{
-			var absolutePath = ProjectSettings.GlobalizePath(ConfigDirectory);
-			DirAccess.MakeDirRecursiveAbsolute(absolutePath);
 		}
 
 		private void CenterWindow()
@@ -148,12 +176,7 @@ namespace Kuros.Managers
 			ProjectSettings.SetSetting("display/window/size/resizable", true);
 		}
 
-		private WindowPreset GetPresetById(string presetId)
-		{
-			var preset = _presets.FirstOrDefault(p => p.Id == presetId);
-			return preset.Id == null ? _presets[0] : preset;
-		}
-
 		public readonly record struct WindowPreset(string Id, string DisplayName, DisplayServer.WindowMode Mode, Vector2I Size);
 	}
 }
+

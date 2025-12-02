@@ -6,7 +6,6 @@ public partial class EnemyChaseMovement : Node
 {
     private const string MovementMetaKey = "__movement_component_registered";
 
-    [Export] public float DetectionRangeOverride = -1f;
     [Export] public string IdleStateName = "Idle";
     [Export] public string WalkStateName = "Walk";
     private static readonly StringName AttackStateName = new("Attack");
@@ -79,9 +78,6 @@ public partial class EnemyChaseMovement : Node
         if (Engine.IsEditorHint() || Enemy == null) return;
         if (Enemy.StateMachine == null) return;
 
-        var player = Enemy.PlayerTarget;
-        if (player == null) return;
-
         string currentState = Enemy.StateMachine.CurrentState?.Name ?? string.Empty;
         if (IsBlocked(currentState))
         {
@@ -90,14 +86,11 @@ public partial class EnemyChaseMovement : Node
             return;
         }
 
-        float detectionRange = DetectionRangeOverride > 0 ? DetectionRangeOverride : Enemy.DetectionRange;
-        Vector2 toPlayer = player.GlobalPosition - Enemy.GlobalPosition;
-        float distance = toPlayer.Length();
-
-        if (distance <= detectionRange)
+        // 使用 DetectionArea 碰撞检测
+        if (Enemy.IsPlayerWithinDetectionRange())
         {
             EnsureState(WalkStateName, currentState);
-            Vector2 direction = toPlayer == Vector2.Zero ? Vector2.Zero : toPlayer.Normalized();
+            Vector2 direction = Enemy.GetDirectionToPlayer();
             Enemy.Velocity = direction * Enemy.Speed;
 
             if (direction.X != 0)

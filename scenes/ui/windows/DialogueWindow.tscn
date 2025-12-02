@@ -1,0 +1,115 @@
+[gd_scene load_steps=2 format=3 uid="uid://dialogue_window_ui"]
+
+[ext_resource type="Script" path="res://scripts/ui/DialogueWindow.cs" id="1_dialogue_window_script"]
+
+[node name="DialogueWindow" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+visible = false
+script = ExtResource("1_dialogue_window_script")
+
+[node name="MainPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -500.0
+offset_top = -200.0
+offset_right = 500.0
+offset_bottom = 0.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="Header" type="HBoxContainer" parent="MainPanel"]
+layout_mode = 1
+anchors_preset = 10
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -480.0
+offset_top = 8.0
+offset_right = 480.0
+offset_bottom = 40.0
+grow_horizontal = 2
+
+[node name="GoldLabel" type="Label" parent="MainPanel/Header"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 18
+text = "金币: 0"
+
+[node name="SpeakerNameLabel" type="Label" parent="MainPanel/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 24
+text = "NPC名称"
+horizontal_alignment = 1
+
+[node name="Body" type="HBoxContainer" parent="MainPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 48.0
+offset_right = -8.0
+offset_bottom = -48.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PortraitTextureRect" type="TextureRect" parent="MainPanel/Body"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+stretch_mode = 5
+texture_filter = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MainPanel/Body"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DialogueTextLabel" type="RichTextLabel" parent="MainPanel/Body/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "对话内容将显示在这里..."
+autowrap_mode = 2
+fit_content = true
+
+[node name="ChoicesContainer" type="VBoxContainer" parent="MainPanel/Body/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 0
+visible = false
+
+[node name="Footer" type="HBoxContainer" parent="MainPanel"]
+layout_mode = 1
+anchors_preset = 12
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -240.0
+offset_top = -40.0
+offset_right = 240.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="InstructionLabel" type="Label" parent="MainPanel/Footer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 14
+text = "按 [Space] 继续 / [Esc] 跳过"
+horizontal_alignment = 1
+
+[node name="ContinueButton" type="Button" parent="MainPanel/Footer"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "继续"
+

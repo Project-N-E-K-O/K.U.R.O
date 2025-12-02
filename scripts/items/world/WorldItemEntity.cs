@@ -6,6 +6,7 @@ using Kuros.Actors.Heroes;
 using Kuros.Core;
 using Kuros.Items.Effects;
 using Kuros.Items;
+using Kuros.Managers;
 using Kuros.Systems.Inventory;
 using Kuros.Utils;
 
@@ -87,6 +88,12 @@ namespace Kuros.Items.World
                 return;
             }
 
+            // 检查对话是否激活，如果激活则不处理拾取（让NPC交互优先）
+            if (DialogueManager.Instance != null && DialogueManager.Instance.IsDialogueActive)
+            {
+                return;
+            }
+
             if (Input.IsActionJustPressed("take_up"))
             {
                 HandlePickupRequest(_focusedActor);
@@ -151,6 +158,45 @@ namespace Kuros.Items.World
             Velocity = velocity;
         }
 
+        /// <summary>
+        /// 供外部调用的拾取方法（如状态机或其他组件触发）
+        /// </summary>
+        public bool TryPickupByActor(GameActor actor)
+        {
+            if (_isPicked)
+            {
+                return false;
+            }
+
+            if (!TryTransferToActor(actor))
+            {
+                return false;
+            }
+
+            ApplyItemEffects(actor, ItemEffectTrigger.OnPickup);
+
+            // 检查是否为部分转移（地面仍有剩余物品）
+            if (Quantity > 0)
+            {
+                // 部分转移 - 发出信号但保持实体可交互
+                if (_lastTransferredItem != null && _lastTransferredAmount > 0)
+                {
+                    EmitSignal(SignalName.ItemTransferred, this, actor, _lastTransferredItem, _lastTransferredAmount);
+                }
+                return true;
+            }
+
+            // 完整转移 - 继续正常的拾取完成流程
+            _isPicked = true;
+            if (AutoDisableTriggerOnPickup)
+            {
+                DisableTriggerArea();
+            }
+
+            OnPicked(actor);
+            return true;
+        }
+
         private void ResolveTriggerArea()
         {
             if (TriggerArea == null)
@@ -180,7 +226,11 @@ namespace Kuros.Items.World
         {
             if (body is GameActor actor)
             {
-                _focusedActor = actor;
+                // 只有在没有聚焦 actor 时才设置新的，避免多人模式下焦点被抢夺
+                if (_focusedActor == null)
+                {
+                    _focusedActor = actor;
+                }
             }
         }
 
@@ -203,30 +253,6 @@ namespace Kuros.Items.World
             {
                 EmitSignal(SignalName.ItemTransferFailed, this, actor);
             }
-        }
-
-        public bool TryPickupByActor(GameActor actor)
-        {
-            if (_isPicked)
-            {
-                return false;
-            }
-
-            if (!TryTransferToActor(actor))
-            {
-                return false;
-            }
-
-            ApplyItemEffects(actor, ItemEffectTrigger.OnPickup);
-
-            _isPicked = true;
-            if (AutoDisableTriggerOnPickup)
-            {
-                DisableTriggerArea();
-            }
-
-            OnPicked(actor);
-            return true;
         }
 
         private void DisableTriggerArea()
@@ -294,6 +320,7 @@ namespace Kuros.Items.World
                 return false;
             }
 
+            // 使用选中槽位添加物品
             int accepted = inventory.TryAddItemToSelectedSlot(stack.Item, stack.Quantity);
             if (accepted <= 0)
             {
@@ -310,7 +337,7 @@ namespace Kuros.Items.World
                 GameLogger.Info(nameof(WorldItemEntity), $"{actor.Name} 仅拾取了 {accepted} 个 {ItemId}，剩余 {Quantity} 个保留在地面。");
                 RestoreTriggerArea();
                 _isPicked = false;
-                return false;
+                return true;
             }
 
             _lastTransferredItem = stack.Item;
@@ -414,4 +441,3 @@ namespace Kuros.Items.World
         }
     }
 }
-

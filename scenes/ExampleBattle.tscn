@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=3 uid="uid://d15hs7qpxqhf3"]
+[gd_scene load_steps=35 format=3 uid="uid://d15hs7qpxqhf3"]
 
 [ext_resource type="Script" uid="uid://btbsyf4hokvud" path="res://scripts/actors/heroes/SamplePlayer.cs" id="1_player"]
 [ext_resource type="PackedScene" uid="uid://b1ljb2q212v3d" path="res://scenes/environments/floor.tscn" id="1_sb658"]
@@ -10,6 +10,7 @@
 [ext_resource type="Script" uid="uid://d3ancpb5wo2ie" path="res://scripts/actors/heroes/states/PlayerAttackState.cs" id="6_bhpvs"]
 [ext_resource type="Script" uid="uid://l40es7irdvdw" path="res://scripts/actors/heroes/states/PlayerHitState.cs" id="7_w7wnm"]
 [ext_resource type="Script" uid="uid://ba1kd5qgh17ag" path="res://scripts/actors/heroes/states/PlayerRunState.cs" id="8_bhpvs"]
+[ext_resource type="PackedScene" uid="uid://ciwlpphli7o01" path="res://scenes/properties/DroppableExampleProperty.tscn" id="11_drop_example"]
 [ext_resource type="PackedScene" uid="uid://ceou8wonisj4d" path="res://scenes/environments/wall.tscn" id="12_v8do6"]
 [ext_resource type="Script" uid="uid://d1g4amacs13a3" path="res://scripts/actors/heroes/states/PlayerFrozenState.cs" id="17_player_frozen"]
 [ext_resource type="Script" uid="uid://c2pgsls8pb7oh" path="res://scripts/actors/heroes/attacks/PlayerBasicMeleeAttack.cs" id="19_player_basic_attack"]
@@ -18,14 +19,15 @@
 [ext_resource type="Script" uid="uid://b6vgqpdrtg1lh" path="res://scripts/actors/heroes/PlayerInventoryComponent.cs" id="22_player_inventory"]
 [ext_resource type="Script" uid="uid://bsa4kolrnan6p" path="res://scripts/actors/heroes/states/PlayerDyingState.cs" id="23_player_dying"]
 [ext_resource type="Script" uid="uid://cp40kowtn1ho3" path="res://scripts/actors/heroes/states/PlayerDeadState.cs" id="24_player_dead"]
-[ext_resource type="PackedScene" uid="uid://1dh24pm5p3id" path="res://scenes/actors/npc/NpcDialogueInteractable.tscn" id="25_npc_dialogue"]
-[ext_resource type="PackedScene" path="res://scenes/items/ExampleWorldItem.tscn" id="26_example_item"]
-[ext_resource type="Script" uid="uid://6pyy6oo1abq7" path="res://scripts/actors/heroes/PlayerItemAttachment.cs" id="27_item_attachment"]
-[ext_resource type="Script" uid="uid://copvnatg446ec" path="res://scripts/ui/QuickSlotBar.cs" id="28_quick_slot_bar"]
+[ext_resource type="PackedScene" path="res://scenes/actors/npc/SimpleNPC.tscn" id="25_simple_npc"]
+[ext_resource type="Script" uid="uid://c1vumadqlusfa" path="res://scripts/actors/heroes/PlayerItemAttachment.cs" id="27_item_attachment"]
+[ext_resource type="Resource" path="res://data/TestItem2.tres" id="27_test_item_2"]
+[ext_resource type="Script" uid="uid://i06ynprjk6fq" path="res://scripts/ui/QuickSlotBar.cs" id="28_quick_slot_bar"]
+[ext_resource type="Resource" path="res://data/TestItem3.tres" id="28_test_item_3"]
 [ext_resource type="Script" uid="uid://b0t8cfl3khjix" path="res://scripts/actors/heroes/PlayerItemInteractionComponent.cs" id="29_item_interaction"]
-[ext_resource type="Script" uid="uid://b8o8wks2ab8sm" path="res://scripts/actors/heroes/PlayerWeaponSkillController.cs" id="30_weapon_skill_controller"]
-[ext_resource type="Script" uid="uid://clkd1wiixwlbh" path="res://scripts/actors/heroes/states/PlayerPickUpState.cs" id="31_player_pickup"]
-[ext_resource type="Script" path="res://scripts/actors/heroes/states/PlayerThrowState.cs" id="32_player_throw"]
+[ext_resource type="Script" uid="uid://djhlxjw4rrt8d" path="res://scripts/actors/heroes/PlayerWeaponSkillController.cs" id="30_weapon_skill_controller"]
+[ext_resource type="Script" uid="uid://ch33kuwv8bhip" path="res://scripts/actors/heroes/states/PlayerPickUpState.cs" id="31_player_pickup"]
+[ext_resource type="Script" uid="uid://b162xt2i3qc4e" path="res://scripts/actors/heroes/states/PlayerThrowState.cs" id="32_player_throw"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_attack"]
 size = Vector2(64.75629, 180.66397)
@@ -73,7 +75,7 @@ scale = Vector2(0.72410905, 0.70131683)
 
 [node name="Player" type="CharacterBody2D" parent="." node_paths=PackedStringArray("AttackArea")]
 position = Vector2(200, 400)
-collision_mask = 3
+collision_mask = 7
 motion_mode = 1
 script = ExtResource("1_player")
 AttackArea = NodePath("SpineCharacter/AttackArea")
@@ -169,15 +171,25 @@ IconOffset = Vector2(0, 0)
 script = ExtResource("20_spawn_controller")
 
 [node name="EnemyInstance" parent="EnemySpawnController" instance=ExtResource("21_enemy_b1_fat")]
-position = Vector2(1870, 733)
-DetectionRange = 400.0
+position = Vector2(1369, 456)
 Speed = 50.0
 
-[node name="FriendlyNPC" parent="." instance=ExtResource("25_npc_dialogue")]
-position = Vector2(600, 380)
+[node name="DroppableExample" parent="." instance=ExtResource("11_drop_example")]
+z_index = 255
+position = Vector2(419, 360)
 
-[node name="ExampleItemPickup" parent="." instance=ExtResource("26_example_item")]
-position = Vector2(528, 801)
+[node name="DroppableExample2" parent="." instance=ExtResource("11_drop_example")]
+z_index = 255
+position = Vector2(550, 360)
+Item = ExtResource("27_test_item_2")
+
+[node name="DroppableExample3" parent="." instance=ExtResource("11_drop_example")]
+z_index = 255
+position = Vector2(680, 360)
+Item = ExtResource("28_test_item_3")
+
+[node name="NPC" parent="." instance=ExtResource("25_simple_npc")]
+position = Vector2(611, 711)
 
 [node name="UI" type="CanvasLayer" parent="."]
 

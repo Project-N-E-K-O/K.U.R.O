@@ -1,0 +1,103 @@
+[gd_scene load_steps=2 format=3 uid="uid://864vgt46e1of"]
+
+[ext_resource type="Script" uid="uid://6scs07q8rlah" path="res://scripts/ui/SkillWindow.cs" id="1_skill_window_script"]
+
+[node name="SkillWindow" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_skill_window_script")
+
+[node name="MainPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -349.0
+offset_top = 178.0
+offset_right = -9.0
+offset_bottom = 668.0
+grow_horizontal = 0
+
+[node name="Header" type="HBoxContainer" parent="MainPanel"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -150.0
+offset_top = 8.0
+offset_right = 150.0
+offset_bottom = 40.0
+grow_horizontal = 2
+
+[node name="Title" type="Label" parent="MainPanel/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 24
+text = "技能"
+horizontal_alignment = 1
+
+[node name="Body" type="VBoxContainer" parent="MainPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 56.0
+offset_right = -16.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 24
+
+[node name="SkillsVBox" type="VBoxContainer" parent="MainPanel/Body"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 24
+
+[node name="ActiveSkillsSection" type="VBoxContainer" parent="MainPanel/Body/SkillsVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="ActiveSkillsTitle" type="Label" parent="MainPanel/Body/SkillsVBox/ActiveSkillsSection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "主技能"
+
+[node name="ActiveSkillsScroll" type="ScrollContainer" parent="MainPanel/Body/SkillsVBox/ActiveSkillsSection"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ActiveSkillsContainer" type="VBoxContainer" parent="MainPanel/Body/SkillsVBox/ActiveSkillsSection/ActiveSkillsScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="PassiveSkillsSection" type="VBoxContainer" parent="MainPanel/Body/SkillsVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="PassiveSkillsTitle" type="Label" parent="MainPanel/Body/SkillsVBox/PassiveSkillsSection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "被动技能"
+
+[node name="PassiveSkillsScroll" type="ScrollContainer" parent="MainPanel/Body/SkillsVBox/PassiveSkillsSection"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PassiveSkillsContainer" type="VBoxContainer" parent="MainPanel/Body/SkillsVBox/PassiveSkillsSection/PassiveSkillsScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="DetailButton" type="Button" parent="MainPanel/Body"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "查看详情"

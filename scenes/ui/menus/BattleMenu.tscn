@@ -77,6 +77,16 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "图鉴系统"
 
+[node name="SaveButton" type="Button" parent="Window/WindowMargin/WindowVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "存档"
+
+[node name="LoadButton" type="Button" parent="Window/WindowMargin/WindowVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "读档"
+
 [node name="MenuSeparator" type="HSeparator" parent="Window/WindowMargin/WindowVBox"]
 layout_mode = 2
 
@@ -95,4 +105,3 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 16
 text = "提示：点击空白区域或按 ESC 可关闭"
 horizontal_alignment = 1
-
