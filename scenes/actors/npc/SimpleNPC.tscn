@@ -34,5 +34,5 @@ shape = SubResource("2_npc_collision")
 [node name="NPCInteraction" type="Node2D" parent="."]
 script = ExtResource("2_npc_interaction")
 InteractionRange = 120.0
-InteractionPromptText = "按 [F] 对话"
+InteractionPromptText = "按 [E] 对话"
 

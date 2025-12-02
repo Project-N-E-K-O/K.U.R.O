@@ -21,6 +21,7 @@ namespace Kuros.Data
 		[Export] public string OnDialogueEndAction { get; set; } = ""; // 对话结束时的行为标识
 		[Export] public bool AutoAdvance { get; set; } = false; // 是否自动推进到下一句
 		[Export(PropertyHint.Range, "0,10,0.1")] public float AutoAdvanceDelay { get; set; } = 2.0f;
+		[Export] public int NextEntryIndex { get; set; } = -2; // -2表示继续下一个（默认），-1表示结束，>=0表示跳转
 	}
 	
 	/// <summary>

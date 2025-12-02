@@ -458,9 +458,34 @@ namespace Kuros.UI
 				return;
 			}
 			
-		// 移动到下一个条目（简单递增索引）
-		int nextIndex = _currentEntryIndex + 1;
-		var nextEntry = _currentDialogue.GetEntry(nextIndex);
+		// 确定下一个条目的索引
+		int nextIndex = -1;
+		
+		if (_currentEntry != null)
+		{
+			if (_currentEntry.NextEntryIndex == -2)
+			{
+				// 默认：继续下一个（线性流程）
+				nextIndex = _currentEntryIndex + 1;
+			}
+			else if (_currentEntry.NextEntryIndex >= 0)
+			{
+				// 跳转到指定条目
+				nextIndex = _currentEntry.NextEntryIndex;
+			}
+			else
+			{
+				// -1 或其他负数：结束对话
+				nextIndex = -1;
+			}
+		}
+		else
+		{
+			// 异常情况，尝试线性推进
+			nextIndex = _currentEntryIndex + 1;
+		}
+		
+		var nextEntry = (nextIndex >= 0 && _currentDialogue != null) ? _currentDialogue.GetEntry(nextIndex) : null;
 		
 		if (nextEntry != null)
 		{
@@ -473,7 +498,7 @@ namespace Kuros.UI
 		}
 		else
 		{
-			// 没有下一条目，让EndDialogue负责触发最终条目的结束行为
+			// 没有下一条目或显式结束，让EndDialogue负责触发最终条目的结束行为
 			EndDialogue();
 		}
 		}

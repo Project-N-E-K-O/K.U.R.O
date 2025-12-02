@@ -25,7 +25,7 @@ size = Vector2(40, 60)
 size = Vector2(80, 150)
 
 [sub_resource type="RectangleShape2D" id="4"]
-size = Vector2(50.64583, 26.785715)
+size = Vector2(41.828102, 28.539782)
 
 [sub_resource type="RectangleShape2D" id="5"]
 size = Vector2(98.90625, 100.714294)
@@ -34,11 +34,11 @@ size = Vector2(98.90625, 100.714294)
 radius = 18.0
 height = 55.0
 
-[node name="Enemy_B1_fat" type="CharacterBody2D" node_paths=PackedStringArray("AttackArea")]
+[node name="Enemy_B1_fat" type="CharacterBody2D" node_paths=PackedStringArray("DetectionArea", "AttackArea")]
 collision_layer = 2
 motion_mode = 1
 script = ExtResource("1")
-DetectionRange = 350.0
+DetectionArea = NodePath("Sprite2D/ControllerDetectionArea")
 AttackArea = NodePath("Sprite2D/AttackArea")
 
 [node name="EffectController" type="Node" parent="."]
@@ -66,7 +66,8 @@ collision_layer = 0
 monitorable = false
 
 [node name="AttackDetectionShape" type="CollisionShape2D" parent="Sprite2D/AttackDetectionArea"]
-position = Vector2(24.156, 0)
+position = Vector2(15.937498, -9.536743e-07)
+scale = Vector2(0.9845911, 2.712654)
 shape = SubResource("4")
 
 [node name="ControllerDetectionArea" type="Area2D" parent="Sprite2D"]
@@ -138,7 +139,8 @@ preview_skin = "Default"
 preview_animation = "-- Empty --"
 preview_frame = false
 preview_time = 0.0
-scale = Vector2(0.5, 0.5)
+position = Vector2(-1, 110.00001)
+scale = Vector2(0.38079956, 0.29094353)
 
 [node name="AnimationController" type="Node" parent="."]
 script = ExtResource("17")

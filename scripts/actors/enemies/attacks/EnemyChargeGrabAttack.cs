@@ -95,9 +95,10 @@ namespace Kuros.Actors.Enemies.Attacks
 				return false;
 			}
 
-			bool detectionSatisfied = _detectionArea == null
-				? Enemy.IsPlayerWithinDetectionRange(DetectionRangeBonus)
-				: _playerInsideDetection;
+			// 使用自己的 DetectionArea 或回退到 Enemy.DetectionArea
+			bool detectionSatisfied = _detectionArea != null
+				? _playerInsideDetection || _detectionArea.OverlapsBody(Enemy.PlayerTarget)
+				: Enemy.IsPlayerWithinDetectionRange();
 
 			if (!detectionSatisfied)
 			{
@@ -205,10 +206,16 @@ namespace Kuros.Actors.Enemies.Attacks
 						_pendingCooldownExit = false;
 					}
 				}
-				if (Enemy != null)
+				// 只有当敌人处于冷却相关状态时，才由此处控制移动
+				// 否则让状态机自己处理，避免覆盖其他状态的速度设置
+				var currentStateName = Enemy?.StateMachine?.CurrentState?.Name;
+				if (currentStateName == CooldownStateName || currentStateName == "Attack")
 				{
-            Enemy.Velocity = Vector2.Zero;
-					Enemy.MoveAndSlide();
+					if (Enemy != null)
+					{
+						Enemy.Velocity = Vector2.Zero;
+						Enemy.MoveAndSlide();
+					}
 				}
 				return;
 			}

@@ -39,10 +39,21 @@ namespace Kuros.Actors.Enemies.States
 			Enemy.Velocity = Vector2.Zero;
 			Enemy.MoveAndSlide();
 
-			_timer -= (float)delta;
-			if (_timer <= 0f && Enemy?.StateMachine != null)
+			if (_timer > 0f)
 			{
-				Enemy.StateMachine.ChangeState("Idle");
+				_timer -= (float)delta;
+				if (_timer <= 0f && Enemy?.StateMachine != null)
+				{
+					// 根据玩家位置决定下一个状态，而不是总是切换到 Idle
+					if (Enemy.IsPlayerWithinDetectionRange())
+					{
+						Enemy.StateMachine.ChangeState("Walk");
+					}
+					else
+					{
+						Enemy.StateMachine.ChangeState("Idle");
+					}
+				}
 			}
 		}
 

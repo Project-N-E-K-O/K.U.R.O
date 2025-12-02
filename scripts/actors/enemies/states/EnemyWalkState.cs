@@ -11,12 +11,7 @@ namespace Kuros.Actors.Enemies.States
 
         public override void PhysicsUpdate(double delta)
         {
-            if (!HasPlayer)
-            {
-                ChangeState("Idle");
-                return;
-            }
-
+            // IsPlayerWithinDetectionRange 会刷新玩家引用，同时检查玩家是否在范围内
             if (!Enemy.IsPlayerWithinDetectionRange())
             {
                 ChangeState("Idle");

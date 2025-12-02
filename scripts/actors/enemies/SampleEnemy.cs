@@ -5,13 +5,16 @@ using Kuros.Utils;
 
 public partial class SampleEnemy : GameActor
 {
-    [Export] public float DetectionRange = 300.0f;
+    [ExportCategory("Detection")]
+    [Export] public Area2D? DetectionArea { get; private set; }
+    
+    [ExportCategory("Attack")]
+    [Export] public Area2D? AttackArea { get; private set; }
+    
+    [ExportCategory("Score")]
     [Export] public int ScoreValue = 10;
     
-    [Export] public Area2D AttackArea { get; private set; } = null!;
-    
     private SamplePlayer? _player;
-    private const float FALLBACK_ATTACK_RANGE = 80.0f;
     
     public SampleEnemy()
     {
@@ -25,32 +28,41 @@ public partial class SampleEnemy : GameActor
     {
         base._Ready();
         
-        // Try to find AttackArea if not assigned
-        if (AttackArea == null) AttackArea = GetNodeOrNull<Area2D>("AttackArea");
-        
+        // Try to find areas if not assigned (they are nested under Sprite2D in the scene)
+        if (AttackArea == null) 
+        {
+            AttackArea = GetNodeOrNull<Area2D>("Sprite2D/AttackArea");
+            if (AttackArea == null) GD.PrintErr("AttackArea not found at Sprite2D/AttackArea");
+        }
+        if (DetectionArea == null) 
+        {
+            DetectionArea = GetNodeOrNull<Area2D>("Sprite2D/DetectionArea");
+            if (DetectionArea == null) GD.PrintErr("DetectionArea not found at Sprite2D/DetectionArea");
+        }
         RefreshPlayerReference();
     }
     
     public SamplePlayer? PlayerTarget => _player;
     
-    public bool IsPlayerWithinDetectionRange(float extraMargin = 0.0f)
+    /// <summary>
+    /// 检查玩家是否在检测范围内。使用 DetectionArea 碰撞检测。
+    /// </summary>
+    public bool IsPlayerWithinDetectionRange()
     {
         RefreshPlayerReference();
-        if (_player == null) return false;
-        float limit = DetectionRange + extraMargin;
-        return _player.GlobalPosition.DistanceTo(GlobalPosition) <= limit;
+        if (_player == null || DetectionArea == null) return false;
+        return DetectionArea.OverlapsBody(_player);
     }
     
+    /// <summary>
+    /// 检查玩家是否在攻击范围内。使用 AttackArea 碰撞检测。
+    /// </summary>
     public bool IsPlayerInAttackRange()
-        {
+    {
         RefreshPlayerReference();
-        if (_player == null) return false;
-            if (AttackArea != null)
-            {
-            return AttackArea.OverlapsBody(_player);
-                }
-        return _player.GlobalPosition.DistanceTo(GlobalPosition) <= FALLBACK_ATTACK_RANGE + 10.0f;
-            }
+        if (_player == null || AttackArea == null) return false;
+        return AttackArea.OverlapsBody(_player);
+    }
 
     public Vector2 GetDirectionToPlayer()
     {
@@ -60,8 +72,8 @@ public partial class SampleEnemy : GameActor
         return direction == Vector2.Zero ? Vector2.Zero : direction.Normalized();
     }
     
-        public void PerformAttack()
-        {
+    public void PerformAttack()
+    {
         AttackTimer = AttackCooldown; 
         GameLogger.Info(nameof(SampleEnemy), "Enemy PerformAttack");
         
@@ -78,12 +90,7 @@ public partial class SampleEnemy : GameActor
                 }
             }
         }
-        else if (_player != null)
-            {
-                _player.TakeDamage((int)AttackDamage);
-                GameLogger.Info(nameof(SampleEnemy), "Enemy attacked player (Fallback)!");
-        }
-        }
+    }
     
     public override void TakeDamage(int damage)
     {

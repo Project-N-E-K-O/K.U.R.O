@@ -40,6 +40,11 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 	private Node2D? _cachedLeftHandAttachment;
 	
 	/// <summary>
+	/// 标记是否已搜索过左手附件点（避免重复搜索和日志）
+	/// </summary>
+	private bool _leftHandAttachmentSearched = false;
+	
+	/// <summary>
 	/// 当前左手装备的物品（从快捷栏获取）
 	/// 右手保持小木剑（快捷栏索引0）
 	/// </summary>
@@ -145,9 +150,12 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 			return;
 		}
 		
+		// 如果 QuickBar 还未初始化，先记录选中的槽位索引，稍后在 QuickBar 设置后会同步
 		if (InventoryComponent?.QuickBar == null)
 		{
-			GD.PrintErr("SwitchToQuickBarSlot: QuickBar is not available");
+			// 仅记录槽位索引，等待 QuickBar 初始化后再同步物品
+			LeftHandSlotIndex = slotIndex;
+			GD.Print($"SwitchToQuickBarSlot: QuickBar not yet available, recorded slot index {slotIndex} for later sync");
 			return;
 		}
 		
@@ -255,11 +263,7 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 				}
 			}
 		}
-		else
-		{
-			GD.PrintErr("UpdateHandItemVisual: Could not find left hand attachment point. " +
-				$"Please set 'LeftHandAttachmentPath' in the editor or ensure a node named '{LeftHandAttachmentName}' exists in the scene hierarchy.");
-		}
+		// 注意：如果找不到左手附件点，静默忽略。这不是致命错误，可能场景中未配置左手物品显示功能。
 	}
 	
 	/// <summary>
@@ -275,6 +279,13 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 			return _cachedLeftHandAttachment;
 		}
 		
+		// 如果已经搜索过但未找到，不再重复搜索（使用标记避免重复日志）
+		if (_leftHandAttachmentSearched)
+		{
+			return null;
+		}
+		_leftHandAttachmentSearched = true;
+		
 		// 方法1：嘗試使用編輯器設置的路徑
 		if (LeftHandAttachmentPath?.IsEmpty == false)
 		{
@@ -284,10 +295,6 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 				_cachedLeftHandAttachment = nodeFromPath;
 				GD.Print($"GetLeftHandAttachment: Found attachment point via editor path: {LeftHandAttachmentPath}");
 				return _cachedLeftHandAttachment;
-			}
-			else
-			{
-				GD.PrintErr($"GetLeftHandAttachment: Editor-assigned path '{LeftHandAttachmentPath}' did not resolve to a valid node. Attempting fallback search...");
 			}
 		}
 		
@@ -316,9 +323,8 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 			}
 		}
 		
-		// 所有方法都失敗
-		GD.PrintErr("GetLeftHandAttachment: All methods to find left hand attachment point failed. " +
-			$"Tried: (1) Editor path '{LeftHandAttachmentPath}', (2) FindChild with name '{LeftHandAttachmentName}', (3) Group 'left_hand_attachment'");
+		// 所有方法都失敗 - 这不是致命错误，左手物品视觉显示功能将被禁用
+		// 如需启用此功能，请在 Player 场景中添加名为 'left_hand_attachment' 的 Node2D 子节点
 		return null;
 	}
 	
@@ -328,6 +334,7 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 	public void InvalidateLeftHandAttachmentCache()
 	{
 		_cachedLeftHandAttachment = null;
+		_leftHandAttachmentSearched = false;
 	}
 	
 	/// <summary>
@@ -393,11 +400,13 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 			InventoryComponent.QuickBar.InventoryChanged += OnQuickBarInventoryChanged;
 			GD.Print("SamplePlayer: Connected QuickBar signals for left hand item synchronization");
 			
-			// 如果当前有选中的槽位，同步一次左手物品
+			// 如果当前有选中的槽位，同步一次左手物品（可能是在 QuickBar 可用之前设置的）
 			if (LeftHandSlotIndex >= 1 && LeftHandSlotIndex <= 4)
 			{
+				GD.Print($"SamplePlayer: Syncing left hand item for previously selected slot {LeftHandSlotIndex}");
 				SyncLeftHandItemFromSlot();
 				UpdateHandItemVisual();
+				UpdateBattleHUDHandHighlight();
 			}
 		}
 	}
