@@ -28,9 +28,9 @@ public partial class SampleEnemy : GameActor
     {
         base._Ready();
         
-        // Try to find areas if not assigned
-        if (AttackArea == null) AttackArea = GetNodeOrNull<Area2D>("AttackArea");
-        if (DetectionArea == null) DetectionArea = GetNodeOrNull<Area2D>("DetectionArea");
+        // Try to find areas if not assigned (they are nested under Sprite2D in the scene)
+        if (AttackArea == null) AttackArea = GetNodeOrNull<Area2D>("Sprite2D/AttackArea");
+        if (DetectionArea == null) DetectionArea = GetNodeOrNull<Area2D>("Sprite2D/DetectionArea");
         
         RefreshPlayerReference();
     }
