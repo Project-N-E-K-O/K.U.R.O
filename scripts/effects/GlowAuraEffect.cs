@@ -20,7 +20,16 @@ namespace Kuros.Effects
         protected override void OnApply()
         {
             base.OnApply();
-            if (Actor == null || _lightNode != null) return;
+            if (Actor == null)
+            {
+                Controller?.RemoveEffect(this);
+                return;
+            }
+
+            if (_lightNode != null)
+            {
+                return;
+            }
 
             _lightNode = new PointLight2D
             {

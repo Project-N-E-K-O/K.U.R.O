@@ -205,9 +205,17 @@ namespace Kuros.Core
                 Target = target;
                 Damage = damage;
                 AttackOrigin = attackOrigin;
-                AttackDirection = attackOrigin.HasValue
-                    ? (target.GlobalPosition - attackOrigin.Value).Normalized()
-                    : Vector2.Zero;
+                if (attackOrigin.HasValue)
+                {
+                    var delta = target.GlobalPosition - attackOrigin.Value;
+                    AttackDirection = delta.LengthSquared() > Mathf.Epsilon
+                        ? delta.Normalized()
+                        : Vector2.Zero;
+                }
+                else
+                {
+                    AttackDirection = Vector2.Zero;
+                }
             }
 
             public Vector2 Forward => Target.FacingRight ? Vector2.Right : Vector2.Left;
