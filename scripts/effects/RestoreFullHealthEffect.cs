@@ -20,7 +20,7 @@ namespace Kuros.Effects
                 return;
             }
 
-            Actor.RestoreHealth(Actor.MaxHealth, Actor.MaxHealth);
+            Actor.RestoreHealth(Actor.MaxHealth);
             Controller?.RemoveEffect(this);
         }
     }

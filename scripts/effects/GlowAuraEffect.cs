@@ -13,6 +13,7 @@ namespace Kuros.Effects
         [Export] public Color LightColor { get; set; } = new Color(1f, 0.95f, 0.8f, 1f);
         [Export(PropertyHint.Range, "0,10,0.1")] public float Energy { get; set; } = 1.5f;
         [Export(PropertyHint.Range, "0.1,4,0.1")] public float TextureScale { get; set; } = 1.5f;
+        [Export] public Texture2D? LightTexture { get; set; }
 
         private PointLight2D? _lightNode;
 
@@ -27,6 +28,7 @@ namespace Kuros.Effects
                 Energy = Energy,
                 Color = LightColor,
                 TextureScale = TextureScale,
+                Texture = ResolveLightTexture(),
                 ShadowEnabled = false
             };
 
@@ -41,6 +43,31 @@ namespace Kuros.Effects
                 _lightNode = null;
             }
             base.OnRemoved();
+        }
+
+        private Texture2D ResolveLightTexture()
+        {
+            if (LightTexture != null)
+            {
+                return LightTexture;
+            }
+
+            var gradient = new Gradient
+            {
+                InterpolationMode = Gradient.InterpolationMode.Cubic
+            };
+            gradient.AddPoint(0f, new Color(LightColor, 0.8f));
+            gradient.AddPoint(0.5f, new Color(LightColor, 0.4f));
+            gradient.AddPoint(1f, new Color(LightColor, 0f));
+
+            var texture = new GradientTexture2D
+            {
+                Gradient = gradient,
+                Width = 256,
+                Height = 256,
+                Fill = GradientTexture2D.FillMode.Radial
+            };
+            return texture;
         }
     }
 }

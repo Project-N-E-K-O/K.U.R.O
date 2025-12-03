@@ -1,0 +1,26 @@
+[gd_scene load_steps=4 format=3 uid="uid://weapon_a0_yaomeng1_world"]
+
+[ext_resource type="Script" path="res://scripts/items/world/WorldItemEntity.cs" id="1_world_item"]
+[ext_resource type="Texture2D" path="res://resources/textures/weapons/weapon_a0_yaomeng1.svg" id="2_icon"]
+
+[sub_resource type="RectangleShape2D" id="TriggerShape"]
+size = Vector2(180, 180)
+
+[node name="Weapon_A0_Yaomeng1_World" type="CharacterBody2D"]
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_world_item")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.7, 0.7)
+texture = ExtResource("2_icon")
+
+[node name="TriggerArea" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 1
+monitorable = true
+monitoring = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TriggerArea"]
+shape = SubResource("TriggerShape")
+

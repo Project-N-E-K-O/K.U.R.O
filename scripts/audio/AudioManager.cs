@@ -80,8 +80,13 @@ namespace Kuros.Audio
             }
 
             _bgmPlayer ??= CreateBgmPlayer();
-            ConfigurePlayer(_bgmPlayer, cue);
-            _bgmPlayer.Stream = cue.Stream;
+            var streamInstance = PrepareStreamForBgm(cue);
+            if (streamInstance == null)
+            {
+                return;
+            }
+
+            ConfigurePlayer(_bgmPlayer, cue, streamInstance);
             _bgmPlayer.Play();
         }
 
@@ -176,20 +181,67 @@ namespace Kuros.Audio
             _free2DPlayers.Enqueue(player);
         }
 
-        private static void ConfigurePlayer(AudioStreamPlayer player, AudioCue cue)
+        private static void ConfigurePlayer(AudioStreamPlayer player, AudioCue cue, AudioStream? streamOverride = null)
         {
-            player.Stream = cue.Stream;
+            var stream = streamOverride ?? cue.Stream;
+            if (stream == null)
+            {
+                player.Stream = null;
+                return;
+            }
+
+            player.Stream = stream;
             player.Bus = string.IsNullOrWhiteSpace(cue.Bus) ? DefaultBus : cue.Bus;
             player.VolumeDb = cue.VolumeDb;
             player.PitchScale = cue.SamplePitchScale();
         }
 
-        private static void ConfigurePlayer(AudioStreamPlayer2D player, AudioCue cue)
+        private static void ConfigurePlayer(AudioStreamPlayer2D player, AudioCue cue, AudioStream? streamOverride = null)
         {
-            player.Stream = cue.Stream;
+            var stream = streamOverride ?? cue.Stream;
+            if (stream == null)
+            {
+                player.Stream = null;
+                return;
+            }
+
+            player.Stream = stream;
             player.Bus = string.IsNullOrWhiteSpace(cue.Bus) ? DefaultBus : cue.Bus;
             player.VolumeDb = cue.VolumeDb;
             player.PitchScale = cue.SamplePitchScale();
+        }
+
+        private static AudioStream? PrepareStreamForBgm(AudioCue cue)
+        {
+            if (cue.Stream == null)
+            {
+                return null;
+            }
+
+            var duplicated = cue.Stream.Duplicate() as AudioStream ?? cue.Stream;
+            ApplyLoopSetting(duplicated, cue.Loop);
+            return duplicated;
+        }
+
+        private static void ApplyLoopSetting(AudioStream stream, bool loop)
+        {
+            switch (stream)
+            {
+                case AudioStreamWav wav:
+                    wav.LoopMode = loop ? AudioStreamWav.LoopModeEnum.Forward : AudioStreamWav.LoopModeEnum.Disabled;
+                    break;
+                case AudioStreamOggVorbis ogg:
+                    ogg.Loop = loop;
+                    break;
+                case AudioStreamMP3 mp3:
+                    mp3.Loop = loop;
+                    break;
+                case AudioStreamSample sample:
+                    sample.LoopMode = loop ? AudioStreamSample.LoopModeEnum.Forward : AudioStreamSample.LoopModeEnum.Disabled;
+                    break;
+                default:
+                    break;
+            }
         }
 
         #endregion

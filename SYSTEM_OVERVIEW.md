@@ -7,7 +7,7 @@
 - `scripts/core/GameActor.cs`  
   - 所有玩家/敌人实体的基类，统一持有 `EffectController` 与 `StatProfile`。  
   - `_Ready()` 中自动挂载 `EffectController`，并通过 `ApplyStatProfile()` 将 `CharacterStatProfile` 中的基础属性与常驻效果套用到角色。  
-  - 公开 `ApplyEffect(ActorEffect effect)` / `RemoveEffect(string effectId)` 方法供外部添加/移除效果，并在 `TakeDamage(int damage, Vector2? attackOrigin = null)` 中提供 `DamageIntercepted` 事件（`DamageEventArgs` 给出攻击方向/来源），供格挡、减伤等效果在受击前干预伤害。
+  - 公开 `ApplyEffect(ActorEffect effect)` / `RemoveEffect(string effectId)` 方法供外部添加/移除效果，并在 `TakeDamage(int damage, Vector2? attackOrigin = null, GameActor? attacker = null)` 中提供 `DamageIntercepted` 事件（`DamageEventArgs` 给出攻击方向/来源），供格挡、减伤等效果在受击前干预伤害；可选的 `attacker` 参数会透传到 `DamageEventBus.Publish(attacker, target, damage)`，用于记录伤害来源供效果（如眩晕/反击）引用。
 
 - `scripts/core/effects/EffectController.cs`、`ActorEffect.cs`、`FreezeEffect.cs`、`SimpleSpeedEffect.cs`、`DirectionalBlockEffect.cs`、`StunEnemiesEffect.cs`  
   - `EffectController` 承担角色效果的生命周期管理：`AddEffect()`、`AddEffectFromScene()`、`RemoveEffect()`、`ClearAll()`。  

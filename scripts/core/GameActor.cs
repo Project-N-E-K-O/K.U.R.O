@@ -182,7 +182,7 @@ namespace Kuros.Core
                 // Force state change to Hit
                 if (StateMachine != null)
                 {
-                StateMachine.ChangeState("Hit");
+                    StateMachine.ChangeState("Hit");
                 }
             }
 

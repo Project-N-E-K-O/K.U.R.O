@@ -2,10 +2,10 @@
 
 [ext_resource type="Script" path="res://scripts/items/ItemDefinition.cs" id="1_item_definition"]
 [ext_resource type="Script" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="2_attribute_entry"]
-[ext_resource type="Texture2D" path="res://icon.svg" id="3_icon"]
+[ext_resource type="Texture2D" path="res://resources/textures/weapons/weapon_a0_yaomeng1.svg" id="3_icon"]
 [ext_resource type="Resource" path="res://resources/items/skills/WeaponYaomeng1ActiveSkill.tres" id="4_active_skill"]
 [ext_resource type="Resource" path="res://resources/items/skills/WeaponYaomengSynergyPassiveSkill.tres" id="5_synergy_skill"]
-[ext_resource type="PackedScene" path="res://scenes/items/ExampleWorldItem.tscn" id="6_world_item"]
+[ext_resource type="PackedScene" path="res://scenes/items/Weapon_A0_Yaomeng1_WorldItem.tscn" id="6_world_item"]
 
 [sub_resource type="ItemAttributeEntry" id="Attribute_AttackPower"]
 AttributeId = "attack_power"
