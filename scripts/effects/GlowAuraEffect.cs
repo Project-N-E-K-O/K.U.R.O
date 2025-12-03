@@ -13,6 +13,7 @@ namespace Kuros.Effects
         [Export] public Color LightColor { get; set; } = new Color(1f, 0.95f, 0.8f, 1f);
         [Export(PropertyHint.Range, "0,10,0.1")] public float Energy { get; set; } = 1.5f;
         [Export(PropertyHint.Range, "0.1,4,0.1")] public float TextureScale { get; set; } = 1.5f;
+        [Export(PropertyHint.Range, "0,512,1")] public float Range { get; set; } = 128f;
         [Export] public Texture2D? LightTexture { get; set; }
 
         private PointLight2D? _lightNode;
@@ -37,6 +38,7 @@ namespace Kuros.Effects
                 Energy = Energy,
                 Color = LightColor,
                 TextureScale = TextureScale,
+                Range = Range,
                 Texture = ResolveLightTexture(),
                 ShadowEnabled = false
             };
