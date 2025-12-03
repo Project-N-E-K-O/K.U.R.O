@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://restore_health_effect_scene"]
+
+[ext_resource type="Script" path="res://scripts/effects/RestoreHealthEffect.cs" id="1_restore_script"]
+
+[node name="RestoreHealthEffect" type="Node"]
+script = ExtResource("1_restore_script")
+

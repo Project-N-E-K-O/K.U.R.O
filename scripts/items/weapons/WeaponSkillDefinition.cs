@@ -18,6 +18,7 @@ namespace Kuros.Items.Weapons
         [Export] public Godot.Collections.Array<ItemEffectEntry> Effects { get; set; } = new();
         [Export] public Godot.Collections.Array<string> StateWhitelist { get; set; } = new();
         [Export] public bool UseDefaultAttackAnimationFallback { get; set; } = true;
+        [Export] public string ActivationAction { get; set; } = string.Empty;
 
         public bool IsUsableInState(string stateName)
         {

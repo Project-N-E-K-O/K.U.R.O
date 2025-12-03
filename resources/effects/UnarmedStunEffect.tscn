@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://unarmed_stun_effect"]
+
+[ext_resource type="Script" path="res://scripts/effects/UnarmedStunEffect.cs" id="1_script"]
+
+[node name="UnarmedStunEffect" type="Node"]
+script = ExtResource("1_script")
+StunDuration = 1.5
+

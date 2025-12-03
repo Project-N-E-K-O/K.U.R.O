@@ -1,7 +1,11 @@
 using System;
 using System.Collections.Generic;
 using Godot;
+using Kuros.Core;
 using Kuros.Items;
+using Kuros.Items.Durability;
+using Kuros.Items.Effects;
+using Kuros.Items.Tags;
 using Kuros.Systems.Inventory;
 using Kuros.Utils;
 
@@ -17,6 +21,8 @@ namespace Kuros.Actors.Heroes
 
         public InventoryContainer Backpack { get; private set; } = null!;
         public InventoryContainer? QuickBar { get; set; }
+        [Export] public ItemDefinition? UnarmedWeaponDefinition { get; set; }
+        private const string DefaultUnarmedWeaponPath = "res://resources/items/Weapon_Unarmed_Default.tres";
 
         // 跟踪已获得的物品ID（用于判断是否是第一次获得）
         private HashSet<string> _obtainedItemIds = new HashSet<string>();
@@ -50,6 +56,11 @@ namespace Kuros.Actors.Heroes
             Backpack = GetNodeOrNull<InventoryContainer>("Backpack") ?? CreateBackpack();
             Backpack.SlotCount = BackpackSlots;
             Backpack.InventoryChanged += OnBackpackInventoryChanged;
+
+            if (UnarmedWeaponDefinition == null)
+            {
+                UnarmedWeaponDefinition = ResourceLoader.Load<ItemDefinition>(DefaultUnarmedWeaponPath);
+            }
 
             // 初始化特殊槽位
             InitializeSpecialSlots();
@@ -351,6 +362,75 @@ namespace Kuros.Actors.Heroes
             return true;
         }
 
+        /// <summary>
+        /// 消耗当前选中槽位中的可食用物品（需要 Food 标签），触发 OnConsume 效果并根据耐久/数量扣除。
+        /// </summary>
+        public bool TryConsumeSelectedItem(GameActor? consumer)
+        {
+            if (Backpack == null) return false;
+            var stack = GetSelectedBackpackStack();
+            if (stack == null || stack.IsEmpty) return false;
+            if (!stack.HasTag(ItemTagIds.Food))
+            {
+                return false;
+            }
+
+            if (stack.DurabilityState != null && stack.DurabilityState.IsBroken)
+            {
+                return false;
+            }
+
+            var item = stack.Item;
+            bool usesDurability = item.DurabilityConfig != null && stack.HasDurability;
+            bool removedStack = false;
+
+            if (usesDurability && item.DurabilityConfig != null)
+            {
+                int damage = item.DurabilityConfig.DamagePerUse;
+                if (damage <= 0)
+                {
+                    damage = 1;
+                }
+
+                bool broke = stack.ApplyDurabilityDamage(damage, consumer, triggerEffects: true);
+                if (broke && item.DurabilityConfig.BreakBehavior == DurabilityBreakBehavior.Disappear)
+                {
+                    removedStack = true;
+                }
+            }
+            else
+            {
+                int removed = Backpack.RemoveItemFromSlot(SelectedBackpackSlot, 1);
+                if (removed <= 0)
+                {
+                    return false;
+                }
+
+                removedStack = Backpack.GetStack(SelectedBackpackSlot) == null;
+            }
+
+            if (consumer != null)
+            {
+                item.ApplyEffects(consumer, ItemEffectTrigger.OnConsume);
+            }
+
+            if (removedStack)
+            {
+                if (usesDurability)
+                {
+                    Backpack.SetStack(SelectedBackpackSlot, null);
+                }
+                NotifyItemRemoved(item.ItemId);
+            }
+            else if (usesDurability)
+            {
+                Backpack.EmitSignal(InventoryContainer.SignalName.SlotChanged, SelectedBackpackSlot, item.ItemId, stack.Quantity);
+                Backpack.EmitSignal(InventoryContainer.SignalName.InventoryChanged);
+            }
+
+            return true;
+        }
+
         public int TryAddItemToSelectedSlot(ItemDefinition item, int quantity)
         {
             if (Backpack == null || item == null || quantity <= 0) return 0;
@@ -380,6 +460,30 @@ namespace Kuros.Actors.Heroes
         public InventoryItemStack? GetSelectedBackpackStack()
         {
             return Backpack?.GetStack(SelectedBackpackSlot);
+        }
+
+        public float GetSelectedAttributeValue(string attributeId, float defaultValue = 0f)
+        {
+            if (string.IsNullOrWhiteSpace(attributeId)) return defaultValue;
+            var stack = GetSelectedBackpackStack();
+            if (stack != null)
+            {
+                return stack.GetAttributeValue(attributeId, defaultValue);
+            }
+
+            if (UnarmedWeaponDefinition != null &&
+                UnarmedWeaponDefinition.TryResolveAttribute(attributeId, 1, out var attribute) &&
+                attribute.IsValid)
+            {
+                return attribute.Value;
+            }
+            return defaultValue;
+        }
+
+        public ItemDefinition? GetCurrentWeaponDefinition()
+        {
+            var stack = GetSelectedBackpackStack();
+            return stack?.Item ?? UnarmedWeaponDefinition;
         }
 
         public float GetBackpackAttributeValue(string attributeId, float baseValue = 0f)

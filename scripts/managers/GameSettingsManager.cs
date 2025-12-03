@@ -179,4 +179,3 @@ namespace Kuros.Managers
 		public readonly record struct WindowPreset(string Id, string DisplayName, DisplayServer.WindowMode Mode, Vector2I Size);
 	}
 }
-

@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://weapon_stun_effect"]
+
+[ext_resource type="Script" path="res://scripts/effects/StunEnemiesEffect.cs" id="1_stun_script"]
+
+[node name="StunEnemiesEffect" type="Node"]
+script = ExtResource("1_stun_script")
+StunDuration = 2.0
+Radius = 220.0
+ArcDegrees = 200.0
+RequiresFacingCheck = true
+

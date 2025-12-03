@@ -1,4 +1,5 @@
 using Kuros.Actors.Heroes;
+using Kuros.Items.Attributes;
 
 namespace Kuros.Actors.Heroes.Attacks
 {
@@ -11,6 +12,7 @@ namespace Kuros.Actors.Heroes.Attacks
     public partial class PlayerBasicMeleeAttack : PlayerAttackTemplate
     {
         private PlayerWeaponSkillController? _weaponSkillController;
+        private PlayerInventoryComponent? _inventory;
         private string _defaultAnimation = "animations/attack";
 
         protected override void OnInitialized()
@@ -26,12 +28,18 @@ namespace Kuros.Actors.Heroes.Attacks
             CooldownDuration = 0.5f;
             AnimationName = _defaultAnimation;
             _weaponSkillController = Player.GetNodeOrNull<PlayerWeaponSkillController>("WeaponSkillController");
+            _inventory = Player.InventoryComponent ?? Player.GetNodeOrNull<PlayerInventoryComponent>("Inventory");
         }
 
         protected override void OnAttackStarted()
         {
             AnimationName = _defaultAnimation;
             DamageOverride = Player.AttackDamage;
+
+            if (_inventory != null)
+            {
+                DamageOverride += _inventory.GetSelectedAttributeValue(ItemAttributeIds.AttackPower, 0f);
+            }
 
             if (_weaponSkillController != null)
             {

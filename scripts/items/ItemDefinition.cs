@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using Godot;
+using Kuros.Core;
 using Kuros.Items.Attributes;
+using Kuros.Items.Durability;
 using Kuros.Items.Effects;
 using Kuros.Items.Weapons;
 
@@ -57,6 +59,9 @@ namespace Kuros.Items
             get => _weaponSkillResources;
             set => _weaponSkillResources = value ?? new();
         }
+
+        [ExportGroup("Durability")]
+        [Export] public ItemDurabilityConfig? DurabilityConfig { get; set; }
 
         private Godot.Collections.Array<string> _tags = new();
         private HashSet<string>? _tagCache;
@@ -126,6 +131,21 @@ namespace Kuros.Items
                 if (entry == null || entry.EffectScene == null) continue;
                 if (entry.Trigger != trigger) continue;
                 yield return entry;
+            }
+        }
+
+        public void ApplyEffects(GameActor actor, ItemEffectTrigger trigger)
+        {
+            if (actor == null || actor.EffectController == null)
+            {
+                return;
+            }
+
+            foreach (var entry in GetEffectEntries(trigger))
+            {
+                var effect = entry.InstantiateEffect();
+                if (effect == null) continue;
+                actor.ApplyEffect(effect);
             }
         }
 

@@ -1,0 +1,34 @@
+[gd_resource type="Resource" load_steps=6 format=3 uid="uid://weapon_a2_chair"]
+
+[ext_resource type="Script" path="res://scripts/items/ItemDefinition.cs" id="1_item_definition"]
+[ext_resource type="Script" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="2_attribute_entry"]
+[ext_resource type="Texture2D" path="res://icon.svg" id="3_chair_icon"]
+[ext_resource type="PackedScene" path="res://scenes/items/ExampleWorldItem.tscn" id="4_world_item"]
+
+[sub_resource type="ItemAttributeEntry" id="Attribute_AttackPower"]
+AttributeId = "attack_power"
+Value = 4.0
+Notes = "木椅提供 4 点攻击力"
+
+[sub_resource type="ItemDurabilityConfig" id="Durability_Config"]
+MaxDurability = 1
+DamagePerUse = 1
+DamagePerHit = 0
+IsRepairable = false
+BreakBehavior = 0
+
+[resource]
+script = ExtResource("1_item_definition")
+ItemId = "weapon_a2_chair"
+DisplayName = "A2 木椅"
+Description = "普通的木椅，耐久度有限。"
+Icon = ExtResource("3_chair_icon")
+Category = "Weapon"
+MaxStackSize = 1
+Tags = PackedStringArray("tag_weapon")
+AttributeEntries = Array[Resource]([SubResource("Attribute_AttackPower")])
+DurabilityConfig = SubResource("Durability_Config")
+EffectEntries = Array[Resource]()
+WeaponSkillResources = Array[Resource]()
+WorldScenePath = ExtResource("4_world_item")
+

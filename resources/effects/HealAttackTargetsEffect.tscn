@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://heal_attack_targets_effect_scene"]
+
+[ext_resource type="Script" path="res://scripts/effects/HealAttackTargetsEffect.cs" id="1_heal_targets_script"]
+
+[node name="HealAttackTargetsEffect" type="Node"]
+script = ExtResource("1_heal_targets_script")
+

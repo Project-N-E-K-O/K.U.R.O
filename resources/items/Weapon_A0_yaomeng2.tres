@@ -1,0 +1,29 @@
+[gd_resource type="Resource" load_steps=9 format=3 uid="uid://weapon_a0_yaomeng2"]
+
+[ext_resource type="Script" path="res://scripts/items/ItemDefinition.cs" id="1_item_definition"]
+[ext_resource type="Script" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="2_attribute_entry"]
+[ext_resource type="Texture2D" path="res://icon.svg" id="3_icon"]
+[ext_resource type="Resource" path="res://resources/items/skills/WeaponYaomeng2ActiveSkill.tres" id="4_active_skill"]
+[ext_resource type="Resource" path="res://resources/items/skills/WeaponYaomengSynergyPassiveSkill.tres" id="5_synergy_skill"]
+[ext_resource type="PackedScene" path="res://scenes/items/ExampleWorldItem.tscn" id="6_world_item"]
+
+[sub_resource type="ItemAttributeEntry" id="Attribute_AttackPower"]
+AttributeId = "attack_power"
+Value = 4.0
+Notes = "妖梦二式提供 4 点攻击力"
+
+[resource]
+script = ExtResource("1_item_definition")
+ItemId = "weapon_a0_yaomeng2"
+DisplayName = "A0 妖梦·贰式"
+Description = "侧重审判的妖梦武器，具有 4 点攻击力与斩杀框架。"
+Icon = ExtResource("3_icon")
+Category = "Weapon"
+MaxStackSize = 1
+Tags = PackedStringArray("tag_weapon")
+AttributeEntries = Array[Resource]([SubResource("Attribute_AttackPower")])
+EffectEntries = Array[Resource]()
+DurabilityConfig = null
+WeaponSkillResources = Array[Resource]([ExtResource("4_active_skill"), ExtResource("5_synergy_skill")])
+WorldScenePath = ExtResource("6_world_item")
+

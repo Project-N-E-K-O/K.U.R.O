@@ -1,0 +1,45 @@
+[gd_resource type="Resource" load_steps=9 format=3 uid="uid://supplies_pudding"]
+
+[ext_resource type="Script" path="res://scripts/items/ItemDefinition.cs" id="1_item_definition"]
+[ext_resource type="Script" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="2_attribute_entry"]
+[ext_resource type="Script" path="res://scripts/items/effects/ItemEffectEntry.cs" id="3_effect_entry"]
+[ext_resource type="Texture2D" path="res://icon.svg" id="4_icon"]
+[ext_resource type="PackedScene" path="res://scenes/items/ExampleWorldItem.tscn" id="5_world_item"]
+[ext_resource type="PackedScene" path="res://resources/effects/IncreaseMaxHealthEffect.tscn" id="6_increase_max_health"]
+
+[sub_resource type="ItemAttributeEntry" id="Attribute_AttackPower"]
+AttributeId = "attack_power"
+Value = 2.0
+Notes = "布丁可作为临时武器，提供 2 点攻击力"
+
+[sub_resource type="ItemDurabilityConfig" id="Durability_Config"]
+MaxDurability = 1
+DamagePerUse = 1
+DamagePerHit = 1
+IsRepairable = false
+BreakBehavior = 0
+
+[sub_resource type="ItemEffectEntry" id="Effect_OnConsume"]
+Trigger = 2
+EffectScene = ExtResource("6_increase_max_health")
+Notes = "食用后永久提升最大生命并回复 1 点生命"
+PropertyOverrides = {
+"MaxHealthIncrease": 1,
+"HealAmount": 1
+}
+
+[resource]
+script = ExtResource("1_item_definition")
+ItemId = "supplies_pudding"
+DisplayName = "浓厚布丁"
+Description = "甜美布丁，既可当作轻型武器，也能在食用后永久提升 1 点最大生命并回复 1 点生命。"
+Icon = ExtResource("4_icon")
+Category = "Supplies"
+MaxStackSize = 1
+Tags = PackedStringArray("tag_food", "tag_weapon")
+AttributeEntries = Array[Resource]([SubResource("Attribute_AttackPower")])
+EffectEntries = Array[Resource]([SubResource("Effect_OnConsume")])
+DurabilityConfig = SubResource("Durability_Config")
+WeaponSkillResources = Array[Resource]()
+WorldScenePath = ExtResource("5_world_item")
+

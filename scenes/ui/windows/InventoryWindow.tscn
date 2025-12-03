@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://bpad88uh6vf2y"]
 
-[ext_resource type="Script" uid="uid://w3ehegcj4w8s" path="res://scripts/ui/InventoryWindow.cs" id="1_inventory_window_script"]
+[ext_resource type="Script" path="res://scripts/ui/InventoryWindow.cs" id="1_inventory_window_script"]
 
 [sub_resource type="StyleBoxFlat" id="PanelStyle_TrashBin"]
 bg_color = Color(0.5, 0.2, 0.2, 0.8)

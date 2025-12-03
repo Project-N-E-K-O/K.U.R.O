@@ -1,0 +1,24 @@
+[gd_resource type="Resource" load_steps=4 format=3 uid="uid://weapon_yaomeng2_active_skill"]
+
+[ext_resource type="Script" path="res://scripts/items/weapons/WeaponSkillDefinition.cs" id="1_skill_definition"]
+[ext_resource type="Script" path="res://scripts/items/effects/ItemEffectEntry.cs" id="2_effect_entry"]
+[ext_resource type="PackedScene" path="res://resources/effects/ExecuteTaggedEnemiesEffect.tscn" id="3_execute_effect"]
+
+[sub_resource type="ItemEffectEntry" id="Effect_Yaomeng2_Active"]
+Trigger = 1
+EffectScene = ExtResource("3_execute_effect")
+Notes = "秒杀特定标签敌人的框架，后续细化"
+PropertyOverrides = {
+"TargetTagId": "enemy_tag_boss",
+"ExecutionDelay": 0.1
+}
+
+[resource]
+script = ExtResource("1_skill_definition")
+SkillId = "weapon_yaomeng2_active"
+DisplayName = "梦魇审判"
+SkillType = 0
+CooldownSeconds = 4.0
+Description = "对特定标签的敌人施加致命打击（逻辑待扩展）。"
+Effects = Array[Resource]([SubResource("Effect_Yaomeng2_Active")])
+

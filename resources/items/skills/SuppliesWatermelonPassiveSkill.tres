@@ -1,0 +1,22 @@
+[gd_resource type="Resource" load_steps=4 format=3 uid="uid://skill_supplies_watermelon_passive"]
+
+[ext_resource type="Script" path="res://scripts/items/weapons/WeaponSkillDefinition.cs" id="1_skill_definition"]
+[ext_resource type="Script" path="res://scripts/items/effects/ItemEffectEntry.cs" id="2_effect_entry"]
+[ext_resource type="PackedScene" path="res://resources/effects/HealAttackTargetsEffect.tscn" id="3_heal_targets_effect"]
+
+[sub_resource type="ItemEffectEntry" id="Effect_Watermelon_Passive"]
+Trigger = 1
+EffectScene = ExtResource("3_heal_targets_effect")
+Notes = "命中时为目标回复生命"
+PropertyOverrides = {
+"HealAmount": 1
+}
+
+[resource]
+script = ExtResource("1_skill_definition")
+SkillId = "supplies_watermelon_passive"
+DisplayName = "甜蜜反哺"
+SkillType = 1
+Description = "持用此武器攻击会反向治疗受击者。"
+Effects = Array[Resource]([SubResource("Effect_Watermelon_Passive")])
+

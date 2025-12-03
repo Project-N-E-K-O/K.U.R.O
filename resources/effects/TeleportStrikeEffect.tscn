@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://teleport_strike_effect"]
+
+[ext_resource type="Script" path="res://scripts/effects/TeleportStrikeEffect.cs" id="1_teleport_strike_script"]
+
+[node name="TeleportStrikeEffect" type="Node"]
+script = ExtResource("1_teleport_strike_script")
+

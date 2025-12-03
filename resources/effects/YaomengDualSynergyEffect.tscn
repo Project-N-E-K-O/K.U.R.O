@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://yaomeng_dual_synergy_effect"]
+
+[ext_resource type="Script" path="res://scripts/effects/YaomengDualSynergyEffect.cs" id="1_yaomeng_synergy_script"]
+
+[node name="YaomengDualSynergyEffect" type="Node"]
+script = ExtResource("1_yaomeng_synergy_script")
+

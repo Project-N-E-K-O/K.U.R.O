@@ -1,0 +1,20 @@
+[gd_resource type="Resource" load_steps=4 format=3 uid="uid://weapon_unarmed_passive_skill"]
+
+[ext_resource type="Script" path="res://scripts/items/weapons/WeaponSkillDefinition.cs" id="1_skill_definition"]
+[ext_resource type="Script" path="res://scripts/items/effects/ItemEffectEntry.cs" id="2_effect_entry"]
+[ext_resource type="PackedScene" path="res://resources/effects/UnarmedStunEffect.tscn" id="3_unarmed_effect"]
+
+[sub_resource type="ItemEffectEntry" id="Skill_Unarmed_Effect"]
+Trigger = 1
+EffectScene = ExtResource("3_unarmed_effect")
+Notes = "空手攻击命中敌人时施加短暂眩晕。"
+
+[resource]
+script = ExtResource("1_skill_definition")
+SkillId = "weapon_unarmed_passive"
+DisplayName = "空手眩晕"
+SkillType = 1
+CooldownSeconds = 0.0
+Description = "空手攻击命中目标时自动施加短暂眩晕效果。"
+Effects = Array[Resource]([SubResource("Skill_Unarmed_Effect")])
+

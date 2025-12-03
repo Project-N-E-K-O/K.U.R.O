@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://weapon_block_effect"]
+
+[ext_resource type="Script" path="res://scripts/effects/DirectionalBlockEffect.cs" id="1_block_script"]
+
+[node name="DirectionalBlockEffect" type="Node"]
+script = ExtResource("1_block_script")
+Duration = 1.0
+BlockArcDegrees = 140.0
+ResidualDamageRatio = 0.0
+EndsOnSuccessfulBlock = true
+

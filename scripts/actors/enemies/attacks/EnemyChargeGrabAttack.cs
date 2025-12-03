@@ -368,7 +368,15 @@ namespace Kuros.Actors.Enemies.Attacks
 
 			if (applyDamage)
 			{
-				_grabbedPlayer.TakeDamage(DamageOnEscapeFailure);
+				var sourcePosition = Enemy?.GlobalPosition;
+				if (Enemy != null)
+				{
+					_grabbedPlayer.TakeDamage(DamageOnEscapeFailure, sourcePosition, Enemy);
+				}
+				else
+				{
+					_grabbedPlayer.TakeDamage(DamageOnEscapeFailure, sourcePosition);
+				}
 				_grabbedPlayer.StateMachine?.ChangeState("Hit");
 			}
 

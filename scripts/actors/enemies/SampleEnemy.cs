@@ -27,6 +27,10 @@ public partial class SampleEnemy : GameActor
     public override void _Ready()
     {
         base._Ready();
+        if (!IsInGroup("enemies"))
+        {
+            AddToGroup("enemies");
+        }
         
         // Try to find areas if not assigned (they are nested under Sprite2D in the scene)
         if (AttackArea == null) 
@@ -85,16 +89,16 @@ public partial class SampleEnemy : GameActor
             {
                 if (body is SamplePlayer player)
                 {
-                    player.TakeDamage((int)AttackDamage);
+                    player.TakeDamage((int)AttackDamage, GlobalPosition, this);
                     GameLogger.Info(nameof(SampleEnemy), "Enemy attacked player via Area2D!");
                 }
             }
         }
     }
     
-    public override void TakeDamage(int damage)
+    public override void TakeDamage(int damage, Vector2? attackOrigin = null, GameActor? attacker = null)
     {
-        base.TakeDamage(damage);
+        base.TakeDamage(damage, attackOrigin, attacker);
         // If we want to play hit animation manually since base FSM logic might not cover enemy without state machine
         if (_animationPlayer != null)
         {

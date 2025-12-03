@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://increase_max_health_effect"]
+
+[ext_resource type="Script" path="res://scripts/effects/IncreaseMaxHealthEffect.cs" id="1_increase_max_health_script"]
+
+[node name="IncreaseMaxHealthEffect" type="Node"]
+script = ExtResource("1_increase_max_health_script")
+

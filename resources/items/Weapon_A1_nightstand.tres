@@ -1,0 +1,50 @@
+[gd_resource type="Resource" load_steps=9 format=3 uid="uid://weapon_a1_nightstand"]
+
+[ext_resource type="Script" path="res://scripts/items/ItemDefinition.cs" id="1_item_definition"]
+[ext_resource type="Script" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="2_attribute_entry"]
+[ext_resource type="Texture2D" path="res://icon.svg" id="3_chest_icon"]
+[ext_resource type="Script" path="res://scripts/items/effects/ItemEffectEntry.cs" id="4_effect_entry"]
+[ext_resource type="PackedScene" path="res://scenes/items/ExampleWorldItem.tscn" id="5_world_item"]
+[ext_resource type="PackedScene" path="res://resources/effects/HeavyCarrySlowEffect.tscn" id="6_slow_effect"]
+[ext_resource type="PackedScene" path="res://resources/effects/BreakRewardCoins.tscn" id="7_break_reward"]
+
+[sub_resource type="ItemAttributeEntry" id="Attribute_AttackPower"]
+AttributeId = "attack_power"
+Value = 4.0
+Notes = "床头柜提供 4 点攻击力"
+
+[sub_resource type="ItemDurabilityConfig" id="Durability_Config"]
+MaxDurability = 1
+DamagePerUse = 1
+DamagePerHit = 0
+IsRepairable = false
+BreakBehavior = 0
+
+[sub_resource type="ItemEffectEntry" id="Effect_Slow"]
+Trigger = 0
+EffectScene = ExtResource("6_slow_effect")
+Notes = "携带时移动速度降低 10%"
+PropertyOverrides = {
+"SpeedMultiplierPerStack": 0.9
+}
+
+[sub_resource type="ItemEffectEntry" id="Effect_BreakReward"]
+Trigger = 3
+EffectScene = ExtResource("7_break_reward")
+Notes = "损坏后奖励金币"
+
+[resource]
+script = ExtResource("1_item_definition")
+ItemId = "weapon_a1_nightstand"
+DisplayName = "A1 床头柜"
+Description = "结实的床头柜，被当成武器挥舞时力度适中，携带会略微拖慢脚步，损坏后可掉出金币。"
+Icon = ExtResource("3_chest_icon")
+Category = "Weapon"
+MaxStackSize = 1
+Tags = PackedStringArray("tag_weapon")
+AttributeEntries = Array[Resource]([SubResource("Attribute_AttackPower")])
+DurabilityConfig = SubResource("Durability_Config")
+EffectEntries = Array[Resource]([SubResource("Effect_Slow"), SubResource("Effect_BreakReward")])
+WeaponSkillResources = Array[Resource]()
+WorldScenePath = ExtResource("5_world_item")
+

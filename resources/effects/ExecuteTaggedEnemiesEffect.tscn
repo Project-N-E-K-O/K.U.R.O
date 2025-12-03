@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://execute_tagged_enemies_effect"]
+
+[ext_resource type="Script" path="res://scripts/effects/ExecuteTaggedEnemiesEffect.cs" id="1_execute_tagged_script"]
+
+[node name="ExecuteTaggedEnemiesEffect" type="Node"]
+script = ExtResource("1_execute_tagged_script")
+

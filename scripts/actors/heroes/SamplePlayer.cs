@@ -17,6 +17,7 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 	public PlayerFrozenState? FrozenState { get; private set; }
 	public PlayerInventoryComponent? InventoryComponent { get; private set; }
 	public InventoryContainer? Backpack => InventoryComponent?.Backpack;
+	public PlayerWeaponSkillController? WeaponSkillController { get; private set; }
 	
 	[ExportCategory("UI")]
 	[Export] public Label StatsLabel { get; private set; } = null!; // Drag & Drop in Editor
@@ -90,6 +91,7 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 		if (FrozenState == null) FrozenState = StateMachine?.GetNodeOrNull<PlayerFrozenState>("Frozen");
 		if (StatsLabel == null) StatsLabel = GetNodeOrNull<Label>("../UI/PlayerStats");
 		if (InventoryComponent == null) InventoryComponent = GetNodeOrNull<PlayerInventoryComponent>("Inventory");
+		if (WeaponSkillController == null) WeaponSkillController = GetNodeOrNull<PlayerWeaponSkillController>("WeaponSkillController");
 		
 		// 连接快捷栏变化信号，确保左手物品与选中槽位严格对应
 		ConnectQuickBarSignals();
@@ -97,8 +99,18 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 		// 设置左手默认选中快捷栏2（索引1）
 		// 使用 CallDeferred 确保在快捷栏初始化完成后再设置
 		CallDeferred(MethodName.InitializeLeftHandSelection);
+		CallDeferred(MethodName.ApplyUnarmedSkillIfEmpty);
 		
 		UpdateStatsUI();
+	}
+
+	private void ApplyUnarmedSkillIfEmpty()
+	{
+		if (InventoryComponent == null) return;
+		if (InventoryComponent.GetSelectedBackpackStack() == null)
+		{
+			WeaponSkillController?.ApplyUnarmedFallback();
+		}
 	}
 	
 	public override void _UnhandledInput(InputEvent @event)
@@ -130,6 +142,15 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 			{
 				SwitchToQuickBarSlot(slotIndex.Value);
 				GetViewport().SetInputAsHandled();
+			}
+		}
+
+		if (@event.IsActionPressed("weapon_skill_block"))
+		{
+			if (WeaponSkillController?.TryTriggerActionSkill("weapon_skill_block") == true)
+			{
+				GetViewport().SetInputAsHandled();
+				return;
 			}
 		}
 		
@@ -483,7 +504,7 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 			{
 				if (body is SampleEnemy enemy)
 				{
-					enemy.TakeDamage((int)AttackDamage);
+					enemy.TakeDamage((int)AttackDamage, GlobalPosition, this);
 					hitCount++;
 					GameLogger.Info(nameof(SamplePlayer), $"Hit enemy: {enemy.Name}");
 				}
@@ -500,10 +521,10 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 		}
 	}
 	
-	public override void TakeDamage(int damage)
+	public override void TakeDamage(int damage, Vector2? attackOrigin = null, GameActor? attacker = null)
 	{
 		_pendingAttackSourceState = string.Empty;
-		base.TakeDamage(damage);
+		base.TakeDamage(damage, attackOrigin, attacker);
 		UpdateStatsUI();
 	}
 	

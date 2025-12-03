@@ -1,0 +1,28 @@
+[gd_resource type="Resource" load_steps=8 format=3 uid="uid://weapon_a0_lengyue"]
+
+[ext_resource type="Script" path="res://scripts/items/ItemDefinition.cs" id="1_item_definition"]
+[ext_resource type="Script" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="2_attribute_entry"]
+[ext_resource type="Texture2D" path="res://icon.svg" id="3_icon"]
+[ext_resource type="Resource" path="res://resources/items/skills/WeaponLengyuePassiveSkill.tres" id="4_lengyue_skill"]
+[ext_resource type="PackedScene" path="res://scenes/items/ExampleWorldItem.tscn" id="5_world_item"]
+
+[sub_resource type="ItemAttributeEntry" id="Attribute_AttackPower"]
+AttributeId = "attack_power"
+Value = 7.0
+Notes = "冷月武器提供 7 点攻击力"
+
+[resource]
+script = ExtResource("1_item_definition")
+ItemId = "weapon_a0_lengyue"
+DisplayName = "A0 冷月"
+Description = "蕴含冷冽月光的武器，除了 7 点攻击力，还会定期向背包投放西瓜补给。"
+Icon = ExtResource("3_icon")
+Category = "Weapon"
+MaxStackSize = 1
+Tags = PackedStringArray("tag_weapon")
+AttributeEntries = Array[Resource]([SubResource("Attribute_AttackPower")])
+EffectEntries = Array[Resource]()
+DurabilityConfig = null
+WeaponSkillResources = Array[Resource]([ExtResource("4_lengyue_skill")])
+WorldScenePath = ExtResource("5_world_item")
+

@@ -23,9 +23,9 @@ public partial class EnemyB1Fat : SampleEnemy
         ApplySimpleAttackTuning();
     }
 
-    public override void TakeDamage(int damage)
+    public override void TakeDamage(int damage, Vector2? attackOrigin = null, GameActor? attacker = null)
     {
-        base.TakeDamage(damage);
+        base.TakeDamage(damage, attackOrigin, attacker);
         if (EffectController == null) return;
 
         _hitTracker.RegisterHit();

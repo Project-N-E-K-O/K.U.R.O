@@ -1,0 +1,45 @@
+[gd_resource type="Resource" load_steps=9 format=3 uid="uid://supplies_watermelon"]
+
+[ext_resource type="Script" path="res://scripts/items/ItemDefinition.cs" id="1_item_definition"]
+[ext_resource type="Script" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="2_attribute_entry"]
+[ext_resource type="Script" path="res://scripts/items/effects/ItemEffectEntry.cs" id="3_effect_entry"]
+[ext_resource type="Texture2D" path="res://icon.svg" id="4_icon"]
+[ext_resource type="PackedScene" path="res://scenes/items/ExampleWorldItem.tscn" id="5_world_item"]
+[ext_resource type="PackedScene" path="res://resources/effects/RestoreHealthEffect.tscn" id="6_restore_effect"]
+[ext_resource type="Resource" path="res://resources/items/skills/SuppliesWatermelonPassiveSkill.tres" id="7_watermelon_skill"]
+
+[sub_resource type="ItemAttributeEntry" id="Attribute_AttackPower"]
+AttributeId = "attack_power"
+Value = -1.0
+Notes = "汁水四溅反而让敌人恢复 1 点生命"
+
+[sub_resource type="ItemDurabilityConfig" id="Durability_Config"]
+MaxDurability = 1
+DamagePerUse = 1
+DamagePerHit = 1
+IsRepairable = false
+BreakBehavior = 0
+
+[sub_resource type="ItemEffectEntry" id="Effect_OnConsume"]
+Trigger = 2
+EffectScene = ExtResource("6_restore_effect")
+Notes = "食用后恢复生命值"
+PropertyOverrides = {
+"HealAmount": 3
+}
+
+[resource]
+script = ExtResource("1_item_definition")
+ItemId = "supplies_watermelon"
+DisplayName = "多汁西瓜"
+Description = "既是食材也是武器：吃下可恢复 3 点生命，用手砸到敌人反而让对方回复 1 点生命。"
+Icon = ExtResource("4_icon")
+Category = "Supplies"
+MaxStackSize = 1
+Tags = PackedStringArray("tag_food", "tag_weapon")
+AttributeEntries = Array[Resource]([SubResource("Attribute_AttackPower")])
+EffectEntries = Array[Resource]([SubResource("Effect_OnConsume")])
+DurabilityConfig = SubResource("Durability_Config")
+WeaponSkillResources = Array[Resource]([ExtResource("7_watermelon_skill")])
+WorldScenePath = ExtResource("5_world_item")
+

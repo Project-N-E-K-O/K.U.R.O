@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://glow_aura_effect"]
+
+[ext_resource type="Script" path="res://scripts/effects/GlowAuraEffect.cs" id="1_glow_script"]
+
+[node name="GlowAuraEffect" type="Node"]
+script = ExtResource("1_glow_script")
+LightColor = Color(1, 0.94902, 0.8, 1)
+Energy = 2.0
+Range = 360.0
+TextureScale = 1.2
+

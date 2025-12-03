@@ -25,6 +25,7 @@ namespace Kuros.Items.Attributes
     /// <summary>
     /// 可在 Godot 编辑器中配置的物品属性条目。
     /// </summary>
+    [GlobalClass]
     public partial class ItemAttributeEntry : Resource
     {
         [Export] public string AttributeId { get; set; } = string.Empty;

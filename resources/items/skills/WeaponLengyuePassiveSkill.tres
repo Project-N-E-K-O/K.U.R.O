@@ -1,0 +1,25 @@
+[gd_resource type="Resource" load_steps=4 format=3 uid="uid://weapon_lengyue_passive_skill"]
+
+[ext_resource type="Script" path="res://scripts/items/weapons/WeaponSkillDefinition.cs" id="1_skill_definition"]
+[ext_resource type="Script" path="res://scripts/items/effects/ItemEffectEntry.cs" id="2_effect_entry"]
+[ext_resource type="PackedScene" path="res://resources/effects/PeriodicItemGrantEffect.tscn" id="3_periodic_grant_effect"]
+
+[sub_resource type="ItemEffectEntry" id="Effect_LengYue_Passive"]
+Trigger = 1
+EffectScene = ExtResource("3_periodic_grant_effect")
+Notes = "每 15 秒自动发放西瓜"
+PropertyOverrides = {
+"IntervalSeconds": 15.0,
+"ItemResourcePath": "res://resources/items/Supplies_watermelon.tres",
+"Quantity": 1,
+"RequireFreeSlot": true
+}
+
+[resource]
+script = ExtResource("1_skill_definition")
+SkillId = "weapon_lengyue_passive"
+DisplayName = "冷月馈赠"
+SkillType = 1
+Description = "每 15 秒检查背包，如未满则自动放入一个西瓜。"
+Effects = Array[Resource]([SubResource("Effect_LengYue_Passive")])
+

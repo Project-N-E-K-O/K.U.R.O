@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://864vgt46e1of"]
 
-[ext_resource type="Script" uid="uid://6scs07q8rlah" path="res://scripts/ui/SkillWindow.cs" id="1_skill_window_script"]
+[ext_resource type="Script" path="res://scripts/ui/SkillWindow.cs" id="1_skill_window_script"]
 
 [node name="SkillWindow" type="Control"]
 layout_mode = 3

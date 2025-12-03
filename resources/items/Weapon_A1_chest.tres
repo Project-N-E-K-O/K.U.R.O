@@ -1,0 +1,44 @@
+[gd_resource type="Resource" load_steps=6 format=3 uid="uid://weapon_a1_chest"]
+
+[ext_resource type="Script" path="res://scripts/items/ItemDefinition.cs" id="1_item_definition"]
+[ext_resource type="Script" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="2_attribute_entry"]
+[ext_resource type="Texture2D" path="res://icon.svg" id="3_chest_icon"]
+[ext_resource type="Script" path="res://scripts/items/effects/ItemEffectEntry.cs" id="4_effect_entry"]
+[ext_resource type="PackedScene" path="res://scenes/items/ExampleWorldItem.tscn" id="5_world_item"]
+[ext_resource type="PackedScene" path="res://resources/effects/BreakRewardCoins.tscn" id="6_break_reward"]
+
+[sub_resource type="ItemAttributeEntry" id="Attribute_AttackPower"]
+AttributeId = "attack_power"
+Value = 2.0
+Notes = "沉重宝箱提供 2 点攻击力"
+
+[sub_resource type="ItemDurabilityConfig" id="Durability_Config"]
+MaxDurability = 1
+DamagePerUse = 1
+DamagePerHit = 0
+IsRepairable = false
+BreakBehavior = 0
+
+[sub_resource type="ItemEffectEntry" id="Effect_BreakReward"]
+Trigger = 3
+EffectScene = ExtResource("6_break_reward")
+Notes = "损坏后奖励 2 枚金币"
+PropertyOverrides = {
+"CoinAmount": 2
+}
+
+[resource]
+script = ExtResource("1_item_definition")
+ItemId = "weapon_a1_chest"
+DisplayName = "A1 铁宝箱"
+Description = "沉甸甸的宝箱武器，敲击力度一般，损坏后会弹出少量金币。"
+Icon = ExtResource("3_chest_icon")
+Category = "Weapon"
+MaxStackSize = 1
+Tags = PackedStringArray("tag_weapon")
+AttributeEntries = Array[Resource]([SubResource("Attribute_AttackPower")])
+DurabilityConfig = SubResource("Durability_Config")
+EffectEntries = Array[Resource]([SubResource("Effect_BreakReward")])
+WeaponSkillResources = Array[Resource]()
+WorldScenePath = ExtResource("5_world_item")
+

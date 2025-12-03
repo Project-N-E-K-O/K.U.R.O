@@ -1,0 +1,27 @@
+[gd_resource type="Resource" load_steps=4 format=3 uid="uid://weapon_block_skill_umbrella"]
+
+[ext_resource type="Script" path="res://scripts/items/weapons/WeaponSkillDefinition.cs" id="1_skill_definition"]
+[ext_resource type="Script" path="res://scripts/items/effects/ItemEffectEntry.cs" id="2_effect_entry"]
+[ext_resource type="PackedScene" path="res://resources/effects/WeaponBlockEffect.tscn" id="3_block_effect"]
+
+[sub_resource type="ItemEffectEntry" id="Skill_Block_Effect"]
+Trigger = 1
+EffectScene = ExtResource("3_block_effect")
+Notes = "撑开雨伞格挡，即时阻挡正面攻击。"
+PropertyOverrides = {
+"Duration": 1.5,
+"BlockArcDegrees": 160.0,
+"ResidualDamageRatio": 0.0,
+"EndsOnSuccessfulBlock": true
+}
+
+[resource]
+script = ExtResource("1_skill_definition")
+SkillId = "weapon_block_umbrella"
+DisplayName = "雨伞格挡"
+SkillType = 0
+CooldownSeconds = 2.5
+Description = "展开雨伞形成临时护盾，短时间内格挡正面攻击。"
+ActivationAction = "weapon_skill_block"
+Effects = Array[Resource]([SubResource("Skill_Block_Effect")])
+

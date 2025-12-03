@@ -71,6 +71,11 @@ namespace Kuros.Actors.Heroes
                 InventoryComponent?.SelectPreviousBackpackSlot();
             }
 
+            if (Input.IsActionJustPressed("item_use"))
+            {
+                TryUseSelectedItem();
+            }
+
             if (Input.IsActionJustPressed("take_up"))
             {
                 TriggerPickupState();
@@ -178,6 +183,16 @@ namespace Kuros.Actors.Heroes
 
             InventoryComponent.NotifyItemRemoved(extracted.Item.ItemId);
             return true;
+        }
+
+        private bool TryUseSelectedItem()
+        {
+            if (InventoryComponent == null)
+            {
+                return false;
+            }
+
+            return InventoryComponent.TryConsumeSelectedItem(_actor);
         }
 
         private Vector2 ComputeSpawnPosition(DropDisposition disposition)

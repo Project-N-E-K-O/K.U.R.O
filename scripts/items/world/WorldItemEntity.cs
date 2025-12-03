@@ -400,22 +400,7 @@ namespace Kuros.Items.World
 
         private void ApplyItemEffects(GameActor actor, ItemEffectTrigger trigger)
         {
-            if (actor?.EffectController == null)
-            {
-                return;
-            }
-
-            if (ItemDefinition == null)
-            {
-                return;
-            }
-
-            foreach (var effectEntry in ItemDefinition.GetEffectEntries(trigger))
-            {
-                var effect = effectEntry.InstantiateEffect();
-                if (effect == null) continue;
-                actor.ApplyEffect(effect);
-            }
+            ItemDefinition?.ApplyEffects(actor, trigger);
         }
 
         private static T? FindChildComponent<T>(Node root) where T : Node

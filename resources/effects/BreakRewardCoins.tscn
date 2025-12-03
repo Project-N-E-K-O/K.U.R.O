@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://break_reward_coins"]
+
+[ext_resource type="Script" path="res://scripts/effects/GrantCoinsEffect.cs" id="1_script"]
+
+[node name="GrantCoinsEffect" type="Node"]
+script = ExtResource("1_script")
+CoinAmount = 25
+

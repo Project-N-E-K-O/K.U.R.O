@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+using Kuros.Core;
 using Kuros.Items;
 using Kuros.Items.Attributes;
+using Kuros.Items.Durability;
+using Kuros.Items.Effects;
 
 namespace Kuros.Systems.Inventory
 {
@@ -12,6 +15,7 @@ namespace Kuros.Systems.Inventory
     {
         public ItemDefinition Item { get; }
         public int Quantity { get; private set; }
+        public ItemDurabilityState? DurabilityState { get; }
 
         public bool IsFull => Quantity >= Item.MaxStackSize;
         public bool IsEmpty => Quantity <= 0;
@@ -20,6 +24,10 @@ namespace Kuros.Systems.Inventory
         {
             Item = item;
             Quantity = Math.Max(0, quantity);
+            if (item.DurabilityConfig != null)
+            {
+                DurabilityState = new ItemDurabilityState(item.DurabilityConfig);
+            }
         }
 
         public int Add(int amount)
@@ -44,7 +52,14 @@ namespace Kuros.Systems.Inventory
         public InventoryItemStack Split(int amount)
         {
             int removed = Remove(amount);
-            return new InventoryItemStack(Item, removed);
+            var newStack = new InventoryItemStack(Item, removed);
+            if (DurabilityState != null && newStack.DurabilityState != null)
+            {
+                int durabilityPerUnit = DurabilityState.CurrentDurability;
+                newStack.DurabilityState.Reset();
+                newStack.DurabilityState.ApplyDamage(DurabilityState.Config.MaxDurability - durabilityPerUnit);
+            }
+            return newStack;
         }
 
         public bool CanMerge(ItemDefinition other) => other == Item;
@@ -82,6 +97,25 @@ namespace Kuros.Systems.Inventory
         public bool HasAnyTag(IEnumerable<string> tagIds) => Item.HasAnyTag(tagIds);
 
         public IReadOnlyCollection<string> GetTags() => Item.GetTags();
+
+        public bool HasDurability => DurabilityState != null;
+
+        public bool ApplyDurabilityDamage(int amount, GameActor? owner = null, bool triggerEffects = true)
+        {
+            if (DurabilityState == null) return false;
+            bool broke = DurabilityState.ApplyDamage(amount);
+            if (broke && triggerEffects && owner != null)
+            {
+                Item.ApplyEffects(owner, ItemEffectTrigger.OnBreak);
+            }
+            return broke;
+        }
+
+        public void RepairDurability(int amount)
+        {
+            DurabilityState?.Repair(amount);
+        }
+
     }
 }
 

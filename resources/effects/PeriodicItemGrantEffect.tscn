@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://periodic_item_grant_effect"]
+
+[ext_resource type="Script" path="res://scripts/effects/PeriodicItemGrantEffect.cs" id="1_periodic_grant_script"]
+
+[node name="PeriodicItemGrantEffect" type="Node"]
+script = ExtResource("1_periodic_grant_script")
+

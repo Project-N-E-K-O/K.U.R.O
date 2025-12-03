@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://heavy_carry_slow_effect"]
+
+[ext_resource type="Script" path="res://scripts/effects/HeavyCarrySlowEffect.cs" id="1_slow_effect_script"]
+
+[node name="HeavyCarrySlowEffect" type="Node"]
+script = ExtResource("1_slow_effect_script")
+

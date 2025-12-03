@@ -1,0 +1,19 @@
+[gd_resource type="Resource" load_steps=4 format=3 uid="uid://weapon_yaomeng_synergy_passive_skill"]
+
+[ext_resource type="Script" path="res://scripts/items/weapons/WeaponSkillDefinition.cs" id="1_skill_definition"]
+[ext_resource type="Script" path="res://scripts/items/effects/ItemEffectEntry.cs" id="2_effect_entry"]
+[ext_resource type="PackedScene" path="res://resources/effects/YaomengDualSynergyEffect.tscn" id="3_synergy_effect"]
+
+[sub_resource type="ItemEffectEntry" id="Effect_Yaomeng_Synergy"]
+Trigger = 1
+EffectScene = ExtResource("3_synergy_effect")
+Notes = "检测两把妖梦武器是否同时存在，若是则减半冷却"
+
+[resource]
+script = ExtResource("1_skill_definition")
+SkillId = "weapon_yaomeng_synergy"
+DisplayName = "妖梦双生"
+SkillType = 1
+Description = "当同时拥有两把妖梦武器时，攻击与技能冷却减半。"
+Effects = Array[Resource]([SubResource("Effect_Yaomeng_Synergy")])
+

@@ -4,6 +4,7 @@ using Kuros.Systems.FSM;
 using Kuros.Core.Effects;
 using Kuros.Utils;
 using Kuros.Core.Stats;
+using Kuros.Core.Events;
 
 namespace Kuros.Core
 {
@@ -28,6 +29,7 @@ namespace Kuros.Core
         public int CurrentHealth { get; protected set; }
         public float AttackTimer { get; set; } = 0.0f;
         public bool FacingRight { get; protected set; } = true;
+        public event Func<DamageEventArgs, bool>? DamageIntercepted;
         public AnimationPlayer? AnimPlayer => _animationPlayer;
         
         protected Node2D _spineCharacter = null!;
@@ -139,8 +141,30 @@ namespace Kuros.Core
             // StateMachine._PhysicsProcess is called automatically by Godot if it's in the tree
         }
 
-        public virtual void TakeDamage(int damage)
+        public virtual void TakeDamage(int damage, Vector2? attackOrigin = null, GameActor? attacker = null)
         {
+            if (damage <= 0) return;
+
+            if (DamageIntercepted != null)
+            {
+                var args = new DamageEventArgs(this, damage, attackOrigin);
+                foreach (Func<DamageEventArgs, bool> handler in DamageIntercepted.GetInvocationList())
+                {
+                    handler(args);
+                    if (args.IsBlocked)
+                    {
+                        GameLogger.Info(nameof(GameActor), $"{Name} blocked incoming damage.");
+                        return;
+                    }
+                }
+
+                damage = args.Damage;
+                if (damage <= 0)
+                {
+                    return;
+                }
+            }
+
             CurrentHealth -= damage;
             CurrentHealth = Mathf.Max(CurrentHealth, 0);
             NotifyHealthChanged();
@@ -158,9 +182,35 @@ namespace Kuros.Core
                 // Force state change to Hit
                 if (StateMachine != null)
                 {
-                    StateMachine.ChangeState("Hit");
+                StateMachine.ChangeState("Hit");
                 }
             }
+
+            if (attacker != null)
+            {
+                Events.DamageEventBus.Publish(attacker, this, damage);
+            }
+        }
+
+        public sealed class DamageEventArgs
+        {
+            public GameActor Target { get; }
+            public int Damage { get; set; }
+            public Vector2? AttackOrigin { get; }
+            public Vector2 AttackDirection { get; }
+            public bool IsBlocked { get; set; }
+
+            internal DamageEventArgs(GameActor target, int damage, Vector2? attackOrigin)
+            {
+                Target = target;
+                Damage = damage;
+                AttackOrigin = attackOrigin;
+                AttackDirection = attackOrigin.HasValue
+                    ? (target.GlobalPosition - attackOrigin.Value).Normalized()
+                    : Vector2.Zero;
+            }
+
+            public Vector2 Forward => Target.FacingRight ? Vector2.Right : Vector2.Left;
         }
 
         /// <summary>
