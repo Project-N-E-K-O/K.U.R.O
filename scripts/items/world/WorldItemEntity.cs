@@ -8,6 +8,7 @@ using Kuros.Items.Effects;
 using Kuros.Items;
 using Kuros.Managers;
 using Kuros.Systems.Inventory;
+using Kuros.UI;
 using Kuros.Utils;
 
 namespace Kuros.Items.World
@@ -33,10 +34,10 @@ namespace Kuros.Items.World
 
         [ExportGroup("World Physics")]
         [Export(PropertyHint.Range, "0,4000,1")] public float ThrowFriction = 600f;
-        [Export] public uint BodyCollisionLayer { get; set; } = 1u << 2;
-        [Export] public uint BodyCollisionMask { get; set; } = 1u;
-        [Export] public uint TriggerCollisionLayer { get; set; } = 1u << 1;
-        [Export] public uint TriggerCollisionMask { get; set; } = 1u;
+        [Export] public uint BodyCollisionLayer { get; set; } = 0;  // 禁用 body 碰撞
+        [Export] public uint BodyCollisionMask { get; set; } = 0;   // 禁用 body 碰撞
+        [Export] public uint TriggerCollisionLayer { get; set; } = 1u << 1;  // collision_layer = 2
+        [Export] public uint TriggerCollisionMask { get; set; } = 1u;        // collision_mask = 1
 
         public InventoryItemStack? CurrentStack { get; private set; }
         public string ItemId => !string.IsNullOrWhiteSpace(ItemIdOverride)
@@ -59,6 +60,7 @@ namespace Kuros.Items.World
             InitializeStack();
             ResolveTriggerArea();
             ApplyCollisionSettings();
+            UpdateSprite(); // 更新精灵贴图
             SetProcess(true);
             SetPhysicsProcess(true);
         }
@@ -77,6 +79,10 @@ namespace Kuros.Items.World
         {
             base._Process(delta);
 
+            // 注意：拾取逻辑已移至 PlayerItemInteractionComponent 统一处理
+            // 这里不再监听 take_up 输入，避免多个物品同时被拾取的问题
+            // WorldItemEntity 只负责追踪哪个 Actor 在范围内（_focusedActor）
+            
             if (_isPicked || _focusedActor == null)
             {
                 return;
@@ -86,17 +92,6 @@ namespace Kuros.Items.World
             {
                 _focusedActor = null;
                 return;
-            }
-
-            // 检查对话是否激活，如果激活则不处理拾取（让NPC交互优先）
-            if (DialogueManager.Instance != null && DialogueManager.Instance.IsDialogueActive)
-            {
-                return;
-            }
-
-            if (Input.IsActionJustPressed("take_up"))
-            {
-                HandlePickupRequest(_focusedActor);
             }
         }
 
@@ -140,6 +135,9 @@ namespace Kuros.Items.World
             ItemDefinition = stack.Item;
             Quantity = stack.Quantity;
             CurrentStack = new InventoryItemStack(stack.Item, stack.Quantity);
+            
+            // 更新精灵贴图
+            UpdateSprite();
         }
 
         public void InitializeFromItem(ItemDefinition definition, int quantity)
@@ -150,6 +148,28 @@ namespace Kuros.Items.World
             ItemDefinition = definition;
             Quantity = quantity;
             CurrentStack = new InventoryItemStack(definition, quantity);
+            
+            // 更新精灵贴图
+            UpdateSprite();
+        }
+
+        /// <summary>
+        /// 根据物品定义更新精灵贴图
+        /// </summary>
+        private void UpdateSprite()
+        {
+            var sprite = GetNodeOrNull<Sprite2D>("Sprite2D");
+            if (sprite == null)
+            {
+                return;
+            }
+
+            // 如果物品定义有图标，使用它；否则保持默认贴图
+            // 注意：保持场景中设置的缩放，不重置
+            if (ItemDefinition?.Icon != null)
+            {
+                sprite.Texture = ItemDefinition.Icon;
+            }
         }
 
         public void ApplyThrowImpulse(Vector2 velocity)
@@ -174,6 +194,9 @@ namespace Kuros.Items.World
             }
 
             ApplyItemEffects(actor, ItemEffectTrigger.OnPickup);
+            
+            // 同步玩家的左手物品和快捷栏显示
+            SyncPlayerHandAndQuickBar(actor);
 
             // 检查是否为部分转移（地面仍有剩余物品）
             if (Quantity > 0)
@@ -195,6 +218,33 @@ namespace Kuros.Items.World
 
             OnPicked(actor);
             return true;
+        }
+        
+        /// <summary>
+        /// 同步玩家的左手物品和快捷栏显示
+        /// </summary>
+        private void SyncPlayerHandAndQuickBar(GameActor actor)
+        {
+            if (actor is SamplePlayer player)
+            {
+                // 同步左手物品
+                player.SyncLeftHandItemFromSlot();
+                player.UpdateHandItemVisual();
+                
+                // 刷新 BattleHUD 快捷栏显示
+                var battleHUD = UIManager.Instance?.GetUI<BattleHUD>("BattleHUD");
+                if (battleHUD == null)
+                {
+                    battleHUD = GetTree().GetFirstNodeInGroup("ui") as BattleHUD;
+                }
+                
+                if (battleHUD != null)
+                {
+                    battleHUD.CallDeferred("UpdateQuickBarDisplay");
+                    int leftHandSlot = player.LeftHandSlotIndex >= 1 && player.LeftHandSlotIndex < 5 ? player.LeftHandSlotIndex : -1;
+                    battleHUD.CallDeferred("UpdateHandSlotHighlight", leftHandSlot, 0);
+                }
+            }
         }
 
         private void ResolveTriggerArea()
@@ -293,9 +343,23 @@ namespace Kuros.Items.World
 
         private void InitializeStack()
         {
+            // 如果 CurrentStack 已经被 InitializeFromStack() 初始化，跳过
+            if (CurrentStack != null)
+            {
+                return;
+            }
+            
             var definition = ResolveItemDefinition();
             if (definition == null)
             {
+                // 如果没有配置 ItemDefinition 或 ItemDefinitionResourcePath，
+                // 可能是通过 WorldItemSpawner 动态生成的，等待 InitializeFromStack() 调用
+                if (ItemDefinition == null && string.IsNullOrWhiteSpace(ItemDefinitionResourcePath))
+                {
+                    // 静默等待，不报错
+                    return;
+                }
+                
                 GameLogger.Error(nameof(WorldItemEntity), $"{Name} 无法解析物品定义，路径：{ItemDefinitionResourcePath}, 推断 Id：{ItemId}");
                 QueueFree();
                 return;
@@ -320,11 +384,11 @@ namespace Kuros.Items.World
                 return false;
             }
 
-            // 使用选中槽位添加物品
-            int accepted = inventory.TryAddItemToSelectedSlot(stack.Item, stack.Quantity);
+            // 使用 AddItemSmart 优先添加到快捷栏，溢出放入背包
+            int accepted = inventory.AddItemSmart(stack.Item, stack.Quantity, showPopupIfFirstTime: true);
             if (accepted <= 0)
             {
-                GameLogger.Info(nameof(WorldItemEntity), $"Actor {actor.Name} 的当前选中栏位无法拾取 {ItemId}。");
+                GameLogger.Info(nameof(WorldItemEntity), $"Actor {actor.Name} 的物品栏已满，无法拾取 {ItemId}。");
                 return false;
             }
 

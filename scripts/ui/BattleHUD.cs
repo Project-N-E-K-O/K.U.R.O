@@ -39,6 +39,7 @@ namespace Kuros.UI
 		// 快捷栏UI引用
 		private readonly Label[] _quickSlotLabels = new Label[5];
 		private readonly Panel[] _quickSlotPanels = new Panel[5];
+		private readonly TextureRect[] _quickSlotIcons = new TextureRect[5];
 		
 		// 小地图相关
 		private Vector2 _mapSize = new Vector2(2000, 1500); // 地图总大小（可以根据实际地图调整）
@@ -145,6 +146,7 @@ namespace Kuros.UI
 			{
 				_quickSlotLabels[i] = GetNodeOrNull<Label>($"QuickBarPanel/QuickBarContainer/QuickSlot{i + 1}/QuickSlotLabel{i + 1}");
 				_quickSlotPanels[i] = GetNodeOrNull<Panel>($"QuickBarPanel/QuickBarContainer/QuickSlot{i + 1}");
+				_quickSlotIcons[i] = GetNodeOrNull<TextureRect>($"QuickBarPanel/QuickBarContainer/QuickSlot{i + 1}/QuickSlotIcon{i + 1}");
 				
 				if (_quickSlotLabels[i] == null)
 				{
@@ -159,6 +161,11 @@ namespace Kuros.UI
 				{
 					// 初始化默认边框颜色
 					UpdateSlotBorderColor(i, DefaultColor);
+				}
+				
+				if (_quickSlotIcons[i] == null)
+				{
+					GD.PrintErr($"CacheQuickBarLabels: Failed to find QuickSlotIcon{i + 1}");
 				}
 			}
 		}
@@ -271,23 +278,37 @@ namespace Kuros.UI
 				GD.PrintErr($"UpdateQuickBarSlot: QuickBarContainer is null for slot {slotIndex}");
 				return;
 			}
-			if (_quickSlotLabels[slotIndex] == null)
-			{
-				GD.PrintErr($"UpdateQuickBarSlot: QuickSlotLabel[{slotIndex}] is null");
-				return;
-			}
 
 			var stack = _quickBarContainer.GetStack(slotIndex);
-			if (stack == null || stack.IsEmpty)
+			bool isEmpty = stack == null || stack.IsEmpty;
+			bool isEmptyItem = !isEmpty && stack!.Item.ItemId == "empty_item";
+			
+			// 更新标签文字
+			if (_quickSlotLabels[slotIndex] != null)
 			{
-				_quickSlotLabels[slotIndex].Text = "空";
+				if (isEmpty || isEmptyItem)
+				{
+					_quickSlotLabels[slotIndex].Text = "";
+				}
+				else
+				{
+					_quickSlotLabels[slotIndex].Text = stack!.Item.DisplayName;
+				}
 			}
-			else
+			
+			// 更新图标
+			if (_quickSlotIcons[slotIndex] != null)
 			{
-				// 检查是否为空白道具（EmptyItem）
-				bool isEmptyItem = stack.Item.ItemId == "empty_item";
-				// 如果是空白道具，显示空文本；否则显示物品名称
-				_quickSlotLabels[slotIndex].Text = isEmptyItem ? "空" : stack.Item.DisplayName;
+				if (isEmpty || isEmptyItem)
+				{
+					_quickSlotIcons[slotIndex].Texture = null;
+					_quickSlotIcons[slotIndex].Modulate = new Color(1, 1, 1, 0.3f);
+				}
+				else
+				{
+					_quickSlotIcons[slotIndex].Texture = stack!.Item.Icon;
+					_quickSlotIcons[slotIndex].Modulate = Colors.White;
+				}
 			}
 		}
 		

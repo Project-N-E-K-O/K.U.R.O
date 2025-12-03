@@ -430,7 +430,7 @@ namespace Kuros.UI
 				return;
 			}
 
-			// ESC键：完全禁用（弹窗显示时不允许使用ESC键）
+			// ESC键：关闭弹窗（返回上一层级）
 			// 检查动作映射和直接键码，确保完全捕获ESC键
 			bool isEscKey = false;
 			if (@event.IsActionPressed("ui_cancel"))
@@ -447,7 +447,8 @@ namespace Kuros.UI
 
 			if (isEscKey)
 			{
-				// 完全禁用ESC键：标记为已处理并接受事件，防止传播到其他节点
+				// ESC键关闭弹窗
+				HandleSpaceKey(); // 使用相同的关闭逻辑
 				GetViewport().SetInputAsHandled();
 				AcceptEvent();
 				return;
@@ -462,12 +463,14 @@ namespace Kuros.UI
 				return;
 			}
 
-			// 禁止其他所有键盘输入（除了鼠标和Space）
+			// 禁止其他所有键盘输入（除了鼠标、Space和ESC）
 			if (@event is InputEventKey keyEvent2 && keyEvent2.Pressed)
 			{
-				// 只允许Space（ESC已经在上面被禁用）
+				// 只允许Space和ESC
 				if (keyEvent2.Keycode != Key.Space &&
-				    keyEvent2.PhysicalKeycode != Key.Space)
+				    keyEvent2.PhysicalKeycode != Key.Space &&
+				    keyEvent2.Keycode != Key.Escape &&
+				    keyEvent2.PhysicalKeycode != Key.Escape)
 				{
 					GetViewport().SetInputAsHandled();
 				}
@@ -484,7 +487,7 @@ namespace Kuros.UI
 				return;
 			}
 
-			// ESC键：完全禁用（弹窗显示时不允许使用ESC键）
+			// ESC键：关闭弹窗（返回上一层级）
 			// 检查动作映射和直接键码，确保完全捕获ESC键
 			bool isEscKey = false;
 			if (@event.IsActionPressed("ui_cancel"))
@@ -501,7 +504,8 @@ namespace Kuros.UI
 
 			if (isEscKey)
 			{
-				// 完全禁用ESC键：标记为已处理并接受事件，防止传播到其他节点
+				// ESC键关闭弹窗
+				HandleSpaceKey(); // 使用相同的关闭逻辑
 				GetViewport().SetInputAsHandled();
 				AcceptEvent();
 				return;

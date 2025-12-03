@@ -197,34 +197,11 @@ namespace Kuros.UI
 
             if (isEscKey)
             {
-                GD.Print($"CompendiumWindow._UnhandledInput: 检测到ESC键，当前标签页={Tabs?.CurrentTab ?? -1}，是否有选中条目={HasSelectedEntry()}");
+                GD.Print($"CompendiumWindow._UnhandledInput: 检测到ESC键，直接关闭图鉴窗口");
                 
-                // 首先检查是否有选中的条目，如果有则取消选择（返回列表状态）
-                if (HasSelectedEntry())
-                {
-                    GD.Print("CompendiumWindow._UnhandledInput: 清除选中条目");
-                    ClearSelectedEntry();
-                    GetViewport().SetInputAsHandled();
-                    return;
-                }
-
-                // 如果没有选中的条目，检查是否在非第一个标签页
-                int currentTab = Tabs?.CurrentTab ?? -1;
-                if (Tabs != null && currentTab > 0)
-                {
-                    // 切换到上一个标签页
-                    int newTab = currentTab - 1;
-                    GD.Print($"CompendiumWindow._UnhandledInput: 切换到上一个标签页，从{currentTab}到{newTab}");
-                    Tabs.CurrentTab = newTab;
-                    GetViewport().SetInputAsHandled();
-                }
-                else
-                {
-                    // 如果已经在第一个标签页且没有选中条目，关闭窗口
-                    GD.Print("CompendiumWindow._UnhandledInput: 关闭图鉴窗口");
-                    HideWindow();
-                    GetViewport().SetInputAsHandled();
-                }
+                // ESC键直接关闭窗口，返回上一层级
+                HideWindow();
+                GetViewport().SetInputAsHandled();
             }
         }
 
@@ -262,34 +239,11 @@ namespace Kuros.UI
 
             if (isEscKey)
             {
-                GD.Print($"CompendiumWindow._GuiInput: 检测到ESC键，当前标签页={Tabs?.CurrentTab ?? -1}，是否有选中条目={HasSelectedEntry()}");
+                GD.Print($"CompendiumWindow._GuiInput: 检测到ESC键，直接关闭图鉴窗口");
                 
-                // 首先检查是否有选中的条目，如果有则取消选择（返回列表状态）
-                if (HasSelectedEntry())
-                {
-                    GD.Print("CompendiumWindow._GuiInput: 清除选中条目");
-                    ClearSelectedEntry();
-                    AcceptEvent();
-                    return;
-                }
-
-                // 如果没有选中的条目，检查是否在非第一个标签页
-                int currentTab = Tabs?.CurrentTab ?? -1;
-                if (Tabs != null && currentTab > 0)
-                {
-                    // 切换到上一个标签页
-                    int newTab = currentTab - 1;
-                    GD.Print($"CompendiumWindow._GuiInput: 切换到上一个标签页，从{currentTab}到{newTab}");
-                    Tabs.CurrentTab = newTab;
-                    AcceptEvent();
-                }
-                else
-                {
-                    // 如果已经在第一个标签页且没有选中条目，关闭窗口
-                    GD.Print("CompendiumWindow._GuiInput: 关闭图鉴窗口");
-                    HideWindow();
-                    AcceptEvent();
-                }
+                // ESC键直接关闭窗口，返回上一层级
+                HideWindow();
+                AcceptEvent();
             }
         }
 
@@ -327,34 +281,11 @@ namespace Kuros.UI
 
             if (isEscKey)
             {
-                GD.Print($"CompendiumWindow._Input: 检测到ESC键，当前标签页={Tabs?.CurrentTab ?? -1}，是否有选中条目={HasSelectedEntry()}");
+                GD.Print($"CompendiumWindow._Input: 检测到ESC键，直接关闭图鉴窗口");
                 
-                // 首先检查是否有选中的条目，如果有则取消选择（返回列表状态）
-                if (HasSelectedEntry())
-                {
-                    GD.Print("CompendiumWindow._Input: 清除选中条目");
-                    ClearSelectedEntry();
-                    GetViewport().SetInputAsHandled();
-                    return;
-                }
-
-                // 如果没有选中的条目，检查是否在非第一个标签页
-                int currentTab = Tabs?.CurrentTab ?? -1;
-                if (Tabs != null && currentTab > 0)
-                {
-                    // 切换到上一个标签页
-                    int newTab = currentTab - 1;
-                    GD.Print($"CompendiumWindow._Input: 切换到上一个标签页，从{currentTab}到{newTab}");
-                    Tabs.CurrentTab = newTab;
-                    GetViewport().SetInputAsHandled();
-                }
-                else
-                {
-                    // 如果已经在第一个标签页且没有选中条目，关闭窗口
-                    GD.Print("CompendiumWindow._Input: 关闭图鉴窗口");
-                    HideWindow();
-                    GetViewport().SetInputAsHandled();
-                }
+                // ESC键直接关闭窗口，返回上一层级
+                HideWindow();
+                GetViewport().SetInputAsHandled();
             }
         }
 

@@ -70,7 +70,7 @@ namespace Kuros.Items
         private Godot.Collections.Array<Resource> _weaponSkillResources = new();
         private ItemAttributeSet? _attributeCache;
 
-        private const string DefaultWorldSceneDirectory = "res://scenes/properties/";
+        private const string DefaultWorldSceneDirectory = "res://scenes/items/";
 
         [ExportGroup("World")]
         [Export(PropertyHint.File, "*.tscn")] public string WorldScenePath { get; set; } = string.Empty;

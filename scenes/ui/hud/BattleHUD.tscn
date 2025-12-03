@@ -170,76 +170,166 @@ alignment = 1
 custom_minimum_size = Vector2(100, 60)
 layout_mode = 2
 
-[node name="QuickSlotLabel1" type="Label" parent="QuickBarPanel/QuickBarContainer/QuickSlot1"]
+[node name="QuickSlotIcon1" type="TextureRect" parent="QuickBarPanel/QuickBarContainer/QuickSlot1"]
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
 grow_horizontal = 2
 grow_vertical = 2
-text = "物品 1"
+expand_mode = 1
+stretch_mode = 5
+
+[node name="QuickSlotLabel1" type="Label" parent="QuickBarPanel/QuickBarContainer/QuickSlot1"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -16.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_font_sizes/font_size = 10
 horizontal_alignment = 1
-vertical_alignment = 1
+vertical_alignment = 2
 
 [node name="QuickSlot2" type="Panel" parent="QuickBarPanel/QuickBarContainer"]
 custom_minimum_size = Vector2(100, 60)
 layout_mode = 2
 
-[node name="QuickSlotLabel2" type="Label" parent="QuickBarPanel/QuickBarContainer/QuickSlot2"]
+[node name="QuickSlotIcon2" type="TextureRect" parent="QuickBarPanel/QuickBarContainer/QuickSlot2"]
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
 grow_horizontal = 2
 grow_vertical = 2
-text = "物品 2"
+expand_mode = 1
+stretch_mode = 5
+
+[node name="QuickSlotLabel2" type="Label" parent="QuickBarPanel/QuickBarContainer/QuickSlot2"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -16.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_font_sizes/font_size = 10
 horizontal_alignment = 1
-vertical_alignment = 1
+vertical_alignment = 2
 
 [node name="QuickSlot3" type="Panel" parent="QuickBarPanel/QuickBarContainer"]
 custom_minimum_size = Vector2(100, 60)
 layout_mode = 2
 
-[node name="QuickSlotLabel3" type="Label" parent="QuickBarPanel/QuickBarContainer/QuickSlot3"]
+[node name="QuickSlotIcon3" type="TextureRect" parent="QuickBarPanel/QuickBarContainer/QuickSlot3"]
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
 grow_horizontal = 2
 grow_vertical = 2
-text = "物品 3"
+expand_mode = 1
+stretch_mode = 5
+
+[node name="QuickSlotLabel3" type="Label" parent="QuickBarPanel/QuickBarContainer/QuickSlot3"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -16.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_font_sizes/font_size = 10
 horizontal_alignment = 1
-vertical_alignment = 1
+vertical_alignment = 2
 
 [node name="QuickSlot4" type="Panel" parent="QuickBarPanel/QuickBarContainer"]
 custom_minimum_size = Vector2(100, 60)
 layout_mode = 2
 
-[node name="QuickSlotLabel4" type="Label" parent="QuickBarPanel/QuickBarContainer/QuickSlot4"]
+[node name="QuickSlotIcon4" type="TextureRect" parent="QuickBarPanel/QuickBarContainer/QuickSlot4"]
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
 grow_horizontal = 2
 grow_vertical = 2
-text = "物品 4"
+expand_mode = 1
+stretch_mode = 5
+
+[node name="QuickSlotLabel4" type="Label" parent="QuickBarPanel/QuickBarContainer/QuickSlot4"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -16.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_font_sizes/font_size = 10
 horizontal_alignment = 1
-vertical_alignment = 1
+vertical_alignment = 2
 
 [node name="QuickSlot5" type="Panel" parent="QuickBarPanel/QuickBarContainer"]
 custom_minimum_size = Vector2(100, 60)
 layout_mode = 2
 
-[node name="QuickSlotLabel5" type="Label" parent="QuickBarPanel/QuickBarContainer/QuickSlot5"]
+[node name="QuickSlotIcon5" type="TextureRect" parent="QuickBarPanel/QuickBarContainer/QuickSlot5"]
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
 grow_horizontal = 2
 grow_vertical = 2
-text = "物品 5"
+expand_mode = 1
+stretch_mode = 5
+
+[node name="QuickSlotLabel5" type="Label" parent="QuickBarPanel/QuickBarContainer/QuickSlot5"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -16.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_font_sizes/font_size = 10
 horizontal_alignment = 1
-vertical_alignment = 1
+vertical_alignment = 2
 
 [node name="GoldLabel" type="Label" parent="."]
 layout_mode = 1

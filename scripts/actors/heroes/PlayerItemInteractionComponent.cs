@@ -99,8 +99,9 @@ namespace Kuros.Actors.Heroes
                 return false;
             }
 
-            var selectedStack = InventoryComponent.GetSelectedBackpackStack();
-            if (selectedStack == null)
+            // 從快捷欄選中的槽位獲取物品（左手物品）
+            var selectedStack = InventoryComponent.GetSelectedQuickBarStack();
+            if (selectedStack == null || selectedStack.IsEmpty || selectedStack.Item.ItemId == "empty_item")
             {
                 return false;
             }
@@ -115,7 +116,8 @@ namespace Kuros.Actors.Heroes
                 return TryHandleDrop(disposition, skipAnimation: true);
             }
 
-            if (!InventoryComponent.TryExtractFromSelectedSlot(selectedStack.Quantity, out var extracted) || extracted == null || extracted.IsEmpty)
+            // 從快捷欄提取物品
+            if (!InventoryComponent.TryExtractFromSelectedQuickBarSlot(selectedStack.Quantity, out var extracted) || extracted == null || extracted.IsEmpty)
             {
                 return false;
             }
@@ -125,7 +127,7 @@ namespace Kuros.Actors.Heroes
 
             if (entity == null)
             {
-                // Recovery path: spawn failed, try to return extracted items to inventory
+                // Recovery path: spawn failed, try to return extracted items to quickbar
                 if (extracted == null || extracted.IsEmpty)
                 {
                     return false;
@@ -134,27 +136,48 @@ namespace Kuros.Actors.Heroes
                 int originalQuantity = extracted.Quantity;
                 int totalRecovered = 0;
 
-                // Step 1: Try to return items to the selected slot first
-                // Note: TryReturnStackToSelectedSlot already removes accepted items from extracted
-                if (InventoryComponent.TryReturnStackToSelectedSlot(extracted, out var returnedToSlot))
+                // Step 1: Try to return items to the selected quickbar slot first
+                if (InventoryComponent.TryReturnStackToSelectedQuickBarSlot(extracted, out var returnedToSlot))
                 {
                     totalRecovered += returnedToSlot;
                 }
 
-                // Step 2: If there are remaining items, try to add them to any available inventory slot
-                if (!extracted.IsEmpty && InventoryComponent.Backpack != null)
+                // Step 2: If there are remaining items, try to add them to quickbar or backpack
+                if (!extracted.IsEmpty)
                 {
                     int remainingQuantity = extracted.Quantity;
-                    int addedToBackpack = InventoryComponent.Backpack.AddItem(extracted.Item, remainingQuantity);
-
-                    if (addedToBackpack > 0)
+                    
+                    // 先嘗試放回快捷欄
+                    if (InventoryComponent.QuickBar != null)
                     {
-                        totalRecovered += addedToBackpack;
-                        // Only remove the amount that was successfully added (with safety clamp)
-                        int safeRemove = Math.Min(addedToBackpack, extracted.Quantity);
-                        if (safeRemove > 0)
+                        for (int i = 1; i < 5 && remainingQuantity > 0; i++)
                         {
-                            extracted.Remove(safeRemove);
+                            int added = InventoryComponent.QuickBar.TryAddItemToSlot(extracted.Item, remainingQuantity, i);
+                            if (added > 0)
+                            {
+                                totalRecovered += added;
+                                remainingQuantity -= added;
+                                int safeRemove = Math.Min(added, extracted.Quantity);
+                                if (safeRemove > 0)
+                                {
+                                    extracted.Remove(safeRemove);
+                                }
+                            }
+                        }
+                    }
+                    
+                    // 如果快捷欄也放不下，放入背包
+                    if (!extracted.IsEmpty && InventoryComponent.Backpack != null)
+                    {
+                        int addedToBackpack = InventoryComponent.Backpack.AddItem(extracted.Item, extracted.Quantity);
+                        if (addedToBackpack > 0)
+                        {
+                            totalRecovered += addedToBackpack;
+                            int safeRemove = Math.Min(addedToBackpack, extracted.Quantity);
+                            if (safeRemove > 0)
+                            {
+                                extracted.Remove(safeRemove);
+                            }
                         }
                     }
                 }
@@ -247,11 +270,48 @@ namespace Kuros.Actors.Heroes
                 return false;
             }
 
-            foreach (var body in area.GetOverlappingBodies())
+            // 找到最近的可拾取物品（支持 WorldItemEntity 和 PickupProperty）
+            Node2D? nearestPickable = null;
+            float nearestDistanceSq = float.MaxValue;
+            var actorPosition = _actor.GlobalPosition;
+
+            // 检查重叠的 Area2D（WorldItemEntity 和 PickupProperty 都使用 TriggerArea）
+            foreach (var areaNode in area.GetOverlappingAreas())
             {
-                if (body is WorldItemEntity entity && entity.TryPickupByActor(_actor))
+                var parent = areaNode.GetParent();
+                
+                // 检查是否是 WorldItemEntity
+                if (parent is WorldItemEntity entity)
                 {
-                    return true;
+                    float distanceSq = actorPosition.DistanceSquaredTo(entity.GlobalPosition);
+                    if (distanceSq < nearestDistanceSq)
+                    {
+                        nearestDistanceSq = distanceSq;
+                        nearestPickable = entity;
+                    }
+                }
+                // 检查是否是 PickupProperty
+                else if (parent is PickupProperty pickup)
+                {
+                    float distanceSq = actorPosition.DistanceSquaredTo(pickup.GlobalPosition);
+                    if (distanceSq < nearestDistanceSq)
+                    {
+                        nearestDistanceSq = distanceSq;
+                        nearestPickable = pickup;
+                    }
+                }
+            }
+
+            // 只拾取最近的一個物品
+            if (nearestPickable != null)
+            {
+                if (nearestPickable is WorldItemEntity worldItem)
+                {
+                    return worldItem.TryPickupByActor(_actor);
+                }
+                else if (nearestPickable is PickupProperty pickupProp)
+                {
+                    return pickupProp.TryPickupByActor(_actor);
                 }
             }
 

@@ -112,13 +112,31 @@ namespace Kuros.UI
             
             if (isEscKey)
             {
-                // 检查物品获得弹窗是否打开（ESC键在弹窗显示时被完全禁用）
+                // 检查物品获得弹窗是否打开
                 var itemPopup = Kuros.Managers.UIManager.Instance?.GetUI<ItemObtainedPopup>("ItemObtainedPopup");
                 if (itemPopup != null && itemPopup.Visible)
                 {
-                    // 物品获得弹窗打开时，ESC键被完全禁用，这里不处理
-                    GD.Print("BattleMenu._Input: 物品获得弹窗打开，ESC键被禁用，不处理");
-                    return; // 不处理，也不调用SetInputAsHandled，让弹窗处理（禁用）
+                    // 物品获得弹窗打开时，让弹窗自己处理ESC键
+                    GD.Print("BattleMenu._Input: 物品获得弹窗打开，ESC键由弹窗处理，不拦截");
+                    return;
+                }
+                
+                // 检查设置菜单是否打开
+                var settingsMenu = Kuros.Managers.UIManager.Instance?.GetUI<SettingsMenu>("SettingsMenu");
+                if (settingsMenu != null && settingsMenu.Visible)
+                {
+                    // 设置菜单打开时，让设置菜单处理ESC键
+                    GD.Print("BattleMenu._Input: 设置菜单打开，ESC键由设置菜单处理，不拦截");
+                    return;
+                }
+                
+                // 检查存档选择界面是否打开
+                var saveSlotSelection = Kuros.Managers.UIManager.Instance?.GetUI<SaveSlotSelection>("SaveSlotSelection");
+                if (saveSlotSelection != null && saveSlotSelection.Visible)
+                {
+                    // 存档选择界面打开时，让存档选择界面处理ESC键
+                    GD.Print("BattleMenu._Input: 存档选择界面打开，ESC键由存档选择界面处理，不拦截");
+                    return;
                 }
                 
                 // 检查物品栏是否打开

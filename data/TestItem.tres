@@ -1,12 +1,15 @@
-[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/items/ItemDefinition.cs" id="1_item_def"]
+[ext_resource type="Texture2D" uid="uid://dccrl4lpl0t2h" path="res://icon.svg" id="2_icon"]
 
 [resource]
 script = ExtResource("1_item_def")
 ItemId = "test_item"
 DisplayName = "测试物品"
 Description = "一个测试物品，用于测试物品栏系统"
+Icon = ExtResource("2_icon")
 Category = "Test"
 MaxStackSize = 10
+WorldScenePath = "res://scenes/items/WorldItem.tscn"
 

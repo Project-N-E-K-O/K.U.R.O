@@ -96,6 +96,33 @@ namespace Kuros.UI
         {
             EmitSignal(SignalName.TestLoadingRequested);
         }
+
+        public override void _Input(InputEvent @event)
+        {
+            // 只有在控件可见时才处理输入
+            if (!IsVisibleInTree())
+            {
+                return;
+            }
+            
+            // 检查ESC键
+            bool isEscKey = false;
+            if (@event.IsActionPressed("ui_cancel"))
+            {
+                isEscKey = true;
+            }
+            else if (@event is InputEventKey keyEvent && keyEvent.Pressed && keyEvent.Keycode == Key.Escape)
+            {
+                isEscKey = true;
+            }
+            
+            if (isEscKey)
+            {
+                // ESC键返回上一层
+                OnBackPressed();
+                GetViewport().SetInputAsHandled();
+            }
+        }
     }
 }
 

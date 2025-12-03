@@ -10,6 +10,11 @@ namespace Kuros.Core
 		private Area2D? _triggerArea;
 		private GameActor? _focusedActor;
 		private bool _isPicked;
+		
+		/// <summary>
+		/// 指示當前拾取是否是手動觸發（如按 F 鍵拾取）
+		/// </summary>
+		protected bool IsManualPickup { get; private set; }
 
 		public override void _Ready()
 		{
@@ -32,6 +37,10 @@ namespace Kuros.Core
 		{
 			base._Process(delta);
 
+			// 注意：拾取逻辑已移至 PlayerItemInteractionComponent 统一处理
+			// 这里不再监听 take_up 输入，避免多个物品同时被拾取的问题
+			// PickupProperty 只负责追踪哪个 Actor 在范围内（_focusedActor）
+			
 			if (_isPicked || _focusedActor == null)
 			{
 				return;
@@ -42,12 +51,23 @@ namespace Kuros.Core
 				_focusedActor = null;
 				return;
 			}
-
-			// 检测拾取输入
-			if (Input.IsActionJustPressed("take_up"))
+		}
+		
+		/// <summary>
+		/// 供外部调用的拾取方法（如 PlayerItemInteractionComponent）
+		/// </summary>
+		public bool TryPickupByActor(GameActor actor)
+		{
+			if (_isPicked)
 			{
-				HandlePickup(_focusedActor);
+				return false;
 			}
+			
+			_isPicked = true;
+			IsManualPickup = true;
+			OnPicked(actor);
+			QueueFree();
+			return true;
 		}
 
 		/// <summary>
@@ -90,23 +110,6 @@ namespace Kuros.Core
 			{
 				_focusedActor = null;
 			}
-		}
-
-		/// <summary>
-		/// 处理拾取逻辑
-		/// </summary>
-		private void HandlePickup(GameActor actor)
-		{
-			if (_isPicked)
-			{
-				return;
-			}
-
-			_isPicked = true;
-			OnPicked(actor);
-			
-			// 拾取后销毁自己
-			QueueFree();
 		}
 
 		/// <summary>

@@ -457,7 +457,18 @@ namespace Kuros.UI
                 return;
             }
             
+            // 检查ESC键（同时检查action和keycode，确保能捕获ESC键）
+            bool isEscKey = false;
             if (@event.IsActionPressed("ui_cancel"))
+            {
+                isEscKey = true;
+            }
+            else if (@event is InputEventKey keyEvent && keyEvent.Pressed && keyEvent.Keycode == Key.Escape)
+            {
+                isEscKey = true;
+            }
+            
+            if (isEscKey)
             {
                 OnBackPressed();
                 GetViewport().SetInputAsHandled();

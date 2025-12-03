@@ -83,6 +83,10 @@ public partial class DroppableExampleProperty : DroppablePickupProperty
                     {
                         GD.Print($"DroppableExampleProperty: Successfully added {added} x {Item.DisplayName} to inventory");
                         
+                        // 同步左手物品显示（确保捡起的物品立即显示在手上）
+                        player.SyncLeftHandItemFromSlot();
+                        player.UpdateHandItemVisual();
+                        
                         // 强制刷新快捷栏显示（通过BattleHUD）
                         // 优先通过 UIManager 获取，如果失败则尝试通过场景树查找
                         BattleHUD? battleHUD = null;
@@ -101,6 +105,9 @@ public partial class DroppableExampleProperty : DroppablePickupProperty
                         {
                             GD.Print("DroppableExampleProperty: Found BattleHUD, requesting quickbar refresh");
                             battleHUD.CallDeferred("UpdateQuickBarDisplay");
+                            // 更新手部槽位高亮
+                            int leftHandSlot = player.LeftHandSlotIndex >= 1 && player.LeftHandSlotIndex < 5 ? player.LeftHandSlotIndex : -1;
+                            battleHUD.CallDeferred("UpdateHandSlotHighlight", leftHandSlot, 0);
                         }
                         else
                         {

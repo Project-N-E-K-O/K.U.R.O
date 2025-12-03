@@ -51,7 +51,41 @@ namespace Kuros.Actors.Heroes
                 GD.PushWarning($"{Name}: PlayerInventoryComponent.Backpack 尚未初始化，无法订阅背包事件。");
             }
 
+            // 订阅 QuickBar 事件（如果存在）
+            SubscribeToQuickBar();
+
             UpdateAttachmentIcon();
+        }
+
+        /// <summary>
+        /// 订阅 QuickBar 的事件
+        /// </summary>
+        public void SubscribeToQuickBar()
+        {
+            if (Inventory?.QuickBar != null)
+            {
+                // 先取消订阅，避免重复
+                Inventory.QuickBar.InventoryChanged -= OnQuickBarChanged;
+                Inventory.QuickBar.SlotChanged -= OnQuickBarSlotChanged;
+                
+                // 订阅
+                Inventory.QuickBar.InventoryChanged += OnQuickBarChanged;
+                Inventory.QuickBar.SlotChanged += OnQuickBarSlotChanged;
+            }
+        }
+
+        private void OnQuickBarChanged()
+        {
+            UpdateAttachmentIcon();
+        }
+
+        private void OnQuickBarSlotChanged(int slotIndex, string itemId, int quantity)
+        {
+            // 如果变化的是当前选中的快捷栏槽位，更新图标
+            if (Inventory != null && slotIndex == Inventory.SelectedQuickBarSlot)
+            {
+                UpdateAttachmentIcon();
+            }
         }
 
         public override void _ExitTree()
@@ -64,6 +98,12 @@ namespace Kuros.Actors.Heroes
                 if (Inventory.Backpack != null)
                 {
                     Inventory.Backpack.InventoryChanged -= OnInventoryChanged;
+                }
+                // 取消订阅 QuickBar 事件
+                if (Inventory.QuickBar != null)
+                {
+                    Inventory.QuickBar.InventoryChanged -= OnQuickBarChanged;
+                    Inventory.QuickBar.SlotChanged -= OnQuickBarSlotChanged;
                 }
             }
             base._ExitTree();
@@ -115,8 +155,20 @@ namespace Kuros.Actors.Heroes
 
         private void UpdateAttachmentIcon()
         {
-            var stack = Inventory?.GetSelectedBackpackStack();
-            ShowItemIcon(stack?.Item.Icon);
+            // 优先从 QuickBar 获取选中的物品（左手物品）
+            var stack = Inventory?.GetSelectedQuickBarStack();
+            
+            // 检查是否为空白道具
+            if (stack != null && !stack.IsEmpty && stack.Item.ItemId != "empty_item")
+            {
+                ShowItemIcon(stack.Item.Icon);
+            }
+            else
+            {
+                // 如果 QuickBar 没有有效物品，尝试从 Backpack 获取
+                var backpackStack = Inventory?.GetSelectedBackpackStack();
+                ShowItemIcon(backpackStack?.Item.Icon);
+            }
         }
 
         private void ShowOnSpineSlot(Texture2D? texture)

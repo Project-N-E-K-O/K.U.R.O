@@ -242,6 +242,22 @@ namespace Kuros.UI
             // 如果处于精确换位模式，执行换位
             if (_selectedSlotIndex >= 0)
             {
+                // 檢查是否嘗試交換到快捷欄1（索引0），這是被鎖定的小木劍槽位
+                if (!isInventory && slotIndex == 0)
+                {
+                    ClearAllSelections();
+                    _selectedSlotIndex = -1;
+                    return;
+                }
+                
+                // 檢查源槽位是否是快捷欄1（索引0）
+                if (!_isSelectedFromInventory && _selectedSlotIndex == 0)
+                {
+                    ClearAllSelections();
+                    _selectedSlotIndex = -1;
+                    return;
+                }
+                
                 PerformSwap(_selectedSlotIndex, _isSelectedFromInventory, slotIndex, isInventory);
                 
                 // 清除所有槽位的选中状态
@@ -280,6 +296,12 @@ namespace Kuros.UI
 
         private void OnSlotDoubleClicked(int slotIndex, bool isInventory)
         {
+            // 檢查是否雙擊快捷欄1（索引0），這是被鎖定的小木劍槽位
+            if (!isInventory && slotIndex == 0)
+            {
+                return;
+            }
+            
             // 清除之前的选中状态
             ClearAllSelections();
             
@@ -312,6 +334,12 @@ namespace Kuros.UI
 
         private void OnSlotDragStarted(int slotIndex, Vector2 position, bool isInventory)
         {
+            // 檢查是否嘗試拖拽快捷欄1（索引0），這是被鎖定的小木劍槽位
+            if (!isInventory && slotIndex == 0)
+            {
+                return;
+            }
+            
             _draggingSlotIndex = slotIndex;
             _isDraggingFromInventory = isInventory;
             _dragOffset = position;
@@ -413,6 +441,15 @@ namespace Kuros.UI
                 int targetIndex = targetSlot.SlotIndex;
                 bool targetIsInventory = IsInventorySlot(targetSlot);
 
+                // 檢查是否嘗試拖拽到快捷欄1（索引0），這是被鎖定的小木劍槽位
+                if (!targetIsInventory && targetIndex == 0)
+                {
+                    DestroyDragPreview();
+                    _draggingSlotIndex = -1;
+                    _draggingStack = null;
+                    return;
+                }
+
                 // 执行移动或交换
                 if (_isDraggingFromInventory == targetIsInventory)
                 {
@@ -423,6 +460,14 @@ namespace Kuros.UI
                     }
                     else
                     {
+                        // 快捷欄內部移動，但跳過快捷欄1
+                        if (_draggingSlotIndex == 0 || targetIndex == 0)
+                        {
+                            DestroyDragPreview();
+                            _draggingSlotIndex = -1;
+                            _draggingStack = null;
+                            return;
+                        }
                         SwapSlotsInContainer(_quickBarContainer, _draggingSlotIndex, targetIndex);
                     }
                 }
@@ -494,6 +539,16 @@ namespace Kuros.UI
 
         private void PerformSwap(int fromIndex, bool fromInventory, int toIndex, bool toInventory)
         {
+            // 保護快捷欄1（索引0）不被更改
+            if (!fromInventory && fromIndex == 0)
+            {
+                return;
+            }
+            if (!toInventory && toIndex == 0)
+            {
+                return;
+            }
+            
             var fromContainer = fromInventory ? _inventoryContainer : _quickBarContainer;
             var toContainer = toInventory ? _inventoryContainer : _quickBarContainer;
 

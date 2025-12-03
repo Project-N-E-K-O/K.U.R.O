@@ -22,7 +22,6 @@
 [ext_resource type="PackedScene" path="res://scenes/actors/npc/SimpleNPC.tscn" id="25_simple_npc"]
 [ext_resource type="Script" path="res://scripts/actors/heroes/PlayerItemAttachment.cs" id="27_item_attachment"]
 [ext_resource type="Resource" path="res://data/TestItem2.tres" id="27_test_item_2"]
-[ext_resource type="Script" path="res://scripts/ui/QuickSlotBar.cs" id="28_quick_slot_bar"]
 [ext_resource type="Resource" path="res://data/TestItem3.tres" id="28_test_item_3"]
 [ext_resource type="Script" uid="uid://b0t8cfl3khjix" path="res://scripts/actors/heroes/PlayerItemInteractionComponent.cs" id="29_item_interaction"]
 [ext_resource type="Script" uid="uid://djhlxjw4rrt8d" path="res://scripts/actors/heroes/PlayerWeaponSkillController.cs" id="30_weapon_skill_controller"]
@@ -216,13 +215,6 @@ grow_vertical = 0
 text = "WASD: Move | Space: Attack | Shift: Run | F: Pick Up | G: Put Down"
 horizontal_alignment = 1
 
-[node name="QuickSlotBar" type="HBoxContainer" parent="UI"]
-offset_left = 20.0
-offset_top = 940.0
-offset_right = 300.0
-offset_bottom = 1020.0
-script = ExtResource("28_quick_slot_bar")
-InventoryPath = NodePath("../../Player/Inventory")
 
 [node name="ArillWall" type="StaticBody2D" parent="."]
 

@@ -11,8 +11,16 @@ namespace Kuros.Items.World
     /// </summary>
     public static class WorldItemSpawner
     {
-        private const string DefaultSceneDirectory = "res://scenes/properties/";
+        private const string DefaultSceneDirectory = "res://scenes/items/";
         private static readonly Dictionary<string, PackedScene> CachedScenes = new(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// 清除场景缓存（用于开发调试）
+        /// </summary>
+        public static void ClearCache()
+        {
+            CachedScenes.Clear();
+        }
 
         public static WorldItemEntity? SpawnFromStack(Node context, InventoryItemStack stack, Vector2 globalPosition)
         {

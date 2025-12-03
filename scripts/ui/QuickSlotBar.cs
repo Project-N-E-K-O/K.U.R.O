@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Godot;
 using Kuros.Actors.Heroes;
@@ -7,8 +8,10 @@ using Kuros.Systems.Inventory;
 namespace Kuros.UI
 {
 	/// <summary>
-	/// 简单的物品快捷栏，展示背包前几格物品。
+	/// [已廢棄] 简单的物品快捷栏，展示背包前几格物品。
+	/// 此組件已被 BattleHUD 中的快捷欄取代，請使用 BattleHUD 來顯示快捷欄。
 	/// </summary>
+	[Obsolete("QuickSlotBar 已廢棄，請使用 BattleHUD 中的快捷欄功能。")]
 	public partial class QuickSlotBar : HBoxContainer
 	{
 		[Export] public NodePath InventoryPath { get; set; } = new("../Player/Inventory");
@@ -44,6 +47,16 @@ namespace Kuros.UI
 
 		public override void _Ready()
 		{
+			// [已廢棄] 此組件已停用，所有初始化邏輯已禁用
+			// 請使用 BattleHUD 中的快捷欄功能
+			GD.PushWarning($"{Name}: QuickSlotBar 已廢棄，請從場景中移除此節點並使用 BattleHUD 中的快捷欄。");
+			
+			// 隱藏自己，避免視覺干擾
+			Visible = false;
+			return;
+			
+			// 以下代碼已停用
+			#pragma warning disable CS0162 // Unreachable code detected
 			_inventory = ResolveInventoryComponent();
 			if (_inventory == null)
 			{
@@ -66,6 +79,7 @@ namespace Kuros.UI
 			_unselectedStyle = BuildStyleBox(UnselectedSlotColor, UnselectedBorderColor);
 			BuildSlotVisuals();
 			RefreshSlots();
+			#pragma warning restore CS0162
 		}
 
 		public override void _ExitTree()

@@ -57,12 +57,6 @@ namespace Kuros.Actors.Heroes.States
 				return;
 			}
 			
-			if (Input.IsActionJustPressed("take_up"))
-			{
-				ChangeState("PickUp");
-				return;
-			}
-			
 			// Apply friction/stop
 			Actor.Velocity = Actor.Velocity.MoveToward(Vector2.Zero, Actor.Speed * 2 * (float)delta);
 			Actor.MoveAndSlide();
