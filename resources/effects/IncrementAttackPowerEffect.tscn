@@ -1,0 +1,10 @@
+[gd_resource type="PackedScene" load_steps=2 format=3 uid="uid://effect_increment_attack_power"]
+
+[ext_resource type="Script" path="res://scripts/effects/IncrementAttackPowerEffect.cs" id="1"]
+
+[node name="IncrementAttackPowerEffect" type="Node"]
+script = ExtResource("1")
+TargetItemId = "weapon_a0_neiku"
+AttackPowerPerAttack = 1.0
+MaxBonusAttackPower = 0.0
+

@@ -1,0 +1,21 @@
+[gd_resource type="Resource" load_steps=4 format=3 uid="uid://weapon_computer_a_active_skill"]
+
+[ext_resource type="Script" path="res://scripts/items/weapons/WeaponSkillDefinition.cs" id="1"]
+[ext_resource type="Script" path="res://scripts/items/effects/ItemEffectEntry.cs" id="2"]
+[ext_resource type="PackedScene" path="res://resources/effects/ComputerAAnnihilationEffect.tscn" id="3"]
+
+[sub_resource type="ItemEffectEntry" id="Effect_ComputerA_Active"]
+Trigger = 1
+EffectScene = ExtResource("3")
+Notes = "瞬间清屏，累计 3 次后弹错并崩溃。"
+
+[resource]
+script = ExtResource("1")
+SkillId = "weapon_computer_a_active"
+DisplayName = "全屏终端"
+SkillType = 0
+CooldownSeconds = 15.0
+Description = "立即秒杀视野内所有敌人。累计 3 次后，终端将报错并关闭。"
+ActivationAction = "weapon_skill_computer_a"
+Effects = Array[Resource]([SubResource("Effect_ComputerA_Active")])
+

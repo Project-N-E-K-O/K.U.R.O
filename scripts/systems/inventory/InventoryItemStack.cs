@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Godot;
 using Kuros.Core;
 using Kuros.Items;
 using Kuros.Items.Attributes;
@@ -19,6 +20,7 @@ namespace Kuros.Systems.Inventory
 
         public bool IsFull => Quantity >= Item.MaxStackSize;
         public bool IsEmpty => Quantity <= 0;
+        private readonly Dictionary<string, float> _runtimeAttributeAdditions = new(StringComparer.OrdinalIgnoreCase);
 
         public InventoryItemStack(ItemDefinition item, int quantity)
         {
@@ -59,6 +61,8 @@ namespace Kuros.Systems.Inventory
                 newStack.DurabilityState.Reset();
                 newStack.DurabilityState.ApplyDamage(DurabilityState.Config.MaxDurability - durabilityPerUnit);
             }
+            // Runtime 属性视为当前堆叠的“单体武器强化”状态，不在分堆时复制，
+            // 以避免一份强化被重复克隆到多个堆叠。若未来需要更复杂的拆分逻辑，可在此处细化。
             return newStack;
         }
 
@@ -66,13 +70,37 @@ namespace Kuros.Systems.Inventory
 
         public bool TryGetAttribute(string attributeId, out ResolvedItemAttribute attribute)
         {
-            if (Item.TryResolveAttribute(attributeId, Quantity, out attribute))
+            attribute = ResolvedItemAttribute.Empty;
+            if (string.IsNullOrWhiteSpace(attributeId))
             {
-                return attribute.IsValid;
+                return false;
             }
 
-            attribute = ResolvedItemAttribute.Empty;
-            return false;
+            bool hasBase = Item.TryResolveAttribute(attributeId, Quantity, out var baseAttribute) && baseAttribute.IsValid;
+            float runtimeBonus = GetRuntimeAttributeValue(attributeId, 0f);
+
+            bool hasRuntime = !Mathf.IsZeroApprox(runtimeBonus);
+
+            if (!hasBase && !hasRuntime)
+            {
+                return false;
+            }
+
+            if (!hasBase && hasRuntime)
+            {
+                attribute = new ResolvedItemAttribute(attributeId, runtimeBonus, ItemAttributeOperation.Add);
+                return true;
+            }
+
+            if (hasBase && !hasRuntime)
+            {
+                attribute = baseAttribute;
+                return true;
+            }
+
+            float combinedValue = baseAttribute.Value + runtimeBonus;
+            attribute = new ResolvedItemAttribute(attributeId, combinedValue, baseAttribute.Operation);
+            return true;
         }
 
         public float GetAttributeValue(string attributeId, float defaultValue = 0f)
@@ -89,6 +117,12 @@ namespace Kuros.Systems.Inventory
                 {
                     yield return resolved;
                 }
+            }
+
+            foreach (var pair in _runtimeAttributeAdditions)
+            {
+                if (Mathf.IsZeroApprox(pair.Value)) continue;
+                yield return new ResolvedItemAttribute(pair.Key, pair.Value, ItemAttributeOperation.Add);
             }
         }
 
@@ -114,6 +148,52 @@ namespace Kuros.Systems.Inventory
         public void RepairDurability(int amount)
         {
             DurabilityState?.Repair(amount);
+        }
+
+        public float GetRuntimeAttributeValue(string attributeId, float defaultValue = 0f)
+        {
+            if (string.IsNullOrWhiteSpace(attributeId)) return defaultValue;
+            return _runtimeAttributeAdditions.TryGetValue(attributeId, out var value) ? value : defaultValue;
+        }
+
+        public float AddRuntimeAttributeValue(string attributeId, float delta)
+        {
+            if (string.IsNullOrWhiteSpace(attributeId) || Mathf.IsZeroApprox(delta))
+            {
+                return GetRuntimeAttributeValue(attributeId, 0f);
+            }
+
+            float updated = GetRuntimeAttributeValue(attributeId, 0f) + delta;
+            SetRuntimeAttributeValue(attributeId, updated);
+            return updated;
+        }
+
+        public float SetRuntimeAttributeValue(string attributeId, float value)
+        {
+            if (string.IsNullOrWhiteSpace(attributeId))
+            {
+                return 0f;
+            }
+
+            if (Mathf.IsZeroApprox(value))
+            {
+                _runtimeAttributeAdditions.Remove(attributeId);
+                return 0f;
+            }
+
+            _runtimeAttributeAdditions[attributeId] = value;
+            return value;
+        }
+
+        public void ClearRuntimeAttribute(string attributeId)
+        {
+            if (string.IsNullOrWhiteSpace(attributeId)) return;
+            _runtimeAttributeAdditions.Remove(attributeId);
+        }
+
+        public void ClearAllRuntimeAttributes()
+        {
+            _runtimeAttributeAdditions.Clear();
         }
 
     }

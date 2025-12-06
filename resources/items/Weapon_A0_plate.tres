@@ -1,0 +1,34 @@
+[gd_resource type="Resource" load_steps=6 format=3 uid="uid://weapon_a0_plate"]
+
+[ext_resource type="Script" path="res://scripts/items/ItemDefinition.cs" id="1_item_definition"]
+[ext_resource type="Script" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="2_attribute_entry"]
+[ext_resource type="Texture2D" path="res://icon.svg" id="3_plate_icon"]
+[ext_resource type="PackedScene" path="res://scenes/items/Weapon_A0_plate_WorldItem.tscn" id="4_world_scene"]
+
+[sub_resource type="ItemAttributeEntry" id="Attribute_AttackPower"]
+AttributeId = "attack_power"
+Value = 1.0
+Notes = "瓷盘造成 1 点攻击属性"
+
+[sub_resource type="ItemDurabilityConfig" id="Durability_Config"]
+MaxDurability = 1
+DamagePerUse = 0
+DamagePerHit = 1
+IsRepairable = false
+BreakBehavior = 0
+
+[resource]
+script = ExtResource("1_item_definition")
+ItemId = "weapon_a0_plate"
+DisplayName = "A0 瓷盘"
+Description = "轻薄的瓷盘，攻击力 1。被投掷后命中任何单位都会造成等同攻击力的伤害，命中后即会损毁。"
+Icon = ExtResource("3_plate_icon")
+Category = "Weapon"
+MaxStackSize = 1
+Tags = PackedStringArray("tag_weapon")
+AttributeEntries = Array[Resource]([SubResource("Attribute_AttackPower")])
+DurabilityConfig = SubResource("Durability_Config")
+EffectEntries = Array[Resource]()
+WeaponSkillResources = Array[Resource]()
+WorldScenePath = ExtResource("4_world_scene")
+

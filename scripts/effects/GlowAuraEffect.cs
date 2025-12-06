@@ -32,16 +32,27 @@ namespace Kuros.Effects
                 return;
             }
 
+            float resolvedScale = TextureScale;
+            if (Range > 0f)
+            {
+                const float maxRange = 512f;
+                const float minScale = 0.1f;
+                const float maxScale = 4f;
+                float normalized = Mathf.Clamp(Range / maxRange, 0f, 1f);
+                resolvedScale = minScale + normalized * (maxScale - minScale);
+                resolvedScale = Mathf.Clamp(resolvedScale, minScale, maxScale);
+            }
+
             _lightNode = new PointLight2D
             {
                 Name = "GlowAuraLight",
                 Energy = Energy,
                 Color = LightColor,
-                TextureScale = TextureScale,
-                Range = Range,
+                TextureScale = resolvedScale,
                 Texture = ResolveLightTexture(),
                 ShadowEnabled = false
             };
+            _lightNode.Set("range", Range);
 
             Actor.AddChild(_lightNode);
         }
@@ -63,10 +74,8 @@ namespace Kuros.Effects
                 return LightTexture;
             }
 
-            var gradient = new Gradient
-            {
-                InterpolationMode = Gradient.InterpolationMode.Cubic
-            };
+            var gradient = new Gradient();
+            gradient.InterpolationMode = Gradient.InterpolationModeEnum.Cubic;
             gradient.AddPoint(0f, new Color(LightColor, 0.8f));
             gradient.AddPoint(0.5f, new Color(LightColor, 0.4f));
             gradient.AddPoint(1f, new Color(LightColor, 0f));
@@ -75,9 +84,9 @@ namespace Kuros.Effects
             {
                 Gradient = gradient,
                 Width = 256,
-                Height = 256,
-                Fill = GradientTexture2D.FillMode.Radial
+                Height = 256
             };
+            texture.Set("fill", 1); // 1 == Radial
             return texture;
         }
     }

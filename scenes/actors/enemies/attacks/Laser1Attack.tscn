@@ -1,0 +1,28 @@
+[gd_scene load_steps=4 format=3 uid="uid://enemy_attack_laser1"]
+
+[ext_resource type="Script" path="res://scripts/actors/enemies/attacks/EnemyLaserSweepAttack.cs" id="1_attack_script"]
+
+[node name="Laser1Attack" type="Node"]
+script = ExtResource("1_attack_script")
+BurstCount = 3
+TelegraphDuration = 1.5
+LaserDuration = 1.0
+InterBurstDelay = 0.2
+PostRecoveryDuration = 1.0
+LaserDamage = 1
+LaserWidth = 1400.0
+LaserThickness = 80.0
+HoverOffset = Vector2(0, -120)
+LaserAnchorPaths = Array[NodePath]([NodePath("Anchors/AnchorLeft"), NodePath("Anchors/AnchorCenter"), NodePath("Anchors/AnchorRight")])
+
+[node name="Anchors" type="Node2D" parent="."]
+
+[node name="AnchorLeft" type="Marker2D" parent="Anchors"]
+position = Vector2(-450, -50)
+
+[node name="AnchorCenter" type="Marker2D" parent="Anchors"]
+position = Vector2(0, -60)
+
+[node name="AnchorRight" type="Marker2D" parent="Anchors"]
+position = Vector2(450, -45)
+

@@ -1,0 +1,17 @@
+[gd_scene load_steps=2 format=3 uid="uid://enemy_attack_thrust"]
+
+[ext_resource type="Script" path="res://scripts/actors/enemies/attacks/EnemyThrustStrikeAttack.cs" id="1_thrust_script"]
+
+[node name="ThrustStrikeAttack" type="Node"]
+script = ExtResource("1_thrust_script")
+AttackName = "ThrustStrike"
+WarmupDuration = 0.3
+ActiveDuration = 0.6
+RecoveryDuration = 0.6
+CooldownDuration = 2.0
+DashSpeed = 900.0
+MaxDashDistance = 700.0
+MinDashDistance = 120.0
+StrikeDelaySeconds = 0.2
+StrikeDamage = 10
+

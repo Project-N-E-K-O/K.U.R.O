@@ -1,0 +1,166 @@
+[gd_scene load_steps=20 format=3 uid="uid://enemy_c1_waiter_b"]
+
+[ext_resource type="Script" path="res://scripts/actors/enemies/EnemyC1WaiterB.cs" id="1_enemy_script"]
+[ext_resource type="Texture2D" path="res://icon.svg" id="2_icon"]
+[ext_resource type="Script" path="res://scripts/core/effects/EffectController.cs" id="3_effect_controller"]
+[ext_resource type="Script" path="res://scripts/systems/fsm/StateMachine.cs" id="4_state_machine"]
+[ext_resource type="Script" path="res://scripts/actors/enemies/states/EnemyIdleState.cs" id="5_idle_state"]
+[ext_resource type="Script" path="res://scripts/actors/enemies/states/EnemyWalkState.cs" id="6_walk_state"]
+[ext_resource type="Script" path="res://scripts/actors/enemies/states/EnemyAttackState.cs" id="7_attack_state"]
+[ext_resource type="Script" path="res://scripts/actors/enemies/states/EnemyHitState.cs" id="8_hit_state"]
+[ext_resource type="Script" path="res://scripts/actors/enemies/states/EnemyFrozenState.cs" id="9_frozen_state"]
+[ext_resource type="Script" path="res://scripts/actors/enemies/states/EnemyCooldownFrozenState.cs" id="10_cooldown_state"]
+[ext_resource type="Script" path="res://scripts/actors/enemies/states/EnemyDyingState.cs" id="11_dying_state"]
+[ext_resource type="Script" path="res://scripts/actors/enemies/states/EnemyDeadState.cs" id="12_dead_state"]
+[ext_resource type="Script" path="res://scripts/actors/enemies/attacks/EnemyAttackController.cs" id="13_attack_controller"]
+[ext_resource type="Script" path="res://scripts/actors/enemies/attacks/EnemyLaserSweepAttack.cs" id="14_laser_attack"]
+[ext_resource type="Script" path="res://scripts/actors/enemies/attacks/EnemyVolleyRangedAttack.cs" id="15_volley_attack"]
+[ext_resource type="Script" path="res://scripts/actors/enemies/attacks/EnemyThrustStrikeAttack.cs" id="16_thrust_attack"]
+[ext_resource type="Resource" path="res://resources/items/Weapon_A0_plate.tres" id="17_plate_item"]
+
+[sub_resource type="CapsuleShape2D" id="BodyShape"]
+radius = 10.0
+height = 48.0
+
+[sub_resource type="RectangleShape2D" id="AttackShape"]
+size = Vector2(90, 50)
+
+[sub_resource type="RectangleShape2D" id="DetectionShape"]
+size = Vector2(220, 140)
+
+[sub_resource type="RectangleShape2D" id="ControllerDetectionShape"]
+size = Vector2(320, 200)
+
+[node name="Enemy_C1_waiterB" type="CharacterBody2D" node_paths=PackedStringArray("DetectionArea", "AttackArea")]
+collision_layer = 2
+script = ExtResource("1_enemy_script")
+DetectionArea = NodePath("Sprite2D/DetectionArea")
+AttackArea = NodePath("Sprite2D/AttackArea")
+
+[node name="EffectController" type="Node" parent="."]
+script = ExtResource("3_effect_controller")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_icon")
+offset = Vector2(0, -8)
+scale = Vector2(1.2, 1.2)
+
+[node name="AttackArea" type="Area2D" parent="Sprite2D"]
+position = Vector2(28, -6)
+collision_layer = 0
+monitoring = true
+
+[node name="AttackShape" type="CollisionShape2D" parent="Sprite2D/AttackArea"]
+shape = SubResource("AttackShape")
+
+[node name="DetectionArea" type="Area2D" parent="Sprite2D"]
+position = Vector2(12, -8)
+collision_layer = 0
+monitoring = true
+
+[node name="DetectionShape" type="CollisionShape2D" parent="Sprite2D/DetectionArea"]
+shape = SubResource("DetectionShape")
+
+[node name="ControllerDetectionArea" type="Area2D" parent="Sprite2D"]
+position = Vector2(12, -8)
+collision_layer = 0
+monitoring = true
+
+[node name="ControllerDetectionShape" type="CollisionShape2D" parent="Sprite2D/ControllerDetectionArea"]
+shape = SubResource("ControllerDetectionShape")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -8)
+shape = SubResource("BodyShape")
+
+[node name="StateMachine" type="Node" parent="." node_paths=PackedStringArray("InitialState")]
+script = ExtResource("4_state_machine")
+InitialState = NodePath("Idle")
+
+[node name="Idle" type="Node" parent="StateMachine"]
+script = ExtResource("5_idle_state")
+
+[node name="Walk" type="Node" parent="StateMachine"]
+script = ExtResource("6_walk_state")
+
+[node name="Attack" type="Node" parent="StateMachine"]
+script = ExtResource("7_attack_state")
+
+[node name="AttackController" type="Node" parent="StateMachine/Attack"]
+script = ExtResource("13_attack_controller")
+PlayerDetectionAreaPath = NodePath("../../../Sprite2D/ControllerDetectionArea")
+
+[node name="LaserAttack" type="Node" parent="StateMachine/Attack/AttackController"]
+script = ExtResource("14_laser_attack")
+AttackName = "Attack1_Laser"
+BurstCount = 3
+TelegraphDuration = 1.5
+LaserDuration = 1.0
+InterBurstDelay = 0.25
+PostRecoveryDuration = 1.0
+LaserDamage = 2
+LaserWidth = 1200.0
+LaserThickness = 80.0
+HoverOffset = Vector2(0, -100)
+LaserAnchorPaths = Array[NodePath]([NodePath("Anchors/AnchorLeft"), NodePath("Anchors/AnchorCenter"), NodePath("Anchors/AnchorRight")])
+metadata/attack_weight = 20.0
+metadata/guarantee_interval = 4
+metadata/guarantee_priority = 0
+
+[node name="Anchors" type="Node2D" parent="StateMachine/Attack/AttackController/LaserAttack"]
+
+[node name="AnchorLeft" type="Marker2D" parent="StateMachine/Attack/AttackController/LaserAttack/Anchors"]
+position = Vector2(-450, -60)
+
+[node name="AnchorCenter" type="Marker2D" parent="StateMachine/Attack/AttackController/LaserAttack/Anchors"]
+position = Vector2(0, -80)
+
+[node name="AnchorRight" type="Marker2D" parent="StateMachine/Attack/AttackController/LaserAttack/Anchors"]
+position = Vector2(450, -60)
+
+[node name="VolleyAttack" type="Node" parent="StateMachine/Attack/AttackController"]
+script = ExtResource("15_volley_attack")
+AttackName = "Attack2_Volley"
+VolleyCount = 2
+ShotsPerVolley = 4
+ShotIntervalSeconds = 0.18
+VolleyIntervalSeconds = 0.65
+AimMode = 1
+DamagePerShot = 1
+ProjectileImpulse = 900.0
+SpawnOffset = Vector2(18, -6)
+ProjectileItem = ExtResource("17_plate_item")
+metadata/attack_weight = 50.0
+metadata/guarantee_interval = 3
+metadata/guarantee_priority = 1
+
+[node name="ThrustAttack" type="Node" parent="StateMachine/Attack/AttackController"]
+script = ExtResource("16_thrust_attack")
+AttackName = "Attack3_Thrust"
+WarmupDuration = 0.15
+RecoveryDuration = 0.5
+CooldownDuration = 1.6
+DashSpeed = 850.0
+MaxDashDistance = 680.0
+MinDashDistance = 140.0
+StrikeDelaySeconds = 0.2
+StrikeDamage = 6
+AttackAreaPath = NodePath("../../../../Sprite2D/AttackArea")
+metadata/attack_weight = 30.0
+metadata/guarantee_priority = 2
+
+[node name="Hit" type="Node" parent="StateMachine"]
+script = ExtResource("8_hit_state")
+
+[node name="Frozen" type="Node" parent="StateMachine"]
+script = ExtResource("9_frozen_state")
+
+[node name="CooldownFrozen" type="Node" parent="StateMachine"]
+script = ExtResource("10_cooldown_state")
+
+[node name="Dying" type="Node" parent="StateMachine"]
+script = ExtResource("11_dying_state")
+
+[node name="Dead" type="Node" parent="StateMachine"]
+script = ExtResource("12_dead_state")
+

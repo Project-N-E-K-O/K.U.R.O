@@ -199,6 +199,13 @@ namespace Kuros.Actors.Heroes
                 return false;
             }
 
+            if (entity == null)
+            {
+                return false;
+            }
+
+            entity.LastDroppedBy = _actor;
+
             if (disposition == DropDisposition.Throw)
             {
                 entity.ApplyThrowImpulse(GetFacingDirection() * ThrowImpulse);

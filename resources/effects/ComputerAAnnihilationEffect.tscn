@@ -1,0 +1,10 @@
+[gd_resource type="PackedScene" load_steps=2 format=3 uid="uid://effect_computer_a_annihilation"]
+
+[ext_resource type="Script" path="res://scripts/effects/ComputerAAnnihilationEffect.cs" id="1"]
+
+[node name="ComputerAAnnihilationEffect" type="Node"]
+script = ExtResource("1")
+CrashThreshold = 3
+FatalDialogWidth = 420.0
+FatalDialogText = "致命异常：SCREEN_OVERLOAD\n\n请按“确定”以继续。"
+

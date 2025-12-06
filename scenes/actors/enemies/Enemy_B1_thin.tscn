@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://bs6eki6cankpq"]
+[gd_scene load_steps=22 format=3 uid="uid://bs6eki6cankpq"]
 
 [ext_resource type="Script" uid="uid://b8q1vhuc5h8vx" path="res://scripts/actors/enemies/EnemyB1Fat.cs" id="1"]
 [ext_resource type="Script" uid="uid://cenpuhlcgesin" path="res://scripts/systems/fsm/StateMachine.cs" id="2"]
@@ -15,6 +15,7 @@
 [ext_resource type="Script" path="res://scripts/actors/enemies/states/EnemyDeadState.cs" id="18"]
 [ext_resource type="Script" uid="uid://8c6vvjl6hwlo" path="res://scripts/actors/enemies/attacks/EnemyMultiStrikeAttack.cs" id="15"]
 [ext_resource type="Script" uid="uid://daikl2ix702w1" path="res://scripts/actors/enemies/attacks/EnemyFreezeMeleeAttack.cs" id="16"]
+[ext_resource type="Resource" path="res://resources/loot/EnemyB1ThinDrops.tres" id="17_drop_table"]
 
 [sub_resource type="PlaceholderTexture2D" id="1"]
 size = Vector2(40, 60)
@@ -37,6 +38,7 @@ collision_layer = 2
 motion_mode = 1
 script = ExtResource("1")
 AttackArea = NodePath("Sprite2D/AttackArea")
+LootTable = ExtResource("17_drop_table")
 
 [node name="EffectController" type="Node" parent="."]
 script = ExtResource("12")

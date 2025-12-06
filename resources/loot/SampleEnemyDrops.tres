@@ -1,0 +1,33 @@
+[gd_resource type="Resource" load_steps=6 format=3 uid="uid://sample_enemy_drops"]
+
+[ext_resource type="Script" path="res://scripts/systems/loot/LootDropTable.cs" id="1_table"]
+[ext_resource type="Script" path="res://scripts/systems/loot/LootDropEntry.cs" id="2_entry"]
+[ext_resource type="Resource" path="res://resources/items/Supplies_watermelon.tres" id="3_watermelon"]
+[ext_resource type="Resource" path="res://resources/items/Supplies_pudding.tres" id="4_pudding"]
+
+[sub_resource type="Resource" id="Drop_Common"]
+script = ExtResource("2_entry")
+Item = ExtResource("3_watermelon")
+DropChance = 0.75
+MinQuantity = 1
+MaxQuantity = 1
+MaxStacks = 2
+ImpulseStrength = 260.0
+ImpulseSpreadDegrees = 120.0
+
+[sub_resource type="Resource" id="Drop_Rare"]
+script = ExtResource("2_entry")
+Item = ExtResource("4_pudding")
+DropChance = 0.25
+MinQuantity = 1
+MaxQuantity = 1
+ImpulseStrength = 220.0
+ImpulseSpreadDegrees = 90.0
+
+[resource]
+script = ExtResource("1_table")
+GlobalDropChance = 1.0
+ScatterRadius = 32.0
+DefaultImpulse = 180.0
+Entries = Array[Resource]([SubResource("Drop_Common"), SubResource("Drop_Rare")])
+

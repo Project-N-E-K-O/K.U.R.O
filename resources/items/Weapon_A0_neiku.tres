@@ -1,0 +1,25 @@
+[gd_resource type="Resource" load_steps=6 format=3 uid="uid://weapon_a0_neiku"]
+
+[ext_resource type="Script" path="res://scripts/items/ItemDefinition.cs" id="1"]
+[ext_resource type="Script" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="2"]
+[ext_resource type="Texture2D" path="res://icon.svg" id="3"]
+[ext_resource type="Resource" path="res://resources/items/skills/WeaponNeikuPassiveSkill.tres" id="4"]
+
+[sub_resource type="ItemAttributeEntry" id="Attribute_AttackPower"]
+AttributeId = "attack_power"
+Value = 0.0
+Notes = "初始攻击力为 0，靠被动叠加"
+
+[resource]
+script = ExtResource("1")
+ItemId = "weapon_a0_neiku"
+DisplayName = "A0 内库"
+Description = "起始攻击力为 0，但每次命中敌人都会永久提升 1 点攻击力。"
+Icon = ExtResource("3")
+Category = "Weapon"
+MaxStackSize = 1
+Tags = PackedStringArray("tag_weapon")
+AttributeEntries = Array[Resource]([SubResource("Attribute_AttackPower")])
+EffectEntries = Array[Resource]()
+WeaponSkillResources = Array[Resource]([ExtResource("4")])
+
