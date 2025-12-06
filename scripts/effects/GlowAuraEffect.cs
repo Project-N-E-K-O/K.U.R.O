@@ -35,7 +35,12 @@ namespace Kuros.Effects
             float resolvedScale = TextureScale;
             if (Range > 0f)
             {
-                resolvedScale = Range;
+                const float maxRange = 512f;
+                const float minScale = 0.1f;
+                const float maxScale = 4f;
+                float normalized = Mathf.Clamp(Range / maxRange, 0f, 1f);
+                resolvedScale = minScale + normalized * (maxScale - minScale);
+                resolvedScale = Mathf.Clamp(resolvedScale, minScale, maxScale);
             }
 
             _lightNode = new PointLight2D
