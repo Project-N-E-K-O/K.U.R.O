@@ -77,25 +77,27 @@ namespace Kuros.Systems.Inventory
             bool hasBase = Item.TryResolveAttribute(attributeId, Quantity, out var baseAttribute) && baseAttribute.IsValid;
             float runtimeBonus = GetRuntimeAttributeValue(attributeId, 0f);
 
-            if (!hasBase && Mathf.IsZeroApprox(runtimeBonus))
+            bool hasRuntime = !Mathf.IsZeroApprox(runtimeBonus);
+
+            if (!hasBase && !hasRuntime)
             {
                 return false;
             }
 
-            if (Mathf.IsZeroApprox(runtimeBonus))
+            if (!hasBase && hasRuntime)
+            {
+                attribute = new ResolvedItemAttribute(attributeId, runtimeBonus, ItemAttributeOperation.Add);
+                return true;
+            }
+
+            if (hasBase && !hasRuntime)
             {
                 attribute = baseAttribute;
                 return true;
             }
 
-            if (hasBase && baseAttribute.Operation != ItemAttributeOperation.Add)
-            {
-                attribute = baseAttribute;
-                return true;
-            }
-
-            float combinedValue = (hasBase ? baseAttribute.Value : 0f) + runtimeBonus;
-            attribute = new ResolvedItemAttribute(attributeId, combinedValue, ItemAttributeOperation.Add);
+            float combinedValue = baseAttribute.Value + runtimeBonus;
+            attribute = new ResolvedItemAttribute(attributeId, combinedValue, baseAttribute.Operation);
             return true;
         }
 

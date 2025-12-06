@@ -85,6 +85,7 @@ namespace Kuros.Effects
                 Width = 256,
                 Height = 256
             };
+            texture.Set("fill", 1); // 1 == Radial
             return texture;
         }
     }
