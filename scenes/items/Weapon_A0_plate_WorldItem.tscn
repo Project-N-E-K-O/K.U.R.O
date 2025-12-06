@@ -1,0 +1,31 @@
+[gd_scene load_steps=6 format=3 uid="uid://weapon_a0_plate_world"]
+
+[ext_resource type="Script" path="res://scripts/items/world/ThrowableDamageItemEntity.cs" id="1_throwable_entity"]
+[ext_resource type="Texture2D" path="res://icon.svg" id="2_icon"]
+
+[sub_resource type="CircleShape2D" id="BodyShape"]
+radius = 14.0
+
+[sub_resource type="CircleShape2D" id="TriggerShape"]
+radius = 28.0
+
+[node name="Weapon_A0_plate_WorldItem" type="CharacterBody2D"]
+collision_layer = 4
+collision_mask = 1
+script = ExtResource("1_throwable_entity")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_icon")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("BodyShape")
+
+[node name="TriggerArea" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 1
+monitorable = true
+monitoring = true
+
+[node name="TriggerShape" type="CollisionShape2D" parent="TriggerArea"]
+shape = SubResource("TriggerShape")
+

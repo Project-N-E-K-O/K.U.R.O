@@ -1,0 +1,33 @@
+[gd_resource type="Resource" load_steps=7 format=3 uid="uid://weapon_a0_computer_a"]
+
+[ext_resource type="Script" path="res://scripts/items/ItemDefinition.cs" id="1"]
+[ext_resource type="Script" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="2"]
+[ext_resource type="Texture2D" path="res://icon.svg" id="3"]
+[ext_resource type="Resource" path="res://resources/items/skills/WeaponComputerAActiveSkill.tres" id="4"]
+
+[sub_resource type="ItemAttributeEntry" id="Attribute_AttackPower"]
+AttributeId = "attack_power"
+Value = 5.0
+Notes = "计算机 A 输出 5 点攻击。"
+
+[sub_resource type="ItemDurabilityConfig" id="Durability_Config"]
+MaxDurability = 1
+DamagePerUse = 0
+DamagePerHit = 1
+IsRepairable = false
+BreakBehavior = 0
+
+[resource]
+script = ExtResource("1")
+ItemId = "weapon_a0_computer_a"
+DisplayName = "A0 终端·A"
+Description = "高风险终端：普通攻击 5 点伤害，仅在命中敌人时才损耗这唯一的耐久。主动技能可秒杀全屏敌人，但累计 3 次就会报错并关闭游戏。"
+Icon = ExtResource("3")
+Category = "Weapon"
+MaxStackSize = 1
+Tags = PackedStringArray("tag_weapon")
+AttributeEntries = Array[Resource]([SubResource("Attribute_AttackPower")])
+DurabilityConfig = SubResource("Durability_Config")
+EffectEntries = Array[Resource]()
+WeaponSkillResources = Array[Resource]([ExtResource("4")])
+

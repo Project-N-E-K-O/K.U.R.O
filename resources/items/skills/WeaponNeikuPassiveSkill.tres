@@ -1,0 +1,19 @@
+[gd_resource type="Resource" load_steps=4 format=3 uid="uid://weapon_neiku_passive_skill"]
+
+[ext_resource type="Script" path="res://scripts/items/weapons/WeaponSkillDefinition.cs" id="1"]
+[ext_resource type="Script" path="res://scripts/items/effects/ItemEffectEntry.cs" id="2"]
+[ext_resource type="PackedScene" path="res://resources/effects/IncrementAttackPowerEffect.tscn" id="3"]
+
+[sub_resource type="ItemEffectEntry" id="Effect_Neiku_Passive"]
+Trigger = 1
+EffectScene = ExtResource("3")
+Notes = "命中后永久+1攻击力"
+
+[resource]
+script = ExtResource("1")
+SkillId = "weapon_neiku_passive"
+DisplayName = "愈战愈强"
+SkillType = 1
+Description = "每次命中敌人后，此武器的攻击力永久 +1。"
+Effects = Array[Resource]([SubResource("Effect_Neiku_Passive")])
+

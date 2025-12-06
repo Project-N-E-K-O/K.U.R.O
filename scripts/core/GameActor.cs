@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using Kuros.Systems.FSM;
+using Kuros.Systems.Loot;
 using Kuros.Core.Effects;
 using Kuros.Utils;
 using Kuros.Core.Stats;
@@ -24,6 +25,9 @@ namespace Kuros.Core
         [Export] public StateMachine StateMachine { get; private set; } = null!;
         [Export] public EffectController EffectController { get; private set; } = null!;
         [Export] public CharacterStatProfile? StatProfile { get; private set; }
+
+        [ExportCategory("Loot")]
+        [Export] public LootDropTable? LootTable { get; set; }
 
         // Exposed state for States to use
         public int CurrentHealth { get; protected set; }
@@ -261,8 +265,19 @@ namespace Kuros.Core
 
         protected virtual void OnDeathFinalized()
         {
+            HandleLootDrops();
             EffectController?.ClearAll();
             QueueFree();
+        }
+
+        protected virtual void HandleLootDrops()
+        {
+            if (LootTable == null)
+            {
+                return;
+            }
+
+            LootDropSystem.SpawnLootForActor(this, LootTable);
         }
 
         public void ApplyEffect(ActorEffect effect)

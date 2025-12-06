@@ -15,6 +15,7 @@ public partial class SampleEnemy : GameActor
     [Export] public int ScoreValue = 10;
     
     private SamplePlayer? _player;
+    private bool _scoreGranted;
     
     public SampleEnemy()
     {
@@ -106,17 +107,22 @@ public partial class SampleEnemy : GameActor
         }
     }
     
-        protected override void Die()
+    protected override void Die()
+    {
+        GameLogger.Info(nameof(SampleEnemy), "Enemy died!");
+        base.Die();
+    }
+
+    protected override void OnDeathFinalized()
+    {
+        if (!_scoreGranted && _player != null)
         {
-            GameLogger.Info(nameof(SampleEnemy), "Enemy died!");
-            
-            if (_player != null)
-            {
-                _player.AddScore(ScoreValue);
-            }
-            
-            QueueFree();
+            _player.AddScore(ScoreValue);
+            _scoreGranted = true;
         }
+
+        base.OnDeathFinalized();
+    }
     private void RefreshPlayerReference()
     {
         if (_player != null && IsInstanceValid(_player)) return;

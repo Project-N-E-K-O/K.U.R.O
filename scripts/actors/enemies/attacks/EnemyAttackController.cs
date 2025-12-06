@@ -61,7 +61,10 @@ namespace Kuros.Actors.Enemies.Attacks
                     var entry = new Entry
                     {
                         Template = template,
-                        Weight = Mathf.Max(weight, 0f)
+                        Weight = Mathf.Max(weight, 0f),
+                        GuaranteeInterval = ReadMetaInt(template, "guarantee_interval", 0),
+                        GuaranteePriority = ReadMetaInt(template, "guarantee_priority", int.MaxValue),
+                        AttackName = template.AttackName
                     };
 
                     _entries.Add(entry);
@@ -182,11 +185,21 @@ namespace Kuros.Actors.Enemies.Attacks
 
         private void QueueNextAttack(string reason = "Auto")
         {
-            _queuedAttack = PickAttack();
+            string selectionReason = reason;
+            var guaranteedAttack = TryGetGuaranteedAttack();
+            if (guaranteedAttack != null)
+            {
+                _queuedAttack = guaranteedAttack;
+                selectionReason = $"{reason}|Guarantee";
+            }
+            else
+            {
+                _queuedAttack = PickAttack();
+            }
             RefreshPlayerDetectionState();
             if (_queuedAttack != null)
             {
-				DebugLog($"({reason}) queued attack {_queuedAttack.Name}.");
+				DebugLog($"({selectionReason}) queued attack {_queuedAttack.Name}.");
 				DebugLogPendingAttackIfPlayerInside();
 
                 if (reason != "PlayerExit" && ShouldForceAttackState())
@@ -336,6 +349,7 @@ namespace Kuros.Actors.Enemies.Attacks
 
         protected virtual void OnChildAttackStarted(EnemyAttackTemplate attack)
         {
+            RegisterAttackUsage(attack);
         }
 
         protected bool TrySetAttackWeight(string attackName, float weight)
@@ -356,6 +370,57 @@ namespace Kuros.Actors.Enemies.Attacks
         {
             public EnemyAttackTemplate Template = null!;
             public float Weight;
+            public int GuaranteeInterval;
+            public int GuaranteePriority = int.MaxValue;
+            public int SinceLastUse;
+            public string AttackName = string.Empty;
+        }
+
+        private void RegisterAttackUsage(EnemyAttackTemplate attack)
+        {
+            foreach (var entry in _entries)
+            {
+                if (entry.Template == null) continue;
+
+                if (entry.Template == attack)
+                {
+                    entry.SinceLastUse = 0;
+                }
+                else if (entry.GuaranteeInterval > 0)
+                {
+                    entry.SinceLastUse = Mathf.Min(entry.SinceLastUse + 1, entry.GuaranteeInterval);
+                }
+            }
+        }
+
+        private EnemyAttackTemplate? TryGetGuaranteedAttack()
+        {
+            Entry? forcedEntry = null;
+            foreach (var entry in _entries)
+            {
+                if (entry.Template == null) continue;
+                if (entry.GuaranteeInterval <= 0) continue;
+                if (entry.SinceLastUse < entry.GuaranteeInterval) continue;
+
+                if (forcedEntry == null || entry.GuaranteePriority < forcedEntry.GuaranteePriority)
+                {
+                    forcedEntry = entry;
+                }
+            }
+
+            return forcedEntry?.Template;
+        }
+
+        private static int ReadMetaInt(Node node, string key, int defaultValue)
+        {
+            if (!node.HasMeta(key)) return defaultValue;
+            Variant meta = node.GetMeta(key);
+            return meta.VariantType switch
+            {
+                Variant.Type.Int => (int)meta,
+                Variant.Type.Float => Mathf.RoundToInt((float)meta),
+                _ => defaultValue
+            };
         }
 
         private void CleanupChildAttack(bool clearCooldown)

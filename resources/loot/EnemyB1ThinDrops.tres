@@ -1,0 +1,53 @@
+[gd_resource type="Resource" load_steps=9 format=3 uid="uid://enemy_b1_thin_drops"]
+
+[ext_resource type="Script" path="res://scripts/systems/loot/LootDropTable.cs" id="1_table"]
+[ext_resource type="Script" path="res://scripts/systems/loot/LootDropEntry.cs" id="2_entry"]
+[ext_resource type="Resource" path="res://resources/items/Weapon_A0_bowl.tres" id="3_weapon_bowl"]
+[ext_resource type="Resource" path="res://resources/items/Weapon_A1_bed.tres" id="4_weapon_bed"]
+[ext_resource type="Resource" path="res://resources/items/Weapon_A1_door.tres" id="5_weapon_door"]
+[ext_resource type="Resource" path="res://resources/items/Weapon_A0_lengyue.tres" id="6_weapon_lengyue"]
+
+[sub_resource type="Resource" id="Drop_Bowl"]
+script = ExtResource("2_entry")
+Item = ExtResource("3_weapon_bowl")
+DropChance = 0.35
+MinQuantity = 1
+MaxQuantity = 1
+ImpulseStrength = 260.0
+ImpulseSpreadDegrees = 100.0
+
+[sub_resource type="Resource" id="Drop_Bed"]
+script = ExtResource("2_entry")
+Item = ExtResource("4_weapon_bed")
+DropChance = 0.2
+MinQuantity = 1
+MaxQuantity = 1
+ImpulseStrength = 240.0
+ImpulseSpreadDegrees = 120.0
+
+[sub_resource type="Resource" id="Drop_Door"]
+script = ExtResource("2_entry")
+Item = ExtResource("5_weapon_door")
+DropChance = 0.25
+MinQuantity = 1
+MaxQuantity = 1
+ImpulseStrength = 280.0
+ImpulseSpreadDegrees = 80.0
+
+[sub_resource type="Resource" id="Drop_Lengyue"]
+script = ExtResource("2_entry")
+Item = ExtResource("6_weapon_lengyue")
+DropChance = 0.05
+MinQuantity = 1
+MaxQuantity = 1
+ImpulseStrength = 300.0
+ImpulseSpreadDegrees = 140.0
+
+[resource]
+script = ExtResource("1_table")
+GlobalDropChance = 1.0
+MaxDrops = 1
+ScatterRadius = 48.0
+DefaultImpulse = 220.0
+Entries = Array[Resource]([SubResource("Drop_Bowl"), SubResource("Drop_Bed"), SubResource("Drop_Door"), SubResource("Drop_Lengyue")])
+

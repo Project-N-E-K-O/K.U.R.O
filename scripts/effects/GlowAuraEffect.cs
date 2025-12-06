@@ -13,7 +13,7 @@ namespace Kuros.Effects
         [Export] public Color LightColor { get; set; } = new Color(1f, 0.95f, 0.8f, 1f);
         [Export(PropertyHint.Range, "0,10,0.1")] public float Energy { get; set; } = 1.5f;
         [Export(PropertyHint.Range, "0.1,4,0.1")] public float TextureScale { get; set; } = 1.5f;
-        [Export(PropertyHint.Range, "0,512,1")] public float Range { get; set; } = 128f;
+        [Export(PropertyHint.Range, "0,512,1")] public float Range { get; set; } = 0f;
         [Export] public Texture2D? LightTexture { get; set; }
 
         private PointLight2D? _lightNode;
@@ -32,13 +32,18 @@ namespace Kuros.Effects
                 return;
             }
 
+            float resolvedScale = TextureScale;
+            if (Range > 0f)
+            {
+                resolvedScale = Range;
+            }
+
             _lightNode = new PointLight2D
             {
                 Name = "GlowAuraLight",
                 Energy = Energy,
                 Color = LightColor,
-                TextureScale = TextureScale,
-                Range = Range,
+                TextureScale = resolvedScale,
                 Texture = ResolveLightTexture(),
                 ShadowEnabled = false
             };
@@ -63,10 +68,8 @@ namespace Kuros.Effects
                 return LightTexture;
             }
 
-            var gradient = new Gradient
-            {
-                InterpolationMode = Gradient.InterpolationMode.Cubic
-            };
+            var gradient = new Gradient();
+            gradient.InterpolationMode = Gradient.InterpolationModeEnum.Cubic;
             gradient.AddPoint(0f, new Color(LightColor, 0.8f));
             gradient.AddPoint(0.5f, new Color(LightColor, 0.4f));
             gradient.AddPoint(1f, new Color(LightColor, 0f));
@@ -75,8 +78,7 @@ namespace Kuros.Effects
             {
                 Gradient = gradient,
                 Width = 256,
-                Height = 256,
-                Fill = GradientTexture2D.FillMode.Radial
+                Height = 256
             };
             return texture;
         }

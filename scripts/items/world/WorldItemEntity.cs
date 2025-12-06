@@ -54,6 +54,9 @@ namespace Kuros.Items.World
         private uint _initialCollisionLayer;
         private uint _initialCollisionMask;
 
+        public GameActor? LastDroppedBy { get; set; }
+        protected Vector2 PendingVelocity => _pendingVelocity;
+
         public override void _Ready()
         {
             base._Ready();
@@ -172,7 +175,7 @@ namespace Kuros.Items.World
             }
         }
 
-        public void ApplyThrowImpulse(Vector2 velocity)
+        public virtual void ApplyThrowImpulse(Vector2 velocity)
         {
             _pendingVelocity = velocity;
             Velocity = velocity;

@@ -236,9 +236,6 @@ namespace Kuros.Audio
                 case AudioStreamMP3 mp3:
                     mp3.Loop = loop;
                     break;
-                case AudioStreamSample sample:
-                    sample.LoopMode = loop ? AudioStreamSample.LoopModeEnum.Forward : AudioStreamSample.LoopModeEnum.Disabled;
-                    break;
                 default:
                     break;
             }

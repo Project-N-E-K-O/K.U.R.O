@@ -50,6 +50,9 @@
 - `scripts/items/world/WorldItemEntity.cs`、`WorldItemSpawner.cs`  
   - `WorldItemEntity` 继承 `CharacterBody2D`，负责地面物品的触发检测、拾取、属性/效果传播、投掷阻尼。  
   - `WorldItemSpawner.SpawnFromStack()` 将 `InventoryItemStack` 实例化为场景节点；拾取成功会调用 `ApplyItemEffects()` 把配置效果赋给拾取者。
+- `scripts/systems/loot/LootDropEntry.cs`、`LootDropTable.cs`、`LootDropSystem.cs` + `resources/loot/*.tres`  
+  - 敌人/角色通用的掉落表框架：`GameActor` 现在导出 `LootTable` 属性，Inspector 中引用任意 `LootDropTable` 资源即可。`LootDropEntry` 支持配置掉落概率、数量范围、堆叠次数、散布半径与抛洒力度，`LootDropSystem.SpawnLootForActor()` 会在 `GameActor.OnDeathFinalized()` 中自动调用，生成 `WorldItemEntity` 并应用随机偏移/冲量。  
+  - 示例：`resources/loot/SampleEnemyDrops.tres` 将普通掉落（`Supplies_watermelon`）与稀有掉落（`Supplies_pudding`）组合在同一表内，并被 `scenes/actors/enemies/SampleEnemyUnit.tscn` 引用，展示最小化配置即可完成掉落的用法。
 
 - `scripts/items/tags/ItemTagIds.cs`、`ItemAttribute*`  
   - 定义常用标签/属性集合，背包和逻辑可通过标签快速筛选（如食物、武器）。  
@@ -61,6 +64,8 @@
 - `resources/items/Supplies_watermelon.tres` + `resources/items/skills/SuppliesWatermelonPassiveSkill.tres`  
   - 多用途物品示例：既打上 `tag_food` 又打上 `tag_weapon`，`ItemAttributeEntry` 将 `attack_power` 设为 -1，配合被动技能 `supplies_watermelon_passive` 调用 `HealAttackTargetsEffect`，使攻击目标回血。  
   - `EffectEntries` 配置 `OnConsume` + `RestoreHealthEffect` 恢复 3 点生命，`ItemDurabilityConfig` 设为 1 点耐久并配置 `DamagePerUse`/`DamagePerHit`，耗尽即消失（`BreakBehavior = Disappear`），展示食品/武器共存的典型写法。
+- `scripts/systems/inventory/InventoryItemStack.cs`  
+  - 支持通过 `AddRuntimeAttributeValue` / `SetRuntimeAttributeValue` 为单个物品堆叠写入运行时属性（目前用于武器逐渐成长的攻击力加成）；`TryGetAttribute`、`GetAllAttributes` 会把这些临时属性与原始配置一起返回，确保 `PlayerInventoryComponent.GetSelectedAttributeValue()` 等调用能读取最新数值。
 - `resources/items/Supplies_cake.tres`  
   - 另一种食品/武器双属性示例：攻击力 3，使用 `RestoreFullHealthEffect` 做到食用即满血，耐久 1 且配置 `DamagePerUse`/`DamagePerHit = 1`，体现与 `item_use` 输入绑定的高阶回复物品。
 - `resources/items/Supplies_pudding.tres`  
@@ -71,12 +76,23 @@
   - 攻击力 11，主动技能使用 `TeleportStrikeEffect` 实现瞬移伤害，冷却 3 秒；同时挂载 `WeaponYaomengSynergyPassiveSkill.tres` 以加入双武器被动联动。
 - `resources/items/Weapon_A0_yaomeng2.tres` + `WeaponYaomeng2ActiveSkill.tres`  
   - 攻击力 4，主动技能引用 `ExecuteTaggedEnemiesEffect` 作为秒杀框架，冷却 4 秒；同样附带 `WeaponYaomengSynergyPassiveSkill.tres`，当与壹式同时存在时通过 `YaomengDualSynergyEffect` 将攻击/技能冷却减半。
+- `resources/items/Weapon_A0_plate.tres` + `scenes/items/Weapon_A0_plate_WorldItem.tscn` + `scripts/items/world/ThrowableDamageItemEntity.cs`  
+  - 轻型瓷盘武器：攻击力 1、耐久 1。该世界实体脚本继承 `WorldItemEntity`，在 `PlayerItemInteractionComponent` 以“投掷”方式抛出后，会在碰撞 `GameActor` 时根据 `ItemAttributeIds.AttackPower` 造成等额伤害并立即销毁，实现“投掷命中造成伤害”的被动。
+- `resources/items/Weapon_A0_neiku.tres` + `resources/items/skills/WeaponNeikuPassiveSkill.tres` + `resources/effects/IncrementAttackPowerEffect.tscn`  
+  - “内库”武器：初始攻击力 0，耐久无限。被动技能应用 `IncrementAttackPowerEffect`，该效果订阅 `DamageEventBus` 并在玩家使用此武器命中敌人后调用 `InventoryItemStack.AddRuntimeAttributeValue()`，让该武器的 `attack_power` 永久 +1（数据保存在堆叠的运行时属性中，即使暂时卸下也会保留强化）。
+- `resources/items/Weapon_A0_manto.tres` + `resources/effects/HealSelfOnHitEffect.tscn`  
+  - “披风”武器：基础攻击 1、无限耐久。被动效果在装备时附加 `HealSelfOnHitEffect`，当玩家使用该武器命中敌人后立即回复 1 点生命值，可通过 `HealAmount` 调整回复值。
+- `resources/items/Weapon_A0_computer_A.tres` + `resources/items/skills/WeaponComputerAActiveSkill.tres` + `resources/effects/ComputerAAnnihilationEffect.tscn`  
+  - 终端·A：基础攻击 5，只有在命中敌人时才消耗这唯一的耐久。主动技能绑定输入 `weapon_skill_computer_a`，瞬间清除全屏“enemies”组目标；累计释放 3 次后通过 `ComputerAAnnihilationEffect` 弹出报错对话框，玩家确认即调用 `SceneTree.Quit()`，模拟“闪退”演出。
+- `scripts/effects/HealSelfOnHitEffect.cs`  
+  - 通用被动：监听 `DamageEventBus`，若拥有者为攻击方则按次回复自身生命值，适合需要“命中回血”类武器/护符。
+- `scripts/effects/ComputerAAnnihilationEffect.cs`  
+  - 主动技能效果：枚举 `enemies` 组逐一 `TakeDamage(int.MaxValue)`，同时在拥有者的 `Meta` 上累计使用次数，超过阈值后生成 `AcceptDialog` 警告并在玩家确认/关闭时强制退出游戏。
 
 - 交互/拾取/放下/投掷流程：  
   - 地图物品：`WorldItemEntity` 挂在 tscn 中，`TryTransferToActor()` 只会把物品写入玩家当前选中栏位（若不可用则直接拒绝），随后触发 `PlayerInventoryComponent.ItemPicked` 并按 `ItemDefinition.EffectEntries` 应用拾取效果。  
   - 快捷键：`PlayerItemInteractionComponent` 监听 `put_down` / `throw`，仅当当前栏位存在物品时才会通过 `WorldItemSpawner` 生成实体；`item_select_left` / `item_select_right` 循环调整指针但不会移动物品。  
   - 骨骼绑定：`PlayerItemAttachment` 订阅 `ItemPicked`/`ItemRemoved` 以及 `ActiveBackpackSlotChanged`，始终展示当前指针对应物品，放下/投掷时自动清除。  
-  - 快捷栏：`QuickSlotBar` 订阅 `InventoryContainer.InventoryChanged` 以及 `ActiveBackpackSlotChanged`，只显示有限数量槽位，并通过标题/红色边框高亮当前指针。
 - 拾取/投掷动画链路：  
   - `PlayerItemInteractionComponent` 会在 `take_up` 输入时切入 `PlayerPickUpState`，播放 `animations/pickup`（Spine/AnimationPlayer），动画结束后才实际执行拾取。  
   - 投掷流程同理：按下 `throw` 时先切换到 `PlayerThrowState` 播放投掷动画，动画完成后 `TryTriggerThrowAfterAnimation()` 生成并抛出物品。
@@ -86,9 +102,19 @@
 - `scripts/actors/heroes/SamplePlayer.cs`、`scripts/actors/enemies/*.cs`  
   - 玩家/敌人均继承 `GameActor`，围绕 `StateMachine` 与 `AttackArea` 实现攻击、受击、死亡等流程。  
   - 敌人可通过 `EffectController` 应用特殊效果（如 `FreezeEffect`）。
+- `scripts/actors/enemies/EnemyC1WaiterA.cs` + `scenes/actors/enemies/Enemy_C1_waiterA.tscn`  
+  - C1 侍者敌人：4 点生命值，0.5 秒转身与受击硬直，距离阈值外投掷 `Weapon_A0_plate`（依赖 `WorldItemSpawner` 和 `ThrowableDamageItemEntity`），距离内则触发 1 点伤害的范围击退攻击；冷却、距离、投掷力度等均通过导出属性可调，示范了敌人脚本直接驱动远程/近战双攻逻辑的实现方式。
+- `scripts/actors/enemies/EnemyC1WaiterB.cs` + `scenes/actors/enemies/Enemy_C1_waiterB.tscn`  
+  - C1 侍者 B：30 点生命值，转身 / 受击各 0.5 秒僵直，依赖 `StateMachine + EnemyAttackController` 调度三段攻击（激光 20%、远程齐射 50%、突刺 30%），并通过 `metadata/guarantee_interval` / `metadata/guarantee_priority` 配置“激光每 4 次、齐射每 3 次必出（冲突时激光优先）”的保底机制。
+- `scripts/actors/enemies/attacks/EnemyLaserSweepAttack.cs` + `scenes/actors/enemies/attacks/Laser1Attack.tscn`  
+  - “Laser1” 攻击模板：在多组锚点间随机腾空，依序落下 3 段横向激光。每段包含 1.5 秒警示（`Polygon2D` 提示）、1 秒激光判定与可选间隔，期间敌人通过 `DamageIntercepted` 事件获得无敌。锚点、激光尺寸/伤害、段数、前/后摇和位移均可在资源中配置，可直接挂到 `EnemyAttackController` 作为子攻击。
+- `scripts/actors/enemies/attacks/EnemyVolleyRangedAttack.cs` + `scenes/actors/enemies/attacks/RangedVolleyAttack.tscn`  
+  - 远程齐射模板：可配置齐射次数、每轮射数、射击/齐射间隔以及三种瞄准模式（整段/每轮/每发重新锁定）。支持简单的直接伤害，也可指定 `ItemDefinition` 让敌人投射现有物品（如 `Weapon_A0_plate`），复用 `WorldItemSpawner` 提供的投掷逻辑，适用于构建多段远程攻击。
+- `scripts/actors/enemies/attacks/EnemyThrustStrikeAttack.cs` + `scenes/actors/enemies/attacks/ThrustStrikeAttack.tscn`  
+  - 简化突刺模板：记录玩家位置后高速突进，抵达后根据 `StrikeDelaySeconds` 延迟判定，最终以常规 `PerformAttack` 输出伤害。可调最小/最大突进距离、冲刺速度与伤害，适合需要“冲到面前→短停→挥击”节奏的敌人。
 
 - `scripts/actors/enemies/attacks/*`、`EnemyAttackController.cs`  
-  - 包含敌人的攻击定义与攻势调度逻辑；效果系统可与之协作（如冻结后重置攻击队列）。
+  - 包含敌人的攻击定义与攻势调度逻辑；效果系统可与之协作（如冻结后重置攻击队列）。`EnemyAttackController` 读取子节点的 `metadata/attack_weight`、`metadata/guarantee_interval` 与 `metadata/guarantee_priority`，可在 Inspector 中直接配置概率与“几次攻击后必出”的保底顺序。
 
 - 投掷动画链路  
   - `PlayerItemInteractionComponent` 的 `ThrowStateName` 默认为 `PlayerThrowState`。按下投掷键会先切换状态，播放 `animations/throw`，动画结束后由 `TryTriggerThrowAfterAnimation()` 实际生成/投掷物品。  

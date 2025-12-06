@@ -1,0 +1,20 @@
+[gd_scene load_steps=3 format=3 uid="uid://enemy_attack_volley"]
+
+[ext_resource type="Script" path="res://scripts/actors/enemies/attacks/EnemyVolleyRangedAttack.cs" id="1_attack_script"]
+[ext_resource type="Resource" path="res://resources/items/Weapon_A0_plate.tres" id="2_projectile"]
+
+[node name="RangedVolleyAttack" type="Node"]
+script = ExtResource("1_attack_script")
+AttackName = "RangedVolley"
+VolleyCount = 2
+ShotsPerVolley = 3
+ShotIntervalSeconds = 0.2
+VolleyIntervalSeconds = 0.7
+PostRecoverySeconds = 0.5
+AimMode = 1
+DamagePerShot = 1
+ProjectileImpulse = 900.0
+SpawnOffset = Vector2(16, -4)
+ProjectileItem = ExtResource("2_projectile")
+
+

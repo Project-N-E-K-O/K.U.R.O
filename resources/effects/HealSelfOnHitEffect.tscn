@@ -1,0 +1,9 @@
+[gd_resource type="PackedScene" load_steps=2 format=3 uid="uid://effect_heal_self_on_hit"]
+
+[ext_resource type="Script" path="res://scripts/effects/HealSelfOnHitEffect.cs" id="1"]
+
+[node name="HealSelfOnHitEffect" type="Node"]
+script = ExtResource("1")
+HealAmount = 1
+RequirePositiveDamage = true
+

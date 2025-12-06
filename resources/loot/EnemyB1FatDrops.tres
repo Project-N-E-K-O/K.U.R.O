@@ -1,0 +1,53 @@
+[gd_resource type="Resource" load_steps=10 format=3 uid="uid://enemy_b1_fat_drops"]
+
+[ext_resource type="Script" path="res://scripts/systems/loot/LootDropTable.cs" id="1_table"]
+[ext_resource type="Script" path="res://scripts/systems/loot/LootDropEntry.cs" id="2_entry"]
+[ext_resource type="Resource" path="res://resources/items/Weapon_A1_nightstand.tres" id="3_weapon_nightstand"]
+[ext_resource type="Resource" path="res://resources/items/Weapon_A1_umbrella.tres" id="4_weapon_umbrella"]
+[ext_resource type="Resource" path="res://resources/items/Weapon_A1_tablelamp.tres" id="5_weapon_tablelamp"]
+[ext_resource type="Resource" path="res://resources/items/Weapon_A2_table.tres" id="6_weapon_table"]
+
+[sub_resource type="Resource" id="Drop_Nightstand"]
+script = ExtResource("2_entry")
+Item = ExtResource("3_weapon_nightstand")
+DropChance = 0.35
+MinQuantity = 1
+MaxQuantity = 1
+ImpulseStrength = 260.0
+ImpulseSpreadDegrees = 90.0
+
+[sub_resource type="Resource" id="Drop_Umbrella"]
+script = ExtResource("2_entry")
+Item = ExtResource("4_weapon_umbrella")
+DropChance = 0.25
+MinQuantity = 1
+MaxQuantity = 1
+ImpulseStrength = 240.0
+ImpulseSpreadDegrees = 120.0
+
+[sub_resource type="Resource" id="Drop_TableLamp"]
+script = ExtResource("2_entry")
+Item = ExtResource("5_weapon_tablelamp")
+DropChance = 0.2
+MinQuantity = 1
+MaxQuantity = 1
+ImpulseStrength = 220.0
+ImpulseSpreadDegrees = 140.0
+
+[sub_resource type="Resource" id="Drop_Table"]
+script = ExtResource("2_entry")
+Item = ExtResource("6_weapon_table")
+DropChance = 0.3
+MinQuantity = 1
+MaxQuantity = 1
+ImpulseStrength = 260.0
+ImpulseSpreadDegrees = 80.0
+
+[resource]
+script = ExtResource("1_table")
+GlobalDropChance = 1.0
+MaxDrops = 1
+ScatterRadius = 48.0
+DefaultImpulse = 200.0
+Entries = Array[Resource]([SubResource("Drop_Nightstand"), SubResource("Drop_Umbrella"), SubResource("Drop_TableLamp"), SubResource("Drop_Table")])
+

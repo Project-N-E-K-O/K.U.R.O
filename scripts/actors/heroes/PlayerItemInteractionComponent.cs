@@ -201,7 +201,12 @@ namespace Kuros.Actors.Heroes
 
             if (disposition == DropDisposition.Throw)
             {
+                entity!.LastDroppedBy = _actor;
                 entity.ApplyThrowImpulse(GetFacingDirection() * ThrowImpulse);
+            }
+            else
+            {
+                entity!.LastDroppedBy = _actor;
             }
 
             InventoryComponent.NotifyItemRemoved(extracted.Item.ItemId);

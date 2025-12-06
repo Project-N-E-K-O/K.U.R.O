@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://scripts/actors/enemies/SampleEnemy.cs" id="1"]
 [ext_resource type="Script" path="res://scripts/systems/fsm/StateMachine.cs" id="2"]
@@ -13,6 +13,7 @@
 [ext_resource type="Script" path="res://scripts/actors/enemies/movement/EnemyChaseMovement.cs" id="9"]
 [ext_resource type="Script" path="res://scripts/core/effects/EffectController.cs" id="11"]
 [ext_resource type="Script" path="res://scripts/actors/enemies/attacks/EnemyMultiStrikeAttack.cs" id="13"]
+[ext_resource type="Resource" path="res://resources/loot/SampleEnemyDrops.tres" id="17_drop_table"]
 
 [sub_resource type="PlaceholderTexture2D" id="1"]
 size = Vector2(32, 48)
@@ -33,6 +34,7 @@ collision_layer = 2
 motion_mode = 1
 script = ExtResource("1")
 AttackArea = NodePath("Sprite2D/AttackArea")
+LootTable = ExtResource("17_drop_table")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 modulate = Color(1, 0.3, 0.3, 1)

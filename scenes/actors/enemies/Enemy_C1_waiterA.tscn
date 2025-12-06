@@ -1,0 +1,46 @@
+[gd_scene load_steps=8 format=3 uid="uid://enemy_c1_waiter_a"]
+
+[ext_resource type="Script" path="res://scripts/actors/enemies/EnemyC1WaiterA.cs" id="1_script"]
+[ext_resource type="Texture2D" path="res://icon.svg" id="2_icon"]
+[ext_resource type="Resource" path="res://resources/items/Weapon_A0_plate.tres" id="3_plate"]
+[ext_resource type="Script" path="res://scripts/core/effects/EffectController.cs" id="4_effect_controller"]
+
+[sub_resource type="RectangleShape2D" id="BodyShape"]
+size = Vector2(36, 72)
+
+[sub_resource type="RectangleShape2D" id="MeleeShape"]
+size = Vector2(120, 70)
+
+[node name="Enemy_C1_waiterA" type="CharacterBody2D" node_paths=PackedStringArray("AttackArea", "MeleeArea")]
+collision_layer = 2
+motion_mode = 1
+script = ExtResource("1_script")
+PlateItemDefinition = ExtResource("3_plate")
+AttackDistanceThreshold = 220.0
+ThrowCooldownSeconds = 1.5
+MeleeCooldownSeconds = 1.0
+TurnCooldownSeconds = 0.5
+HitStunDuration = 0.5
+
+[node name="EffectController" type="Node" parent="."]
+script = ExtResource("4_effect_controller")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_icon")
+offset = Vector2(0, -10)
+scale = Vector2(1.3, 1.3)
+
+[node name="AttackArea" type="Area2D" parent="Sprite2D"]
+position = Vector2(30, -10)
+collision_layer = 0
+collision_mask = 1
+monitorable = false
+monitoring = true
+
+[node name="MeleeShape" type="CollisionShape2D" parent="Sprite2D/AttackArea"]
+shape = SubResource("MeleeShape")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -10)
+shape = SubResource("BodyShape")
+
