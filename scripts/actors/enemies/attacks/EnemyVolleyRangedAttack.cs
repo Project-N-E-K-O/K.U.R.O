@@ -67,6 +67,7 @@ namespace Kuros.Actors.Enemies.Attacks
                 if (t.Exception != null)
                 {
                     GD.PrintErr($"[{AttackName}] Sequence error: {t.Exception.InnerException?.Message}");
+                    StopSequence();
                 }
             }, TaskContinuationOptions.OnlyOnFaulted);
         }
