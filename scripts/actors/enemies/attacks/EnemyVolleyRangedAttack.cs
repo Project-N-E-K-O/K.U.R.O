@@ -179,13 +179,20 @@ namespace Kuros.Actors.Enemies.Attacks
 
         private async Task DelaySeconds(float seconds)
         {
-            if (seconds <= 0f || _cancelRequested)
+            if (seconds <= 0f || _cancelRequested || !IsInstanceValid(Enemy))
             {
                 return;
             }
 
             var timer = Enemy.GetTree().CreateTimer(seconds);
-            await ToSignal(timer, SceneTreeTimer.SignalName.Timeout);
+            try
+            {
+                await ToSignal(timer, SceneTreeTimer.SignalName.Timeout);
+            }
+            catch (ObjectDisposedException)
+            {
+                _cancelRequested = true;
+            }
         }
 
         private void StopSequence()
