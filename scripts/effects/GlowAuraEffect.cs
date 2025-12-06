@@ -52,6 +52,7 @@ namespace Kuros.Effects
                 Texture = ResolveLightTexture(),
                 ShadowEnabled = false
             };
+            _lightNode.Set("range", Range);
 
             Actor.AddChild(_lightNode);
         }

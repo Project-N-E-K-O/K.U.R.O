@@ -199,14 +199,16 @@ namespace Kuros.Actors.Heroes
                 return false;
             }
 
+            if (entity == null)
+            {
+                return false;
+            }
+
+            entity.LastDroppedBy = _actor;
+
             if (disposition == DropDisposition.Throw)
             {
-                entity!.LastDroppedBy = _actor;
                 entity.ApplyThrowImpulse(GetFacingDirection() * ThrowImpulse);
-            }
-            else
-            {
-                entity!.LastDroppedBy = _actor;
             }
 
             InventoryComponent.NotifyItemRemoved(extracted.Item.ItemId);
