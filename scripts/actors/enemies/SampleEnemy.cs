@@ -113,16 +113,17 @@ public partial class SampleEnemy : GameActor
         base.Die();
     }
 
-    protected override void OnDeathFinalized()
-    {
-        if (!_scoreGranted && _player != null)
+        protected override void OnDeathFinalized()
         {
-            _player.AddScore(ScoreValue);
-            _scoreGranted = true;
-        }
+            RefreshPlayerReference();
+            if (!_scoreGranted && _player != null)
+            {
+                _player.AddScore(ScoreValue);
+                _scoreGranted = true;
+            }
 
-        base.OnDeathFinalized();
-    }
+            base.OnDeathFinalized();
+        }
     private void RefreshPlayerReference()
     {
         if (_player != null && IsInstanceValid(_player)) return;
