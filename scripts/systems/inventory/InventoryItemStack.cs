@@ -61,12 +61,8 @@ namespace Kuros.Systems.Inventory
                 newStack.DurabilityState.Reset();
                 newStack.DurabilityState.ApplyDamage(DurabilityState.Config.MaxDurability - durabilityPerUnit);
             }
-            // Runtime属性是针对整件武器/物品的强化状态，拆分堆叠时应保留同样的加成。
-            foreach (var pair in _runtimeAttributeAdditions)
-            {
-                if (Mathf.IsZeroApprox(pair.Value)) continue;
-                newStack.SetRuntimeAttributeValue(pair.Key, pair.Value);
-            }
+            // Runtime 属性视为当前堆叠的“单体武器强化”状态，不在分堆时复制，
+            // 以避免一份强化被重复克隆到多个堆叠。若未来需要更复杂的拆分逻辑，可在此处细化。
             return newStack;
         }
 
