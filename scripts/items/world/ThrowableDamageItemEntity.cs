@@ -22,6 +22,7 @@ namespace Kuros.Items.World
             if (velocity.LengthSquared() > 0.01f)
             {
                 _impactArmed = true;
+                _hasDealtDamage = false;
             }
         }
 
