@@ -59,7 +59,13 @@ namespace Kuros.Actors.Enemies.Attacks
             _sequenceRunning = true;
             float totalAttackTime = Mathf.Max(0.01f, VolleyCount * Mathf.Max(ShotIntervalSeconds * ShotsPerVolley + VolleyIntervalSeconds, 0.01f));
             ActiveDuration = totalAttackTime;
-            _ = RunSequenceAsync();
+            _ = RunSequenceAsync().ContinueWith(t =>
+            {
+                if (t.Exception != null)
+                {
+                    GD.PrintErr($"[{AttackName}] Sequence error: {t.Exception.InnerException?.Message}");
+                }
+            }, TaskContinuationOptions.OnlyOnFaulted);
         }
 
         protected override void OnAttackFinished()
