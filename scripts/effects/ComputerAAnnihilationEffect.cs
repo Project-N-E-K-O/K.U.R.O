@@ -15,7 +15,7 @@ namespace Kuros.Effects
         [Export(PropertyHint.Range, "1,10,1")]
         public int CrashThreshold { get; set; } = 3;
 
-        [Export(PropertyHint.Range, "0,60,0.1")]
+        [Export(PropertyHint.Range, "200,800,10")]
         public float FatalDialogWidth { get; set; } = 420f;
 
         [Export(PropertyHint.MultilineText)]
