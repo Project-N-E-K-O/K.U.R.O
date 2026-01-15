@@ -1,11 +1,10 @@
-[gd_resource type="Resource" load_steps=8 format=3 uid="uid://weapon_a1_umbrella"]
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=7 format=3 uid="uid://c01sltuo7404y"]
 
-[ext_resource type="Script" path="res://scripts/items/ItemDefinition.cs" id="1_item_definition"]
-[ext_resource type="Script" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="2_attribute_entry"]
-[ext_resource type="Texture2D" path="res://icon.svg" id="3_umbrella_icon"]
-[ext_resource type="Script" path="res://scripts/items/effects/ItemEffectEntry.cs" id="4_effect_entry"]
-[ext_resource type="PackedScene" path="res://scenes/items/ExampleWorldItem.tscn" id="5_world_item"]
-[ext_resource type="Resource" path="res://resources/items/skills/WeaponBlockSkill_Umbrella.tres" id="6_block_skill"]
+[ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="1_item_definition"]
+[ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="2_attribute_entry"]
+[ext_resource type="Texture2D" uid="uid://dccrl4lpl0t2h" path="res://icon.svg" id="3_umbrella_icon"]
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="4_effect_entry"]
+[ext_resource type="Resource" uid="uid://dj2v1hj15vgiv" path="res://resources/items/skills/WeaponBlockSkill_Umbrella.tres" id="6_block_skill"]
 
 [sub_resource type="Resource" id="Attribute_AttackPower"]
 script = ExtResource("2_attribute_entry")
@@ -21,9 +20,5 @@ Description = "坚固的战斗雨伞，既可攻击也可格挡。"
 Icon = ExtResource("3_umbrella_icon")
 Category = "Weapon"
 MaxStackSize = 1
-Tags = PackedStringArray("tag_weapon")
-AttributeEntries = Array[Resource]([SubResource("Attribute_AttackPower")])
-EffectEntries = Array[Resource]([])
+AttributeEntries = Array[ExtResource("2_attribute_entry")]([SubResource("Attribute_AttackPower")])
 WeaponSkillResources = Array[Resource]([ExtResource("6_block_skill")])
-WorldScenePath = ExtResource("5_world_item")
-

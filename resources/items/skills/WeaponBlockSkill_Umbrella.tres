@@ -1,7 +1,7 @@
-[gd_resource type="Resource" load_steps=5 format=3 uid="uid://weapon_block_skill_umbrella"]
+[gd_resource type="Resource" script_class="WeaponSkillDefinition" load_steps=5 format=3 uid="uid://dj2v1hj15vgiv"]
 
-[ext_resource type="Script" path="res://scripts/items/weapons/WeaponSkillDefinition.cs" id="1_skill_definition"]
-[ext_resource type="Script" path="res://scripts/items/effects/ItemEffectEntry.cs" id="2_effect_entry"]
+[ext_resource type="Script" uid="uid://bp6pwgoj44cuq" path="res://scripts/items/weapons/WeaponSkillDefinition.cs" id="1_skill_definition"]
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="2_effect_entry"]
 [ext_resource type="PackedScene" path="res://resources/effects/WeaponBlockEffect.tscn" id="3_block_effect"]
 
 [sub_resource type="Resource" id="Skill_Block_Effect"]
@@ -9,12 +9,12 @@ script = ExtResource("2_effect_entry")
 Trigger = 1
 EffectScene = ExtResource("3_block_effect")
 Notes = "撑开雨伞格挡，即时阻挡正面攻击。"
-PropertyOverrides = {
-"Duration": 1.5,
+PropertyOverrides = Dictionary[String, Variant]({
 "BlockArcDegrees": 160.0,
-"ResidualDamageRatio": 0.0,
-"EndsOnSuccessfulBlock": true
-}
+"Duration": 1.5,
+"EndsOnSuccessfulBlock": true,
+"ResidualDamageRatio": 0.0
+})
 
 [resource]
 script = ExtResource("1_skill_definition")
@@ -23,6 +23,5 @@ DisplayName = "雨伞格挡"
 SkillType = 0
 CooldownSeconds = 2.5
 Description = "展开雨伞形成临时护盾，短时间内格挡正面攻击。"
+Effects = Array[ExtResource("2_effect_entry")]([SubResource("Skill_Block_Effect")])
 ActivationAction = "weapon_skill_block"
-Effects = Array[Resource]([SubResource("Skill_Block_Effect")])
-

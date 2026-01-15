@@ -1,13 +1,12 @@
-[gd_resource type="Resource" load_steps=12 format=3 uid="uid://weapon_a1_tablelamp"]
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=11 format=3 uid="uid://y2gp100lkcom"]
 
-[ext_resource type="Script" path="res://scripts/items/ItemDefinition.cs" id="1_item_definition"]
-[ext_resource type="Script" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="2_attribute_entry"]
-[ext_resource type="Texture2D" path="res://icon.svg" id="3_tablelamp_icon"]
-[ext_resource type="Script" path="res://scripts/items/effects/ItemEffectEntry.cs" id="4_effect_entry"]
-[ext_resource type="PackedScene" path="res://scenes/items/ExampleWorldItem.tscn" id="5_world_item"]
+[ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="1_item_definition"]
+[ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="2_attribute_entry"]
+[ext_resource type="Texture2D" uid="uid://dccrl4lpl0t2h" path="res://icon.svg" id="3_tablelamp_icon"]
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="4_effect_entry"]
 [ext_resource type="PackedScene" path="res://resources/effects/GlowAuraEffect.tscn" id="6_glow_effect"]
-[ext_resource type="Resource" path="res://resources/items/skills/WeaponStunSkill.tres" id="7_stun_skill"]
-[ext_resource type="Script" path="res://scripts/items/durability/ItemDurabilityConfig.cs" id="durability_script"]
+[ext_resource type="Resource" uid="uid://cauc105apa7s0" path="res://resources/items/skills/WeaponStunSkill.tres" id="7_stun_skill"]
+[ext_resource type="Script" uid="uid://bkm4r2swk5lyl" path="res://scripts/items/durability/ItemDurabilityConfig.cs" id="durability_script"]
 
 [sub_resource type="Resource" id="Attribute_AttackPower"]
 script = ExtResource("2_attribute_entry")
@@ -18,14 +17,12 @@ Notes = "桌灯提供 4 点攻击力"
 [sub_resource type="Resource" id="Durability_Config"]
 script = ExtResource("durability_script")
 MaxDurability = 1
-DamagePerUse = 1
 DamagePerHit = 0
 IsRepairable = false
 BreakBehavior = 0
 
 [sub_resource type="Resource" id="Effect_Glow"]
 script = ExtResource("4_effect_entry")
-Trigger = 0
 EffectScene = ExtResource("6_glow_effect")
 Notes = "携带时发出柔和光芒，照亮周围。"
 
@@ -37,10 +34,7 @@ Description = "精致的桌灯，既可照明也能在关键时刻眩晕敌人�
 Icon = ExtResource("3_tablelamp_icon")
 Category = "Weapon"
 MaxStackSize = 1
-Tags = PackedStringArray("tag_weapon")
-AttributeEntries = Array[Resource]([SubResource("Attribute_AttackPower")])
-DurabilityConfig = SubResource("Durability_Config")
-EffectEntries = Array[Resource]([SubResource("Effect_Glow")])
+AttributeEntries = Array[ExtResource("2_attribute_entry")]([SubResource("Attribute_AttackPower")])
+EffectEntries = Array[ExtResource("4_effect_entry")]([SubResource("Effect_Glow")])
 WeaponSkillResources = Array[Resource]([ExtResource("7_stun_skill")])
-WorldScenePath = ExtResource("5_world_item")
-
+DurabilityConfig = SubResource("Durability_Config")

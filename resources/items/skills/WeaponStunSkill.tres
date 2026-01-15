@@ -1,7 +1,7 @@
-[gd_resource type="Resource" load_steps=5 format=3 uid="uid://weapon_stun_skill"]
+[gd_resource type="Resource" script_class="WeaponSkillDefinition" load_steps=5 format=3 uid="uid://cauc105apa7s0"]
 
-[ext_resource type="Script" path="res://scripts/items/weapons/WeaponSkillDefinition.cs" id="1_skill_definition"]
-[ext_resource type="Script" path="res://scripts/items/effects/ItemEffectEntry.cs" id="2_effect_entry"]
+[ext_resource type="Script" uid="uid://bp6pwgoj44cuq" path="res://scripts/items/weapons/WeaponSkillDefinition.cs" id="1_skill_definition"]
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="2_effect_entry"]
 [ext_resource type="PackedScene" path="res://resources/effects/WeaponStunEffect.tscn" id="3_stun_effect"]
 
 [sub_resource type="Resource" id="Skill_Stun_Effect"]
@@ -9,12 +9,12 @@ script = ExtResource("2_effect_entry")
 Trigger = 1
 EffectScene = ExtResource("3_stun_effect")
 Notes = "在前方范围内释放眩晕冲击波，冻结敌人。"
-PropertyOverrides = {
-"StunDuration": 2.0,
-"Radius": 220.0,
+PropertyOverrides = Dictionary[String, Variant]({
 "ArcDegrees": 200.0,
-"RequiresFacingCheck": true
-}
+"Radius": 220.0,
+"RequiresFacingCheck": true,
+"StunDuration": 2.0
+})
 
 [resource]
 script = ExtResource("1_skill_definition")
@@ -23,6 +23,5 @@ DisplayName = "眩晕冲击"
 SkillType = 0
 CooldownSeconds = 5.0
 Description = "释放前向冲击波，命中的敌人将被冻结一段时间。"
+Effects = Array[ExtResource("2_effect_entry")]([SubResource("Skill_Stun_Effect")])
 ActivationAction = "weapon_skill_stun"
-Effects = Array[Resource]([SubResource("Skill_Stun_Effect")])
-

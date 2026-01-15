@@ -1,12 +1,11 @@
-[gd_resource type="Resource" load_steps=11 format=3 uid="uid://weapon_a2_table"]
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=10 format=3 uid="uid://6h6lii4j1pf7"]
 
-[ext_resource type="Script" path="res://scripts/items/ItemDefinition.cs" id="1_item_definition"]
-[ext_resource type="Script" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="2_attribute_entry"]
-[ext_resource type="Texture2D" path="res://icon.svg" id="3_table_icon"]
-[ext_resource type="Script" path="res://scripts/items/effects/ItemEffectEntry.cs" id="4_effect_entry"]
-[ext_resource type="PackedScene" path="res://scenes/items/ExampleWorldItem.tscn" id="5_world_item"]
+[ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="1_item_definition"]
+[ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="2_attribute_entry"]
+[ext_resource type="Texture2D" uid="uid://dccrl4lpl0t2h" path="res://icon.svg" id="3_table_icon"]
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="4_effect_entry"]
 [ext_resource type="PackedScene" path="res://resources/effects/HeavyCarrySlowEffect.tscn" id="6_slow_effect"]
-[ext_resource type="Script" path="res://scripts/items/durability/ItemDurabilityConfig.cs" id="durability_script"]
+[ext_resource type="Script" uid="uid://bkm4r2swk5lyl" path="res://scripts/items/durability/ItemDurabilityConfig.cs" id="durability_script"]
 
 [sub_resource type="Resource" id="Attribute_AttackPower"]
 script = ExtResource("2_attribute_entry")
@@ -17,19 +16,17 @@ Notes = "武器提供 6 点基础攻击力"
 [sub_resource type="Resource" id="Durability_Config"]
 script = ExtResource("durability_script")
 MaxDurability = 2
-DamagePerUse = 1
 DamagePerHit = 0
 IsRepairable = false
 BreakBehavior = 0
 
 [sub_resource type="Resource" id="Effect_HeavyPenalty"]
 script = ExtResource("4_effect_entry")
-Trigger = 0
 EffectScene = ExtResource("6_slow_effect")
 Notes = "持有此武器时移动速度额外降低"
-PropertyOverrides = {
+PropertyOverrides = Dictionary[String, Variant]({
 "SpeedMultiplierPerStack": 0.85
-}
+})
 
 [resource]
 script = ExtResource("1_item_definition")
@@ -39,10 +36,6 @@ Description = "厚重的木桌，抡起来威力十足，但行动会变得迟�
 Icon = ExtResource("3_table_icon")
 Category = "Weapon"
 MaxStackSize = 1
-Tags = PackedStringArray("tag_weapon")
-AttributeEntries = Array[Resource]([SubResource("Attribute_AttackPower")])
+AttributeEntries = Array[ExtResource("2_attribute_entry")]([SubResource("Attribute_AttackPower")])
+EffectEntries = Array[ExtResource("4_effect_entry")]([SubResource("Effect_HeavyPenalty")])
 DurabilityConfig = SubResource("Durability_Config")
-EffectEntries = Array[Resource]([SubResource("Effect_HeavyPenalty")])
-WeaponSkillResources = Array[Resource]([])
-WorldScenePath = ExtResource("5_world_item")
-

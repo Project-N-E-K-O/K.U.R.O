@@ -1,4 +1,4 @@
-[gd_scene load_steps=34 format=3 uid="uid://d15hs7qpxqhf3"]
+[gd_scene load_steps=42 format=3 uid="uid://d15hs7qpxqhf3"]
 
 [ext_resource type="Script" uid="uid://btbsyf4hokvud" path="res://scripts/actors/heroes/SamplePlayer.cs" id="1_player"]
 [ext_resource type="PackedScene" uid="uid://b1ljb2q212v3d" path="res://scenes/environments/floor.tscn" id="1_sb658"]
@@ -11,7 +11,6 @@
 [ext_resource type="Script" uid="uid://l40es7irdvdw" path="res://scripts/actors/heroes/states/PlayerHitState.cs" id="7_w7wnm"]
 [ext_resource type="Script" uid="uid://ba1kd5qgh17ag" path="res://scripts/actors/heroes/states/PlayerRunState.cs" id="8_bhpvs"]
 [ext_resource type="PackedScene" uid="uid://ciwlpphli7o01" path="res://scenes/properties/DroppableExampleProperty.tscn" id="11_drop_example"]
-[ext_resource type="PackedScene" uid="uid://ceou8wonisj4d" path="res://scenes/environments/wall.tscn" id="12_v8do6"]
 [ext_resource type="Script" uid="uid://d1g4amacs13a3" path="res://scripts/actors/heroes/states/PlayerFrozenState.cs" id="17_player_frozen"]
 [ext_resource type="Script" uid="uid://c2pgsls8pb7oh" path="res://scripts/actors/heroes/attacks/PlayerBasicMeleeAttack.cs" id="19_player_basic_attack"]
 [ext_resource type="Script" uid="uid://cn2bsvambjids" path="res://scripts/controllers/EnemySpawnController.cs" id="20_spawn_controller"]
@@ -20,11 +19,13 @@
 [ext_resource type="Script" uid="uid://bsa4kolrnan6p" path="res://scripts/actors/heroes/states/PlayerDyingState.cs" id="23_player_dying"]
 [ext_resource type="Script" uid="uid://cp40kowtn1ho3" path="res://scripts/actors/heroes/states/PlayerDeadState.cs" id="24_player_dead"]
 [ext_resource type="PackedScene" path="res://scenes/actors/npc/SimpleNPC.tscn" id="25_simple_npc"]
-[ext_resource type="Script" uid="uid://c1vumadqlusfa" path="res://scripts/actors/heroes/PlayerItemAttachment.cs" id="27_item_attachment"]
+[ext_resource type="Texture2D" uid="uid://bh147mrx1sgm" path="res://textures/environments/wall/25.12.3 厨房 下墙壁.png" id="27_dgope"]
+[ext_resource type="Script" uid="uid://6uws0lovsucd" path="res://scripts/actors/heroes/PlayerItemAttachment.cs" id="27_item_attachment"]
 [ext_resource type="Resource" path="res://data/TestItem2.tres" id="27_test_item_2"]
+[ext_resource type="Texture2D" uid="uid://sinhag8w2ijl" path="res://textures/environments/wall/25.12.3 卧室下墙壁.png" id="28_pfjrb"]
 [ext_resource type="Resource" path="res://data/TestItem3.tres" id="28_test_item_3"]
 [ext_resource type="Script" uid="uid://b0t8cfl3khjix" path="res://scripts/actors/heroes/PlayerItemInteractionComponent.cs" id="29_item_interaction"]
-[ext_resource type="Script" uid="uid://djhlxjw4rrt8d" path="res://scripts/actors/heroes/PlayerWeaponSkillController.cs" id="30_weapon_skill_controller"]
+[ext_resource type="Script" uid="uid://v8exb3wpvh6d" path="res://scripts/actors/heroes/PlayerWeaponSkillController.cs" id="30_weapon_skill_controller"]
 [ext_resource type="Script" uid="uid://ch33kuwv8bhip" path="res://scripts/actors/heroes/states/PlayerPickUpState.cs" id="31_player_pickup"]
 [ext_resource type="Script" uid="uid://b162xt2i3qc4e" path="res://scripts/actors/heroes/states/PlayerThrowState.cs" id="32_player_throw"]
 
@@ -39,54 +40,55 @@ radius = 15.0
 height = 60.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_sb658"]
-size = Vector2(8, 1444)
+size = Vector2(17, 1106)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_v8do6"]
-size = Vector2(10, 1440)
+size = Vector2(146, 1080.75)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_x7t42"]
-size = Vector2(2397, 16)
+size = Vector2(3887, 24)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_10ijk"]
+size = Vector2(2977, 82)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_cijyb"]
+size = Vector2(645.5, 18)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_dgope"]
+size = Vector2(256.5, 26)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_pfjrb"]
+size = Vector2(123, 473)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_34xhk"]
+size = Vector2(68, 247.5)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_feb7u"]
+size = Vector2(111.5, 289.5)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1hj54"]
+size = Vector2(98, 307)
 
 [node name="BattleScene" type="Node2D"]
+position = Vector2(-6, 0)
 script = ExtResource("2_battle_manager")
 
-[node name="Background" type="ColorRect" parent="."]
-offset_left = 7.0
-offset_top = 10.0
-offset_right = 1838.0
-offset_bottom = 1118.0
-color = Color(0.2, 0.3, 0.4, 1)
+[node name="scnene" parent="." instance=ExtResource("1_sb658")]
+position = Vector2(-8, 5)
 
-[node name="Ground" type="ColorRect" parent="."]
-offset_left = 8.0
-offset_top = 999.0
-offset_right = 1842.0
-offset_bottom = 1119.0
-color = Color(0.4, 0.35, 0.3, 1)
-
-[node name="floor" parent="." instance=ExtResource("1_sb658")]
-position = Vector2(1127, 706)
-scale = Vector2(1.8534186, 1.9305735)
-
-[node name="wall" parent="." instance=ExtResource("12_v8do6")]
-position = Vector2(1380.9999, 397.00003)
-scale = Vector2(0.72410905, 0.70131683)
-
-[node name="Player" type="CharacterBody2D" parent="." node_paths=PackedStringArray("AttackArea")]
+[node name="Player" type="CharacterBody2D" parent="."]
 position = Vector2(200, 400)
 collision_mask = 7
 motion_mode = 1
 script = ExtResource("1_player")
-AttackArea = NodePath("SpineCharacter/AttackArea")
 
 [node name="Camera2D" type="Camera2D" parent="Player"]
-position = Vector2(-5, -17)
-scale = Vector2(0.8799991, 0.68)
-zoom = Vector2(1.75, 1.75)
+position = Vector2(-5, -88)
+zoom = Vector2(2.5, 2.5)
 limit_left = 0
 limit_top = 10
-limit_right = 2360
-limit_bottom = 1425
+limit_right = 3854
+limit_bottom = 1080
 drag_horizontal_enabled = true
 drag_vertical_enabled = true
 
@@ -167,30 +169,44 @@ AttachmentParentPath = NodePath("SpineCharacter/Skeleton2D/root/bone/bone2/bone3
 IconOffset = Vector2(0, 0)
 
 [node name="EnemySpawnController" type="Node2D" parent="."]
+visible = false
 script = ExtResource("20_spawn_controller")
 
 [node name="EnemyInstance" parent="EnemySpawnController" instance=ExtResource("21_enemy_b1_fat")]
+visible = false
 position = Vector2(1369, 456)
 Speed = 50.0
+ActorZIndex = -1
+ForceAllChildZIndex = null
 
 [node name="DroppableExample" parent="." instance=ExtResource("11_drop_example")]
+visible = false
 z_index = 255
 position = Vector2(419, 360)
 
 [node name="DroppableExample2" parent="." instance=ExtResource("11_drop_example")]
+visible = false
 z_index = 255
 position = Vector2(550, 360)
 Item = ExtResource("27_test_item_2")
 
 [node name="DroppableExample3" parent="." instance=ExtResource("11_drop_example")]
+visible = false
 z_index = 255
 position = Vector2(680, 360)
 Item = ExtResource("28_test_item_3")
 
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(1934, 534)
+scale = Vector2(0.33224, 0.36351487)
+texture = ExtResource("28_pfjrb")
+
 [node name="NPC" parent="." instance=ExtResource("25_simple_npc")]
+visible = false
 position = Vector2(611, 711)
 
 [node name="UI" type="CanvasLayer" parent="."]
+visible = false
 
 [node name="PlayerStats" type="Label" parent="UI"]
 offset_left = 10.0
@@ -218,13 +234,52 @@ horizontal_alignment = 1
 [node name="ArillWall" type="StaticBody2D" parent="."]
 
 [node name="left" type="CollisionShape2D" parent="ArillWall"]
-position = Vector2(-20, 714)
+visible = false
+position = Vector2(-12, 545)
 shape = SubResource("RectangleShape2D_sb658")
 
 [node name="right" type="CollisionShape2D" parent="ArillWall"]
-position = Vector2(2365, 707)
+visible = false
+position = Vector2(3786, 538.625)
 shape = SubResource("RectangleShape2D_v8do6")
 
 [node name="down" type="CollisionShape2D" parent="ArillWall"]
-position = Vector2(1165.5, 1421)
+visible = false
+position = Vector2(1939.5, 1096)
 shape = SubResource("RectangleShape2D_x7t42")
+
+[node name="home up" type="CollisionShape2D" parent="ArillWall"]
+visible = false
+position = Vector2(1464, 41)
+shape = SubResource("RectangleShape2D_10ijk")
+
+[node name="road up" type="CollisionShape2D" parent="ArillWall"]
+visible = false
+position = Vector2(3530.75, 10)
+shape = SubResource("RectangleShape2D_cijyb")
+
+[node name="floor up" type="CollisionShape2D" parent="ArillWall"]
+visible = false
+position = Vector2(3078.75, 11)
+shape = SubResource("RectangleShape2D_dgope")
+
+[node name="badroom up wall" type="CollisionShape2D" parent="ArillWall"]
+position = Vector2(1690.5, 264)
+shape = SubResource("RectangleShape2D_pfjrb")
+
+[node name="badroom down wall" type="CollisionShape2D" parent="ArillWall"]
+position = Vector2(1719, 976.75)
+shape = SubResource("RectangleShape2D_34xhk")
+
+[node name="kitchen up wall" type="CollisionShape2D" parent="ArillWall"]
+position = Vector2(2897.75, 159.25)
+shape = SubResource("RectangleShape2D_feb7u")
+
+[node name="kitchen down wall" type="CollisionShape2D" parent="ArillWall"]
+position = Vector2(2902, 922.5)
+shape = SubResource("RectangleShape2D_1hj54")
+
+[node name="Sprite2D2" type="Sprite2D" parent="."]
+position = Vector2(1927.5002, 538.00006)
+scale = Vector2(0.33379373, 0.3641831)
+texture = ExtResource("27_dgope")
