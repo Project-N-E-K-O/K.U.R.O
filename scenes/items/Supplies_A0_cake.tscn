@@ -16,12 +16,14 @@ position = Vector2(-0.5, 8)
 shape = SubResource("RectangleShape2D_jyvv2")
 
 [node name="Hitbox" type="Area2D" parent="."]
+collision_layer = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
 position = Vector2(-0.5, 8)
 shape = SubResource("RectangleShape2D_jyvv2")
 
 [node name="GrabArea" type="Area2D" parent="."]
+collision_layer = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="GrabArea"]
 position = Vector2(-0.5, 8)

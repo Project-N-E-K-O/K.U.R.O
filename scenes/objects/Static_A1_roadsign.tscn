@@ -2,8 +2,8 @@
 
 [ext_resource type="Texture2D" uid="uid://hgywt5xvygxc" path="res://assets/furnitures/出租车牌子.png" id="1_dbhg2"]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_6vw8c"]
-radius = 31.257
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_dbhg2"]
+size = Vector2(89.39393, 23.63636)
 
 [node name="Static_A1_roadsign" type="StaticBody2D"]
 
@@ -12,8 +12,6 @@ scale = Vector2(0.345, 0.345)
 texture = ExtResource("1_dbhg2")
 
 [node name="CollisionShape2D3" type="CollisionShape2D" parent="."]
-position = Vector2(-3.0000114, 104.00001)
-rotation = -0.37350047
+position = Vector2(-0.49999905, 105.200005)
 scale = Vector2(0.66, 0.66)
-skew = -0.7749262
-shape = SubResource("CircleShape2D_6vw8c")
+shape = SubResource("RectangleShape2D_dbhg2")
