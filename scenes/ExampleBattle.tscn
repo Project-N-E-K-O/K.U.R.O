@@ -135,7 +135,7 @@ scale = Vector2(0.4285608, 0.48420432)
 position = Vector2(9.333557, -130.11035)
 scale = Vector2(2.3333912, 2.0652437)
 collision_layer = 0
-collision_mask = 2
+collision_mask = 3
 monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Player/SpineCharacter/AttackArea"]
@@ -204,7 +204,6 @@ AttachmentParentPath = NodePath("SpineCharacter/Skeleton2D/root/bone/bone2/bone3
 IconOffset = Vector2(0, 0)
 
 [node name="EnemySpawnController" type="Node2D" parent="."]
-visible = false
 script = ExtResource("20_spawn_controller")
 
 [node name="EnemyInstance" parent="EnemySpawnController" instance=ExtResource("21_enemy_b1_fat")]
@@ -354,10 +353,6 @@ freeze = true
 
 [node name="Weapon_A1_ball" parent="PickupItems" instance=ExtResource("34_hfn0d")]
 position = Vector2(427, 637)
-collision_layer = 8
-collision_mask = 0
-gravity_scale = 0.0
-freeze = true
 
 [node name="Weapon_A1_bed" parent="PickupItems" instance=ExtResource("35_w4oyo")]
 position = Vector2(1008, 312)
@@ -454,8 +449,6 @@ freeze = true
 
 [node name="Weapon_A1_chair" parent="PickupItems" instance=ExtResource("51_a2yqm")]
 position = Vector2(173, 371)
-gravity_scale = 0.0
-freeze = true
 
 [node name="ArillWall" type="StaticBody2D" parent="."]
 

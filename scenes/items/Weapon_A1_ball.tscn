@@ -5,24 +5,30 @@
 [sub_resource type="CircleShape2D" id="CircleShape2D_klue8"]
 radius = 11.0
 
-[node name="Weapon_A1_ball" type="RigidBody2D"]
+[node name="Ball" type="Node2D"]
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Weapon_A1_ball" type="RigidBody2D" parent="."]
+collision_mask = 2
+gravity_scale = 0.0
+can_sleep = false
+
+[node name="Sprite2D" type="Sprite2D" parent="Weapon_A1_ball"]
 scale = Vector2(0.36, 0.36)
 texture = ExtResource("1_qce8s")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_ball"]
 scale = Vector2(3.6, 3.6)
 shape = SubResource("CircleShape2D_klue8")
 
-[node name="Hitbox" type="Area2D" parent="."]
+[node name="Hitbox" type="Area2D" parent="Weapon_A1_ball"]
 
-[node name="CollisionShape2D2" type="CollisionShape2D" parent="Hitbox"]
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="Weapon_A1_ball/Hitbox"]
 scale = Vector2(3.6, 3.6)
 shape = SubResource("CircleShape2D_klue8")
 
-[node name="GrabArea" type="Area2D" parent="."]
+[node name="GrabArea" type="Area2D" parent="Weapon_A1_ball"]
+collision_mask = 2
 
-[node name="CollisionShape2D2" type="CollisionShape2D" parent="GrabArea"]
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="Weapon_A1_ball/GrabArea"]
 scale = Vector2(3.6, 3.6)
 shape = SubResource("CircleShape2D_klue8")
