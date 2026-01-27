@@ -36,6 +36,9 @@ namespace Kuros.Items.World
 
 		[ExportGroup("Physics")]
 		[Export] public NodePath RigidBodyPath { get; set; } = new NodePath(".");
+		[Export] public double FlightDurationSeconds = 0.4; // how long the item keeps flying before dropping
+		[Export] public float DropLimitDistance { get; set; } = 64f;
+
 
 		public InventoryItemStack? CurrentStack { get; private set; }
 		public string ItemId => !string.IsNullOrWhiteSpace(ItemIdOverride)
@@ -48,6 +51,17 @@ namespace Kuros.Items.World
 		private bool _isPicked;
 		private Area2D? _grabArea;
 		private RigidBody2D? _rigidBody;
+		private bool _refreezePending = false;
+		private double _refreezeTimer = 0.0;
+		private const double RefreezeTimeThreshold = 0.25; // seconds below speed threshold to refreeze
+		private const float RefreezeSpeedThreshold = 8.0f; // speed below which we consider the body at rest
+		private float _initialGravityScale = 0.0f;
+		private bool _inFlight = false;
+		private double _flightTimer = 0.0;
+		private const float DropVerticalSpeed = 240f; // downward speed when starting drop
+		private const float DropHorizontalDamping = 0.6f; // horizontal speed multiplier when dropping
+		private bool _isDropping = false;
+		private float _dropStartY = 0f;
 		private bool _initialMonitoring;
 		private bool _initialMonitorable;
 		private uint _initialCollisionLayer;
@@ -164,10 +178,115 @@ namespace Kuros.Items.World
 
 		public virtual void ApplyThrowImpulse(Vector2 velocity)
 		{
+			if (_rigidBody == null)
+			{
+				// Try to resolve rigidbody if it wasn't found earlier
+				ResolveRigidBody();
+			}
 			if (_rigidBody != null)
 			{
+				// Ensure the rigid body is active (avoid referencing Mode/ModeEnum)
+				try
+				{
+					_rigidBody.Sleeping = false;
+					// Unset 'freeze' flag on the RigidBody so it can move when thrown
+					try
+					{
+						_rigidBody.Set("freeze", false);
+					}
+					catch { /* ignore if property not available */ }
+					// enter flight state: disable gravity while flying and start flight timer
+					try { _rigidBody.GravityScale = 0.0f; } catch { try { _rigidBody.Set("gravity_scale", 0.0f); } catch { } }
+					_inFlight = true;
+					_flightTimer = 0.0;
+				}
+				catch
+				{
+					// ignore if property not available on this build
+				}
+				// Ensure the physics body position lines up with the Node2D root
+				_rigidBody.GlobalPosition = GlobalPosition;
+				// Set linear velocity and apply impulse to simulate a throw
 				_rigidBody.LinearVelocity = velocity;
-				_rigidBody.ApplyImpulse(velocity);
+				// ApplyImpulse may be available; call defensively
+				try
+				{
+					_rigidBody.ApplyImpulse(velocity);
+				}
+				catch
+				{
+					// fallback: no-op
+				}
+			}
+		}
+
+		public override void _PhysicsProcess(double delta)
+		{
+			base._PhysicsProcess(delta);
+
+			if (_rigidBody == null) return;
+
+			// Flight handling: keep flying for a short duration, then start drop
+			if (_inFlight)
+			{
+				_flightTimer += delta;
+				var vel = _rigidBody.LinearVelocity;
+				// keep vertical velocity minimal during flight so it travels horizontally
+				try { _rigidBody.LinearVelocity = new Vector2(vel.X, 0); } catch { }
+				if (_flightTimer >= FlightDurationSeconds)
+				{
+					_inFlight = false;
+					// restore gravity so the item drops
+					try { _rigidBody.GravityScale = _initialGravityScale; } catch { try { _rigidBody.Set("gravity_scale", _initialGravityScale); } catch { } }
+					// apply downward velocity while damping horizontal speed
+					try { _rigidBody.LinearVelocity = new Vector2(vel.X * DropHorizontalDamping, DropVerticalSpeed); } catch { }
+					// start drop tracking and refreeze detection
+					_isDropping = true;
+					try { _dropStartY = _rigidBody.GlobalPosition.Y; } catch { _dropStartY = GlobalPosition.Y; }
+					_refreezePending = true;
+					_refreezeTimer = 0.0;
+				}
+				return;
+			}
+
+			if (_refreezePending && !_isPicked)
+			{
+				// If we're in a dropping phase, check vertical drop limit first
+				if (_isDropping)
+				{
+					try
+					{
+						var currentY = _rigidBody.GlobalPosition.Y;
+						if (currentY - _dropStartY >= DropLimitDistance)
+						{
+							// hit drop limit — consider touching ground
+							try { _rigidBody.Set("freeze", true); } catch { }
+							try { _rigidBody.LinearVelocity = Vector2.Zero; } catch { }
+							_isDropping = false;
+							_refreezePending = false;
+							_refreezeTimer = 0.0;
+							return;
+						}
+					}
+					catch { }
+				}
+				var speed = _rigidBody.LinearVelocity.Length();
+				if (speed <= RefreezeSpeedThreshold)
+				{
+					_refreezeTimer += delta;
+					if (_refreezeTimer >= RefreezeTimeThreshold)
+					{
+						// re-freeze the body and clear velocity
+						try { _rigidBody.Set("freeze", true); } catch { }
+						try { _rigidBody.LinearVelocity = Vector2.Zero; } catch { }
+						_refreezePending = false;
+						_refreezeTimer = 0.0;
+					}
+				}
+				else
+				{
+					_refreezeTimer = 0.0;
+				}
 			}
 		}
 
@@ -250,6 +369,7 @@ namespace Kuros.Items.World
 			else
 			{
 				GD.Print($"{Name}: RigidBody2D resolved at {_rigidBody.GetPath()}");
+				try { _initialGravityScale = _rigidBody.GravityScale; } catch { _initialGravityScale = 0.0f; }
 			}
 		}
 

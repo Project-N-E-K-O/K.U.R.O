@@ -20,6 +20,7 @@ script = ExtResource("5_5a40b")
 ItemId = "Weapon_A1_chair"
 DisplayName = "Office Chair"
 Description = "Sit down! Be humble!"
+Icon = ExtResource("1_bbajv")
 MaxStackSize = 1
 WeaponSkillResources = Array[Resource]([null])
 DurabilityConfig = SubResource("Resource_7eoxl")
@@ -42,7 +43,10 @@ RigidBodyPath = NodePath("Rigidbody2D")
 
 [node name="Rigidbody2D" type="RigidBody2D" parent="."]
 collision_layer = 2
+gravity_scale = 0.0
 can_sleep = false
+freeze = true
+freeze_mode = 1
 
 [node name="Sprite2D" type="Sprite2D" parent="Rigidbody2D"]
 scale = Vector2(0.34, 0.34)
