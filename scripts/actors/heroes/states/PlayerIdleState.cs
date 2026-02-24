@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using Kuros.Actors.Heroes;
 
 namespace Kuros.Actors.Heroes.States
 {
@@ -12,23 +13,30 @@ namespace Kuros.Actors.Heroes.States
 		{
 			Player.NotifyMovementState(Name);
 			
-			if (Actor.AnimPlayer != null)
+			// 使用 PlayAnimation 方法，自动适配 MainCharacter 和 SamplePlayer
+			if (Player is MainCharacter mainChar)
 			{
-				// Save original speed scale before modifying
-				_originalSpeedScale = Actor.AnimPlayer.SpeedScale;
-				
-				// Reset bones first to avoid "stuck" poses from previous animations
-				if (Actor.AnimPlayer.HasAnimation("RESET"))
+				// MainCharacter 使用 Spine 动画
+				PlayAnimation(mainChar.IdleAnimationName, true, IdleAnimationSpeed);
+			}
+			else
+			{
+				// SamplePlayer 使用 AnimationPlayer
+				if (Actor.AnimPlayer != null)
 				{
-					Actor.AnimPlayer.Play("RESET");
-					Actor.AnimPlayer.Advance(0); // Apply immediately
+					// Save original speed scale before modifying
+					_originalSpeedScale = Actor.AnimPlayer.SpeedScale;
+					
+					// Reset bones first to avoid "stuck" poses from previous animations
+					if (Actor.AnimPlayer.HasAnimation("RESET"))
+					{
+						Actor.AnimPlayer.Play("RESET");
+						Actor.AnimPlayer.Advance(0); // Apply immediately
+					}
+					
+					// 使用 PlayAnimation 方法（虽然它会再次检查，但这样可以统一接口）
+					PlayAnimation("animations/Idle", true, IdleAnimationSpeed);
 				}
-				
-				Actor.AnimPlayer.Play("animations/Idle");
-				// Set animation playback speed only for idle animation
-				Actor.AnimPlayer.SpeedScale = IdleAnimationSpeed;
-				var anim = Actor.AnimPlayer.GetAnimation("animations/Idle");
-				if (anim != null) anim.LoopMode = Animation.LoopModeEnum.Linear;
 			}
 			Actor.Velocity = Vector2.Zero;
 		}

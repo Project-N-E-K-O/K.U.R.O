@@ -8,20 +8,23 @@ size = Vector2(74, 41)
 [node name="Supplies_A0_pudding" type="RigidBody2D"]
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(-0.29999927, -28)
 scale = Vector2(0.36, 0.36)
 texture = ExtResource("1_woh2e")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, -0.5)
+position = Vector2(-0.29999924, -28.499996)
 shape = SubResource("RectangleShape2D_jyvv2")
 
 [node name="Hitbox" type="Area2D" parent="."]
+position = Vector2(-0.29999924, -27.999996)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
 position = Vector2(0, -0.5)
 shape = SubResource("RectangleShape2D_jyvv2")
 
 [node name="GrabArea" type="Area2D" parent="."]
+position = Vector2(-0.29999924, -27.999996)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="GrabArea"]
 position = Vector2(0, -0.5)

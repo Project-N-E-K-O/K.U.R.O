@@ -16,7 +16,7 @@ MaxStackSize = 1
 metadata/_custom_type_script = "uid://dfgtff7mly02w"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_d166k"]
-size = Vector2(119, 22)
+size = Vector2(123, 113)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jyvv2"]
 size = Vector2(36.687737, 39.139023)
@@ -35,6 +35,7 @@ RigidBodyPath = NodePath("Weapon_A1_chair2")
 HitboxAreaPath = NodePath("Weapon_A1_chair2/Hitbox")
 
 [node name="Weapon_A1_chair2" type="RigidBody2D" parent="."]
+position = Vector2(0, -91)
 gravity_scale = 0.0
 freeze = true
 freeze_mode = 1
@@ -44,7 +45,7 @@ scale = Vector2(0.345, 0.345)
 texture = ExtResource("1_brbvu")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_chair2"]
-position = Vector2(-45.5, 71)
+position = Vector2(-43.5, 21.5)
 shape = SubResource("RectangleShape2D_d166k")
 
 [node name="Hitbox" type="Area2D" parent="Weapon_A1_chair2"]

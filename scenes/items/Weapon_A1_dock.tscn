@@ -31,6 +31,7 @@ RigidBodyPath = NodePath("Weapon_A1_dock")
 HitboxAreaPath = NodePath("Weapon_A1_dock/Hitbox")
 
 [node name="Weapon_A1_dock" type="RigidBody2D" parent="."]
+position = Vector2(0, -63)
 gravity_scale = 0.0
 can_sleep = false
 freeze = true
@@ -45,13 +46,16 @@ position = Vector2(-1, 52)
 shape = SubResource("RectangleShape2D_nfu6c")
 
 [node name="Hitbox" type="Area2D" parent="Weapon_A1_dock"]
+visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_dock/Hitbox"]
 scale = Vector2(3.45, 3.45)
 shape = SubResource("RectangleShape2D_jyvv2")
 
 [node name="GrabArea" type="Area2D" parent="Weapon_A1_dock"]
+visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_dock/GrabArea"]
+visible = false
 scale = Vector2(3.45, 3.45)
 shape = SubResource("RectangleShape2D_jyvv2")

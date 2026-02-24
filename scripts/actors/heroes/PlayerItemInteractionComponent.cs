@@ -34,13 +34,59 @@ namespace Kuros.Actors.Heroes
         {
             base._Ready();
 
+            // 获取 Actor 引用（优先使用父节点，然后是 Owner）
             _actor = GetParent() as GameActor ?? GetOwner() as GameActor;
-            InventoryComponent ??= GetNodeOrNull<PlayerInventoryComponent>("Inventory");
-            InventoryComponent ??= FindChildComponent<PlayerInventoryComponent>(GetParent());
+            
+            // 如果还是 null，尝试从父节点的父节点获取（处理嵌套结构）
+            if (_actor == null && GetParent() != null)
+            {
+                var parent = GetParent();
+                _actor = parent.GetParent() as GameActor;
+            }
+            
+            // 如果还是 null，尝试通过场景树查找
+            if (_actor == null)
+            {
+                var player = GetTree().GetFirstNodeInGroup("player") as GameActor;
+                if (player != null)
+                {
+                    _actor = player;
+                    GD.Print($"[{Name}] 通过场景树查找找到 Actor: {_actor.Name}");
+                }
+            }
+
+            if (_actor == null)
+            {
+                GameLogger.Error(nameof(PlayerItemInteractionComponent), $"{Name} 未能找到 GameActor（父节点: {GetParent()?.Name ?? "null"}, Owner: {GetOwner()?.Name ?? "null"}）。");
+            }
+            else
+            {
+                GD.Print($"[{Name}] Actor 初始化成功: {_actor.Name}");
+            }
+
+            // 查找 InventoryComponent（优先使用 Export 属性，然后是节点查找）
+            if (InventoryComponent == null)
+            {
+                InventoryComponent = GetNodeOrNull<PlayerInventoryComponent>("Inventory");
+            }
+            
+            if (InventoryComponent == null && _actor != null)
+            {
+                InventoryComponent = _actor.GetNodeOrNull<PlayerInventoryComponent>("Inventory");
+            }
+            
+            if (InventoryComponent == null)
+            {
+                InventoryComponent = FindChildComponent<PlayerInventoryComponent>(GetParent());
+            }
 
             if (InventoryComponent == null)
             {
                 GameLogger.Error(nameof(PlayerItemInteractionComponent), $"{Name} 未能找到 PlayerInventoryComponent。");
+            }
+            else
+            {
+                GD.Print($"[{Name}] InventoryComponent 初始化成功: {InventoryComponent.Name}");
             }
 
             // 尝试解析互动区域

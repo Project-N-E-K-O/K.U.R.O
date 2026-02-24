@@ -17,7 +17,7 @@ WorldScenePath = "uid://d15hs7qpxqhf3"
 metadata/_custom_type_script = "uid://dfgtff7mly02w"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jyvv2"]
-size = Vector2(33, 11.428572)
+size = Vector2(33, 61.714287)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_pn715"]
 size = Vector2(118, 256)
@@ -33,6 +33,7 @@ RigidBodyPath = NodePath("Weapon_A1_bed")
 HitboxAreaPath = NodePath("Weapon_A1_bed/Hitbox")
 
 [node name="Weapon_A1_bed" type="RigidBody2D" parent="."]
+position = Vector2(0, -74)
 gravity_scale = 0.0
 can_sleep = false
 freeze = true
@@ -43,7 +44,7 @@ scale = Vector2(0.35, 0.35)
 texture = ExtResource("1_pn715")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_bed"]
-position = Vector2(-0.5, 111)
+position = Vector2(-0.5, 23)
 scale = Vector2(3.5, 3.5)
 shape = SubResource("RectangleShape2D_jyvv2")
 

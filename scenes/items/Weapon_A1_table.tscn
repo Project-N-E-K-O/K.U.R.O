@@ -16,10 +16,10 @@ MaxStackSize = 1
 metadata/_custom_type_script = "uid://dfgtff7mly02w"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_blvkh"]
-size = Vector2(191.30437, 591.3043)
+size = Vector2(191.30437, 478.2609)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_w4umi"]
-size = Vector2(160, 71)
+size = Vector2(160, 20.5)
 
 [node name="Table" type="Node2D"]
 script = ExtResource("1_w4umi")
@@ -31,6 +31,7 @@ RigidBodyPath = NodePath("Weapon_A1_table")
 HitboxAreaPath = NodePath("Weapon_A1_table/Hitbox")
 
 [node name="Weapon_A1_table" type="RigidBody2D" parent="."]
+position = Vector2(0, -136)
 gravity_scale = 0.0
 can_sleep = false
 freeze = true
@@ -42,15 +43,16 @@ scale = Vector2(0.345, 0.345)
 texture = ExtResource("1_blvkh")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_table"]
-position = Vector2(-62.000004, -4.999998)
+position = Vector2(-62.000004, 14.499992)
 scale = Vector2(0.345, 0.345)
 shape = SubResource("RectangleShape2D_blvkh")
 
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="Weapon_A1_table"]
-position = Vector2(50, 63)
+position = Vector2(50, 88.25)
 shape = SubResource("RectangleShape2D_w4umi")
 
 [node name="Hitbox" type="Area2D" parent="Weapon_A1_table"]
+visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_table/Hitbox"]
 position = Vector2(-62.000004, -4.999998)
@@ -62,6 +64,7 @@ position = Vector2(50, 63)
 shape = SubResource("RectangleShape2D_w4umi")
 
 [node name="GrabArea" type="Area2D" parent="Weapon_A1_table"]
+visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_table/GrabArea"]
 position = Vector2(-62.000004, -4.999998)

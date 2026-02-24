@@ -15,8 +15,8 @@ Icon = ExtResource("4_lnlkn")
 MaxStackSize = 1
 metadata/_custom_type_script = "uid://dfgtff7mly02w"
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_mxfcx"]
-radius = 79.47399
+[sub_resource type="CircleShape2D" id="CircleShape2D_lnlkn"]
+radius = 62.110886
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_mxfcx"]
 radius = 70.0
@@ -33,6 +33,7 @@ RigidBodyPath = NodePath("Weapon_A1_toying")
 HitboxAreaPath = NodePath("Weapon_A1_toying/Hitbox")
 
 [node name="Weapon_A1_toying" type="RigidBody2D" parent="."]
+position = Vector2(-4, -79)
 gravity_scale = 0.0
 can_sleep = false
 freeze = true
@@ -43,10 +44,10 @@ scale = Vector2(0.34, 0.34)
 texture = ExtResource("1_mxfcx")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_toying"]
-position = Vector2(3.9999971, 96.99999)
-rotation = -0.43284166
-scale = Vector2(0.805, 0.805)
-shape = SubResource("CircleShape2D_mxfcx")
+position = Vector2(3, 120.00001)
+rotation = 1.5707964
+scale = Vector2(0.665, 0.665)
+shape = SubResource("CircleShape2D_lnlkn")
 
 [node name="Hitbox" type="Area2D" parent="Weapon_A1_toying"]
 

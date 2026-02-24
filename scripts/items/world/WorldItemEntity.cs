@@ -216,7 +216,8 @@ namespace Kuros.Items.World
 			_isPicked = true;
 			if (AutoDisableTriggerOnPickup)
 			{
-				DisableTriggerArea();
+				// 使用 CallDeferred 避免在信号回调期间修改监控状态
+				CallDeferred(MethodName.DisableTriggerArea);
 			}
 
 			OnPicked(actor);
@@ -315,8 +316,9 @@ namespace Kuros.Items.World
 				return;
 			}
 
-			TriggerArea.Monitoring = false;
-			TriggerArea.Monitorable = false;
+			// 使用 SetDeferred 避免在信号回调期间修改监控状态
+			TriggerArea.SetDeferred(Area2D.PropertyName.Monitoring, false);
+			TriggerArea.SetDeferred(Area2D.PropertyName.Monitorable, false);
 			TriggerArea.CollisionLayer = 0;
 			TriggerArea.CollisionMask = 0;
 		}
@@ -328,8 +330,9 @@ namespace Kuros.Items.World
 				return;
 			}
 
-			TriggerArea.Monitoring = _initialMonitoring;
-			TriggerArea.Monitorable = _initialMonitorable;
+			// 使用 SetDeferred 避免在信号回调期间修改监控状态
+			TriggerArea.SetDeferred(Area2D.PropertyName.Monitoring, _initialMonitoring);
+			TriggerArea.SetDeferred(Area2D.PropertyName.Monitorable, _initialMonitorable);
 			TriggerArea.CollisionLayer = _initialCollisionLayer;
 			TriggerArea.CollisionMask = _initialCollisionMask;
 		}
@@ -402,7 +405,8 @@ namespace Kuros.Items.World
 				_lastTransferredItem = stack.Item;
 				_lastTransferredAmount = accepted;
 				GameLogger.Info(nameof(WorldItemEntity), $"{actor.Name} 仅拾取了 {accepted} 个 {ItemId}，剩余 {Quantity} 个保留在地面。");
-				RestoreTriggerArea();
+				// 使用 CallDeferred 避免在信号回调期间修改监控状态
+				CallDeferred(MethodName.RestoreTriggerArea);
 				_isPicked = false;
 				return true;
 			}

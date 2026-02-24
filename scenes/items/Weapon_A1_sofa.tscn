@@ -16,7 +16,7 @@ MaxStackSize = 1
 metadata/_custom_type_script = "uid://dfgtff7mly02w"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_yv3ra"]
-size = Vector2(109.41304, 39.42029)
+size = Vector2(109.41304, 31.304348)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_q076e"]
 size = Vector2(39.710148, 38)
@@ -35,6 +35,7 @@ RigidBodyPath = NodePath("Weapon_A1_sofa")
 HitboxAreaPath = NodePath("Weapon_A1_sofa/Hitbox")
 
 [node name="Weapon_A1_sofa" type="RigidBody2D" parent="."]
+position = Vector2(0, -27)
 gravity_scale = 0.0
 can_sleep = false
 freeze = true
@@ -45,7 +46,7 @@ scale = Vector2(0.345, 0.345)
 texture = ExtResource("1_xql1w")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_sofa"]
-position = Vector2(0.737499, -45)
+position = Vector2(0.737499, -30.999998)
 scale = Vector2(3.45, 3.45)
 shape = SubResource("RectangleShape2D_yv3ra")
 
@@ -55,17 +56,21 @@ scale = Vector2(3.45, 3.45)
 shape = SubResource("RectangleShape2D_q076e")
 
 [node name="Hitbox" type="Area2D" parent="Weapon_A1_sofa"]
+visible = false
 
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="Weapon_A1_sofa/Hitbox"]
+visible = false
 position = Vector2(-121.5, 85.00001)
 scale = Vector2(3.45, 3.45)
 shape = SubResource("RectangleShape2D_q076e")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_sofa/Hitbox"]
+visible = false
 position = Vector2(-0.5, -64.5)
 shape = SubResource("RectangleShape2D_xql1w")
 
 [node name="GrabArea" type="Area2D" parent="Weapon_A1_sofa"]
+visible = false
 
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="Weapon_A1_sofa/GrabArea"]
 position = Vector2(-121.5, 85.00001)

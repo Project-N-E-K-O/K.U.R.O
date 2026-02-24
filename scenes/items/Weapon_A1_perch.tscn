@@ -16,7 +16,7 @@ MaxStackSize = 1
 metadata/_custom_type_script = "uid://dfgtff7mly02w"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_acoon"]
-size = Vector2(147, 95)
+size = Vector2(147, 71)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jyvv2"]
 size = Vector2(41, 46.869568)
@@ -32,6 +32,7 @@ RigidBodyPath = NodePath("Weapon_A1_perch")
 HitboxAreaPath = NodePath("Weapon_A1_perch/Hitbox")
 
 [node name="Weapon_A1_perch" type="RigidBody2D" parent="."]
+position = Vector2(0, -32)
 gravity_scale = 0.0
 can_sleep = false
 freeze = true
@@ -42,7 +43,7 @@ scale = Vector2(0.345, 0.345)
 texture = ExtResource("1_acoon")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_perch"]
-position = Vector2(-4, 42.5)
+position = Vector2(-4, 54.5)
 shape = SubResource("RectangleShape2D_acoon")
 
 [node name="Hitbox" type="Area2D" parent="Weapon_A1_perch"]

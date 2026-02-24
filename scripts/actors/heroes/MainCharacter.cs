@@ -2,13 +2,14 @@ using Godot;
 using System;
 using Kuros.Core;
 using Kuros.Actors.Enemies;
+using Kuros.Items.Attributes;
 using Kuros.Utils;
 
 namespace Kuros.Actors.Heroes
 {
 	/// <summary>
 	/// 主角色控制器，用于控制带有 SpineSprite 动画的 CharacterBody2D 角色
-	/// 简化版本，不依赖复杂的状态机系统
+	/// 与 StateMachine 协同工作，集成 WeaponSkillController 功能
 	/// 继承自 SamplePlayer 以确保敌人能够正确检测和攻击
 	/// </summary>
 	public partial class MainCharacter : SamplePlayer
@@ -25,7 +26,7 @@ namespace Kuros.Actors.Heroes
 	[Export] public float AnimationMixDuration { get; set; } = 0.1f; // 动画混合时长
 
 	[ExportCategory("Combat")]
-	[Export] public Area2D AttackArea { get; private set; } = null!;
+	[Export] public new Area2D AttackArea { get; private set; } = null!;
 
 	[ExportCategory("Input")]
 	[Export] public string MoveLeftAction { get; set; } = "move_left";
@@ -38,8 +39,6 @@ namespace Kuros.Actors.Heroes
 	// Spine 相关（使用 Node 引用，通过 Call 调用 GDScript 方法）
 	private Node? _spineController;
 	private string _currentAnimation = string.Empty;
-	private bool _isAttacking = false;
-	private bool _isRunning = false;
 
 	public override void _Ready()
 	{
@@ -57,8 +56,62 @@ namespace Kuros.Actors.Heroes
 		// 如果场景中没有这些组件，会有警告但不会影响基本功能
 		InitializeSpine();
 
-		// 播放初始待机动画
-		PlayAnimation(IdleAnimationName, true);
+		// 检查并验证组件初始化
+		ValidateComponents();
+
+		// 检查状态机是否正确初始化
+		if (StateMachine == null)
+		{
+			GD.PushError($"[{Name}] StateMachine 未找到！请确保场景中有 StateMachine 子节点。");
+		}
+		else if (StateMachine.CurrentState == null)
+		{
+			GD.PushWarning($"[{Name}] StateMachine 当前状态为 null，请确保 InitialState 已设置。");
+		}
+		else
+		{
+			GD.Print($"[{Name}] StateMachine 初始化成功，当前状态: {StateMachine.CurrentState.Name}");
+		}
+
+		// 状态机会在进入 Idle 状态时播放待机动画
+		// 这里不需要手动播放，让状态机管理
+	}
+
+	/// <summary>
+	/// 验证组件是否正确初始化
+	/// </summary>
+	private void ValidateComponents()
+	{
+		// 检查 InventoryComponent
+		if (InventoryComponent == null)
+		{
+			GD.PushWarning($"[{Name}] InventoryComponent 未找到！请确保场景中有 'Inventory' 子节点（PlayerInventoryComponent）。");
+		}
+		else
+		{
+			GD.Print($"[{Name}] InventoryComponent 初始化成功: {InventoryComponent.Name}");
+		}
+
+		// 检查 WeaponSkillController
+		if (WeaponSkillController == null)
+		{
+			GD.PushWarning($"[{Name}] WeaponSkillController 未找到！");
+		}
+		else
+		{
+			GD.Print($"[{Name}] WeaponSkillController 初始化成功: {WeaponSkillController.Name}");
+		}
+
+		// 检查 PlayerItemInteractionComponent
+		var itemInteraction = GetNodeOrNull<PlayerItemInteractionComponent>("ItemInteraction");
+		if (itemInteraction == null)
+		{
+			GD.PushWarning($"[{Name}] PlayerItemInteractionComponent 未找到！请确保场景中有 'ItemInteraction' 子节点。");
+		}
+		else
+		{
+			GD.Print($"[{Name}] PlayerItemInteractionComponent 初始化成功: {itemInteraction.Name}");
+		}
 	}
 
 
@@ -107,95 +160,34 @@ namespace Kuros.Actors.Heroes
 		}
 	}
 
-	public override void _PhysicsProcess(double delta)
-		{
-			base._PhysicsProcess(delta);
-
-			// 如果正在攻击，不处理移动输入
-			if (_isAttacking)
-			{
-				// 应用摩擦力，逐渐停止
-				Velocity = Velocity.MoveToward(Vector2.Zero, Speed * 2 * (float)delta);
-				MoveAndSlide();
-				return;
-			}
-
-			// 获取移动输入
-			Vector2 input = GetMovementInput();
-
-			// 检查是否按住跑步键
-			_isRunning = Input.IsActionPressed(RunAction);
-
-			// 处理移动
-			if (input != Vector2.Zero)
-			{
-				// 计算速度
-				float currentSpeed = _isRunning ? Speed * RunSpeedMultiplier : Speed;
-				Velocity = input * currentSpeed;
-
-				// 更新朝向
-				if (input.X != 0)
-				{
-					FlipFacing(input.X > 0);
-				}
-
-				// 播放移动动画
-				if (_isRunning)
-				{
-					PlayAnimation(RunAnimationName, true, RunAnimationSpeed);
-				}
-				else
-				{
-					PlayAnimation(WalkAnimationName, true, WalkAnimationSpeed);
-				}
-			}
-			else
-			{
-				// 没有输入，播放待机动画
-				Velocity = Velocity.MoveToward(Vector2.Zero, Speed * 2 * (float)delta);
-				PlayAnimation(IdleAnimationName, true);
-			}
-
-			// 应用移动
-			MoveAndSlide();
-		}
-
+	// 注意：需要保留 _UnhandledInput 来调用基类方法，让状态机处理输入
+	// StateMachine 会自动调用 _PhysicsProcess 和 _UnhandledInput
 	public override void _UnhandledInput(InputEvent @event)
-		{
-			// 处理攻击输入
-			if (@event.IsActionPressed(AttackAction) && !_isAttacking && AttackTimer <= 0)
-			{
-				StartAttack();
-				GetViewport().SetInputAsHandled();
-			}
-
-			base._UnhandledInput(@event);
-		}
+	{
+		// 调用基类方法，让 SamplePlayer 处理快捷栏切换等输入
+		// 然后 SamplePlayer 会调用 base._UnhandledInput，让状态机处理攻击等输入
+		base._UnhandledInput(@event);
+	}
 
 		/// <summary>
-		/// 获取移动输入向量
-		/// </summary>
-		private Vector2 GetMovementInput()
-		{
-			return Input.GetVector(MoveLeftAction, MoveRightAction, MoveForwardAction, MoveBackAction);
-		}
-
-		/// <summary>
-		/// 播放 Spine 动画（通过调用 SpineController.gd 的 play 方法）
+		/// 播放 Spine 动画（供状态机调用）
+		/// 这个方法会被状态机状态调用，替代 AnimationPlayer
 		/// </summary>
 		/// <param name="animName">动画名称</param>
 		/// <param name="loop">是否循环</param>
 		/// <param name="timeScale">时间缩放（播放速度）</param>
-		private void PlayAnimation(string animName, bool loop, float timeScale = 1.0f)
+		public void PlaySpineAnimation(string animName, bool loop = true, float timeScale = 1.0f)
 		{
 			// 如果 SpineController 未初始化，跳过
 			if (_spineController == null)
 			{
+				GD.PushWarning($"[{Name}] SpineController 未初始化，无法播放动画: {animName}");
 				return;
 			}
 
-			// 如果动画已经在播放，跳过
-			if (_currentAnimation == animName)
+			// 对于非循环动画（如攻击），即使名称相同也强制播放
+			// 对于循环动画，如果已经在播放则跳过（避免重复播放）
+			if (loop && _currentAnimation == animName)
 			{
 				return;
 			}
@@ -207,15 +199,6 @@ namespace Kuros.Actors.Heroes
 				// 调用 SpineController.gd 的 play 方法
 				// play(anim: String, loop := true, mix_duration := 0.1, time_scale := 1.0)
 				_spineController.Call("play", animName, loop, AnimationMixDuration, timeScale);
-
-				// 如果是非循环动画（如攻击），使用定时器估算动画时长
-				if (!loop)
-				{
-					// 获取动画时长（通过调用 get_state 获取 AnimationState，然后查询动画时长）
-					// 这里使用固定时长作为后备方案
-					float estimatedDuration = EstimateAnimationDuration(animName);
-					GetTree().CreateTimer(estimatedDuration).Timeout += OnAnimationComplete;
-				}
 			}
 			catch (Exception ex)
 			{
@@ -223,62 +206,12 @@ namespace Kuros.Actors.Heroes
 			}
 		}
 
-		/// <summary>
-		/// 估算动画时长（用于非循环动画的完成检测）
-		/// </summary>
-		private float EstimateAnimationDuration(string animName)
-		{
-			// 可以根据动画名称返回不同的估算时长
-			// 这里使用默认值，实际项目中可以通过配置文件或动画数据获取真实时长
-			if (animName == AttackAnimationName)
-			{
-				return 0.5f; // 攻击动画通常较短
-			}
-			return 1.0f; // 默认 1 秒
-		}
 
 		/// <summary>
-		/// 动画播放完成回调（用于非循环动画，如攻击）
+		/// 执行攻击检测（集成 WeaponSkillController）
+		/// 这个方法会被 PlayerAttackTemplate 或状态机调用
 		/// </summary>
-		private void OnAnimationComplete()
-		{
-			// 只处理攻击动画的完成事件
-			if (_isAttacking && _currentAnimation == AttackAnimationName)
-			{
-				OnAttackAnimationFinished();
-			}
-		}
-
-		/// <summary>
-		/// 开始攻击
-		/// </summary>
-		private void StartAttack()
-	{
-		_isAttacking = true;
-		AttackTimer = AttackCooldown;
-
-		// 播放攻击动画（非循环）
-		PlayAnimation(AttackAnimationName, false);
-
-		// 执行攻击检测
-		PerformAttackCheck();
-	}
-
-		/// <summary>
-		/// 攻击动画完成回调
-		/// </summary>
-		private void OnAttackAnimationFinished()
-	{
-		_isAttacking = false;
-
-		// 恢复待机动画
-		PlayAnimation(IdleAnimationName, true);
-	}
-
-		/// <summary>
-		/// 执行攻击检测
-		/// </summary>
-		private void PerformAttackCheck()
+		public new void PerformAttackCheck()
 		{
 			if (AttackArea == null)
 			{
@@ -286,27 +219,44 @@ namespace Kuros.Actors.Heroes
 				return;
 			}
 
+			// 计算基础伤害
+			float baseDamage = AttackDamage;
+
+			// 应用 InventoryComponent 的攻击力加成
+			if (InventoryComponent != null)
+			{
+				baseDamage += InventoryComponent.GetSelectedAttributeValue(ItemAttributeIds.AttackPower, 0f);
+			}
+
+			// 应用 WeaponSkillController 的伤害倍率
+			if (WeaponSkillController != null)
+			{
+				baseDamage = WeaponSkillController.ModifyAttackDamage(baseDamage);
+			}
+
+			// 执行攻击检测
 			var bodies = AttackArea.GetOverlappingBodies();
+			int hitCount = 0;
 			foreach (var body in bodies)
 			{
 				if (body is SampleEnemy enemy)
 				{
-					enemy.TakeDamage((int)AttackDamage, GlobalPosition, this);
-					GameLogger.Info(nameof(MainCharacter), $"击中敌人: {enemy.Name}");
+					enemy.TakeDamage((int)baseDamage, GlobalPosition, this);
+					hitCount++;
+					GameLogger.Info(nameof(MainCharacter), $"击中敌人: {enemy.Name}, 伤害: {baseDamage}");
 				}
+			}
+
+			if (hitCount == 0)
+			{
+				GameLogger.Info(nameof(MainCharacter), "未击中任何敌人");
 			}
 		}
 
 	public override void TakeDamage(int damage, Vector2? attackOrigin = null, GameActor? attacker = null)
 	{
 		base.TakeDamage(damage, attackOrigin, attacker);
-		
-		// 受伤时停止攻击
-		if (_isAttacking)
-		{
-			_isAttacking = false;
-			// 注意：定时器回调无法直接取消，但会在回调中检查 _isAttacking 状态
-		}
+		// 状态机会处理受伤状态切换，不需要额外逻辑
 	}
 
 	protected override void OnDeathFinalized()

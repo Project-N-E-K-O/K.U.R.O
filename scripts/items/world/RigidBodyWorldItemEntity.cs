@@ -419,7 +419,8 @@ namespace Kuros.Items.World
 			_isPicked = true;
 			if (AutoDisableTriggerOnPickup)
 			{
-				DisableGrabArea();
+				// 使用 CallDeferred 避免在信号回调期间修改监控状态
+				CallDeferred(MethodName.DisableGrabArea);
 			}
 
 			OnPicked(actor);
@@ -952,7 +953,8 @@ namespace Kuros.Items.World
 			_impactArmed = false;
 			if (_hitboxArea != null)
 			{
-				_hitboxArea.Monitoring = false;
+				// 使用 SetDeferred 避免在信号回调期间修改监控状态
+				_hitboxArea.SetDeferred(Area2D.PropertyName.Monitoring, false);
 			}
 			if (_grabArea != null)
 			{
@@ -1061,8 +1063,9 @@ namespace Kuros.Items.World
 		{
 			if (_grabArea == null) return;
 
-			_grabArea.Monitoring = false;
-			_grabArea.Monitorable = false;
+			// 使用 SetDeferred 避免在信号回调期间修改监控状态
+			_grabArea.SetDeferred(Area2D.PropertyName.Monitoring, false);
+			_grabArea.SetDeferred(Area2D.PropertyName.Monitorable, false);
 			_grabArea.CollisionLayer = 0;
 			_grabArea.CollisionMask = 0;
 		}
@@ -1071,8 +1074,9 @@ namespace Kuros.Items.World
 		{
 			if (_grabArea == null) return;
 
-			_grabArea.Monitoring = _initialMonitoring;
-			_grabArea.Monitorable = _initialMonitorable;
+			// 使用 SetDeferred 避免在信号回调期间修改监控状态
+			_grabArea.SetDeferred(Area2D.PropertyName.Monitoring, _initialMonitoring);
+			_grabArea.SetDeferred(Area2D.PropertyName.Monitorable, _initialMonitorable);
 			_grabArea.CollisionLayer = _initialCollisionLayer;
 			_grabArea.CollisionMask = _initialCollisionMask;
 		}
@@ -1132,7 +1136,8 @@ namespace Kuros.Items.World
 				Quantity = stack.Quantity;
 				_lastTransferredItem = stack.Item;
 				_lastTransferredAmount = accepted;
-				RestoreGrabArea();
+				// 使用 CallDeferred 避免在信号回调期间修改监控状态
+				CallDeferred(MethodName.RestoreGrabArea);
 				_isPicked = false;
 				return true;
 			}

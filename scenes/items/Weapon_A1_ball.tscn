@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://bgwe3y3bxgqut"]
+[gd_scene load_steps=12 format=3 uid="uid://bgwe3y3bxgqut"]
 
 [ext_resource type="Script" uid="uid://rpt50t16vkk7" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_klue8"]
 [ext_resource type="Texture2D" uid="uid://c82sp73bkqewk" path="res://assets/furnitures/房间卧室家具导出_0000s_0012_毛球.png" id="1_qce8s"]
@@ -24,6 +24,9 @@ DurabilityConfig = SubResource("Resource_fjh3k")
 WorldScenePath = "uid://d15hs7qpxqhf3"
 metadata/_custom_type_script = "uid://dfgtff7mly02w"
 
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_l6kq0"]
+radius = 4.1237106
+
 [sub_resource type="CircleShape2D" id="CircleShape2D_klue8"]
 radius = 11.0
 
@@ -37,6 +40,7 @@ RigidBodyPath = NodePath("Weapon_A1_ball")
 HitboxAreaPath = NodePath("Weapon_A1_ball/Hitbox")
 
 [node name="Weapon_A1_ball" type="RigidBody2D" parent="."]
+position = Vector2(0, -37)
 collision_mask = 6
 gravity_scale = 0.0
 can_sleep = false
@@ -48,8 +52,10 @@ scale = Vector2(0.36, 0.36)
 texture = ExtResource("1_qce8s")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_ball"]
-scale = Vector2(3.6, 3.6)
-shape = SubResource("CircleShape2D_klue8")
+position = Vector2(0, 26.155)
+rotation = 1.5707964
+scale = Vector2(1.94, 1.94)
+shape = SubResource("CapsuleShape2D_l6kq0")
 
 [node name="Hitbox" type="Area2D" parent="Weapon_A1_ball"]
 
@@ -61,5 +67,5 @@ shape = SubResource("CircleShape2D_klue8")
 collision_mask = 2
 
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="Weapon_A1_ball/GrabArea"]
-scale = Vector2(3.6, 3.6)
+scale = Vector2(4.065, 4.065)
 shape = SubResource("CircleShape2D_klue8")

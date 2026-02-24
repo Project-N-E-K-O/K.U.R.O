@@ -32,6 +32,7 @@ RigidBodyPath = NodePath("Weapon_A0_chest")
 HitboxAreaPath = NodePath("Weapon_A0_chest/Hitbox")
 
 [node name="Weapon_A0_chest" type="RigidBody2D" parent="."]
+position = Vector2(0, -63)
 gravity_scale = 0.0
 freeze = true
 freeze_mode = 1

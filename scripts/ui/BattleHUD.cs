@@ -3,6 +3,7 @@ using Kuros.Core;
 using Kuros.Systems.Inventory;
 using Kuros.Items;
 using Kuros.Managers;
+using Kuros.Actors.Heroes;
 
 namespace Kuros.UI
 {
@@ -406,25 +407,61 @@ namespace Kuros.UI
 		/// </summary>
 		public void ConnectPlayerInventory(SamplePlayer player)
 		{
-			if (player?.InventoryComponent != null && _quickBarContainer != null)
+			if (player == null)
 			{
-				player.InventoryComponent.SetQuickBar(_quickBarContainer);
-				
-				// 确保玩家连接快捷栏信号，以便左手物品与选中槽位严格对应
-				player.ConnectQuickBarSignals();
-				
-				// 初始化左手选择（只在还没有选中时才初始化，避免覆盖用户选择）
-				// 注意：使用 CallDeferred 确保在快捷栏连接完成后再初始化
-				player.CallDeferred(SamplePlayer.MethodName.InitializeLeftHandSelection);
-				
-				// 延迟更新高亮，确保初始化完成后再显示
-				int clampedIndex = Mathf.Clamp(player.LeftHandSlotIndex, 1, 4);
-				CallDeferred(MethodName.UpdateHandSlotHighlight, clampedIndex, 0);
+				GD.PrintErr($"BattleHUD.ConnectPlayerInventory: Player 为 null");
+				return;
 			}
-			else
+
+			// 如果 InventoryComponent 为 null，尝试延迟查找
+			// 注意：InventoryComponent 的 setter 是 private，不能直接设置
+			// 但 SamplePlayer._Ready() 应该已经初始化了它
+			if (player.InventoryComponent == null)
 			{
-				GD.PrintErr($"BattleHUD.ConnectPlayerInventory: Failed - Player={player != null}, InventoryComponent={player?.InventoryComponent != null}, QuickBarContainer={_quickBarContainer != null}");
+				GD.PushWarning($"BattleHUD.ConnectPlayerInventory: Player.InventoryComponent 为 null，尝试延迟查找...");
+				
+				// 尝试通过节点查找（但无法直接设置，因为 setter 是 private）
+				var foundInventory = player.GetNodeOrNull<PlayerInventoryComponent>("Inventory");
+				
+				if (foundInventory == null)
+				{
+					GD.PrintErr($"BattleHUD.ConnectPlayerInventory: Failed - Player={player != null}, InventoryComponent={player?.InventoryComponent != null}, QuickBarContainer={_quickBarContainer != null}");
+					GD.PrintErr($"BattleHUD.ConnectPlayerInventory: Player 类型: {player.GetType().Name}, 子节点数量: {player.GetChildCount()}");
+					// 打印所有子节点名称以便调试
+					foreach (Node child in player.GetChildren())
+					{
+						GD.PrintErr($"  - 子节点: {child.Name}, 类型: {child.GetType().Name}");
+					}
+					GD.PrintErr($"BattleHUD.ConnectPlayerInventory: 注意：InventoryComponent 的 setter 是 private，无法从外部设置。请确保 SamplePlayer._Ready() 已正确初始化。");
+					return;
+				}
+				else
+				{
+					GD.PushWarning($"BattleHUD.ConnectPlayerInventory: 找到了 Inventory 节点，但无法设置 InventoryComponent（setter 是 private）。请检查 SamplePlayer._Ready() 是否正确初始化。");
+					return;
+				}
 			}
+
+			if (_quickBarContainer == null)
+			{
+				GD.PrintErr($"BattleHUD.ConnectPlayerInventory: QuickBarContainer 为 null");
+				return;
+			}
+
+			player.InventoryComponent.SetQuickBar(_quickBarContainer);
+			
+			// 确保玩家连接快捷栏信号，以便左手物品与选中槽位严格对应
+			player.ConnectQuickBarSignals();
+			
+			// 初始化左手选择（只在还没有选中时才初始化，避免覆盖用户选择）
+			// 注意：使用 CallDeferred 确保在快捷栏连接完成后再初始化
+			player.CallDeferred(SamplePlayer.MethodName.InitializeLeftHandSelection);
+			
+			// 延迟更新高亮，确保初始化完成后再显示
+			int clampedIndex = Mathf.Clamp(player.LeftHandSlotIndex, 1, 4);
+			CallDeferred(MethodName.UpdateHandSlotHighlight, clampedIndex, 0);
+			
+			GD.Print($"BattleHUD.ConnectPlayerInventory: 成功连接 - Player={player.Name}, InventoryComponent={player.InventoryComponent.Name}");
 		}
 
 		/// <summary>

@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://cb014clwmf2xy"]
+[gd_scene load_steps=10 format=3 uid="uid://cb014clwmf2xy"]
 
 [ext_resource type="Script" uid="uid://rpt50t16vkk7" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_jv07d"]
 [ext_resource type="Texture2D" uid="uid://5ms0y7lqt56x" path="res://assets/furnitures/房间卧室家具导出_0000s_0000_扫地机器人.png" id="1_jyvv2"]
@@ -14,6 +14,10 @@ DisplayName = "Robot"
 Icon = ExtResource("4_tg82t")
 MaxStackSize = 1
 metadata/_custom_type_script = "uid://dfgtff7mly02w"
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_jv07d"]
+radius = 6.0
+height = 54.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_jyvv2"]
 radius = 40.04997
@@ -38,7 +42,9 @@ scale = Vector2(0.345, 0.345)
 texture = ExtResource("1_jyvv2")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_robot"]
-shape = SubResource("CircleShape2D_jyvv2")
+position = Vector2(0, 33)
+rotation = 1.5707964
+shape = SubResource("CapsuleShape2D_jv07d")
 
 [node name="Hitbox" type="Area2D" parent="Weapon_A1_robot"]
 
