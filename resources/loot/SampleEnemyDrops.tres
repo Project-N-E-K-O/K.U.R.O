@@ -24,4 +24,4 @@ ImpulseSpreadDegrees = 90.0
 script = ExtResource("1_table")
 ScatterRadius = 32.0
 DefaultImpulse = 180.0
-Entries = [SubResource("Drop_Common"), SubResource("Drop_Rare")]
+Entries = Array[Resource]([SubResource("Drop_Common"), SubResource("Drop_Rare")])

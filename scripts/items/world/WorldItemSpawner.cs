@@ -44,11 +44,10 @@ namespace Kuros.Items.World
                 return null;
             }
 
-            worldNode.AddChild(rootNode);
-
             // 支持两种世界物品实体：WorldItemEntity (CharacterBody2D) 或 RigidBodyWorldItemEntity (Node2D wrapper)
             if (rootNode is WorldItemEntity entity)
             {
+                worldNode.AddChild(entity);
                 entity.GlobalPosition = globalPosition;
                 entity.InitializeFromStack(stack);
                 return entity;
@@ -56,6 +55,7 @@ namespace Kuros.Items.World
 
             if (rootNode is RigidBodyWorldItemEntity rigidEntity)
             {
+                worldNode.AddChild(rigidEntity);
                 rigidEntity.GlobalPosition = globalPosition;
                 rigidEntity.InitializeFromStack(stack);
                 return rigidEntity;
