@@ -21,7 +21,7 @@
 [ext_resource type="PackedScene" path="res://scenes/actors/npc/SimpleNPC.tscn" id="25_simple_npc"]
 [ext_resource type="Script" uid="uid://6uws0lovsucd" path="res://scripts/actors/heroes/PlayerItemAttachment.cs" id="27_item_attachment"]
 [ext_resource type="Resource" path="res://data/TestItem2.tres" id="27_test_item_2"]
-[ext_resource type="Texture2D" uid="uid://sinhag8w2ijl" path="res://textures/environments/wall/25.12.3 卧室下墙壁.png" id="28_pfjrb"]
+[ext_resource type="Texture2D" uid="uid://cggx01ms6yloy" path="res://textures/environments/wall/25.12.3 卧室下墙壁.png" id="28_pfjrb"]
 [ext_resource type="Resource" path="res://data/TestItem3.tres" id="28_test_item_3"]
 [ext_resource type="PackedScene" uid="uid://cwnslqteb78nc" path="res://scenes/objects/Static_A1_sink.tscn" id="29_bh7yi"]
 [ext_resource type="PackedScene" uid="uid://ccrrtbrue2s7d" path="res://scenes/items/Weapon_A0_bowl.tscn" id="29_feb7u"]
@@ -29,9 +29,9 @@
 [ext_resource type="PackedScene" uid="uid://dnwhjf0qt2753" path="res://scenes/items/Supplies_A0_cake.tscn" id="29_pfjrb"]
 [ext_resource type="PackedScene" uid="uid://cl861foq2wo6m" path="res://scenes/items/Supplies_A0_pudding.tscn" id="30_34xhk"]
 [ext_resource type="Script" uid="uid://v8exb3wpvh6d" path="res://scripts/actors/heroes/PlayerWeaponSkillController.cs" id="30_weapon_skill_controller"]
-[ext_resource type="Script" uid="uid://ch33kuwv8bhip" path="res://scripts/actors/heroes/states/PlayerPickUpState.cs" id="31_player_pickup"]
+[ext_resource type="Script" uid="uid://vr51ymsfyxws" path="res://scripts/actors/heroes/states/PlayerPickUpState.cs" id="31_player_pickup"]
 [ext_resource type="PackedScene" uid="uid://bl14myq60jv3t" path="res://scenes/items/Weapon_A0_chest2.tscn" id="32_1hj54"]
-[ext_resource type="Script" uid="uid://b162xt2i3qc4e" path="res://scripts/actors/heroes/states/PlayerThrowState.cs" id="32_player_throw"]
+[ext_resource type="Script" uid="uid://dijk8ngvrs5g0" path="res://scripts/actors/heroes/states/PlayerThrowState.cs" id="32_player_throw"]
 [ext_resource type="PackedScene" uid="uid://b815iwh3dh67r" path="res://scenes/items/Weapon_A2_chair.tscn" id="32_xn6vi"]
 [ext_resource type="PackedScene" uid="uid://dhu3s8mlc7i0i" path="res://scenes/items/Weapon_A0_chest.tscn" id="33_76ea4"]
 [ext_resource type="PackedScene" uid="uid://bgwe3y3bxgqut" path="res://scenes/items/Weapon_A1_ball.tscn" id="34_hfn0d"]
@@ -237,30 +237,7 @@ texture = ExtResource("28_pfjrb")
 y_sort_enabled = true
 position = Vector2(611, 711)
 
-[node name="UI" type="CanvasLayer" parent="."]
-
-[node name="PlayerStats" type="Label" parent="UI"]
-offset_left = 10.0
-offset_top = 10.0
-offset_right = 200.0
-offset_bottom = 60.0
-text = "Player HP: 100
-Score: 0"
-
-[node name="Instructions" type="Label" parent="UI"]
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = 49.0
-offset_top = 127.0
-offset_right = 563.0
-offset_bottom = 167.0
-grow_horizontal = 2
-grow_vertical = 0
-text = "WASD: Move | Space: Attack | Shift: Run | F: Pick Up | G: Put Down"
-horizontal_alignment = 1
+; 旧版示例 UI 节点已移除，UI 由 BattleHUD 统一负责
 
 [node name="StaticOBJ" type="Node2D" parent="."]
 

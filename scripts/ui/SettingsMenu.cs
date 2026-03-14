@@ -14,7 +14,6 @@ namespace Kuros.UI
         [Export] public HSlider MusicVolumeSlider { get; private set; } = null!;
         [Export] public HSlider SFXVolumeSlider { get; private set; } = null!;
 		[Export] public OptionButton WindowModeOption { get; private set; } = null!;
-		[Export] public ConfirmationDialog RestartDialog { get; private set; } = null!;
         [Export] public OptionButton LanguageOption { get; private set; } = null!;
 
         // 信号
@@ -22,7 +21,6 @@ namespace Kuros.UI
         [Signal] public delegate void SettingsChangedEventHandler();
 
 		private bool _suppressWindowSelection = false;
-		private int _pendingPresetIndex = -1;
 
         /// <summary>
         /// 使用 Godot 原生 Connect 方法连接按钮信号
@@ -106,7 +104,6 @@ namespace Kuros.UI
             }
 
 			SetupWindowModeOption();
-			SetupRestartDialog();
 
             if (LanguageOption == null)
             {
@@ -163,28 +160,6 @@ namespace Kuros.UI
 			RestoreSelectedPreset();
 		}
 
-		private void SetupRestartDialog()
-		{
-			if (RestartDialog == null)
-			{
-				RestartDialog = GetNodeOrNull<ConfirmationDialog>("MenuPanel/RestartDialog");
-			}
-
-			if (RestartDialog == null) return;
-
-			// 使用 Godot 原生 Connect 方法连接对话框信号
-			var confirmedCallable = new Callable(this, nameof(OnRestartConfirmed));
-			if (!RestartDialog.IsConnected(ConfirmationDialog.SignalName.Confirmed, confirmedCallable))
-			{
-				RestartDialog.Connect(ConfirmationDialog.SignalName.Confirmed, confirmedCallable);
-			}
-			var canceledCallable = new Callable(this, nameof(OnRestartCanceled));
-			if (!RestartDialog.IsConnected(ConfirmationDialog.SignalName.Canceled, canceledCallable))
-			{
-				RestartDialog.Connect(ConfirmationDialog.SignalName.Canceled, canceledCallable);
-			}
-		}
-
 		private void OnWindowModeSelected(long index)
 		{
 			if (_suppressWindowSelection || WindowModeOption == null)
@@ -196,36 +171,10 @@ namespace Kuros.UI
 			if (index < 0 || index >= settings.Presets.Length)
 				return;
 
-			_pendingPresetIndex = (int)index;
-			var preset = settings.Presets[_pendingPresetIndex];
-
-			if (RestartDialog != null)
-			{
-				RestartDialog.DialogText = $"将分辨率切换为「{preset.DisplayName}」需要重新启动游戏，是否立即重启？";
-				RestartDialog.PopupCentered();
-			}
-		}
-
-		private void OnRestartConfirmed()
-		{
-			var settings = GameSettingsManager.Instance;
-			if (settings == null || _pendingPresetIndex < 0)
-				return;
-
-			var preset = settings.GetPresetByIndex(_pendingPresetIndex);
-			settings.SetPreset(preset.Id, applyImmediately: false);
+			// 直接应用并保存窗口模式，无需重启游戏
+			var preset = settings.GetPresetByIndex((int)index);
+			settings.SetPreset(preset.Id, applyImmediately: true);
 			EmitSignal(SignalName.SettingsChanged);
-
-			_pendingPresetIndex = -1;
-
-			OS.Alert("设置已保存，游戏将立即退出。请重新启动以应用新的分辨率。", "需要重新启动");
-			GetTree().Quit();
-		}
-
-		private void OnRestartCanceled()
-		{
-			_pendingPresetIndex = -1;
-			RestoreSelectedPreset();
 		}
 
 		private void RestoreSelectedPreset()

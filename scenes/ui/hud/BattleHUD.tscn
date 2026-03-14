@@ -1,6 +1,9 @@
-[gd_scene load_steps=2 format=3 uid="uid://c88kwpwoxtoev"]
+[gd_scene load_steps=5 format=3 uid="uid://c88kwpwoxtoev"]
 
 [ext_resource type="Script" uid="uid://3vrm8fkuw0da" path="res://scripts/ui/BattleHUD.cs" id="1_battle_hud"]
+[ext_resource type="Texture2D" uid="uid://bw7cloof3sie5" path="res://resources/ui/生命值.png" id="2_health_bar"]
+[ext_resource type="Texture2D" uid="uid://b65npykj1n37g" path="res://resources/ui/生命值条.png" id="2_health_fill"]
+[ext_resource type="Texture2D" uid="uid://b4bnmx44vnatg" path="res://resources/ui/生命值栏.png" id="3_health_bg"]
 
 [node name="BattleHUD" type="Control"]
 layout_mode = 3
@@ -17,11 +20,6 @@ script = ExtResource("1_battle_hud")
 
 [node name="MinimapPanel" type="Panel" parent="."]
 layout_mode = 1
-anchors_preset = 0
-anchor_left = 0.0
-anchor_top = 0.0
-anchor_right = 0.0
-anchor_bottom = 0.0
 offset_left = 10.0
 offset_top = 10.0
 offset_right = 210.0
@@ -78,35 +76,75 @@ grow_horizontal = 0
 grow_vertical = 0
 color = Color(1, 0, 0, 1)
 
-[node name="PlayerStats" type="Label" parent="."]
+[node name="HealthBarBackground" type="TextureRect" parent="."]
 layout_mode = 1
-offset_left = 10.0
-offset_top = 220.0
-offset_right = 300.0
-offset_bottom = 290.0
-theme_override_font_sizes/font_size = 18
-text = "Player HP: 100/100
-Score: 0"
+offset_left = 286.00006
+offset_top = -58.0
+offset_right = 5646.0
+offset_bottom = 3962.0
+scale = Vector2(0.09344275, 0.06638585)
+texture = ExtResource("3_health_bg")
+stretch_mode = 5
 
 [node name="HealthBar" type="TextureProgressBar" parent="."]
 layout_mode = 1
-offset_left = 10.0
-offset_top = 300.0
-offset_right = 300.0
-offset_bottom = 330.0
+offset_left = 238.00006
+offset_top = 85.0
+offset_right = 528.00006
+offset_bottom = 115.0
 value = 100.0
 tint_under = Color(0.5, 0, 0, 1)
 tint_progress = Color(1, 0, 0, 1)
 
+[node name="HealthFillBar" type="TextureProgressBar" parent="HealthBar"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 50.0
+offset_top = -126.000015
+offset_right = 5120.0
+offset_bottom = 3864.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.09208033, 0.05920435)
+value = 100.0
+texture_progress = ExtResource("2_health_fill")
+
+[node name="HealthValueLabel" type="Label" parent="HealthBar"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 91.0
+offset_top = -3.0
+offset_right = 91.0
+offset_bottom = -3.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 16
+text = "100/100"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="ScoreLabel" type="Label" parent="."]
 layout_mode = 1
-offset_left = 320.0
-offset_top = 10.0
-offset_right = 500.0
-offset_bottom = 50.0
+offset_left = 642.00006
+offset_top = 80.0
+offset_right = 762.00006
+offset_bottom = 114.0
 theme_override_font_sizes/font_size = 24
-text = "Score: 0"
-horizontal_alignment = 1
+text = "0"
+
+[node name="HealthBarBackground2" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 205.0
+offset_top = 24.000029
+offset_right = 5565.0
+offset_bottom = 4044.0
+scale = Vector2(0.031491708, 0.03128878)
+texture = ExtResource("2_health_bar")
+stretch_mode = 5
 
 [node name="Instructions" type="Label" parent="."]
 layout_mode = 1

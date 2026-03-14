@@ -16,6 +16,10 @@ namespace Kuros.UI
 	[Export] public Label PlayerStatsLabel { get; private set; } = null!;
 	[Export] public Label InstructionsLabel { get; private set; } = null!;
 	[Export] public ProgressBar HealthBar { get; private set; } = null!;
+	// 生命值条内部用于遮罩数值的进度条（新节点），不改变 HealthBar 本身的贴图
+	[Export] public TextureProgressBar? HealthFillBar { get; private set; } = null!;
+	// 叠加在生命条上的数字显示
+	[Export] public Label? HealthValueLabel { get; private set; } = null!;
 	[Export] public Label ScoreLabel { get; private set; } = null!;
 	[Export] public Button PauseButton { get; private set; } = null!;
 	[Export] public Label GoldLabel { get; private set; } = null!;
@@ -73,6 +77,16 @@ namespace Kuros.UI
 			if (HealthBar == null)
 			{
 				HealthBar = GetNodeOrNull<ProgressBar>("HealthBar");
+			}
+
+			if (HealthFillBar == null)
+			{
+				HealthFillBar = GetNodeOrNull<TextureProgressBar>("HealthBar/HealthFillBar");
+			}
+
+			if (HealthValueLabel == null)
+			{
+				HealthValueLabel = GetNodeOrNull<Label>("HealthBar/HealthValueLabel");
 			}
 
 			if (ScoreLabel == null)
@@ -458,17 +472,29 @@ namespace Kuros.UI
 		{
 			if (HealthBar != null)
 			{
+				// 保持 HealthBar 作为你在编辑器中布置好的容器/图标，不去修改其贴图
 				HealthBar.MaxValue = _maxHealth;
 				HealthBar.Value = _currentHealth;
 			}
+
+			// 使用单独的遮罩进度条来表现生命值长度
+			if (HealthFillBar != null)
+			{
+				HealthFillBar.MaxValue = _maxHealth;
+				HealthFillBar.Value = _currentHealth;
+			}
+
+			// 在生命条中央叠加数值显示
+			if (HealthValueLabel != null)
+			{
+				HealthValueLabel.Text = $"{_currentHealth}/{_maxHealth}";
+			}
 			if (ScoreLabel != null)
 			{
-				ScoreLabel.Text = $"Score: {_score}";
+				// 只显示数字，便于与图标/背景组合
+				ScoreLabel.Text = $"{_score}";
 			}
-			if (PlayerStatsLabel != null)
-			{
-				PlayerStatsLabel.Text = $"Player HP: {_currentHealth}/{_maxHealth}\nScore: {_score}";
-			}
+			// PlayerStatsLabel 保留原逻辑用于调试/回退需要
 		}
 
 		/// <summary>
