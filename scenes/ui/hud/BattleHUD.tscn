@@ -1,9 +1,19 @@
-[gd_scene load_steps=5 format=3 uid="uid://c88kwpwoxtoev"]
+[gd_scene load_steps=11 format=3 uid="uid://c88kwpwoxtoev"]
 
 [ext_resource type="Script" uid="uid://3vrm8fkuw0da" path="res://scripts/ui/BattleHUD.cs" id="1_battle_hud"]
 [ext_resource type="Texture2D" uid="uid://bw7cloof3sie5" path="res://resources/ui/生命值.png" id="2_health_bar"]
 [ext_resource type="Texture2D" uid="uid://b65npykj1n37g" path="res://resources/ui/生命值条.png" id="2_health_fill"]
 [ext_resource type="Texture2D" uid="uid://b4bnmx44vnatg" path="res://resources/ui/生命值栏.png" id="3_health_bg"]
+[ext_resource type="Texture2D" uid="uid://dabcvkkj7ddao" path="res://resources/ui/暂停.png" id="5_l8vag"]
+[ext_resource type="Texture2D" uid="uid://vgh6xkgwp8w4" path="res://resources/ui/金币.png" id="6_gold"]
+[ext_resource type="Texture2D" uid="uid://cy0qwoe0qpjfb" path="res://resources/ui/武器栏底.png" id="7_weapon_bg"]
+[ext_resource type="Texture2D" uid="uid://diqoct36b5bv4" path="res://resources/ui/武器栏框（未选中）.png" id="8_slot_normal"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_weapon_bg"]
+texture = ExtResource("7_weapon_bg")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_slot_normal"]
+texture = ExtResource("8_slot_normal")
 
 [node name="BattleHUD" type="Control"]
 layout_mode = 3
@@ -78,20 +88,20 @@ color = Color(1, 0, 0, 1)
 
 [node name="HealthBarBackground" type="TextureRect" parent="."]
 layout_mode = 1
-offset_left = 286.00006
-offset_top = -58.0
-offset_right = 5646.0
-offset_bottom = 3962.0
+offset_left = 265.0
+offset_top = -61.0
+offset_right = 5625.0
+offset_bottom = 3959.0
 scale = Vector2(0.09344275, 0.06638585)
 texture = ExtResource("3_health_bg")
 stretch_mode = 5
 
 [node name="HealthBar" type="TextureProgressBar" parent="."]
 layout_mode = 1
-offset_left = 238.00006
-offset_top = 85.0
-offset_right = 528.00006
-offset_bottom = 115.0
+offset_left = 217.0
+offset_top = 82.0
+offset_right = 507.0
+offset_bottom = 112.0
 value = 100.0
 tint_under = Color(0.5, 0, 0, 1)
 tint_progress = Color(1, 0, 0, 1)
@@ -129,20 +139,20 @@ vertical_alignment = 1
 
 [node name="ScoreLabel" type="Label" parent="."]
 layout_mode = 1
-offset_left = 642.00006
-offset_top = 80.0
-offset_right = 762.00006
-offset_bottom = 114.0
+offset_left = 621.0
+offset_top = 77.0
+offset_right = 741.0
+offset_bottom = 111.0
 theme_override_font_sizes/font_size = 24
 text = "0"
 
 [node name="HealthBarBackground2" type="TextureRect" parent="."]
 layout_mode = 0
-offset_left = 205.0
-offset_top = 24.000029
-offset_right = 5565.0
-offset_bottom = 4044.0
-scale = Vector2(0.031491708, 0.03128878)
+offset_left = 206.0
+offset_top = 27.0
+offset_right = 5566.0
+offset_bottom = 4047.0
+scale = Vector2(0.025328826, 0.026320279)
 texture = ExtResource("2_health_bar")
 stretch_mode = 5
 
@@ -170,43 +180,34 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -350.0
-offset_top = -140.0
-offset_right = 350.0
-offset_bottom = -70.0
+offset_left = -497.0
+offset_top = -264.0
+offset_right = 203.0
+offset_bottom = -194.0
 grow_horizontal = 2
 grow_vertical = 0
-
-[node name="QuickBarTitle" type="Label" parent="QuickBarPanel"]
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_left = 10.0
-offset_top = 6.0
-offset_right = -10.0
-offset_bottom = 34.0
-grow_horizontal = 2
-theme_override_font_sizes/font_size = 18
-text = "快捷物品栏"
-horizontal_alignment = 1
+scale = Vector2(1.4853818, 6.901976)
+theme_override_styles/panel = SubResource("StyleBoxTexture_weapon_bg")
 
 [node name="QuickBarContainer" type="HBoxContainer" parent="QuickBarPanel"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 20.0
-offset_top = 40.0
-offset_right = -20.0
-offset_bottom = -10.0
+offset_left = 78.3341
+offset_top = 22.233864
+offset_right = 38.334106
+offset_bottom = 12.233864
 grow_horizontal = 2
 grow_vertical = 2
+scale = Vector2(0.8327243, 0.2918077)
 theme_override_constants/separation = 18
 alignment = 1
 
 [node name="QuickSlot1" type="Panel" parent="QuickBarPanel/QuickBarContainer"]
 custom_minimum_size = Vector2(100, 60)
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_slot_normal")
 
 [node name="QuickSlotIcon1" type="TextureRect" parent="QuickBarPanel/QuickBarContainer/QuickSlot1"]
 layout_mode = 1
@@ -240,6 +241,7 @@ vertical_alignment = 2
 [node name="QuickSlot2" type="Panel" parent="QuickBarPanel/QuickBarContainer"]
 custom_minimum_size = Vector2(100, 60)
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_slot_normal")
 
 [node name="QuickSlotIcon2" type="TextureRect" parent="QuickBarPanel/QuickBarContainer/QuickSlot2"]
 layout_mode = 1
@@ -273,6 +275,7 @@ vertical_alignment = 2
 [node name="QuickSlot3" type="Panel" parent="QuickBarPanel/QuickBarContainer"]
 custom_minimum_size = Vector2(100, 60)
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_slot_normal")
 
 [node name="QuickSlotIcon3" type="TextureRect" parent="QuickBarPanel/QuickBarContainer/QuickSlot3"]
 layout_mode = 1
@@ -306,6 +309,7 @@ vertical_alignment = 2
 [node name="QuickSlot4" type="Panel" parent="QuickBarPanel/QuickBarContainer"]
 custom_minimum_size = Vector2(100, 60)
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_slot_normal")
 
 [node name="QuickSlotIcon4" type="TextureRect" parent="QuickBarPanel/QuickBarContainer/QuickSlot4"]
 layout_mode = 1
@@ -339,6 +343,7 @@ vertical_alignment = 2
 [node name="QuickSlot5" type="Panel" parent="QuickBarPanel/QuickBarContainer"]
 custom_minimum_size = Vector2(100, 60)
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_slot_normal")
 
 [node name="QuickSlotIcon5" type="TextureRect" parent="QuickBarPanel/QuickBarContainer/QuickSlot5"]
 layout_mode = 1
@@ -369,31 +374,49 @@ theme_override_font_sizes/font_size = 10
 horizontal_alignment = 1
 vertical_alignment = 2
 
-[node name="GoldLabel" type="Label" parent="."]
+[node name="GoldIcon" type="TextureRect" parent="."]
+custom_minimum_size = Vector2(36, 36)
+layout_mode = 0
+offset_left = 1558.0
+offset_top = -119.0
+offset_right = 1594.0
+offset_bottom = -83.0
+scale = Vector2(9.151882, 9.68226)
+size_flags_vertical = 4
+texture = ExtResource("6_gold")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="GoldContainer" type="HBoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -180.0
-offset_top = 10.0
-offset_right = -90.0
-offset_bottom = 50.0
+offset_left = -284.0
+offset_top = 29.0
+offset_right = -194.0
+offset_bottom = 69.0
 grow_horizontal = 0
-grow_vertical = 0
+scale = Vector2(2.1840193, 2.3212185)
+theme_override_constants/separation = 6
+alignment = 1
+
+[node name="GoldLabel" type="Label" parent="GoldContainer"]
+layout_mode = 2
 theme_override_font_sizes/font_size = 18
-text = "金币: 0"
-horizontal_alignment = 1
+text = "0"
 vertical_alignment = 1
 
 [node name="PauseButton" type="Button" parent="."]
+custom_minimum_size = Vector2(64, 64)
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -80.0
-offset_top = 10.0
-offset_right = -10.0
-offset_bottom = 50.0
+offset_left = -122.99988
+offset_top = 15.0
+offset_right = 91.00012
+offset_bottom = 221.0
 grow_horizontal = 0
-grow_vertical = 0
-text = "暂停"
+scale = Vector2(0.47342315, 0.4649675)
+icon = ExtResource("5_l8vag")

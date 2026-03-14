@@ -17,7 +17,11 @@ namespace Kuros.Scenes
 		private ModeSelectionMenu? _modeSelectionMenu;
 		private SettingsMenu? _settingsMenu;
 		private SaveSlotSelection? _saveSlotSelection;
-		private LoadingTestManager? _loadingTestManager;
+		private LoadingScreen? _loadingScreen;
+		private Callable? _onLoadingCompleteCallable;
+		private string _pendingScenePath = "";
+		private bool _isLoadingScene;
+		private PackedScene? _loadedBattleScene;
 
 		public override void _Ready()
 		{
@@ -98,7 +102,6 @@ namespace Kuros.Scenes
 				_modeSelectionMenu.Visible = true;
 				_modeSelectionMenu.ModeSelected += OnModeSelected;
 				_modeSelectionMenu.BackRequested += LoadMainMenu;
-				_modeSelectionMenu.TestLoadingRequested += OnTestLoadingRequested;
 			}
 		}
 
@@ -205,7 +208,95 @@ namespace Kuros.Scenes
 		private void OnStartGame()
 		{
 			GameLogger.Info(nameof(MainMenuManager), "开始新游戏");
-			PerformSceneChange(BattleScenePath);
+			if (UIManager.Instance == null)
+			{
+				PerformSceneChange(BattleScenePath);
+				return;
+			}
+			_loadingScreen = UIManager.Instance.LoadLoadingScreen();
+			if (_loadingScreen == null)
+			{
+				PerformSceneChange(BattleScenePath);
+				return;
+			}
+			_pendingScenePath = BattleScenePath;
+			_loadedBattleScene = null;
+			_isLoadingScene = true;
+			_loadingScreen.ShowLoading();
+			var onComplete = new Callable(this, MethodName.OnLoadingScreenComplete);
+			_onLoadingCompleteCallable = onComplete;
+			if (!_loadingScreen.IsConnected(LoadingScreen.SignalName.LoadingComplete, onComplete))
+				_loadingScreen.Connect(LoadingScreen.SignalName.LoadingComplete, onComplete);
+			// 后台异步加载战斗场景，加载过程中加载页会持续播放动画
+			Error err = ResourceLoader.LoadThreadedRequest(_pendingScenePath);
+			if (err != Error.Ok)
+			{
+				GameLogger.Error(nameof(MainMenuManager), $"异步加载场景失败: {_pendingScenePath}, err={err}");
+				_isLoadingScene = false;
+				if (_loadingScreen != null) _loadingScreen.SetLoadingComplete();
+			}
+		}
+
+		public override void _Process(double delta)
+		{
+			base._Process(delta);
+			if (!_isLoadingScene || string.IsNullOrEmpty(_pendingScenePath)) return;
+			var status = ResourceLoader.LoadThreadedGetStatus(_pendingScenePath);
+			if (status == ResourceLoader.ThreadLoadStatus.Loaded)
+			{
+				_isLoadingScene = false;
+				_loadedBattleScene = ResourceLoader.LoadThreadedGet(_pendingScenePath) as PackedScene;
+				if (_loadingScreen != null && !_loadingScreen.IsLoadingComplete())
+					_loadingScreen.SetLoadingComplete();
+			}
+			else if (status == ResourceLoader.ThreadLoadStatus.Failed)
+			{
+				_isLoadingScene = false;
+				GameLogger.Error(nameof(MainMenuManager), $"场景加载失败: {_pendingScenePath}");
+				_pendingScenePath = "";
+			}
+		}
+
+		private void OnLoadingScreenComplete()
+		{
+			var callable = _onLoadingCompleteCallable;
+			if (_loadingScreen != null && callable != null)
+			{
+				Callable cb = callable.Value;
+				if (_loadingScreen.IsConnected(LoadingScreen.SignalName.LoadingComplete, cb))
+					_loadingScreen.Disconnect(LoadingScreen.SignalName.LoadingComplete, cb);
+				_loadingScreen = null;
+			}
+			_onLoadingCompleteCallable = null;
+			PackedScene? scene = _loadedBattleScene;
+			string path = _pendingScenePath;
+			_loadedBattleScene = null;
+			_pendingScenePath = "";
+			if (scene != null)
+				PerformSceneChangeWithPacked(scene);
+			else if (!string.IsNullOrEmpty(path))
+				PerformSceneChange(path);
+		}
+
+		/// <summary>
+		/// 使用已加载的 PackedScene 切换场景（用于异步加载完成后）
+		/// </summary>
+		private void PerformSceneChangeWithPacked(PackedScene scene)
+		{
+			var tree = GetTree();
+			if (tree == null)
+			{
+				GameLogger.Error(nameof(MainMenuManager), "无法获取场景树！");
+				return;
+			}
+			if (PauseManager.Instance != null)
+				PauseManager.Instance.ClearAllPauses();
+			CleanupUI();
+			var error = tree.ChangeSceneToPacked(scene);
+			if (error != Error.Ok)
+				GameLogger.Error(nameof(MainMenuManager), $"切换场景失败: {error}");
+			else
+				GameLogger.Info(nameof(MainMenuManager), "已切换到战斗场景");
 		}
 		
 		/// <summary>
@@ -305,54 +396,6 @@ namespace Kuros.Scenes
 			PerformSceneChange(BattleScenePath);
 		}
 		
-		private void OnTestLoadingRequested()
-		{
-			GD.Print("开始测试加载页面");
-			
-			// 如果已存在加载测试管理器，先停止并清理
-			CleanupLoadingTestManager();
-			
-			// 创建新的加载测试管理器
-			_loadingTestManager = new LoadingTestManager();
-			_loadingTestManager.Name = "LoadingTestManager";
-			
-			// 连接 TreeExited 信号，当节点被释放时清除引用
-			_loadingTestManager.TreeExited += OnLoadingTestManagerExited;
-			
-			GetTree().Root.AddChild(_loadingTestManager);
-			
-			// 开始加载测试
-			_loadingTestManager.StartLoadingTest();
-		}
-		
-		/// <summary>
-		/// 清理加载测试管理器
-		/// </summary>
-		private void CleanupLoadingTestManager()
-		{
-			if (_loadingTestManager != null && IsInstanceValid(_loadingTestManager))
-			{
-				// 断开信号连接
-				_loadingTestManager.TreeExited -= OnLoadingTestManagerExited;
-				
-				// 从场景树中移除并释放
-				if (_loadingTestManager.IsInsideTree())
-				{
-					_loadingTestManager.GetParent()?.RemoveChild(_loadingTestManager);
-				}
-				_loadingTestManager.QueueFree();
-			}
-			_loadingTestManager = null;
-		}
-		
-		/// <summary>
-		/// 当加载测试管理器被释放时的回调
-		/// </summary>
-		private void OnLoadingTestManagerExited()
-		{
-			_loadingTestManager = null;
-		}
-
 		private void OnSaveSlotSelected(int slotIndex)
 		{
 			if (_saveSlotSelection == null) return;
@@ -400,9 +443,22 @@ namespace Kuros.Scenes
 				_saveSlotSelection.BackRequested -= LoadMainMenu;
 				_saveSlotSelection.ModeSwitchRequested -= OnSaveSlotSelectionModeSwitchRequested;
 			}
-			
-			// 清理加载测试管理器
-			CleanupLoadingTestManager();
+
+			// 若正在显示加载页则断开并隐藏
+			if (_loadingScreen != null && IsInstanceValid(_loadingScreen))
+			{
+				var c = _onLoadingCompleteCallable;
+				if (c != null)
+				{
+					Callable cb = c.Value;
+					if (_loadingScreen.IsConnected(LoadingScreen.SignalName.LoadingComplete, cb))
+						_loadingScreen.Disconnect(LoadingScreen.SignalName.LoadingComplete, cb);
+				}
+				_loadingScreen.HideLoading();
+				_loadingScreen = null;
+			}
+			_onLoadingCompleteCallable = null;
+			_pendingScenePath = "";
 
 			UIManager.Instance.ClearAllUI();
 			_mainMenu = null;

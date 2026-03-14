@@ -12,14 +12,12 @@ namespace Kuros.UI
         [Export] public Button StoryModeButton { get; private set; } = null!;
         [Export] public Button ArcadeModeButton { get; private set; } = null!;
         [Export] public Button EndlessModeButton { get; private set; } = null!;
-        [Export] public Button TestLoadingButton { get; private set; } = null!;
         [Export] public Button BackButton { get; private set; } = null!;
         [Export] public Label TitleLabel { get; private set; } = null!;
 
         // 信号
         [Signal] public delegate void ModeSelectedEventHandler(string modeName);
         [Signal] public delegate void BackRequestedEventHandler();
-        [Signal] public delegate void TestLoadingRequestedEventHandler();
 
         /// <summary>
         /// 使用 Godot 原生 Connect 方法连接按钮信号
@@ -63,11 +61,6 @@ namespace Kuros.UI
                 EndlessModeButton = GetNodeOrNull<Button>("MenuPanel/VBoxContainer/EndlessModeButton");
             }
 
-            if (TestLoadingButton == null)
-            {
-                TestLoadingButton = GetNodeOrNull<Button>("MenuPanel/VBoxContainer/TestLoadingButton");
-            }
-
             if (BackButton == null)
             {
                 BackButton = GetNodeOrNull<Button>("MenuPanel/VBoxContainer/BackButton");
@@ -77,7 +70,6 @@ namespace Kuros.UI
             ConnectButtonSignal(StoryModeButton, nameof(OnStoryModePressed));
             ConnectButtonSignal(ArcadeModeButton, nameof(OnArcadeModePressed));
             ConnectButtonSignal(EndlessModeButton, nameof(OnEndlessModePressed));
-            ConnectButtonSignal(TestLoadingButton, nameof(OnTestLoadingPressed));
             ConnectButtonSignal(BackButton, nameof(OnBackPressed));
         }
 
@@ -90,11 +82,6 @@ namespace Kuros.UI
         private void OnBackPressed()
         {
             EmitSignal(SignalName.BackRequested);
-        }
-        
-        private void OnTestLoadingPressed()
-        {
-            EmitSignal(SignalName.TestLoadingRequested);
         }
 
         public override void _Input(InputEvent @event)
