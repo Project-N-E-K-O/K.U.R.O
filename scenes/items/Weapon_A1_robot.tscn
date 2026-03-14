@@ -1,25 +1,57 @@
-[gd_scene load_steps=3 format=3 uid="uid://cb014clwmf2xy"]
+[gd_scene load_steps=10 format=3 uid="uid://cb014clwmf2xy"]
 
+[ext_resource type="Script" uid="uid://rpt50t16vkk7" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_jv07d"]
 [ext_resource type="Texture2D" uid="uid://5ms0y7lqt56x" path="res://assets/furnitures/房间卧室家具导出_0000s_0000_扫地机器人.png" id="1_jyvv2"]
+[ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="2_u3u7s"]
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="3_h7pp8"]
+[ext_resource type="Texture2D" uid="uid://c53bn6uf5ccc1" path="res://resources/assets/weapons/Weapon_A1_robot.png" id="4_tg82t"]
+[ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="5_lxtku"]
+
+[sub_resource type="Resource" id="Resource_1i5tm"]
+script = ExtResource("5_lxtku")
+ItemId = "Weapon_A1_robot"
+DisplayName = "Robot"
+Icon = ExtResource("4_tg82t")
+MaxStackSize = 1
+metadata/_custom_type_script = "uid://dfgtff7mly02w"
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_jv07d"]
+radius = 6.0
+height = 54.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_jyvv2"]
 radius = 40.04997
 
-[node name="Weapon_A1_robot" type="RigidBody2D"]
+[node name="Robot" type="Node2D"]
+script = ExtResource("1_jv07d")
+ItemDefinition = SubResource("Resource_1i5tm")
+GrabAreaPath = NodePath("Weapon_A1_robot/GrabArea")
+ThrowDamage = 3.0
+StopOnHit = true
+MaxDurability = 1
+RigidBodyPath = NodePath("Weapon_A1_robot")
+HitboxAreaPath = NodePath("Weapon_A1_robot/Hitbox")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Weapon_A1_robot" type="RigidBody2D" parent="."]
+gravity_scale = 0.0
+freeze = true
+freeze_mode = 1
+
+[node name="Sprite2D" type="Sprite2D" parent="Weapon_A1_robot"]
 scale = Vector2(0.345, 0.345)
 texture = ExtResource("1_jyvv2")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_robot"]
+position = Vector2(0, 33)
+rotation = 1.5707964
+shape = SubResource("CapsuleShape2D_jv07d")
+
+[node name="Hitbox" type="Area2D" parent="Weapon_A1_robot"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_robot/Hitbox"]
 shape = SubResource("CircleShape2D_jyvv2")
 
-[node name="Hitbox" type="Area2D" parent="."]
+[node name="GrabArea" type="Area2D" parent="Weapon_A1_robot"]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
-shape = SubResource("CircleShape2D_jyvv2")
-
-[node name="GrabArea" type="Area2D" parent="."]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="GrabArea"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_robot/GrabArea"]
 shape = SubResource("CircleShape2D_jyvv2")

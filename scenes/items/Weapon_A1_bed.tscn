@@ -1,30 +1,59 @@
-[gd_scene load_steps=4 format=3 uid="uid://dfbyu6g4g63lo"]
+[gd_scene load_steps=10 format=3 uid="uid://dfbyu6g4g63lo"]
 
+[ext_resource type="Script" uid="uid://rpt50t16vkk7" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_8nyov"]
 [ext_resource type="Texture2D" uid="uid://bg6wa1iioey6o" path="res://assets/furnitures/房间卧室家具导出_0000s_0003_床-的复制.png" id="1_pn715"]
+[ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="2_jcddh"]
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="3_88sx2"]
+[ext_resource type="Texture2D" uid="uid://b2j2at2dwb4gn" path="res://resources/assets/weapons/Weapon_A1_red bed .png" id="4_88sx2"]
+[ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="4_a2sme"]
+
+[sub_resource type="Resource" id="Resource_wf313"]
+script = ExtResource("4_a2sme")
+ItemId = "Weapon_A1_bed"
+DisplayName = "Red Bed"
+Icon = ExtResource("4_88sx2")
+MaxStackSize = 1
+WorldScenePath = "uid://d15hs7qpxqhf3"
+metadata/_custom_type_script = "uid://dfgtff7mly02w"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jyvv2"]
-size = Vector2(33, 11.428572)
+size = Vector2(33, 61.714287)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_pn715"]
 size = Vector2(118, 256)
 
-[node name="Weapon_A1_bed" type="RigidBody2D"]
+[node name="Bed_2" type="Node2D"]
+script = ExtResource("1_8nyov")
+ItemDefinition = SubResource("Resource_wf313")
+GrabAreaPath = NodePath("Weapon_A1_bed/GrabArea")
+ThrowDamage = 8.0
+StopOnHit = true
+MaxDurability = 1
+RigidBodyPath = NodePath("Weapon_A1_bed")
+HitboxAreaPath = NodePath("Weapon_A1_bed/Hitbox")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Weapon_A1_bed" type="RigidBody2D" parent="."]
+position = Vector2(0, -74)
+gravity_scale = 0.0
+can_sleep = false
+freeze = true
+freeze_mode = 1
+
+[node name="Sprite2D" type="Sprite2D" parent="Weapon_A1_bed"]
 scale = Vector2(0.35, 0.35)
 texture = ExtResource("1_pn715")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(-0.5, 111)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_bed"]
+position = Vector2(-0.5, 23)
 scale = Vector2(3.5, 3.5)
 shape = SubResource("RectangleShape2D_jyvv2")
 
-[node name="Hitbox" type="Area2D" parent="."]
+[node name="Hitbox" type="Area2D" parent="Weapon_A1_bed"]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_bed/Hitbox"]
 shape = SubResource("RectangleShape2D_pn715")
 
-[node name="GrabArea" type="Area2D" parent="."]
+[node name="GrabArea" type="Area2D" parent="Weapon_A1_bed"]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="GrabArea"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_bed/GrabArea"]
 shape = SubResource("RectangleShape2D_pn715")

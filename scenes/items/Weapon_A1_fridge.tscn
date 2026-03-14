@@ -1,6 +1,17 @@
-[gd_scene load_steps=4 format=3 uid="uid://licguk1si41g"]
+[gd_scene load_steps=9 format=3 uid="uid://licguk1si41g"]
 
 [ext_resource type="Texture2D" uid="uid://cutal70lj4h84" path="res://assets/furnitures/冰箱.png" id="1_88qpd"]
+[ext_resource type="Script" uid="uid://rpt50t16vkk7" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_ei7ol"]
+[ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="2_78pgh"]
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="3_mkjpm"]
+[ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="5_q38lp"]
+
+[sub_resource type="Resource" id="Resource_5nqfd"]
+script = ExtResource("5_q38lp")
+ItemId = "Weapon_A1_fridge"
+DisplayName = "Fridge"
+Icon = ExtResource("1_88qpd")
+metadata/_custom_type_script = "uid://dfgtff7mly02w"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_88qpd"]
 size = Vector2(134, 34)
@@ -8,24 +19,38 @@ size = Vector2(134, 34)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jyvv2"]
 size = Vector2(38, 74)
 
-[node name="Weapon_A1_fridge" type="RigidBody2D"]
+[node name="Fridge" type="Node2D"]
+script = ExtResource("1_ei7ol")
+ItemDefinition = SubResource("Resource_5nqfd")
+GrabAreaPath = NodePath("Weapon_A1_fridge/GrabArea")
+ThrowDamage = 6.0
+StopOnHit = true
+MaxDurability = 1
+RigidBodyPath = NodePath("Weapon_A1_fridge")
+HitboxAreaPath = NodePath("Weapon_A1_fridge/Hitbox")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Weapon_A1_fridge" type="RigidBody2D" parent="."]
+gravity_scale = 0.0
+can_sleep = false
+freeze = true
+freeze_mode = 1
+
+[node name="Sprite2D" type="Sprite2D" parent="Weapon_A1_fridge"]
 scale = Vector2(0.345, 0.345)
 texture = ExtResource("1_88qpd")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_fridge"]
 position = Vector2(0, 115)
 shape = SubResource("RectangleShape2D_88qpd")
 
-[node name="Hitbox" type="Area2D" parent="."]
+[node name="Hitbox" type="Area2D" parent="Weapon_A1_fridge"]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_fridge/Hitbox"]
 scale = Vector2(3.45, 3.45)
 shape = SubResource("RectangleShape2D_jyvv2")
 
-[node name="GrabArea" type="Area2D" parent="."]
+[node name="GrabArea" type="Area2D" parent="Weapon_A1_fridge"]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="GrabArea"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_fridge/GrabArea"]
 scale = Vector2(3.45, 3.45)
 shape = SubResource("RectangleShape2D_jyvv2")

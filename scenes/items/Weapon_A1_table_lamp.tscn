@@ -1,6 +1,19 @@
-[gd_scene load_steps=4 format=3 uid="uid://4cqtahrpuji0"]
+[gd_scene load_steps=10 format=3 uid="uid://4cqtahrpuji0"]
 
 [ext_resource type="Texture2D" uid="uid://dnkdlcd500xue" path="res://assets/furnitures/房间卧室家具导出_0000s_0010_台灯-的复制.png" id="1_cwtbw"]
+[ext_resource type="Script" uid="uid://rpt50t16vkk7" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_iw0oq"]
+[ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="2_3441s"]
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="3_cirp3"]
+[ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="4_1k8d2"]
+[ext_resource type="Texture2D" uid="uid://ne7nfxwyccgg" path="res://resources/assets/weapons/Weapon_A1_​table lamp.png" id="4_3441s"]
+
+[sub_resource type="Resource" id="Resource_t7hcl"]
+script = ExtResource("4_1k8d2")
+ItemId = "Weapon_A1_table_lamp"
+DisplayName = "Table Lamp"
+Icon = ExtResource("4_3441s")
+MaxStackSize = 1
+metadata/_custom_type_script = "uid://dfgtff7mly02w"
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_cwtbw"]
 radius = 23.021729
@@ -8,27 +21,41 @@ radius = 23.021729
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jyvv2"]
 size = Vector2(16, 59)
 
-[node name="Weapon_A1_table_lamp" type="RigidBody2D"]
+[node name="Table_Lamp" type="Node2D"]
+script = ExtResource("1_iw0oq")
+ItemDefinition = SubResource("Resource_t7hcl")
+GrabAreaPath = NodePath("Weapon_A1_table_lamp/GrabArea")
+StopOnHit = true
+MaxDurability = 1
+RigidBodyPath = NodePath("Weapon_A1_table_lamp")
+HitboxAreaPath = NodePath("Weapon_A1_table_lamp/Hitbox")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Weapon_A1_table_lamp" type="RigidBody2D" parent="."]
+position = Vector2(0, -104)
+gravity_scale = 0.0
+can_sleep = false
+freeze = true
+freeze_mode = 1
+
+[node name="Sprite2D" type="Sprite2D" parent="Weapon_A1_table_lamp"]
 position = Vector2(0.99999994, 0)
 scale = Vector2(0.345, 0.345)
 texture = ExtResource("1_cwtbw")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_table_lamp"]
 position = Vector2(-1, 75)
 shape = SubResource("CircleShape2D_cwtbw")
 
-[node name="Hitbox" type="Area2D" parent="."]
+[node name="Hitbox" type="Area2D" parent="Weapon_A1_table_lamp"]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_table_lamp/Hitbox"]
 position = Vector2(1, -1)
 scale = Vector2(3.45, 3.45)
 shape = SubResource("RectangleShape2D_jyvv2")
 
-[node name="GrabArea" type="Area2D" parent="."]
+[node name="GrabArea" type="Area2D" parent="Weapon_A1_table_lamp"]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="GrabArea"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_table_lamp/GrabArea"]
 position = Vector2(1, -1)
 scale = Vector2(3.45, 3.45)
 shape = SubResource("RectangleShape2D_jyvv2")

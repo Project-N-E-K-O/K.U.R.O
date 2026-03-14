@@ -1,9 +1,22 @@
-[gd_scene load_steps=5 format=3 uid="uid://jrl3rhlkubaj"]
+[gd_scene load_steps=11 format=3 uid="uid://jrl3rhlkubaj"]
 
 [ext_resource type="Texture2D" uid="uid://byp4asmcf3ssa" path="res://assets/furnitures/房间卧室家具导出_0000s_0007_沙发.png" id="1_xql1w"]
+[ext_resource type="Script" uid="uid://rpt50t16vkk7" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_yv3ra"]
+[ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="2_8l4p8"]
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="3_fgjj7"]
+[ext_resource type="Texture2D" uid="uid://b418ci5a5gt6p" path="res://resources/assets/weapons/Weapon_A1_sofa.png" id="4_fgjj7"]
+[ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="4_lmrpy"]
+
+[sub_resource type="Resource" id="Resource_ghiq7"]
+script = ExtResource("4_lmrpy")
+ItemId = "Weapon_A1_sofa"
+DisplayName = "Sofa"
+Icon = ExtResource("4_fgjj7")
+MaxStackSize = 1
+metadata/_custom_type_script = "uid://dfgtff7mly02w"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_yv3ra"]
-size = Vector2(109.41304, 39.42029)
+size = Vector2(109.41304, 31.304348)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_q076e"]
 size = Vector2(39.710148, 38)
@@ -11,40 +24,59 @@ size = Vector2(39.710148, 38)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_xql1w"]
 size = Vector2(379, 175)
 
-[node name="Weapon_A1_sofa" type="RigidBody2D"]
+[node name="Sofa" type="Node2D"]
+script = ExtResource("1_yv3ra")
+ItemDefinition = SubResource("Resource_ghiq7")
+GrabAreaPath = NodePath("Weapon_A1_sofa/GrabArea")
+ThrowDamage = 7.0
+StopOnHit = true
+MaxDurability = 1
+RigidBodyPath = NodePath("Weapon_A1_sofa")
+HitboxAreaPath = NodePath("Weapon_A1_sofa/Hitbox")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Weapon_A1_sofa" type="RigidBody2D" parent="."]
+position = Vector2(0, -27)
+gravity_scale = 0.0
+can_sleep = false
+freeze = true
+freeze_mode = 1
+
+[node name="Sprite2D" type="Sprite2D" parent="Weapon_A1_sofa"]
 scale = Vector2(0.345, 0.345)
 texture = ExtResource("1_xql1w")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0.737499, -45)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_sofa"]
+position = Vector2(0.737499, -30.999998)
 scale = Vector2(3.45, 3.45)
 shape = SubResource("RectangleShape2D_yv3ra")
 
-[node name="CollisionShape2D2" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="Weapon_A1_sofa"]
 position = Vector2(-121.5, 85.00001)
 scale = Vector2(3.45, 3.45)
 shape = SubResource("RectangleShape2D_q076e")
 
-[node name="Hitbox" type="Area2D" parent="."]
+[node name="Hitbox" type="Area2D" parent="Weapon_A1_sofa"]
+visible = false
 
-[node name="CollisionShape2D2" type="CollisionShape2D" parent="Hitbox"]
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="Weapon_A1_sofa/Hitbox"]
+visible = false
 position = Vector2(-121.5, 85.00001)
 scale = Vector2(3.45, 3.45)
 shape = SubResource("RectangleShape2D_q076e")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_sofa/Hitbox"]
+visible = false
 position = Vector2(-0.5, -64.5)
 shape = SubResource("RectangleShape2D_xql1w")
 
-[node name="GrabArea" type="Area2D" parent="."]
+[node name="GrabArea" type="Area2D" parent="Weapon_A1_sofa"]
+visible = false
 
-[node name="CollisionShape2D2" type="CollisionShape2D" parent="GrabArea"]
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="Weapon_A1_sofa/GrabArea"]
 position = Vector2(-121.5, 85.00001)
 scale = Vector2(3.45, 3.45)
 shape = SubResource("RectangleShape2D_q076e")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="GrabArea"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_sofa/GrabArea"]
 position = Vector2(-0.5, -64.5)
 shape = SubResource("RectangleShape2D_xql1w")

@@ -1,5 +1,6 @@
 using Godot;
 using Godot.Collections;
+using Kuros.Actors.Heroes;
 
 namespace Kuros.Actors.Heroes.Attacks
 {
@@ -225,12 +226,30 @@ namespace Kuros.Actors.Heroes.Attacks
 
         protected virtual void OnAttackStarted()
         {
-            if (!string.IsNullOrEmpty(AnimationName) && Player.AnimPlayer != null)
+            // 如果是 MainCharacter，使用 Spine 动画
+            if (Player is MainCharacter mainChar)
+            {
+                if (!string.IsNullOrEmpty(AnimationName))
+                {
+                    GD.Print($"[{GetType().Name}] 播放攻击动画 (Spine): {AnimationName}");
+                    mainChar.PlaySpineAnimation(AnimationName, false);
+                }
+                else
+                {
+                    GD.PushWarning($"[{GetType().Name}] AnimationName 为空，无法播放攻击动画");
+                }
+            }
+            // 否则使用 AnimationPlayer
+            else if (!string.IsNullOrEmpty(AnimationName) && Player.AnimPlayer != null)
             {
                 if (RestartAnimationOnLoop || !Player.AnimPlayer.IsPlaying())
                 {
                     Player.AnimPlayer.Play(AnimationName);
                 }
+            }
+            else
+            {
+                GD.PushWarning($"[{GetType().Name}] 无法播放攻击动画: AnimationName={AnimationName}, AnimPlayer={Player.AnimPlayer}");
             }
         }
 

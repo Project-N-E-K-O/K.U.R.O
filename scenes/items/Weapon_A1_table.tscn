@@ -1,47 +1,76 @@
-[gd_scene load_steps=4 format=3 uid="uid://c11uxbw23hrhf"]
+[gd_scene load_steps=10 format=3 uid="uid://c11uxbw23hrhf"]
 
 [ext_resource type="Texture2D" uid="uid://b03yxgeplmcm0" path="res://assets/furnitures/房间卧室家具导出_0000s_0011_桌子.png" id="1_blvkh"]
+[ext_resource type="Script" uid="uid://rpt50t16vkk7" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_w4umi"]
+[ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="2_eww8t"]
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="3_e4qva"]
+[ext_resource type="Texture2D" uid="uid://qwhl2c5hc4i4" path="res://resources/assets/weapons/Weapon_A1_table.png" id="4_4ctq3"]
+[ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="5_f0qel"]
+
+[sub_resource type="Resource" id="Resource_6p66a"]
+script = ExtResource("5_f0qel")
+ItemId = "Weapon_A1_table"
+DisplayName = "Table"
+Icon = ExtResource("4_4ctq3")
+MaxStackSize = 1
+metadata/_custom_type_script = "uid://dfgtff7mly02w"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_blvkh"]
-size = Vector2(191.30437, 591.3043)
+size = Vector2(191.30437, 478.2609)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_w4umi"]
-size = Vector2(160, 71)
+size = Vector2(160, 20.5)
 
-[node name="Weapon_A1_table" type="RigidBody2D"]
+[node name="Table" type="Node2D"]
+script = ExtResource("1_w4umi")
+ItemDefinition = SubResource("Resource_6p66a")
+GrabAreaPath = NodePath("Weapon_A1_table/GrabArea")
+StopOnHit = true
+MaxDurability = 1
+RigidBodyPath = NodePath("Weapon_A1_table")
+HitboxAreaPath = NodePath("Weapon_A1_table/Hitbox")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Weapon_A1_table" type="RigidBody2D" parent="."]
+position = Vector2(0, -136)
+gravity_scale = 0.0
+can_sleep = false
+freeze = true
+freeze_mode = 1
+
+[node name="Sprite2D" type="Sprite2D" parent="Weapon_A1_table"]
 position = Vector2(160, 13)
 scale = Vector2(0.345, 0.345)
 texture = ExtResource("1_blvkh")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_table"]
+position = Vector2(-62.000004, 14.499992)
+scale = Vector2(0.345, 0.345)
+shape = SubResource("RectangleShape2D_blvkh")
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="Weapon_A1_table"]
+position = Vector2(50, 88.25)
+shape = SubResource("RectangleShape2D_w4umi")
+
+[node name="Hitbox" type="Area2D" parent="Weapon_A1_table"]
+visible = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_table/Hitbox"]
 position = Vector2(-62.000004, -4.999998)
 scale = Vector2(0.345, 0.345)
 shape = SubResource("RectangleShape2D_blvkh")
 
-[node name="CollisionShape2D2" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="Weapon_A1_table/Hitbox"]
 position = Vector2(50, 63)
 shape = SubResource("RectangleShape2D_w4umi")
 
-[node name="Hitbox" type="Area2D" parent="."]
+[node name="GrabArea" type="Area2D" parent="Weapon_A1_table"]
+visible = false
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_table/GrabArea"]
 position = Vector2(-62.000004, -4.999998)
 scale = Vector2(0.345, 0.345)
 shape = SubResource("RectangleShape2D_blvkh")
 
-[node name="CollisionShape2D2" type="CollisionShape2D" parent="Hitbox"]
-position = Vector2(50, 63)
-shape = SubResource("RectangleShape2D_w4umi")
-
-[node name="GrabArea" type="Area2D" parent="."]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="GrabArea"]
-position = Vector2(-62.000004, -4.999998)
-scale = Vector2(0.345, 0.345)
-shape = SubResource("RectangleShape2D_blvkh")
-
-[node name="CollisionShape2D2" type="CollisionShape2D" parent="GrabArea"]
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="Weapon_A1_table/GrabArea"]
 position = Vector2(50, 63)
 shape = SubResource("RectangleShape2D_w4umi")

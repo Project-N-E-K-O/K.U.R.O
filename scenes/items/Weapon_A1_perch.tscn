@@ -1,33 +1,61 @@
-[gd_scene load_steps=4 format=3 uid="uid://cs6dkspm16vj4"]
+[gd_scene load_steps=10 format=3 uid="uid://cs6dkspm16vj4"]
 
+[ext_resource type="Script" uid="uid://rpt50t16vkk7" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_01w86"]
 [ext_resource type="Texture2D" uid="uid://jvsrkvlnp7c2" path="res://assets/furnitures/房间卧室家具导出_0000s_0008_猫爬架.png" id="1_acoon"]
+[ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="2_o7g1q"]
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="3_f5pt5"]
+[ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="4_1272w"]
+[ext_resource type="Texture2D" uid="uid://cc4u1t2slq1dp" path="res://resources/assets/weapons/Weapon_A1_perch.png" id="4_o7g1q"]
+
+[sub_resource type="Resource" id="Resource_tubsy"]
+script = ExtResource("4_1272w")
+ItemId = "Weapon_A1_perch"
+DisplayName = "Perch"
+Icon = ExtResource("4_o7g1q")
+MaxStackSize = 1
+metadata/_custom_type_script = "uid://dfgtff7mly02w"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_acoon"]
-size = Vector2(147, 95)
+size = Vector2(147, 71)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jyvv2"]
 size = Vector2(41, 46.869568)
 
-[node name="Weapon_A1_perch" type="RigidBody2D"]
+[node name="Perch" type="Node2D"]
+script = ExtResource("1_01w86")
+ItemDefinition = SubResource("Resource_tubsy")
+GrabAreaPath = NodePath("Weapon_A1_perch/GrabArea")
+ThrowDamage = 2.0
+StopOnHit = true
+MaxDurability = 1
+RigidBodyPath = NodePath("Weapon_A1_perch")
+HitboxAreaPath = NodePath("Weapon_A1_perch/Hitbox")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Weapon_A1_perch" type="RigidBody2D" parent="."]
+position = Vector2(0, -32)
+gravity_scale = 0.0
+can_sleep = false
+freeze = true
+freeze_mode = 1
+
+[node name="Sprite2D" type="Sprite2D" parent="Weapon_A1_perch"]
 scale = Vector2(0.345, 0.345)
 texture = ExtResource("1_acoon")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(-4, 42.5)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_perch"]
+position = Vector2(-4, 54.5)
 shape = SubResource("RectangleShape2D_acoon")
 
-[node name="Hitbox" type="Area2D" parent="."]
+[node name="Hitbox" type="Area2D" parent="Weapon_A1_perch"]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_perch/Hitbox"]
 position = Vector2(-0.5, 8.849998)
 scale = Vector2(3.45, 3.45)
 shape = SubResource("RectangleShape2D_jyvv2")
 
-[node name="GrabArea" type="Area2D" parent="."]
+[node name="GrabArea" type="Area2D" parent="Weapon_A1_perch"]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="GrabArea"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_perch/GrabArea"]
 position = Vector2(-0.5, 8.849998)
 scale = Vector2(3.45, 3.45)
 shape = SubResource("RectangleShape2D_jyvv2")

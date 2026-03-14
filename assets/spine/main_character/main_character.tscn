@@ -1,0 +1,118 @@
+[gd_scene load_steps=25 format=3 uid="uid://ufprfd4r8ijj"]
+
+[ext_resource type="SpineAtlasResource" uid="uid://c4cx1o154rxba" path="res://assets/spine/main_character/Enemy_A1_zhuA.atlas" id="1_kqj82"]
+[ext_resource type="Script" uid="uid://befx3l05f0eph" path="res://scripts/actors/heroes/MainCharacter.cs" id="1_om6pm"]
+[ext_resource type="SpineSkeletonFileResource" uid="uid://dpgx38fv62p11" path="res://assets/spine/main_character/Enemy_A1_zhuA.spine-json" id="2_om6pm"]
+[ext_resource type="Script" uid="uid://den5n78y0t6q5" path="res://scripts/controllers/SpineController.gd" id="4_ixg0x"]
+[ext_resource type="Script" uid="uid://cenpuhlcgesin" path="res://scripts/systems/fsm/StateMachine.cs" id="5_y1hyr"]
+[ext_resource type="Script" uid="uid://0u5whf0qv6i5" path="res://scripts/actors/heroes/states/PlayerIdleState.cs" id="6_r1uv4"]
+[ext_resource type="Script" uid="uid://cue6hp5ws2264" path="res://scripts/actors/heroes/states/PlayerWalkState.cs" id="7_mcamx"]
+[ext_resource type="Script" uid="uid://d3ancpb5wo2ie" path="res://scripts/actors/heroes/states/PlayerAttackState.cs" id="8_rfchi"]
+[ext_resource type="Script" uid="uid://c2pgsls8pb7oh" path="res://scripts/actors/heroes/attacks/PlayerBasicMeleeAttack.cs" id="9_13pt2"]
+[ext_resource type="Script" uid="uid://l40es7irdvdw" path="res://scripts/actors/heroes/states/PlayerHitState.cs" id="10_utqjm"]
+[ext_resource type="Script" uid="uid://d1g4amacs13a3" path="res://scripts/actors/heroes/states/PlayerFrozenState.cs" id="11_t3prk"]
+[ext_resource type="Script" uid="uid://ba1kd5qgh17ag" path="res://scripts/actors/heroes/states/PlayerRunState.cs" id="12_4ht1x"]
+[ext_resource type="Script" uid="uid://bsa4kolrnan6p" path="res://scripts/actors/heroes/states/PlayerDyingState.cs" id="13_tdm7a"]
+[ext_resource type="Script" uid="uid://cp40kowtn1ho3" path="res://scripts/actors/heroes/states/PlayerDeadState.cs" id="14_0y2r2"]
+[ext_resource type="Script" uid="uid://ch33kuwv8bhip" path="res://scripts/actors/heroes/states/PlayerPickUpState.cs" id="15_0y6jy"]
+[ext_resource type="Script" uid="uid://b162xt2i3qc4e" path="res://scripts/actors/heroes/states/PlayerThrowState.cs" id="16_oc5yk"]
+[ext_resource type="Script" uid="uid://b6vgqpdrtg1lh" path="res://scripts/actors/heroes/PlayerInventoryComponent.cs" id="17_13pt2"]
+[ext_resource type="Script" uid="uid://v8exb3wpvh6d" path="res://scripts/actors/heroes/PlayerWeaponSkillController.cs" id="18_utqjm"]
+[ext_resource type="Script" uid="uid://b0t8cfl3khjix" path="res://scripts/actors/heroes/PlayerItemInteractionComponent.cs" id="19_t3prk"]
+[ext_resource type="Script" uid="uid://6uws0lovsucd" path="res://scripts/actors/heroes/PlayerItemAttachment.cs" id="20_4ht1x"]
+
+[sub_resource type="SpineSkeletonDataResource" id="SpineSkeletonDataResource_ixg0x"]
+atlas_res = ExtResource("1_kqj82")
+skeleton_file_res = ExtResource("2_om6pm")
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ixg0x"]
+size = Vector2(368.75, 168.75)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_kqj82"]
+size = Vector2(657, 1236)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_om6pm"]
+size = Vector2(723, 1355)
+
+[node name="MainCharacter" type="CharacterBody2D" node_paths=PackedStringArray("AttackArea", "AttackArea")]
+scale = Vector2(0.16, 0.16)
+script = ExtResource("1_om6pm")
+AttackArea = NodePath("AttackArea")
+AttackArea = NodePath("AttackArea")
+
+[node name="SpineSprite" type="SpineSprite" parent="."]
+skeleton_data_res = SubResource("SpineSkeletonDataResource_ixg0x")
+bones_thickness = 10.09
+preview_skin = "Default"
+preview_animation = "idle_holding_item"
+preview_frame = false
+preview_time = 0.0
+script = ExtResource("4_ixg0x")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(-15.625, -78.125)
+shape = SubResource("RectangleShape2D_ixg0x")
+
+[node name="AttackArea" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AttackArea"]
+position = Vector2(300, -638)
+shape = SubResource("RectangleShape2D_kqj82")
+
+[node name="GrabArea" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="GrabArea"]
+position = Vector2(342.5, -656)
+shape = SubResource("RectangleShape2D_om6pm")
+
+[node name="StateMachine" type="Node" parent="." node_paths=PackedStringArray("InitialState")]
+script = ExtResource("5_y1hyr")
+InitialState = NodePath("Idle")
+
+[node name="Idle" type="Node" parent="StateMachine"]
+script = ExtResource("6_r1uv4")
+
+[node name="Walk" type="Node" parent="StateMachine"]
+script = ExtResource("7_mcamx")
+
+[node name="Attack" type="Node" parent="StateMachine"]
+script = ExtResource("8_rfchi")
+
+[node name="BasicMeleeAttack" type="Node" parent="StateMachine/Attack"]
+script = ExtResource("9_13pt2")
+
+[node name="Hit" type="Node" parent="StateMachine"]
+script = ExtResource("10_utqjm")
+
+[node name="Frozen" type="Node" parent="StateMachine"]
+script = ExtResource("11_t3prk")
+
+[node name="Run" type="Node" parent="StateMachine"]
+script = ExtResource("12_4ht1x")
+
+[node name="Dying" type="Node" parent="StateMachine"]
+script = ExtResource("13_tdm7a")
+
+[node name="Dead" type="Node" parent="StateMachine"]
+script = ExtResource("14_0y2r2")
+
+[node name="PickUp" type="Node" parent="StateMachine"]
+script = ExtResource("15_0y6jy")
+
+[node name="Throw" type="Node" parent="StateMachine"]
+script = ExtResource("16_oc5yk")
+
+[node name="Inventory" type="Node" parent="."]
+script = ExtResource("17_13pt2")
+
+[node name="WeaponSkillController" type="Node" parent="."]
+script = ExtResource("18_utqjm")
+
+[node name="ItemInteraction" type="Node" parent="."]
+script = ExtResource("19_t3prk")
+
+[node name="ItemAttachment" type="Node" parent="." node_paths=PackedStringArray("Inventory")]
+script = ExtResource("20_4ht1x")
+Inventory = NodePath("../Inventory")
+AttachmentParentPath = NodePath("../SpineSprite")
+IconOffset = Vector2(0, 0)

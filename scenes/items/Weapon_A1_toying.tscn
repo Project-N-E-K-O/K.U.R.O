@@ -1,34 +1,62 @@
-[gd_scene load_steps=4 format=3 uid="uid://dlhdp0ee1hxnp"]
+[gd_scene load_steps=10 format=3 uid="uid://dlhdp0ee1hxnp"]
 
 [ext_resource type="Texture2D" uid="uid://c47aqt0abqxhi" path="res://assets/furnitures/房间卧室家具导出_0000s_0001_投影.png" id="1_mxfcx"]
+[ext_resource type="Script" uid="uid://rpt50t16vkk7" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_p8ku7"]
+[ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="2_lnlkn"]
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="3_ller4"]
+[ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="4_b2opx"]
+[ext_resource type="Texture2D" uid="uid://5mufejttm6tq" path="res://resources/assets/weapons/Weapon_A1_projector.png" id="4_lnlkn"]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_mxfcx"]
-radius = 79.47399
+[sub_resource type="Resource" id="Resource_x5c4s"]
+script = ExtResource("4_b2opx")
+ItemId = "Weapon_A1_toying"
+DisplayName = "Projecter"
+Icon = ExtResource("4_lnlkn")
+MaxStackSize = 1
+metadata/_custom_type_script = "uid://dfgtff7mly02w"
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_lnlkn"]
+radius = 62.110886
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_mxfcx"]
 radius = 70.0
 height = 166.0
 
-[node name="Weapon_A1_toying" type="RigidBody2D"]
+[node name="Projecter" type="Node2D"]
+script = ExtResource("1_p8ku7")
+ItemDefinition = SubResource("Resource_x5c4s")
+GrabAreaPath = NodePath("Weapon_A1_toying/GrabArea")
+ThrowDamage = 3.0
+StopOnHit = true
+MaxDurability = 1
+RigidBodyPath = NodePath("Weapon_A1_toying")
+HitboxAreaPath = NodePath("Weapon_A1_toying/Hitbox")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Weapon_A1_toying" type="RigidBody2D" parent="."]
+position = Vector2(-4, -79)
+gravity_scale = 0.0
+can_sleep = false
+freeze = true
+freeze_mode = 1
+
+[node name="Sprite2D" type="Sprite2D" parent="Weapon_A1_toying"]
 scale = Vector2(0.34, 0.34)
 texture = ExtResource("1_mxfcx")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(3.9999971, 96.99999)
-rotation = -0.43284166
-scale = Vector2(0.805, 0.805)
-shape = SubResource("CircleShape2D_mxfcx")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_toying"]
+position = Vector2(3, 120.00001)
+rotation = 1.5707964
+scale = Vector2(0.665, 0.665)
+shape = SubResource("CircleShape2D_lnlkn")
 
-[node name="Hitbox" type="Area2D" parent="."]
+[node name="Hitbox" type="Area2D" parent="Weapon_A1_toying"]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_toying/Hitbox"]
 position = Vector2(5, 78)
 shape = SubResource("CapsuleShape2D_mxfcx")
 
-[node name="GrabArea" type="Area2D" parent="."]
+[node name="GrabArea" type="Area2D" parent="Weapon_A1_toying"]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="GrabArea"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_toying/GrabArea"]
 position = Vector2(5, 78)
 shape = SubResource("CapsuleShape2D_mxfcx")

@@ -1,7 +1,9 @@
-[gd_resource type="Resource" script_class="ItemDefinition" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=5 format=3 uid="uid://5w2fnlwg721b"]
 
-[ext_resource type="Script" path="res://scripts/items/ItemDefinition.cs" id="1_item_def"]
+[ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="1_1j72j"]
+[ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="1_item_def"]
 [ext_resource type="Texture2D" uid="uid://dccrl4lpl0t2h" path="res://icon.svg" id="2_icon"]
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="2_iy0jh"]
 
 [resource]
 script = ExtResource("1_item_def")
@@ -12,4 +14,3 @@ Icon = ExtResource("2_icon")
 Category = "Test"
 MaxStackSize = 10
 WorldScenePath = "res://scenes/items/WorldItem.tscn"
-

@@ -1,6 +1,20 @@
-[gd_scene load_steps=4 format=3 uid="uid://dhu3s8mlc7i0i"]
+[gd_scene load_steps=10 format=3 uid="uid://dhu3s8mlc7i0i"]
 
 [ext_resource type="Texture2D" uid="uid://c7rhdmp33t4h8" path="res://assets/furnitures/房间卧室家具导出_0000s_0015_箱子1.png" id="1_07wj5"]
+[ext_resource type="Script" uid="uid://rpt50t16vkk7" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_tl7tg"]
+[ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="2_0ufid"]
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="3_kkglm"]
+[ext_resource type="Texture2D" uid="uid://b1d8l86e6a7qc" path="res://resources/assets/weapons/Weapon_A0_chest a.png" id="4_14r6c"]
+[ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="5_8gee7"]
+
+[sub_resource type="Resource" id="Resource_m7hhq"]
+script = ExtResource("5_8gee7")
+ItemId = "Weapon_A0_chest"
+DisplayName = "Big Chest"
+Icon = ExtResource("4_14r6c")
+MaxStackSize = 1
+WorldScenePath = "uid://d15hs7qpxqhf3"
+metadata/_custom_type_script = "uid://dfgtff7mly02w"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jyvv2"]
 size = Vector2(23, 3.666666)
@@ -8,23 +22,36 @@ size = Vector2(23, 3.666666)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_07wj5"]
 size = Vector2(82, 124)
 
-[node name="Weapon_A0_chest" type="RigidBody2D"]
+[node name="Chest" type="Node2D"]
+script = ExtResource("1_tl7tg")
+ItemDefinition = SubResource("Resource_m7hhq")
+GrabAreaPath = NodePath("Weapon_A0_chest/GrabArea")
+ThrowDamage = 2.0
+MaxDurability = 1
+RigidBodyPath = NodePath("Weapon_A0_chest")
+HitboxAreaPath = NodePath("Weapon_A0_chest/Hitbox")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Weapon_A0_chest" type="RigidBody2D" parent="."]
+position = Vector2(0, -63)
+gravity_scale = 0.0
+freeze = true
+freeze_mode = 1
+
+[node name="Sprite2D" type="Sprite2D" parent="Weapon_A0_chest"]
 scale = Vector2(0.36, 0.36)
 texture = ExtResource("1_07wj5")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A0_chest"]
 position = Vector2(0.5, 54.6)
 scale = Vector2(3.6, 3.6)
 shape = SubResource("RectangleShape2D_jyvv2")
 
-[node name="Hitbox" type="Area2D" parent="."]
+[node name="Hitbox" type="Area2D" parent="Weapon_A0_chest"]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A0_chest/Hitbox"]
 shape = SubResource("RectangleShape2D_07wj5")
 
-[node name="GrabArea" type="Area2D" parent="."]
+[node name="GrabArea" type="Area2D" parent="Weapon_A0_chest"]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="GrabArea"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A0_chest/GrabArea"]
 shape = SubResource("RectangleShape2D_07wj5")

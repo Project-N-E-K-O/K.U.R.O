@@ -1,30 +1,50 @@
-[gd_scene load_steps=3 format=3 uid="uid://dnwhjf0qt2753"]
+[gd_scene load_steps=9 format=3 uid="uid://dnwhjf0qt2753"]
 
 [ext_resource type="Texture2D" uid="uid://bjoe68nbi1smd" path="res://assets/furnitures/房间卧室家具导出_0000_蛋糕.png" id="1_ccqri"]
+[ext_resource type="Script" uid="uid://rpt50t16vkk7" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_uqjai"]
+[ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="2_tuvwh"]
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="3_mpx87"]
+[ext_resource type="Texture2D" uid="uid://b1n54555yniwu" path="res://resources/assets/supplies/Supplies_A0_cake.png" id="4_ifnd6"]
+[ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="5_lombk"]
+
+[sub_resource type="Resource" id="Resource_44gcb"]
+script = ExtResource("5_lombk")
+ItemId = "Supplies_A0_cake"
+DisplayName = "Cake"
+Icon = ExtResource("4_ifnd6")
+MaxStackSize = 1
+metadata/_custom_type_script = "uid://dfgtff7mly02w"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jyvv2"]
 size = Vector2(121, 96)
 
-[node name="Supplies_A0_cake" type="RigidBody2D"]
+[node name="Supplies_A0_cake" type="Node2D"]
+script = ExtResource("1_uqjai")
+ItemDefinition = SubResource("Resource_44gcb")
+GrabAreaPath = NodePath("Rigidbody2D/GrabArea")
+StopOnHit = true
+MaxDurability = 1
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Rigidbody2D" type="RigidBody2D" parent="."]
+
+[node name="Sprite2D" type="Sprite2D" parent="Rigidbody2D"]
 scale = Vector2(0.36, 0.36)
 texture = ExtResource("1_ccqri")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Rigidbody2D"]
 position = Vector2(-0.5, 8)
 shape = SubResource("RectangleShape2D_jyvv2")
 
-[node name="Hitbox" type="Area2D" parent="."]
+[node name="Hitbox" type="Area2D" parent="Rigidbody2D"]
 collision_layer = 2
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Rigidbody2D/Hitbox"]
 position = Vector2(-0.5, 8)
 shape = SubResource("RectangleShape2D_jyvv2")
 
-[node name="GrabArea" type="Area2D" parent="."]
+[node name="GrabArea" type="Area2D" parent="Rigidbody2D"]
 collision_layer = 2
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="GrabArea"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Rigidbody2D/GrabArea"]
 position = Vector2(-0.5, 8)
 shape = SubResource("RectangleShape2D_jyvv2")

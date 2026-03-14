@@ -1,6 +1,31 @@
-[gd_scene load_steps=4 format=3 uid="uid://bgkw4qeioiet3"]
+[gd_scene load_steps=11 format=3 uid="uid://bgkw4qeioiet3"]
 
 [ext_resource type="Texture2D" uid="uid://coa8804fc1wc6" path="res://assets/furnitures/椅子.png" id="1_bbajv"]
+[ext_resource type="Script" uid="uid://rpt50t16vkk7" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_f84p0"]
+[ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="2_g101m"]
+[ext_resource type="Script" uid="uid://bkm4r2swk5lyl" path="res://scripts/items/durability/ItemDurabilityConfig.cs" id="3_wra1e"]
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="4_o1n6d"]
+[ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="5_5a40b"]
+
+[sub_resource type="Resource" id="Resource_7eoxl"]
+script = ExtResource("3_wra1e")
+MaxDurability = 1
+DamagePerHit = 4
+IsRepairable = false
+BreakBehavior = 0
+metadata/_custom_type_script = "uid://bkm4r2swk5lyl"
+
+[sub_resource type="Resource" id="Resource_mqegp"]
+script = ExtResource("5_5a40b")
+ItemId = "Weapon_A1_chair"
+DisplayName = "Office Chair"
+Description = "Sit down! Be humble!"
+Icon = ExtResource("1_bbajv")
+MaxStackSize = 1
+WeaponSkillResources = Array[Resource]([null])
+DurabilityConfig = SubResource("Resource_7eoxl")
+WorldScenePath = "uid://d15hs7qpxqhf3"
+metadata/_custom_type_script = "uid://dfgtff7mly02w"
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_bbajv"]
 radius = 46.270943
@@ -8,38 +33,58 @@ radius = 46.270943
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jyvv2"]
 size = Vector2(18, 15.748167)
 
-[node name="Weapon_A1_chair" type="RigidBody2D"]
+[node name="Weapon_A1_chair" type="Node2D"]
+script = ExtResource("1_f84p0")
+ItemDefinition = SubResource("Resource_mqegp")
+GrabAreaPath = NodePath("Rigidbody2D/GrabArea")
+GrabAreaCollisionLayer = 1
+GrabAreaCollisionMask = 2
+StopOnHit = true
+MaxDurability = 1
+RigidBodyPath = NodePath("Rigidbody2D")
+ThrowCollisionLayer = 2
+ThrowCollisionMask = 2
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Rigidbody2D" type="RigidBody2D" parent="."]
+collision_mask = 6
+gravity_scale = 0.0
+can_sleep = false
+freeze = true
+freeze_mode = 1
+contact_monitor = true
+
+[node name="Sprite2D" type="Sprite2D" parent="Rigidbody2D"]
 scale = Vector2(0.34, 0.34)
 texture = ExtResource("1_bbajv")
 
-[node name="CollisionShape2D3" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D3" type="CollisionShape2D" parent="Rigidbody2D"]
 position = Vector2(-5, 27)
 shape = SubResource("CircleShape2D_bbajv")
 
-[node name="Hitbox" type="Area2D" parent="."]
+[node name="Hitbox" type="Area2D" parent="Rigidbody2D"]
 
-[node name="CollisionShape2D2" type="CollisionShape2D" parent="Hitbox"]
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="Rigidbody2D/Hitbox"]
 position = Vector2(20, -32)
 rotation = 0.7347836
 scale = Vector2(4.005, 4.005)
 skew = -0.29147
 shape = SubResource("RectangleShape2D_jyvv2")
 
-[node name="CollisionShape2D3" type="CollisionShape2D" parent="Hitbox"]
+[node name="CollisionShape2D3" type="CollisionShape2D" parent="Rigidbody2D/Hitbox"]
 position = Vector2(-5, 27)
 shape = SubResource("CircleShape2D_bbajv")
 
-[node name="GrabArea" type="Area2D" parent="."]
+[node name="GrabArea" type="Area2D" parent="Rigidbody2D"]
+collision_layer = 2
 
-[node name="CollisionShape2D2" type="CollisionShape2D" parent="GrabArea"]
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="Rigidbody2D/GrabArea"]
 position = Vector2(20, -32)
 rotation = 0.7347836
-scale = Vector2(4.005, 4.005)
+scale = Vector2(8.125, 8.125)
 skew = -0.29147
 shape = SubResource("RectangleShape2D_jyvv2")
 
-[node name="CollisionShape2D3" type="CollisionShape2D" parent="GrabArea"]
+[node name="CollisionShape2D3" type="CollisionShape2D" parent="Rigidbody2D/GrabArea"]
 position = Vector2(-5, 27)
+scale = Vector2(1.98, 1.98)
 shape = SubResource("CircleShape2D_bbajv")

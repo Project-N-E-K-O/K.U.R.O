@@ -1,9 +1,22 @@
-[gd_scene load_steps=5 format=3 uid="uid://j25a4e8oawlb"]
+[gd_scene load_steps=11 format=3 uid="uid://j25a4e8oawlb"]
 
 [ext_resource type="Texture2D" uid="uid://cbp6st5uu3two" path="res://assets/furnitures/房间卧室家具导出_0000s_0009_按摩椅.png" id="1_brbvu"]
+[ext_resource type="Script" uid="uid://rpt50t16vkk7" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_ny5sw"]
+[ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="2_f3rsp"]
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="3_76upk"]
+[ext_resource type="Texture2D" uid="uid://78ispwhvbbwg" path="res://resources/assets/weapons/Weapon_A1_chair2.png" id="4_p7ojl"]
+[ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="5_mjlsn"]
+
+[sub_resource type="Resource" id="Resource_2kd4o"]
+script = ExtResource("5_mjlsn")
+ItemId = "Weapon_A1_chair2"
+DisplayName = "Massage Chair"
+Icon = ExtResource("4_p7ojl")
+MaxStackSize = 1
+metadata/_custom_type_script = "uid://dfgtff7mly02w"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_d166k"]
-size = Vector2(119, 22)
+size = Vector2(123, 113)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jyvv2"]
 size = Vector2(36.687737, 39.139023)
@@ -11,40 +24,54 @@ size = Vector2(36.687737, 39.139023)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_brbvu"]
 size = Vector2(94.85824, 121)
 
-[node name="Weapon_A1_chair2" type="RigidBody2D"]
+[node name="Massage_Chair" type="Node2D"]
+script = ExtResource("1_ny5sw")
+ItemDefinition = SubResource("Resource_2kd4o")
+GrabAreaPath = NodePath("Weapon_A1_chair2/GrabArea")
+ThrowDamage = 5.0
+StopOnHit = true
+MaxDurability = 1
+RigidBodyPath = NodePath("Weapon_A1_chair2")
+HitboxAreaPath = NodePath("Weapon_A1_chair2/Hitbox")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Weapon_A1_chair2" type="RigidBody2D" parent="."]
+position = Vector2(0, -91)
+gravity_scale = 0.0
+freeze = true
+freeze_mode = 1
+
+[node name="Sprite2D" type="Sprite2D" parent="Weapon_A1_chair2"]
 scale = Vector2(0.345, 0.345)
 texture = ExtResource("1_brbvu")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(-45.5, 71)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_chair2"]
+position = Vector2(-43.5, 21.5)
 shape = SubResource("RectangleShape2D_d166k")
 
-[node name="Hitbox" type="Area2D" parent="."]
+[node name="Hitbox" type="Area2D" parent="Weapon_A1_chair2"]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_chair2/Hitbox"]
 position = Vector2(-45.872425, 16.500004)
 scale = Vector2(3.45, 3.45)
 skew = 0.02094388
 shape = SubResource("RectangleShape2D_jyvv2")
 
-[node name="CollisionShape2D2" type="CollisionShape2D" parent="Hitbox"]
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="Weapon_A1_chair2/Hitbox"]
 position = Vector2(39.48605, 1.8238708)
 rotation = -0.57072264
 scale = Vector2(0.9999999, 1)
 skew = 0.34033918
 shape = SubResource("RectangleShape2D_brbvu")
 
-[node name="GrabArea" type="Area2D" parent="."]
+[node name="GrabArea" type="Area2D" parent="Weapon_A1_chair2"]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="GrabArea"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_chair2/GrabArea"]
 position = Vector2(-45.872425, 16.500004)
 scale = Vector2(3.45, 3.45)
 skew = 0.02094388
 shape = SubResource("RectangleShape2D_jyvv2")
 
-[node name="CollisionShape2D2" type="CollisionShape2D" parent="GrabArea"]
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="Weapon_A1_chair2/GrabArea"]
 position = Vector2(39.48605, 1.8238708)
 rotation = -0.57072264
 scale = Vector2(0.9999999, 1)

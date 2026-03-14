@@ -1,28 +1,71 @@
-[gd_scene load_steps=3 format=3 uid="uid://bgwe3y3bxgqut"]
+[gd_scene load_steps=12 format=3 uid="uid://bgwe3y3bxgqut"]
 
+[ext_resource type="Script" uid="uid://rpt50t16vkk7" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_klue8"]
 [ext_resource type="Texture2D" uid="uid://c82sp73bkqewk" path="res://assets/furnitures/房间卧室家具导出_0000s_0012_毛球.png" id="1_qce8s"]
+[ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="2_l6kq0"]
+[ext_resource type="Script" uid="uid://bkm4r2swk5lyl" path="res://scripts/items/durability/ItemDurabilityConfig.cs" id="3_p7vti"]
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="4_ehvll"]
+[ext_resource type="Texture2D" uid="uid://diatnolcdw3ob" path="res://resources/assets/weapons/Weapon_A1_ball.png" id="5_mupg1"]
+[ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="6_oq8c5"]
+
+[sub_resource type="Resource" id="Resource_fjh3k"]
+script = ExtResource("3_p7vti")
+MaxDurability = 1
+metadata/_custom_type_script = "uid://bkm4r2swk5lyl"
+
+[sub_resource type="Resource" id="Resource_ce53t"]
+script = ExtResource("6_oq8c5")
+ItemId = "Weapon_A1_ball"
+DisplayName = "Ball"
+Description = "A fur ball"
+Icon = ExtResource("5_mupg1")
+MaxStackSize = 1
+DurabilityConfig = SubResource("Resource_fjh3k")
+WorldScenePath = "uid://d15hs7qpxqhf3"
+metadata/_custom_type_script = "uid://dfgtff7mly02w"
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_l6kq0"]
+radius = 4.1237106
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_klue8"]
 radius = 11.0
 
-[node name="Weapon_A1_ball" type="RigidBody2D"]
+[node name="Ball" type="Node2D"]
+script = ExtResource("1_klue8")
+ItemDefinition = SubResource("Resource_ce53t")
+GrabAreaPath = NodePath("Weapon_A1_ball/GrabArea")
+StopOnHit = true
+MaxDurability = 10
+RigidBodyPath = NodePath("Weapon_A1_ball")
+HitboxAreaPath = NodePath("Weapon_A1_ball/Hitbox")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Weapon_A1_ball" type="RigidBody2D" parent="."]
+position = Vector2(0, -37)
+collision_mask = 6
+gravity_scale = 0.0
+can_sleep = false
+freeze = true
+freeze_mode = 1
+
+[node name="Sprite2D" type="Sprite2D" parent="Weapon_A1_ball"]
 scale = Vector2(0.36, 0.36)
 texture = ExtResource("1_qce8s")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_ball"]
+position = Vector2(0, 26.155)
+rotation = 1.5707964
+scale = Vector2(1.94, 1.94)
+shape = SubResource("CapsuleShape2D_l6kq0")
+
+[node name="Hitbox" type="Area2D" parent="Weapon_A1_ball"]
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="Weapon_A1_ball/Hitbox"]
 scale = Vector2(3.6, 3.6)
 shape = SubResource("CircleShape2D_klue8")
 
-[node name="Hitbox" type="Area2D" parent="."]
+[node name="GrabArea" type="Area2D" parent="Weapon_A1_ball"]
+collision_mask = 2
 
-[node name="CollisionShape2D2" type="CollisionShape2D" parent="Hitbox"]
-scale = Vector2(3.6, 3.6)
-shape = SubResource("CircleShape2D_klue8")
-
-[node name="GrabArea" type="Area2D" parent="."]
-
-[node name="CollisionShape2D2" type="CollisionShape2D" parent="GrabArea"]
-scale = Vector2(3.6, 3.6)
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="Weapon_A1_ball/GrabArea"]
+scale = Vector2(4.065, 4.065)
 shape = SubResource("CircleShape2D_klue8")

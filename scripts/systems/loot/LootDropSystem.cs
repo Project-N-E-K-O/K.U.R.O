@@ -83,7 +83,7 @@ namespace Kuros.Systems.Loot
             return new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * radius;
         }
 
-        private static void ApplyImpulse(WorldItemEntity entity, LootDropEntry entry, LootDropTable table, RandomNumberGenerator rng)
+        private static void ApplyImpulse(Kuros.Items.World.IWorldItemEntity entity, LootDropEntry entry, LootDropTable table, RandomNumberGenerator rng)
         {
             float impulse = entry.ImpulseStrength > 0f ? entry.ImpulseStrength : table.DefaultImpulse;
             if (impulse <= 0f)

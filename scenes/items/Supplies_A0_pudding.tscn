@@ -1,28 +1,51 @@
-[gd_scene load_steps=3 format=3 uid="uid://cl861foq2wo6m"]
+[gd_scene load_steps=9 format=3 uid="uid://cl861foq2wo6m"]
 
+[ext_resource type="Script" uid="uid://rpt50t16vkk7" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_2vfbu"]
 [ext_resource type="Texture2D" uid="uid://cyltfomsjhw82" path="res://assets/furnitures/房间卧室家具导出_0001_布丁.png" id="1_woh2e"]
+[ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="2_s545b"]
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="3_j3n02"]
+[ext_resource type="Texture2D" uid="uid://cbygwy246d6t0" path="res://resources/assets/supplies/Supplies_A0_pudding.png" id="4_qgoig"]
+[ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="5_sb2c1"]
+
+[sub_resource type="Resource" id="Resource_5ruhd"]
+script = ExtResource("5_sb2c1")
+ItemId = "Supplies_A0_pudding"
+DisplayName = "Pudding"
+Icon = ExtResource("4_qgoig")
+MaxStackSize = 1
+metadata/_custom_type_script = "uid://dfgtff7mly02w"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jyvv2"]
 size = Vector2(74, 41)
 
-[node name="Supplies_A0_pudding" type="RigidBody2D"]
+[node name="Supplies_A0_pudding" type="Node2D"]
+script = ExtResource("1_2vfbu")
+ItemDefinition = SubResource("Resource_5ruhd")
+GrabAreaPath = NodePath("Rigidbody2D/GrabArea")
+StopOnHit = true
+MaxDurability = 1
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Rigidbody2D" type="RigidBody2D" parent="."]
+
+[node name="Sprite2D" type="Sprite2D" parent="Rigidbody2D"]
+position = Vector2(-0.29999927, -28)
 scale = Vector2(0.36, 0.36)
 texture = ExtResource("1_woh2e")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Rigidbody2D"]
+position = Vector2(-0.29999924, -28.499996)
+shape = SubResource("RectangleShape2D_jyvv2")
+
+[node name="Hitbox" type="Area2D" parent="Rigidbody2D"]
+position = Vector2(-0.29999924, -27.999996)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Rigidbody2D/Hitbox"]
 position = Vector2(0, -0.5)
 shape = SubResource("RectangleShape2D_jyvv2")
 
-[node name="Hitbox" type="Area2D" parent="."]
+[node name="GrabArea" type="Area2D" parent="Rigidbody2D"]
+position = Vector2(-0.29999924, -27.999996)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
-position = Vector2(0, -0.5)
-shape = SubResource("RectangleShape2D_jyvv2")
-
-[node name="GrabArea" type="Area2D" parent="."]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="GrabArea"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Rigidbody2D/GrabArea"]
 position = Vector2(0, -0.5)
 shape = SubResource("RectangleShape2D_jyvv2")

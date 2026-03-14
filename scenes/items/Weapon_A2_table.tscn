@@ -1,0 +1,61 @@
+[gd_scene load_steps=9 format=3 uid="uid://0g621ssvm2cp"]
+
+[ext_resource type="Script" uid="uid://rpt50t16vkk7" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_1rea5"]
+[ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="2_k340y"]
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="3_4pcy5"]
+[ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="5_sjlfq"]
+[ext_resource type="Texture2D" uid="uid://ox4lkxf1ejh4" path="res://resources/assets/weapons/Weapon_A2_table.png" id="6_1rea5"]
+
+[sub_resource type="Resource" id="Resource_tdtid"]
+script = ExtResource("5_sjlfq")
+ItemId = "Weapon_A2_table"
+DisplayName = "kitchen table"
+Icon = ExtResource("6_1rea5")
+MaxStackSize = 1
+metadata/_custom_type_script = "uid://dfgtff7mly02w"
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_jyvv2"]
+size = Vector2(151.47058, 30.000002)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_gy46y"]
+size = Vector2(529, 197)
+
+[node name="Kitchen_table" type="Node2D"]
+script = ExtResource("1_1rea5")
+ItemDefinition = SubResource("Resource_tdtid")
+GrabAreaPath = NodePath("Weapon_A2_table/GrabArea")
+ThrowDamage = 2.0
+StopOnHit = true
+MaxDurability = 1
+RigidBodyPath = NodePath("Weapon_A2_table")
+HitboxAreaPath = NodePath("Weapon_A2_table/Hitbox")
+
+[node name="Weapon_A2_table" type="RigidBody2D" parent="."]
+position = Vector2(1, -10)
+gravity_scale = 0.0
+can_sleep = false
+freeze = true
+freeze_mode = 1
+
+[node name="Sprite2D" type="Sprite2D" parent="Weapon_A2_table"]
+scale = Vector2(0.34, 0.34)
+texture = ExtResource("6_1rea5")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A2_table"]
+position = Vector2(0.49999595, 40)
+scale = Vector2(3.4, 3.4)
+shape = SubResource("RectangleShape2D_jyvv2")
+
+[node name="Hitbox" type="Area2D" parent="Weapon_A2_table"]
+visible = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A2_table/Hitbox"]
+position = Vector2(0.5, -0.5)
+shape = SubResource("RectangleShape2D_gy46y")
+
+[node name="GrabArea" type="Area2D" parent="Weapon_A2_table"]
+visible = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A2_table/GrabArea"]
+position = Vector2(0.5, -0.5)
+shape = SubResource("RectangleShape2D_gy46y")

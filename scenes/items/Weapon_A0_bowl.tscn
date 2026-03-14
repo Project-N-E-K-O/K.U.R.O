@@ -1,31 +1,59 @@
-[gd_scene load_steps=3 format=3 uid="uid://ccrrtbrue2s7d"]
+[gd_scene load_steps=9 format=3 uid="uid://ccrrtbrue2s7d"]
 
 [ext_resource type="Texture2D" uid="uid://hknkbiylfgiw" path="res://assets/furnitures/房间卧室家具导出_0002_碗.png" id="1_1j7rj"]
+[ext_resource type="Script" uid="uid://rpt50t16vkk7" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_brou7"]
+[ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="2_48ksx"]
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="3_i68yc"]
+[ext_resource type="Texture2D" uid="uid://dnppo51tlaa3f" path="res://resources/assets/weapons/Weapon_A0_bowl.png" id="4_37taf"]
+[ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="5_4andf"]
+
+[sub_resource type="Resource" id="Resource_yyp65"]
+script = ExtResource("5_4andf")
+ItemId = "Weapon_A0_bowl"
+DisplayName = "Bowl"
+Icon = ExtResource("4_37taf")
+MaxStackSize = 1
+metadata/_custom_type_script = "uid://dfgtff7mly02w"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jyvv2"]
 size = Vector2(21.38889, 18.055555)
 
-[node name="Weapon_A0_bowl" type="RigidBody2D"]
+[node name="Bowl" type="Node2D"]
+script = ExtResource("1_brou7")
+ItemDefinition = SubResource("Resource_yyp65")
+GrabAreaPath = NodePath("Weapon_A0_bowl/GrabArea")
+ThrowDamage = 1.0
+StopOnHit = true
+MaxDurability = 1
+RigidBodyPath = NodePath("Weapon_A0_bowl")
+HitboxAreaPath = NodePath("Weapon_A0_bowl/Hitbox")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Weapon_A0_bowl" type="RigidBody2D" parent="."]
+position = Vector2(0, -15)
+gravity_scale = 0.0
+can_sleep = false
+freeze = true
+freeze_mode = 1
+
+[node name="Sprite2D" type="Sprite2D" parent="Weapon_A0_bowl"]
 scale = Vector2(0.36, 0.36)
 texture = ExtResource("1_1j7rj")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A0_bowl"]
 position = Vector2(1.4999995, -3.4999976)
 scale = Vector2(3.6, 3.6)
 shape = SubResource("RectangleShape2D_jyvv2")
 
-[node name="Hitbox" type="Area2D" parent="."]
+[node name="Hitbox" type="Area2D" parent="Weapon_A0_bowl"]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A0_bowl/Hitbox"]
 position = Vector2(1.4999995, -3.4999976)
 scale = Vector2(3.6, 3.6)
 shape = SubResource("RectangleShape2D_jyvv2")
 
-[node name="GrabArea" type="Area2D" parent="."]
+[node name="GrabArea" type="Area2D" parent="Weapon_A0_bowl"]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="GrabArea"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A0_bowl/GrabArea"]
 position = Vector2(1.4999995, -3.4999976)
 scale = Vector2(3.6, 3.6)
 shape = SubResource("RectangleShape2D_jyvv2")

@@ -1,0 +1,368 @@
+[gd_scene load_steps=54 format=3 uid="uid://btqx0751t5bx4"]
+
+[ext_resource type="Script" uid="uid://x1ic1ym4ykq8" path="res://scripts/scenes/BattleSceneManager.cs" id="1_givaq"]
+[ext_resource type="PackedScene" uid="uid://b1ljb2q212v3d" path="res://scenes/environments/floor.tscn" id="2_refik"]
+[ext_resource type="PackedScene" uid="uid://ufprfd4r8ijj" path="res://assets/spine/main_character/main_character.tscn" id="4_givaq"]
+[ext_resource type="Script" uid="uid://cn2bsvambjids" path="res://scripts/controllers/EnemySpawnController.cs" id="21_kt4h1"]
+[ext_resource type="PackedScene" uid="uid://cofm45kotvgto" path="res://scenes/actors/enemies/Enemy_B1_fat.tscn" id="22_uvtj7"]
+[ext_resource type="Texture2D" uid="uid://sinhag8w2ijl" path="res://textures/environments/wall/25.12.3 卧室下墙壁.png" id="26_yy663"]
+[ext_resource type="PackedScene" path="res://scenes/actors/npc/SimpleNPC.tscn" id="27_28u5u"]
+[ext_resource type="PackedScene" uid="uid://cwnslqteb78nc" path="res://scenes/objects/Static_A1_sink.tscn" id="28_61adh"]
+[ext_resource type="PackedScene" uid="uid://dh4uaik8ybpc" path="res://scenes/objects/Static_A1_stove.tscn" id="29_223i8"]
+[ext_resource type="PackedScene" uid="uid://bq3m0dmil852a" path="res://scenes/objects/Static_A1_dishwasher.tscn" id="30_c56lo"]
+[ext_resource type="PackedScene" uid="uid://ce1grag072rk1" path="res://scenes/objects/Static_A1_countertop.tscn" id="31_meaug"]
+[ext_resource type="PackedScene" uid="uid://0k5p2tny0qe" path="res://scenes/objects/Static_A1_roadsign.tscn" id="32_qxg8q"]
+[ext_resource type="PackedScene" uid="uid://ccrrtbrue2s7d" path="res://scenes/items/Weapon_A0_bowl.tscn" id="33_2y4e6"]
+[ext_resource type="PackedScene" uid="uid://dnwhjf0qt2753" path="res://scenes/items/Supplies_A0_cake.tscn" id="34_gjaq7"]
+[ext_resource type="PackedScene" uid="uid://cl861foq2wo6m" path="res://scenes/items/Supplies_A0_pudding.tscn" id="35_612qn"]
+[ext_resource type="PackedScene" uid="uid://b815iwh3dh67r" path="res://scenes/items/Weapon_A2_chair.tscn" id="36_jfqnp"]
+[ext_resource type="PackedScene" uid="uid://bl14myq60jv3t" path="res://scenes/items/Weapon_A0_chest2.tscn" id="37_yuueu"]
+[ext_resource type="PackedScene" uid="uid://dhu3s8mlc7i0i" path="res://scenes/items/Weapon_A0_chest.tscn" id="38_kwl34"]
+[ext_resource type="PackedScene" uid="uid://bgwe3y3bxgqut" path="res://scenes/items/Weapon_A1_ball.tscn" id="39_k4wt5"]
+[ext_resource type="PackedScene" uid="uid://dfbyu6g4g63lo" path="res://scenes/items/Weapon_A1_bed.tscn" id="40_8h3ka"]
+[ext_resource type="PackedScene" uid="uid://bmp8leplbbuak" path="res://scenes/items/Weapon_A1_bed2.tscn" id="41_vp0ji"]
+[ext_resource type="PackedScene" uid="uid://dlhdp0ee1hxnp" path="res://scenes/items/Weapon_A1_toying.tscn" id="42_yj2ks"]
+[ext_resource type="PackedScene" uid="uid://0g621ssvm2cp" path="res://scenes/items/Weapon_A2_table.tscn" id="43_15qi6"]
+[ext_resource type="PackedScene" uid="uid://4cqtahrpuji0" path="res://scenes/items/Weapon_A1_table_lamp.tscn" id="43_kdjwv"]
+[ext_resource type="PackedScene" uid="uid://b781tdbk3jhr6" path="res://scenes/items/Weapon_A1_cabinet.tscn" id="44_cl643"]
+[ext_resource type="PackedScene" uid="uid://o8goa34wkaov" path="res://scenes/items/Weapon_A1_cat.tscn" id="45_wri45"]
+[ext_resource type="PackedScene" uid="uid://b77cre3oyr2eq" path="res://scenes/items/Weapon_A1_dock.tscn" id="46_wx2j4"]
+[ext_resource type="PackedScene" uid="uid://j25a4e8oawlb" path="res://scenes/items/Weapon_A1_chair2.tscn" id="47_lf7i8"]
+[ext_resource type="PackedScene" uid="uid://3t2nfvvcqc83" path="res://scenes/items/Weapon_A1_garbage_can.tscn" id="48_nc3gi"]
+[ext_resource type="PackedScene" uid="uid://cohms5dnn8iox" path="res://scenes/items/Weapon_A1_nightstand.tscn" id="49_qvufq"]
+[ext_resource type="PackedScene" uid="uid://licguk1si41g" path="res://scenes/items/Weapon_A1_fridge.tscn" id="50_coo5v"]
+[ext_resource type="PackedScene" uid="uid://cb014clwmf2xy" path="res://scenes/items/Weapon_A1_robot.tscn" id="51_d3kkb"]
+[ext_resource type="PackedScene" uid="uid://jrl3rhlkubaj" path="res://scenes/items/Weapon_A1_sofa.tscn" id="52_pesgf"]
+[ext_resource type="PackedScene" uid="uid://cs6dkspm16vj4" path="res://scenes/items/Weapon_A1_perch.tscn" id="53_3ppxr"]
+[ext_resource type="PackedScene" uid="uid://c11uxbw23hrhf" path="res://scenes/items/Weapon_A1_table.tscn" id="54_uf7ju"]
+[ext_resource type="PackedScene" uid="uid://bgkw4qeioiet3" path="res://scenes/items/Weapon_A1_chair.tscn" id="55_s1se0"]
+[ext_resource type="Texture2D" uid="uid://c7e1c2yfd6v55" path="res://assets/objects/25.12.3 卧室上墙壁.png" id="56_gyq12"]
+[ext_resource type="Texture2D" uid="uid://2fgkjed3uus0" path="res://assets/objects/25.12.3 卧室下墙壁.png" id="57_wnuj8"]
+[ext_resource type="Texture2D" uid="uid://bctuie2bylxrg" path="res://assets/objects/25.12.3 厨房 下墙壁.png" id="58_mulhb"]
+[ext_resource type="Texture2D" uid="uid://bppugi8deuvwf" path="res://assets/objects/25.12.3 厨房 上墙壁.png" id="59_lwy8n"]
+[ext_resource type="PackedScene" uid="uid://r6k0tyrf5n84" path="res://scenes/items/Weapon_A1_door.tscn" id="60_nnnrk"]
+[ext_resource type="PackedScene" uid="uid://bbcqflgys8xp2" path="res://scenes/items/Weapon_A1_door2.tscn" id="61_qpe52"]
+[ext_resource type="PackedScene" uid="uid://chway4etqkroy" path="res://scenes/objects/Moving_A1_taxi.tscn" id="62_7gwax"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_sb658"]
+size = Vector2(17, 1106)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_v8do6"]
+size = Vector2(146, 1080.75)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_x7t42"]
+size = Vector2(3887, 24)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_10ijk"]
+size = Vector2(2977, 196)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_cijyb"]
+size = Vector2(645.5, 18)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_dgope"]
+size = Vector2(256.5, 26)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_pfjrb"]
+size = Vector2(123, 530.0001)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_34xhk"]
+size = Vector2(81.434326, 298.70178)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_feb7u"]
+size = Vector2(207.82617, 299.98145)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1hj54"]
+size = Vector2(98, 394.5)
+
+[node name="BattleScene" type="Node2D"]
+z_as_relative = false
+position = Vector2(-6, 0)
+script = ExtResource("1_givaq")
+
+[node name="World" type="Node2D" parent="."]
+z_as_relative = false
+y_sort_enabled = true
+
+[node name="scnene" parent="World" instance=ExtResource("2_refik")]
+position = Vector2(-8, 5)
+metadata/_edit_lock_ = true
+
+[node name="MainCharacter" parent="World" instance=ExtResource("4_givaq")]
+position = Vector2(317, 454)
+
+[node name="Camera2D" type="Camera2D" parent="World/MainCharacter"]
+position = Vector2(-18.75, -781.25)
+scale = Vector2(6.25, 6.25)
+limit_left = 0
+limit_top = 10
+limit_right = 3854
+limit_bottom = 1080
+drag_horizontal_enabled = true
+drag_vertical_enabled = true
+
+[node name="EnemySpawnController" type="Node2D" parent="World"]
+visible = false
+y_sort_enabled = true
+position = Vector2(-339, 127)
+script = ExtResource("21_kt4h1")
+
+[node name="EnemyInstance" parent="World/EnemySpawnController" instance=ExtResource("22_uvtj7")]
+position = Vector2(1369, 456)
+Speed = 50.0
+
+[node name="Sprite2D" type="Sprite2D" parent="World"]
+position = Vector2(1915, 487)
+scale = Vector2(0.33224, 0.36351487)
+texture = ExtResource("26_yy663")
+
+[node name="NPC" parent="World" instance=ExtResource("27_28u5u")]
+y_sort_enabled = true
+position = Vector2(611, 711)
+
+[node name="StaticOBJ" type="Node2D" parent="World"]
+
+[node name="PickupItems" type="Node2D" parent="World"]
+
+[node name="ArillWall" type="StaticBody2D" parent="World"]
+collision_layer = 3
+collision_mask = 7
+
+[node name="left" type="CollisionShape2D" parent="World/ArillWall"]
+position = Vector2(-12, 545)
+shape = SubResource("RectangleShape2D_sb658")
+
+[node name="right" type="CollisionShape2D" parent="World/ArillWall"]
+position = Vector2(3786, 538.625)
+shape = SubResource("RectangleShape2D_v8do6")
+
+[node name="down" type="CollisionShape2D" parent="World/ArillWall"]
+position = Vector2(1939.5, 1096)
+shape = SubResource("RectangleShape2D_x7t42")
+
+[node name="home up" type="CollisionShape2D" parent="World/ArillWall"]
+position = Vector2(1464, 98)
+shape = SubResource("RectangleShape2D_10ijk")
+
+[node name="road up" type="CollisionShape2D" parent="World/ArillWall"]
+position = Vector2(3530.75, 10)
+shape = SubResource("RectangleShape2D_cijyb")
+
+[node name="floor up" type="CollisionShape2D" parent="World/ArillWall"]
+position = Vector2(3078.75, 11)
+shape = SubResource("RectangleShape2D_dgope")
+
+[node name="badroom up wall" type="CollisionShape2D" parent="World/ArillWall"]
+position = Vector2(1697.0001, 285.14423)
+rotation = -1.134464
+skew = 1.1344641
+shape = SubResource("RectangleShape2D_pfjrb")
+
+[node name="badroom down wall" type="CollisionShape2D" parent="World/ArillWall"]
+position = Vector2(1711, 953.3509)
+shape = SubResource("RectangleShape2D_34xhk")
+
+[node name="kitchen up wall" type="CollisionShape2D" parent="World/ArillWall"]
+position = Vector2(2875.6086, 204.0324)
+rotation = -1.2130039
+skew = 1.2130038
+shape = SubResource("RectangleShape2D_feb7u")
+
+[node name="kitchen down wall" type="CollisionShape2D" parent="World/ArillWall"]
+position = Vector2(2888, 913.25)
+shape = SubResource("RectangleShape2D_1hj54")
+
+[node name="Bedroom_Wall_Up" type="Sprite2D" parent="World/ArillWall"]
+position = Vector2(1919.9998, 494.99994)
+scale = Vector2(0.341, 0.341)
+texture = ExtResource("56_gyq12")
+
+[node name="Bedroom_Wall_Down" type="Sprite2D" parent="World/ArillWall"]
+position = Vector2(1921, 512)
+scale = Vector2(0.341, 0.341)
+texture = ExtResource("57_wnuj8")
+
+[node name="Kitchen_Wall_Down" type="Sprite2D" parent="World/ArillWall"]
+position = Vector2(1897, 503)
+scale = Vector2(0.341, 0.341)
+texture = ExtResource("58_mulhb")
+
+[node name="Kitchen_Wall_Up" type="Sprite2D" parent="World/ArillWall"]
+position = Vector2(1896.9999, 507)
+scale = Vector2(0.341, 0.341)
+texture = ExtResource("59_lwy8n")
+
+[node name="Door" type="Node2D" parent="World"]
+y_sort_enabled = true
+
+[node name="Weapon_A1_door" parent="World/Door" instance=ExtResource("60_nnnrk")]
+position = Vector2(1704, 850)
+
+[node name="Weapon_A1_door2" parent="World/Door" instance=ExtResource("61_qpe52")]
+position = Vector2(2874, 788)
+
+[node name="AnimatedOBJ" type="Node2D" parent="World"]
+y_sort_enabled = true
+
+[node name="Moving_A1_taxi" parent="World/AnimatedOBJ" instance=ExtResource("62_7gwax")]
+position = Vector2(3338.0002, 169)
+
+[node name="Kitchen_table" parent="World" instance=ExtResource("43_15qi6")]
+position = Vector2(2247, 489)
+
+[node name="Static_A1_sink" parent="World" instance=ExtResource("28_61adh")]
+position = Vector2(2356, 230)
+
+[node name="Static_A1_Stove" parent="World" instance=ExtResource("29_223i8")]
+position = Vector2(2095, 239)
+
+[node name="Static_A1_dishwasher" parent="World" instance=ExtResource("30_c56lo")]
+position = Vector2(1949, 239)
+
+[node name="Static_A1_countertop" parent="World" instance=ExtResource("31_meaug")]
+position = Vector2(1813, 327)
+
+[node name="Static_A1_roadsign" parent="World" instance=ExtResource("32_qxg8q")]
+position = Vector2(3182, 522)
+
+[node name="Weapon_A2_chair" parent="World" instance=ExtResource("36_jfqnp")]
+position = Vector2(2298, 647)
+
+[node name="Weapon_A2_chair2" parent="World" instance=ExtResource("36_jfqnp")]
+position = Vector2(2408, 647)
+
+[node name="Weapon_A0_chest2" parent="World" instance=ExtResource("37_yuueu")]
+position = Vector2(534, 980)
+
+[node name="Weapon_A0_chest3" parent="World" instance=ExtResource("37_yuueu")]
+position = Vector2(1974, 975)
+
+[node name="Weapon_A0_chest" parent="World" instance=ExtResource("38_kwl34")]
+position = Vector2(453, 976)
+
+[node name="Weapon_A0_chest4" parent="World" instance=ExtResource("38_kwl34")]
+position = Vector2(1888, 972)
+
+[node name="Weapon_A0_chest5" parent="World" instance=ExtResource("38_kwl34")]
+position = Vector2(2671, 981)
+
+[node name="Weapon_A1_ball" parent="World" instance=ExtResource("39_k4wt5")]
+position = Vector2(427, 672)
+
+[node name="Weapon_A1_bed" parent="World" instance=ExtResource("40_8h3ka")]
+position = Vector2(1009, 390)
+
+[node name="Weapon_A1_bed2" parent="World" instance=ExtResource("41_vp0ji")]
+position = Vector2(792, 393)
+
+[node name="Weapon_A1_toying" parent="World" instance=ExtResource("42_yj2ks")]
+position = Vector2(1501, 547)
+
+[node name="Weapon_A1_table_lamp" parent="World" instance=ExtResource("43_kdjwv")]
+position = Vector2(585, 288)
+
+[node name="Weapon_A1_table_lamp2" parent="World" instance=ExtResource("43_kdjwv")]
+position = Vector2(1203, 299)
+
+[node name="Weapon_A1_cabinet" parent="World" instance=ExtResource("44_cl643")]
+position = Vector2(232, 977)
+
+[node name="Weapon_A1_cat" parent="World" instance=ExtResource("45_wri45")]
+position = Vector2(303, 635)
+collision_layer = 8
+collision_mask = 0
+gravity_scale = 0.0
+freeze = true
+
+[node name="Weapon_A1_dock" parent="World" instance=ExtResource("46_wx2j4")]
+position = Vector2(1353, 253)
+
+[node name="Weapon_A1_chair2" parent="World" instance=ExtResource("47_lf7i8")]
+position = Vector2(565, 467)
+
+[node name="Weapon_A1_garbage_can" parent="World" instance=ExtResource("48_nc3gi")]
+position = Vector2(279, 563)
+
+[node name="Weapon_A1_nightstand" parent="World" instance=ExtResource("49_qvufq")]
+position = Vector2(686, 291)
+
+[node name="Weapon_A1_nightstand2" parent="World" instance=ExtResource("49_qvufq")]
+position = Vector2(1114, 290)
+
+[node name="Weapon_A1_fridge" parent="World" instance=ExtResource("50_coo5v")]
+position = Vector2(2604, 176)
+
+[node name="Weapon_A1_robot" parent="World" instance=ExtResource("51_d3kkb")]
+position = Vector2(545, 638)
+
+[node name="Weapon_A1_sofa" parent="World" instance=ExtResource("52_pesgf")]
+position = Vector2(1428, 476)
+
+[node name="Weapon_A1_perch" parent="World" instance=ExtResource("53_3ppxr")]
+position = Vector2(1528, 238)
+
+[node name="Weapon_A1_table" parent="World" instance=ExtResource("54_uf7ju")]
+position = Vector2(97, 580)
+
+[node name="Weapon_A1_chair" parent="World" instance=ExtResource("55_s1se0")]
+position = Vector2(173, 371)
+
+[node name="Supplies_A0_cake" parent="World" instance=ExtResource("34_gjaq7")]
+z_as_relative = false
+position = Vector2(2115, 456)
+collision_layer = 8
+collision_mask = 0
+gravity_scale = 0.0
+freeze = true
+
+[node name="Weapon_A0_bowl" parent="World" instance=ExtResource("33_2y4e6")]
+z_as_relative = false
+position = Vector2(2292, 481)
+
+[node name="Supplies_A0_pudding" parent="World" instance=ExtResource("35_612qn")]
+z_as_relative = false
+position = Vector2(2292, 482)
+collision_layer = 8
+collision_mask = 0
+gravity_scale = 0.0
+freeze = true
+
+[node name="Supplies_A0_pudding2" parent="World" instance=ExtResource("35_612qn")]
+z_as_relative = false
+position = Vector2(2409, 471)
+collision_layer = 8
+collision_mask = 0
+gravity_scale = 0.0
+freeze = true
+
+[node name="Weapon_A0_bowl2" parent="World" instance=ExtResource("33_2y4e6")]
+z_as_relative = false
+position = Vector2(2410, 469)
+
+[node name="Surface" type="Node2D" parent="."]
+z_index = 1
+z_as_relative = false
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="PlayerStats" type="Label" parent="UI"]
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 200.0
+offset_bottom = 60.0
+text = "Player HP: 100
+Score: 0"
+
+[node name="Instructions" type="Label" parent="UI"]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = 49.0
+offset_top = 127.0
+offset_right = 563.0
+offset_bottom = 167.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "WASD: Move | Space: Attack | Shift: Run | F: Pick Up | G: Put Down"
+horizontal_alignment = 1

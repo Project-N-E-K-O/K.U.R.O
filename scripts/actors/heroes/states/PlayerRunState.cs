@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using Kuros.Actors.Heroes;
 
 namespace Kuros.Actors.Heroes.States
 {
@@ -11,16 +12,24 @@ namespace Kuros.Actors.Heroes.States
         public override void Enter()
         {
             Player.NotifyMovementState(Name);
-            if (Actor.AnimPlayer != null)
+            
+            // 使用 PlayAnimation 方法，自动适配 MainCharacter 和 SamplePlayer
+            if (Player is MainCharacter mainChar)
             {
-                // Save original speed scale before modifying
-                _originalSpeedScale = Actor.AnimPlayer.SpeedScale;
-                
-                Actor.AnimPlayer.Play("animations/run");
-                // Set animation playback speed only for run animation
-                Actor.AnimPlayer.SpeedScale = RunAnimationSpeed;
-                var anim = Actor.AnimPlayer.GetAnimation("animations/run");
-                if (anim != null) anim.LoopMode = Animation.LoopModeEnum.Linear;
+                // MainCharacter 使用 Spine 动画
+                PlayAnimation(mainChar.RunAnimationName, true, RunAnimationSpeed);
+            }
+            else
+            {
+                // SamplePlayer 使用 AnimationPlayer
+                if (Actor.AnimPlayer != null)
+                {
+                    // Save original speed scale before modifying
+                    _originalSpeedScale = Actor.AnimPlayer.SpeedScale;
+                    
+                    // 使用 PlayAnimation 方法（虽然它会再次检查，但这样可以统一接口）
+                    PlayAnimation("animations/run", true, RunAnimationSpeed);
+                }
             }
             // Increase speed by changing velocity calculation, not base stat
         }

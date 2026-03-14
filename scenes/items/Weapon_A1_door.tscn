@@ -1,6 +1,22 @@
-[gd_scene load_steps=4 format=3 uid="uid://r6k0tyrf5n84"]
+[gd_scene load_steps=10 format=3 uid="uid://r6k0tyrf5n84"]
 
 [ext_resource type="Texture2D" uid="uid://ddf7bb8odriem" path="res://textures/environments/wall/25.12.3 卧室大钢门.png" id="1_8of5r"]
+[ext_resource type="Script" uid="uid://rpt50t16vkk7" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_viu3r"]
+[ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="2_bi080"]
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="3_pda0u"]
+[ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="5_1lrih"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_g4uc7"]
+atlas = ExtResource("1_8of5r")
+region = Rect2(4570.865, 1275.996, 1188.419, 1188.4191)
+
+[sub_resource type="Resource" id="Resource_spawv"]
+script = ExtResource("5_1lrih")
+ItemId = "Weapon_A1_door"
+DisplayName = "Door"
+Icon = SubResource("AtlasTexture_g4uc7")
+MaxStackSize = 1
+metadata/_custom_type_script = "uid://dfgtff7mly02w"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8of5r"]
 size = Vector2(24, 186)
@@ -8,29 +24,43 @@ size = Vector2(24, 186)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jyvv2"]
 size = Vector2(41.567154, 53.98491)
 
-[node name="Weapon_A1_door" type="RigidBody2D"]
+[node name="Door_1" type="Node2D"]
+script = ExtResource("1_viu3r")
+ItemDefinition = SubResource("Resource_spawv")
+GrabAreaPath = NodePath("Weapon_A1_door/GrabArea")
+ThrowDamage = 6.0
+StopOnHit = true
+MaxDurability = 6
+RigidBodyPath = NodePath("Weapon_A1_door")
+HitboxAreaPath = NodePath("Weapon_A1_door/Hitbox")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Weapon_A1_door" type="RigidBody2D" parent="."]
+gravity_scale = 0.0
+can_sleep = false
+freeze = true
+freeze_mode = 1
+
+[node name="Sprite2D" type="Sprite2D" parent="Weapon_A1_door"]
 position = Vector2(227, -140)
 scale = Vector2(0.345, 0.345)
 texture = ExtResource("1_8of5r")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_door"]
 position = Vector2(-24, 65)
 shape = SubResource("RectangleShape2D_8of5r")
 
-[node name="Hitbox" type="Area2D" parent="."]
+[node name="Hitbox" type="Area2D" parent="Weapon_A1_door"]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_door/Hitbox"]
 position = Vector2(1.1920929e-07, 5.000001)
 rotation = -1.0681415
 scale = Vector2(3.45, 3.45)
 skew = 1.0437069
 shape = SubResource("RectangleShape2D_jyvv2")
 
-[node name="GrabArea" type="Area2D" parent="."]
+[node name="GrabArea" type="Area2D" parent="Weapon_A1_door"]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="GrabArea"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_door/GrabArea"]
 position = Vector2(1.1920929e-07, 5.000001)
 rotation = -1.0681415
 scale = Vector2(3.45, 3.45)

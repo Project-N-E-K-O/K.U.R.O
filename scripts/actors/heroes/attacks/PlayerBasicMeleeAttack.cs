@@ -33,7 +33,16 @@ namespace Kuros.Actors.Heroes.Attacks
 
         protected override void OnAttackStarted()
         {
-            AnimationName = _defaultAnimation;
+            // 如果是 MainCharacter，使用攻击动画名称
+            if (Player is MainCharacter mainChar)
+            {
+                AnimationName = mainChar.AttackAnimationName;
+            }
+            else
+            {
+                AnimationName = _defaultAnimation;
+            }
+            
             DamageOverride = Player.AttackDamage;
 
             if (_inventory != null)
@@ -53,6 +62,7 @@ namespace Kuros.Actors.Heroes.Attacks
                 _weaponSkillController.TriggerDefaultSkill();
             }
 
+            // 调用基类方法，基类会自动检测 MainCharacter 并播放 Spine 动画
             base.OnAttackStarted();
         }
 

@@ -1,6 +1,19 @@
-[gd_scene load_steps=4 format=3 uid="uid://3t2nfvvcqc83"]
+[gd_scene load_steps=10 format=3 uid="uid://3t2nfvvcqc83"]
 
+[ext_resource type="Script" uid="uid://rpt50t16vkk7" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_6atsg"]
 [ext_resource type="Texture2D" uid="uid://c5thp1rjtgsbv" path="res://assets/furnitures/房间卧室家具导出_0000s_0013_垃圾桶.png" id="1_cts57"]
+[ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="2_pf0x0"]
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="3_h8f5c"]
+[ext_resource type="Texture2D" uid="uid://mhjw04gpb2j5" path="res://resources/assets/weapons/Weapon_A1_garbage can.png" id="4_7t1ej"]
+[ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="5_4rctf"]
+
+[sub_resource type="Resource" id="Resource_1xgyu"]
+script = ExtResource("5_4rctf")
+ItemId = "Weapon_A1_garbage_can"
+DisplayName = "Garbage Can"
+Icon = ExtResource("4_7t1ej")
+MaxStackSize = 1
+metadata/_custom_type_script = "uid://dfgtff7mly02w"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_cts57"]
 size = Vector2(59, 8)
@@ -8,26 +21,40 @@ size = Vector2(59, 8)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jyvv2"]
 size = Vector2(16.521742, 20.869566)
 
-[node name="Weapon_A1_garbage_can" type="RigidBody2D"]
+[node name="Garbage_Can" type="Node2D"]
+script = ExtResource("1_6atsg")
+ItemDefinition = SubResource("Resource_1xgyu")
+GrabAreaPath = NodePath("Weapon_A1_garbage_can/GrabArea")
+ThrowDamage = 1.0
+StopOnHit = true
+RigidBodyPath = NodePath("Weapon_A1_garbage_can")
+HitboxAreaPath = NodePath("Weapon_A1_garbage_can/Hitbox")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Weapon_A1_garbage_can" type="RigidBody2D" parent="."]
+position = Vector2(0, -36)
+gravity_scale = 0.0
+can_sleep = false
+freeze = true
+freeze_mode = 1
+
+[node name="Sprite2D" type="Sprite2D" parent="Weapon_A1_garbage_can"]
 scale = Vector2(0.345, 0.345)
 texture = ExtResource("1_cts57")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_garbage_can"]
 position = Vector2(0.5, 35)
 shape = SubResource("RectangleShape2D_cts57")
 
-[node name="Hitbox" type="Area2D" parent="."]
+[node name="Hitbox" type="Area2D" parent="Weapon_A1_garbage_can"]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_garbage_can/Hitbox"]
 position = Vector2(0.49999905, 0.9999998)
 scale = Vector2(3.45, 3.45)
 shape = SubResource("RectangleShape2D_jyvv2")
 
-[node name="GrabArea" type="Area2D" parent="."]
+[node name="GrabArea" type="Area2D" parent="Weapon_A1_garbage_can"]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="GrabArea"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Weapon_A1_garbage_can/GrabArea"]
 position = Vector2(0.49999905, 0.9999998)
 scale = Vector2(3.45, 3.45)
 shape = SubResource("RectangleShape2D_jyvv2")
