@@ -1,99 +1,91 @@
-[gd_scene load_steps=11 format=3 uid="uid://bxqqlv61h6k6t"]
+[gd_scene load_steps=9 format=3 uid="uid://dd8xmpgwy0t2o"]
 
-[ext_resource type="Texture2D" uid="uid://d4bn57ykg28py" path="res://assets/art/去掉遮挡墙面的底图.png" id="1_4oj7m"]
-[ext_resource type="Texture2D" uid="uid://b6ov17gfo2r3j" path="res://assets/environments/scene_2_hotel/摆放参考_0002_墙面.png" id="2_4oj7m"]
-[ext_resource type="Texture2D" uid="uid://nkyaao1vc340" path="res://assets/environments/scene_2_hotel/摆放参考_0011_地板.png" id="2_fsr21"]
-[ext_resource type="Texture2D" uid="uid://7sqhgrutdlus" path="res://assets/environments/scene_2_hotel/摆放参考_0006_酒吧吧台.png" id="3_fsr21"]
-[ext_resource type="Texture2D" uid="uid://db0g18l3khykp" path="res://assets/environments/scene_2_hotel/摆放参考_0000_无缝窗户模块.png" id="4_7qe3t"]
-[ext_resource type="Texture2D" uid="uid://c003bkl5ohjrp" path="res://assets/environments/scene_2_hotel/摆放参考_0010_地毯.png" id="4_qqgfp"]
-[ext_resource type="Texture2D" uid="uid://bjiue5hpotpvk" path="res://assets/environments/scene_2_hotel/摆放参考_0007_电梯墙前.png" id="5_7qe3t"]
-[ext_resource type="Texture2D" uid="uid://btlvqkxah8ilf" path="res://assets/environments/scene_2_hotel/摆放参考_0008_电梯墙后.png" id="6_7oy14"]
-[ext_resource type="Texture2D" uid="uid://bo7e8jyjfsr8u" path="res://assets/environments/scene_2_hotel/摆放参考_0004_酒店大门口墙后.png" id="8_qqgfp"]
-[ext_resource type="Texture2D" uid="uid://crg63mfenxwls" path="res://assets/environments/scene_2_hotel/摆放参考.png" id="9_7qe3t"]
+[ext_resource type="Texture2D" uid="uid://rpleid8er0tq" path="res://assets/environments/scene_2_hotel/去掉遮挡墙面的大门底图.png" id="1_qqgfp"]
+[ext_resource type="Texture2D" uid="uid://bldctlu6nwf6g" path="res://assets/environments/scene_2_hotel/地板.png" id="2_fsr21"]
+[ext_resource type="Texture2D" uid="uid://k45cthgn2dgq" path="res://assets/environments/scene_2_hotel/墙面.png" id="3_qqgfp"]
+[ext_resource type="Texture2D" uid="uid://cu2c3j0gpbqhb" path="res://assets/environments/scene_2_hotel/无缝窗户模块.png" id="4_7qe3t"]
+[ext_resource type="Texture2D" uid="uid://dw2alagwosewh" path="res://assets/environments/scene_2_hotel/地毯.png" id="5_7oy14"]
+[ext_resource type="Texture2D" uid="uid://dtmefhuw7vvci" path="res://assets/environments/scene_2_hotel/酒吧吧台.png" id="5_fsr21"]
+[ext_resource type="Texture2D" uid="uid://c2cdvsj12ngr1" path="res://assets/environments/scene_2_hotel/电梯墙后.png" id="6_hsu0y"]
+[ext_resource type="Texture2D" uid="uid://dkpv0dxfg1rx7" path="res://assets/environments/scene_2_hotel/酒店大门口墙后.png" id="8_qqgfp"]
 
 [node name="Scene2" type="Node2D"]
 
 [node name="Floor" type="Node2D" parent="."]
 
 [node name="gatefloor" type="Sprite2D" parent="Floor"]
-position = Vector2(-6887, 0)
-texture = ExtResource("1_4oj7m")
+position = Vector2(-7011, 0)
+texture = ExtResource("1_qqgfp")
 region_enabled = true
-region_rect = Rect2(153, 0, 4863, 3056)
+region_rect = Rect2(0, 0, 4624, 3059)
 
 [node name="floor1" type="Sprite2D" parent="Floor"]
 position = Vector2(-1934, 328)
 texture = ExtResource("2_fsr21")
 region_enabled = true
-region_rect = Rect2(0, 0, 5592, 2376)
+region_rect = Rect2(0, 0, 5595, 2379)
 
 [node name="floor2" type="Sprite2D" parent="Floor"]
-position = Vector2(3636, 328)
+position = Vector2(3635, 328)
 texture = ExtResource("2_fsr21")
 region_enabled = true
-region_rect = Rect2(0, 0, 5592, 2376)
+region_rect = Rect2(0, 0, 5595, 2379)
 
 [node name="floor3" type="Sprite2D" parent="Floor"]
-position = Vector2(9205, 329)
+position = Vector2(9197, 328)
 texture = ExtResource("2_fsr21")
 region_enabled = true
-region_rect = Rect2(0, 0, 5592, 2376)
+region_rect = Rect2(0, 0, 5595, 2379)
 
 [node name="Wall" type="Node2D" parent="."]
 
 [node name="wall1" type="Sprite2D" parent="Wall"]
 position = Vector2(-1799, -1188)
-texture = ExtResource("2_4oj7m")
+texture = ExtResource("3_qqgfp")
 region_enabled = true
-region_rect = Rect2(0, 0, 5856, 688)
+region_rect = Rect2(0, 0, 5858, 688)
 
 [node name="wall2" type="Sprite2D" parent="Wall"]
-position = Vector2(4059, -1188)
-texture = ExtResource("2_4oj7m")
+position = Vector2(4056.695, -1188)
+texture = ExtResource("3_qqgfp")
 region_enabled = true
-region_rect = Rect2(0, 0, 5856, 688)
+region_rect = Rect2(0, 0, 5858, 688)
 
 [node name="wall3" type="Sprite2D" parent="Wall"]
-position = Vector2(9895, -1188)
-texture = ExtResource("2_4oj7m")
+position = Vector2(9112, -1188)
+texture = ExtResource("3_qqgfp")
 region_enabled = true
-region_rect = Rect2(0, 0, 5856, 688)
+region_rect = Rect2(0, 0, 5858, 688)
 
 [node name="window1" type="Sprite2D" parent="Wall"]
-position = Vector2(-2904, -1150)
+position = Vector2(-737, -1150)
 texture = ExtResource("4_7qe3t")
 region_enabled = true
-region_rect = Rect2(0, 0, 2744, 760)
+region_rect = Rect2(1, 0, 2737, 766)
 
 [node name="window2" type="Sprite2D" parent="Wall"]
-position = Vector2(-327, -1150)
+position = Vector2(1834.25, -1150)
 texture = ExtResource("4_7qe3t")
 region_enabled = true
-region_rect = Rect2(0, 0, 2744, 760)
+region_rect = Rect2(1, 0, 2737, 766)
 
 [node name="window3" type="Sprite2D" parent="Wall"]
-position = Vector2(2248, -1150)
+position = Vector2(4402, -1150)
 texture = ExtResource("4_7qe3t")
 region_enabled = true
-region_rect = Rect2(0, 0, 2744, 760)
+region_rect = Rect2(1, 0, 2737, 766)
 
 [node name="window4" type="Sprite2D" parent="Wall"]
-position = Vector2(4818, -1150)
+position = Vector2(6971, -1150)
 texture = ExtResource("4_7qe3t")
 region_enabled = true
-region_rect = Rect2(0, 0, 2744, 760)
-
-[node name="window5" type="Sprite2D" parent="Wall"]
-position = Vector2(7402, -1150)
-texture = ExtResource("4_7qe3t")
-region_enabled = true
-region_rect = Rect2(0, 0, 2744, 760)
+region_rect = Rect2(1, 0, 2737, 766)
 
 [node name="bar" type="Sprite2D" parent="Wall"]
 position = Vector2(10053, -1174)
-texture = ExtResource("3_fsr21")
+texture = ExtResource("5_fsr21")
 region_enabled = true
-region_rect = Rect2(0, 0, 1904, 720)
+region_rect = Rect2(90, 0, 1811, 727)
 
 [node name="items" type="Node2D" parent="."]
 position = Vector2(9197, 328)
@@ -102,50 +94,40 @@ position = Vector2(9197, 328)
 
 [node name="carpet1" type="Sprite2D" parent="items/carpets"]
 position = Vector2(-11805, -50)
-texture = ExtResource("4_qqgfp")
+texture = ExtResource("5_7oy14")
 region_enabled = true
-region_rect = Rect2(0, 0, 4248, 848)
+region_rect = Rect2(0, 1, 4250, 854)
 
 [node name="carpet2" type="Sprite2D" parent="items/carpets"]
-position = Vector2(-7557, -50)
-texture = ExtResource("4_qqgfp")
+position = Vector2(-7555, -50)
+texture = ExtResource("5_7oy14")
 region_enabled = true
-region_rect = Rect2(0, 0, 4248, 848)
+region_rect = Rect2(0, 1, 4250, 854)
 
 [node name="carpet3" type="Sprite2D" parent="items/carpets"]
-position = Vector2(-3309, -50)
-texture = ExtResource("4_qqgfp")
+position = Vector2(-3310, -50)
+texture = ExtResource("5_7oy14")
 region_enabled = true
-region_rect = Rect2(0, 0, 4248, 848)
+region_rect = Rect2(0, 1, 4250, 854)
 
 [node name="carpet4" type="Sprite2D" parent="items/carpets"]
-position = Vector2(939, -50)
-texture = ExtResource("4_qqgfp")
+position = Vector2(940, -50)
+texture = ExtResource("5_7oy14")
 region_enabled = true
-region_rect = Rect2(0, 0, 4248, 848)
+region_rect = Rect2(0, 1, 4250, 854)
 
 [node name="ElevatorWall" type="Node2D" parent="."]
 
-[node name="elevatorwall2" type="Sprite2D" parent="ElevatorWall"]
-position = Vector2(11342, -159)
-texture = ExtResource("5_7qe3t")
-region_enabled = true
-region_rect = Rect2(0, -16, 352, 1632)
-
 [node name="elevatorwall" type="Sprite2D" parent="ElevatorWall"]
 position = Vector2(11658, 0)
-texture = ExtResource("6_7oy14")
+texture = ExtResource("6_hsu0y")
 region_enabled = true
-region_rect = Rect2(0, 0, 1040, 3056)
+region_rect = Rect2(0, 0, 1047, 3059)
 
 [node name="GateWall" type="Node2D" parent="."]
 
 [node name="gatewall" type="Sprite2D" parent="GateWall"]
-position = Vector2(-4746, -855)
+position = Vector2(-4760, -879)
 texture = ExtResource("8_qqgfp")
 region_enabled = true
-region_rect = Rect2(0, 0, 440, 1312)
-
-[node name="Sprite2D" type="Sprite2D" parent="."]
-visible = false
-texture = ExtResource("9_7qe3t")
+region_rect = Rect2(0, 0, 437, 1307)
