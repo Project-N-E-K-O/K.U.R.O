@@ -1,8 +1,9 @@
-[gd_scene load_steps=11 format=3 uid="uid://qd5abd4opeob"]
+[gd_scene load_steps=14 format=3 uid="uid://qd5abd4opeob"]
 
 [ext_resource type="PackedScene" uid="uid://dd8xmpgwy0t2o" path="res://scenes/environments/scene2.tscn" id="1_7jsho"]
 [ext_resource type="PackedScene" uid="uid://ufprfd4r8ijj" path="res://assets/spine/main_character/main_character.tscn" id="2_s0pgc"]
-[ext_resource type="Texture2D" uid="uid://cmmjfopaf3bck" path="res://assets/environments/scene_2_hotel/酒店大门口墙前.png" id="3_s0pgc"]
+[ext_resource type="Texture2D" uid="uid://pl67o3rwu44h" path="res://assets/environments/scene_2_hotel/酒店大门口墙前.png" id="3_s0pgc"]
+[ext_resource type="Texture2D" uid="uid://pan0auvatm1f" path="res://assets/environments/scene_2_hotel/电梯墙前.png" id="4_hq53u"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_s0pgc"]
 size = Vector2(16974, 774)
@@ -11,7 +12,13 @@ size = Vector2(16974, 774)
 size = Vector2(21320, 173)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_5klp8"]
-size = Vector2(268, 2380)
+size = Vector2(767, 1375)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_sfgmy"]
+size = Vector2(855, 604.375)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_vvtmr"]
+size = Vector2(273, 427)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_qokfb"]
 size = Vector2(367.03125, 573.125)
@@ -34,27 +41,34 @@ position = Vector2(0, 20)
 
 [node name="MainCharacter" parent="World" instance=ExtResource("2_s0pgc")]
 z_index = 1
-position = Vector2(-5765, 119.000046)
+position = Vector2(-6603.999, 318)
 
 [node name="Camera2D" type="Camera2D" parent="World/MainCharacter"]
-position = Vector2(0, -15.151652)
+position = Vector2(0, -15.15156)
 zoom = Vector2(0.4, 0.4)
 limit_left = -9300
 limit_top = -1500
-limit_right = 11600
+limit_right = 11500
 limit_bottom = 1500
 position_smoothing_enabled = true
 drag_horizontal_enabled = true
 drag_vertical_enabled = true
 
-[node name="GateWAll" type="Node" parent="World"]
+[node name="FrontWall" type="Node" parent="World"]
 
-[node name="GatefrontWall" type="Sprite2D" parent="World/GateWAll"]
+[node name="GateFrontWall" type="Sprite2D" parent="World/FrontWall"]
 z_index = 3
-position = Vector2(-4192, 20)
+position = Vector2(-4193, 18)
 texture = ExtResource("3_s0pgc")
 region_enabled = true
-region_rect = Rect2(4513, 0, 1689, 3059)
+region_rect = Rect2(1, 0, 1689, 3059)
+
+[node name="ElevatorFrontWall" type="Sprite2D" parent="World/FrontWall"]
+z_index = 3
+position = Vector2(11336, 741)
+texture = ExtResource("4_hq53u")
+region_enabled = true
+region_rect = Rect2(0, 0, 352, 1612)
 
 [node name="AirWall" type="StaticBody2D" parent="World"]
 position = Vector2(-4853.25, -737.5)
@@ -68,8 +82,16 @@ position = Vector2(6197.25, 2363.5)
 shape = SubResource("RectangleShape2D_hq53u")
 
 [node name="wall3" type="CollisionShape2D" parent="World/AirWall"]
-position = Vector2(16127.25, 1106.5)
+position = Vector2(16462.75, 604)
 shape = SubResource("RectangleShape2D_5klp8")
+
+[node name="wall4" type="CollisionShape2D" parent="World/AirWall"]
+position = Vector2(16415.75, 1977.5)
+shape = SubResource("RectangleShape2D_sfgmy")
+
+[node name="wall5" type="CollisionShape2D" parent="World/AirWall"]
+position = Vector2(16710.75, 1474.5)
+shape = SubResource("RectangleShape2D_vvtmr")
 
 [node name="gatewall1" type="CollisionShape2D" parent="World/AirWall"]
 position = Vector2(61.734375, 228.9375)
