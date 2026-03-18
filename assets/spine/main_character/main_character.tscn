@@ -50,6 +50,8 @@ WalkAnimationSpeed = 2.0
 RunAnimationSpeed = 3.0
 AttackArea = NodePath("AttackArea")
 AttackArea = NodePath("AttackArea")
+LeftHandAttachmentPath = NodePath("SpineSprite/SpineBoneNode")
+Speed = 500.0
 StateMachine = NodePath("StateMachine")
 EffectController = NodePath("EffectController")
 
@@ -64,9 +66,15 @@ skeleton_data_res = SubResource("SpineSkeletonDataResource_ixg0x")
 bones_thickness = 10.09
 preview_skin = "Default"
 preview_animation = "-- Empty --"
-preview_frame = true
+preview_frame = false
 preview_time = 0.03
 script = ExtResource("4_ixg0x")
+
+[node name="SpineBoneNode" type="SpineBoneNode" parent="SpineSprite"]
+show_behind_parent = true
+position = Vector2(-0.011810303, 0.0173645)
+scale = Vector2(1.0000002, 0.99999994)
+bone_name = "WQ"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(-19.696936, -174.1477)
@@ -130,14 +138,18 @@ script = ExtResource("17_13pt2")
 script = ExtResource("18_utqjm")
 Inventory = NodePath("../Inventory")
 
-[node name="ItemInteraction" type="Node" parent="."]
+[node name="ItemInteraction" type="Node" parent="." node_paths=PackedStringArray("InventoryComponent")]
 script = ExtResource("19_t3prk")
+InventoryComponent = NodePath("../Inventory")
+InteractionAreaPath = NodePath("")
 
 [node name="ItemAttachment" type="Node" parent="." node_paths=PackedStringArray("Inventory")]
 script = ExtResource("20_4ht1x")
 Inventory = NodePath("../Inventory")
 AttachmentParentPath = NodePath("../SpineSprite")
-IconOffset = Vector2(0, 0)
+SpineSlotNodePath = NodePath("../SpineSprite/SpineBoneNode")
+SpineBoneNodePaths = Array[NodePath]([NodePath("../SpineSprite/SpineBoneNode")])
+BoneIconOffset = Vector2(21, 0)
 
 [node name="EffectController" type="Node" parent="."]
 script = ExtResource("21_utqjm")

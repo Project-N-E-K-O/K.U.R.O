@@ -89,7 +89,6 @@ metadata/_edit_lock_ = true
 
 [node name="MainCharacter" parent="World" instance=ExtResource("4_givaq")]
 position = Vector2(317, 454)
-Speed = 500.0
 
 [node name="Camera2D" type="Camera2D" parent="World/MainCharacter"]
 position = Vector2(-18.75, -781.25)

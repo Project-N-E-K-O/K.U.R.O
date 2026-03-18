@@ -6,6 +6,7 @@ using Kuros.Core.Effects;
 using Kuros.Items;
 using Kuros.Items.Effects;
 using Kuros.Items.Weapons;
+using Kuros.Systems.Inventory;
 
 namespace Kuros.Actors.Heroes
 {
@@ -25,6 +26,7 @@ namespace Kuros.Actors.Heroes
         private WeaponSkillDefinition? _fallbackUnarmedSkill;
         private ItemDefinition? _fallbackWeaponDefinition;
         private GameActor? _actor;
+        private InventoryContainer? _currentQuickBar;
         private readonly Dictionary<string, float> _cooldownScaleSources = new(StringComparer.Ordinal);
 
         public override void _Ready()
@@ -41,10 +43,13 @@ namespace Kuros.Actors.Heroes
             Inventory.WeaponEquipped += OnWeaponEquipped;
             Inventory.WeaponUnequipped += OnWeaponUnequipped;
             Inventory.ActiveBackpackSlotChanged += OnActiveSlotChanged;
+            Inventory.QuickBarAssigned += OnQuickBarAssigned;
+            Inventory.QuickBarSlotChanged += OnQuickBarSelectedSlotChanged;
             if (Inventory.Backpack != null)
             {
                 Inventory.Backpack.InventoryChanged += OnBackpackInventoryChanged;
             }
+            SubscribeToQuickBarSignals();
             InitializeFallbackSkill();
             CallDeferred(nameof(ApplyFallbackIfNoWeapon));
         }
@@ -56,12 +61,15 @@ namespace Kuros.Actors.Heroes
                 Inventory.WeaponEquipped -= OnWeaponEquipped;
                 Inventory.WeaponUnequipped -= OnWeaponUnequipped;
                 Inventory.ActiveBackpackSlotChanged -= OnActiveSlotChanged;
+                Inventory.QuickBarAssigned -= OnQuickBarAssigned;
+                Inventory.QuickBarSlotChanged -= OnQuickBarSelectedSlotChanged;
                 if (Inventory.Backpack != null)
                 {
                     Inventory.Backpack.InventoryChanged -= OnBackpackInventoryChanged;
                 }
             }
 
+            UnsubscribeFromQuickBarSignals();
             ClearSkills();
             base._ExitTree();
         }
@@ -136,17 +144,12 @@ namespace Kuros.Actors.Heroes
         private void OnWeaponUnequipped()
         {
             ClearSkills();
-            ApplyUnarmedFallback();
+            ApplyFallbackIfNoWeapon();
         }
 
         private void OnActiveSlotChanged(int slotIndex)
         {
-            if (Inventory == null) return;
-            var stack = Inventory.GetSelectedBackpackStack();
-            if (stack == null || stack.IsEmpty)
-            {
-                ApplyUnarmedFallback();
-            }
+            ApplyFallbackIfNoWeapon();
         }
 
         private void InitializeFallbackSkill()
@@ -165,11 +168,17 @@ namespace Kuros.Actors.Heroes
 
         private void ApplyFallbackIfNoWeapon()
         {
-            if (Inventory == null) return;
-            if (Inventory.GetSelectedBackpackStack() == null)
+            if (TryApplyQuickBarWeapon())
             {
-                ApplyUnarmedFallback();
+                return;
             }
+
+            if (TryApplyBackpackWeapon())
+            {
+                return;
+            }
+
+            ApplyUnarmedFallback();
         }
 
         private void LoadSkills(ItemDefinition weapon)
@@ -278,6 +287,85 @@ namespace Kuros.Actors.Heroes
                 scale *= MathF.Max(0.01f, value);
             }
             return Mathf.Clamp(scale, 0.05f, 100f);
+        }
+
+        private bool TryApplyQuickBarWeapon()
+        {
+            if (Inventory == null) return false;
+            var stack = Inventory.GetSelectedQuickBarStack();
+            if (!IsUsableWeaponStack(stack)) return false;
+
+            LoadSkills(stack!.Item);
+            return true;
+        }
+
+        private bool TryApplyBackpackWeapon()
+        {
+            if (Inventory == null) return false;
+            var stack = Inventory.GetSelectedBackpackStack();
+            if (!IsUsableWeaponStack(stack)) return false;
+
+            LoadSkills(stack!.Item);
+            return true;
+        }
+
+        private static bool IsUsableWeaponStack(InventoryItemStack? stack)
+        {
+            return stack != null && !stack.IsEmpty && stack.Item.ItemId != "empty_item";
+        }
+
+        private void SubscribeToQuickBarSignals()
+        {
+            if (Inventory?.QuickBar == null)
+            {
+                return;
+            }
+
+            if (_currentQuickBar == Inventory.QuickBar)
+            {
+                return;
+            }
+
+            UnsubscribeFromQuickBarSignals();
+            _currentQuickBar = Inventory.QuickBar;
+            _currentQuickBar.SlotChanged += OnQuickBarSlotChanged;
+            _currentQuickBar.InventoryChanged += OnQuickBarInventoryChanged;
+        }
+
+        private void UnsubscribeFromQuickBarSignals()
+        {
+            if (_currentQuickBar == null)
+            {
+                return;
+            }
+
+            _currentQuickBar.SlotChanged -= OnQuickBarSlotChanged;
+            _currentQuickBar.InventoryChanged -= OnQuickBarInventoryChanged;
+            _currentQuickBar = null;
+        }
+
+        private void OnQuickBarAssigned()
+        {
+            SubscribeToQuickBarSignals();
+            ApplyFallbackIfNoWeapon();
+        }
+
+        private void OnQuickBarSelectedSlotChanged(int slotIndex)
+        {
+            ApplyFallbackIfNoWeapon();
+        }
+
+        private void OnQuickBarSlotChanged(int slotIndex, string itemId, int quantity)
+        {
+            if (Inventory != null && slotIndex == Inventory.SelectedQuickBarSlot)
+            {
+                ApplyFallbackIfNoWeapon();
+            }
+        }
+
+        private void OnQuickBarInventoryChanged()
+        {
+            ApplyFallbackIfNoWeapon();
         }
 
         public void SetCooldownScale(string sourceId, float scale)

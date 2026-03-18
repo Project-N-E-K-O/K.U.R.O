@@ -46,7 +46,21 @@ namespace Kuros.Actors.Heroes
         /// 當前左手選中的快捷欄槽位索引（1-4，對應快捷欄2-5）
         /// -1 表示未選中任何槽位
         /// </summary>
-        public int SelectedQuickBarSlot { get; set; } = 1;
+        public int SelectedQuickBarSlot
+        {
+            get => _selectedQuickBarSlot;
+            set
+            {
+                if (_selectedQuickBarSlot == value)
+                {
+                    return;
+                }
+
+                _selectedQuickBarSlot = value;
+                QuickBarSlotChanged?.Invoke(_selectedQuickBarSlot);
+            }
+        }
+        private int _selectedQuickBarSlot = 1;
         
         /// <summary>
         /// 檢查左手選中的快捷欄槽位是否有物品
@@ -66,6 +80,8 @@ namespace Kuros.Actors.Heroes
         public event Action<ItemDefinition>? WeaponEquipped;
         public event Action? WeaponUnequipped;
         public event Action<int>? ActiveBackpackSlotChanged;
+        public event Action? QuickBarAssigned;
+        public event Action<int>? QuickBarSlotChanged;
 
         public override void _Ready()
         {
@@ -101,7 +117,18 @@ namespace Kuros.Actors.Heroes
         /// </summary>
         public void SetQuickBar(InventoryContainer quickBar)
         {
+            if (quickBar == null)
+            {
+                return;
+            }
+
+            if (QuickBar == quickBar)
+            {
+                return;
+            }
+
             QuickBar = quickBar;
+            QuickBarAssigned?.Invoke();
         }
 
         /// <summary>
@@ -496,6 +523,13 @@ namespace Kuros.Actors.Heroes
         public float GetSelectedAttributeValue(string attributeId, float defaultValue = 0f)
         {
             if (string.IsNullOrWhiteSpace(attributeId)) return defaultValue;
+
+            var quickBarStack = GetSelectedQuickBarStack();
+            if (quickBarStack != null && !quickBarStack.IsEmpty && quickBarStack.Item.ItemId != "empty_item")
+            {
+                return quickBarStack.GetAttributeValue(attributeId, defaultValue);
+            }
+
             var stack = GetSelectedBackpackStack();
             if (stack != null)
             {

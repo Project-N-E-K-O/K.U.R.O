@@ -27,7 +27,7 @@ shader_parameter/softness = 0.5
 shader_parameter/alpha = 0.4
 
 [sub_resource type="RectangleShape2D" id="2"]
-size = Vector2(114.37497, 303.5714)
+size = Vector2(114.37497, 441.07138)
 
 [sub_resource type="RectangleShape2D" id="4"]
 size = Vector2(41.828102, 28.539782)
@@ -36,8 +36,8 @@ size = Vector2(41.828102, 28.539782)
 size = Vector2(98.90625, 100.714294)
 
 [sub_resource type="CapsuleShape2D" id="3"]
-radius = 20.588236
-height = 93.46405
+radius = 33.088234
+height = 176.4706
 
 [node name="Enemy_B1_fat" type="CharacterBody2D" node_paths=PackedStringArray("DetectionArea", "AttackArea", "StateMachine", "EffectController")]
 collision_layer = 2
@@ -56,7 +56,7 @@ script = ExtResource("12")
 show_behind_parent = true
 material = SubResource("ShaderMaterial_b5vhy")
 position = Vector2(13.000001, 83)
-scale = Vector2(3.6898432, 0.46015635)
+scale = Vector2(8.625, 1.075)
 texture = ExtResource("5_2sv5o")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
@@ -69,7 +69,7 @@ collision_layer = 0
 monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/AttackArea"]
-position = Vector2(77.187515, -76.785736)
+position = Vector2(150.78123, -211.60716)
 scale = Vector2(1.0000001, 1.0000001)
 shape = SubResource("2")
 
@@ -80,24 +80,23 @@ collision_layer = 0
 monitorable = false
 
 [node name="AttackDetectionShape" type="CollisionShape2D" parent="Sprite2D/AttackDetectionArea"]
-position = Vector2(15.729166, -9.761906)
+position = Vector2(16.145832, -28.928574)
 scale = Vector2(0.9845911, 2.712654)
 shape = SubResource("4")
 
 [node name="ControllerDetectionArea" type="Area2D" parent="Sprite2D"]
-visible = false
 position = Vector2(15, 0)
 scale = Vector2(4, 4)
 collision_layer = 0
 monitorable = false
 
 [node name="ControllerDetectionShape" type="CollisionShape2D" parent="Sprite2D/ControllerDetectionArea"]
-position = Vector2(-3.828, 0)
+position = Vector2(-3.828125, -16.25)
 shape = SubResource("5")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(-1, -76)
-scale = Vector2(4.08, 3.06)
+position = Vector2(1, -132)
+scale = Vector2(2.98, 2.235)
 shape = SubResource("3")
 
 [node name="StateMachine" type="Node" parent="." node_paths=PackedStringArray("InitialState")]
@@ -154,7 +153,7 @@ FreezeDuration = 1.0
 
 [node name="SpineSprite" type="SpineSprite" parent="."]
 position = Vector2(11, 80.00001)
-scale = Vector2(0.178, 0.178)
+scale = Vector2(0.33, 0.33)
 skeleton_data_res = ExtResource("14_xv2am")
 preview_skin = "Default"
 preview_animation = "-- Empty --"

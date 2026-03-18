@@ -1,6 +1,8 @@
 using Godot;
 using Godot.Collections;
 using Kuros.Actors.Heroes;
+using Kuros.Core;
+using Kuros.Core.Events;
 
 namespace Kuros.Actors.Heroes.Attacks
 {
@@ -44,6 +46,10 @@ namespace Kuros.Actors.Heroes.Attacks
         [Export] public string AnimationName = "animations/attack";
         [Export] public bool RestartAnimationOnLoop = true;
 
+        [ExportCategory("Effects")]
+        [Export] public PackedScene? HitEffectScene;
+        [Export] public NodePath HitEffectParentPath = new();
+
         [ExportCategory("Requirements")]
         [Export] public bool RequiresTargetInRange = false;
         [Export] public bool RequiresResource = false;
@@ -60,6 +66,9 @@ namespace Kuros.Actors.Heroes.Attacks
         private float _phaseTimer = 0f;
         private float _cooldownTimer = 0f;
         private bool _bufferedInput = false;
+        private bool _hitEffectSubscribed = false;
+        private bool _hitWindowActive = false;
+        private Node? _hitEffectParent;
 
         public bool IsRunning => _phase != AttackPhase.Idle;
         public bool IsOnCooldown => _cooldownTimer > 0f;
@@ -78,7 +87,19 @@ namespace Kuros.Actors.Heroes.Attacks
                 AttackArea = Player.AttackArea;
             }
 
+            InitializeHitEffectSupport();
+
             OnInitialized();
+        }
+
+        public override void _ExitTree()
+        {
+            base._ExitTree();
+            if (_hitEffectSubscribed)
+            {
+                DamageEventBus.Unsubscribe(OnDamageResolved);
+                _hitEffectSubscribed = false;
+            }
         }
 
         protected virtual void OnInitialized() { }
@@ -285,7 +306,15 @@ namespace Kuros.Actors.Heroes.Attacks
                     break;
                 case AttackPhase.Active:
                     _phaseTimer = ActiveDuration;
-                    OnActivePhase();
+                    _hitWindowActive = HitEffectScene != null;
+                    try
+                    {
+                        OnActivePhase();
+                    }
+                    finally
+                    {
+                        _hitWindowActive = false;
+                    }
                     break;
                 case AttackPhase.Recovery:
                     _phaseTimer = RecoveryDuration;
@@ -325,6 +354,81 @@ namespace Kuros.Actors.Heroes.Attacks
             Player.PerformAttackCheck();
 
             Player.AttackDamage = originalDamage;
+        }
+
+        private void InitializeHitEffectSupport()
+        {
+            if (HitEffectScene == null || Player == null)
+            {
+                if (_hitEffectSubscribed)
+                {
+                    DamageEventBus.Unsubscribe(OnDamageResolved);
+                    _hitEffectSubscribed = false;
+                }
+                _hitEffectParent = null;
+                return;
+            }
+
+            _hitEffectParent = ResolveHitEffectParent();
+
+            if (!_hitEffectSubscribed)
+            {
+                DamageEventBus.Subscribe(OnDamageResolved);
+                _hitEffectSubscribed = true;
+            }
+        }
+
+        private Node? ResolveHitEffectParent()
+        {
+            if (!HitEffectParentPath.IsEmpty && Player != null)
+            {
+                return Player.GetNodeOrNull<Node>(HitEffectParentPath);
+            }
+
+            return Player?.GetParent();
+        }
+
+        private void OnDamageResolved(GameActor attacker, GameActor target, int damage)
+        {
+            if (!_hitWindowActive || HitEffectScene == null)
+            {
+                return;
+            }
+
+            if (attacker != Player || target is not Node2D targetNode)
+            {
+                return;
+            }
+
+            var parent = GetValidHitEffectParent();
+            if (parent == null)
+            {
+                GD.PushWarning($"[{GetType().Name}] 无法生成击打特效，未找到父节点。");
+                return;
+            }
+
+            var instance = HitEffectScene.Instantiate();
+            if (instance is Node2D effectNode)
+            {
+                parent.AddChild(effectNode);
+                effectNode.GlobalPosition = targetNode.GlobalPosition;
+            }
+            else
+            {
+                GD.PushWarning($"[{GetType().Name}] HitEffectScene 需要是 Node2D 场景。");
+                instance.QueueFree();
+            }
+        }
+
+        private Node? GetValidHitEffectParent()
+        {
+            if (_hitEffectParent != null && _hitEffectParent.IsInsideTree())
+            {
+                return _hitEffectParent;
+            }
+
+            _hitEffectParent = ResolveHitEffectParent();
+            return _hitEffectParent;
         }
     }
 }

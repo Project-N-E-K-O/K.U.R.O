@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Godot;
 using Kuros.Core;
 using Kuros.Items;
@@ -13,6 +14,10 @@ namespace Kuros.Actors.Heroes
         [Export] public PlayerInventoryComponent? Inventory { get; set; }
         [Export] public NodePath AttachmentParentPath { get; set; } = new("SpineCharacter/Skeleton2D");
         [Export] public NodePath SpineSlotNodePath { get; set; } = new();
+        [Export] public Godot.Collections.Array<NodePath> SpineBoneNodePaths { get; set; } = new();
+        [Export] public Godot.Collections.Array<string> SpineBoneOrder { get; set; } = new() { "WQ1", "WQ2", "WP" };
+        [Export] public bool FlipBoneAttachmentWithFacing { get; set; } = false;
+        [Export(PropertyHint.Range, "-512,512,1")] public Vector2 BoneIconOffset { get; set; } = Vector2.Zero;
         [Export(PropertyHint.Range, "-512,512,1")] public Vector2 IconOffset { get; set; } = new Vector2(32, -32);
         [Export] public bool FlipWithFacing { get; set; } = true;
         [Export] public int ZIndex { get; set; } = 100;
@@ -24,6 +29,9 @@ namespace Kuros.Actors.Heroes
         private Node? _spineSlotNode;
         private Node? _SpineSlotIconContainer;
         private string? _previousSlotSelection;
+        private readonly List<Node2D> _spineBoneNodes = new();
+        private Node2D? _activeBoneNode;
+        private bool _iconUsesBoneTracking;
         private const string SlotSelectProperty = "切换名";
         private const string SlotIconName = "HeldItemSlotIcon";
 
@@ -39,6 +47,7 @@ namespace Kuros.Actors.Heroes
 
             _attachmentParent = ResolveAttachmentParent();
             _spineSlotNode = ResolveSpineSlotNode();
+            ResolveSpineBoneNodes();
             Inventory.ItemPicked += OnItemPicked;
             Inventory.ItemRemoved += OnItemRemoved;
             Inventory.ActiveBackpackSlotChanged += OnActiveSlotChanged;
@@ -114,11 +123,22 @@ namespace Kuros.Actors.Heroes
             UpdateAttachmentIcon();
         }
 
+        public override void _Process(double delta)
+        {
+            base._Process(delta);
+            UpdateBoneAttachmentTransform();
+        }
+
         private void ShowItemIcon(Texture2D? texture)
         {
             if (_spineSlotNode != null)
             {
                 ShowOnSpineSlot(texture);
+                return;
+            }
+
+            if (TryShowOnSpineBone(texture))
+            {
                 return;
             }
 
@@ -131,6 +151,8 @@ namespace Kuros.Actors.Heroes
             {
                 _iconSprite?.QueueFree();
                 _iconSprite = null;
+                _activeBoneNode = null;
+                _iconUsesBoneTracking = false;
                 return;
             }
 
@@ -214,6 +236,86 @@ namespace Kuros.Actors.Heroes
             _spineSlotNode.Set(SlotSelectProperty, _iconSprite.Name);
         }
 
+        private bool TryShowOnSpineBone(Texture2D? texture)
+        {
+            var boneNode = ResolveActiveBoneNode();
+            if (boneNode == null)
+            {
+                return false;
+            }
+
+            if (texture == null)
+            {
+                if (_iconSprite != null)
+                {
+                    _iconSprite.Visible = false;
+                }
+                _activeBoneNode = null;
+                _iconUsesBoneTracking = false;
+                return true;
+            }
+
+            _iconSprite ??= CreateIconSprite(SlotIconName);
+            _activeBoneNode = boneNode;
+            _iconUsesBoneTracking = true;
+            AttachIconTo(_attachmentParent ?? boneNode, texture, isBoneAnchor: true);
+            UpdateBoneAttachmentTransform(force: true);
+            return true;
+        }
+
+        private void ResolveSpineBoneNodes()
+        {
+            _spineBoneNodes.Clear();
+
+            foreach (var path in SpineBoneNodePaths)
+            {
+                if (path == null || path.IsEmpty)
+                {
+                    continue;
+                }
+
+                var node = GetNodeOrNull<Node2D>(path) ??
+                           _actor?.GetNodeOrNull<Node2D>(path) ??
+                           _attachmentParent?.GetNodeOrNull<Node2D>(path);
+                if (node != null)
+                {
+                    _spineBoneNodes.Add(node);
+                }
+            }
+
+            if (_spineBoneNodes.Count == 0 && _attachmentParent != null)
+            {
+                foreach (var boneName in SpineBoneOrder)
+                {
+                    if (string.IsNullOrWhiteSpace(boneName)) continue;
+                    var candidate = _attachmentParent.FindChild(boneName, recursive: true, owned: false) as Node2D;
+                    if (candidate != null)
+                    {
+                        _spineBoneNodes.Add(candidate);
+                        break;
+                    }
+                }
+            }
+        }
+
+        private Node2D? ResolveActiveBoneNode()
+        {
+            if (_spineBoneNodes.Count == 0)
+            {
+                ResolveSpineBoneNodes();
+            }
+
+            foreach (var node in _spineBoneNodes)
+            {
+                if (IsInstanceValid(node))
+                {
+                    return node;
+                }
+            }
+
+            return null;
+        }
+
         private void ClearSpineSlot()
         {
             if (_spineSlotNode == null)
@@ -236,12 +338,13 @@ namespace Kuros.Actors.Heroes
         {
             var sprite = new Sprite2D
             {
-                Name = name
+                Name = name,
+                TopLevel = false
             };
             return sprite;
         }
 
-        private void AttachIconTo(Node parent, Texture2D texture)
+        private void AttachIconTo(Node parent, Texture2D texture, bool isBoneAnchor = false)
         {
             if (_iconSprite == null)
             {
@@ -255,16 +358,63 @@ namespace Kuros.Actors.Heroes
 
             _iconSprite.Visible = true;
             _iconSprite.Texture = texture;
-            _iconSprite.Position = IconOffset;
             _iconSprite.ZIndex = ZIndex;
             _iconSprite.ZAsRelative = false;
 
-            if (_actor != null && FlipWithFacing)
+            if (isBoneAnchor)
+            {
+                UpdateBoneAttachmentTransform(force: true);
+                ApplyFacingFlip(applyForBone: true);
+            }
+            else
+            {
+                _iconUsesBoneTracking = false;
+                _activeBoneNode = null;
+                _iconSprite.Position = IconOffset;
+                ApplyFacingFlip(applyForBone: false);
+            }
+        }
+
+        private void UpdateBoneAttachmentTransform(bool force = false)
+        {
+            if (!_iconUsesBoneTracking || _iconSprite == null || _activeBoneNode == null)
+            {
+                return;
+            }
+
+            if (!_iconSprite.Visible && !force)
+            {
+                return;
+            }
+
+            var boneTransform = _activeBoneNode.GetGlobalTransform();
+            var final = boneTransform;
+            final.Origin = boneTransform * BoneIconOffset;
+            _iconSprite.GlobalTransform = final;
+
+            if (_actor != null && FlipBoneAttachmentWithFacing)
             {
                 var scale = _iconSprite.Scale;
                 scale.X = MathF.Abs(scale.X) * (_actor.FacingRight ? 1f : -1f);
                 _iconSprite.Scale = scale;
             }
+        }
+
+        private void ApplyFacingFlip(bool applyForBone)
+        {
+            if (_iconSprite == null || _actor == null)
+            {
+                return;
+            }
+
+            bool shouldFlip = applyForBone ? FlipBoneAttachmentWithFacing : FlipWithFacing;
+            var targetScaleX = shouldFlip && _actor != null
+                ? (_actor.FacingRight ? 1f : -1f)
+                : 1f;
+
+            var scale = _iconSprite.Scale;
+            scale.X = MathF.Abs(scale.X) * targetScaleX;
+            _iconSprite.Scale = scale;
         }
 
         private Node2D? ResolveAttachmentParent()
