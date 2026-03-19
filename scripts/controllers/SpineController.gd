@@ -1,22 +1,5 @@
 extends SpineSprite
 
-# 2026/3/18新增
-# 定義一個信號，讓父節點或其他腳本可以輕鬆監聽
-signal hit_received(hit_step: int, animation_name: String)
-
-func _ready() -> void:
-	# 在初始化時連結 Spine 原生的事件信號
-	self.animation_event.connect(_on_animation_event)
-
-## 處理 Spine 事件
-func _on_animation_event(_sprite: SpineSprite, _anim_state: SpineAnimationState, track_entry: SpineTrackEntry, event: SpineEvent):
-	if event.get_data().get_event_name() == "hit":
-		var hit_step = event.get_int_value()
-		var anim_name = track_entry.get_animation().get_name()
-		
-		# 發出我們自定義的信號
-		hit_received.emit(hit_step, anim_name)
-
 ## 播放动画
 ## anim: 动画名称
 ## loop: 是否循环播放

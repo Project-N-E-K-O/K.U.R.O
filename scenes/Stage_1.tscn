@@ -276,7 +276,7 @@ freeze = true
 position = Vector2(1353, 253)
 
 [node name="Weapon_A1_chair2" parent="World" instance=ExtResource("47_lf7i8")]
-position = Vector2(1514, 810)
+position = Vector2(565, 467)
 
 [node name="Weapon_A1_garbage_can" parent="World" instance=ExtResource("48_nc3gi")]
 position = Vector2(279, 563)

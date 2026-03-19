@@ -1,6 +1,6 @@
 using Kuros.Actors.Heroes;
 using Kuros.Items.Attributes;
-using System.Collections.Generic;
+
 namespace Kuros.Actors.Heroes.Attacks
 {
 	/// <summary>
@@ -12,8 +12,6 @@ namespace Kuros.Actors.Heroes.Attacks
 		private PlayerWeaponSkillController? _weaponSkillController;
 		private PlayerInventoryComponent? _inventory;
 		private string _defaultAnimation = "attack";
-
-	
 
 		protected override void OnInitialized()
 		{
@@ -72,18 +70,18 @@ namespace Kuros.Actors.Heroes.Attacks
 
 		protected override void OnActivePhase()
 		{
-			// // 如果是 MainCharacter，使用集成了 WeaponSkillController 的 PerformAttackCheck
-			// // 否则使用基类的默认实现
-			// if (Player is MainCharacter mainChar)
-			// {
-			// 	// 不调用 base.OnActivePhase()，避免重复调用 PerformAttackCheck
-			// 	mainChar.PerformAttackCheck();
-			// }
-			// else
-			// {
-			// 	// 回退到基类的默认实现
-			// 	base.OnActivePhase();
-			// }
+			// 如果是 MainCharacter，使用集成了 WeaponSkillController 的 PerformAttackCheck
+			// 否则使用基类的默认实现
+			if (Player is MainCharacter mainChar)
+			{
+				// 不调用 base.OnActivePhase()，避免重复调用 PerformAttackCheck
+				mainChar.PerformAttackCheck();
+			}
+			else
+			{
+				// 回退到基类的默认实现
+				base.OnActivePhase();
+			}
 		}
 
 		protected override bool MeetsCustomConditions()

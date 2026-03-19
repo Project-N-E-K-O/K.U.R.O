@@ -48,7 +48,6 @@ namespace Kuros.Core
 
 		private bool _deathStarted = false;
 		private bool _deathFinalized = false;
-		private Tween? _flashTween;
 
 		public bool IsDeathSequenceActive => _deathStarted && !_deathFinalized;
 		public bool IsDead => _deathFinalized;
@@ -371,34 +370,39 @@ namespace Kuros.Core
 
 		protected virtual void FlashDamageEffect()
 		{
+			// Use GDScript helper for Spine
 			if (_spineHelper != null)
 			{
 				_spineHelper.Call("flash_damage", this, new Color(1f, 0f, 0f));
 			}
+			// Fallback or legacy handling if wrapper exists
 			else if (_spineCharacter != null)
 			{
-				_flashTween?.Kill();
-				_spineCharacter.Modulate = new Color(1f, 0f, 0f);
-				_flashTween = CreateTween();
-				_flashTween.TweenInterval(0.1);
-				_flashTween.TweenCallback(Callable.From(() =>
+				var visualNode = _spineCharacter;
+				Color baseColor = _spineDefaultModulate;
+				visualNode.Modulate = new Color(1f, 0f, 0f);
+
+				var tween = CreateTween();
+				tween.TweenInterval(0.1);
+				tween.TweenCallback(Callable.From(() =>
 				{
-					if (GodotObject.IsInstanceValid(_spineCharacter))
-						_spineCharacter.Modulate = Colors.White;
+					if (!GodotObject.IsInstanceValid(visualNode)) return;
+					visualNode.Modulate = baseColor;
 				}));
 			}
 
 			if (_sprite != null)
 			{
-				_flashTween?.Kill();
+				Color baseColor = _spriteDefaultModulate;
 				_sprite.Modulate = new Color(1f, 0f, 0f);
-				_flashTween = CreateTween();
-				_flashTween.TweenInterval(0.1);
+
+				var tween = CreateTween();
+				tween.TweenInterval(0.1);
 				Node2D targetNode = _sprite;
-				_flashTween.TweenCallback(Callable.From(() =>
+				tween.TweenCallback(Callable.From(() =>
 				{
-					if (GodotObject.IsInstanceValid(targetNode))
-						targetNode.Modulate = Colors.White;
+					if (!GodotObject.IsInstanceValid(targetNode)) return;
+					targetNode.Modulate = baseColor;
 				}));
 			}
 		}

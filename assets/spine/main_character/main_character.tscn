@@ -33,19 +33,13 @@ shader_parameter/alpha = 0.4
 
 [sub_resource type="SpineSkeletonDataResource" id="SpineSkeletonDataResource_ixg0x"]
 atlas_res = ExtResource("1_kqj82")
-skeleton_file_res = ExtResource("5_tdm7a")
+skeleton_file_res = ExtResource("2_om6pm")
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ixg0x"]
-size = Vector2(1000.00006, 360.79547)
+size = Vector2(1106.0608, 360.79547)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_kqj82"]
-size = Vector2(557.5758, 409.09103)
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_tdm7a"]
-radius = 1024.0
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_tdm7a"]
-size = Vector2(1217.9167, 241.51517)
+size = Vector2(657, 1236)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_om6pm"]
 size = Vector2(723, 1355)
@@ -74,9 +68,9 @@ texture = ExtResource("3_tdm7a")
 skeleton_data_res = SubResource("SpineSkeletonDataResource_ixg0x")
 bones_thickness = 10.09
 preview_skin = "Default"
-preview_animation = "attack_swing"
-preview_frame = true
-preview_time = 0.53
+preview_animation = "-- Empty --"
+preview_frame = false
+preview_time = 0.03
 script = ExtResource("4_ixg0x")
 
 [node name="SpineBoneNode" type="SpineBoneNode" parent="SpineSprite"]
@@ -86,29 +80,16 @@ scale = Vector2(1.0000002, 0.99999994)
 bone_name = "WQ"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(-39.39393, -174.1477)
+position = Vector2(-19.696936, -174.1477)
 scale = Vector2(0.9999999, 0.9999999)
 shape = SubResource("RectangleShape2D_ixg0x")
 
 [node name="AttackArea" type="Area2D" parent="."]
 collision_mask = 3
 
-[node name="Brawl_HitBox" type="CollisionShape2D" parent="AttackArea"]
-position = Vector2(366.66663, -589.3937)
-scale = Vector2(0.9999999, 0.9999999)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AttackArea"]
+position = Vector2(300, -638)
 shape = SubResource("RectangleShape2D_kqj82")
-disabled = true
-
-[node name="Slash_HitBox" type="CollisionShape2D" parent="AttackArea"]
-position = Vector2(493.93936, -681.8181)
-shape = SubResource("CircleShape2D_tdm7a")
-disabled = true
-
-[node name="Stab_HitBox" type="CollisionShape2D" parent="AttackArea"]
-position = Vector2(857.7083, -363.63632)
-scale = Vector2(0.9999999, 0.9999999)
-shape = SubResource("RectangleShape2D_tdm7a")
-disabled = true
 
 [node name="GrabArea" type="Area2D" parent="."]
 

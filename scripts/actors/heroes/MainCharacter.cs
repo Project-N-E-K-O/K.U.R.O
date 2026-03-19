@@ -4,7 +4,6 @@ using Kuros.Core;
 using Kuros.Actors.Enemies;
 using Kuros.Items.Attributes;
 using Kuros.Utils;
-using System.Collections.Generic;
 
 namespace Kuros.Actors.Heroes
 {
@@ -153,63 +152,11 @@ namespace Kuros.Actors.Heroes
 		if (_spineController != null && _spineController.HasMethod("play"))
 		{
 			GD.Print($"[{Name}] SpineController 初始化成功");
-
-			// 连接 hit_received 信号
-        	_spineController.Connect("hit_received", Callable.From<int, string>(OnSpineHitReceived));
 		}
 		else
 		{
 			GD.PushWarning($"[{Name}] SpineSprite 节点未挂载 SpineController.gd 脚本！请在 SpineSprite 节点上附加 scripts/controllers/SpineController.gd 脚本。");
 			_spineController = null;
-		}
-	}
-
-	// 动画名 → HitBox 节点名的映射
-	private readonly Dictionary<string, string> _animationToHitboxMap = new()
-	{
-		{ "attack", "Brawl_HitBox" },
-		{ "attack_swing", "Salsh_HitBox" },
-		{ "attack_thrust", "Stab_HitBox" }
-	};
-
-	// 处理 SpineController 发出的 hit_received 信号，根据动画帧启用对应的 HitBox 进行伤害判定
-	private void OnSpineHitReceived(int hitStep, string animName)
-	{
-		if (AttackArea == null)
-		{
-        	GD.Print($"[HitBox] AttackArea 为空，跳过");
-			return;
-		}
-
-		// 找到对应的 HitBox 名称
-		if (!_animationToHitboxMap.TryGetValue(animName, out string hitboxName))
-		{
-			GD.Print($"[HitBox] 未找到动画 '{animName}' 对应的 HitBox, 跳过");
-			return;
-		}
-
-		GD.Print($"[HitBox] 动画: {animName} | hit段: {hitStep} | 目标HitBox: {hitboxName}");
-
-		// 先全部禁用，再启用对应的hitbox
-		foreach (Node child in AttackArea.GetChildren())
-		{
-			if (child is CollisionShape2D shape)
-			{
-				bool shouldEnable = (child.Name == hitboxName);
-				shape.Disabled = !shouldEnable;
-				GD.Print($"[HitBox]   {child.Name} → {(shouldEnable ? "启用 ✓" : "禁用")}");
-			}
-		}
-
-		// 执行这一帧的伤害判定
-		PerformAttackCheck();
-    	GD.Print($"[HitBox] 伤害判定完成，禁用所有 HitBox");
-		
-		// 判定完立即禁用，避免持续生效
-		foreach (Node child in AttackArea.GetChildren())
-		{
-			if (child is CollisionShape2D shape)
-				shape.Disabled = true;
 		}
 	}
 

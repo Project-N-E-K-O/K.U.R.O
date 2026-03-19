@@ -1,9 +1,8 @@
-[gd_scene load_steps=15 format=3 uid="uid://qd5abd4opeob"]
+[gd_scene load_steps=17 format=3 uid="uid://c6oa864m0u6px"]
 
 [ext_resource type="PackedScene" uid="uid://dd8xmpgwy0t2o" path="res://scenes/environments/scene2.tscn" id="1_7jsho"]
 [ext_resource type="Script" uid="uid://x1ic1ym4ykq8" path="res://scripts/scenes/BattleSceneManager.cs" id="1_ctuyy"]
 [ext_resource type="PackedScene" uid="uid://ufprfd4r8ijj" path="res://assets/spine/main_character/main_character.tscn" id="2_s0pgc"]
-[ext_resource type="PackedScene" uid="uid://cofm45kotvgto" path="res://scenes/actors/enemies/Enemy_B1_fat.tscn" id="3_qokfb"]
 [ext_resource type="Texture2D" uid="uid://pl67o3rwu44h" path="res://assets/environments/scene_2_hotel/酒店大门口墙前.png" id="3_s0pgc"]
 [ext_resource type="Texture2D" uid="uid://pan0auvatm1f" path="res://assets/environments/scene_2_hotel/电梯墙前.png" id="4_hq53u"]
 [ext_resource type="PackedScene" uid="uid://c88kwpwoxtoev" path="res://scenes/ui/hud/BattleHUD.tscn" id="5_qokfb"]
@@ -48,8 +47,7 @@ y_sort_enabled = true
 position = Vector2(0, 20)
 
 [node name="MainCharacter" parent="World" instance=ExtResource("2_s0pgc")]
-z_index = 1
-position = Vector2(-2078.0007, 482)
+position = Vector2(-6603.999, 318)
 
 [node name="Camera2D" type="Camera2D" parent="World/MainCharacter"]
 position = Vector2(0, -15.15156)
@@ -62,11 +60,7 @@ position_smoothing_enabled = true
 drag_horizontal_enabled = true
 drag_vertical_enabled = true
 
-[node name="Enemy_B1_fat" parent="World" instance=ExtResource("3_qokfb")]
-position = Vector2(-1325, 415)
-scale = Vector2(1.4999998, 1.4999998)
-
-[node name="FrontWall" type="Node2D" parent="World"]
+[node name="FrontWall" type="Node" parent="World"]
 
 [node name="GateFrontWall" type="Sprite2D" parent="World/FrontWall"]
 z_index = 3
