@@ -60,6 +60,8 @@ namespace Kuros.Items.World
 		public override void _Ready()
 		{
 			base._Ready();
+			AddToGroup("world_items");  // 将物品添加到 "world_items" 组，用于场景中的物品管理
+    		AddToGroup("pickables");    // 统一使用 "pickables" 组来标识可拾取对象，方便 PlayerItemInteractionComponent 处理
 			InitializeStack();
 			ResolveTriggerArea();
 			ApplyCollisionSettings();

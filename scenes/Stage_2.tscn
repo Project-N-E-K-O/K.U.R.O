@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://c6oa864m0u6px"]
+[gd_scene load_steps=18 format=3 uid="uid://qd5abd4opeob"]
 
 [ext_resource type="PackedScene" uid="uid://dd8xmpgwy0t2o" path="res://scenes/environments/scene2.tscn" id="1_7jsho"]
 [ext_resource type="Script" uid="uid://x1ic1ym4ykq8" path="res://scripts/scenes/BattleSceneManager.cs" id="1_ctuyy"]
@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://pan0auvatm1f" path="res://assets/environments/scene_2_hotel/电梯墙前.png" id="4_hq53u"]
 [ext_resource type="PackedScene" uid="uid://c88kwpwoxtoev" path="res://scenes/ui/hud/BattleHUD.tscn" id="5_qokfb"]
 [ext_resource type="PackedScene" uid="uid://cofm45kotvgto" path="res://scenes/actors/enemies/Enemy_B1_fat.tscn" id="6_ctuyy"]
+[ext_resource type="Script" uid="uid://co6mikk3codni" path="res://scripts/items/world/DropItemDebugger.cs" id="7_k0qph"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_s0pgc"]
 size = Vector2(16974, 774)
@@ -47,7 +48,7 @@ y_sort_enabled = true
 position = Vector2(0, 20)
 
 [node name="MainCharacter" parent="World" instance=ExtResource("2_s0pgc")]
-position = Vector2(-6603.999, 318)
+position = Vector2(-2078.0007, 482)
 
 [node name="Camera2D" type="Camera2D" parent="World/MainCharacter"]
 position = Vector2(0, -15.15156)
@@ -60,7 +61,11 @@ position_smoothing_enabled = true
 drag_horizontal_enabled = true
 drag_vertical_enabled = true
 
-[node name="FrontWall" type="Node" parent="World"]
+[node name="Enemy_B1_fat" parent="World" instance=ExtResource("6_ctuyy")]
+position = Vector2(-1325, 415)
+scale = Vector2(1.4999998, 1.4999998)
+
+[node name="FrontWall" type="Node2D" parent="World"]
 
 [node name="GateFrontWall" type="Sprite2D" parent="World/FrontWall"]
 z_index = 3
@@ -116,11 +121,12 @@ position = Vector2(-4538.75, 830.5)
 shape = SubResource("RectangleShape2D_k0qph")
 
 [node name="Node2D" type="Node2D" parent="World"]
-
-[node name="Enemy_B1_fat" parent="World" instance=ExtResource("6_ctuyy")]
-position = Vector2(-5903, 257)
+script = ExtResource("7_k0qph")
 
 [node name="Enemy_B1_fat2" parent="World" instance=ExtResource("6_ctuyy")]
+position = Vector2(-5903, 257)
+
+[node name="Enemy_B1_fat3" parent="World" instance=ExtResource("6_ctuyy")]
 position = Vector2(-3037, 354)
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
