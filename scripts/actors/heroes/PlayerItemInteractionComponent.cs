@@ -106,18 +106,18 @@ namespace Kuros.Actors.Heroes
             // 尝试常见的路径
             if (_interactionArea == null && _actor != null)
             {
-                _interactionArea = _actor.GetNodeOrNull<Area2D>("SpineCharacter/AttackArea");
+                _interactionArea = _actor.GetNodeOrNull<Area2D>("SpineCharacter/GrabArea");
             }
             
             if (_interactionArea == null && _actor != null)
             {
-                _interactionArea = _actor.GetNodeOrNull<Area2D>("AttackArea");
+                _interactionArea = _actor.GetNodeOrNull<Area2D>("GrabArea");
             }
             
             if (_interactionArea == null && _actor != null)
             {
-                // 尝试查找任何名为 AttackArea 的子节点
-                _interactionArea = _actor.FindChild("AttackArea", recursive: true) as Area2D;
+                // 尝试查找任何名为 GrabArea 的子节点
+                _interactionArea = _actor.FindChild("GrabArea", recursive: true) as Area2D;
             }
             
             if (_interactionArea == null)

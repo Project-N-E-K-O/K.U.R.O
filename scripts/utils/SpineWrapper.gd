@@ -3,6 +3,8 @@ extends Node
 # 这是一个 GDScript 桥接脚本，用于帮助 C# 操作 Spine 节点
 # 因为 C# 绑定可能缺失，我们在 GDScript 中进行操作
 
+var _flash_tween: Tween = null
+
 func find_spine_node(root: Node) -> Node:
 	if root.has_node("SpineCharacter"):
 		return root.get_node("SpineCharacter")
@@ -22,16 +24,17 @@ func flip_facing(root: Node, face_right: bool, default_face_left: bool) -> void:
 
 func flash_damage(root: Node, color: Color) -> void:
 	var sprite = find_spine_node(root)
-	if sprite:
-		var original_modulate = sprite.modulate
-		sprite.modulate = color
-		
-		var tween = create_tween()
-		tween.tween_interval(0.1)
-		tween.tween_callback(func(): 
-			if is_instance_valid(sprite):
-				sprite.modulate = original_modulate
-		)
+	if not sprite:
+		return
+	if _flash_tween != null and _flash_tween.is_valid():
+		_flash_tween.kill()
+	sprite.modulate = color
+	_flash_tween = create_tween()
+	_flash_tween.tween_interval(0.1)
+	_flash_tween.tween_callback(func():
+		if is_instance_valid(sprite):
+			sprite.modulate = Color.WHITE
+	)
 
 # 动画控制相关
 func play_animation(root: Node, anim_name: String, loop: bool, mix_duration: float = 0.1, time_scale: float = 1.0) -> bool:

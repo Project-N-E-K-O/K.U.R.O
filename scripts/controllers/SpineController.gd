@@ -17,6 +17,9 @@ func _on_animation_event(_sprite: SpineSprite, _anim_state: SpineAnimationState,
 		# 發出我們自定義的信號
 		hit_received.emit(hit_step, anim_name)
 
+		# 打印調試資訊
+		print("[Spine Event] 觸發 hit: ", anim_name, " 段數: ", hit_step)
+
 ## 播放动画
 ## anim: 动画名称
 ## loop: 是否循环播放
