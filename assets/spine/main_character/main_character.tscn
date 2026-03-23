@@ -1,4 +1,4 @@
-[gd_scene load_steps=31 format=3 uid="uid://ufprfd4r8ijj"]
+[gd_scene load_steps=32 format=3 uid="uid://ufprfd4r8ijj"]
 
 [ext_resource type="SpineAtlasResource" uid="uid://c4cx1o154rxba" path="res://assets/spine/main_character/Enemy_A1_zhuA.atlas" id="1_kqj82"]
 [ext_resource type="Script" uid="uid://befx3l05f0eph" path="res://scripts/actors/heroes/MainCharacter.cs" id="1_om6pm"]
@@ -50,7 +50,7 @@ size = Vector2(657, 1236)
 radius = 750.0
 
 [node name="MainCharacter" type="CharacterBody2D" node_paths=PackedStringArray("AttackArea", "AttackArea", "StateMachine", "EffectController")]
-z_index = 1
+z_index = 2
 scale = Vector2(0.33, 0.33)
 script = ExtResource("1_om6pm")
 WalkAnimationSpeed = 2.0

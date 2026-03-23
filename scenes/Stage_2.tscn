@@ -182,7 +182,7 @@ SpawnBackEffectOffset = Vector2(0, -240)
 SpawnFrontEffectOffset = Vector2(0, -240)
 EnemyAppearDelay = 0.8
 BackEffectZOffset = 1
-FrontEffectZOffset = 2
+FrontEffectZOffset = 3
 DebugLineWidth = 5.0
 
 [node name="TriggerArea" type="Area2D" parent="EnemySpawneManager2"]

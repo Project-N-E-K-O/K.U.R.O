@@ -50,7 +50,7 @@ atlas_res = ExtResource("19_5i0uy")
 skeleton_file_res = ExtResource("20_8xfgw")
 
 [node name="Enemy_B1_thin" type="CharacterBody2D" node_paths=PackedStringArray("DetectionArea", "AttackArea", "StateMachine", "EffectController")]
-z_index = 1
+z_index = 2
 collision_layer = 2
 motion_mode = 1
 script = ExtResource("1_grl5w")
