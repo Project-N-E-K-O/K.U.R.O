@@ -267,6 +267,7 @@ animations = [{
 }]
 
 [node name="SpawnPodBack" type="AnimatedSprite2D"]
+position = Vector2(0, -382)
 scale = Vector2(0.3, 0.3)
 sprite_frames = SubResource("SpriteFrames_1w55o")
 animation = &"spawn"

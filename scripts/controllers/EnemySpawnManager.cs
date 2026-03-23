@@ -44,6 +44,8 @@ namespace Kuros.Controllers
         [ExportCategory("Spawn FX")]
         [Export] public PackedScene? SpawnBackEffectScene { get; set; } = GD.Load<PackedScene>("res://scenes/actors/etc/enemy_spaw_back.tscn");
         [Export] public PackedScene? SpawnFrontEffectScene { get; set; } = GD.Load<PackedScene>("res://scenes/actors/etc/enemy_spawn_front.tscn");
+        [Export] public Vector2 SpawnBackEffectOffset { get; set; } = Vector2.Zero;
+        [Export] public Vector2 SpawnFrontEffectOffset { get; set; } = Vector2.Zero;
         [Export(PropertyHint.Range, "0,5,0.05")] public float EnemyAppearDelay { get; set; } = 0.2f;
         [Export(PropertyHint.Range, "-1000,1000,1")] public int BackEffectZOffset { get; set; } = -1;
         [Export(PropertyHint.Range, "-1000,1000,1")] public int FrontEffectZOffset { get; set; } = 1;
@@ -51,9 +53,12 @@ namespace Kuros.Controllers
         [ExportCategory("Debug")]
         [Export] public bool ShowDebugOverlay { get; set; } = true;
         [Export] public bool ShowDebugOverlayInGame { get; set; } = true;
+        [Export] public bool LogSpawnEffectPositions { get; set; } = true;
         [Export] public Color TriggerDebugColor { get; set; } = new Color(0.2f, 0.8f, 1f, 0.9f);
         [Export] public Color SpawnDebugColor { get; set; } = new Color(1f, 0.85f, 0.25f, 0.9f);
         [Export] public Color ExplicitPointDebugColor { get; set; } = new Color(1f, 0.45f, 0.2f, 1f);
+        [Export] public Color BackEffectPointColor { get; set; } = new Color(0.4f, 0.9f, 1f, 1f);
+        [Export] public Color FrontEffectPointColor { get; set; } = new Color(1f, 0.5f, 0.9f, 1f);
         [Export(PropertyHint.Range, "1,8,0.5")] public float DebugLineWidth { get; set; } = 2f;
         [Export(PropertyHint.Range, "2,16,0.5")] public float DebugPointRadius { get; set; } = 5f;
 
@@ -122,6 +127,7 @@ namespace Kuros.Controllers
             DrawTriggerDebugShape();
             DrawSpawnDebugShape();
             DrawExplicitSpawnPoints();
+            DrawEffectOffsetDebugPoints();
         }
 
         public void StartSpawnSequence()
@@ -134,6 +140,11 @@ namespace Kuros.Controllers
             if (TriggerOnce && _hasTriggered)
             {
                 return;
+            }
+
+            if (LogSpawnEffectPositions)
+            {
+                GD.Print($"[{Name}] StartSpawnSequence path={GetPath()}, count={SpawnCount}, interval={SpawnInterval}, enemyDelay={EnemyAppearDelay}, backOffset={SpawnBackEffectOffset}, frontOffset={SpawnFrontEffectOffset}");
             }
 
             _ = SpawnSequenceAsync();
@@ -161,10 +172,18 @@ namespace Kuros.Controllers
                 Vector2 spawnPosition = ResolveSpawnPosition(i);
                 PlaySpawnEffects(spawnPosition);
 
-                if (EnemyAppearDelay > 0f)
+                float waitSeconds = Mathf.Max(0f, EnemyAppearDelay);
+                ulong waitStart = Time.GetTicksMsec();
+                if (waitSeconds > 0f)
                 {
-                    var appearTimer = GetTree().CreateTimer(EnemyAppearDelay);
+                    var appearTimer = GetTree().CreateTimer(waitSeconds);
                     await ToSignal(appearTimer, SceneTreeTimer.SignalName.Timeout);
+                }
+                ulong waitedMs = Time.GetTicksMsec() - waitStart;
+
+                if (LogSpawnEffectPositions)
+                {
+                    GD.Print($"[{Name}] Spawn index={i + 1}/{spawnTotal}, intendedDelay={waitSeconds:0.###}s, actualWait={waitedMs}ms");
                 }
 
                 var enemy = SpawnEnemy(spawnPosition, i);
@@ -340,8 +359,16 @@ namespace Kuros.Controllers
 
         private void PlaySpawnEffects(Vector2 spawnPosition)
         {
-            SpawnEffect(SpawnBackEffectScene, spawnPosition, BackEffectZOffset);
-            SpawnEffect(SpawnFrontEffectScene, spawnPosition, FrontEffectZOffset);
+            Vector2 backEffectPos = spawnPosition + SpawnBackEffectOffset;
+            Vector2 frontEffectPos = spawnPosition + SpawnFrontEffectOffset;
+
+            if (LogSpawnEffectPositions)
+            {
+                GD.Print($"[{Name}] SpawnFX base={spawnPosition}, backOffset={SpawnBackEffectOffset}, backPos={backEffectPos}, frontOffset={SpawnFrontEffectOffset}, frontPos={frontEffectPos}");
+            }
+
+            SpawnEffect(SpawnBackEffectScene, backEffectPos, BackEffectZOffset);
+            SpawnEffect(SpawnFrontEffectScene, frontEffectPos, FrontEffectZOffset);
         }
 
         private void SpawnEffect(PackedScene? effectScene, Vector2 spawnPosition, int zOffset)
@@ -505,6 +532,22 @@ namespace Kuros.Controllers
             foreach (var offset in SpawnOffsets)
             {
                 DrawCircle(offset, DebugPointRadius, ExplicitPointDebugColor);
+            }
+        }
+
+        private void DrawEffectOffsetDebugPoints()
+        {
+            if (!UseExplicitSpawnOffsets)
+            {
+                DrawCircle(SpawnBackEffectOffset, DebugPointRadius, BackEffectPointColor);
+                DrawCircle(SpawnFrontEffectOffset, DebugPointRadius, FrontEffectPointColor);
+                return;
+            }
+
+            foreach (var baseOffset in SpawnOffsets)
+            {
+                DrawCircle(baseOffset + SpawnBackEffectOffset, DebugPointRadius, BackEffectPointColor);
+                DrawCircle(baseOffset + SpawnFrontEffectOffset, DebugPointRadius, FrontEffectPointColor);
             }
         }
     }

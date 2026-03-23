@@ -271,9 +271,9 @@ animations = [{
 }]
 
 [node name="SpawnPodFront" type="AnimatedSprite2D"]
+position = Vector2(0, -382)
 scale = Vector2(0.3, 0.3)
 sprite_frames = SubResource("SpriteFrames_y7i3i")
 animation = &"spawn"
 autoplay = "spawn"
-frame = 16
-frame_progress = 0.8261762
+frame_progress = 0.05803057

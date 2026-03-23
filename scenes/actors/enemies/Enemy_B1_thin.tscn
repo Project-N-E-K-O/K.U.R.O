@@ -42,7 +42,7 @@ size = Vector2(41.828102, 28.539782)
 size = Vector2(98.90625, 100.714294)
 
 [sub_resource type="CapsuleShape2D" id="3"]
-radius = 12.254902
+radius = 19.362745
 height = 51.63399
 
 [sub_resource type="SpineSkeletonDataResource" id="SpineSkeletonDataResource_h8apo"]
@@ -50,6 +50,7 @@ atlas_res = ExtResource("19_5i0uy")
 skeleton_file_res = ExtResource("20_8xfgw")
 
 [node name="Enemy_B1_thin" type="CharacterBody2D" node_paths=PackedStringArray("DetectionArea", "AttackArea", "StateMachine", "EffectController")]
+z_index = 1
 collision_layer = 2
 motion_mode = 1
 script = ExtResource("1_grl5w")
@@ -66,7 +67,7 @@ script = ExtResource("12")
 show_behind_parent = true
 material = SubResource("ShaderMaterial_b5vhy")
 position = Vector2(13.000001, 28)
-scale = Vector2(3.6898432, 0.46015635)
+scale = Vector2(5.47, 0.682)
 texture = ExtResource("5_8xfgw")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
@@ -74,35 +75,32 @@ modulate = Color(0.8, 0.6, 0.5, 1)
 scale = Vector2(3.2, 2.8)
 
 [node name="AttackArea" type="Area2D" parent="Sprite2D"]
-visible = false
 scale = Vector2(0.4, 0.4)
 collision_layer = 0
 monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/AttackArea"]
-position = Vector2(77.187515, -76.785736)
+position = Vector2(80.46874, -123.214294)
 scale = Vector2(1.0000001, 1.0000001)
 shape = SubResource("2")
 
 [node name="AttackDetectionArea" type="Area2D" parent="Sprite2D"]
-visible = false
 position = Vector2(15, 0)
 scale = Vector2(3, 3)
 collision_layer = 0
 
 [node name="AttackDetectionShape" type="CollisionShape2D" parent="Sprite2D/AttackDetectionArea"]
-position = Vector2(15.729166, -9.761906)
+position = Vector2(15.937499, -16.785713)
 scale = Vector2(0.9845911, 2.712654)
 shape = SubResource("4")
 
 [node name="ControllerDetectionArea" type="Area2D" parent="Sprite2D"]
-visible = false
 position = Vector2(15, 0)
 scale = Vector2(4, 4)
 collision_layer = 0
 
 [node name="ControllerDetectionShape" type="CollisionShape2D" parent="Sprite2D/ControllerDetectionArea"]
-position = Vector2(-3.828, 0)
+position = Vector2(-3.828125, -10)
 shape = SubResource("5")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
@@ -166,7 +164,7 @@ FreezeDuration = 1.0
 
 [node name="SpineSprite" type="SpineSprite" parent="."]
 position = Vector2(8, 26.000008)
-scale = Vector2(0.171, 0.171)
+scale = Vector2(0.3, 0.3)
 skeleton_data_res = SubResource("SpineSkeletonDataResource_h8apo")
 preview_skin = "Default"
 preview_animation = "-- Empty --"

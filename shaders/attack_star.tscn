@@ -1,20 +1,13 @@
-[gd_scene load_steps=7 format=3 uid="uid://bxgdthwh67px6"]
+[gd_scene load_steps=5 format=3 uid="uid://bxgdthwh67px6"]
 
 [ext_resource type="Texture2D" uid="uid://b7npsyqtwnlq8" path="res://assets/environments/star-svgrepo-com (1)@0.1x.png" id="1_57k3e"]
 
 [sub_resource type="Gradient" id="Gradient_slnuo"]
-offsets = PackedFloat32Array(0, 0.5145631)
+offsets = PackedFloat32Array(0.20064725, 0.59546924)
 colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 0)
 
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_rgi1p"]
 gradient = SubResource("Gradient_slnuo")
-
-[sub_resource type="Curve" id="Curve_hhdc5"]
-_data = [Vector2(0, 0.3365932), 0.0, 0.0, 0, 0, Vector2(0.35060972, 0.30423188), 0.0, 0.0, 0, 0, Vector2(0.67378044, 0.017603159), 0.0, 0.0, 0, 0]
-point_count = 3
-
-[sub_resource type="CurveTexture" id="CurveTexture_66mme"]
-curve = SubResource("Curve_hhdc5")
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_ldgxw"]
 particle_flag_disable_z = true
@@ -24,9 +17,8 @@ spread = 36.0
 initial_velocity_min = 25.0
 initial_velocity_max = 75.0
 gravity = Vector3(0, 0, 0)
-damping_min = 14.5060005
-damping_max = 15.741001
-scale_curve = SubResource("CurveTexture_66mme")
+damping_min = 4.078
+damping_max = 5.899
 color_ramp = SubResource("GradientTexture1D_rgi1p")
 turbulence_enabled = true
 
@@ -35,7 +27,8 @@ scale = Vector2(30, 30)
 emitting = false
 amount = 5
 texture = ExtResource("1_57k3e")
-lifetime = 0.36
+lifetime = 0.68
 one_shot = true
+speed_scale = 1.8399999999999999
 explosiveness = 1.0
 process_material = SubResource("ParticleProcessMaterial_ldgxw")
