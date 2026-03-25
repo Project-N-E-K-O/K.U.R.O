@@ -19,16 +19,18 @@ initial_velocity_max = 75.0
 gravity = Vector3(0, 0, 0)
 damping_min = 4.078
 damping_max = 5.899
+scale_min = 0.29999998
+scale_max = 0.29999998
 color_ramp = SubResource("GradientTexture1D_rgi1p")
 turbulence_enabled = true
 
 [node name="AttackStar" type="GPUParticles2D"]
-scale = Vector2(30, 30)
+scale = Vector2(25.55, 25.55)
 emitting = false
 amount = 5
 texture = ExtResource("1_57k3e")
 lifetime = 0.68
 one_shot = true
-speed_scale = 1.8399999999999999
+speed_scale = 1.84
 explosiveness = 1.0
 process_material = SubResource("ParticleProcessMaterial_ldgxw")

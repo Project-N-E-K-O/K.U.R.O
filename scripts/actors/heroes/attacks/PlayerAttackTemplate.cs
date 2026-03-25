@@ -136,6 +136,19 @@ namespace Kuros.Actors.Heroes.Attacks
             TriggerSourceState = stateName;
         }
 
+        public bool HasWeaponRequirement => !string.IsNullOrWhiteSpace(RequiredItemId);
+
+        public bool IsWeaponRequirementSatisfied()
+        {
+            if (!HasWeaponRequirement)
+            {
+                return true;
+            }
+
+            string currentWeaponId = ResolveCurrentWeaponItemId();
+            return string.Equals(currentWeaponId, RequiredItemId, StringComparison.OrdinalIgnoreCase);
+        }
+
         public void Tick(double delta)
         {
             if (_cooldownTimer > 0f)
@@ -197,6 +210,11 @@ namespace Kuros.Actors.Heroes.Attacks
             if (IsRunning || IsOnCooldown) return false;
             if (Player.AttackTimer > 0f) return false;
 
+            if (!IsWeaponRequirementSatisfied())
+            {
+                return false;
+            }
+
             if (checkInput && !IsInputTriggered())
             {
                 return false;
@@ -222,6 +240,31 @@ namespace Kuros.Actors.Heroes.Attacks
         }
 
         protected virtual bool EvaluateCustomRequirement() => true;
+
+        private string ResolveCurrentWeaponItemId()
+        {
+            if (Player.InventoryComponent != null)
+            {
+                var quickBarStack = Player.InventoryComponent.GetSelectedQuickBarStack();
+                if (quickBarStack != null && !quickBarStack.IsEmpty && quickBarStack.Item.ItemId != "empty_item")
+                {
+                    return quickBarStack.Item.ItemId;
+                }
+
+                var backpackStack = Player.InventoryComponent.GetSelectedBackpackStack();
+                if (backpackStack != null && !backpackStack.IsEmpty && backpackStack.Item.ItemId != "empty_item")
+                {
+                    return backpackStack.Item.ItemId;
+                }
+            }
+
+            if (Player.LeftHandItem != null && !string.Equals(Player.LeftHandItem.ItemId, "empty_item", StringComparison.OrdinalIgnoreCase))
+            {
+                return Player.LeftHandItem.ItemId;
+            }
+
+            return string.Empty;
+        }
 
         protected virtual bool HasValidTarget()
         {

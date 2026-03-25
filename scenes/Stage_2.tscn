@@ -158,9 +158,16 @@ TriggerCollisionMask = 1
 SpawnAreaExtents = Vector2(300, 300)
 SpawnBackEffectOffset = Vector2(0, -240)
 SpawnFrontEffectOffset = Vector2(0, -240)
-EnemyAppearDelay = 0.8
+EnemyAppearDelay = 1.0
+BackEffectAppearFrame = 25
+BackEffectGateTimeout = 1.55
 BackEffectZOffset = 1
-FrontEffectZOffset = 2
+FrontEffectZOffset = 3
+FrontEffectLowerDelay = 1.0
+FrontEffectPostSpawnZOffset = 1
+EnableYAxisAutoLayering = true
+YAxisZMin = 1
+YAxisZMax = 2
 DebugLineWidth = 2.5
 
 [node name="EnemySpawneManager2" type="Node2D" parent="." node_paths=PackedStringArray("TriggerArea")]
@@ -180,9 +187,16 @@ SpawnOffsets = Array[Vector2]([Vector2(1000, 0)])
 SpawnAreaExtents = Vector2(312.48, 600)
 SpawnBackEffectOffset = Vector2(0, -240)
 SpawnFrontEffectOffset = Vector2(0, -240)
-EnemyAppearDelay = 0.8
+EnemyAppearDelay = 1.0
+BackEffectAppearFrame = 25
+BackEffectGateTimeout = 1.55
 BackEffectZOffset = 1
 FrontEffectZOffset = 3
+FrontEffectLowerDelay = 1.0
+FrontEffectPostSpawnZOffset = 1
+EnableYAxisAutoLayering = true
+YAxisZMin = 1
+YAxisZMax = 2
 DebugLineWidth = 5.0
 
 [node name="TriggerArea" type="Area2D" parent="EnemySpawneManager2"]

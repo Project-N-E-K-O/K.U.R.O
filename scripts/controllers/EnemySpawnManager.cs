@@ -13,6 +13,13 @@ namespace Kuros.Controllers
     [GlobalClass]
     public partial class EnemySpawnManager : Node2D
     {
+        public enum BackEffectSpawnGateMode
+        {
+            Delay,
+            BackEffectFrame,
+            BackEffectFinished
+        }
+
         [Signal] public delegate void SpawnStartedEventHandler();
         [Signal] public delegate void EnemySpawnedEventHandler(Node enemy, int index);
         [Signal] public delegate void SpawnCompletedEventHandler();
@@ -47,8 +54,24 @@ namespace Kuros.Controllers
         [Export] public Vector2 SpawnBackEffectOffset { get; set; } = Vector2.Zero;
         [Export] public Vector2 SpawnFrontEffectOffset { get; set; } = Vector2.Zero;
         [Export(PropertyHint.Range, "0,5,0.05")] public float EnemyAppearDelay { get; set; } = 0.2f;
+        [Export] public BackEffectSpawnGateMode EnemyAppearGateMode { get; set; } = BackEffectSpawnGateMode.Delay;
+        [Export(PropertyHint.Range, "0,300,1")] public int BackEffectAppearFrame { get; set; } = 8;
+        [Export(PropertyHint.Range, "0,10,0.05")] public float BackEffectGateTimeout { get; set; } = 3f;
+        [Export] public bool FallbackToDelayWhenGateUnavailable { get; set; } = true;
         [Export(PropertyHint.Range, "-1000,1000,1")] public int BackEffectZOffset { get; set; } = -1;
         [Export(PropertyHint.Range, "-1000,1000,1")] public int FrontEffectZOffset { get; set; } = 1;
+        [Export] public bool AutoLowerFrontEffectAfterEnemySpawn { get; set; } = true;
+        [Export(PropertyHint.Range, "0,5,0.05")] public float FrontEffectLowerDelay { get; set; } = 0f;
+        [Export(PropertyHint.Range, "-1000,1000,1")] public int FrontEffectPostSpawnZOffset { get; set; } = -1;
+
+        [ExportCategory("Y-Sort")]
+        [Export] public bool EnableYAxisAutoLayering { get; set; } = false;
+        [Export(PropertyHint.Range, "0.1,20,0.1")] public float YAxisZScale { get; set; } = 1f;
+        [Export(PropertyHint.Range, "-10000,10000,1")] public int YAxisZBase { get; set; } = 0;
+        [Export] public bool ClampYAxisZRange { get; set; } = true;
+        [Export(PropertyHint.Range, "-10000,10000,1")] public int YAxisZMin { get; set; } = -200;
+        [Export(PropertyHint.Range, "-10000,10000,1")] public int YAxisZMax { get; set; } = 400;
+        [Export(PropertyHint.Range, "-1000,1000,1")] public int EnemyZOffset { get; set; } = 0;
 
         [ExportCategory("Debug")]
         [Export] public bool ShowDebugOverlay { get; set; } = true;
@@ -144,7 +167,7 @@ namespace Kuros.Controllers
 
             if (LogSpawnEffectPositions)
             {
-                GD.Print($"[{Name}] StartSpawnSequence path={GetPath()}, count={SpawnCount}, interval={SpawnInterval}, enemyDelay={EnemyAppearDelay}, backOffset={SpawnBackEffectOffset}, frontOffset={SpawnFrontEffectOffset}");
+                GD.Print($"[{Name}] StartSpawnSequence path={GetPath()}, count={SpawnCount}, interval={SpawnInterval}, enemyDelay={EnemyAppearDelay}, gateMode={EnemyAppearGateMode}, gateFrame={BackEffectAppearFrame}, gateTimeout={BackEffectGateTimeout}, backOffset={SpawnBackEffectOffset}, frontOffset={SpawnFrontEffectOffset}, ySort={EnableYAxisAutoLayering}, yScale={YAxisZScale:0.##}, yBase={YAxisZBase}");
             }
 
             _ = SpawnSequenceAsync();
@@ -170,25 +193,32 @@ namespace Kuros.Controllers
             for (int i = 0; i < spawnTotal; i++)
             {
                 Vector2 spawnPosition = ResolveSpawnPosition(i);
-                PlaySpawnEffects(spawnPosition);
+                SpawnEffectRefs effectRefs = PlaySpawnEffects(spawnPosition);
 
-                float waitSeconds = Mathf.Max(0f, EnemyAppearDelay);
+                await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+
                 ulong waitStart = Time.GetTicksMsec();
-                if (waitSeconds > 0f)
-                {
-                    var appearTimer = GetTree().CreateTimer(waitSeconds);
-                    await ToSignal(appearTimer, SceneTreeTimer.SignalName.Timeout);
-                }
+                await WaitForEnemyAppearGateAsync(effectRefs.BackEffectInstance);
                 ulong waitedMs = Time.GetTicksMsec() - waitStart;
 
                 if (LogSpawnEffectPositions)
                 {
-                    GD.Print($"[{Name}] Spawn index={i + 1}/{spawnTotal}, intendedDelay={waitSeconds:0.###}s, actualWait={waitedMs}ms");
+                    GD.Print($"[{Name}] Spawn index={i + 1}/{spawnTotal}, gateMode={EnemyAppearGateMode}, actualWait={waitedMs}ms");
                 }
 
                 var enemy = SpawnEnemy(spawnPosition, i);
                 if (enemy != null)
                 {
+                    if (LogSpawnEffectPositions)
+                    {
+                        GD.Print($"[{Name}] Enemy spawned index={i + 1}/{spawnTotal}, pos={spawnPosition}, root={DescribeCanvasItem(enemy as CanvasItem)}");
+                    }
+
+                    if (AutoLowerFrontEffectAfterEnemySpawn)
+                    {
+                        LowerFrontEffectAfterEnemySpawn(effectRefs.FrontEffect, enemy);
+                    }
+
                     EmitSignal(SignalName.EnemySpawned, enemy, i);
                 }
 
@@ -224,7 +254,15 @@ namespace Kuros.Controllers
             if (instance is Node2D node2D)
             {
                 node2D.GlobalPosition = spawnPosition;
+                ApplyNodeZIndex(node2D, spawnPosition, EnemyZOffset);
+                node2D.Visible = true;
+
+                // Some enemy sub-controllers may toggle visibility/modulate in their own _Ready,
+                // so we re-apply visibility and z over a few frames for multi-spawn stability.
+                StabilizeSpawnedEnemyVisualAsync(node2D, spawnPosition);
             }
+
+            EnsureSpawnedEnemyVisible(instance);
 
             if (instance is GameActor actor && AlignEnemyFacingToManager)
             {
@@ -237,6 +275,90 @@ namespace Kuros.Controllers
             }
 
             return instance;
+        }
+
+        private async void StabilizeSpawnedEnemyVisualAsync(Node2D enemyNode2D, Vector2 spawnPosition)
+        {
+            if (!GodotObject.IsInstanceValid(enemyNode2D))
+            {
+                return;
+            }
+
+            for (int i = 0; i < 3; i++)
+            {
+                await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+
+                if (!GodotObject.IsInstanceValid(enemyNode2D))
+                {
+                    return;
+                }
+
+                ApplyNodeZIndex(enemyNode2D, spawnPosition, EnemyZOffset);
+                EnsureSpawnedEnemyVisible(enemyNode2D);
+            }
+
+            if (LogSpawnEffectPositions)
+            {
+                GD.Print($"[{Name}] Enemy visual stabilization complete: {DescribeCanvasItem(enemyNode2D)}");
+            }
+        }
+
+        private void EnsureSpawnedEnemyVisible(Node enemyRoot)
+        {
+            // Ensure common render nodes are visible and opaque after instantiation.
+            EnsureCanvasItemVisible(enemyRoot as CanvasItem);
+
+            Node? spineNode = enemyRoot.GetNodeOrNull("SpineSprite");
+            if (spineNode is CanvasItem spineCanvas)
+            {
+                EnsureCanvasItemVisible(spineCanvas);
+            }
+
+            Node? spriteNode = enemyRoot.GetNodeOrNull("Sprite2D");
+            if (spriteNode is CanvasItem spriteCanvas)
+            {
+                EnsureCanvasItemVisible(spriteCanvas);
+            }
+
+            if (LogSpawnEffectPositions)
+            {
+                string spineInfo = DescribeCanvasItem(spineNode as CanvasItem);
+                string spriteInfo = DescribeCanvasItem(spriteNode as CanvasItem);
+                GD.Print($"[{Name}] Enemy visual restore: root={DescribeCanvasItem(enemyRoot as CanvasItem)}, spine={spineInfo}, sprite={spriteInfo}");
+            }
+        }
+
+        private static void EnsureCanvasItemVisible(CanvasItem? item)
+        {
+            if (item == null || !GodotObject.IsInstanceValid(item))
+            {
+                return;
+            }
+
+            item.Visible = true;
+            Color modulate = item.Modulate;
+            if (modulate.A < 1f)
+            {
+                modulate.A = 1f;
+                item.Modulate = modulate;
+            }
+
+            Color selfModulate = item.SelfModulate;
+            if (selfModulate.A < 1f)
+            {
+                selfModulate.A = 1f;
+                item.SelfModulate = selfModulate;
+            }
+        }
+
+        private static string DescribeCanvasItem(CanvasItem? item)
+        {
+            if (item == null || !GodotObject.IsInstanceValid(item))
+            {
+                return "null";
+            }
+
+            return $"{item.Name}(visible={item.Visible}, modA={item.Modulate.A:0.##}, selfA={item.SelfModulate.A:0.##}, z={item.ZIndex})";
         }
 
         private Node ResolveSpawnParent()
@@ -357,8 +479,9 @@ namespace Kuros.Controllers
             _triggerShape.Disabled = false;
         }
 
-        private void PlaySpawnEffects(Vector2 spawnPosition)
+        private SpawnEffectRefs PlaySpawnEffects(Vector2 spawnPosition)
         {
+            SpawnEffectRefs effectRefs = new();
             Vector2 backEffectPos = spawnPosition + SpawnBackEffectOffset;
             Vector2 frontEffectPos = spawnPosition + SpawnFrontEffectOffset;
 
@@ -367,22 +490,33 @@ namespace Kuros.Controllers
                 GD.Print($"[{Name}] SpawnFX base={spawnPosition}, backOffset={SpawnBackEffectOffset}, backPos={backEffectPos}, frontOffset={SpawnFrontEffectOffset}, frontPos={frontEffectPos}");
             }
 
-            SpawnEffect(SpawnBackEffectScene, backEffectPos, BackEffectZOffset);
-            SpawnEffect(SpawnFrontEffectScene, frontEffectPos, FrontEffectZOffset);
+            var backEffectInstance = SpawnEffect(SpawnBackEffectScene, backEffectPos, BackEffectZOffset);
+            var frontEffectInstance = SpawnEffect(SpawnFrontEffectScene, frontEffectPos, FrontEffectZOffset);
+
+            effectRefs.BackEffect = backEffectInstance?.Root;
+            effectRefs.BackAnimatedSprite = backEffectInstance?.AnimatedSprite;
+            effectRefs.BackEffectInstance = backEffectInstance;
+            effectRefs.FrontEffect = frontEffectInstance?.Root;
+            return effectRefs;
         }
 
-        private void SpawnEffect(PackedScene? effectScene, Vector2 spawnPosition, int zOffset)
+        private SpawnEffectInstance? SpawnEffect(PackedScene? effectScene, Vector2 spawnPosition, int zOffset)
         {
             if (effectScene == null)
             {
-                return;
+                return null;
             }
 
             var instance = effectScene.Instantiate();
             if (instance == null)
             {
-                return;
+                return null;
             }
+
+            var effectInstance = new SpawnEffectInstance
+            {
+                Root = instance as Node2D
+            };
 
             var parent = ResolveSpawnParent();
             parent.AddChild(instance);
@@ -390,7 +524,8 @@ namespace Kuros.Controllers
             if (instance is Node2D node2D)
             {
                 node2D.GlobalPosition = spawnPosition;
-                node2D.ZIndex += zOffset;
+                ApplyNodeZIndex(node2D, spawnPosition, zOffset);
+                node2D.Visible = true;
             }
 
             AnimatedSprite2D? animatedSprite = instance as AnimatedSprite2D;
@@ -411,18 +546,38 @@ namespace Kuros.Controllers
                 var animationName = animatedSprite.Animation;
                 if (!string.IsNullOrEmpty(animationName.ToString()) && animatedSprite.SpriteFrames != null)
                 {
+                    animatedSprite.Visible = true;
+                    animatedSprite.Frame = 0;
+                    animatedSprite.FrameProgress = 0f;
+                    animatedSprite.SpeedScale = 1f;
                     animatedSprite.SpriteFrames.SetAnimationLoop(animationName, false);
                     animatedSprite.Play(animationName);
+
+                    if (LogSpawnEffectPositions)
+                    {
+                        GD.Print($"[{Name}] Spawn FX started: scene={effectScene.ResourcePath}, anim={animationName}, pos={spawnPosition}, z={animatedSprite.ZIndex}, frames={animatedSprite.SpriteFrames.GetFrameCount(animationName)}");
+                    }
+
                     animatedSprite.AnimationFinished += () =>
                     {
+                        effectInstance.Finished = true;
+
                         if (GodotObject.IsInstanceValid(instance))
                         {
                             instance.QueueFree();
                         }
                     };
-                    return;
+                    return effectInstance;
                 }
+
+                GD.PushWarning($"{Name}: Spawn FX found AnimatedSprite2D but animation is invalid. scene={effectScene.ResourcePath}, anim={animationName}");
             }
+            else
+            {
+                GD.PushWarning($"{Name}: Spawn FX scene does not contain AnimatedSprite2D. scene={effectScene.ResourcePath}");
+            }
+
+            effectInstance.AnimatedSprite = animatedSprite;
 
             var timer = GetTree().CreateTimer(Mathf.Max(EnemyAppearDelay, 0.5f));
             timer.Timeout += () =>
@@ -432,6 +587,202 @@ namespace Kuros.Controllers
                     instance.QueueFree();
                 }
             };
+
+            return effectInstance;
+        }
+
+        private async System.Threading.Tasks.Task WaitForEnemyAppearGateAsync(SpawnEffectInstance? backEffectInstance)
+        {
+            switch (EnemyAppearGateMode)
+            {
+                case BackEffectSpawnGateMode.BackEffectFrame:
+                    if (await WaitForBackEffectFrameAsync(backEffectInstance))
+                    {
+                        return;
+                    }
+                    break;
+                case BackEffectSpawnGateMode.BackEffectFinished:
+                    if (await WaitForBackEffectFinishedAsync(backEffectInstance))
+                    {
+                        return;
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            if (EnemyAppearGateMode == BackEffectSpawnGateMode.Delay || FallbackToDelayWhenGateUnavailable)
+            {
+                await WaitSecondsAsync(EnemyAppearDelay);
+            }
+        }
+
+        private async System.Threading.Tasks.Task<bool> WaitForBackEffectFrameAsync(SpawnEffectInstance? backEffectInstance)
+        {
+            AnimatedSprite2D? backAnimatedSprite = backEffectInstance?.AnimatedSprite;
+            if (!GodotObject.IsInstanceValid(backAnimatedSprite) || backAnimatedSprite == null)
+            {
+                return false;
+            }
+
+            int targetFrame = Mathf.Max(0, BackEffectAppearFrame);
+            var animationName = backAnimatedSprite.Animation;
+            if (backAnimatedSprite.SpriteFrames != null && !string.IsNullOrEmpty(animationName.ToString()))
+            {
+                int frameCount = backAnimatedSprite.SpriteFrames.GetFrameCount(animationName);
+                if (frameCount > 0)
+                {
+                    targetFrame = Mathf.Clamp(targetFrame, 0, frameCount - 1);
+                }
+            }
+
+            double timeout = Mathf.Max(0f, BackEffectGateTimeout);
+            double start = Time.GetTicksMsec() / 1000.0;
+
+            while (GodotObject.IsInstanceValid(backAnimatedSprite))
+            {
+                if (backEffectInstance?.Finished == true)
+                {
+                    return true;
+                }
+
+                if (backAnimatedSprite.Frame >= targetFrame)
+                {
+                    return true;
+                }
+
+                if (timeout > 0 && (Time.GetTicksMsec() / 1000.0 - start) >= timeout)
+                {
+                    GD.PushWarning($"{Name}: WaitForBackEffectFrame timeout, frame={backAnimatedSprite.Frame}, target={targetFrame}");
+                    return false;
+                }
+
+                await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+            }
+
+            return false;
+        }
+
+        private async System.Threading.Tasks.Task<bool> WaitForBackEffectFinishedAsync(SpawnEffectInstance? backEffectInstance)
+        {
+            AnimatedSprite2D? backAnimatedSprite = backEffectInstance?.AnimatedSprite;
+            if (!GodotObject.IsInstanceValid(backAnimatedSprite) || backAnimatedSprite == null)
+            {
+                return false;
+            }
+
+            if (backEffectInstance?.Finished == true || !backAnimatedSprite.IsPlaying())
+            {
+                return true;
+            }
+
+            double timeout = Mathf.Max(0f, BackEffectGateTimeout);
+            double start = Time.GetTicksMsec() / 1000.0;
+
+            while (GodotObject.IsInstanceValid(backAnimatedSprite))
+            {
+                if (backEffectInstance?.Finished == true || !backAnimatedSprite.IsPlaying())
+                {
+                    return true;
+                }
+
+                if (timeout > 0 && (Time.GetTicksMsec() / 1000.0 - start) >= timeout)
+                {
+                    GD.PushWarning($"{Name}: WaitForBackEffectFinished timeout.");
+                    return false;
+                }
+
+                await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+            }
+
+            return backEffectInstance?.Finished == true;
+        }
+
+        private async System.Threading.Tasks.Task WaitSecondsAsync(float seconds)
+        {
+            float waitSeconds = Mathf.Max(0f, seconds);
+            if (waitSeconds <= 0f)
+            {
+                return;
+            }
+
+            var timer = GetTree().CreateTimer(waitSeconds);
+            await ToSignal(timer, SceneTreeTimer.SignalName.Timeout);
+        }
+
+        private async void LowerFrontEffectAfterEnemySpawn(Node2D? frontEffectNode, Node enemy)
+        {
+            if (frontEffectNode == null || !GodotObject.IsInstanceValid(frontEffectNode))
+            {
+                return;
+            }
+
+            if (enemy is not Node2D enemyNode || !GodotObject.IsInstanceValid(enemyNode))
+            {
+                return;
+            }
+
+            float delay = Mathf.Max(0f, FrontEffectLowerDelay);
+            if (delay > 0f)
+            {
+                var timer = GetTree().CreateTimer(delay);
+                await ToSignal(timer, SceneTreeTimer.SignalName.Timeout);
+            }
+
+            if (!GodotObject.IsInstanceValid(frontEffectNode) || !GodotObject.IsInstanceValid(enemyNode))
+            {
+                return;
+            }
+
+            frontEffectNode.ZAsRelative = false;
+            frontEffectNode.ZIndex = enemyNode.ZIndex + FrontEffectPostSpawnZOffset;
+
+            if (LogSpawnEffectPositions)
+            {
+                GD.Print($"[{Name}] Front FX lowered after spawn: enemyZ={enemyNode.ZIndex}, frontFXZ={frontEffectNode.ZIndex}, offset={FrontEffectPostSpawnZOffset}, delay={delay:0.###}s");
+            }
+        }
+
+        private sealed class SpawnEffectRefs
+        {
+            public Node2D? BackEffect;
+            public AnimatedSprite2D? BackAnimatedSprite;
+            public SpawnEffectInstance? BackEffectInstance;
+            public Node2D? FrontEffect;
+        }
+
+        private sealed class SpawnEffectInstance
+        {
+            public Node2D? Root;
+            public AnimatedSprite2D? AnimatedSprite;
+            public bool Finished;
+        }
+
+        private void ApplyNodeZIndex(Node2D node2D, Vector2 worldPosition, int extraOffset)
+        {
+            int originalZ = node2D.ZIndex;
+            int resolvedZ = ResolveZIndex(worldPosition.Y, originalZ + extraOffset);
+            node2D.ZAsRelative = false;
+            node2D.ZIndex = resolvedZ;
+        }
+
+        private int ResolveZIndex(float worldY, int fallbackZ)
+        {
+            if (!EnableYAxisAutoLayering)
+            {
+                return fallbackZ;
+            }
+
+            float scale = Mathf.Max(0.1f, YAxisZScale);
+            int z = YAxisZBase + Mathf.RoundToInt(worldY * scale);
+            if (ClampYAxisZRange)
+            {
+                int min = Mathf.Min(YAxisZMin, YAxisZMax);
+                int max = Mathf.Max(YAxisZMin, YAxisZMax);
+                z = Mathf.Clamp(z, min, max);
+            }
+
+            return z;
         }
 
         private bool ShouldDrawDebugOverlay()

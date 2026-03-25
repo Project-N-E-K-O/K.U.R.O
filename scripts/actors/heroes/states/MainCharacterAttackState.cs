@@ -80,6 +80,26 @@ namespace Kuros.Actors.Heroes.States
 			foreach (var template in _attackTemplates)
 			{
 				template.SetTriggerSourceState(requestedState);
+				if (!template.HasWeaponRequirement || !template.IsWeaponRequirementSatisfied())
+				{
+					continue;
+				}
+
+				if (template.TryStart(checkInput: false))
+				{
+					_activeTemplate = template;
+					return true;
+				}
+			}
+
+			foreach (var template in _attackTemplates)
+			{
+				template.SetTriggerSourceState(requestedState);
+				if (template.HasWeaponRequirement)
+				{
+					continue;
+				}
+
 				if (template.TryStart(checkInput: false))
 				{
 					_activeTemplate = template;

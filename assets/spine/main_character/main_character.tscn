@@ -1,4 +1,4 @@
-[gd_scene load_steps=32 format=3 uid="uid://ufprfd4r8ijj"]
+[gd_scene load_steps=33 format=3 uid="uid://ufprfd4r8ijj"]
 
 [ext_resource type="SpineAtlasResource" uid="uid://c4cx1o154rxba" path="res://assets/spine/main_character/Enemy_A1_zhuA.atlas" id="1_kqj82"]
 [ext_resource type="Script" uid="uid://befx3l05f0eph" path="res://scripts/actors/heroes/MainCharacter.cs" id="1_om6pm"]
@@ -24,6 +24,7 @@
 [ext_resource type="Script" uid="uid://b0t8cfl3khjix" path="res://scripts/actors/heroes/PlayerItemInteractionComponent.cs" id="19_t3prk"]
 [ext_resource type="Script" uid="uid://6uws0lovsucd" path="res://scripts/actors/heroes/PlayerItemAttachment.cs" id="20_4ht1x"]
 [ext_resource type="Script" uid="uid://d6ppl6a6djpr" path="res://scripts/core/effects/EffectController.cs" id="21_utqjm"]
+[ext_resource type="Script" uid="uid://tiv8umrrhofu" path="res://scripts/actors/heroes/attacks/UmbrellaMeleeAttack.cs" id="22_umbrella_attack"]
 [ext_resource type="PackedScene" uid="uid://ch7507iroiljg" path="res://scenes/ui/hud/EscapeHUD.tscn" id="24_tdm7a"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_0y2r2"]
@@ -129,6 +130,18 @@ script = ExtResource("9_13pt2")
 HitEffectScene = ExtResource("12_0y2r2")
 HitEffectAnchorMode = 2
 HitEffectForceTopLevel = true
+
+[node name="UmbrellaMeleeAttack" type="Node" parent="StateMachine/Attack"]
+script = ExtResource("22_umbrella_attack")
+AttackId = "umbrella_melee_attack"
+DisplayName = "Umbrella Melee Attack"
+Description = "雨伞专属攻击模板示例"
+ActiveDuration = 0.6
+AnimationName = "animations/attack_thrust"
+HitEffectScene = ExtResource("12_0y2r2")
+HitEffectAnchorMode = 2
+HitEffectForceTopLevel = true
+RequiredItemId = "Weapon_Stab_umbrella"
 
 [node name="Hit" type="Node" parent="StateMachine"]
 script = ExtResource("10_utqjm")
