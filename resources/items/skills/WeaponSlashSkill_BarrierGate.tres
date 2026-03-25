@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="WeaponSkillDefinition" load_steps=4 format=3 uid="uid://8agpqw2xpa76"]
+
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="1_a01rw"]
+[ext_resource type="Script" uid="uid://bp6pwgoj44cuq" path="res://scripts/items/weapons/WeaponSkillDefinition.cs" id="2_is78p"]
+
+[sub_resource type="Resource" id="Resource_a5flt"]
+script = ExtResource("1_a01rw")
+Trigger = 1
+PropertyOverrides = Dictionary[String, Variant]({
+"attack_power": 6
+})
+metadata/_custom_type_script = "uid://bv0es4osw3x0r"
+
+[resource]
+script = ExtResource("2_is78p")
+SkillId = "weapon_slash_barriergate"
+DisplayName = "闸门攻击"
+AnimationName = "attack_swing"
+CooldownSeconds = 2.5
+Description = "攻击到敌人时使该敌人移动速度减少100%，持续0.5秒"
+Effects = Array[ExtResource("1_a01rw")]([SubResource("Resource_a5flt")])
+ActivationAction = "weapon_skill_block"

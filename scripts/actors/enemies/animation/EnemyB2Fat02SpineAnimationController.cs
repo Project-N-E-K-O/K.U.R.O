@@ -5,9 +5,9 @@ using Kuros.Actors.Enemies.Attacks;
 namespace Kuros.Actors.Enemies.Animation
 {
     /// <summary>
-    /// Enemy_C1_waiterA 专用 Spine 动画控制器，将动画与状态机/攻击模板绑定。
+    /// Enemy_B2_fat_02 专用 Spine 动画控制器，将动画与状态机/攻击模板绑定。
     /// </summary>
-    public partial class EnemyC1WaiteraASpineAnimationController : EnemySpineAnimationController
+    public partial class EnemyB2Fat02SpineAnimationController : EnemySpineAnimationController
     {
         [Export] public NodePath AttackControllerPath { get; set; } = new("StateMachine/Attack/AttackController");
         [Export] public string IdleAnimation = "idle";
@@ -17,11 +17,13 @@ namespace Kuros.Actors.Enemies.Animation
         [Export] public string HitAnimation = "hit";
         [Export] public string DieAnimation = "death";
         [Export(PropertyHint.Range, "0,1,0.01")] public float MixDuration = 0.15f;
-
-        private EnemyC1WaiteraAAttackController? _attackController;
+        private EnemyB2Fat02AttackController? _attackController;
         private string _currentKey = string.Empty;
         private SpineAnimationPlaybackMode _currentMode = SpineAnimationPlaybackMode.Loop;
         private StringComparison _comparison = StringComparison.OrdinalIgnoreCase;
+        private float _activeLoopStart;
+        private float _activeLoopEnd;
+        private EnemySmashAttack? _skillChargeSmashAttack;
 
         public override void _Ready()
         {
@@ -48,6 +50,7 @@ namespace Kuros.Actors.Enemies.Animation
         {
             base._Process(delta);
             UpdateAnimation();
+            TickPartialLoop();
         }
 
         private void UpdateAnimation()
@@ -93,17 +96,22 @@ namespace Kuros.Actors.Enemies.Animation
 
             string attackName = controller.CurrentAttackName;
             if (!string.IsNullOrEmpty(attackName))
-            {
+            {   
                 if (attackName.Equals(controller.MeleeAttackName, _comparison))
                 {
                     PlayOnceIfNeeded("Attack", AttackAnimation);
                     return;
                 }
 
-                if (attackName.Equals(controller.ChargeAttackName, _comparison))
+                if (attackName.Equals(controller.SkillAttackName, _comparison))
                 {
-                    PlayOnceIfNeeded("Skill", SkillAnimation);
-                    return;
+                    var skillAttack = ResolveSkillSmashAttack(controller);
+
+                    if (skillAttack == null || !skillAttack.IsDashing || !skillAttack.IsDashFinished)// 只有当冲刺攻击存在且冲刺阶段结束时才切换到其他动画，否则继续播放skill动画
+                    {
+                        PlayOnceIfNeeded("Skill", SkillAnimation);
+                        return;
+                    }
                 }
             }
 
@@ -154,6 +162,16 @@ namespace Kuros.Actors.Enemies.Animation
             }
         }
 
+        private void TickPartialLoop()
+        {
+            if (_currentMode != SpineAnimationPlaybackMode.PartialLoop)
+            {
+                return;
+            }
+
+            UpdatePartialLoop(_activeLoopStart, _activeLoopEnd);
+        }
+
         private void PlayEmptyIfNeeded()
         {
             if (_currentKey == "Empty")
@@ -168,7 +186,7 @@ namespace Kuros.Actors.Enemies.Animation
             }
         }
 
-        private EnemyC1WaiteraAAttackController? ResolveAttackController()
+        private EnemyB2Fat02AttackController? ResolveAttackController()
         {
             if (_attackController != null && IsInstanceValid(_attackController))
             {
@@ -180,14 +198,25 @@ namespace Kuros.Actors.Enemies.Animation
                 return null;
             }
 
-            _attackController = GetNodeOrNull<EnemyC1WaiteraAAttackController>(AttackControllerPath);
+            _attackController = GetNodeOrNull<EnemyB2Fat02AttackController>(AttackControllerPath);
             if (_attackController == null)
             {
-                _attackController = Enemy.GetNodeOrNull<EnemyC1WaiteraAAttackController>(AttackControllerPath);
+                _attackController = Enemy.GetNodeOrNull<EnemyB2Fat02AttackController>(AttackControllerPath);
             }
 
             return _attackController;
         }
+        private EnemySmashAttack? ResolveSkillSmashAttack(EnemyB2Fat02AttackController controller)
+        {
+            if (_skillChargeSmashAttack != null && IsInstanceValid(_skillChargeSmashAttack))
+            {
+                return _skillChargeSmashAttack;
+            }
+
+            _skillChargeSmashAttack = controller.GetNodeOrNull<EnemySmashAttack>(controller.SkillAttackName);
+            return _skillChargeSmashAttack;
+        }
+
     }
 }
 

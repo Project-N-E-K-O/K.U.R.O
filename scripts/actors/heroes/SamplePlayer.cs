@@ -612,10 +612,14 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 	private int ApplyDamageWithSpecificArea(Area2D attackArea, float damageAmount, Action<GameActor, bool>? onHit)
 	{
 		CacheAttackCollisionShape(attackArea);
-		int hitCount = DealDamageFromBodies(attackArea, damageAmount, onHit);
+		int hitCount = DealDamageFromHitAreas(attackArea, damageAmount, onHit);
 		if (hitCount == 0)
 		{
 			hitCount = DealDamageViaShapeQuery(attackArea, damageAmount, onHit);
+		}
+		if (hitCount == 0)
+		{
+			hitCount = DealDamageFromBodies(attackArea, damageAmount, onHit);
 		}
 
 		return hitCount;
@@ -681,13 +685,53 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 		}
 	}
 
+	private int DealDamageFromHitAreas(Area2D attackArea, float damageAmount, Action<GameActor, bool>? onHit)
+	{
+		var overlappingAreas = attackArea.GetOverlappingAreas();
+		int hitCount = 0;
+		var uniqueTargets = new HashSet<GameActor>();
+
+		foreach (Node areaNode in overlappingAreas)
+		{
+			if (areaNode is not Area2D hitArea)
+			{
+				continue;
+			}
+
+			if (!TryResolveActorFromHitArea(hitArea, out GameActor actor))
+			{
+				continue;
+			}
+
+			if (!IsValidAttackTarget(actor) || !uniqueTargets.Add(actor))
+			{
+				continue;
+			}
+
+			if (!actor.IsHitByArea(attackArea))
+			{
+				continue;
+			}
+
+			DealDamageToTarget(actor, damageAmount);
+			hitCount++;
+			onHit?.Invoke(actor, false);
+		}
+
+		return hitCount;
+	}
+
 	private int DealDamageFromBodies(Area2D attackArea, float damageAmount, Action<GameActor, bool>? onHit)
 	{
 		var bodies = attackArea.GetOverlappingBodies();
 		int hitCount = 0;
+		var uniqueTargets = new HashSet<GameActor>();
 		foreach (Node body in bodies)
 		{
-			if (body is GameActor actor && IsValidAttackTarget(actor))
+			if (body is GameActor actor &&
+				IsValidAttackTarget(actor) &&
+				uniqueTargets.Add(actor) &&
+				actor.IsHitByArea(attackArea))
 			{
 				DealDamageToTarget(actor, damageAmount);
 				hitCount++;
@@ -721,8 +765,8 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 			Shape = _attackCollisionShape.Shape,
 			Transform = _attackCollisionShape.GlobalTransform,
 			CollisionMask = uint.MaxValue,
-			CollideWithAreas = false,
-			CollideWithBodies = true
+			CollideWithAreas = true,
+			CollideWithBodies = false
 		};
 
 		_attackQueryExclude.Clear();
@@ -745,7 +789,11 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 			}
 
 			var colliderObject = colliderVariant.As<GodotObject>();
-			if (colliderObject is GameActor actor && IsValidAttackTarget(actor) && uniqueTargets.Add(actor))
+			if (colliderObject is Area2D hitArea &&
+				TryResolveActorFromHitArea(hitArea, out GameActor actor) &&
+				IsValidAttackTarget(actor) &&
+				uniqueTargets.Add(actor) &&
+				actor.IsHitByArea(attackArea))
 			{
 				DealDamageToTarget(actor, damageAmount);
 				hitCount++;
@@ -754,6 +802,24 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 		}
 
 		return hitCount;
+	}
+
+	private static bool TryResolveActorFromHitArea(Area2D hitArea, out GameActor actor)
+	{
+		Node? current = hitArea;
+		while (current != null)
+		{
+			if (current is GameActor gameActor)
+			{
+				actor = gameActor;
+				return true;
+			}
+
+			current = current.GetParent();
+		}
+
+		actor = null!;
+		return false;
 	}
 
 	protected virtual bool IsValidAttackTarget(GameActor candidate)
@@ -772,7 +838,7 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 		target.TakeDamage(finalDamage, GlobalPosition, this);
 	}
 
-	public bool IsHitByArea(Area2D? attackerArea)
+	public override bool IsHitByArea(Area2D? attackerArea)
 	{
 		if (attackerArea == null)
 		{

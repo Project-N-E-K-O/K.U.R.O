@@ -1,0 +1,38 @@
+[gd_scene load_steps=6 format=3 uid="uid://2pny8f8vuu3j"]
+
+[ext_resource type="Script" uid="uid://dtgdjgrqgype7" path="res://scripts/items/world/WorldItemEntity.cs" id="1_64hvb"]
+[ext_resource type="Resource" uid="uid://c01sltuo7404y" path="res://resources/items/Weapon_Stab_umbrella.tres" id="2_07ll6"]
+[ext_resource type="Texture2D" uid="uid://bruwldtdbju66" path="res://assets/weapons/26_0000s_0004_闸门刀-副本.png" id="3_64hvb"]
+
+[sub_resource type="RectangleShape2D" id="BodyShape_rr6vl"]
+size = Vector2(1836, 184)
+
+[sub_resource type="RectangleShape2D" id="TriggerShape_yahcm"]
+size = Vector2(3168, 360)
+
+[node name="WeaponSlashBarrierGate" type="CharacterBody2D"]
+scale = Vector2(0.5, 0.5)
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_64hvb")
+ItemDefinition = ExtResource("2_07ll6")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("3_64hvb")
+region_enabled = true
+region_rect = Rect2(0, 424, 1832, 177)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(1, 0)
+scale = Vector2(0.5, 0.5)
+shape = SubResource("BodyShape_rr6vl")
+
+[node name="AttackArea" type="Area2D" parent="."]
+scale = Vector2(0.5, 0.5)
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AttackArea"]
+position = Vector2(128, 2)
+scale = Vector2(0.5, 0.5)
+shape = SubResource("TriggerShape_yahcm")

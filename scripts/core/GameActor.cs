@@ -48,9 +48,12 @@ namespace Kuros.Core
 
 		private bool _deathStarted = false;
 		private bool _deathFinalized = false;
+		private Area2D? _cachedHitArea;
+		private bool _hitAreaResolved;
 
 		public bool IsDeathSequenceActive => _deathStarted && !_deathFinalized;
 		public bool IsDead => _deathFinalized;
+		public bool IgnoreHitStateOnDamage { get; set; } = false;
 
 		public override void _Ready()
 		{
@@ -166,6 +169,42 @@ namespace Kuros.Core
 			// StateMachine._PhysicsProcess is called automatically by Godot if it's in the tree
 		}
 
+		protected virtual Area2D? ResolvePreferredHitArea()
+		{
+			if (_cachedHitArea != null && GodotObject.IsInstanceValid(_cachedHitArea) && _cachedHitArea.IsInsideTree())
+			{
+				return _cachedHitArea;
+			}
+
+			if (_hitAreaResolved)
+			{
+				return null;
+			}
+
+			_cachedHitArea = GetNodeOrNull<Area2D>("HitArea")
+				?? GetNodeOrNull<Area2D>("Sprite2D/HitArea")
+				?? FindChild("HitArea", recursive: true, owned: false) as Area2D;
+
+			_hitAreaResolved = true;
+			return _cachedHitArea;
+		}
+
+		public virtual bool IsHitByArea(Area2D? attackerArea)
+		{
+			if (attackerArea == null || !attackerArea.IsInsideTree())
+			{
+				return false;
+			}
+
+			var hitArea = ResolvePreferredHitArea();
+			if (hitArea != null && GodotObject.IsInstanceValid(hitArea) && hitArea.IsInsideTree())
+			{
+				return attackerArea.OverlapsArea(hitArea);
+			}
+
+			return attackerArea.OverlapsBody(this);
+		}
+
 		public virtual void TakeDamage(int damage, Vector2? attackOrigin = null, GameActor? attacker = null)
 		{
 			if (IsDeathSequenceActive || IsDead) return;
@@ -205,8 +244,8 @@ namespace Kuros.Core
 			}
 			else
 			{
-				// Force state change to Hit
-				if (StateMachine != null)
+				// Force state change to Hit unless this actor is in super-armor phase.
+				if (!IgnoreHitStateOnDamage && StateMachine != null)
 				{
 					StateMachine.ChangeState("Hit");
 				}

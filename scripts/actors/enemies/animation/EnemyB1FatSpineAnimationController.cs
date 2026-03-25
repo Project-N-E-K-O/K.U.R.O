@@ -46,6 +46,11 @@ namespace Kuros.Actors.Enemies.Animation
             ResolveAttackController();
         }
 
+        protected override float GetPreferredMixDuration()
+        {
+            return MixDuration;
+        }
+
         public override void _Process(double delta)
         {
             base._Process(delta);
@@ -78,6 +83,17 @@ namespace Kuros.Actors.Enemies.Animation
                     break;
                 case "Attack":
                     HandleAttackAnimations();
+                    break;
+                case "CooldownFrozen":
+                    if (_currentKey == "Skill3" && _currentMode == SpineAnimationPlaybackMode.Once)
+                    {
+                        // skill3 正在播放，等待其自然结束，不打断
+                        break;
+                    }
+                    if (!TryPlaySkill3Finisher())
+                    {
+                        PlayIdle();
+                    }
                     break;
                 default:
                     PlayIdle();
@@ -119,13 +135,48 @@ namespace Kuros.Actors.Enemies.Animation
                         return;
                     }
 
-                    // PlayOnceIfNeeded("Skill3", Skill3Animation);
-                    // return;
+                    TryPlaySkill3Finisher();
+                    return;
                 }
 
             }
 
             PlayIdle();
+        }
+
+        private bool TryPlaySkill3Finisher()
+        {
+            var controller = ResolveAttackController();
+            if (controller == null)
+            {
+                return false;
+            }
+
+            string attackName = controller.CurrentAttackName;
+            if (string.IsNullOrEmpty(attackName) || !attackName.Equals(controller.Skill1AttackName, _comparison))
+            {
+                return false;
+            }
+
+            var skill1Attack = ResolveSkill1ChargeGrabAttack(controller);
+            if (skill1Attack == null || !skill1Attack.IsDashFinished)
+            {
+                return false;
+            }
+
+            if (skill1Attack.IsEvaluatingEscape || !skill1Attack.AreEscapeCountersCleared)
+            {
+                return false;
+            }
+
+            if (!skill1Attack.HasPendingSkill3Finisher)
+            {
+                return false;
+            }
+
+            PlayOnceIfNeeded("Skill3", Skill3Animation);
+            skill1Attack.ConsumeSkill3FinisherRequest();
+            return true;
         }
 
         private void PlayIdle()

@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://qd5abd4opeob"]
+[gd_scene load_steps=23 format=3 uid="uid://qd5abd4opeob"]
 
 [ext_resource type="PackedScene" uid="uid://dd8xmpgwy0t2o" path="res://scenes/environments/scene2.tscn" id="1_7jsho"]
 [ext_resource type="Script" uid="uid://x1ic1ym4ykq8" path="res://scripts/scenes/BattleSceneManager.cs" id="1_ctuyy"]
@@ -8,8 +8,9 @@
 [ext_resource type="PackedScene" uid="uid://c88kwpwoxtoev" path="res://scenes/ui/hud/BattleHUD.tscn" id="5_qokfb"]
 [ext_resource type="PackedScene" uid="uid://cofm45kotvgto" path="res://scenes/actors/enemies/Enemy_B1_fat.tscn" id="6_ctuyy"]
 [ext_resource type="Script" uid="uid://b7afb3wjghskq" path="res://scripts/items/world/DropItemDebugger.cs" id="7_k0qph"]
-[ext_resource type="Script" uid="uid://carsh4dnv63qg" path="res://scripts/controllers/EnemySpawnManager.cs" id="8_5klp8"]
+[ext_resource type="Script" uid="uid://b3iq6dm2pc5y0" path="res://scripts/controllers/EnemySpawnManager.cs" id="8_5klp8"]
 [ext_resource type="PackedScene" uid="uid://wqcdwpyo1nji" path="res://scenes/actors/enemies/Enemy_B1_thin.tscn" id="10_sfgmy"]
+[ext_resource type="PackedScene" uid="uid://wrebd662va23" path="res://scenes/actors/enemies/Enemy_B2_fat02.tscn" id="11_vvtmr"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_s0pgc"]
 size = Vector2(16974, 774)
@@ -56,7 +57,7 @@ y_sort_enabled = true
 position = Vector2(0, 20)
 
 [node name="MainCharacter" parent="World" instance=ExtResource("2_s0pgc")]
-position = Vector2(-2078.0007, 482)
+position = Vector2(6305, 482.00003)
 
 [node name="Camera2D" type="Camera2D" parent="World/MainCharacter"]
 position = Vector2(0, -15.15156)
@@ -68,9 +69,6 @@ limit_bottom = 1500
 position_smoothing_enabled = true
 drag_horizontal_enabled = true
 drag_vertical_enabled = true
-
-[node name="Enemy_B1_fat" parent="World" instance=ExtResource("6_ctuyy")]
-position = Vector2(-1325, 415)
 
 [node name="FrontWall" type="Node2D" parent="World"]
 
@@ -129,6 +127,12 @@ shape = SubResource("RectangleShape2D_k0qph")
 
 [node name="Node2D" type="Node2D" parent="World"]
 script = ExtResource("7_k0qph")
+
+[node name="Enemy_B1_fat" parent="World" instance=ExtResource("6_ctuyy")]
+position = Vector2(9810, 0)
+
+[node name="Enemy_B2_fat02" parent="World" instance=ExtResource("11_vvtmr")]
+position = Vector2(2906, 196)
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 visible = false

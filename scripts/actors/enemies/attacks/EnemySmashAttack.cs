@@ -4,32 +4,27 @@ using Kuros.Actors.Heroes.States;
 namespace Kuros.Actors.Enemies.Attacks
 {
     /// <summary>
-    /// 冲刺抓取攻击：
+    /// 冲刺重击攻击：
 	/// 1. 玩家进入检测区域后触发预热；
 	/// 2. 预热结束直线冲刺至玩家先前位置；
-	/// 3. 冲刺结束若命中，施加冻结并进入逃脱判定；
-	/// 4. 逃脱失败造成伤害，任一阶段被打断则立即结束。
+	/// 3. 冲刺结束若命中，施加冻结并进入后摇冷却。
     /// </summary>
-    public partial class EnemyChargeGrabAttack : EnemyAttackTemplate
+    public partial class EnemySmashAttack : EnemyAttackTemplate
     {
         [ExportCategory("Areas")]
         [Export] public NodePath DetectionAreaPath = new NodePath();
-        [Export] public NodePath GrabAreaPath = new NodePath();
+        [Export] public NodePath SmashAreaPath = new NodePath();
 
         [ExportCategory("Dash")]
         [Export(PropertyHint.Range, "10,2000,10")] public float DashSpeed = 600f;
 		[Export(PropertyHint.Range, "0,2000,10")] public float DashDistance = 0f;
         [Export] public bool LockFacingDuringDash = true;
-		[Export(PropertyHint.Range, "0,500,1")] public float MinDashDistanceBeforeGrab = 24f;
+		[Export(PropertyHint.Range, "0,500,1")] public float MinDashDistanceBeforeSmash = 24f;
 		[Export(PropertyHint.Range, "0,5,0.1")] public float SnapshotDelaySeconds = 0f; // 冲刺前等待一段时间再记录玩家位置
 
         [ExportCategory("Effects")]
 		[Export(PropertyHint.Range, "0,10,0.1")] public float AppliedFrozenDuration = 5.0f;
-        [Export(PropertyHint.Range, "0,1000,1")] public int DamageOnEscapeFailure = 20;
 		[Export] public StringName CooldownStateName = "CooldownFrozen";
-
-		[ExportCategory("Escape")]
-		[Export(PropertyHint.Range, "0,10,0.1")] public float EscapeWindowSeconds = 0.0f;
 
 		private const float MinDashDistance = 32f;
 		private const float PostCooldownDuration = 1.0f;
@@ -41,9 +36,6 @@ namespace Kuros.Actors.Enemies.Attacks
 
         private Vector2 _dashDirection = Vector2.Right;
 		private Vector2 _dashTarget;
-		private SamplePlayer? _grabbedPlayer;
-		private bool _isEvaluatingEscape;
-		private float _escapeTimer;
 		private bool _isDashing;
 		private bool _dashFinalized;
 		private bool _skipRecoveryGrab;
@@ -54,19 +46,9 @@ namespace Kuros.Actors.Enemies.Attacks
         private bool _canAttemptGrab;
 		private float _snapshotTimer = 0f;
 		private bool _waitingForSnapshot = false;
-		private bool _pendingSkill3Finisher;
 
-		public bool IsEvaluatingEscape => _isEvaluatingEscape;
 		public bool IsDashing => _isDashing;
 		public bool IsDashFinished => _dashFinalized;
-		public virtual bool AreEscapeCountersCleared => true;
-		public bool HasPendingSkill3Finisher => _pendingSkill3Finisher;
-		protected float EscapeTimerRemaining => _escapeTimer;
-
-		public void ConsumeSkill3FinisherRequest()
-		{
-			_pendingSkill3Finisher = false;
-		}
 
         protected override void OnInitialized()
         {
@@ -82,10 +64,10 @@ namespace Kuros.Actors.Enemies.Attacks
 			}
 			else
 			{
-				GD.PushWarning($"[EnemyChargeGrabAttack] DetectionArea not found for {Enemy?.Name ?? Name}, fallback to DetectionRange.");
+				GD.PushWarning($"[EnemySmashAttack] DetectionArea not found for {Enemy?.Name ?? Name}, fallback to DetectionRange.");
             }
 
-            _grabArea = ResolveArea(GrabAreaPath);
+            _grabArea = ResolveArea(SmashAreaPath);
             if (_grabArea == null)
             {
                 _grabArea = AttackArea;
@@ -145,8 +127,7 @@ namespace Kuros.Actors.Enemies.Attacks
 			_pendingCooldownExit = false;
 			_dashPreviousPosition = Enemy?.GlobalPosition ?? Vector2.Zero;
 			_dashDistanceTraveled = 0f;
-			_canAttemptGrab = MinDashDistanceBeforeGrab <= 0f;
-			_pendingSkill3Finisher = false;
+			_canAttemptGrab = MinDashDistanceBeforeSmash <= 0f;
 			PrepareDashTowardsPlayer();
 		}
 
@@ -178,8 +159,6 @@ namespace Kuros.Actors.Enemies.Attacks
 			Enemy.Velocity = _dashDirection * DashSpeed;
         }
 
-		private bool HasActiveGrab => _grabbedPlayer != null || _isEvaluatingEscape;
-
         protected override void OnRecoveryStarted()
         {
             base.OnRecoveryStarted();
@@ -200,23 +179,17 @@ namespace Kuros.Actors.Enemies.Attacks
 				FinishDash();
 			}
 
-			if (HasActiveGrab)
-			{
-				return;
-			}
-
 			if (!_canAttemptGrab)
 			{
-				// 未达到可抓取条件时，等待攻击流程自然结束后再进入冷却。
-				_pendingSkill3Finisher = true;
+				StartPostCooldown();
+				_pendingCooldownExit = true;
 				return;
 			}
 
 			if (!TryExecuteGrab())
 			{
-				// 未抓到玩家时，不立即切冷却状态，避免直接打断攻击收尾动画。
-				_pendingSkill3Finisher = true;
-				return;
+				StartPostCooldown();
+				_pendingCooldownExit = true;
 			}
 		}
 
@@ -237,17 +210,6 @@ namespace Kuros.Actors.Enemies.Attacks
 					PrepareDashTowardsPlayer(); // 延迟结束，此时快照玩家位置
 				}
 				return; 
-			}
-
-			if (_isEvaluatingEscape && _grabbedPlayer != null)
-			{
-				_escapeTimer -= (float)delta;
-				UpdateEscapeSequence(_grabbedPlayer, delta);
-
-				if (_escapeTimer <= 0f)
-				{
-					ResolveEscape(false);
-				}
 			}
 
 			if (_postAttackCooldown > 0f)
@@ -280,51 +242,10 @@ namespace Kuros.Actors.Enemies.Attacks
 			UpdateDetectionTracking();
 		}
 
-		protected virtual void UpdateEscapeSequence(SamplePlayer player, double delta)
-		{
-			// 子类实现具体逃脱判定逻辑
-		}
-
 		protected override bool ShouldHoldRecoveryPhase()
 		{
-			return HasActiveGrab;
+			return false;
 		}
-
-		protected void ResolveEscape(bool escaped)
-		{
-			if (_grabbedPlayer == null)
-			{
-				_isEvaluatingEscape = false;
-				return;
-			}
-
-			_isEvaluatingEscape = false;
-
-			var player = _grabbedPlayer;
-
-			if (!escaped)
-			{
-				ReleasePlayer(applyDamage: true);
-        }
-			else
-			{
-				ReleasePlayer(applyDamage: false);
-			}
-
-			if (player != null)
-			{
-				OnEscapeSequenceFinished(player, escaped);
-			}
-
-			// 抓到后进入挣脱，判定结束（成功/失败）都应进入 skill3 收尾。
-			_pendingSkill3Finisher = true;
-
-			// 挣脱判定结束后不立即取消攻击，让恢复阶段自然收尾，避免瞬切冷却状态。
-		}
-
-		protected virtual void OnEscapeSequenceStarted(SamplePlayer player) { }
-
-		protected virtual void OnEscapeSequenceFinished(SamplePlayer player, bool escaped) { }
 
 		private void PrepareDashTowardsPlayer()
         {
@@ -339,7 +260,8 @@ namespace Kuros.Actors.Enemies.Attacks
 				recordedTarget = Enemy.PlayerTarget.GlobalPosition;
 			}
 			else
-			{
+			{	
+				// 没有玩家目标时朝当前朝向的方向冲刺一个固定距离，避免原地。
 				recordedTarget = dashStart + (Enemy.FacingRight ? Vector2.Right : Vector2.Left) * MinDashDistance;
 			}
 
@@ -392,13 +314,11 @@ namespace Kuros.Actors.Enemies.Attacks
 				return false;
             }
 
-			_grabbedPlayer = player;
+			// 成功命中，施加冻结状态并进入后摇冷却。
             ApplyFrozenState(player);
 			_playerInsideDetection = false;
 
-			_isEvaluatingEscape = true;
-			_escapeTimer = EscapeWindowSeconds > 0f ? EscapeWindowSeconds : AppliedFrozenDuration;
-			OnEscapeSequenceStarted(player);
+			// 命中后先保持当前攻击流程，避免动画被立即切到冷却状态。
 			return true;
         }
 
@@ -418,36 +338,9 @@ namespace Kuros.Actors.Enemies.Attacks
             if (frozenState != null)
             {
                 frozenState.FrozenDuration = AppliedFrozenDuration;
-				frozenState.BeginExternalHold();
-            player.StateMachine?.ChangeState("Frozen");
+				player.StateMachine?.ChangeState("Frozen");
 			}
         }
-
-		private void ReleasePlayer(bool applyDamage)
-		{
-			if (_grabbedPlayer == null) return;
-
-			if (applyDamage)
-			{
-				var sourcePosition = Enemy?.GlobalPosition;
-				if (Enemy != null)
-				{
-					_grabbedPlayer.TakeDamage(DamageOnEscapeFailure, sourcePosition, Enemy);
-				}
-				else
-				{
-					_grabbedPlayer.TakeDamage(DamageOnEscapeFailure, sourcePosition);
-				}
-				_grabbedPlayer.StateMachine?.ChangeState("Hit");
-			}
-
-			var frozenState = _grabbedPlayer.StateMachine?.GetNodeOrNull<PlayerFrozenState>("Frozen");
-			frozenState?.EndExternalHold();
-
-			_grabbedPlayer = null;
-
-			// 交由 OnAttackFinished 统一进入冷却，避免在释放瞬间切状态打断动画。
-		}
 
 		private void StartPostCooldown()
         {
@@ -506,8 +399,7 @@ namespace Kuros.Actors.Enemies.Attacks
 		private void UpdateDetectionTracking()
 		{
 			if (_detectionArea == null || Enemy?.PlayerTarget == null) return;
-			if (HasActiveGrab) return;
-		if (_postAttackCooldown > 0f) return;
+			if (_postAttackCooldown > 0f) return;
 
 			bool overlaps = _detectionArea.OverlapsBody(Enemy.PlayerTarget);
 			if (overlaps && !_playerInsideDetection)
@@ -527,7 +419,6 @@ namespace Kuros.Actors.Enemies.Attacks
 			if (Enemy.IsDeathSequenceActive || Enemy.IsDead) return;
             if (IsRunning || IsOnCooldown) return;
 			if (Enemy.AttackTimer > 0) return;
-			if (HasActiveGrab) return;
 			if (_postAttackCooldown > 0f) return;
 
 			if (_controller != null && _controller.PeekQueuedAttack() != this)
@@ -593,8 +484,8 @@ namespace Kuros.Actors.Enemies.Attacks
 				_canAttemptGrab = true;
 				if (!TryExecuteGrab())
 				{
-					// 强制收尾时若未抓到玩家，保持在攻击流程内，交由 OnAttackFinished 统一进入冷却。
-					_pendingSkill3Finisher = true;
+					//StartPostCooldown();
+					FinishCooldownState();
 				}
 				return;
 			}
@@ -611,7 +502,7 @@ namespace Kuros.Actors.Enemies.Attacks
 			{
 				_dashDistanceTraveled += moved;
 				_dashPreviousPosition = currentPosition;
-				if (!_canAttemptGrab && _dashDistanceTraveled >= MinDashDistanceBeforeGrab)
+				if (!_canAttemptGrab && _dashDistanceTraveled >= MinDashDistanceBeforeSmash)
 				{
 					_canAttemptGrab = true;
 				}
@@ -648,7 +539,7 @@ namespace Kuros.Actors.Enemies.Attacks
 		{
 			base.OnAttackFinished();
 			_playerInsideDetection = false;
-			if (_grabbedPlayer == null && _postAttackCooldown <= 0f)
+			if (_postAttackCooldown <= 0f)
 			{
 				StartPostCooldown();
 			}

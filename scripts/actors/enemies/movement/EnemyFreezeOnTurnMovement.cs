@@ -48,6 +48,11 @@ public partial class EnemyFreezeOnTurnMovement : EnemyChaseMovement
 
     private bool ShouldApplyFreeze(SampleEnemy enemy)
     {
+        if (enemy.StateMachine?.CurrentState?.Name == "Attack")
+        {
+            return false;
+        }
+
         if (!ApplyFreezeOnlyWhenFacingPlayer) return true;
         Vector2 dirToPlayer = enemy.GetDirectionToPlayer();
         return dirToPlayer != Vector2.Zero;

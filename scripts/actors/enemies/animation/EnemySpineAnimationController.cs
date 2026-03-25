@@ -49,8 +49,16 @@ namespace Kuros.Actors.Enemies.Animation
         {
             if (!string.IsNullOrEmpty(DefaultLoopAnimation))
             {
-                PlayLoop(DefaultLoopAnimation);
+                PlayLoop(DefaultLoopAnimation, GetPreferredMixDuration());
             }
+        }
+
+        /// <summary>
+        /// 子类可覆写该方法，统一提供当前控制器期望的默认混合时长。
+        /// </summary>
+        protected virtual float GetPreferredMixDuration()
+        {
+            return 0.5f;
         }
 
         /// <summary>
@@ -61,12 +69,12 @@ namespace Kuros.Actors.Enemies.Animation
             return true; 
         }
 
-        protected bool PlayLoop(string animationName, float mixDuration = 0.1f, float timeScale = 1f)
+        protected bool PlayLoop(string animationName, float mixDuration = 0.5f, float timeScale = 1f)
         {
             return PlayInternal(animationName, SpineAnimationPlaybackMode.Loop, mixDuration, timeScale);
         }
 
-        protected bool PlayOnce(string animationName, float mixDuration = 0.1f, float timeScale = 1f, string? followUpAnimation = null)
+        protected bool PlayOnce(string animationName, float mixDuration = 0.5f, float timeScale = 1f, string? followUpAnimation = null)
         {
             if (!PlayInternal(animationName, SpineAnimationPlaybackMode.Once, mixDuration, timeScale))
             {
@@ -76,13 +84,13 @@ namespace Kuros.Actors.Enemies.Animation
             var fallback = followUpAnimation ?? DefaultLoopAnimation;
             if (!string.IsNullOrEmpty(fallback))
             {
-                QueueAnimation(fallback, SpineAnimationPlaybackMode.Loop, 0f);
+                QueueAnimation(fallback, SpineAnimationPlaybackMode.Loop, 0f, GetPreferredMixDuration());
             }
 
             return true;
         }
 
-        protected bool QueueAnimation(string animationName, SpineAnimationPlaybackMode mode, float delaySeconds = 0f, float mixDuration = 0.1f, float timeScale = 1f)
+        protected bool QueueAnimation(string animationName, SpineAnimationPlaybackMode mode, float delaySeconds = 0f, float mixDuration = 0.5f, float timeScale = 1f)
         {
             if (string.IsNullOrEmpty(animationName) || _spineHelper == null)
             {
@@ -105,7 +113,7 @@ namespace Kuros.Actors.Enemies.Animation
             }
         }
 
-        protected bool PlayEmpty(float mixDuration = 0.1f)
+        protected bool PlayEmpty(float mixDuration = 0.5f)
         {
             if (_spineHelper == null) return false;
             
@@ -121,7 +129,7 @@ namespace Kuros.Actors.Enemies.Animation
             }
         }
 
-        protected bool PlayPartialLoop(string animationName, float loopStart, float loopEnd, float mixDuration = 0.1f, float timeScale = 1f)
+        protected bool PlayPartialLoop(string animationName, float loopStart, float loopEnd, float mixDuration = 0.5f, float timeScale = 1f)
         {
             if (string.IsNullOrEmpty(animationName) || _spineHelper == null || loopEnd <= loopStart)
             {

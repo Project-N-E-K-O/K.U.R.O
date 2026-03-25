@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="LootDropTable" load_steps=11 format=3 uid="uid://dj2v23mbucftf"]
+[gd_resource type="Resource" script_class="LootDropTable" load_steps=21 format=3 uid="uid://dj2v23mbucftf"]
 
 [ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="1_a21nw"]
 [ext_resource type="Script" uid="uid://dpdpwmf4dwu8k" path="res://scripts/systems/loot/LootDropTable.cs" id="1_table"]
@@ -7,6 +7,10 @@
 [ext_resource type="Texture2D" uid="uid://cp3tj4mexoi30" path="res://assets/weapons/伞.png" id="3_yfhaw"]
 [ext_resource type="Resource" uid="uid://dj2v1hj15vgiv" path="res://resources/items/skills/WeaponBlockSkill_Umbrella.tres" id="4_o1b4u"]
 [ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="5_0syin"]
+[ext_resource type="Texture2D" uid="uid://cgafxjgxpwvss" path="res://assets/weapons/26_0000s_0003_钻头-副本-2.png" id="7_r0x7m"]
+[ext_resource type="Resource" uid="uid://bf0i6jxqjqnb5" path="res://resources/items/skills/WeaponStabSkill_Drill.tres" id="8_yfhaw"]
+[ext_resource type="Texture2D" uid="uid://bruwldtdbju66" path="res://assets/weapons/26_0000s_0004_闸门刀-副本.png" id="9_0syin"]
+[ext_resource type="Resource" uid="uid://8agpqw2xpa76" path="res://resources/items/skills/WeaponSlashSkill_BarrierGate.tres" id="10_yx6va"]
 
 [sub_resource type="Resource" id="Resource_yx6va"]
 script = ExtResource("1_a21nw")
@@ -32,11 +36,66 @@ metadata/_custom_type_script = "uid://dfgtff7mly02w"
 [sub_resource type="Resource" id="Resource_5acox"]
 script = ExtResource("2_entry")
 Item = SubResource("Resource_hxipi")
+DropChance = 0.33
+metadata/_custom_type_script = "uid://nd1f744icb05"
+
+[sub_resource type="Resource" id="Resource_yfhaw"]
+script = ExtResource("1_a21nw")
+AttributeId = "attack_power"
+Value = 5.0
+Scaling = 2
+metadata/_custom_type_script = "uid://b4tcdtjy6u7ee"
+
+[sub_resource type="Resource" id="Resource_o1b4u"]
+script = ExtResource("5_0syin")
+ItemId = "Weapon_Stab_drill"
+DisplayName = "合金钻头"
+Description = "合金钻头"
+Icon = ExtResource("7_r0x7m")
+Category = "Weapon"
+Tags = Array[String](["戳刺类"])
+MaxStackSize = 1
+AttributeEntries = Array[ExtResource("1_a21nw")]([SubResource("Resource_yfhaw")])
+WeaponSkillResources = Array[Resource]([ExtResource("8_yfhaw")])
+WorldScenePath = "res://scenes/weapons/Weapon_Stab_drill.tscn"
+metadata/_custom_type_script = "uid://dfgtff7mly02w"
+
+[sub_resource type="Resource" id="Resource_0syin"]
+script = ExtResource("2_entry")
+Item = SubResource("Resource_o1b4u")
+DropChance = 0.33
+metadata/_custom_type_script = "uid://nd1f744icb05"
+
+[sub_resource type="Resource" id="Resource_13qse"]
+script = ExtResource("1_a21nw")
+AttributeId = "attack_power"
+Value = 3.0
+Scaling = 2
+metadata/_custom_type_script = "uid://b4tcdtjy6u7ee"
+
+[sub_resource type="Resource" id="Resource_ptnna"]
+script = ExtResource("5_0syin")
+ItemId = "Weapon_Slash_BarrierGate"
+DisplayName = "开刃升降杆"
+Description = "开刃升降杆"
+Icon = ExtResource("9_0syin")
+Category = "Weapon"
+Tags = Array[String](["挥砍类"])
+MaxStackSize = 1
+AttributeEntries = Array[ExtResource("1_a21nw")]([SubResource("Resource_13qse")])
+WeaponSkillResources = Array[Resource]([ExtResource("10_yx6va")])
+WorldScenePath = "res://scenes/weapons/Weapon_Slash_barrierGate.tscn"
+metadata/_custom_type_script = "uid://dfgtff7mly02w"
+
+[sub_resource type="Resource" id="Resource_rsspt"]
+script = ExtResource("2_entry")
+Item = SubResource("Resource_ptnna")
+DropChance = 0.33
 metadata/_custom_type_script = "uid://nd1f744icb05"
 
 [resource]
 script = ExtResource("1_table")
-MaxDrops = 1
+MaxDrops = 3
 ScatterRadius = 48.0
-DefaultImpulse = 200.0
-Entries = [SubResource("Resource_5acox")]
+DefaultImpulse = 400.0
+Entries = [SubResource("Resource_5acox"), SubResource("Resource_0syin"), SubResource("Resource_rsspt")]
