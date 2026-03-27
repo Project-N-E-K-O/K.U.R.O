@@ -9,11 +9,11 @@ namespace Kuros.Actors.Enemies.Attacks
 	/// 2. 预热结束直线冲刺至玩家先前位置；
 	/// 3. 冲刺结束若命中，造成伤害并施加不可挣脱的定时眩晕。
     /// </summary>
-    public partial class EnemySmashAttack : EnemyAttackTemplate
+    public partial class EnemyMoveAttack : EnemyAttackTemplate
     {
         [ExportCategory("Areas")]
         [Export] public NodePath DetectionAreaPath = new NodePath();
-        [Export] public NodePath SmashAreaPath = new NodePath();
+        [Export] public NodePath MoveAttackAreaPath = new NodePath();
 
         [ExportCategory("Dash")]
         [Export(PropertyHint.Range, "10,2000,10")] public float DashSpeed = 600f;
@@ -68,7 +68,7 @@ namespace Kuros.Actors.Enemies.Attacks
 				GD.PushWarning($"[EnemySmashAttack] DetectionArea not found for {Enemy?.Name ?? Name}, fallback to DetectionRange.");
             }
 
-	            _smashArea = ResolveArea(SmashAreaPath);
+	            _smashArea = ResolveArea(MoveAttackAreaPath);
 	            if (_smashArea == null)
             {
 	                _smashArea = AttackArea;

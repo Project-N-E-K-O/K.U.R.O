@@ -1,6 +1,7 @@
-[gd_scene load_steps=27 format=3 uid="uid://byi2utn347fwu"]
+[gd_scene load_steps=28 format=3 uid="uid://byi2utn347fwu"]
 
 [ext_resource type="Script" uid="uid://dk2iwmam78oa5" path="res://scripts/actors/enemies/EnemyNormalGuard1.cs" id="1_75dbm"]
+[ext_resource type="Resource" uid="uid://dj2v23mbucftf" path="res://resources/loot/EnemyB1FatDrops.tres" id="2_lxpom"]
 [ext_resource type="Script" uid="uid://d6ppl6a6djpr" path="res://scripts/core/effects/EffectController.cs" id="3_it0yr"]
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="4_f6qhq"]
 [ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="5_fp57c"]
@@ -60,6 +61,7 @@ AttackDamage = 0.0
 AttackCooldown = 1.0
 StateMachine = NodePath("StateMachine")
 EffectController = NodePath("EffectController")
+LootTable = ExtResource("2_lxpom")
 
 [node name="EffectController" type="Node" parent="."]
 script = ExtResource("3_it0yr")
@@ -107,9 +109,9 @@ shape = SubResource("CircleShape2D_ooggc")
 position = Vector2(0, 25)
 shape = SubResource("CapsuleShape2D_gvrrx")
 
-[node name="SmashArea" type="Area2D" parent="Sprite2D"]
+[node name="OnePunchAttackArea" type="Area2D" parent="Sprite2D"]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/SmashArea"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/OnePunchAttackArea"]
 position = Vector2(170, 0)
 shape = SubResource("RectangleShape2D_gvrrx")
 
@@ -138,13 +140,13 @@ PlayerDetectionAreaPath = NodePath("../../../Sprite2D/ControllerDetectionArea")
 [node name="OnePunchAttack" type="Node" parent="StateMachine/Attack/AttackController"]
 script = ExtResource("10_75dbm")
 DetectionAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
-SmashAreaPath = NodePath("../../../../Sprite2D/SmashArea")
+OnePunchAttackAreaPath = NodePath("../../../../Sprite2D/OnePunchAttackArea")
 DashSpeed = 1500.0
 DashDistance = 1500.0
 MinDashDistanceBeforeSmash = 0.0
 SnapshotDelaySeconds = 1.0
 OnePunchKnockbackDistance = 500.0
-OnePunchKnockbackDuration = 0.09999999999999999
+OnePunchKnockbackDuration = 0.1
 WarmupDuration = 1.0
 ActiveDuration = 0.5
 RecoveryDuration = 0.47
@@ -178,7 +180,6 @@ script = ExtResource("17_lt3oi")
 
 [node name="FreezeOnTurnMovement" type="Node" parent="."]
 script = ExtResource("18_u8fiq")
-FreezeDuration = 1.0
 
 [node name="SpineSprite" type="SpineSprite" parent="."]
 scale = Vector2(0.33, 0.33)

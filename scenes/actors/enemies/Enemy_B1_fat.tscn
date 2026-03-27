@@ -60,6 +60,7 @@ DetectionArea = NodePath("Sprite2D/ControllerDetectionArea")
 AttackArea = NodePath("Sprite2D/AttackArea")
 AttackDamage = 0.0
 AttackCooldown = 1.0
+MaxHealth = 1000
 StateMachine = NodePath("StateMachine")
 EffectController = NodePath("EffectController")
 LootTable = ExtResource("18_drop_table")
@@ -176,7 +177,7 @@ scale = Vector2(0.33, 0.33)
 skeleton_data_res = ExtResource("14_xv2am")
 preview_skin = "Default"
 preview_animation = "-- Empty --"
-preview_frame = true
+preview_frame = false
 preview_time = 0.0
 
 [node name="AnimationController" type="Node" parent="."]

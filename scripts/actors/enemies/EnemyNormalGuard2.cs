@@ -4,7 +4,7 @@ using Kuros.Core.Effects;
 using Kuros.Controllers;
 using Kuros.Actors.Enemies.Attacks;
 
-public partial class EnemyB2Fat02 : SampleEnemy
+public partial class EnemyNormalGuard2 : SampleEnemy
 {
 	// [Export(PropertyHint.Range, "0.1,10,0.1")] public float HitWindowSeconds = 2f;
 	// [Export(PropertyHint.Range, "0.1,5,0.1")] public float FreezeOnHitDuration = 0.5f;
@@ -45,7 +45,7 @@ public partial class EnemyB2Fat02 : SampleEnemy
 	// 		FrozenStateName = "Frozen",
 	// 		FallbackStateName = "Walk",
 	// 		Duration = FreezeOnHitDuration,
-	// 		EffectId = $"b2_fat02_hit_freeze_{GetInstanceId()}",
+	// 		EffectId = $"normal_guard2_hit_freeze_{GetInstanceId()}",
 	// 		ResumePreviousState = true
 	// 	};
 

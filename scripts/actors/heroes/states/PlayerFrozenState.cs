@@ -17,6 +17,7 @@ namespace Kuros.Actors.Heroes.States
         private float _originalSpeedScale = 1.0f;
         private MainCharacter? _mainCharacter;
         private bool _spineAnimationApplied;
+        private bool _allowTransitionOut;
 
         public bool IsExternallyHeld => _externallyHeld;
         public float RemainingHoldRatio
@@ -35,6 +36,7 @@ namespace Kuros.Actors.Heroes.States
         {
             _timer = FrozenDuration;
             _externallyHeld = false;
+            _allowTransitionOut = false; // 初始时不允许转换到其他状态。
             Actor.Velocity = Vector2.Zero;
             _mainCharacter = Actor as MainCharacter;
             _spineAnimationApplied = false;
@@ -91,20 +93,38 @@ namespace Kuros.Actors.Heroes.States
             _timer -= (float)delta;
             if (_timer <= 0)
             {
+                _allowTransitionOut = true; // 允许转换到其他状态（如 Idle），除非被外部控制打断。
                 ChangeState("Idle");
             }
+        }
+    
+        public override bool CanExitTo(string nextStateName)
+        {
+            if (nextStateName == "Dying" || nextStateName == "Dead")
+            {
+                return true;
+            }
+
+            if (nextStateName == "Frozen")
+            {
+                return true;
+            }
+
+            return _allowTransitionOut && nextStateName == "Idle";
         }
 
         public void BeginExternalHold()
         {
             _timer = FrozenDuration;
             _externallyHeld = true;
+            _allowTransitionOut = false;
         }
 
         public void EndExternalHold()
         {
             _externallyHeld = false;
 			_timer = 0f;
+			_allowTransitionOut = true;
 			ChangeState("Idle");
         }
     }

@@ -15,7 +15,6 @@ namespace Kuros.Actors.Enemies.Animation
         [Export] public string AttackAnimation = "attack";
         [Export] public string SkillAnimation = "skill";
         [Export] public string HitAnimation = "hit";
-        [Export] public string FrozenAnimation = "hit";
         [Export] public string DieAnimation = "death";
         private EnemyB2Fat02AttackController? _attackController;
         private string _currentKey = string.Empty;
@@ -69,9 +68,6 @@ namespace Kuros.Actors.Enemies.Animation
                     break;
                 case "Hit":
                     PlayOnceIfNeeded("Hit", HitAnimation, HitMixDuration);
-                    break;
-                case "Frozen":
-                    PlayLoopIfNeeded("Frozen", FrozenAnimation, HitMixDuration);
                     break;
                 case "Dying":
                     PlayOnceIfNeeded("Die", DieAnimation, DieMixDuration, enqueueIdle: false);

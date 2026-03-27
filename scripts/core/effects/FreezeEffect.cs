@@ -24,7 +24,7 @@ namespace Kuros.Core.Effects
             if (Actor.StateMachine == null) return;
 
             _previousState = Actor.StateMachine.CurrentState?.Name ?? FallbackStateName;
-            Actor.StateMachine.ChangeState(FrozenStateName);
+            //Actor.StateMachine.ChangeState(FrozenStateName);
 
             Actor.Velocity = Vector2.Zero;
             Actor.MoveAndSlide();

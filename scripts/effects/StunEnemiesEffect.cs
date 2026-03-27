@@ -11,7 +11,7 @@ namespace Kuros.Effects
     [GlobalClass]
     public partial class StunEnemiesEffect : ActorEffect
     {
-        [Export(PropertyHint.Range, "0.1,10,0.1")] public float StunDuration = 2f;
+        [Export(PropertyHint.Range, "0.1,10,0.1")] public float StunDuration = 0f;
         [Export(PropertyHint.Range, "10,1000,10")] public float Radius = 200f;
         [Export(PropertyHint.Range, "30,360,5")] public float ArcDegrees = 180f;
         [Export] public string TargetGroup = "enemies";

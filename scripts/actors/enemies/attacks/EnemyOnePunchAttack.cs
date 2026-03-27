@@ -1,4 +1,4 @@
-using Godot;
+﻿using Godot;
 
 namespace Kuros.Actors.Enemies.Attacks
 {
@@ -12,7 +12,7 @@ namespace Kuros.Actors.Enemies.Attacks
     {
         [ExportCategory("Areas")]
         [Export] public NodePath DetectionAreaPath = new NodePath();
-        [Export] public NodePath SmashAreaPath = new NodePath();
+        [Export] public NodePath OnePunchAttackAreaPath = new NodePath();
 
         [ExportCategory("Dash")]
         [Export(PropertyHint.Range, "10,2000,10")] public float DashSpeed = 600f;
@@ -31,7 +31,7 @@ namespace Kuros.Actors.Enemies.Attacks
 		private const float PostCooldownDuration = 1.0f;
 
         private Area2D? _detectionArea;
-        private Area2D? _grabArea;
+		private Area2D? _onePunchArea;
         private EnemyAttackController? _controller;
 		private bool _playerInsideDetection;
 
@@ -39,12 +39,12 @@ namespace Kuros.Actors.Enemies.Attacks
 		private Vector2 _dashTarget;
 		private bool _isDashing;
 		private bool _dashFinalized;
-		private bool _skipRecoveryGrab;
+		private bool _skipRecoveryOnePunch;
 		private float _postAttackCooldown;
 		private bool _pendingCooldownExit;
         private Vector2 _dashPreviousPosition;
         private float _dashDistanceTraveled;
-        private bool _canAttemptGrab;
+		private bool _canAttemptOnePunch;
 		private float _snapshotTimer = 0f;
 		private bool _waitingForSnapshot = false;
 
@@ -68,10 +68,10 @@ namespace Kuros.Actors.Enemies.Attacks
 				GD.PushWarning($"[EnemySmashAttack] DetectionArea not found for {Enemy?.Name ?? Name}, fallback to DetectionRange.");
             }
 
-            _grabArea = ResolveArea(SmashAreaPath);
-            if (_grabArea == null)
+            _onePunchArea = ResolveArea(OnePunchAttackAreaPath);
+            if (_onePunchArea == null)
             {
-                _grabArea = AttackArea;
+                _onePunchArea = AttackArea;
             }
 
 			SetPhysicsProcess(true);
@@ -98,7 +98,7 @@ namespace Kuros.Actors.Enemies.Attacks
 				return false;
 			}
 
-			// 使用自己的 DetectionArea 或回退到 Enemy.DetectionArea
+			// 使用自己的 DetectionArea 或回退到Enemy.DetectionArea
 			bool detectionSatisfied = _detectionArea != null
 				? _playerInsideDetection || _detectionArea.OverlapsBody(Enemy.PlayerTarget)
 				: Enemy.IsPlayerWithinDetectionRange();
@@ -123,12 +123,12 @@ namespace Kuros.Actors.Enemies.Attacks
 			base.OnAttackStarted();
 			_isDashing = false;
 			_dashFinalized = false;
-			_skipRecoveryGrab = false;
+			_skipRecoveryOnePunch = false;
 			_postAttackCooldown = 0f;
 			_pendingCooldownExit = false;
 			_dashPreviousPosition = Enemy?.GlobalPosition ?? Vector2.Zero;
 			_dashDistanceTraveled = 0f;
-			_canAttemptGrab = MinDashDistanceBeforeSmash <= 0f;
+			_canAttemptOnePunch = MinDashDistanceBeforeSmash <= 0f;
 			PrepareDashTowardsPlayer();
 		}
 
@@ -169,9 +169,9 @@ namespace Kuros.Actors.Enemies.Attacks
 				Enemy.Velocity = Vector2.Zero;
 			}
 
-			if (_skipRecoveryGrab)
+			if (_skipRecoveryOnePunch)
 			{
-				_skipRecoveryGrab = false;
+				_skipRecoveryOnePunch = false;
 				return;
 			}
 
@@ -180,14 +180,14 @@ namespace Kuros.Actors.Enemies.Attacks
 				FinishDash();
 			}
 
-			if (!_canAttemptGrab)
+			if (!_canAttemptOnePunch)
 			{
 				//StartPostCooldown();
 				_pendingCooldownExit = true;
 				return;
 			}
 
-			if (!TryExecuteGrab())
+			if (!TryExecuteOnePunch())
 			{
 				//StartPostCooldown();
 				_pendingCooldownExit = true;
@@ -301,7 +301,7 @@ namespace Kuros.Actors.Enemies.Attacks
 			RecoveryDuration = 1.0f;
         }
 
-		private bool TryExecuteGrab()
+		private bool TryExecuteOnePunch()
         {
 			if (Enemy == null) return false;
 
@@ -336,9 +336,9 @@ namespace Kuros.Actors.Enemies.Attacks
 
         private bool IsPlayerInsideOnePunchZone(SamplePlayer player)
         {
-            if (_grabArea != null)
+            if (_onePunchArea != null)
             {
-				return player.IsHitByArea(_grabArea);
+				return player.IsHitByArea(_onePunchArea);
             }
 
 			return player.IsHitByArea(AttackArea);
@@ -457,7 +457,7 @@ namespace Kuros.Actors.Enemies.Attacks
 
 			UpdateDashTravelProgress();
 
-			if (_canAttemptGrab && Enemy.PlayerTarget != null && IsPlayerInsideOnePunchZone(Enemy.PlayerTarget))
+			if (_canAttemptOnePunch && Enemy.PlayerTarget != null && IsPlayerInsideOnePunchZone(Enemy.PlayerTarget))
 			{
 				FinishDash(forceGrab: true);
 				return;
@@ -498,10 +498,10 @@ namespace Kuros.Actors.Enemies.Attacks
 			_isDashing = false;
 			if (forceGrab)
 			{
-				_skipRecoveryGrab = true;
+				_skipRecoveryOnePunch = true;
 				ForceEnterRecoveryPhase();
-				_canAttemptGrab = true;
-				if (!TryExecuteGrab())
+				_canAttemptOnePunch = true;
+				if (!TryExecuteOnePunch())
 				{
 					StartPostCooldown();
 					FinishCooldownState();
@@ -521,9 +521,9 @@ namespace Kuros.Actors.Enemies.Attacks
 			{
 				_dashDistanceTraveled += moved;
 				_dashPreviousPosition = currentPosition;
-				if (!_canAttemptGrab && _dashDistanceTraveled >= MinDashDistanceBeforeSmash)
+				if (!_canAttemptOnePunch && _dashDistanceTraveled >= MinDashDistanceBeforeSmash)
 				{
-					_canAttemptGrab = true;
+					_canAttemptOnePunch = true;
 				}
 			}
 		}
@@ -562,7 +562,8 @@ namespace Kuros.Actors.Enemies.Attacks
 			{
 				StartPostCooldown();
 			}
-			_skipRecoveryGrab = false;
+			_skipRecoveryOnePunch = false;
     }
 }
 }
+

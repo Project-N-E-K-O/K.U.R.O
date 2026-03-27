@@ -10,7 +10,7 @@ namespace Kuros.Actors.Enemies.Attacks
     public partial class EnemySimpleMeleeAttack : EnemyAttackTemplate
     {
         [Export(PropertyHint.Range, "0.1,5,0.1")]
-        public float AttackIntervalSeconds = 1.5f;
+        public float AttackIntervalSeconds = 1.5f; // 攻击间隔时间，单位秒
 
         [Export(PropertyHint.Range, "1,200,1")]
         public int Damage = 10;

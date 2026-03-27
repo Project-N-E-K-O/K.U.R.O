@@ -4,7 +4,7 @@ namespace Kuros.Actors.Enemies.States
 {
     public partial class EnemyHitState : EnemyState
     {
-        private const float STUN_DURATION = 0.1f;
+        private const float STUN_DURATION = 0.2f;
         private float _stunTimer;
 
         public override void Enter()

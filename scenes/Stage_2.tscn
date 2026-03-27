@@ -10,9 +10,9 @@
 [ext_resource type="Script" uid="uid://b7afb3wjghskq" path="res://scripts/items/world/DropItemDebugger.cs" id="7_k0qph"]
 [ext_resource type="Script" uid="uid://b3iq6dm2pc5y0" path="res://scripts/controllers/EnemySpawnManager.cs" id="8_5klp8"]
 [ext_resource type="PackedScene" uid="uid://byi2utn347fwu" path="res://scenes/actors/enemies/Enemy_Normal_guard1.tscn" id="8_vvtmr"]
-[ext_resource type="Resource" uid="uid://dj2v23mbucftf" path="res://resources/loot/EnemyB1FatDrops.tres" id="9_2l4aj"]
 [ext_resource type="PackedScene" uid="uid://wrebd662va23" path="res://scenes/actors/enemies/Enemy_B2_fat02.tscn" id="10_f0l3g"]
 [ext_resource type="PackedScene" uid="uid://wqcdwpyo1nji" path="res://scenes/actors/enemies/Enemy_B1_thin.tscn" id="10_sfgmy"]
+[ext_resource type="PackedScene" uid="uid://djio6ojcqw8yf" path="res://scenes/actors/enemies/Enemy_Normal_guard2.tscn" id="10_x3vg8"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_s0pgc"]
 size = Vector2(16974, 774)
@@ -131,14 +131,17 @@ shape = SubResource("RectangleShape2D_k0qph")
 script = ExtResource("7_k0qph")
 
 [node name="Enemy_B1_fat" parent="World" instance=ExtResource("6_ctuyy")]
-position = Vector2(13725, 0)
+position = Vector2(9530, 218)
+MaxHealth = 100
 
 [node name="Enemy_Normal_guard1" parent="World" instance=ExtResource("8_vvtmr")]
-position = Vector2(3220, 157)
-LootTable = ExtResource("9_2l4aj")
+position = Vector2(3901, 81)
 
 [node name="Enemy_B2_fat02" parent="World" instance=ExtResource("10_f0l3g")]
-position = Vector2(14478, 272)
+position = Vector2(1625, 1392)
+
+[node name="Enemy_Normal_guard2" parent="World" instance=ExtResource("10_x3vg8")]
+position = Vector2(276, -110)
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 visible = false

@@ -21,6 +21,10 @@ namespace Kuros.Systems.FSM
 
         public virtual void Enter() { }
         public virtual void Exit() { }
+
+        // 这是可选的转换。状态可以重写以阻止中断。
+        public virtual bool CanExitTo(string nextStateName) => true;
+        public virtual bool CanEnterFrom(string? currentStateName) => true;
         
         public virtual void Update(double delta) { }
         public virtual void PhysicsUpdate(double delta) { }
