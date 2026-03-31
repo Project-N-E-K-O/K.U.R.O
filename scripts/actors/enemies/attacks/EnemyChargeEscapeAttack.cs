@@ -10,10 +10,10 @@ namespace Kuros.Actors.Enemies.Attacks
     public partial class EnemyChargeEscapeAttack : EnemyChargeGrabAttack
     {
         [Export(PropertyHint.Range, "1,20,1")]
-        public int RequiredLeftInputs = 4;
+        public int RequiredLeftInputs = 3;
 
         [Export(PropertyHint.Range, "1,20,1")]
-        public int RequiredRightInputs = 4;
+        public int RequiredRightInputs = 3;
 
 		private int _leftCount;
 		private int _rightCount;

@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=3 uid="uid://qd5abd4opeob"]
+[gd_scene load_steps=22 format=3 uid="uid://qd5abd4opeob"]
 
 [ext_resource type="PackedScene" uid="uid://dd8xmpgwy0t2o" path="res://scenes/environments/scene2.tscn" id="1_7jsho"]
 [ext_resource type="Script" uid="uid://x1ic1ym4ykq8" path="res://scripts/scenes/BattleSceneManager.cs" id="1_ctuyy"]
@@ -9,10 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://cofm45kotvgto" path="res://scenes/actors/enemies/Enemy_B1_fat.tscn" id="6_ctuyy"]
 [ext_resource type="Script" uid="uid://b7afb3wjghskq" path="res://scripts/items/world/DropItemDebugger.cs" id="7_k0qph"]
 [ext_resource type="Script" uid="uid://b3iq6dm2pc5y0" path="res://scripts/controllers/EnemySpawnManager.cs" id="8_5klp8"]
-[ext_resource type="PackedScene" uid="uid://byi2utn347fwu" path="res://scenes/actors/enemies/Enemy_Normal_guard1.tscn" id="8_vvtmr"]
-[ext_resource type="PackedScene" uid="uid://wrebd662va23" path="res://scenes/actors/enemies/Enemy_B2_fat02.tscn" id="10_f0l3g"]
 [ext_resource type="PackedScene" uid="uid://wqcdwpyo1nji" path="res://scenes/actors/enemies/Enemy_B1_thin.tscn" id="10_sfgmy"]
-[ext_resource type="PackedScene" uid="uid://djio6ojcqw8yf" path="res://scenes/actors/enemies/Enemy_Normal_guard2.tscn" id="10_x3vg8"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_s0pgc"]
 size = Vector2(16974, 774)
@@ -41,11 +38,11 @@ size = Vector2(4509, 130)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_k0qph"]
 size = Vector2(193.5, 3232.25)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_f0l3g"]
-size = Vector2(1000, 1500)
-
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2l4aj"]
 size = Vector2(1112.5, 1843)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_f0l3g"]
+size = Vector2(1000, 1500)
 
 [node name="BattleScene" type="Node2D" node_paths=PackedStringArray("Player")]
 script = ExtResource("1_ctuyy")
@@ -59,7 +56,7 @@ y_sort_enabled = true
 position = Vector2(0, 20)
 
 [node name="MainCharacter" parent="World" instance=ExtResource("2_s0pgc")]
-position = Vector2(6305, 482.00003)
+position = Vector2(4084.9998, 482.00003)
 
 [node name="Camera2D" type="Camera2D" parent="World/MainCharacter"]
 position = Vector2(0, -15.15156)
@@ -130,24 +127,14 @@ shape = SubResource("RectangleShape2D_k0qph")
 [node name="Node2D" type="Node2D" parent="World"]
 script = ExtResource("7_k0qph")
 
-[node name="Enemy_B1_fat" parent="World" instance=ExtResource("6_ctuyy")]
-position = Vector2(10450, 266)
-
-[node name="Enemy_B2_fat02" parent="World" instance=ExtResource("10_f0l3g")]
-position = Vector2(373, 1234)
-
-[node name="Enemy_Normal_guard1" parent="World" instance=ExtResource("8_vvtmr")]
-position = Vector2(729, 81)
-
-[node name="Enemy_Normal_guard2" parent="World" instance=ExtResource("10_x3vg8")]
-position = Vector2(3954, 228)
+[node name="Enemy_B1_thin" parent="World" instance=ExtResource("10_sfgmy")]
+position = Vector2(5931, 106)
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 visible = false
 follow_viewport_scale = 4.18
 
 [node name="BattleHUD" parent="CanvasLayer" instance=ExtResource("5_qokfb")]
-visible = false
 top_level = true
 offset_left = -7553.0
 offset_top = -358.0
@@ -156,14 +143,14 @@ offset_bottom = -358.0
 
 [node name="EnemySpawneManager" type="Node2D" parent="." node_paths=PackedStringArray("TriggerArea")]
 top_level = true
-position = Vector2(-997, -18)
+position = Vector2(-997, 337)
 scale = Vector2(1.2, 1.2)
 script = ExtResource("8_5klp8")
 EnemyScene = ExtResource("6_ctuyy")
 SpawnCount = 2
 SpawnInterval = 1.35
 SpawnParentPath = NodePath("../World")
-TriggerArea = NodePath("../TriggerArea")
+TriggerArea = NodePath("TriggerArea")
 TriggerSize = Vector2(320, 197.37)
 TriggerCollisionLayer = 1
 TriggerCollisionMask = 1
@@ -174,6 +161,11 @@ EnemyAppearDelay = 1.0
 BackEffectZOffset = 1
 FrontEffectZOffset = 3
 DebugLineWidth = 2.5
+
+[node name="TriggerArea" type="Area2D" parent="EnemySpawneManager"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="EnemySpawneManager/TriggerArea"]
+shape = SubResource("RectangleShape2D_2l4aj")
 
 [node name="EnemySpawneManager2" type="Node2D" parent="." node_paths=PackedStringArray("TriggerArea")]
 top_level = true
@@ -202,9 +194,3 @@ monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="EnemySpawneManager2/TriggerArea"]
 shape = SubResource("RectangleShape2D_f0l3g")
-
-[node name="TriggerArea" type="Area2D" parent="."]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="TriggerArea"]
-position = Vector2(-924.25, 353.5)
-shape = SubResource("RectangleShape2D_2l4aj")
