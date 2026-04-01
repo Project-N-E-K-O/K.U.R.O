@@ -12,6 +12,15 @@ namespace Kuros.Core
 	public partial class GameActor : CharacterBody2D
 	{
 		public event Action<int, int>? HealthChanged;
+		/// <summary>
+		/// 实际受到伤害后触发（已扣血）。参数为实际伤害值。
+		/// </summary>
+		public event Action<int>? DamageTaken;
+		/// <summary>
+		/// 任意 GameActor 受到伤害时触发的全局静态事件。
+		/// 参数：victim（受击方）, attacker（攻击方，可为 null）, damage（实际伤害）
+		/// </summary>
+		public static event Action<GameActor, GameActor?, int>? AnyDamageTaken;
 
 		[ExportCategory("Stats")]
 		[Export] public float Speed = 300.0f;
@@ -233,6 +242,8 @@ namespace Kuros.Core
 			CurrentHealth -= damage;
 			CurrentHealth = Mathf.Max(CurrentHealth, 0);
 			NotifyHealthChanged();
+			DamageTaken?.Invoke(damage);
+			AnyDamageTaken?.Invoke(this, attacker, damage);
 
 			GameLogger.Info(nameof(GameActor), $"{Name} took {damage} damage! Health: {CurrentHealth}");
 			

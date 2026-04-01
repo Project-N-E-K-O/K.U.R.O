@@ -36,20 +36,21 @@ radius = 1024.0
 radius = 1024.0
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_gvrrx"]
-radius = 60.0
-height = 200.0
+radius = 55.0
+height = 150.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_gvrrx"]
 size = Vector2(300, 150)
 
 [sub_resource type="CapsuleShape2D" id="3"]
-radius = 35.0
-height = 105.0
+radius = 28.0
+height = 134.0
 
 [node name="Enemy_Normal_guard1" type="CharacterBody2D" node_paths=PackedStringArray("DetectionArea", "AttackArea", "StateMachine", "EffectController")]
 z_index = 2
 y_sort_enabled = true
 collision_layer = 2
+collision_mask = 7
 motion_mode = 1
 script = ExtResource("1_75dbm")
 SimpleAttackWarmupSeconds = 0.4
@@ -88,6 +89,7 @@ shape = SubResource("2")
 [node name="AttackDetectionArea" type="Area2D" parent="Sprite2D"]
 visible = false
 collision_layer = 0
+collision_mask = 4
 monitorable = false
 
 [node name="AttackDetectionShape" type="CollisionShape2D" parent="Sprite2D/AttackDetectionArea"]
@@ -97,6 +99,7 @@ shape = SubResource("CircleShape2D_gvrrx")
 [node name="ControllerDetectionArea" type="Area2D" parent="Sprite2D"]
 visible = false
 collision_layer = 0
+collision_mask = 4
 monitorable = false
 
 [node name="ControllerDetectionShape" type="CollisionShape2D" parent="Sprite2D/ControllerDetectionArea"]
@@ -106,7 +109,8 @@ shape = SubResource("CircleShape2D_ooggc")
 [node name="HitArea" type="Area2D" parent="Sprite2D"]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/HitArea"]
-position = Vector2(0, 25)
+position = Vector2(0, 30)
+scale = Vector2(1.2, 1.2)
 shape = SubResource("CapsuleShape2D_gvrrx")
 
 [node name="OnePunchAttackArea" type="Area2D" parent="Sprite2D"]
@@ -116,7 +120,8 @@ position = Vector2(170, 0)
 shape = SubResource("RectangleShape2D_gvrrx")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, -50)
+position = Vector2(0, -20)
+rotation = 1.5707964
 shape = SubResource("3")
 
 [node name="StateMachine" type="Node" parent="." node_paths=PackedStringArray("InitialState")]
@@ -145,6 +150,7 @@ DashSpeed = 2000.0
 DashDistance = 1500.0
 MinDashDistanceBeforeSmash = 0.0
 SnapshotDelaySeconds = 0.9
+OnePunchDmg = 1
 OnePunchKnockbackDistance = 500.0
 OnePunchKnockbackDuration = 0.1
 OnePunchKnockbackSpeed = 6000.0
@@ -152,6 +158,7 @@ WarmupDuration = 1.0
 ActiveDuration = 0.5
 RecoveryDuration = 0.47
 EnableSuperArmor = true
+IgnoreEnemyCollisionDuringAttack = true
 metadata/attack_weight = 60.0
 
 [node name="SimpleMeleeAttack" type="Node" parent="StateMachine/Attack/AttackController"]
@@ -196,9 +203,8 @@ preview_time = 0.4
 
 [node name="AnimationController" type="Node" parent="."]
 script = ExtResource("19_lxpom")
-IdleMixDuration = 0.01
-WalkMixDuration = 0.01
-HitMixDuration = 0.01
-DieMixDuration = 0.03
-AttackMixDuration = 0.15
-SkillMixDuration = 0.25
+IdleMixDuration = 0.0
+WalkMixDuration = 0.0
+HitMixDuration = 0.0
+DieMixDuration = 0.0
+AttackMixDuration = 0.0

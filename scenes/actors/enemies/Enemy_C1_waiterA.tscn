@@ -51,6 +51,7 @@ skeleton_file_res = ExtResource("21_q6o81")
 
 [node name="Enemy_C1_waiterA" type="CharacterBody2D" node_paths=PackedStringArray("DetectionArea", "AttackArea", "StateMachine", "EffectController")]
 collision_layer = 2
+collision_mask = 3
 motion_mode = 1
 script = ExtResource("1_cc1qw")
 DetectionArea = NodePath("Sprite2D/ControllerDetectionArea")
@@ -89,6 +90,7 @@ visible = false
 position = Vector2(15, 0)
 scale = Vector2(3, 3)
 collision_layer = 0
+collision_mask = 4
 
 [node name="AttackDetectionShape" type="CollisionShape2D" parent="Sprite2D/AttackDetectionArea"]
 position = Vector2(15.729166, -9.761906)
@@ -100,6 +102,7 @@ visible = false
 position = Vector2(15, 0)
 scale = Vector2(4, 4)
 collision_layer = 0
+collision_mask = 4
 
 [node name="ControllerDetectionShape" type="CollisionShape2D" parent="Sprite2D/ControllerDetectionArea"]
 position = Vector2(-3.828, 0)

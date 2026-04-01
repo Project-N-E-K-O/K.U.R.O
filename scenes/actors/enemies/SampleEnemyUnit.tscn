@@ -31,6 +31,7 @@ size = Vector2(50.64583, 26.785715)
 [node name="Enemy" type="CharacterBody2D" node_paths=PackedStringArray("AttackArea")]
 position = Vector2(0, 0)
 collision_layer = 2
+collision_mask = 3
 motion_mode = 1
 script = ExtResource("1")
 AttackArea = NodePath("Sprite2D/AttackArea")

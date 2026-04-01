@@ -1,4 +1,4 @@
-[gd_scene load_steps=67 format=3 uid="uid://dsofgohgx0eoo"]
+[gd_scene load_steps=68 format=3 uid="uid://dsofgohgx0eoo"]
 
 [ext_resource type="Texture2D" uid="uid://b8l1hb16o55bk" path="res://assets/environments/Spawm_Emeny_Pod/front/时间轴 1_0000.png" id="65_jq05s"]
 [ext_resource type="Texture2D" uid="uid://bwvqxgbvbae2u" path="res://assets/environments/Spawm_Emeny_Pod/front/时间轴 1_0001.png" id="66_sc6l5"]
@@ -89,6 +89,9 @@ animations = [{
 "texture": ExtResource("70_6evoa")
 }, {
 "duration": 1.0,
+"texture": ExtResource("74_ljd7r")
+}, {
+"duration": 1.0,
 "texture": ExtResource("71_qac0v")
 }, {
 "duration": 1.0,
@@ -96,9 +99,6 @@ animations = [{
 }, {
 "duration": 1.0,
 "texture": ExtResource("73_e1qgi")
-}, {
-"duration": 1.0,
-"texture": ExtResource("74_ljd7r")
 }, {
 "duration": 1.0,
 "texture": ExtResource("75_m2mpp")
@@ -158,13 +158,13 @@ animations = [{
 "texture": ExtResource("93_qsr83")
 }, {
 "duration": 1.0,
-"texture": ExtResource("94_k3h2g")
-}, {
-"duration": 1.0,
 "texture": ExtResource("95_a28qd")
 }, {
 "duration": 1.0,
 "texture": ExtResource("96_bme5r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("94_k3h2g")
 }, {
 "duration": 1.0,
 "texture": ExtResource("97_cmhqn")
@@ -270,10 +270,22 @@ animations = [{
 "speed": 25.0
 }]
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_qxcqd"]
+radius = 650.0
+
 [node name="SpawnPodFront" type="AnimatedSprite2D"]
 position = Vector2(0, -382)
 scale = Vector2(0.3, 0.3)
 sprite_frames = SubResource("SpriteFrames_y7i3i")
 animation = &"spawn"
 autoplay = "spawn"
-frame_progress = 0.05803057
+frame = 16
+frame_progress = 0.13316894
+
+[node name="CharacterBody2D" type="CharacterBody2D" parent="."]
+position = Vector2(0, 590)
+collision_mask = 7
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CharacterBody2D"]
+scale = Vector2(1, 0.8)
+shape = SubResource("CircleShape2D_qxcqd")

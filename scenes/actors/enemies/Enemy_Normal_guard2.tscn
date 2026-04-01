@@ -36,20 +36,21 @@ radius = 1024.0
 radius = 1024.0
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_gvrrx"]
-radius = 60.0
-height = 200.0
+radius = 55.0
+height = 150.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_gkl6r"]
 radius = 260.0
 
 [sub_resource type="CapsuleShape2D" id="3"]
-radius = 35.0
-height = 105.0
+radius = 28.0
+height = 134.0
 
 [node name="Enemy_Normal_guard2" type="CharacterBody2D" node_paths=PackedStringArray("DetectionArea", "AttackArea", "StateMachine", "EffectController")]
 z_index = 2
 y_sort_enabled = true
 collision_layer = 2
+collision_mask = 7
 motion_mode = 1
 script = ExtResource("1_wixbd")
 SimpleAttackWarmupSeconds = 0.4
@@ -87,6 +88,7 @@ shape = SubResource("2")
 [node name="AttackDetectionArea" type="Area2D" parent="Sprite2D"]
 visible = false
 collision_layer = 0
+collision_mask = 4
 monitorable = false
 
 [node name="AttackDetectionShape" type="CollisionShape2D" parent="Sprite2D/AttackDetectionArea"]
@@ -96,6 +98,7 @@ shape = SubResource("CircleShape2D_gvrrx")
 [node name="ControllerDetectionArea" type="Area2D" parent="Sprite2D"]
 visible = false
 collision_layer = 0
+collision_mask = 4
 monitorable = false
 
 [node name="ControllerDetectionShape" type="CollisionShape2D" parent="Sprite2D/ControllerDetectionArea"]
@@ -105,7 +108,8 @@ shape = SubResource("CircleShape2D_ooggc")
 [node name="HitArea" type="Area2D" parent="Sprite2D"]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/HitArea"]
-position = Vector2(0, 25)
+position = Vector2(0, 30)
+scale = Vector2(1.2, 1.2)
 shape = SubResource("CapsuleShape2D_gvrrx")
 
 [node name="MoveAttackArea" type="Area2D" parent="Sprite2D"]
@@ -115,7 +119,8 @@ position = Vector2(0, -25)
 shape = SubResource("CircleShape2D_gkl6r")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, -50)
+position = Vector2(0, -20)
+rotation = 1.5707964
 shape = SubResource("3")
 
 [node name="StateMachine" type="Node" parent="." node_paths=PackedStringArray("InitialState")]
@@ -152,6 +157,7 @@ AttackAreaPath = NodePath("../../../../Sprite2D/MoveAttackArea")
 RequireAnimationHitTrigger = true
 AllowMultipleAnimationHits = true
 EnableSuperArmor = true
+IgnoreEnemyCollisionDuringAttack = true
 metadata/attack_weight = 60.0
 
 [node name="SimpleMeleeAttack" type="Node" parent="StateMachine/Attack/AttackController"]
@@ -192,7 +198,7 @@ script = ExtResource("17_2j78c")
 scale = Vector2(0.33, 0.33)
 skeleton_data_res = ExtResource("18_wixbd")
 preview_skin = "Default"
-preview_animation = "skill"
+preview_animation = "-- Empty --"
 preview_frame = true
 preview_time = 3.23
 script = ExtResource("19_gkl6r")

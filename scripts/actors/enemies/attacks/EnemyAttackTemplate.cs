@@ -37,6 +37,10 @@ namespace Kuros.Actors.Enemies.Attacks
         [ExportCategory("Interrupt")]
         [Export] public bool EnableSuperArmor = false;
 
+        [ExportCategory("Collision Override")]
+        [Export] public bool IgnoreEnemyCollisionDuringAttack = false;
+        [Export(PropertyHint.Range, "1,32,1")] public int EnemyCollisionLayerIndex = 2;
+
         protected SampleEnemy Enemy { get; private set; } = null!;
         protected SamplePlayer? Player => Enemy.PlayerTarget;
         protected Area2D? AttackArea { get; private set; }
@@ -47,6 +51,8 @@ namespace Kuros.Actors.Enemies.Attacks
         protected bool _animationHitReady = false;
         private bool _pendingAnimationHitFromWarmup;
         private bool? _previousIgnoreHitStateOnDamage;
+        private uint _cachedCollisionMask;
+        private bool _hasCollisionMaskOverride;
 
         public bool IsRunning => _phase != AttackPhase.Idle;
         public bool IsOnCooldown => _cooldownTimer > 0.0f;
@@ -133,15 +139,23 @@ namespace Kuros.Actors.Enemies.Attacks
             }
         }
 
+        public override void _ExitTree()
+        {
+            RestoreEnemyCollisionMask();
+            base._ExitTree();
+        }
+
         protected virtual void OnAttackStarted()
         {
+            ApplyEnemyCollisionMaskOverride();
+
             if (EnableSuperArmor && Enemy != null)
             {
                 _previousIgnoreHitStateOnDamage = Enemy.IgnoreHitStateOnDamage;
                 Enemy.IgnoreHitStateOnDamage = true;
             }
 
-            if (!string.IsNullOrEmpty(AnimationName))
+            if (Enemy != null && !string.IsNullOrEmpty(AnimationName))
             {
                 Enemy.AnimPlayer?.Play(AnimationName);
             }
@@ -171,12 +185,39 @@ namespace Kuros.Actors.Enemies.Attacks
 
         protected virtual void OnAttackFinished()
         {
+            RestoreEnemyCollisionMask();
+
             if (Enemy != null && _previousIgnoreHitStateOnDamage.HasValue)
             {
                 Enemy.IgnoreHitStateOnDamage = _previousIgnoreHitStateOnDamage.Value;
             }
 
             _previousIgnoreHitStateOnDamage = null;
+        }
+
+        private void ApplyEnemyCollisionMaskOverride()
+        {
+            if (!IgnoreEnemyCollisionDuringAttack || Enemy == null || _hasCollisionMaskOverride)
+            {
+                return;
+            }
+
+            int clampedLayer = Mathf.Clamp(EnemyCollisionLayerIndex, 1, 32);
+            uint enemyLayerBit = 1u << (clampedLayer - 1);
+            _cachedCollisionMask = Enemy.CollisionMask;
+            Enemy.CollisionMask = _cachedCollisionMask & ~enemyLayerBit;
+            _hasCollisionMaskOverride = true;
+        }
+
+        private void RestoreEnemyCollisionMask()
+        {
+            if (Enemy == null || !_hasCollisionMaskOverride)
+            {
+                return;
+            }
+
+            Enemy.CollisionMask = _cachedCollisionMask;
+            _hasCollisionMaskOverride = false;
         }
 
         protected virtual bool ShouldHoldRecoveryPhase()

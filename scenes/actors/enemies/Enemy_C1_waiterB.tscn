@@ -33,6 +33,7 @@ size = Vector2(320, 200)
 
 [node name="Enemy_C1_waiterB" type="CharacterBody2D" node_paths=PackedStringArray("DetectionArea", "AttackArea")]
 collision_layer = 2
+collision_mask = 3
 script = ExtResource("1_enemy_script")
 DetectionArea = NodePath("Sprite2D/DetectionArea")
 AttackArea = NodePath("Sprite2D/AttackArea")
@@ -64,6 +65,7 @@ shape = SubResource("DetectionShape")
 [node name="ControllerDetectionArea" type="Area2D" parent="Sprite2D"]
 position = Vector2(12, -8)
 collision_layer = 0
+collision_mask = 4
 monitoring = true
 
 [node name="ControllerDetectionShape" type="CollisionShape2D" parent="Sprite2D/ControllerDetectionArea"]
