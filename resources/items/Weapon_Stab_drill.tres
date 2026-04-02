@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=7 format=3 uid="uid://db23sdg46k031"]
+
+[ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="1_kq0dh"]
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="2_fgsqv"]
+[ext_resource type="Texture2D" uid="uid://cgafxjgxpwvss" path="res://assets/weapons/26_0000s_0003_钻头-副本-2.png" id="3_xvvcl"]
+[ext_resource type="Resource" uid="uid://ckgxa7plx2tf7" path="res://resources/items/skills/WeaponStabSkill_Umbrella.tres" id="4_h8h81"]
+[ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="5_i15sv"]
+
+[sub_resource type="Resource" id="Attribute_AttackPower"]
+script = ExtResource("1_kq0dh")
+AttributeId = "attack_power"
+Value = 4.0
+
+[resource]
+script = ExtResource("5_i15sv")
+ItemId = "Weapon_Stab_drill"
+DisplayName = "钻头"
+Description = "钻头"
+Icon = ExtResource("3_xvvcl")
+Category = "Weapon"
+Tags = Array[String](["戳刺类"])
+MaxStackSize = 1
+AttributeEntries = Array[ExtResource("1_kq0dh")]([SubResource("Attribute_AttackPower")])
+WeaponSkillResources = Array[Resource]([ExtResource("4_h8h81")])
+WorldScenePath = "uid://cdnitqquebaw6"

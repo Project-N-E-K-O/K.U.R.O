@@ -28,8 +28,17 @@ namespace Kuros.Core
 			base._ExitTree();
 			if (_triggerArea != null)
 			{
-				_triggerArea.BodyEntered -= OnBodyEntered;
-				_triggerArea.BodyExited -= OnBodyExited;
+				var entered = new Callable(this, MethodName.OnBodyEntered);
+				var exited = new Callable(this, MethodName.OnBodyExited);
+				if (_triggerArea.IsConnected(Area2D.SignalName.BodyEntered, entered))
+				{
+					_triggerArea.BodyEntered -= OnBodyEntered;
+				}
+
+				if (_triggerArea.IsConnected(Area2D.SignalName.BodyExited, exited))
+				{
+					_triggerArea.BodyExited -= OnBodyExited;
+				}
 			}
 		}
 

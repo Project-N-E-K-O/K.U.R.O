@@ -75,8 +75,17 @@ namespace Kuros.Items.World
 			base._ExitTree();
 			if (TriggerArea != null)
 			{
-				TriggerArea.BodyEntered -= OnBodyEntered;
-				TriggerArea.BodyExited -= OnBodyExited;
+				var entered = new Callable(this, MethodName.OnBodyEntered);
+				var exited = new Callable(this, MethodName.OnBodyExited);
+				if (TriggerArea.IsConnected(Area2D.SignalName.BodyEntered, entered))
+				{
+					TriggerArea.BodyEntered -= OnBodyEntered;
+				}
+
+				if (TriggerArea.IsConnected(Area2D.SignalName.BodyExited, exited))
+				{
+					TriggerArea.BodyExited -= OnBodyExited;
+				}
 			}
 		}
 

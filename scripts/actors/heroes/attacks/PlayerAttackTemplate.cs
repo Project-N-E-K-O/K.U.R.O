@@ -4,6 +4,7 @@ using Godot.Collections;
 using Kuros.Actors.Heroes;
 using Kuros.Core;
 using Kuros.Core.Events;
+using Kuros.Items.Weapons;
 
 namespace Kuros.Actors.Heroes.Attacks
 {
@@ -46,6 +47,7 @@ namespace Kuros.Actors.Heroes.Attacks
         [ExportCategory("Animation")]
         [Export] public string AnimationName = "animations/attack";
         [Export] public bool RestartAnimationOnLoop = true;
+        [Export] public bool UseEquippedWeaponSkillAnimation = false;
 
         [ExportCategory("Animation Sync")]
         [Export] public bool UseSpineHitEvents = true;
@@ -93,6 +95,9 @@ namespace Kuros.Actors.Heroes.Attacks
         private bool _spineHitSubscribed = false;
         private bool _spineHitWindowActive = false;
         private string _spineAttackAnimationName = string.Empty;
+        private string _resolvedAnimationName = string.Empty;
+        private WeaponSkillDefinition? _activeWeaponSkill;
+        private AttackHitboxDebugDrawer? _hitboxDebugDrawer;
 
         public bool IsRunning => _phase != AttackPhase.Idle;
         public bool IsOnCooldown => _cooldownTimer > 0f;
@@ -127,6 +132,12 @@ namespace Kuros.Actors.Heroes.Attacks
             }
 
             UnsubscribeSpineHitSignal();
+
+            if (_hitboxDebugDrawer != null && GodotObject.IsInstanceValid(_hitboxDebugDrawer))
+            {
+                _hitboxDebugDrawer.QueueFree();
+                _hitboxDebugDrawer = null;
+            }
         }
 
         protected virtual void OnInitialized() { }
@@ -191,6 +202,7 @@ namespace Kuros.Actors.Heroes.Attacks
         {
             _spineHitWindowActive = false;
             _spineAttackAnimationName = string.Empty;
+            _activeWeaponSkill = null;
 
             if (clearCooldown)
             {
@@ -320,17 +332,20 @@ namespace Kuros.Actors.Heroes.Attacks
 
         protected virtual void OnAttackStarted()
         {
+            _activeWeaponSkill = Player.WeaponSkillController?.GetPrimarySkillDefinition();
+            ShowCurrentHitboxDebug(_activeWeaponSkill);
+            _resolvedAnimationName = ResolveAnimationName(_activeWeaponSkill);
             EnsureSpineHitSupport();
-            _spineAttackAnimationName = AnimationName;
+            _spineAttackAnimationName = _resolvedAnimationName;
             _spineHitWindowActive = ShouldUseSpineHitEvents();
 
             // 如果是 MainCharacter，使用 Spine 动画
             if (Player is MainCharacter mainChar)
             {
-                if (!string.IsNullOrEmpty(AnimationName))
+                if (!string.IsNullOrEmpty(_resolvedAnimationName))
                 {
-                    GD.Print($"[{GetType().Name}] 播放攻击动画 (Spine): {AnimationName}");
-                    mainChar.PlaySpineAnimation(AnimationName, false);
+                    GD.Print($"[{GetType().Name}] 播放攻击动画 (Spine): {_resolvedAnimationName}");
+                    mainChar.PlaySpineAnimation(_resolvedAnimationName, false);
                 }
                 else
                 {
@@ -338,17 +353,125 @@ namespace Kuros.Actors.Heroes.Attacks
                 }
             }
             // 否则使用 AnimationPlayer
-            else if (!string.IsNullOrEmpty(AnimationName) && Player.AnimPlayer != null)
+            else if (!string.IsNullOrEmpty(_resolvedAnimationName) && Player.AnimPlayer != null)
             {
                 if (RestartAnimationOnLoop || !Player.AnimPlayer.IsPlaying())
                 {
-                    Player.AnimPlayer.Play(AnimationName);
+                    Player.AnimPlayer.Play(_resolvedAnimationName);
                 }
             }
             else
             {
-                GD.PushWarning($"[{GetType().Name}] 无法播放攻击动画: AnimationName={AnimationName}, AnimPlayer={Player.AnimPlayer}");
+                GD.PushWarning($"[{GetType().Name}] 无法播放攻击动画: AnimationName={_resolvedAnimationName}, AnimPlayer={Player.AnimPlayer}");
             }
+        }
+
+        private string ResolveAnimationName(WeaponSkillDefinition? primarySkill)
+        {
+            if (!UseEquippedWeaponSkillAnimation)
+            {
+                return AnimationName;
+            }
+
+            if (primarySkill == null)
+            {
+                return AnimationName;
+            }
+
+            if (!string.IsNullOrWhiteSpace(primarySkill.AnimationName))
+            {
+                return primarySkill.AnimationName;
+            }
+
+            if (primarySkill.UseDefaultAttackAnimationFallback)
+            {
+                return AnimationName;
+            }
+
+            return string.Empty;
+        }
+
+        private void ShowCurrentHitboxDebug(WeaponSkillDefinition? skill)
+        {
+            if (skill == null || !skill.ShowHitboxDebug)
+            {
+                return;
+            }
+
+            Area2D? area = Player.ResolveAttackAreaForHitDetection();
+            if (area == null)
+            {
+                return;
+            }
+
+            var collisionShape = ResolveCollisionShape(area);
+            if (collisionShape == null || collisionShape.Shape == null)
+            {
+                return;
+            }
+
+            ShowWeaponHitboxDebug(skill, collisionShape);
+        }
+
+        private void ShowWeaponHitboxDebug(WeaponSkillDefinition skill, CollisionShape2D collisionShape)
+        {
+            if (!skill.ShowHitboxDebug)
+            {
+                return;
+            }
+
+            EnsureHitboxDebugDrawer();
+            _hitboxDebugDrawer?.ShowFromCollisionShape(
+                collisionShape,
+                skill.HitboxDebugColor,
+                skill.HitboxDebugLineWidth,
+                skill.HitboxDebugDuration
+            );
+
+            GD.Print($"[{GetType().Name}] Hitbox Debug => Shape={collisionShape.Shape.GetType().Name}, Position={collisionShape.GlobalPosition}, Rotation={collisionShape.GlobalRotationDegrees}");
+        }
+
+        private void EnsureHitboxDebugDrawer()
+        {
+            if (_hitboxDebugDrawer != null && GodotObject.IsInstanceValid(_hitboxDebugDrawer))
+            {
+                return;
+            }
+
+            if (Player == null || !Player.IsInsideTree())
+            {
+                return;
+            }
+
+            _hitboxDebugDrawer = new AttackHitboxDebugDrawer
+            {
+                Name = "AttackHitboxDebugDrawer",
+                ZIndex = 9999,
+                TopLevel = true,
+                Visible = false
+            };
+
+            var host = Player.GetTree().CurrentScene ?? Player.GetTree().Root;
+            host.AddChild(_hitboxDebugDrawer);
+        }
+
+        private static CollisionShape2D? ResolveCollisionShape(Area2D area)
+        {
+            var direct = area.GetNodeOrNull<CollisionShape2D>("CollisionShape2D");
+            if (direct != null)
+            {
+                return direct;
+            }
+
+            foreach (Node child in area.GetChildren())
+            {
+                if (child is CollisionShape2D shape)
+                {
+                    return shape;
+                }
+            }
+
+            return null;
         }
 
         protected virtual void OnWarmupStarted()

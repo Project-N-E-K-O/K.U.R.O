@@ -280,8 +280,17 @@ namespace Kuros.Actors.Enemies.Attacks
         {
             if (_playerDetectionArea != null)
             {
-                _playerDetectionArea.BodyEntered -= OnDetectionAreaBodyEntered;
-                _playerDetectionArea.BodyExited -= OnDetectionAreaBodyExited;
+                var entered = new Callable(this, MethodName.OnDetectionAreaBodyEntered);
+                var exited = new Callable(this, MethodName.OnDetectionAreaBodyExited);
+                if (_playerDetectionArea.IsConnected(Area2D.SignalName.BodyEntered, entered))
+                {
+                    _playerDetectionArea.BodyEntered -= OnDetectionAreaBodyEntered;
+                }
+
+                if (_playerDetectionArea.IsConnected(Area2D.SignalName.BodyExited, exited))
+                {
+                    _playerDetectionArea.BodyExited -= OnDetectionAreaBodyExited;
+                }
             }
             base._ExitTree();
         }

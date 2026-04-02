@@ -23,6 +23,7 @@ namespace Kuros.Actors.Heroes.Attacks
             TriggerActions.Add("attack");
             RequiresTargetInRange = false;
             AnimationName = _defaultAnimation;
+            UseEquippedWeaponSkillAnimation = true;
             _weaponSkillController = Player.GetNodeOrNull<PlayerWeaponSkillController>("WeaponSkillController");
             _inventory = Player.InventoryComponent ?? Player.GetNodeOrNull<PlayerInventoryComponent>("Inventory");
         }
@@ -48,12 +49,6 @@ namespace Kuros.Actors.Heroes.Attacks
 
             if (_weaponSkillController != null)
             {
-                var overrideAnim = _weaponSkillController.GetPrimarySkillAnimation();
-                if (!string.IsNullOrEmpty(overrideAnim))
-                {
-                    AnimationName = overrideAnim;
-                }
-
                 DamageOverride = _weaponSkillController.ModifyAttackDamage(DamageOverride);
                 _weaponSkillController.TriggerDefaultSkill();
             }

@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://qd5abd4opeob"]
+[gd_scene load_steps=23 format=3 uid="uid://qd5abd4opeob"]
 
 [ext_resource type="PackedScene" uid="uid://dd8xmpgwy0t2o" path="res://scenes/environments/scene2.tscn" id="1_7jsho"]
 [ext_resource type="Script" uid="uid://x1ic1ym4ykq8" path="res://scripts/scenes/BattleSceneManager.cs" id="1_ctuyy"]
@@ -8,8 +8,9 @@
 [ext_resource type="PackedScene" uid="uid://c88kwpwoxtoev" path="res://scenes/ui/hud/BattleHUD.tscn" id="5_qokfb"]
 [ext_resource type="PackedScene" uid="uid://cofm45kotvgto" path="res://scenes/actors/enemies/Enemy_B1_fat.tscn" id="6_ctuyy"]
 [ext_resource type="Script" uid="uid://b7afb3wjghskq" path="res://scripts/items/world/DropItemDebugger.cs" id="7_k0qph"]
-[ext_resource type="Script" uid="uid://b3iq6dm2pc5y0" path="res://scripts/controllers/EnemySpawnManager.cs" id="8_5klp8"]
+[ext_resource type="Script" uid="uid://bquq58vywbbot" path="res://scripts/controllers/EnemySpawnManager.cs" id="8_5klp8"]
 [ext_resource type="PackedScene" uid="uid://wqcdwpyo1nji" path="res://scenes/actors/enemies/Enemy_B1_thin.tscn" id="10_sfgmy"]
+[ext_resource type="PackedScene" uid="uid://cdnitqquebaw6" path="res://scenes/weapons/Weapon_Stab_drill.tscn" id="11_vvtmr"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_s0pgc"]
 size = Vector2(16974, 774)
@@ -194,3 +195,6 @@ monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="EnemySpawneManager2/TriggerArea"]
 shape = SubResource("RectangleShape2D_f0l3g")
+
+[node name="WeaponStabDrill" parent="." instance=ExtResource("11_vvtmr")]
+position = Vector2(4462, 64)
