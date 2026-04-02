@@ -55,12 +55,12 @@ collision_layer = 2
 collision_mask = 7
 motion_mode = 1
 script = ExtResource("1_gvrrx")
-SimpleAttackWarmupSeconds = 0.8
 EnableStateDebugOverlay = true
 DebugOverlayOffset = Vector2(-300, 60)
 DebugOverlayFontSize = 32
 DetectionArea = NodePath("Sprite2D/ControllerDetectionArea")
 AttackArea = NodePath("Sprite2D/AttackArea")
+Speed = 120.0
 AttackDamage = 0.0
 AttackCooldown = 1.0
 StateMachine = NodePath("StateMachine")
@@ -139,9 +139,11 @@ script = ExtResource("8_aqxxu")
 
 [node name="Attack" type="Node" parent="StateMachine"]
 script = ExtResource("9_rbnx7")
+EnableAttackDebugCounter = true
 
 [node name="AttackController" type="Node" parent="StateMachine/Attack"]
 script = ExtResource("9_ooggc")
+MeleeCountBeforeCharge = 10
 PlayerDetectionAreaPath = NodePath("../../../Sprite2D/ControllerDetectionArea")
 
 [node name="SmashAttack" type="Node" parent="StateMachine/Attack/AttackController"]
@@ -167,10 +169,12 @@ metadata/attack_weight = 60.0
 [node name="SimpleMeleeAttack" type="Node" parent="StateMachine/Attack/AttackController"]
 script = ExtResource("12_daw10")
 Damage = 1
-SimpleMeleeAttackKnockbackDistance = 100.0
-SimpleMeleeAttackKnockbackDuration = 0.2
-SimpleMeleeAttackKnockbackSpeed = 2000.0
-ActiveDuration = 0.51
+SimpleMeleeAttackKnockbackDistance = 50.0
+SimpleMeleeAttackKnockbackDuration = 0.1
+SimpleMeleeAttackKnockbackSpeed = 1000.0
+WarmupDuration = 1.0
+ActiveDuration = 0.11
+RecoveryDuration = 0.39
 AttackAreaPath = NodePath("../../../../Sprite2D/AttackArea")
 RequireAnimationHitTrigger = true
 metadata/attack_weight = 40.0
@@ -198,7 +202,7 @@ FreezeDuration = 1.0
 scale = Vector2(0.33, 0.33)
 skeleton_data_res = ExtResource("19_gvrrx")
 preview_skin = "Default"
-preview_animation = "-- Empty --"
+preview_animation = "skill"
 preview_frame = true
 preview_time = 1.04
 script = ExtResource("20_ooggc")

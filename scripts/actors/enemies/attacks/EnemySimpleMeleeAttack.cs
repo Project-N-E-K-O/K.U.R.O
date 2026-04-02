@@ -11,7 +11,6 @@ namespace Kuros.Actors.Enemies.Attacks
     public partial class EnemySimpleMeleeAttack : EnemyAttackTemplate
     {
         [ExportCategory("Basic Attack Settings")]
-        [Export(PropertyHint.Range, "0.1,5,0.1")] public float AttackIntervalSeconds = 1.5f; // 攻击间隔时间，单位秒
         [Export(PropertyHint.Range, "1,200,1")] public int Damage = 10;
 
         [ExportCategory("Effects")]
@@ -25,7 +24,6 @@ namespace Kuros.Actors.Enemies.Attacks
         protected override void OnInitialized()
         {
             base.OnInitialized();
-            CooldownDuration = AttackIntervalSeconds;
             SetPhysicsProcess(true);
         }
 
@@ -61,7 +59,6 @@ namespace Kuros.Actors.Enemies.Attacks
 
         protected override void OnAttackStarted()
         {
-            CooldownDuration = AttackIntervalSeconds;
             base.OnAttackStarted();
         }
 

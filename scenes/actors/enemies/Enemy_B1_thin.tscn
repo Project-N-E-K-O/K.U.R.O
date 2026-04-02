@@ -43,7 +43,7 @@ radius = 55.0
 height = 150.0
 
 [sub_resource type="RectangleShape2D" id="2"]
-size = Vector2(320, 133)
+size = Vector2(320, 161.5)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_h8apo"]
 size = Vector2(303, 188)
@@ -58,12 +58,12 @@ collision_layer = 2
 collision_mask = 7
 motion_mode = 1
 script = ExtResource("1_grl5w")
-SimpleAttackWarmupSeconds = 0.6
 EnableStateDebugOverlay = true
 DebugOverlayOffset = Vector2(-300, 50)
 DebugOverlayFontSize = 32
 DetectionArea = NodePath("Sprite2D/ControllerDetectionArea")
 AttackArea = NodePath("Sprite2D/AttackArea")
+Speed = 200.0
 AttackDamage = 0.0
 StateMachine = NodePath("StateMachine")
 EffectController = NodePath("EffectController")
@@ -112,7 +112,7 @@ collision_layer = 0
 monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/AttackArea"]
-position = Vector2(189, -20)
+position = Vector2(189, -34.25)
 scale = Vector2(1.0000001, 1.0000001)
 shape = SubResource("2")
 

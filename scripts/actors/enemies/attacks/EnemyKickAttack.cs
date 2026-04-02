@@ -31,7 +31,7 @@ namespace Kuros.Actors.Enemies.Attacks
 		[Export(PropertyHint.Range, "0.01,2,0.01")] public float KickKnockbackDuration = 0.18f;
 		[Export(PropertyHint.Range, "0,6000,1")] public float KickKnockbackSpeed = 0f;
 
-		private const float PostCooldownDuration = 1.0f;
+		private const float PostCooldownDuration = 0.1f;
 
 
         private Area2D? _detectionArea;

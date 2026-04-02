@@ -24,13 +24,13 @@ public partial class SampleEnemy : GameActor
 	private bool _scoreGranted;
 	private string _debugOverlayText = string.Empty;
 	
-	public SampleEnemy()
-	{
-		Speed = 150.0f;
-		AttackDamage = 10.0f;
-		AttackCooldown = 1.5f;
-		MaxHealth = 50;
-	}
+	// public SampleEnemy()
+	// {
+	// 	Speed = 150.0f;
+	// 	AttackDamage = 10.0f;
+	// 	AttackCooldown = 1.5f;
+	// 	MaxHealth = 50;
+	// }
 	
 	public override void _Ready()
 	{
