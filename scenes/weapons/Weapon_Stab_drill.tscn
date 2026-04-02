@@ -1,21 +1,21 @@
 [gd_scene load_steps=6 format=3 uid="uid://cdnitqquebaw6"]
 
 [ext_resource type="Script" uid="uid://dtgdjgrqgype7" path="res://scripts/items/world/WorldItemEntity.cs" id="1_0qove"]
-[ext_resource type="Resource" uid="uid://c01sltuo7404y" path="res://resources/items/Weapon_Stab_umbrella.tres" id="2_emqd7"]
+[ext_resource type="Resource" uid="uid://db23sdg46k031" path="res://resources/items/Weapon_Stab_drill.tres" id="2_0qove"]
 [ext_resource type="Texture2D" uid="uid://cgafxjgxpwvss" path="res://assets/weapons/26_0000s_0003_钻头-副本-2.png" id="3_0qove"]
 
 [sub_resource type="RectangleShape2D" id="BodyShape_rr6vl"]
 size = Vector2(500, 120)
 
 [sub_resource type="RectangleShape2D" id="TriggerShape_yahcm"]
-size = Vector2(1400, 270)
+size = Vector2(1404, 270)
 
 [node name="WeaponStabDrill" type="CharacterBody2D"]
 scale = Vector2(0.5, 0.5)
 collision_layer = 0
 collision_mask = 0
 script = ExtResource("1_0qove")
-ItemDefinition = ExtResource("2_emqd7")
+ItemDefinition = ExtResource("2_0qove")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 scale = Vector2(0.5, 0.5)
@@ -30,6 +30,6 @@ scale = Vector2(0.5, 0.5)
 collision_layer = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AttackArea"]
-position = Vector2(200, -4)
+position = Vector2(201, -4)
 scale = Vector2(0.5, 0.5)
 shape = SubResource("TriggerShape_yahcm")

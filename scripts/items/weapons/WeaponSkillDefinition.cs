@@ -15,6 +15,11 @@ namespace Kuros.Items.Weapons
         [Export] public string AnimationName { get; set; } = string.Empty;
         [Export(PropertyHint.Range, "0,5,0.1")] public float DamageMultiplier { get; set; } = 1f;
         [Export(PropertyHint.Range, "0,30,0.1")] public float CooldownSeconds { get; set; } = 0.5f;
+        [ExportGroup("Hitbox Debug")]
+        [Export] public bool ShowHitboxDebug { get; set; } = true;
+        [Export] public Color HitboxDebugColor { get; set; } = new Color(1f, 0.28f, 0.18f, 0.95f);
+        [Export(PropertyHint.Range, "0.05,5,0.05")] public float HitboxDebugDuration { get; set; } = 0.6f;
+        [Export(PropertyHint.Range, "1,12,0.5")] public float HitboxDebugLineWidth { get; set; } = 3f;
         [Export(PropertyHint.MultilineText)] public string Description { get; set; } = string.Empty;
         [Export] public Godot.Collections.Array<ItemEffectEntry> Effects { get; set; } = new();
         [Export] public Godot.Collections.Array<string> StateWhitelist { get; set; } = new();

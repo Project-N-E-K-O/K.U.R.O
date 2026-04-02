@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Godot;
 using Kuros.Core;
 using Kuros.Items;
+using Kuros.Utils;
 
 namespace Kuros.Actors.Heroes
 {
@@ -11,6 +12,8 @@ namespace Kuros.Actors.Heroes
     /// </summary>
     public partial class PlayerItemAttachment : Node
     {
+        [Signal] public delegate void EquippedAttackAreaChangedEventHandler();
+
         [Export] public PlayerInventoryComponent? Inventory { get; set; }
         [Export] public NodePath AttachmentParentPath { get; set; } = new("SpineCharacter/Skeleton2D");
         [Export] public NodePath SpineSlotNodePath { get; set; } = new();
@@ -35,6 +38,10 @@ namespace Kuros.Actors.Heroes
         private bool _iconUsesBoneTracking;
         private bool _useSlotAnchorBinding;
         private Area2D? _equippedAttackArea;
+        private Transform2D _equippedAttackAreaLocalTransform = Transform2D.Identity;
+        private Shape2D? _equippedAttackShapeTemplate;
+        private Transform2D _equippedAttackShapeTransform = Transform2D.Identity;
+        private uint _equippedAttackCollisionMask = 1u;
         private const string SlotSelectProperty = "切换名";
         private const string SlotIconName = "HeldItemSlotIcon";
 
@@ -131,6 +138,7 @@ namespace Kuros.Actors.Heroes
             base._Process(delta);
             MaintainSlotAnchorBinding();
             UpdateBoneAttachmentTransform();
+            UpdateEquippedAttackAreaTransform();
         }
 
         private void ShowItemIcon(Texture2D? texture)
@@ -210,6 +218,22 @@ namespace Kuros.Actors.Heroes
             }
 
             return _equippedAttackArea;
+        }
+
+        public bool TryGetEquippedAttackAreaTemplate(out Shape2D? shape, out Transform2D transform, out uint collisionMask)
+        {
+            if (_equippedAttackShapeTemplate == null)
+            {
+                shape = null;
+                transform = Transform2D.Identity;
+                collisionMask = 1u;
+                return false;
+            }
+
+            shape = _equippedAttackShapeTemplate.Duplicate() as Shape2D;
+            transform = _equippedAttackShapeTransform;
+            collisionMask = _equippedAttackCollisionMask;
+            return shape != null;
         }
 
         private void ShowOnSpineSlot(Texture2D? texture)
@@ -388,7 +412,7 @@ namespace Kuros.Actors.Heroes
                 return;
             }
 
-            var scene = ResourceLoader.Load<PackedScene>(scenePath);
+            var scene = ResourceLoader.Load<PackedScene>(scenePath, string.Empty, ResourceLoader.CacheMode.Ignore);
             if (scene == null)
             {
                 ClearEquippedAttackArea();
@@ -420,16 +444,85 @@ namespace Kuros.Actors.Heroes
                 return;
             }
 
+            LogSourceAttackArea(item, scenePath, duplicatedArea);
+
             ClearEquippedAttackArea();
             _equippedAttackArea = duplicatedArea;
             _equippedAttackArea.Name = "AttackArea";
             ConfigureEquippedAttackArea(_equippedAttackArea);
+            _equippedAttackAreaLocalTransform = _equippedAttackArea.Transform;
+            CaptureEquippedAttackAreaTemplate(_equippedAttackArea);
             AttachEquippedAttackAreaToIcon();
+            EmitSignal(SignalName.EquippedAttackAreaChanged);
+        }
+
+        private void LogSourceAttackArea(ItemDefinition item, string scenePath, Area2D sourceArea)
+        {
+            CollisionShape2D? collisionShape = sourceArea.GetNodeOrNull<CollisionShape2D>("CollisionShape2D");
+            if (collisionShape == null)
+            {
+                foreach (Node child in sourceArea.GetChildren())
+                {
+                    if (child is CollisionShape2D shape)
+                    {
+                        collisionShape = shape;
+                        break;
+                    }
+                }
+            }
+
+            string shapeType = collisionShape?.Shape?.GetType().Name ?? "None";
+            string shapeInfo = string.Empty;
+            if (collisionShape?.Shape is RectangleShape2D rect)
+            {
+                shapeInfo = $"rectSize={rect.Size}";
+            }
+            else if (collisionShape?.Shape is CapsuleShape2D capsule)
+            {
+                shapeInfo = $"capsule(r={capsule.Radius}, h={capsule.Height})";
+            }
+            else if (collisionShape?.Shape is CircleShape2D circle)
+            {
+                shapeInfo = $"circle(r={circle.Radius})";
+            }
+
+            GameLogger.Info(nameof(PlayerItemAttachment),
+                $"EquipAttackArea item={item.ItemId}, scene={scenePath}, areaTransform={sourceArea.Transform}, shapeTransform={collisionShape?.Transform}, shape={shapeType} {shapeInfo}");
+        }
+
+        private void CaptureEquippedAttackAreaTemplate(Area2D area)
+        {
+            _equippedAttackShapeTemplate = null;
+            _equippedAttackShapeTransform = Transform2D.Identity;
+            _equippedAttackCollisionMask = area.CollisionMask != 0 ? area.CollisionMask : 1u;
+
+            var collisionShape = area.GetNodeOrNull<CollisionShape2D>("CollisionShape2D");
+            if (collisionShape == null)
+            {
+                foreach (Node child in area.GetChildren())
+                {
+                    if (child is CollisionShape2D shape)
+                    {
+                        collisionShape = shape;
+                        break;
+                    }
+                }
+            }
+
+            if (collisionShape?.Shape == null)
+            {
+                return;
+            }
+
+            _equippedAttackShapeTemplate = collisionShape.Shape.Duplicate() as Shape2D;
+            _equippedAttackShapeTransform = area.Transform * collisionShape.Transform;
         }
 
         private void ConfigureEquippedAttackArea(Area2D area)
         {
-            area.TopLevel = false;
+            NormalizeAttackAreaGeometry(area);
+
+            area.TopLevel = true;
             area.Monitoring = true;
             area.Monitorable = false;
             area.CollisionLayer = 0;
@@ -448,6 +541,71 @@ namespace Kuros.Actors.Heroes
             }
         }
 
+        private static void NormalizeAttackAreaGeometry(Area2D area)
+        {
+            var collisionShape = area.GetNodeOrNull<CollisionShape2D>("CollisionShape2D");
+            if (collisionShape == null)
+            {
+                foreach (Node child in area.GetChildren())
+                {
+                    if (child is CollisionShape2D shape)
+                    {
+                        collisionShape = shape;
+                        break;
+                    }
+                }
+            }
+
+            if (collisionShape?.Shape == null)
+            {
+                area.Scale = Vector2.One;
+                return;
+            }
+
+            Vector2 areaScale = area.Scale;
+            Vector2 shapeScale = collisionShape.Scale;
+            Vector2 bakedScale = new Vector2(
+                Mathf.Abs(areaScale.X * shapeScale.X),
+                Mathf.Abs(areaScale.Y * shapeScale.Y));
+
+            collisionShape.Shape = DuplicateShapeWithScale(collisionShape.Shape, bakedScale);
+            collisionShape.Position = new Vector2(
+                collisionShape.Position.X * areaScale.X,
+                collisionShape.Position.Y * areaScale.Y);
+            collisionShape.Scale = Vector2.One;
+            area.Scale = Vector2.One;
+        }
+
+        private static Shape2D DuplicateShapeWithScale(Shape2D shape, Vector2 scale)
+        {
+            var duplicated = shape.Duplicate() as Shape2D;
+            if (duplicated == null)
+            {
+                return shape;
+            }
+
+            if (duplicated is RectangleShape2D rect)
+            {
+                rect.Size = new Vector2(rect.Size.X * scale.X, rect.Size.Y * scale.Y);
+                return rect;
+            }
+
+            if (duplicated is CircleShape2D circle)
+            {
+                circle.Radius *= Mathf.Max(scale.X, scale.Y);
+                return circle;
+            }
+
+            if (duplicated is CapsuleShape2D capsule)
+            {
+                capsule.Radius *= scale.X;
+                capsule.Height *= scale.Y;
+                return capsule;
+            }
+
+            return duplicated;
+        }
+
         private void AttachEquippedAttackAreaToIcon()
         {
             if (_equippedAttackArea == null || _iconSprite == null)
@@ -459,6 +617,8 @@ namespace Kuros.Actors.Heroes
             {
                 _iconSprite.AddChild(_equippedAttackArea);
             }
+
+            UpdateEquippedAttackAreaTransform();
         }
 
         private void ClearEquippedAttackArea()
@@ -469,6 +629,36 @@ namespace Kuros.Actors.Heroes
             }
 
             _equippedAttackArea = null;
+            _equippedAttackAreaLocalTransform = Transform2D.Identity;
+            _equippedAttackShapeTemplate = null;
+            _equippedAttackShapeTransform = Transform2D.Identity;
+            _equippedAttackCollisionMask = 1u;
+            EmitSignal(SignalName.EquippedAttackAreaChanged);
+        }
+
+        private void UpdateEquippedAttackAreaTransform()
+        {
+            if (_equippedAttackArea == null || !GodotObject.IsInstanceValid(_equippedAttackArea) || _iconSprite == null || !GodotObject.IsInstanceValid(_iconSprite))
+            {
+                return;
+            }
+
+            Transform2D iconNoScale = RemoveScaleFromTransform(_iconSprite.GlobalTransform);
+            _equippedAttackArea.GlobalTransform = iconNoScale * _equippedAttackAreaLocalTransform;
+        }
+
+        private static Transform2D RemoveScaleFromTransform(Transform2D transform)
+        {
+            Vector2 x = transform.X;
+            Vector2 y = transform.Y;
+
+            float xLen = x.Length();
+            float yLen = y.Length();
+
+            Vector2 xUnit = xLen > 0.0001f ? x / xLen : Vector2.Right;
+            Vector2 yUnit = yLen > 0.0001f ? y / yLen : Vector2.Down;
+
+            return new Transform2D(xUnit, yUnit, transform.Origin);
         }
 
         private Sprite2D CreateIconSprite(string name)

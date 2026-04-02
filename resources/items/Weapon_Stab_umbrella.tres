@@ -2,22 +2,21 @@
 
 [ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="1_qwcde"]
 [ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="2_7v5qf"]
-[ext_resource type="Texture2D" uid="uid://cp3tj4mexoi30" path="res://assets/weapons/伞.png" id="3_q4lwa"]
+[ext_resource type="Texture2D" uid="uid://cp3tj4mexoi30" path="res://assets/weapons/伞.png" id="3_qwcde"]
 [ext_resource type="Resource" uid="uid://ckgxa7plx2tf7" path="res://resources/items/skills/WeaponStabSkill_Umbrella.tres" id="4_qwcde"]
 [ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="5_mfmvt"]
 
 [sub_resource type="Resource" id="Attribute_AttackPower"]
 script = ExtResource("1_qwcde")
 AttributeId = "attack_power"
-Value = 6.0
-Notes = "伞柄提供 6 点攻击力"
+Value = 4.0
 
 [resource]
 script = ExtResource("5_mfmvt")
 ItemId = "Weapon_Stab_umbrella"
 DisplayName = "雨伞"
 Description = "坚固的战斗雨伞，既可攻击也可格挡。"
-Icon = ExtResource("3_q4lwa")
+Icon = ExtResource("3_qwcde")
 Category = "Weapon"
 Tags = Array[String](["戳刺类"])
 MaxStackSize = 1

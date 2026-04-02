@@ -83,8 +83,17 @@ namespace Kuros.Actors.Enemies.Attacks
         {
             if (_detectionArea != null)
             {
-                _detectionArea.BodyEntered -= OnDetectionAreaBodyEntered;
-				_detectionArea.BodyExited -= OnDetectionAreaBodyExited;
+				var entered = new Callable(this, MethodName.OnDetectionAreaBodyEntered);
+				var exited = new Callable(this, MethodName.OnDetectionAreaBodyExited);
+				if (_detectionArea.IsConnected(Area2D.SignalName.BodyEntered, entered))
+				{
+					_detectionArea.BodyEntered -= OnDetectionAreaBodyEntered;
+				}
+
+				if (_detectionArea.IsConnected(Area2D.SignalName.BodyExited, exited))
+				{
+					_detectionArea.BodyExited -= OnDetectionAreaBodyExited;
+				}
             }
 
             base._ExitTree();

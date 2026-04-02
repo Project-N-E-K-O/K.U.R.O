@@ -89,6 +89,11 @@ namespace Kuros.Actors.Heroes
             return _defaultActiveSkill?.AnimationName;
         }
 
+        public WeaponSkillDefinition? GetPrimarySkillDefinition()
+        {
+            return _defaultActiveSkill;
+        }
+
         public bool TriggerDefaultSkill(GameActor? target = null)
         {
             if (_defaultActiveSkill == null)

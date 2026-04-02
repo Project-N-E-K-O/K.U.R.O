@@ -28,10 +28,33 @@ namespace Kuros.Items.Attributes
     [GlobalClass]
     public partial class ItemAttributeEntry : Resource
     {
-        [Export] public string AttributeId { get; set; } = string.Empty;
+        [Export]
+        public string AttributeId
+        {
+            get => _attributeId;
+            set
+            {
+                _attributeId = value ?? string.Empty;
+                // Re-apply guard when id changes to attack_power.
+                Value = _value;
+            }
+        }
 
-        [Export(PropertyHint.Range, "-999999,999999,0.1")]
-        public float Value { get; set; } = 0f;
+        [Export(PropertyHint.Range, "0,999,0.1")]
+        public float Value
+        {
+            get => _value;
+            set
+            {
+                float safe = float.IsNaN(value) || float.IsInfinity(value) ? 0f : value;
+                if (string.Equals(_attributeId, "attack_power", System.StringComparison.OrdinalIgnoreCase))
+                {
+                    safe = Mathf.Clamp(safe, 0f, 999f);
+                }
+
+                _value = safe;
+            }
+        }
 
         [Export] public ItemAttributeOperation Operation { get; set; } = ItemAttributeOperation.Add;
 
@@ -39,6 +62,29 @@ namespace Kuros.Items.Attributes
 
         [Export(PropertyHint.MultilineText)]
         public string Notes { get; set; } = string.Empty;
+
+        private string _attributeId = string.Empty;
+        private float _value = 0f;
+
+        public override bool _Set(StringName property, Variant value)
+        {
+            string key = property.ToString();
+            if (key == nameof(Value) || key == "value")
+            {
+                Value = value.VariantType == Variant.Type.Float || value.VariantType == Variant.Type.Int
+                    ? value.AsSingle()
+                    : 0f;
+                return true;
+            }
+
+            if (key == nameof(AttributeId) || key == "attribute_id")
+            {
+                AttributeId = value.VariantType == Variant.Type.String ? value.AsString() : string.Empty;
+                return true;
+            }
+
+            return base._Set(property, value);
+        }
 
         internal ItemAttributeValue ToRuntimeValue()
         {

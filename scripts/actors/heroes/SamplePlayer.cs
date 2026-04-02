@@ -16,8 +16,15 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 	[ExportCategory("Combat")]
 	[Export] public Area2D AttackArea { get; private set; } = null!;
 	[Export] public Area2D? HitArea { get; private set; }
+	[Export] public bool SyncMainAttackAreaWithEquippedWeaponArea { get; set; } = true;
 	private CollisionShape2D? _attackCollisionShape;
 	private Area2D? _cachedAttackAreaOwner;
+	private CollisionShape2D? _mainAttackCollisionShape;
+	private Vector2 _defaultAttackShapePosition;
+	private float _defaultAttackShapeRotation;
+	private Vector2 _defaultAttackShapeScale;
+	private Shape2D? _defaultAttackShape;
+	private PlayerItemAttachment? _itemAttachment;
 	private readonly Godot.Collections.Array<Rid> _attackQueryExclude = new();
 	public PlayerFrozenState? FrozenState { get; private set; }
 	public PlayerInventoryComponent? InventoryComponent { get; private set; }
@@ -98,6 +105,18 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 		if (StatsLabel == null) StatsLabel = GetNodeOrNull<Label>("../UI/PlayerStats");
 		if (InventoryComponent == null) InventoryComponent = GetNodeOrNull<PlayerInventoryComponent>("Inventory");
 		if (WeaponSkillController == null) WeaponSkillController = GetNodeOrNull<PlayerWeaponSkillController>("WeaponSkillController");
+		_itemAttachment = GetNodeOrNull<PlayerItemAttachment>("ItemAttachment");
+		if (_itemAttachment != null)
+		{
+			var callable = new Callable(this, MethodName.OnEquippedAttackAreaChanged);
+			if (!_itemAttachment.IsConnected(PlayerItemAttachment.SignalName.EquippedAttackAreaChanged, callable))
+			{
+				_itemAttachment.EquippedAttackAreaChanged += OnEquippedAttackAreaChanged;
+			}
+		}
+
+		CacheMainAttackAreaDefaults();
+		CallDeferred(MethodName.OnEquippedAttackAreaChanged);
 		
 		// 连接快捷栏变化信号，确保左手物品与选中槽位严格对应
 		ConnectQuickBarSignals();
@@ -108,6 +127,112 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 		CallDeferred(MethodName.ApplyUnarmedSkillIfEmpty);
 		
 		UpdateStatsUI();
+	}
+
+	public override void _ExitTree()
+	{
+		if (_itemAttachment != null)
+		{
+			var callable = new Callable(this, MethodName.OnEquippedAttackAreaChanged);
+			if (_itemAttachment.IsConnected(PlayerItemAttachment.SignalName.EquippedAttackAreaChanged, callable))
+			{
+				_itemAttachment.EquippedAttackAreaChanged -= OnEquippedAttackAreaChanged;
+			}
+		}
+
+		base._ExitTree();
+	}
+
+	private void CacheMainAttackAreaDefaults()
+	{
+		if (AttackArea == null)
+		{
+			return;
+		}
+
+		_mainAttackCollisionShape = AttackArea.GetNodeOrNull<CollisionShape2D>("CollisionShape2D");
+		if (_mainAttackCollisionShape == null)
+		{
+			foreach (Node child in AttackArea.GetChildren())
+			{
+				if (child is CollisionShape2D shape)
+				{
+					_mainAttackCollisionShape = shape;
+					break;
+				}
+			}
+		}
+
+		if (_mainAttackCollisionShape == null)
+		{
+			return;
+		}
+
+		_defaultAttackShapePosition = _mainAttackCollisionShape.Position;
+		_defaultAttackShapeRotation = _mainAttackCollisionShape.Rotation;
+		_defaultAttackShapeScale = _mainAttackCollisionShape.Scale;
+		_defaultAttackShape = _mainAttackCollisionShape.Shape?.Duplicate() as Shape2D;
+	}
+
+	private void OnEquippedAttackAreaChanged()
+	{
+		if (!SyncMainAttackAreaWithEquippedWeaponArea || AttackArea == null)
+		{
+			return;
+		}
+
+		_mainAttackCollisionShape ??= AttackArea.GetNodeOrNull<CollisionShape2D>("CollisionShape2D");
+		if (_mainAttackCollisionShape == null)
+		{
+			return;
+		}
+
+		if (_itemAttachment == null)
+		{
+			RestoreDefaultMainAttackArea();
+			return;
+		}
+
+		if (!_itemAttachment.TryGetEquippedAttackAreaTemplate(out var templateShape, out var templateTransform, out var templateMask) || templateShape == null)
+		{
+			RestoreDefaultMainAttackArea();
+			return;
+		}
+
+		AttackArea.Monitoring = true;
+		AttackArea.Monitorable = false;
+		if (templateMask != 0)
+		{
+			AttackArea.CollisionMask = templateMask;
+		}
+		AttackArea.CollisionLayer = 0;
+
+		Vector2 parentScale = GetGlobalScaleFromTransform(AttackArea.GlobalTransform);
+		Vector2 templateScale = GetGlobalScaleFromTransform(templateTransform);
+		Vector2 bakedScale = new Vector2(
+			templateScale.X / Mathf.Max(0.0001f, parentScale.X),
+			templateScale.Y / Mathf.Max(0.0001f, parentScale.Y));
+
+		_mainAttackCollisionShape.Position = templateTransform.Origin;
+		_mainAttackCollisionShape.Rotation = templateTransform.Rotation;
+		_mainAttackCollisionShape.Scale = Vector2.One;
+		_mainAttackCollisionShape.Shape = DuplicateShapeWithBakedScale(templateShape, bakedScale);
+	}
+
+	private void RestoreDefaultMainAttackArea()
+	{
+		if (_mainAttackCollisionShape == null)
+		{
+			return;
+		}
+
+		_mainAttackCollisionShape.Position = _defaultAttackShapePosition;
+		_mainAttackCollisionShape.Rotation = _defaultAttackShapeRotation;
+		_mainAttackCollisionShape.Scale = _defaultAttackShapeScale;
+		if (_defaultAttackShape != null)
+		{
+			_mainAttackCollisionShape.Shape = _defaultAttackShape.Duplicate() as Shape2D;
+		}
 	}
 
 	private void ApplyUnarmedSkillIfEmpty()
@@ -506,6 +631,7 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 		}
 
 		GameLogger.Info(nameof(SamplePlayer), $"AttackArea Source: {areaSource}, Node: {activeAttackArea.GetPath()}");
+		GameLogger.Info(nameof(SamplePlayer), $"AttackArea Detail: {DescribeAttackArea(activeAttackArea)}");
 
 		int hitCount = ApplyDamageWithArea(AttackDamage, (target, isFallback) =>
 		{
@@ -556,8 +682,16 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 		var attachedWeaponArea = itemAttachment?.GetEquippedAttackArea();
 		if (IsAttackAreaUsable(attachedWeaponArea))
 		{
-			areaSource = "WeaponArea";
+			areaSource = "WeaponAreaAttached";
 			return attachedWeaponArea;
+		}
+
+		// If enabled, the player's own AttackArea is already mirrored from equipped weapon scene.
+		// Prefer this single source to avoid divergent results between weapon area and fallback area.
+		if (SyncMainAttackAreaWithEquippedWeaponArea)
+		{
+			areaSource = "PlayerAreaSynced";
+			return AttackArea;
 		}
 
 		var leftHandAttachment = GetLeftHandAttachment();
@@ -579,6 +713,30 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 
 		areaSource = "PlayerArea";
 		return AttackArea;
+	}
+
+	private static string DescribeAttackArea(Area2D area)
+	{
+		var shapeNode = area.GetNodeOrNull<CollisionShape2D>("CollisionShape2D");
+		if (shapeNode == null)
+		{
+			foreach (Node child in area.GetChildren())
+			{
+				if (child is CollisionShape2D shape)
+				{
+					shapeNode = shape;
+					break;
+				}
+			}
+		}
+
+		string shapeName = shapeNode?.Shape?.GetType().Name ?? "None";
+		Vector2 pos = shapeNode?.GlobalPosition ?? area.GlobalPosition;
+		float rot = shapeNode?.GlobalRotationDegrees ?? area.GlobalRotationDegrees;
+		Vector2 scale = shapeNode?.GlobalScale ?? area.GlobalScale;
+		int overlapAreas = area.GetOverlappingAreas().Count;
+		int overlapBodies = area.GetOverlappingBodies().Count;
+		return $"shape={shapeName}, globalPos={pos}, rot={rot:F2}, scale={scale}, layer={area.CollisionLayer}, mask={area.CollisionMask}, overlaps(area={overlapAreas}, body={overlapBodies})";
 	}
 
 	private Area2D? FindUsableWeaponAttackArea(Node subtreeRoot)
@@ -620,6 +778,11 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 		if (hitCount == 0)
 		{
 			hitCount = DealDamageFromBodies(attackArea, damageAmount, onHit);
+		}
+
+		if (hitCount == 0)
+		{
+			LogNoHitDiagnostics(attackArea);
 		}
 
 		return hitCount;
@@ -703,12 +866,17 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 				continue;
 			}
 
-			if (!IsValidAttackTarget(actor) || !uniqueTargets.Add(actor))
+			if (!IsValidAttackTarget(actor))
 			{
 				continue;
 			}
 
-			if (!actor.IsHitByArea(attackArea))
+			if (!IsConfirmedActorHit(attackArea, actor, hitArea))
+			{
+				continue;
+			}
+
+			if (!uniqueTargets.Add(actor))
 			{
 				continue;
 			}
@@ -731,7 +899,7 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 			if (body is GameActor actor &&
 				IsValidAttackTarget(actor) &&
 				uniqueTargets.Add(actor) &&
-				actor.IsHitByArea(attackArea))
+				IsConfirmedActorHit(attackArea, actor, null))
 			{
 				DealDamageToTarget(actor, damageAmount);
 				hitCount++;
@@ -764,9 +932,9 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 		{
 			Shape = _attackCollisionShape.Shape,
 			Transform = _attackCollisionShape.GlobalTransform,
-			CollisionMask = uint.MaxValue,
+			CollisionMask = attackArea.CollisionMask == 0 ? uint.MaxValue : attackArea.CollisionMask,
 			CollideWithAreas = true,
-			CollideWithBodies = false
+			CollideWithBodies = true
 		};
 
 		_attackQueryExclude.Clear();
@@ -789,12 +957,15 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 			}
 
 			var colliderObject = colliderVariant.As<GodotObject>();
-			if (colliderObject is Area2D hitArea &&
-				TryResolveActorFromHitArea(hitArea, out GameActor actor) &&
+			if (TryResolveActorFromCollider(colliderObject, out GameActor actor, out Area2D? hitArea) &&
 				IsValidAttackTarget(actor) &&
-				uniqueTargets.Add(actor) &&
-				actor.IsHitByArea(attackArea))
+				IsConfirmedActorHit(attackArea, actor, hitArea))
 			{
+				if (!uniqueTargets.Add(actor))
+				{
+					continue;
+				}
+
 				DealDamageToTarget(actor, damageAmount);
 				hitCount++;
 				onHit?.Invoke(actor, true);
@@ -820,6 +991,121 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 
 		actor = null!;
 		return false;
+	}
+
+	private static bool TryResolveActorFromCollider(GodotObject colliderObject, out GameActor actor, out Area2D? hitArea)
+	{
+		if (colliderObject is Area2D area)
+		{
+			hitArea = area;
+			return TryResolveActorFromHitArea(area, out actor);
+		}
+
+		hitArea = null;
+
+		if (colliderObject is GameActor gameActor)
+		{
+			actor = gameActor;
+			return true;
+		}
+
+		if (colliderObject is Node node)
+		{
+			Node? current = node;
+			while (current != null)
+			{
+				if (current is GameActor parentActor)
+				{
+					actor = parentActor;
+					return true;
+				}
+
+				current = current.GetParent();
+			}
+		}
+
+		actor = null!;
+		return false;
+	}
+
+	private static bool IsConfirmedActorHit(Area2D attackArea, GameActor actor, Area2D? overlappedArea)
+	{
+		if (overlappedArea != null && string.Equals(overlappedArea.Name.ToString(), "HitArea", StringComparison.OrdinalIgnoreCase))
+		{
+			return true;
+		}
+
+		if (actor.IsHitByArea(attackArea))
+		{
+			return true;
+		}
+
+		return attackArea.OverlapsBody(actor);
+	}
+
+	private static Vector2 GetGlobalScaleFromTransform(Transform2D transform)
+	{
+		return new Vector2(transform.X.Length(), transform.Y.Length());
+	}
+
+	private static Shape2D DuplicateShapeWithBakedScale(Shape2D originalShape, Vector2 scale)
+	{
+		Shape2D? duplicated = originalShape.Duplicate() as Shape2D;
+		if (duplicated == null)
+		{
+			return originalShape;
+		}
+
+		scale = new Vector2(Mathf.Abs(scale.X), Mathf.Abs(scale.Y));
+
+		if (duplicated is RectangleShape2D rect)
+		{
+			rect.Size = new Vector2(rect.Size.X * scale.X, rect.Size.Y * scale.Y);
+			return rect;
+		}
+
+		if (duplicated is CircleShape2D circle)
+		{
+			float uniform = Mathf.Max(scale.X, scale.Y);
+			circle.Radius *= uniform;
+			return circle;
+		}
+
+		if (duplicated is CapsuleShape2D capsule)
+		{
+			capsule.Radius *= scale.X;
+			capsule.Height *= scale.Y;
+			return capsule;
+		}
+
+		return duplicated;
+	}
+
+	private void LogNoHitDiagnostics(Area2D attackArea)
+	{
+		var overlapAreas = attackArea.GetOverlappingAreas();
+		foreach (Node node in overlapAreas)
+		{
+			if (node is not Area2D area)
+			{
+				continue;
+			}
+
+			bool actorResolved = TryResolveActorFromHitArea(area, out GameActor resolvedActor);
+			string actorName = actorResolved ? resolvedActor.Name : "None";
+			bool isEnemy = actorResolved && IsValidAttackTarget(resolvedActor);
+			bool areaHit = actorResolved && resolvedActor.IsHitByArea(attackArea);
+			GameLogger.Info(nameof(SamplePlayer), $"NoHit Diagnose Area: {area.GetPath()}, actor={actorName}, validEnemy={isEnemy}, actorHitCheck={areaHit}");
+		}
+
+		var overlapBodies = attackArea.GetOverlappingBodies();
+		foreach (Node body in overlapBodies)
+		{
+			string name = body.Name;
+			bool isActor = body is GameActor;
+			bool isEnemy = isActor && IsValidAttackTarget((GameActor)body);
+			GameLogger.Info(nameof(SamplePlayer), $"NoHit Diagnose Body: {name}, isGameActor={isActor}, validEnemy={isEnemy}");
+		}
 	}
 
 	protected virtual bool IsValidAttackTarget(GameActor candidate)

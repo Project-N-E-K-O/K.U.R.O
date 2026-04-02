@@ -147,16 +147,33 @@ namespace Kuros.Items.World
 			base._ExitTree();
 			if (_grabArea != null)
 			{
-				_grabArea.BodyEntered -= OnBodyEntered;
-				_grabArea.BodyExited -= OnBodyExited;
+				var entered = new Callable(this, MethodName.OnBodyEntered);
+				var exited = new Callable(this, MethodName.OnBodyExited);
+				if (_grabArea.IsConnected(Area2D.SignalName.BodyEntered, entered))
+				{
+					_grabArea.BodyEntered -= OnBodyEntered;
+				}
+
+				if (_grabArea.IsConnected(Area2D.SignalName.BodyExited, exited))
+				{
+					_grabArea.BodyExited -= OnBodyExited;
+				}
 			}
 			if (_rigidBody != null)
 			{
-				_rigidBody.BodyEntered -= OnRigidBodyEntered;
+				var rigidEntered = new Callable(this, MethodName.OnRigidBodyEntered);
+				if (_rigidBody.IsConnected(RigidBody2D.SignalName.BodyEntered, rigidEntered))
+				{
+					_rigidBody.BodyEntered -= OnRigidBodyEntered;
+				}
 			}
 			if (_hitboxArea != null)
 			{
-				_hitboxArea.BodyEntered -= OnHitboxBodyEntered;
+				var hitboxEntered = new Callable(this, MethodName.OnHitboxBodyEntered);
+				if (_hitboxArea.IsConnected(Area2D.SignalName.BodyEntered, hitboxEntered))
+				{
+					_hitboxArea.BodyEntered -= OnHitboxBodyEntered;
+				}
 			}
 		}
 
