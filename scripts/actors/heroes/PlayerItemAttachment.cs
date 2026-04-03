@@ -61,6 +61,8 @@ namespace Kuros.Actors.Heroes
             Inventory.ItemPicked += OnItemPicked;
             Inventory.ItemRemoved += OnItemRemoved;
             Inventory.ActiveBackpackSlotChanged += OnActiveSlotChanged;
+            Inventory.QuickBarAssigned += OnQuickBarAssigned;
+            Inventory.QuickBarSlotChanged += OnSelectedQuickBarSlotChanged;
             Inventory.WeaponEquipped += OnWeaponEquipped;
             Inventory.WeaponUnequipped += OnWeaponUnequipped;
             if (Inventory.Backpack != null)
@@ -100,6 +102,17 @@ namespace Kuros.Actors.Heroes
             UpdateAttachmentIcon();
         }
 
+        private void OnQuickBarAssigned()
+        {
+            SubscribeToQuickBar();
+            UpdateAttachmentIcon();
+        }
+
+        private void OnSelectedQuickBarSlotChanged(int _)
+        {
+            UpdateAttachmentIcon();
+        }
+
         private void OnQuickBarSlotChanged(int slotIndex, string itemId, int quantity)
         {
             // 如果变化的是当前选中的快捷栏槽位，更新图标
@@ -116,6 +129,8 @@ namespace Kuros.Actors.Heroes
                 Inventory.ItemPicked -= OnItemPicked;
                 Inventory.ItemRemoved -= OnItemRemoved;
                 Inventory.ActiveBackpackSlotChanged -= OnActiveSlotChanged;
+                Inventory.QuickBarAssigned -= OnQuickBarAssigned;
+                Inventory.QuickBarSlotChanged -= OnSelectedQuickBarSlotChanged;
                 Inventory.WeaponEquipped -= OnWeaponEquipped;
                 Inventory.WeaponUnequipped -= OnWeaponUnequipped;
                 if (Inventory.Backpack != null)
