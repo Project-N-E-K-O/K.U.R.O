@@ -547,8 +547,47 @@ namespace Kuros.Actors.Heroes
 
         public ItemDefinition? GetCurrentWeaponDefinition()
         {
-            var stack = GetSelectedBackpackStack();
-            return stack?.Item ?? UnarmedWeaponDefinition;
+            return GetActiveCombatWeaponDefinition() ?? UnarmedWeaponDefinition;
+        }
+
+        public InventoryItemStack? GetEquippedWeaponStack()
+        {
+            var slot = GetSpecialSlot(SpecialInventorySlotIds.PrimaryWeapon);
+            if (slot == null || slot.IsEmpty)
+            {
+                return null;
+            }
+
+            var stack = slot.Stack;
+            if (stack == null || stack.IsEmpty)
+            {
+                return null;
+            }
+
+            return stack;
+        }
+
+        public ItemDefinition? GetActiveCombatWeaponDefinition()
+        {
+            var equippedStack = GetEquippedWeaponStack();
+            if (equippedStack != null && equippedStack.Item != null)
+            {
+                return equippedStack.Item;
+            }
+
+            var quickBarStack = GetSelectedQuickBarStack();
+            if (quickBarStack != null && !quickBarStack.IsEmpty && quickBarStack.Item.ItemId != "empty_item")
+            {
+                return quickBarStack.Item;
+            }
+
+            var backpackStack = GetSelectedBackpackStack();
+            if (backpackStack != null && !backpackStack.IsEmpty && backpackStack.Item.ItemId != "empty_item")
+            {
+                return backpackStack.Item;
+            }
+
+            return null;
         }
 
         /// <summary>

@@ -61,6 +61,10 @@ namespace Kuros.Actors.Heroes
             Inventory.ItemPicked += OnItemPicked;
             Inventory.ItemRemoved += OnItemRemoved;
             Inventory.ActiveBackpackSlotChanged += OnActiveSlotChanged;
+            Inventory.QuickBarAssigned += OnQuickBarAssigned;
+            Inventory.QuickBarSlotChanged += OnSelectedQuickBarSlotChanged;
+            Inventory.WeaponEquipped += OnWeaponEquipped;
+            Inventory.WeaponUnequipped += OnWeaponUnequipped;
             if (Inventory.Backpack != null)
             {
                 Inventory.Backpack.InventoryChanged += OnInventoryChanged;
@@ -98,6 +102,17 @@ namespace Kuros.Actors.Heroes
             UpdateAttachmentIcon();
         }
 
+        private void OnQuickBarAssigned()
+        {
+            SubscribeToQuickBar();
+            UpdateAttachmentIcon();
+        }
+
+        private void OnSelectedQuickBarSlotChanged(int _)
+        {
+            UpdateAttachmentIcon();
+        }
+
         private void OnQuickBarSlotChanged(int slotIndex, string itemId, int quantity)
         {
             // 如果变化的是当前选中的快捷栏槽位，更新图标
@@ -114,6 +129,10 @@ namespace Kuros.Actors.Heroes
                 Inventory.ItemPicked -= OnItemPicked;
                 Inventory.ItemRemoved -= OnItemRemoved;
                 Inventory.ActiveBackpackSlotChanged -= OnActiveSlotChanged;
+                Inventory.QuickBarAssigned -= OnQuickBarAssigned;
+                Inventory.QuickBarSlotChanged -= OnSelectedQuickBarSlotChanged;
+                Inventory.WeaponEquipped -= OnWeaponEquipped;
+                Inventory.WeaponUnequipped -= OnWeaponUnequipped;
                 if (Inventory.Backpack != null)
                 {
                     Inventory.Backpack.InventoryChanged -= OnInventoryChanged;
@@ -187,24 +206,20 @@ namespace Kuros.Actors.Heroes
             UpdateAttachmentIcon();
         }
 
+        private void OnWeaponEquipped(ItemDefinition _)
+        {
+            UpdateAttachmentIcon();
+        }
+
+        private void OnWeaponUnequipped()
+        {
+            UpdateAttachmentIcon();
+        }
+
         private void UpdateAttachmentIcon()
         {
-            ItemDefinition? activeItem = null;
-
-            // 优先从 QuickBar 获取选中的物品（左手物品）
-            var stack = Inventory?.GetSelectedQuickBarStack();
-            
-            // 检查是否为空白道具
-            if (stack != null && !stack.IsEmpty && stack.Item.ItemId != "empty_item")
-            {
-                activeItem = stack.Item;
-            }
-            else
-            {
-                // 如果 QuickBar 没有有效物品，尝试从 Backpack 获取
-                var backpackStack = Inventory?.GetSelectedBackpackStack();
-                activeItem = backpackStack?.Item;
-            }
+            // Combat weapon source: special weapon slot > quick bar > backpack.
+            ItemDefinition? activeItem = Inventory?.GetActiveCombatWeaponDefinition();
 
             ShowItemIcon(activeItem?.Icon);
             UpdateEquippedAttackArea(activeItem);
@@ -234,6 +249,22 @@ namespace Kuros.Actors.Heroes
             transform = _equippedAttackShapeTransform;
             collisionMask = _equippedAttackCollisionMask;
             return shape != null;
+        }
+
+        public bool TryGetAttackAnchorGlobalPosition(out Vector2 globalPosition)
+        {
+            var anchorNode = ResolveCurrentSlotAnchorNode() ?? ResolveActiveBoneNode();
+            if (anchorNode == null || !IsInstanceValid(anchorNode))
+            {
+                globalPosition = Vector2.Zero;
+                return false;
+            }
+
+            var anchorTransform = anchorNode.GetGlobalTransform();
+            globalPosition = RotateBoneOffsetWithBone
+                ? anchorTransform * BoneIconOffset
+                : anchorNode.GlobalPosition + BoneIconOffset;
+            return true;
         }
 
         private void ShowOnSpineSlot(Texture2D? texture)
@@ -406,7 +437,7 @@ namespace Kuros.Actors.Heroes
             }
 
             string scenePath = item.ResolveWorldScenePath();
-            if (string.IsNullOrWhiteSpace(scenePath) || !scenePath.StartsWith("res://", StringComparison.OrdinalIgnoreCase))
+            if (string.IsNullOrWhiteSpace(scenePath))
             {
                 ClearEquippedAttackArea();
                 return;
@@ -608,14 +639,28 @@ namespace Kuros.Actors.Heroes
 
         private void AttachEquippedAttackAreaToIcon()
         {
-            if (_equippedAttackArea == null || _iconSprite == null)
+            if (_equippedAttackArea == null)
             {
                 return;
             }
 
-            if (_equippedAttackArea.GetParent() != _iconSprite)
+            Node? targetParent = (Node?)_iconSprite ?? _attachmentParent ?? _actor;
+            if (targetParent == null)
             {
-                _iconSprite.AddChild(_equippedAttackArea);
+                GD.PushWarning($"{Name}: 无法找到 AttackArea 的挂载父节点，武器攻击区域将无法生效。");
+                return;
+            }
+
+            if (_equippedAttackArea.GetParent() != targetParent)
+            {
+                if (_equippedAttackArea.GetParent() != null)
+                {
+                    _equippedAttackArea.Reparent(targetParent);
+                }
+                else
+                {
+                    targetParent.AddChild(_equippedAttackArea);
+                }
             }
 
             UpdateEquippedAttackAreaTransform();
@@ -638,13 +683,25 @@ namespace Kuros.Actors.Heroes
 
         private void UpdateEquippedAttackAreaTransform()
         {
-            if (_equippedAttackArea == null || !GodotObject.IsInstanceValid(_equippedAttackArea) || _iconSprite == null || !GodotObject.IsInstanceValid(_iconSprite))
+            if (_equippedAttackArea == null || !GodotObject.IsInstanceValid(_equippedAttackArea))
             {
                 return;
             }
 
-            Transform2D iconNoScale = RemoveScaleFromTransform(_iconSprite.GlobalTransform);
-            _equippedAttackArea.GlobalTransform = iconNoScale * _equippedAttackAreaLocalTransform;
+            if (_iconSprite != null && GodotObject.IsInstanceValid(_iconSprite))
+            {
+                Transform2D iconNoScale = RemoveScaleFromTransform(_iconSprite.GlobalTransform);
+                _equippedAttackArea.GlobalTransform = iconNoScale * _equippedAttackAreaLocalTransform;
+            }
+            else
+            {
+                // Fallback: follow attachment parent or actor position
+                var anchor = (_attachmentParent as Node2D) ?? (_actor as Node2D);
+                if (anchor != null)
+                {
+                    _equippedAttackArea.GlobalTransform = anchor.GlobalTransform * _equippedAttackAreaLocalTransform;
+                }
+            }
         }
 
         private static Transform2D RemoveScaleFromTransform(Transform2D transform)

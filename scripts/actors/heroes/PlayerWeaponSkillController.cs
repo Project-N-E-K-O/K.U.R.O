@@ -178,6 +178,13 @@ namespace Kuros.Actors.Heroes
 
         private void ApplyFallbackIfNoWeapon()
         {
+            var activeWeapon = Inventory?.GetActiveCombatWeaponDefinition();
+            if (activeWeapon != null)
+            {
+                LoadSkills(activeWeapon);
+                return;
+            }
+
             if (Inventory?.QuickBar != null)
             {
                 if (TryApplyQuickBarWeapon())

@@ -75,10 +75,9 @@ namespace Kuros.Items.World
             // Try the explicit path first
             var rawPath = definition.ResolveWorldScenePath();
 
-            // If the resolved path is not a file path (e.g. ExtResource(...) or uid://),
-            // fall back to the default convention using ItemId.
+            // If the resolved path is not available, fall back to the default convention using ItemId.
             string[] tryPaths;
-            if (!string.IsNullOrWhiteSpace(rawPath) && rawPath.StartsWith("res://", StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrWhiteSpace(rawPath))
             {
                 tryPaths = new[] { rawPath, $"{DefaultSceneDirectory}{definition.ItemId}.tscn" };
             }

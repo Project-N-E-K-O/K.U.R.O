@@ -8,7 +8,7 @@
 size = Vector2(500, 120)
 
 [sub_resource type="RectangleShape2D" id="TriggerShape_yahcm"]
-size = Vector2(1404, 270)
+size = Vector2(1972, 270)
 
 [node name="WeaponStabDrill" type="CharacterBody2D"]
 scale = Vector2(0.5, 0.5)
@@ -27,9 +27,8 @@ shape = SubResource("BodyShape_rr6vl")
 
 [node name="AttackArea" type="Area2D" parent="."]
 scale = Vector2(0.5, 0.5)
-collision_layer = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AttackArea"]
-position = Vector2(201, -4)
+position = Vector2(343, -4)
 scale = Vector2(0.5, 0.5)
 shape = SubResource("TriggerShape_yahcm")

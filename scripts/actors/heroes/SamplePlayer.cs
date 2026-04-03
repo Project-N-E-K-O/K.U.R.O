@@ -17,6 +17,8 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 	[Export] public Area2D AttackArea { get; private set; } = null!;
 	[Export] public Area2D? HitArea { get; private set; }
 	[Export] public bool SyncMainAttackAreaWithEquippedWeaponArea { get; set; } = true;
+	[Export] public bool FollowSyncedAttackAreaWithAttackBoneMotion { get; set; } = true;
+	[Export] public NodePath AttackMotionBonePath { get; set; } = new("SpineSprite/SpineBoneNode");
 	private CollisionShape2D? _attackCollisionShape;
 	private Area2D? _cachedAttackAreaOwner;
 	private CollisionShape2D? _mainAttackCollisionShape;
@@ -24,6 +26,12 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 	private float _defaultAttackShapeRotation;
 	private Vector2 _defaultAttackShapeScale;
 	private Shape2D? _defaultAttackShape;
+	private Vector2 _currentAttackShapeBasePosition;
+	private float _currentAttackShapeBaseRotation;
+	private Vector2 _currentAttackAreaBaseScale = Vector2.One;
+	private Vector2 _attackAnchorRestLocalPosition;
+	private Vector2 _currentAttackAnchorMotionOffset = Vector2.Zero;
+	private Node2D? _attackMotionBoneNode;
 	private PlayerItemAttachment? _itemAttachment;
 	private readonly Godot.Collections.Array<Rid> _attackQueryExclude = new();
 	public PlayerFrozenState? FrozenState { get; private set; }
@@ -115,6 +123,8 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 			}
 		}
 
+		ResolveAttackMotionBoneNode();
+
 		CacheMainAttackAreaDefaults();
 		CallDeferred(MethodName.OnEquippedAttackAreaChanged);
 		
@@ -127,6 +137,12 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 		CallDeferred(MethodName.ApplyUnarmedSkillIfEmpty);
 		
 		UpdateStatsUI();
+	}
+
+	public override void _Process(double delta)
+	{
+		base._Process(delta);
+		UpdateSyncedAttackAreaAttackBoneMotion();
 	}
 
 	public override void _ExitTree()
@@ -172,6 +188,11 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 		_defaultAttackShapeRotation = _mainAttackCollisionShape.Rotation;
 		_defaultAttackShapeScale = _mainAttackCollisionShape.Scale;
 		_defaultAttackShape = _mainAttackCollisionShape.Shape?.Duplicate() as Shape2D;
+		_currentAttackShapeBasePosition = _defaultAttackShapePosition;
+		_currentAttackShapeBaseRotation = _defaultAttackShapeRotation;
+		_currentAttackAreaBaseScale = AttackArea.Scale;
+		_attackAnchorRestLocalPosition = Vector2.Zero;
+		_currentAttackAnchorMotionOffset = Vector2.Zero;
 	}
 
 	private void OnEquippedAttackAreaChanged()
@@ -212,11 +233,19 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 		Vector2 bakedScale = new Vector2(
 			templateScale.X / Mathf.Max(0.0001f, parentScale.X),
 			templateScale.Y / Mathf.Max(0.0001f, parentScale.Y));
+		Shape2D syncedShape = DuplicateShapeWithBakedScale(templateShape, bakedScale);
 
-		_mainAttackCollisionShape.Position = templateTransform.Origin;
-		_mainAttackCollisionShape.Rotation = templateTransform.Rotation;
+		// The weapon scene's local transform is relative to its own root/icon setup,
+		// not the player root. Only copy the shape size here and keep the player's
+		// default hitbox anchor so the attack area remains in front of the character.
+		_currentAttackShapeBasePosition = ComputeForwardAnchoredAttackShapePosition(syncedShape);
+		_currentAttackShapeBaseRotation = _defaultAttackShapeRotation;
+		_currentAttackAreaBaseScale = new Vector2(Mathf.Abs(AttackArea.Scale.X), Mathf.Abs(AttackArea.Scale.Y));
+		AttackArea.Scale = _currentAttackAreaBaseScale;
 		_mainAttackCollisionShape.Scale = Vector2.One;
-		_mainAttackCollisionShape.Shape = DuplicateShapeWithBakedScale(templateShape, bakedScale);
+		_mainAttackCollisionShape.Shape = syncedShape;
+		RefreshAttackAnchorTracking(resetOffset: true);
+		ApplyAttackAreaFacingTransform(FacingRight);
 	}
 
 	private void RestoreDefaultMainAttackArea()
@@ -233,12 +262,135 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 		{
 			_mainAttackCollisionShape.Shape = _defaultAttackShape.Duplicate() as Shape2D;
 		}
+
+		_currentAttackShapeBasePosition = _defaultAttackShapePosition;
+		_currentAttackShapeBaseRotation = _defaultAttackShapeRotation;
+		_currentAttackAreaBaseScale = AttackArea != null
+			? new Vector2(Mathf.Abs(AttackArea.Scale.X), Mathf.Abs(AttackArea.Scale.Y))
+			: Vector2.One;
+		RefreshAttackAnchorTracking(resetOffset: true);
+		ApplyAttackAreaFacingTransform(FacingRight);
+	}
+
+	private void RefreshAttackAnchorTracking(bool resetOffset)
+	{
+		if (resetOffset)
+		{
+			_currentAttackAnchorMotionOffset = Vector2.Zero;
+		}
+
+		if (!TryGetCurrentAttackAnchorLocalPosition(out var localPosition))
+		{
+			_attackAnchorRestLocalPosition = Vector2.Zero;
+			return;
+		}
+
+		_attackAnchorRestLocalPosition = localPosition;
+	}
+
+	private void UpdateSyncedAttackAreaAttackBoneMotion()
+	{
+		if (!SyncMainAttackAreaWithEquippedWeaponArea || !FollowSyncedAttackAreaWithAttackBoneMotion)
+		{
+			return;
+		}
+
+		if (AttackArea == null || _mainAttackCollisionShape == null)
+		{
+			return;
+		}
+
+		if (!TryGetCurrentAttackAnchorLocalPosition(out var localPosition))
+		{
+			if (_currentAttackAnchorMotionOffset != Vector2.Zero)
+			{
+				_currentAttackAnchorMotionOffset = Vector2.Zero;
+				ApplyAttackAreaFacingTransform(FacingRight);
+			}
+			return;
+		}
+
+		Vector2 newOffset = localPosition - _attackAnchorRestLocalPosition;
+		if (newOffset.IsEqualApprox(_currentAttackAnchorMotionOffset))
+		{
+			return;
+		}
+
+		_currentAttackAnchorMotionOffset = newOffset;
+		ApplyAttackAreaFacingTransform(FacingRight);
+	}
+
+	private bool TryGetCurrentAttackAnchorLocalPosition(out Vector2 localPosition)
+	{
+		if (_itemAttachment != null && _itemAttachment.TryGetAttackAnchorGlobalPosition(out var globalPosition))
+		{
+			localPosition = ToLocal(globalPosition);
+			return true;
+		}
+
+		ResolveAttackMotionBoneNode();
+		if (_attackMotionBoneNode != null && IsInstanceValid(_attackMotionBoneNode))
+		{
+			localPosition = ToLocal(_attackMotionBoneNode.GlobalPosition);
+			return true;
+		}
+
+		localPosition = Vector2.Zero;
+		return false;
+	}
+
+	private void ResolveAttackMotionBoneNode()
+	{
+		if (_attackMotionBoneNode != null && IsInstanceValid(_attackMotionBoneNode))
+		{
+			return;
+		}
+
+		if (AttackMotionBonePath != null && !AttackMotionBonePath.IsEmpty)
+		{
+			_attackMotionBoneNode = GetNodeOrNull<Node2D>(AttackMotionBonePath);
+			if (_attackMotionBoneNode != null)
+			{
+				return;
+			}
+
+			_attackMotionBoneNode = GetNodeOrNull<Node2D>($"../{AttackMotionBonePath}");
+			if (_attackMotionBoneNode != null)
+			{
+				return;
+			}
+		}
+
+		_attackMotionBoneNode = GetNodeOrNull<Node2D>("SpineSprite/SpineBoneNode")
+			?? FindChild("SpineBoneNode", recursive: true, owned: false) as Node2D;
+	}
+
+	private void ApplyAttackAreaFacingTransform(bool faceRight)
+	{
+		if (AttackArea == null || _mainAttackCollisionShape == null)
+		{
+			return;
+		}
+
+		AttackArea.Scale = new Vector2(
+			Mathf.Abs(_currentAttackAreaBaseScale.X),
+			Mathf.Abs(_currentAttackAreaBaseScale.Y));
+
+		Vector2 basePosition = _currentAttackShapeBasePosition;
+		Vector2 facingPosition = new Vector2(
+			faceRight ? Mathf.Abs(basePosition.X) : -Mathf.Abs(basePosition.X),
+			basePosition.Y);
+		_mainAttackCollisionShape.Position = facingPosition + _currentAttackAnchorMotionOffset;
+
+		_mainAttackCollisionShape.Rotation = faceRight
+			? _currentAttackShapeBaseRotation
+			: -_currentAttackShapeBaseRotation;
 	}
 
 	private void ApplyUnarmedSkillIfEmpty()
 	{
 		if (InventoryComponent == null) return;
-		if (InventoryComponent.GetSelectedBackpackStack() == null)
+		if (InventoryComponent.GetActiveCombatWeaponDefinition() == null)
 		{
 			WeaponSkillController?.ApplyUnarmedFallback();
 		}
@@ -606,14 +758,8 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 			 // Check if AttackArea parent is NOT the flipped visual (to avoid double flipping)
 			 if (AttackArea.GetParent() != _spineCharacter && AttackArea.GetParent() != _sprite)
 			 {
-				 var areaPos = AttackArea.Position;
-				 float absX = Mathf.Abs(areaPos.X);
-				 AttackArea.Position = new Vector2(faceRight ? absX : -absX, areaPos.Y);
-				 
-				 // Optional: Flip scale too if the shape is asymmetric
-				 var areaScale = AttackArea.Scale;
-				 float absScaleX = Mathf.Abs(areaScale.X);
-				 AttackArea.Scale = new Vector2(faceRight ? absScaleX : -absScaleX, areaScale.Y);
+				 RefreshAttackAnchorTracking(resetOffset: true);
+				 ApplyAttackAreaFacingTransform(faceRight);
 			 }
 		}
 	}
@@ -678,20 +824,22 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 			return null;
 		}
 
+		// When sync mode is enabled, the player's own AttackArea is the single
+		// authoritative hitbox. Do not fall back to the attached weapon Area2D,
+		// because that node follows icon/bone transforms and can inherit unwanted
+		// rotation even though the synced player hitbox should only react to facing.
+		if (SyncMainAttackAreaWithEquippedWeaponArea)
+		{
+			areaSource = "PlayerAreaSynced";
+			return AttackArea;
+		}
+
 		var itemAttachment = GetNodeOrNull<PlayerItemAttachment>("ItemAttachment");
 		var attachedWeaponArea = itemAttachment?.GetEquippedAttackArea();
 		if (IsAttackAreaUsable(attachedWeaponArea))
 		{
 			areaSource = "WeaponAreaAttached";
 			return attachedWeaponArea;
-		}
-
-		// If enabled, the player's own AttackArea is already mirrored from equipped weapon scene.
-		// Prefer this single source to avoid divergent results between weapon area and fallback area.
-		if (SyncMainAttackAreaWithEquippedWeaponArea)
-		{
-			areaSource = "PlayerAreaSynced";
-			return AttackArea;
 		}
 
 		var leftHandAttachment = GetLeftHandAttachment();
@@ -1046,6 +1194,33 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 	private static Vector2 GetGlobalScaleFromTransform(Transform2D transform)
 	{
 		return new Vector2(transform.X.Length(), transform.Y.Length());
+	}
+
+	private Vector2 ComputeForwardAnchoredAttackShapePosition(Shape2D shape)
+	{
+		float defaultRearEdge = _defaultAttackShapePosition.X - GetShapeHalfWidth(_defaultAttackShape);
+		float newHalfWidth = GetShapeHalfWidth(shape);
+		return new Vector2(defaultRearEdge + newHalfWidth, _defaultAttackShapePosition.Y);
+	}
+
+	private static float GetShapeHalfWidth(Shape2D? shape)
+	{
+		if (shape is RectangleShape2D rect)
+		{
+			return rect.Size.X * 0.5f;
+		}
+
+		if (shape is CircleShape2D circle)
+		{
+			return circle.Radius;
+		}
+
+		if (shape is CapsuleShape2D capsule)
+		{
+			return capsule.Radius;
+		}
+
+		return 0f;
 	}
 
 	private static Shape2D DuplicateShapeWithBakedScale(Shape2D originalShape, Vector2 scale)

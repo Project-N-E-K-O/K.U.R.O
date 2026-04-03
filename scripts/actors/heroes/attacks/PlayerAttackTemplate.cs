@@ -176,6 +176,7 @@ namespace Kuros.Actors.Heroes.Attacks
             }
 
             OnTick(delta);
+            RefreshCurrentHitboxDebug();
         }
 
         protected virtual void OnTick(double delta) { }
@@ -257,16 +258,10 @@ namespace Kuros.Actors.Heroes.Attacks
         {
             if (Player.InventoryComponent != null)
             {
-                var quickBarStack = Player.InventoryComponent.GetSelectedQuickBarStack();
-                if (quickBarStack != null && !quickBarStack.IsEmpty && quickBarStack.Item.ItemId != "empty_item")
+                var activeWeapon = Player.InventoryComponent.GetActiveCombatWeaponDefinition();
+                if (activeWeapon != null && !string.Equals(activeWeapon.ItemId, "empty_item", StringComparison.OrdinalIgnoreCase))
                 {
-                    return quickBarStack.Item.ItemId;
-                }
-
-                var backpackStack = Player.InventoryComponent.GetSelectedBackpackStack();
-                if (backpackStack != null && !backpackStack.IsEmpty && backpackStack.Item.ItemId != "empty_item")
-                {
-                    return backpackStack.Item.ItemId;
+                    return activeWeapon.ItemId;
                 }
             }
 
@@ -410,10 +405,37 @@ namespace Kuros.Actors.Heroes.Attacks
                 return;
             }
 
-            ShowWeaponHitboxDebug(skill, collisionShape);
+            ShowWeaponHitboxDebug(skill, collisionShape, logOnce: true);
         }
 
-        private void ShowWeaponHitboxDebug(WeaponSkillDefinition skill, CollisionShape2D collisionShape)
+        private void RefreshCurrentHitboxDebug()
+        {
+            if (_phase == AttackPhase.Idle)
+            {
+                return;
+            }
+
+            if (_activeWeaponSkill == null || !_activeWeaponSkill.ShowHitboxDebug)
+            {
+                return;
+            }
+
+            Area2D? area = Player.ResolveAttackAreaForHitDetection();
+            if (area == null)
+            {
+                return;
+            }
+
+            var collisionShape = ResolveCollisionShape(area);
+            if (collisionShape == null || collisionShape.Shape == null)
+            {
+                return;
+            }
+
+            ShowWeaponHitboxDebug(_activeWeaponSkill, collisionShape, logOnce: false);
+        }
+
+        private void ShowWeaponHitboxDebug(WeaponSkillDefinition skill, CollisionShape2D collisionShape, bool logOnce)
         {
             if (!skill.ShowHitboxDebug)
             {
@@ -428,7 +450,10 @@ namespace Kuros.Actors.Heroes.Attacks
                 skill.HitboxDebugDuration
             );
 
-            GD.Print($"[{GetType().Name}] Hitbox Debug => Shape={collisionShape.Shape.GetType().Name}, Position={collisionShape.GlobalPosition}, Rotation={collisionShape.GlobalRotationDegrees}");
+            if (logOnce)
+            {
+                GD.Print($"[{GetType().Name}] Hitbox Debug => Shape={collisionShape.Shape.GetType().Name}, Position={collisionShape.GlobalPosition}, Rotation={collisionShape.GlobalRotationDegrees}");
+            }
         }
 
         private void EnsureHitboxDebugDrawer()
