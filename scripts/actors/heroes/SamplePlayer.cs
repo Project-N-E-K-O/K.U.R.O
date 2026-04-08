@@ -8,6 +8,7 @@ using Kuros.Actors.Heroes;
 using Kuros.Systems.Inventory;
 using Kuros.Items;
 using Kuros.Managers;
+using Kuros.Systems.AI;
 using Kuros.UI;
 using Kuros.Utils;
 
@@ -33,6 +34,7 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 	private Vector2 _currentAttackAnchorMotionOffset = Vector2.Zero;
 	private Node2D? _attackMotionBoneNode;
 	private PlayerItemAttachment? _itemAttachment;
+	private AiDecisionBridge? _aiDecisionBridge;
 	private readonly Godot.Collections.Array<Rid> _attackQueryExclude = new();
 	public PlayerFrozenState? FrozenState { get; private set; }
 	public PlayerInventoryComponent? InventoryComponent { get; private set; }
@@ -114,6 +116,7 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 		if (InventoryComponent == null) InventoryComponent = GetNodeOrNull<PlayerInventoryComponent>("Inventory");
 		if (WeaponSkillController == null) WeaponSkillController = GetNodeOrNull<PlayerWeaponSkillController>("WeaponSkillController");
 		_itemAttachment = GetNodeOrNull<PlayerItemAttachment>("ItemAttachment");
+		_aiDecisionBridge = GetNodeOrNull<AiDecisionBridge>("AiDecisionBridge");
 		if (_itemAttachment != null)
 		{
 			var callable = new Callable(this, MethodName.OnEquippedAttackAreaChanged);
@@ -401,6 +404,14 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 		// 处理数字键 2、3、4、5 切换快捷栏物品（对应快捷栏槽位 1、2、3、4）
 		if (@event is InputEventKey keyEvent && keyEvent.Pressed)
 		{
+			bool isPipeHotkey = keyEvent.Keycode == Key.Backslash || keyEvent.Unicode == '|';
+			if (isPipeHotkey)
+			{
+				_ = RequestAiDecisionTestAsync();
+				GetViewport().SetInputAsHandled();
+				return;
+			}
+
 			int? slotIndex = null;
 			
 			// 数字键 2-5 对应快捷栏槽位 1-4（索引从0开始，但槽位0是小木剑）
@@ -438,6 +449,33 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 		}
 		
 		base._UnhandledInput(@event);
+	}
+
+	private async System.Threading.Tasks.Task RequestAiDecisionTestAsync()
+	{
+		_aiDecisionBridge ??= GetNodeOrNull<AiDecisionBridge>("AiDecisionBridge");
+		if (_aiDecisionBridge == null)
+		{
+			GameLogger.Warn(nameof(SamplePlayer), "AI test skipped: AiDecisionBridge node not found.");
+			return;
+		}
+
+		if (_aiDecisionBridge.RequestInFlight)
+		{
+			GameLogger.Info(nameof(SamplePlayer), "AI test skipped: request already in flight.");
+			return;
+		}
+
+		GameLogger.Info(nameof(SamplePlayer), "AI test request started (|). ");
+		var result = await _aiDecisionBridge.RequestDecisionAsync("根据当前游戏状态给出下一步行动建议，返回 JSON，字段为 action, reason, risk_level。");
+		if (result.Success)
+		{
+			GameLogger.Info(nameof(SamplePlayer), $"AI test response: {result.ResponseText}");
+		}
+		else
+		{
+			GameLogger.Error(nameof(SamplePlayer), $"AI test failed: {result.ErrorMessage}");
+		}
 	}
 	
 	/// <summary>

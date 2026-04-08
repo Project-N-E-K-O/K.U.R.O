@@ -1,4 +1,4 @@
-[gd_scene load_steps=34 format=3 uid="uid://ufprfd4r8ijj"]
+[gd_scene load_steps=37 format=3 uid="uid://ufprfd4r8ijj"]
 
 [ext_resource type="SpineAtlasResource" uid="uid://c4cx1o154rxba" path="res://assets/spine/main_character/Enemy_A1_zhuA.atlas" id="1_kqj82"]
 [ext_resource type="Script" uid="uid://befx3l05f0eph" path="res://scripts/actors/heroes/MainCharacter.cs" id="1_om6pm"]
@@ -27,6 +27,9 @@
 [ext_resource type="Script" uid="uid://c060w6pctgir3" path="res://scripts/actors/heroes/attacks/AttackHitboxDebugDrawer.cs" id="22_hitbox_debug"]
 [ext_resource type="PackedScene" uid="uid://ch7507iroiljg" path="res://scenes/ui/hud/EscapeHUD.tscn" id="24_tdm7a"]
 [ext_resource type="Resource" uid="uid://ckgxa7plx2tf7" path="res://resources/items/skills/WeaponStabSkill_Umbrella.tres" id="26_hitbox_preview_skill"]
+[ext_resource type="Script" path="res://scripts/systems/ai/GameStateProvider.cs" id="27_game_state_provider"]
+[ext_resource type="Script" path="res://scripts/systems/ai/OllamaGenerateClient.cs" id="28_ollama_client"]
+[ext_resource type="Script" path="res://scripts/systems/ai/AiDecisionBridge.cs" id="29_ai_decision_bridge"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_0y2r2"]
 shader = ExtResource("2_4ht1x")
@@ -217,6 +220,23 @@ IconOffset = Vector2(3, -1)
 
 [node name="EffectController" type="Node" parent="."]
 script = ExtResource("21_utqjm")
+
+[node name="GameStateProvider" type="Node" parent="."]
+script = ExtResource("27_game_state_provider")
+PlayerPath = NodePath("..")
+EnemyGroupName = "enemies"
+
+[node name="OllamaClient" type="Node" parent="."]
+script = ExtResource("28_ollama_client")
+Endpoint = "http://localhost:11434/api/generate"
+DefaultModel = "qwen3.5:9b"
+DefaultStream = true
+
+[node name="AiDecisionBridge" type="Node" parent="."]
+script = ExtResource("29_ai_decision_bridge")
+GameStateProviderPath = NodePath("../GameStateProvider")
+OllamaClientPath = NodePath("../OllamaClient")
+Model = "qwen3.5:9b"
 
 [node name="HitboxEditorPreview" type="Node2D" parent="."]
 visible = false
