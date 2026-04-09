@@ -17,9 +17,9 @@ layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -220.0
+offset_left = -150.0
 offset_top = 178.0
-offset_right = -20.0
+offset_right = -25.0
 offset_bottom = 668.0
 grow_horizontal = 0
 
@@ -38,7 +38,7 @@ grow_horizontal = 2
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 24
-text = "技能"
+text = "Effect"
 horizontal_alignment = 1
 
 [node name="Body" type="VBoxContainer" parent="MainPanel"]
@@ -57,47 +57,32 @@ theme_override_constants/separation = 24
 [node name="SkillsVBox" type="VBoxContainer" parent="MainPanel/Body"]
 layout_mode = 2
 size_flags_vertical = 3
+tooltip_text = "
+"
 theme_override_constants/separation = 24
-
-[node name="ActiveSkillsSection" type="VBoxContainer" parent="MainPanel/Body/SkillsVBox"]
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_constants/separation = 12
-
-[node name="ActiveSkillsTitle" type="Label" parent="MainPanel/Body/SkillsVBox/ActiveSkillsSection"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 24
-text = "主技能"
-
-[node name="ActiveSkillsScroll" type="ScrollContainer" parent="MainPanel/Body/SkillsVBox/ActiveSkillsSection"]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="ActiveSkillsContainer" type="VBoxContainer" parent="MainPanel/Body/SkillsVBox/ActiveSkillsSection/ActiveSkillsScroll"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 12
 
 [node name="PassiveSkillsSection" type="VBoxContainer" parent="MainPanel/Body/SkillsVBox"]
 layout_mode = 2
 size_flags_vertical = 3
+tooltip_text = "
+"
 theme_override_constants/separation = 12
 
 [node name="PassiveSkillsTitle" type="Label" parent="MainPanel/Body/SkillsVBox/PassiveSkillsSection"]
+visible = false
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
-text = "被动技能"
 
 [node name="PassiveSkillsScroll" type="ScrollContainer" parent="MainPanel/Body/SkillsVBox/PassiveSkillsSection"]
 layout_mode = 2
 size_flags_vertical = 3
+horizontal_scroll_mode = 0
 
 [node name="PassiveSkillsContainer" type="VBoxContainer" parent="MainPanel/Body/SkillsVBox/PassiveSkillsSection/PassiveSkillsScroll"]
 layout_mode = 2
-size_flags_horizontal = 3
 theme_override_constants/separation = 12
 
 [node name="DetailButton" type="Button" parent="MainPanel/Body"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
-text = "TAB 查看详情"
+text = "TAB"

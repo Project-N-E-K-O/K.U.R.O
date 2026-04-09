@@ -12,9 +12,7 @@ namespace Kuros.UI
     {
         [ExportCategory("UI References")]
         [Export] public Button CloseButton { get; private set; } = null!;
-        [Export] public VBoxContainer ActiveSkillsContainer { get; private set; } = null!;
         [Export] public VBoxContainer PassiveSkillsContainer { get; private set; } = null!;
-        [Export] public Label ActiveSkillsTitle { get; private set; } = null!;
         [Export] public Label PassiveSkillsTitle { get; private set; } = null!;
         [Export] public Button DetailButton { get; private set; } = null!;
 
@@ -22,14 +20,8 @@ namespace Kuros.UI
         private SkillDetailWindow? _skillDetailWindow;
         private const string SkillDetailWindowPath = "res://scenes/ui/windows/SkillDetailWindow.tscn";
         private InventoryWindow? _cachedInventoryWindow;
+        private PlayerBuildController? _buildController;
         private readonly List<OwnedBuildViewData> _ownedBuilds = new();
-
-        // 技能数据（占位数据，等待接入真实技能接口）
-        private readonly List<SkillData> _activeSkills = new();
-        private readonly List<SkillData> _passiveSkills = new();
-        
-        // 技能卡片引用，用于更新冷却时间
-        private readonly Dictionary<string, SkillCardControl> _skillCards = new();
 
         public override void _Ready()
         {
@@ -37,32 +29,22 @@ namespace Kuros.UI
             ProcessMode = ProcessModeEnum.Always;
             
             CacheNodeReferences();
-            InitializePlaceholderSkills();
-            UpdateSkillDisplay();
+            SubscribeBuildControllerSignals();
+            RefreshBuildIcons();
             // 默认显示在战斗场景中
             Visible = true;
             _isOpen = true;
         }
 
+        public override void _ExitTree()
+        {
+            UnsubscribeBuildControllerSignals();
+            base._ExitTree();
+        }
+
         public override void _Process(double delta)
         {
             base._Process(delta);
-            
-            // 如果游戏暂停（菜单栏或物品栏打开），不更新冷却时间
-            var tree = GetTree();
-            if (tree != null && tree.Paused)
-            {
-                return;
-            }
-            
-            // 如果物品栏打开，不更新冷却时间
-            if (IsInventoryWindowOpen())
-            {
-                return;
-            }
-            
-            // 实时更新技能冷却时间
-            UpdateCooldowns((float)delta);
         }
 
         public override void _UnhandledInput(InputEvent @event)
@@ -98,9 +80,7 @@ namespace Kuros.UI
         private void CacheNodeReferences()
         {
             CloseButton ??= GetNodeOrNull<Button>("MainPanel/Header/CloseButton");
-            ActiveSkillsContainer ??= GetNodeOrNull<VBoxContainer>("MainPanel/Body/SkillsVBox/ActiveSkillsSection/ActiveSkillsScroll/ActiveSkillsContainer");
             PassiveSkillsContainer ??= GetNodeOrNull<VBoxContainer>("MainPanel/Body/SkillsVBox/PassiveSkillsSection/PassiveSkillsScroll/PassiveSkillsContainer");
-            ActiveSkillsTitle ??= GetNodeOrNull<Label>("MainPanel/Body/SkillsVBox/ActiveSkillsSection/ActiveSkillsTitle");
             PassiveSkillsTitle ??= GetNodeOrNull<Label>("MainPanel/Body/SkillsVBox/PassiveSkillsSection/PassiveSkillsTitle");
             DetailButton ??= GetNodeOrNull<Button>("MainPanel/Body/DetailButton");
 
@@ -116,15 +96,14 @@ namespace Kuros.UI
         }
 
         /// <summary>
-        /// 初始化占位技能数据（等待接入真实技能接口）
+        /// 初始化构筑图标数据：根据当前武器构筑，仅显示已拥有的 build 图标。
         /// </summary>
         private void InitializePlaceholderSkills()
         {
-            _activeSkills.Clear();
-            _passiveSkills.Clear();
             _ownedBuilds.Clear();
 
-            var buildController = FindPlayerBuildController();
+            _buildController ??= FindPlayerBuildController();
+            var buildController = _buildController;
             if (buildController == null)
             {
                 return;
@@ -132,6 +111,7 @@ namespace Kuros.UI
 
             buildController.RefreshBuildState();
             int currentPoints = buildController.CurrentBuildCount;
+            string currentBuildClass = ResolveCurrentBuildClass(buildController);
 
             var entries = new List<BuildLevelEffectEntry>();
             foreach (var entry in buildController.LevelEntries)
@@ -156,6 +136,13 @@ namespace Kuros.UI
                     continue;
                 }
 
+                if (!string.IsNullOrWhiteSpace(currentBuildClass) &&
+                    !string.IsNullOrWhiteSpace(entry.BuildClass) &&
+                    !string.Equals(entry.BuildClass.Trim(), currentBuildClass, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
                 _ownedBuilds.Add(new OwnedBuildViewData
                 {
                     Name = string.IsNullOrWhiteSpace(entry.BuildName) ? $"构筑 Lv.{entry.Level}" : entry.BuildName,
@@ -163,8 +150,75 @@ namespace Kuros.UI
                     Icon = LoadBuildIcon(entry.IconPath ?? string.Empty)
                 });
             }
+        }
 
-            // 不做未拥有构筑兜底：仅展示当前已拥有（已达成点数）的构筑图标。
+        private void RefreshBuildIcons()
+        {
+            InitializePlaceholderSkills();
+            UpdateSkillDisplay();
+        }
+
+        private void SubscribeBuildControllerSignals()
+        {
+            var controller = FindPlayerBuildController();
+            if (controller == _buildController && controller != null)
+            {
+                return;
+            }
+
+            UnsubscribeBuildControllerSignals();
+            _buildController = controller;
+            if (_buildController == null)
+            {
+                return;
+            }
+
+            _buildController.BuildCountChanged += OnBuildCountChanged;
+            _buildController.BuildLevelChanged += OnBuildLevelChanged;
+        }
+
+        private void UnsubscribeBuildControllerSignals()
+        {
+            if (_buildController == null)
+            {
+                return;
+            }
+
+            _buildController.BuildCountChanged -= OnBuildCountChanged;
+            _buildController.BuildLevelChanged -= OnBuildLevelChanged;
+            _buildController = null;
+        }
+
+        private void OnBuildCountChanged(int _)
+        {
+            if (IsInsideTree())
+            {
+                CallDeferred(nameof(RefreshBuildIcons));
+            }
+        }
+
+        private void OnBuildLevelChanged(int _)
+        {
+            if (IsInsideTree())
+            {
+                CallDeferred(nameof(RefreshBuildIcons));
+            }
+        }
+
+        private static string ResolveCurrentBuildClass(PlayerBuildController buildController)
+        {
+            if (!string.IsNullOrWhiteSpace(buildController.BuildClass))
+            {
+                return buildController.BuildClass.Trim();
+            }
+
+            var activeWeapon = buildController.Inventory?.GetActiveCombatWeaponDefinition();
+            if (!string.IsNullOrWhiteSpace(activeWeapon?.BuildClass))
+            {
+                return activeWeapon.BuildClass.Trim();
+            }
+
+            return string.Empty;
         }
 
         /// <summary>
@@ -172,15 +226,6 @@ namespace Kuros.UI
         /// </summary>
         private void UpdateSkillDisplay()
         {
-            // 清空现有显示
-            if (ActiveSkillsContainer != null)
-            {
-                foreach (Node child in ActiveSkillsContainer.GetChildren())
-                {
-                    child.QueueFree();
-                }
-            }
-
             if (PassiveSkillsContainer != null)
             {
                 foreach (Node child in PassiveSkillsContainer.GetChildren())
@@ -189,89 +234,54 @@ namespace Kuros.UI
                 }
             }
 
-            // 清空技能卡片引用，避免引用已释放的节点
-            _skillCards.Clear();
-
-            // 仅显示当前已拥有构筑图标列表（不使用下拉框）
-            if (ActiveSkillsTitle != null)
-            {
-                ActiveSkillsTitle.Text = string.Empty;
-            }
-
             if (PassiveSkillsTitle != null)
             {
+                PassiveSkillsTitle.Text = string.Empty;
                 PassiveSkillsTitle.Visible = false;
             }
 
             if (PassiveSkillsContainer != null && PassiveSkillsContainer.GetParent() is Control passiveSection)
             {
-                passiveSection.Visible = false;
-            }
-
-            if (ActiveSkillsContainer != null)
-            {
-                ActiveSkillsContainer.AddChild(CreateBuildIconsPanel());
-                return;
-            }
-
-            // 显示主技能
-            if (ActiveSkillsContainer != null)
-            {
-                foreach (var skill in _activeSkills)
-                {
-                    var skillCard = CreateSkillCard(skill);
-                    ActiveSkillsContainer.AddChild(skillCard);
-                    _skillCards[skill.Id] = skillCard;
-                }
-            }
-
-            // 显示被动技能
-            if (PassiveSkillsContainer != null)
-            {
-                foreach (var skill in _passiveSkills)
-                {
-                    var skillCard = CreateSkillCard(skill);
-                    PassiveSkillsContainer.AddChild(skillCard);
-                    _skillCards[skill.Id] = skillCard;
-                }
+                passiveSection.Visible = true;
+                PassiveSkillsContainer.AddChild(CreateBuildIconsPanel());
             }
         }
 
         private Control CreateBuildIconsPanel()
         {
-            var panel = new Panel();
-            panel.CustomMinimumSize = new Vector2(300, 180);
-
             var margin = new MarginContainer();
+            margin.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
             margin.AddThemeConstantOverride("margin_left", 12);
             margin.AddThemeConstantOverride("margin_top", 12);
             margin.AddThemeConstantOverride("margin_right", 12);
             margin.AddThemeConstantOverride("margin_bottom", 12);
-            panel.AddChild(margin);
 
             var root = new VBoxContainer();
-            root.AddThemeConstantOverride("separation", 10);
+            root.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+            root.AddThemeConstantOverride("separation", 16);
             margin.AddChild(root);
 
             if (_ownedBuilds.Count == 0)
             {
-                var emptyLabel = new Label();
-                //emptyLabel.Text = "当前无已拥有构筑";
-                root.AddChild(emptyLabel);
-                return panel;
+                return margin;
             }
 
             for (int i = 0; i < _ownedBuilds.Count; i++)
             {
+                var centerContainer = new CenterContainer();
+                centerContainer.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+                centerContainer.CustomMinimumSize = new Vector2(0, 96);
+                root.AddChild(centerContainer);
+
                 var iconRect = new TextureRect();
                 iconRect.CustomMinimumSize = new Vector2(96, 96);
                 iconRect.StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered;
                 iconRect.ExpandMode = TextureRect.ExpandModeEnum.FitWidthProportional;
                 iconRect.Texture = _ownedBuilds[i].Icon;
-                root.AddChild(iconRect);
+                centerContainer.AddChild(iconRect);
             }
 
-            return panel;
+            return margin;
         }
 
         private PlayerBuildController? FindPlayerBuildController()
@@ -345,157 +355,6 @@ namespace Kuros.UI
             return null;
         }
 
-        /// <summary>
-        /// 更新所有技能的冷却时间
-        /// </summary>
-        private void UpdateCooldowns(float delta)
-        {
-            foreach (var skill in _activeSkills)
-            {
-                if (_skillCards.TryGetValue(skill.Id, out var card))
-                {
-                    // 更新冷却时间（模拟冷却倒计时）
-                    if (skill.CurrentCooldown > 0)
-                    {
-                        skill.CurrentCooldown = Mathf.Max(0, skill.CurrentCooldown - delta);
-                        card.UpdateCooldown(skill.CurrentCooldown, skill.Cooldown);
-                    }
-                    else if (skill.CurrentCooldown <= 0 && skill.Cooldown > 0)
-                    {
-                        // 冷却完成，显示就绪状态
-                        card.UpdateCooldown(0, skill.Cooldown);
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// 创建技能卡片
-        /// </summary>
-        private SkillCardControl CreateSkillCard(SkillData skill)
-        {
-            var card = new SkillCardControl();
-            card.CustomMinimumSize = new Vector2(300, 100);
-
-            var margin = new MarginContainer();
-            margin.AddThemeConstantOverride("margin_left", 12);
-            margin.AddThemeConstantOverride("margin_top", 12);
-            margin.AddThemeConstantOverride("margin_right", 12);
-            margin.AddThemeConstantOverride("margin_bottom", 12);
-            card.AddChild(margin);
-
-            var hbox = new HBoxContainer();
-            hbox.AddThemeConstantOverride("separation", 12);
-            margin.AddChild(hbox);
-
-            // 技能图标
-            var iconRect = new TextureRect();
-            iconRect.CustomMinimumSize = new Vector2(80, 80);
-            iconRect.ExpandMode = TextureRect.ExpandModeEnum.FitWidthProportional;
-            iconRect.StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered;
-            if (skill.Icon != null)
-            {
-                iconRect.Texture = skill.Icon;
-            }
-            hbox.AddChild(iconRect);
-
-            // 技能信息
-            var vbox = new VBoxContainer();
-            vbox.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-            hbox.AddChild(vbox);
-
-            // 技能名称
-            var nameLabel = new Label();
-            nameLabel.Text = skill.Name;
-            nameLabel.AddThemeFontSizeOverride("font_size", 20);
-            vbox.AddChild(nameLabel);
-
-            // 技能描述
-            var descLabel = new RichTextLabel();
-            descLabel.Text = skill.Description;
-            descLabel.BbcodeEnabled = true;
-            descLabel.FitContent = true;
-            descLabel.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
-            vbox.AddChild(descLabel);
-
-            // 冷却时间（仅主技能显示）
-            if (skill.IsActive && skill.Cooldown > 0)
-            {
-                var cooldownLabel = new Label();
-                cooldownLabel.Name = "CooldownLabel";
-                cooldownLabel.Text = $"冷却: {skill.Cooldown:F1}秒";
-                cooldownLabel.AddThemeFontSizeOverride("font_size", 16);
-                cooldownLabel.AddThemeColorOverride("font_color", new Color(1.0f, 0.8f, 0.0f));
-                vbox.AddChild(cooldownLabel);
-                card.SetCooldownLabel(cooldownLabel);
-            }
-
-            card.Initialize(skill);
-            
-            // 添加点击事件来测试冷却（仅主技能）
-            if (skill.IsActive)
-            {
-                card.GuiInput += (InputEvent @event) =>
-                {
-                    // 如果游戏暂停（菜单栏或物品栏打开），阻止技能使用
-                    var tree = GetTree();
-                    if (tree != null && tree.Paused)
-                    {
-                        return;
-                    }
-                    
-                    // 如果物品栏打开，阻止技能使用
-                    if (IsInventoryWindowOpen())
-                    {
-                        return;
-                    }
-                    
-                    if (@event is InputEventMouseButton mouseEvent && mouseEvent.Pressed && mouseEvent.ButtonIndex == MouseButton.Left)
-                    {
-                        // 触发技能冷却
-                        TriggerSkillCooldown(skill.Id);
-                        GetViewport().SetInputAsHandled();
-                    }
-                };
-            }
-            
-            return card;
-        }
-
-        /// <summary>
-        /// 触发技能冷却（测试用，等待接入真实技能接口）
-        /// </summary>
-        public void TriggerSkillCooldown(string skillId)
-        {
-            // 如果游戏暂停（菜单栏或物品栏打开），阻止技能使用
-            var tree = GetTree();
-            if (tree != null && tree.Paused)
-            {
-                GD.Print("SkillWindow.TriggerSkillCooldown: 游戏已暂停，无法使用技能");
-                return;
-            }
-            
-            // 如果物品栏打开，阻止技能使用
-            if (IsInventoryWindowOpen())
-            {
-                GD.Print("SkillWindow.TriggerSkillCooldown: 物品栏打开，无法使用技能");
-                return;
-            }
-            
-            foreach (var skill in _activeSkills)
-            {
-                if (skill.Id == skillId && skill.CurrentCooldown <= 0)
-                {
-                    skill.CurrentCooldown = skill.Cooldown;
-                    if (_skillCards.TryGetValue(skillId, out var card))
-                    {
-                        card.UpdateCooldown(skill.CurrentCooldown, skill.Cooldown);
-                    }
-                    GD.Print($"技能 {skill.Name} 已使用，冷却时间: {skill.Cooldown}秒");
-                    break;
-                }
-            }
-        }
 
         /// <summary>
         /// 检查物品栏是否打开
@@ -561,6 +420,8 @@ namespace Kuros.UI
         {
             if (_isOpen) return;
 
+            SubscribeBuildControllerSignals();
+            RefreshBuildIcons();
             Visible = true;
             _isOpen = true;
             // 注意：不在这里暂停游戏，因为BattleMenu已经管理了暂停状态
@@ -591,65 +452,11 @@ namespace Kuros.UI
 
         public bool IsOpen => _isOpen;
 
-        /// <summary>
-        /// 技能数据类（占位，等待接入真实技能接口）
-        /// </summary>
-        private class SkillData
-        {
-            public string Id { get; set; } = string.Empty;
-            public string Name { get; set; } = string.Empty;
-            public string Description { get; set; } = string.Empty;
-            public Texture2D? Icon { get; set; }
-            public float Cooldown { get; set; } = 0.0f;
-            public float CurrentCooldown { get; set; } = 0.0f;
-            public bool IsActive { get; set; } = true;
-        }
-
         private class OwnedBuildViewData
         {
             public string Name { get; set; } = string.Empty;
             public string IconPath { get; set; } = string.Empty;
             public Texture2D? Icon { get; set; }
-        }
-
-        /// <summary>
-        /// 技能卡片控件
-        /// </summary>
-        private partial class SkillCardControl : Panel
-        {
-            private Label? _cooldownLabel;
-            private SkillData? _skillData;
-
-            public void Initialize(SkillData skill)
-            {
-                _skillData = skill;
-                // 初始化时设置冷却时间为0（技能就绪）
-                if (skill.IsActive && skill.Cooldown > 0)
-                {
-                    skill.CurrentCooldown = 0;
-                }
-            }
-
-            public void SetCooldownLabel(Label label)
-            {
-                _cooldownLabel = label;
-            }
-
-            public void UpdateCooldown(float currentCooldown, float maxCooldown)
-            {
-                if (_cooldownLabel == null || _skillData == null) return;
-
-                if (currentCooldown > 0)
-                {
-                    _cooldownLabel.Text = $"冷却: {currentCooldown:F1}秒";
-                    _cooldownLabel.AddThemeColorOverride("font_color", new Color(1.0f, 0.3f, 0.3f)); // 红色表示冷却中
-                }
-                else
-                {
-                    _cooldownLabel.Text = "就绪";
-                    _cooldownLabel.AddThemeColorOverride("font_color", new Color(0.3f, 1.0f, 0.3f)); // 绿色表示就绪
-                }
-            }
         }
 
         /// <summary>
