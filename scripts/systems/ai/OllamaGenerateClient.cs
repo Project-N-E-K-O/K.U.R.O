@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Godot;
 
@@ -20,8 +21,11 @@ namespace Kuros.Systems.AI
 
         [Export] public string Endpoint { get; set; } = "http://localhost:11434/api/generate";
         [Export] public string DefaultModel { get; set; } = "llama3";
-        [Export] public bool DefaultStream { get; set; } = true;
+        [Export] public bool DefaultStream { get; set; } = false;
         [Export(PropertyHint.Range, "1,600,1")] public int TimeoutSeconds { get; set; } = 120;
+        [Export(PropertyHint.Range, "16,4096,1")] public int MaxPredictTokens { get; set; } = 512;
+        [Export(PropertyHint.Range, "0,2,0.01")] public float Temperature { get; set; } = 0.2f;
+        [Export] public bool DisableThinking { get; set; } = true;
 
         private static readonly System.Net.Http.HttpClient SharedHttpClient = new();
 
@@ -41,9 +45,22 @@ namespace Kuros.Systems.AI
                 ["stream"] = requestStream
             };
 
+            payload["options"] = new Godot.Collections.Dictionary<string, Variant>
+            {
+                ["num_predict"] = Mathf.Max(16, MaxPredictTokens),
+                ["temperature"] = Mathf.Clamp(Temperature, 0f, 2f)
+            };
+
             if (!string.IsNullOrWhiteSpace(system))
             {
                 payload["system"] = system;
+            }
+
+            if (DisableThinking)
+            {
+                // Qwen models may output only `thinking` with empty `response`.
+                // Request non-thinking mode to increase chance of direct final answer text.
+                payload["think"] = false;
             }
 
             return await SendGenerateRequestAsync(payload, requestStream);
@@ -98,11 +115,12 @@ namespace Kuros.Systems.AI
                     Content = new StringContent(Json.Stringify(payload), Encoding.UTF8, "application/json")
                 };
 
-                SharedHttpClient.Timeout = TimeSpan.FromSeconds(Mathf.Max(1, TimeoutSeconds));
+                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(Mathf.Max(1, TimeoutSeconds)));
 
                 using HttpResponseMessage response = await SharedHttpClient.SendAsync(
                     request,
-                    HttpCompletionOption.ResponseHeadersRead);
+                    HttpCompletionOption.ResponseHeadersRead,
+                    cts.Token);
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -114,10 +132,16 @@ namespace Kuros.Systems.AI
 
                 if (streaming)
                 {
-                    return await ParseStreamingResponseAsync(response);
+                    return await ParseStreamingResponseAsync(response, cts.Token);
                 }
 
-                return await ParseSingleJsonResponseAsync(response);
+                return await ParseSingleJsonResponseAsync(response, cts.Token);
+            }
+            catch (OperationCanceledException)
+            {
+                string err = $"Ollama request timeout after {Mathf.Max(1, TimeoutSeconds)} second(s).";
+                EmitSignal(SignalName.RequestFailed, err);
+                return OllamaGenerateResult.FromError(err);
             }
             catch (Exception ex)
             {
@@ -127,9 +151,9 @@ namespace Kuros.Systems.AI
             }
         }
 
-        private async Task<OllamaGenerateResult> ParseSingleJsonResponseAsync(HttpResponseMessage response)
+        private async Task<OllamaGenerateResult> ParseSingleJsonResponseAsync(HttpResponseMessage response, CancellationToken cancellationToken)
         {
-            string body = await response.Content.ReadAsStringAsync();
+            string body = await response.Content.ReadAsStringAsync(cancellationToken);
             Variant parsed = Json.ParseString(body);
             if (parsed.VariantType != Variant.Type.Dictionary)
             {
@@ -140,12 +164,14 @@ namespace Kuros.Systems.AI
 
             var dict = parsed.AsGodotDictionary();
             string text = GetString(dict, "response");
+            string thinking = GetString(dict, "thinking");
             var result = new OllamaGenerateResult
             {
                 Success = true,
                 Model = GetString(dict, "model"),
                 CreatedAt = GetString(dict, "created_at"),
                 ResponseText = text,
+                ThinkingText = thinking,
                 Done = GetBool(dict, "done"),
                 DoneReason = GetString(dict, "done_reason"),
                 Context = GetIntArray(dict, "context"),
@@ -158,20 +184,24 @@ namespace Kuros.Systems.AI
                 EvalDuration = GetLong(dict, "eval_duration")
             };
 
+            ApplyThinkingFallbackIfNeeded(result);
+
             EmitSignal(SignalName.StreamCompleted, result.ResponseText);
             return result;
         }
 
-        private async Task<OllamaGenerateResult> ParseStreamingResponseAsync(HttpResponseMessage response)
+        private async Task<OllamaGenerateResult> ParseStreamingResponseAsync(HttpResponseMessage response, CancellationToken cancellationToken)
         {
             var result = new OllamaGenerateResult { Success = true };
             var sb = new StringBuilder(1024);
+            var thinkingSb = new StringBuilder(1024);
 
-            await using Stream stream = await response.Content.ReadAsStreamAsync();
+            await using Stream stream = await response.Content.ReadAsStreamAsync(cancellationToken);
             using var reader = new StreamReader(stream, Encoding.UTF8);
 
             while (!reader.EndOfStream)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 string? line = await reader.ReadLineAsync();
                 if (string.IsNullOrWhiteSpace(line))
                 {
@@ -192,6 +222,12 @@ namespace Kuros.Systems.AI
                 {
                     sb.Append(chunkText);
                     EmitSignal(SignalName.StreamChunkReceived, chunkText);
+                }
+
+                string thinkingChunk = GetString(chunkObj, "thinking");
+                if (!string.IsNullOrEmpty(thinkingChunk))
+                {
+                    thinkingSb.Append(thinkingChunk);
                 }
 
                 result.Model = string.IsNullOrEmpty(result.Model) ? GetString(chunkObj, "model") : result.Model;
@@ -215,8 +251,26 @@ namespace Kuros.Systems.AI
             }
 
             result.ResponseText = sb.ToString();
+            result.ThinkingText = thinkingSb.ToString();
+            ApplyThinkingFallbackIfNeeded(result);
             EmitSignal(SignalName.StreamCompleted, result.ResponseText);
             return result;
+        }
+
+        private static void ApplyThinkingFallbackIfNeeded(OllamaGenerateResult result)
+        {
+            if (!string.IsNullOrWhiteSpace(result.ResponseText))
+            {
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(result.ThinkingText))
+            {
+                return;
+            }
+
+            result.ResponseText = result.ThinkingText;
+            result.UsedThinkingFallback = true;
         }
 
         private static string GetString(Godot.Collections.Dictionary dict, string key)
@@ -280,6 +334,8 @@ namespace Kuros.Systems.AI
         public string Model { get; set; } = string.Empty;
         public string CreatedAt { get; set; } = string.Empty;
         public string ResponseText { get; set; } = string.Empty;
+        public string ThinkingText { get; set; } = string.Empty;
+        public bool UsedThinkingFallback { get; set; }
         public bool Done { get; set; }
         public string DoneReason { get; set; } = string.Empty;
 

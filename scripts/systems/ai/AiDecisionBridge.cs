@@ -11,6 +11,7 @@ namespace Kuros.Systems.AI
     public partial class AiDecisionBridge : Node
     {
         [Signal] public delegate void DecisionChunkReceivedEventHandler(string chunkText);
+        [Signal] public delegate void DecisionPromptBuiltEventHandler(string promptText);
         [Signal] public delegate void DecisionCompletedEventHandler(string responseText);
         [Signal] public delegate void DecisionFailedEventHandler(string errorMessage);
 
@@ -22,6 +23,7 @@ namespace Kuros.Systems.AI
         [Export(PropertyHint.Range, "0,60,0.1")] public float MinRequestIntervalSeconds { get; set; } = 0.5f;
 
         public bool RequestInFlight => _requestInFlight;
+        public string LastPromptText { get; private set; } = string.Empty;
         public string LastDecisionText { get; private set; } = string.Empty;
         public string LastError { get; private set; } = string.Empty;
 
@@ -69,14 +71,19 @@ namespace Kuros.Systems.AI
 
             _requestInFlight = true;
             _lastRequestAtMs = now;
+            LastPromptText = string.Empty;
             LastDecisionText = string.Empty;
             LastError = string.Empty;
 
             try
             {
-                var result = await _ollamaClient.GenerateFromGameStateAsync(
-                    _gameStateProvider,
-                    string.IsNullOrWhiteSpace(instruction) ? DefaultInstruction : instruction!,
+                string effectiveInstruction = string.IsNullOrWhiteSpace(instruction) ? DefaultInstruction : instruction!;
+                var state = _gameStateProvider.CaptureGameState();
+                LastPromptText = OllamaGenerateClient.BuildGameStatePrompt(state, effectiveInstruction);
+                EmitSignal(SignalName.DecisionPromptBuilt, LastPromptText);
+
+                var result = await _ollamaClient.GenerateAsync(
+                    LastPromptText,
                     string.IsNullOrWhiteSpace(Model) ? null : Model,
                     Stream);
 

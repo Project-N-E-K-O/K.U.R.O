@@ -470,7 +470,12 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 		var result = await _aiDecisionBridge.RequestDecisionAsync("根据当前游戏状态给出下一步行动建议，返回 JSON，字段为 action, reason, risk_level。");
 		if (result.Success)
 		{
-			GameLogger.Info(nameof(SamplePlayer), $"AI test response: {result.ResponseText}");
+			string text = result.ResponseText ?? string.Empty;
+			if (text.Length > 800)
+			{
+				text = text.Substring(0, 800) + "...<truncated>";
+			}
+			GameLogger.Info(nameof(SamplePlayer), $"AI test response(done_reason={result.DoneReason}, used_thinking_fallback={result.UsedThinkingFallback}): {text}");
 		}
 		else
 		{

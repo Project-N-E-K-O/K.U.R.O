@@ -1,4 +1,4 @@
-[gd_scene load_steps=37 format=3 uid="uid://ufprfd4r8ijj"]
+[gd_scene load_steps=39 format=3 uid="uid://ufprfd4r8ijj"]
 
 [ext_resource type="SpineAtlasResource" uid="uid://c4cx1o154rxba" path="res://assets/spine/main_character/Enemy_A1_zhuA.atlas" id="1_kqj82"]
 [ext_resource type="Script" uid="uid://befx3l05f0eph" path="res://scripts/actors/heroes/MainCharacter.cs" id="1_om6pm"]
@@ -27,9 +27,11 @@
 [ext_resource type="Script" uid="uid://c060w6pctgir3" path="res://scripts/actors/heroes/attacks/AttackHitboxDebugDrawer.cs" id="22_hitbox_debug"]
 [ext_resource type="PackedScene" uid="uid://ch7507iroiljg" path="res://scenes/ui/hud/EscapeHUD.tscn" id="24_tdm7a"]
 [ext_resource type="Resource" uid="uid://ckgxa7plx2tf7" path="res://resources/items/skills/WeaponStabSkill_Umbrella.tres" id="26_hitbox_preview_skill"]
-[ext_resource type="Script" path="res://scripts/systems/ai/GameStateProvider.cs" id="27_game_state_provider"]
-[ext_resource type="Script" path="res://scripts/systems/ai/OllamaGenerateClient.cs" id="28_ollama_client"]
-[ext_resource type="Script" path="res://scripts/systems/ai/AiDecisionBridge.cs" id="29_ai_decision_bridge"]
+[ext_resource type="Script" uid="uid://bwok3hmgrj42p" path="res://scripts/systems/ai/GameStateProvider.cs" id="27_game_state_provider"]
+[ext_resource type="Script" uid="uid://c5utxtiab6ieq" path="res://scripts/systems/ai/OllamaGenerateClient.cs" id="28_ollama_client"]
+[ext_resource type="Script" uid="uid://5y0siu0cpkp" path="res://scripts/systems/ai/AiDecisionBridge.cs" id="29_ai_decision_bridge"]
+[ext_resource type="Script" uid="uid://jdkrte1ds1cg" path="res://scripts/systems/ai/GameStateDebugPanel.cs" id="30_game_state_debug_panel"]
+[ext_resource type="Script" uid="uid://c4vf2e3jvlhg7" path="res://scripts/systems/ai/AiOutputDebugPanel.cs" id="31_ai_output_debug_panel"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_0y2r2"]
 shader = ExtResource("2_4ht1x")
@@ -87,7 +89,7 @@ script = ExtResource("4_ixg0x")
 
 [node name="SpineBoneNode" type="SpineBoneNode" parent="SpineSprite"]
 show_behind_parent = true
-position = Vector2(0.81747717, -466.17545)
+position = Vector2(0.08342266, -452.47226)
 rotation = -1.6160004
 scale = Vector2(0.99999994, 0.99999994)
 bone_name = "Upper Body"
@@ -224,24 +226,73 @@ script = ExtResource("21_utqjm")
 [node name="GameStateProvider" type="Node" parent="."]
 script = ExtResource("27_game_state_provider")
 PlayerPath = NodePath("..")
-EnemyGroupName = "enemies"
 
 [node name="OllamaClient" type="Node" parent="."]
 script = ExtResource("28_ollama_client")
-Endpoint = "http://localhost:11434/api/generate"
 DefaultModel = "qwen3.5:9b"
-DefaultStream = true
 
 [node name="AiDecisionBridge" type="Node" parent="."]
 script = ExtResource("29_ai_decision_bridge")
-GameStateProviderPath = NodePath("../GameStateProvider")
-OllamaClientPath = NodePath("../OllamaClient")
 Model = "qwen3.5:9b"
+Stream = false
+
+[node name="GameStateDebugPanel" type="CanvasLayer" parent="."]
+layer = 100
+script = ExtResource("30_game_state_debug_panel")
+
+[node name="Panel" type="PanelContainer" parent="GameStateDebugPanel"]
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 560.0
+offset_bottom = 420.0
+
+[node name="VBox" type="VBoxContainer" parent="GameStateDebugPanel/Panel"]
+layout_mode = 2
+
+[node name="RefreshButton" type="Button" parent="GameStateDebugPanel/Panel/VBox"]
+layout_mode = 2
+text = "Refresh GameState"
+
+[node name="ToggleButton" type="Button" parent="GameStateDebugPanel/Panel/VBox"]
+layout_mode = 2
+text = "Hide"
+
+[node name="StateText" type="RichTextLabel" parent="GameStateDebugPanel/Panel/VBox"]
+custom_minimum_size = Vector2(520, 360)
+layout_mode = 2
+size_flags_vertical = 3
+scroll_following = true
+
+[node name="AiOutputDebugPanel" type="CanvasLayer" parent="."]
+layer = 101
+script = ExtResource("31_ai_output_debug_panel")
+
+[node name="Panel" type="PanelContainer" parent="AiOutputDebugPanel"]
+offset_left = 580.0
+offset_top = 16.0
+offset_right = 1120.0
+offset_bottom = 420.0
+
+[node name="VBox" type="VBoxContainer" parent="AiOutputDebugPanel/Panel"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="AiOutputDebugPanel/Panel/VBox"]
+layout_mode = 2
+text = "AI Output"
+
+[node name="ToggleButton" type="Button" parent="AiOutputDebugPanel/Panel/VBox"]
+layout_mode = 2
+text = "Hide"
+
+[node name="OutputText" type="RichTextLabel" parent="AiOutputDebugPanel/Panel/VBox"]
+custom_minimum_size = Vector2(520, 340)
+layout_mode = 2
+size_flags_vertical = 3
+scroll_following = true
 
 [node name="HitboxEditorPreview" type="Node2D" parent="."]
-visible = false
 z_as_relative = false
-position = Vector2(171.99998, 3.9999998)
+position = Vector2(402.12112, -569.99994)
 scale = Vector2(0.9999999, 0.9999999)
 script = ExtResource("22_hitbox_debug")
 EnableEditorPreview = true
