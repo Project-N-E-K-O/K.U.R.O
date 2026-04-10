@@ -1,5 +1,4 @@
 using Godot;
-using Kuros.Core;
 
 namespace Kuros.Actors.Enemies.States
 {
@@ -20,16 +19,8 @@ namespace Kuros.Actors.Enemies.States
         [Export]
         public string NextStateName = "Walk";
 
-        [ExportCategory("Interrupt")]
-        [Export]
-        public bool EnableDamageImmunity = true;
-
-        [Export]
-        public bool EnableSuperArmor = true;
-
         private float _timer;
         private Vector2 _dashDirection = Vector2.Zero;
-        private bool? _previousIgnoreHitStateOnDamage;
 
         public override void Enter()
         {
@@ -45,22 +36,6 @@ namespace Kuros.Actors.Enemies.States
                 _dashDirection = Enemy.FacingRight ? Vector2.Left : Vector2.Right;
             }
 
-            if (EnableSuperArmor)
-            {
-                _previousIgnoreHitStateOnDamage = Enemy.IgnoreHitStateOnDamage;
-                Enemy.IgnoreHitStateOnDamage = true;
-            }
-            else
-            {
-                _previousIgnoreHitStateOnDamage = null;
-            }
-
-            Enemy.DamageIntercepted -= OnEnemyDamageIntercepted;
-            if (EnableDamageImmunity)
-            {
-                Enemy.DamageIntercepted += OnEnemyDamageIntercepted;
-            }
-
             if (Enemy.AnimPlayer != null && !string.IsNullOrEmpty(AnimationName) && Enemy.AnimPlayer.HasAnimation(AnimationName))
             {
                 Enemy.AnimPlayer.Play(AnimationName);
@@ -72,13 +47,6 @@ namespace Kuros.Actors.Enemies.States
             if (Enemy != null && GodotObject.IsInstanceValid(Enemy))
             {
                 Enemy.Velocity = Vector2.Zero;
-                Enemy.DamageIntercepted -= OnEnemyDamageIntercepted;
-
-                if (_previousIgnoreHitStateOnDamage.HasValue)
-                {
-                    Enemy.IgnoreHitStateOnDamage = _previousIgnoreHitStateOnDamage.Value;
-                    _previousIgnoreHitStateOnDamage = null;
-                }
             }
         }
 
@@ -89,30 +57,7 @@ namespace Kuros.Actors.Enemies.States
                 return true;
             }
 
-            if (nextStateName == "Dying" || nextStateName == "Dead")
-            {
-                return true;
-            }
-
-            if (EnableSuperArmor)
-            {
-                return false;
-            }
-
-            return nextStateName == "Hit"
-                || nextStateName == "Frozen"
-                || nextStateName == "CooldownFrozen";
-        }
-
-        private bool OnEnemyDamageIntercepted(GameActor.DamageEventArgs args)
-        {
-            if (!EnableDamageImmunity || _timer <= 0f)
-            {
-                return false;
-            }
-
-            args.IsBlocked = true;
-            return true;
+            return nextStateName == "Dying" || nextStateName == "Dead";
         }
 
         public override void PhysicsUpdate(double delta)

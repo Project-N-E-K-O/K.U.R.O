@@ -90,90 +90,41 @@ AttackArea = NodePath("AttackArea")
 LeftHandAttachmentPath = NodePath("SpineSprite/SpineBoneNode")
 Speed = 500.0
 AttackDamage = 1.0
-MaxHealth = 1000
+MaxHealth = 70
 StateMachine = NodePath("StateMachine")
 EffectController = NodePath("EffectController")
-DamageFlashColor = Color(18.892157, 18.892157, 18.892157, 1)
-DamageFlashDuration = 0.15
 
 [node name="Shadow" type="Sprite2D" parent="."]
 material = SubResource("ShaderMaterial_0y2r2")
 scale = Vector2(15, 2)
 texture = ExtResource("3_tdm7a")
 
-[node name="OutlineLayer" type="Node2D" parent="."]
-show_behind_parent = true
-
-[node name="OutlineSpineSprite_Left" type="SpineSprite" parent="OutlineLayer"]
-modulate = Color(0.02, 0.02, 0.02, 0.85)
-show_behind_parent = true
-position = Vector2(-20, 0)
-skeleton_data_res = SubResource("SpineSkeletonDataResource_rs5xn")
-preview_skin = "Default"
-preview_animation = "-- Empty --"
-preview_frame = true
-preview_time = 0.99
-script = ExtResource("4_ixg0x")
-
-[node name="OutlineSpineSprite_Right" type="SpineSprite" parent="OutlineLayer"]
-modulate = Color(0.02, 0.02, 0.02, 0.85)
-show_behind_parent = true
-position = Vector2(20, 0)
-skeleton_data_res = SubResource("SpineSkeletonDataResource_rs5xn")
-preview_skin = "Default"
-preview_animation = "-- Empty --"
-preview_frame = true
-preview_time = 0.99
-script = ExtResource("4_ixg0x")
-
-[node name="OutlineSpineSprite_Up" type="SpineSprite" parent="OutlineLayer"]
-modulate = Color(0.02, 0.02, 0.02, 0.85)
-show_behind_parent = true
-position = Vector2(0, -20)
-skeleton_data_res = SubResource("SpineSkeletonDataResource_rs5xn")
-preview_skin = "Default"
-preview_animation = "-- Empty --"
-preview_frame = true
-preview_time = 0.99
-script = ExtResource("4_ixg0x")
-
-[node name="OutlineSpineSprite_Down" type="SpineSprite" parent="OutlineLayer"]
-modulate = Color(0.02, 0.02, 0.02, 0.85)
-show_behind_parent = true
-position = Vector2(0, 20)
-skeleton_data_res = SubResource("SpineSkeletonDataResource_rs5xn")
-preview_skin = "Default"
-preview_animation = "-- Empty --"
-preview_frame = true
-preview_time = 0.99
-script = ExtResource("4_ixg0x")
-
 [node name="SpineSprite" type="SpineSprite" parent="."]
+material = SubResource("ShaderMaterial_sprite_outline")
 skeleton_data_res = SubResource("SpineSkeletonDataResource_rs5xn")
 bones_thickness = 10.09
 preview_skin = "Default"
 preview_animation = "-- Empty --"
 preview_frame = true
-preview_time = 1.0
+preview_time = 0.99
 script = ExtResource("4_ixg0x")
 
 [node name="SpineBoneNode" type="SpineBoneNode" parent="SpineSprite"]
 show_behind_parent = true
 z_index = -1
+y_sort_enabled = true
 position = Vector2(0.82191175, -473.95676)
 rotation = -1.6160004
 scale = Vector2(0.99999994, 0.99999994)
 bone_name = "Upper Body"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-visible = false
 position = Vector2(0, -108.995995)
 rotation = 1.5707964
 scale = Vector2(0.9999999, 0.9999999)
 shape = SubResource("CapsuleShape2D_0y6jy")
 
 [node name="HitArea" type="Area2D" parent="."]
-visible = false
 scale = Vector2(0.99999994, 0.99999994)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HitArea"]
@@ -181,7 +132,6 @@ position = Vector2(6.0606065, -515.15155)
 shape = SubResource("CapsuleShape2D_0y2r2")
 
 [node name="AttackArea" type="Area2D" parent="."]
-visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AttackArea"]
 position = Vector2(464.24234, -569.99994)
@@ -221,7 +171,7 @@ script = ExtResource("9_13pt2")
 AttackId = "umbrella_melee_attack"
 DisplayName = "Umbrella Melee Attack"
 Description = "雨伞专属攻击模板示例"
-RecoveryDuration = 0.0
+ActiveDuration = 0.6
 AnimationName = "animations/attack_thrust"
 HitEffectScene = ExtResource("12_0y2r2")
 HitEffectAnchorMode = 2
@@ -233,7 +183,7 @@ script = ExtResource("9_13pt2")
 AttackId = "drill_melee_attack"
 DisplayName = "Drill Melee Attack"
 Description = "合金钻头专属攻击模板示例"
-RecoveryDuration = 0.0
+ActiveDuration = 0.6
 AnimationName = "animations/Weapon_Stab_Drill"
 HitEffectScene = ExtResource("12_0y2r2")
 HitEffectAnchorMode = 2
@@ -250,19 +200,6 @@ HitEffectScene = ExtResource("12_0y2r2")
 HitEffectAnchorMode = 2
 HitEffectForceTopLevel = true
 RequiredItemId = "Weapon_Slash_barrierGate"
-
-[node name="RiotBracerMeleeAttack" type="Node" parent="StateMachine/Attack"]
-script = ExtResource("9_13pt2")
-AttackId = "riot_bracer_melee_attack"
-DisplayName = "Riot Bracer Melee Attack"
-Description = "镇暴护腕专属攻击模板示例"
-ActiveDuration = 0.5
-RecoveryDuration = 0.35
-AnimationName = "animations/Weapon_Brawl_MechGlove"
-HitEffectScene = ExtResource("12_0y2r2")
-HitEffectAnchorMode = 2
-HitEffectForceTopLevel = true
-RequiredItemId = "Weapon_Brawl_riotBracer"
 
 [node name="Hit" type="Node" parent="StateMachine"]
 script = ExtResource("10_utqjm")

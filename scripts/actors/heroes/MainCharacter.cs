@@ -1,6 +1,5 @@
 using Godot;
 using System;
-using System.Collections.Generic;
 using Kuros.Core;
 using Kuros.Actors.Enemies;
 using Kuros.Items.Attributes;
@@ -17,7 +16,6 @@ namespace Kuros.Actors.Heroes
 	{
 		[ExportCategory("Animation")]
 	[Export] public NodePath SpineSpritePath { get; set; } = new NodePath("SpineSprite");
-	[Export] public NodePath OutlineSpineSpritePath { get; set; } = new NodePath("OutlineSpineSprite");
 	[Export] public string IdleAnimationName { get; set; } = "idle";
 	[Export] public string WalkAnimationName { get; set; } = "walk";
 	[Export] public string RunAnimationName { get; set; } = "run";
@@ -50,9 +48,7 @@ namespace Kuros.Actors.Heroes
 
 	// Spine 相关（使用 Node 引用，通过 Call 调用 GDScript 方法）
 	private Node? _spineController;
-	private readonly List<Node> _outlineSpineControllers = new();
 	private CanvasItem? _spineBoneNode;
-	private Color _defaultOutlineModulate = new Color(0.02f, 0.02f, 0.02f, 0.85f);
 	private string _currentAnimation = string.Empty;
 	private float _hitInvincibilityRemaining = 0.0f;
 	private float _invincibleFlashElapsed = 0.0f;
@@ -79,7 +75,6 @@ namespace Kuros.Actors.Heroes
 		InitializeSpine();
 		_defaultSpineAlpha = _spineCharacter != null ? _spineCharacter.Modulate.A : 1.0f;
 		_defaultSpriteAlpha = _sprite != null ? _sprite.Modulate.A : 1.0f;
-		SyncOutlineFacing(FacingRight);
 
 		// 检查并验证组件初始化
 		ValidateComponents();
@@ -184,97 +179,6 @@ namespace Kuros.Actors.Heroes
 			//GD.PushWarning($"[{Name}] SpineSprite 节点未挂载 SpineController.gd 脚本！请在 SpineSprite 节点上附加 scripts/controllers/SpineController.gd 脚本。");
 			_spineController = null;
 		}
-
-		ResolveOutlineSpines();
-	}
-
-	private void ResolveOutlineSpines()
-	{
-		_outlineSpineControllers.RemoveAll(node => node == null || !IsInstanceValid(node));
-		if (_outlineSpineControllers.Count > 0)
-		{
-			return;
-		}
-
-		if (!OutlineSpineSpritePath.IsEmpty)
-		{
-			Node? configuredNode = GetNodeOrNull(OutlineSpineSpritePath);
-			if (configuredNode != null)
-			{
-				if (configuredNode.HasMethod("play"))
-				{
-					_outlineSpineControllers.Add(configuredNode);
-				}
-
-				foreach (Node child in configuredNode.GetChildren())
-				{
-					if (child.HasMethod("play") && child.Name.ToString().StartsWith("OutlineSpineSprite", StringComparison.OrdinalIgnoreCase))
-					{
-						_outlineSpineControllers.Add(child);
-					}
-				}
-			}
-		}
-
-		foreach (Node candidate in FindChildren("OutlineSpineSprite*", recursive: true, owned: false))
-		{
-			if (!candidate.HasMethod("play") || _outlineSpineControllers.Contains(candidate))
-			{
-				continue;
-			}
-
-			_outlineSpineControllers.Add(candidate);
-		}
-
-		if (_outlineSpineControllers.Count == 0)
-		{
-			return;
-		}
-
-		Variant outlineColor = _outlineSpineControllers[0].Get("modulate");
-		if (outlineColor.VariantType == Variant.Type.Color)
-		{
-			_defaultOutlineModulate = outlineColor.AsColor();
-		}
-	}
-
-	private void SyncOutlineFacing(bool faceRight)
-	{
-		ResolveOutlineSpines();
-		if (_outlineSpineControllers.Count == 0)
-		{
-			return;
-		}
-
-		float sign = faceRight ? 1.0f : -1.0f;
-		if (FaceLeftByDefault)
-		{
-			sign *= -1.0f;
-		}
-
-		foreach (Node outlineNode in _outlineSpineControllers)
-		{
-			if (!IsInstanceValid(outlineNode))
-			{
-				continue;
-			}
-
-			Variant scaleVariant = outlineNode.Get("scale");
-			if (scaleVariant.VariantType != Variant.Type.Vector2)
-			{
-				continue;
-			}
-
-			Vector2 scale = scaleVariant.AsVector2();
-			float absX = Mathf.Abs(scale.X);
-			outlineNode.Set("scale", new Vector2(absX * sign, scale.Y));
-		}
-	}
-
-	public override void FlipFacing(bool faceRight)
-	{
-		base.FlipFacing(faceRight);
-		SyncOutlineFacing(faceRight);
 	}
 
 	// 注意：需要保留 _UnhandledInput 来调用基类方法，让状态机处理输入
@@ -376,19 +280,10 @@ namespace Kuros.Actors.Heroes
 				// 调用 SpineController.gd 的 play 方法
 				// play(anim: String, loop := true, mix_duration := 0.1, time_scale := 1.0)
 				_spineController.Call("play", animName, loop, AnimationMixDuration, timeScale);
-
-				ResolveOutlineSpines();
-				foreach (Node outlineNode in _outlineSpineControllers)
-				{
-					if (IsInstanceValid(outlineNode) && outlineNode.HasMethod("play"))
-					{
-						outlineNode.Call("play", animName, loop, AnimationMixDuration, timeScale);
-					}
-				}
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
-				//GD.PushWarning($"[{Name}] 播放动画失败: {animName}");
+				//GD.PushWarning($"[{Name}] 播放动画失败: {animName}, 错误: {ex.Message}");
 			}
 		}
 
@@ -527,19 +422,6 @@ namespace Kuros.Actors.Heroes
 			color.A = alpha;
 			_sprite.Modulate = color;
 		}
-
-		ResolveOutlineSpines();
-		foreach (Node outlineNode in _outlineSpineControllers)
-		{
-			if (!IsInstanceValid(outlineNode))
-			{
-				continue;
-			}
-
-			var color = _defaultOutlineModulate;
-			color.A = Mathf.Clamp(_defaultOutlineModulate.A * alpha, 0.0f, 1.0f);
-			outlineNode.Set("modulate", color);
-		}
 	}
 
 	private void RestoreInvincibleFlash()
@@ -556,15 +438,6 @@ namespace Kuros.Actors.Heroes
 			var color = _sprite.Modulate;
 			color.A = _defaultSpriteAlpha;
 			_sprite.Modulate = color;
-		}
-
-		ResolveOutlineSpines();
-		foreach (Node outlineNode in _outlineSpineControllers)
-		{
-			if (IsInstanceValid(outlineNode))
-			{
-				outlineNode.Set("modulate", _defaultOutlineModulate);
-			}
 		}
 	}
 

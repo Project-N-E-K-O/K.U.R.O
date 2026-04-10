@@ -32,12 +32,6 @@ namespace Kuros.Items.World
 		[Export] public Area2D TriggerArea { get; private set; } = null!;
 		[Export] public bool AutoDisableTriggerOnPickup { get; set; } = true;
 
-		[ExportGroup("Outline Highlight")]
-		[Export] public bool EnableGrabAreaOutlineHighlight { get; set; } = true;
-		[Export] public NodePath HighlightSpritePath { get; set; } = new("Outline");
-		[Export] public Color DefaultOutlineColor { get; set; } = new Color(0f, 0f, 0f, 1f);
-		[Export] public Color HighlightOutlineColor { get; set; } = new Color(1f, 1f, 1f, 1f);
-
 		[ExportGroup("World Physics")]
 		[Export(PropertyHint.Range, "0,4000,1")] public float ThrowFriction = 600f;
 		[Export] public uint BodyCollisionLayer { get; set; } = 0;  // 禁用 body 碰撞
@@ -54,10 +48,6 @@ namespace Kuros.Items.World
 		private int _lastTransferredAmount;
 		private Vector2 _pendingVelocity;
 		private GameActor? _focusedActor;
-		private Sprite2D? _highlightSprite;
-		private ShaderMaterial? _outlineMaterial;
-		private Area2D? _cachedPlayerGrabArea;
-		private bool _isOutlineHighlighted;
 		private bool _isPicked;
 		private bool _initialMonitoring;
 		private bool _initialMonitorable;
@@ -76,8 +66,6 @@ namespace Kuros.Items.World
 			ResolveTriggerArea();
 			ApplyCollisionSettings();
 			UpdateSprite(); // 更新精灵贴图
-			ResolveOutlineHighlight();
-			UpdateOutlineHighlight(force: true);
 			SetProcess(true);
 			SetPhysicsProcess(true);
 		}
@@ -108,7 +96,6 @@ namespace Kuros.Items.World
 			// 注意：拾取逻辑已移至 PlayerItemInteractionComponent 统一处理
 			// 这里不再监听 take_up 输入，避免多个物品同时被拾取的问题
 			// WorldItemEntity 只负责追踪哪个 Actor 在范围内（_focusedActor）
-			UpdateOutlineHighlight();
 			
 			if (_isPicked || _focusedActor == null)
 			{
@@ -199,111 +186,6 @@ namespace Kuros.Items.World
 			}
 		}
 
-		private void ResolveOutlineHighlight()
-		{
-			if (!EnableGrabAreaOutlineHighlight)
-			{
-				_outlineMaterial = null;
-				return;
-			}
-
-			if (_highlightSprite == null || !GodotObject.IsInstanceValid(_highlightSprite))
-			{
-				_highlightSprite = !HighlightSpritePath.IsEmpty
-					? GetNodeOrNull<Sprite2D>(HighlightSpritePath)
-					: null;
-
-				_highlightSprite ??= GetNodeOrNull<Sprite2D>("Sprite2D");
-			}
-
-			if (_highlightSprite?.Material is ShaderMaterial spriteMaterial)
-			{
-				if (!ReferenceEquals(spriteMaterial, _outlineMaterial))
-				{
-					_outlineMaterial = spriteMaterial.Duplicate() as ShaderMaterial;
-					if (_outlineMaterial != null)
-					{
-						_outlineMaterial.ResourceLocalToScene = true;
-						_highlightSprite.Material = _outlineMaterial;
-					}
-				}
-			}
-			else
-			{
-				_outlineMaterial = null;
-			}
-		}
-
-		private Area2D? ResolvePlayerGrabArea()
-		{
-			if (_cachedPlayerGrabArea != null && GodotObject.IsInstanceValid(_cachedPlayerGrabArea))
-			{
-				return _cachedPlayerGrabArea;
-			}
-
-			GameActor? actor = _focusedActor;
-			if ((actor == null || !GodotObject.IsInstanceValid(actor)) && GetTree() != null)
-			{
-				actor = GetTree().GetFirstNodeInGroup("player") as GameActor;
-			}
-
-			if (actor == null || !GodotObject.IsInstanceValid(actor))
-			{
-				return null;
-			}
-
-			_cachedPlayerGrabArea = actor.GetNodeOrNull<Area2D>("GrabArea")
-				?? actor.GetNodeOrNull<Area2D>("SpineCharacter/GrabArea")
-				?? actor.FindChild("GrabArea", recursive: true, owned: false) as Area2D;
-
-			return _cachedPlayerGrabArea;
-		}
-
-		private void UpdateOutlineHighlight(bool force = false)
-		{
-			ResolveOutlineHighlight();
-			if (_outlineMaterial == null)
-			{
-				return;
-			}
-
-			// 只高亮离玩家最近的那一件
-			bool shouldHighlight = false;
-			if (EnableGrabAreaOutlineHighlight && !_isPicked && TriggerArea != null && GodotObject.IsInstanceValid(TriggerArea))
-			{
-				var grabArea = ResolvePlayerGrabArea();
-				if (grabArea != null && GodotObject.IsInstanceValid(grabArea))
-				{
-					WorldItemEntity? closest = null;
-					float minDist = float.MaxValue;
-					foreach (var node in GetTree().GetNodesInGroup("world_items"))
-					{
-						if (node is WorldItemEntity item && item.EnableGrabAreaOutlineHighlight && !item._isPicked && item.TriggerArea != null && GodotObject.IsInstanceValid(item.TriggerArea))
-						{
-							if (item.TriggerArea.OverlapsArea(grabArea))
-							{
-								float dist = item.GlobalPosition.DistanceSquaredTo(grabArea.GlobalPosition);
-								if (dist < minDist)
-								{
-									minDist = dist;
-									closest = item;
-								}
-							}
-						}
-					}
-					shouldHighlight = ReferenceEquals(this, closest);
-				}
-			}
-
-			if (!force && _isOutlineHighlighted == shouldHighlight)
-			{
-				return;
-			}
-
-			_outlineMaterial.SetShaderParameter("outline_color", shouldHighlight ? HighlightOutlineColor : DefaultOutlineColor);
-			_isOutlineHighlighted = shouldHighlight;
-		}
-
 		public virtual void ApplyThrowImpulse(Vector2 velocity)
 		{
 			_pendingVelocity = velocity;
@@ -390,9 +272,8 @@ namespace Kuros.Items.World
 		{
 			if (TriggerArea == null)
 			{
-				TriggerArea = GetNodeOrNull<Area2D>("TriggerArea")
-					?? GetNodeOrNull<Area2D>("CollisionArea")
-					?? throw new InvalidOperationException($"{Name} 缺少 TriggerArea、CollisionArea2D 或 CollisionArea 节点。");
+				TriggerArea = GetNodeOrNull<Area2D>("TriggerArea") ??
+							  throw new InvalidOperationException($"{Name} 缺少 TriggerArea 节点。");
 			}
 
 			_initialMonitoring = TriggerArea.Monitoring;

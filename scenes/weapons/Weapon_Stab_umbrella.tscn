@@ -1,17 +1,8 @@
-[gd_scene load_steps=8 format=3 uid="uid://6ghjqyjkk37w"]
+[gd_scene load_steps=6 format=3 uid="uid://6ghjqyjkk37w"]
 
 [ext_resource type="Script" uid="uid://dtgdjgrqgype7" path="res://scripts/items/world/WorldItemEntity.cs" id="1_inoct"]
-[ext_resource type="Texture2D" uid="uid://cuysvmaku41f8" path="res://assets/weapons/伞.png" id="1_kyvej"]
-[ext_resource type="Resource" uid="uid://c01sltuo7404y" path="res://resources/items/Weapon_Stab_umbrella.tres" id="2_inoct"]
-[ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="3_o27ch"]
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_4lmql"]
-shader = ExtResource("3_o27ch")
-shader_parameter/outline_color = Color(0, 0, 0, 1)
-shader_parameter/outline_size = 24.0000003576288
-shader_parameter/alpha_threshold = 0.56999998725936
-shader_parameter/edge_softness = 0.12
-shader_parameter/preserve_fill = true
+[ext_resource type="Texture2D" uid="uid://cp3tj4mexoi30" path="res://assets/weapons/伞.png" id="1_kyvej"]
+[ext_resource type="Resource" uid="uid://c01sltuo7404y" path="res://resources/items/Weapon_Stab_Umbrella.tres" id="2_inoct"]
 
 [sub_resource type="RectangleShape2D" id="BodyShape_rr6vl"]
 size = Vector2(972, 208)
@@ -21,31 +12,24 @@ size = Vector2(1536, 144)
 
 [node name="WeaponStabUmbrella" type="CharacterBody2D"]
 z_index = 1
-scale = Vector2(0.66, 0.66)
+scale = Vector2(0.5, 0.5)
 collision_layer = 0
 collision_mask = 0
 script = ExtResource("1_inoct")
 ItemDefinition = ExtResource("2_inoct")
-DefaultOutlineColor = Color(0, 0, 0, 0)
 
-[node name="Outline" type="Sprite2D" parent="."]
-material = SubResource("ShaderMaterial_4lmql")
+[node name="Sprite2D" type="Sprite2D" parent="."]
 scale = Vector2(0.5, 0.5)
 texture = ExtResource("1_kyvej")
 
-[node name="Sprite2D" type="Sprite2D" parent="Outline"]
-texture = ExtResource("1_kyvej")
+[node name="CollisionArea2D" type="Area2D" parent="."]
 
-[node name="CollisionArea" type="Area2D" parent="."]
-visible = false
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="CollisionArea"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CollisionArea2D"]
 position = Vector2(-1, 0)
 scale = Vector2(0.5, 0.5)
 shape = SubResource("BodyShape_rr6vl")
 
 [node name="AttackArea" type="Area2D" parent="."]
-visible = false
 scale = Vector2(0.5, 0.5)
 collision_layer = 0
 

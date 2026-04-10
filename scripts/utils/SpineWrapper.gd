@@ -16,24 +16,11 @@ func find_spine_node(root: Node) -> Node:
 	if found: return found
 	return root.find_child("SpineCharacter", true, false)
 
-func find_spine_nodes(root: Node) -> Array:
-	var nodes: Array = []
-	var primary = find_spine_node(root)
-	if primary:
-		nodes.append(primary)
-
-	for candidate in root.find_children("OutlineSpineSprite*", "", true, false):
-		if candidate and candidate != primary and candidate.has_method("get_animation_state"):
-			nodes.append(candidate)
-
-	return nodes
-
 func flip_facing(root: Node, face_right: bool, default_face_left: bool) -> void:
-	var sign_val = 1.0 if face_right else -1.0
-	if default_face_left:
-		sign_val *= -1.0
-
-	for sprite in find_spine_nodes(root):
+	var sprite = find_spine_node(root)
+	if sprite:
+		var sign_val = 1.0 if face_right else -1.0
+		if default_face_left: sign_val *= -1.0
 		sprite.scale.x = abs(sprite.scale.x) * sign_val
 
 func flash_damage(root: Node, color: Color, restore_color = null, duration: float = 0.1) -> void:
@@ -75,144 +62,154 @@ func flash_damage(root: Node, color: Color, restore_color = null, duration: floa
 
 # 动画控制相关
 func play_animation(root: Node, anim_name: String, loop: bool, mix_duration: float = 0.1, time_scale: float = 1.0) -> bool:
-	var sprites = find_spine_nodes(root)
-	if sprites.is_empty():
+	var sprite = find_spine_node(root)
+	if not sprite:
 		print("[SpineWrapper] ERROR: 無法找到 SpineSprite 節點在: ", root)
 		return false
 	
-	print("[SpineWrapper] 找到 SpineSprite 數量: ", sprites.size())
-	print("[SpineWrapper] 嘗試播放動畫: ", anim_name, " (loop: ", loop, ")")
-
-	var played_any := false
-	for sprite in sprites:
-		var state = sprite.get_animation_state()
-		if not state:
-			continue
+	print("[SpineWrapper] 找到 SpineSprite: ", sprite)
 	
-		var entry = state.set_animation(anim_name, loop)
-		if entry:
-			if entry.has_method("set_mix_duration"):
-				entry.set_mix_duration(mix_duration)
-			if entry.has_method("set_time_scale"):
-				entry.set_time_scale(time_scale)
-			played_any = true
-	
-	if played_any:
-		return true
-
-	print("[SpineWrapper] ERROR: set_animation() 返回 nil，動畫可能不存在或其他錯誤")
-	var skeleton = sprites[0].get_skeleton()
-	if skeleton and skeleton.has_method("get_animations"):
-		var animations = skeleton.get_animations()
-		print("[SpineWrapper] 可用的動畫列表: ", animations)
-	return false
-
-func add_animation(root: Node, anim_name: String, loop: bool, delay: float, mix_duration: float = 0.1, time_scale: float = 1.0) -> bool:
-	var played_any := false
-	for sprite in find_spine_nodes(root):
-		var state = sprite.get_animation_state()
-		if not state:
-			continue
-	
-		var entry = state.add_animation(anim_name, loop, delay)
-		if entry:
-			if entry.has_method("set_mix_duration"):
-				entry.set_mix_duration(mix_duration)
-			if entry.has_method("set_time_scale"):
-				entry.set_time_scale(time_scale)
-			if entry.has_method("set_event_threshold"):
-				entry.set_event_threshold(1.0)
-			played_any = true
-	return played_any
-
-func set_empty_animation(root: Node, track_index: int, mix_duration: float) -> bool:
-	var cleared_any := false
-	for sprite in find_spine_nodes(root):
-		var state = sprite.get_animation_state()
-		if not state:
-			continue
-	
-		state.set_empty_animation(track_index, mix_duration)
-		cleared_any = true
-	return cleared_any
-
-func play_partial_loop_animation(root: Node, anim_name: String, loop_start: float, loop_end: float, mix_duration: float = 0.1, time_scale: float = 1.0) -> bool:
-	if loop_end <= loop_start:
+	var state = sprite.get_animation_state()
+	if not state:
+		print("[SpineWrapper] ERROR: 無法獲得 AnimationState")
 		return false
-
-	var played_any := false
-	for sprite in find_spine_nodes(root):
-		var state = sprite.get_animation_state()
-		if not state:
-			continue
-
-		var entry = state.set_animation(anim_name, false)
-		if not entry:
-			continue
-
+	
+	print("[SpineWrapper] 嘗試播放動畫: ", anim_name, " (loop: ", loop, ")")
+	var entry = state.set_animation(anim_name, loop)
+	
+	if entry:
+		print("[SpineWrapper] 動畫播放成功，設置參數...")
+		# Use setter methods instead of direct property assignment
 		if entry.has_method("set_mix_duration"):
 			entry.set_mix_duration(mix_duration)
 		if entry.has_method("set_time_scale"):
 			entry.set_time_scale(time_scale)
-		played_any = true
+		return true
+	else:
+		print("[SpineWrapper] ERROR: set_animation() 返回 nil，動畫可能不存在或其他錯誤")
+		# 嘗試列舉所有可用動畫
+		var skeleton = sprite.get_skeleton()
+		if skeleton and skeleton.has_method("get_animations"):
+			var animations = skeleton.get_animations()
+			print("[SpineWrapper] 可用的動畫列表: ", animations)
+		return false
 
-	return played_any
+func add_animation(root: Node, anim_name: String, loop: bool, delay: float, mix_duration: float = 0.1, time_scale: float = 1.0) -> bool:
+	var sprite = find_spine_node(root)
+	if not sprite: return false
+	
+	var state = sprite.get_animation_state()
+	if not state: return false
+	
+	var entry = state.add_animation(anim_name, loop, delay)
+	if entry:
+		# Use setter methods instead of direct property assignment
+		if entry.has_method("set_mix_duration"):
+			entry.set_mix_duration(mix_duration)
+		if entry.has_method("set_time_scale"):
+			entry.set_time_scale(time_scale)
+		# 让前一个动画（mixingFrom）在整个过渡期间仍能派发事件（如 hit）
+		# eventThreshold=1.0 表示 mix < 1.0 时都允许派发，覆盖整个 mix 阶段
+		if entry.has_method("set_event_threshold"):
+			entry.set_event_threshold(1.0)
+	return true
+
+func set_empty_animation(root: Node, track_index: int, mix_duration: float) -> bool:
+	var sprite = find_spine_node(root)
+	if not sprite: return false
+	
+	var state = sprite.get_animation_state()
+	if not state: return false
+	
+	state.set_empty_animation(track_index, mix_duration)
+	return true
+
+func play_partial_loop_animation(root: Node, anim_name: String, loop_start: float, loop_end: float, mix_duration: float = 0.1, time_scale: float = 1.0) -> bool:
+	var sprite = find_spine_node(root)
+	if not sprite:
+		return false
+
+	if loop_end <= loop_start:
+		return false
+
+	var state = sprite.get_animation_state()
+	if not state:
+		return false
+
+	# 先整段从头播到 loop_start，再由 update_partial_loop_animation 维持分段循环
+	var entry = state.set_animation(anim_name, false)
+	if not entry:
+		return false
+
+	if entry.has_method("set_mix_duration"):
+		entry.set_mix_duration(mix_duration)
+	if entry.has_method("set_time_scale"):
+		entry.set_time_scale(time_scale)
+
+	return true
 
 func play_partial_once_animation(root: Node, anim_name: String, part_start: float, part_end: float, mix_duration: float = 0.1, time_scale: float = 1.0) -> bool:
+	var sprite = find_spine_node(root)
+	if not sprite:
+		return false
+
 	if part_end <= part_start:
 		return false
 
-	var played_any := false
-	for sprite in find_spine_nodes(root):
-		var state = sprite.get_animation_state()
-		if not state:
-			continue
+	var state = sprite.get_animation_state()
+	if not state:
+		return false
 
-		var entry = state.set_animation(anim_name, false)
-		if not entry:
-			continue
+	var entry = state.set_animation(anim_name, false)
+	if not entry:
+		return false
 
-		if entry.has_method("set_mix_duration"):
-			entry.set_mix_duration(mix_duration)
-		if entry.has_method("set_time_scale"):
-			entry.set_time_scale(time_scale)
-		if entry.has_method("set_track_time"):
-			entry.set_track_time(part_start)
-		if entry.has_method("set_track_last"):
-			entry.set_track_last(part_start)
-		if entry.has_method("set_track_end"):
-			entry.set_track_end(part_end)
-		played_any = true
+	if entry.has_method("set_mix_duration"):
+		entry.set_mix_duration(mix_duration)
+	if entry.has_method("set_time_scale"):
+		entry.set_time_scale(time_scale)
+	if entry.has_method("set_track_time"):
+		entry.set_track_time(part_start)
+	if entry.has_method("set_track_last"):
+		entry.set_track_last(part_start)
+	if entry.has_method("set_track_end"):
+		entry.set_track_end(part_end)
 
-	return played_any
+	return true
 
 func update_partial_loop_animation(root: Node, track_index: int, loop_start: float, loop_end: float) -> bool:
+	var sprite = find_spine_node(root)
+	if not sprite:
+		return false
+
 	if loop_end <= loop_start:
 		return false
 
-	var updated_any := false
-	for sprite in find_spine_nodes(root):
-		var state = sprite.get_animation_state()
-		if not state or not state.has_method("get_current"):
-			continue
+	var state = sprite.get_animation_state()
+	if not state or not state.has_method("get_current"):
+		return false
 
-		var entry = state.get_current(track_index)
-		if not entry or not entry.has_method("get_track_time"):
-			continue
+	var entry = state.get_current(track_index)
+	if not entry:
+		return false
 
-		var track_time := float(entry.get_track_time())
-		if track_time < loop_end:
-			updated_any = true
-			continue
+	if not entry.has_method("get_track_time"):
+		return false
 
-		var loop_len = maxf(loop_end - loop_start, 0.0001)
-		var wrapped_time = loop_start + fmod(maxf(track_time - loop_start, 0.0), loop_len)
-		if not entry.has_method("set_track_time"):
-			continue
+	var track_time := float(entry.get_track_time())
 
-		entry.set_track_time(wrapped_time)
-		if entry.has_method("set_track_last"):
-			entry.set_track_last(wrapped_time)
-		updated_any = true
+	if track_time < loop_end:
+		return true
 
-	return updated_any
+	var loop_len = maxf(loop_end - loop_start, 0.0001)
+	var wrapped_time = loop_start + fmod(maxf(track_time - loop_start, 0.0), loop_len)
+
+	if not entry.has_method("set_track_time"):
+		return false
+
+	entry.set_track_time(wrapped_time)
+
+	if entry.has_method("set_track_last"):
+		entry.set_track_last(wrapped_time)
+
+	return true

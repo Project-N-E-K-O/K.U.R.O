@@ -66,7 +66,6 @@ MaxHealth = 20
 StateMachine = NodePath("StateMachine")
 EffectController = NodePath("EffectController")
 LootTable = ExtResource("2_ooggc")
-DamageFlashColor = Color(18.892157, 18.892157, 18.892157, 1)
 
 [node name="EffectController" type="Node" parent="."]
 script = ExtResource("3_6yc1u")
@@ -77,63 +76,12 @@ material = SubResource("ShaderMaterial_b5vhy")
 scale = Vector2(8, 1.5)
 texture = ExtResource("5_bb8mk")
 
-[node name="OutlineLayer" type="Node2D" parent="."]
-show_behind_parent = true
-
-[node name="OutlineSpineSprite_Left" type="SpineSprite" parent="OutlineLayer"]
-modulate = Color(0.02, 0.02, 0.02, 0.85)
-show_behind_parent = true
-position = Vector2(-7, 0)
-scale = Vector2(0.33, 0.33)
-skeleton_data_res = ExtResource("19_gvrrx")
-preview_skin = "Default"
-preview_animation = "-- Empty --"
-preview_frame = true
-preview_time = 1.04
-script = ExtResource("20_ooggc")
-
-[node name="OutlineSpineSprite_Right" type="SpineSprite" parent="OutlineLayer"]
-modulate = Color(0.02, 0.02, 0.02, 0.85)
-show_behind_parent = true
-position = Vector2(7, 0)
-scale = Vector2(0.33, 0.33)
-skeleton_data_res = ExtResource("19_gvrrx")
-preview_skin = "Default"
-preview_animation = "-- Empty --"
-preview_frame = true
-preview_time = 1.04
-script = ExtResource("20_ooggc")
-
-[node name="OutlineSpineSprite_Up" type="SpineSprite" parent="OutlineLayer"]
-modulate = Color(0.02, 0.02, 0.02, 0.85)
-show_behind_parent = true
-position = Vector2(0, -7)
-scale = Vector2(0.33, 0.33)
-skeleton_data_res = ExtResource("19_gvrrx")
-preview_skin = "Default"
-preview_animation = "-- Empty --"
-preview_frame = true
-preview_time = 1.04
-script = ExtResource("20_ooggc")
-
-[node name="OutlineSpineSprite_Down" type="SpineSprite" parent="OutlineLayer"]
-modulate = Color(0.02, 0.02, 0.02, 0.85)
-show_behind_parent = true
-position = Vector2(0, 7)
-scale = Vector2(0.33, 0.33)
-skeleton_data_res = ExtResource("19_gvrrx")
-preview_skin = "Default"
-preview_animation = "-- Empty --"
-preview_frame = true
-preview_time = 1.04
-script = ExtResource("20_ooggc")
-
 [node name="Sprite2D" type="Sprite2D" parent="."]
-visible = false
 modulate = Color(0.8, 0.6, 0.5, 1)
 position = Vector2(0, -340)
 
 [node name="ControllerDetectionArea" type="Area2D" parent="Sprite2D"]
+visible = false
 collision_layer = 0
 collision_mask = 4
 monitorable = false
@@ -143,6 +91,7 @@ scale = Vector2(3, 3)
 shape = SubResource("CircleShape2D_ooggc")
 
 [node name="AttackDetectionArea" type="Area2D" parent="Sprite2D"]
+visible = false
 collision_layer = 0
 collision_mask = 4
 monitorable = false
@@ -174,7 +123,6 @@ scale = Vector2(1.5, 1)
 shape = SubResource("CircleShape2D_6yc1u")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-visible = false
 position = Vector2(0, -58)
 rotation = 1.5707964
 shape = SubResource("3")
@@ -210,7 +158,7 @@ ActiveDuration = 0.43
 RecoveryDuration = 0.97
 AttackAreaPath = NodePath("../../../../Sprite2D/SmashArea")
 KnockbackDistance = 500.0
-KnockbackDuration = 0.1
+KnockbackDuration = 0.09999999999999999
 KnockbackSpeed = 2500.0
 RequireAnimationHitTrigger = true
 EnableSuperArmor = true

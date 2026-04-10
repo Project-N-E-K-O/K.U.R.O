@@ -1,8 +1,7 @@
-[gd_scene load_steps=31 format=3 uid="uid://qd5abd4opeob"]
+[gd_scene load_steps=28 format=3 uid="uid://qd5abd4opeob"]
 
 [ext_resource type="PackedScene" uid="uid://dd8xmpgwy0t2o" path="res://scenes/environments/scene2.tscn" id="1_7jsho"]
 [ext_resource type="Script" uid="uid://x1ic1ym4ykq8" path="res://scripts/scenes/BattleSceneManager.cs" id="1_ctuyy"]
-[ext_resource type="Script" uid="uid://ch3pldopfd7tr" path="res://scripts/effects/AreaSpriteFadeTrigger.cs" id="2_fadewall"]
 [ext_resource type="PackedScene" uid="uid://ufprfd4r8ijj" path="res://assets/spine/main_character/main_character.tscn" id="2_s0pgc"]
 [ext_resource type="Texture2D" uid="uid://pl67o3rwu44h" path="res://assets/environments/scene_2_hotel/酒店大门口墙前.png" id="3_s0pgc"]
 [ext_resource type="Texture2D" uid="uid://pan0auvatm1f" path="res://assets/environments/scene_2_hotel/电梯墙前.png" id="4_hq53u"]
@@ -10,7 +9,6 @@
 [ext_resource type="PackedScene" uid="uid://cofm45kotvgto" path="res://scenes/actors/enemies/Enemy_B1_fat.tscn" id="6_ctuyy"]
 [ext_resource type="Script" uid="uid://b7afb3wjghskq" path="res://scripts/items/world/DropItemDebugger.cs" id="7_k0qph"]
 [ext_resource type="Script" uid="uid://b3iq6dm2pc5y0" path="res://scripts/controllers/EnemySpawnManager.cs" id="8_5klp8"]
-[ext_resource type="PackedScene" uid="uid://6ghjqyjkk37w" path="res://scenes/weapons/Weapon_Stab_umbrella.tscn" id="8_pvxkr"]
 [ext_resource type="PackedScene" uid="uid://2pny8f8vuu3j" path="res://scenes/weapons/Weapon_Slash_barrierGate.tscn" id="10_f0l3g"]
 [ext_resource type="PackedScene" uid="uid://wqcdwpyo1nji" path="res://scenes/actors/enemies/Enemy_B1_thin.tscn" id="10_sfgmy"]
 [ext_resource type="PackedScene" uid="uid://bhjc0grsl76ep" path="res://scenes/weapons/Weapon_Brawl_riotBracer.tscn" id="11_3yw8j"]
@@ -18,9 +16,6 @@
 [ext_resource type="PackedScene" uid="uid://wrebd662va23" path="res://scenes/actors/enemies/Enemy_B2_fat02.tscn" id="13_f0l3g"]
 [ext_resource type="PackedScene" uid="uid://byi2utn347fwu" path="res://scenes/actors/enemies/Enemy_Normal_guard1.tscn" id="13_x3vg8"]
 [ext_resource type="PackedScene" uid="uid://djio6ojcqw8yf" path="res://scenes/actors/enemies/Enemy_Normal_guard2.tscn" id="14_cwau0"]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_pvxkr"]
-size = Vector2(877.5, 3200)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_s0pgc"]
 size = Vector2(16974, 774)
@@ -102,16 +97,6 @@ position = Vector2(-4193, 18)
 texture = ExtResource("3_s0pgc")
 region_enabled = true
 region_rect = Rect2(1, 0, 1689, 3059)
-script = ExtResource("2_fadewall")
-TriggerAreaPath = NodePath("Area2D")
-TargetPath = NodePath(".")
-
-[node name="Area2D" type="Area2D" parent="World/FrontWall/GateFrontWall"]
-collision_mask = 4
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="World/FrontWall/GateFrontWall/Area2D"]
-position = Vector2(227.25, 0)
-shape = SubResource("RectangleShape2D_pvxkr")
 
 [node name="ElevatorFrontWall" type="Sprite2D" parent="World/FrontWall"]
 z_index = 3
@@ -161,9 +146,6 @@ shape = SubResource("RectangleShape2D_k0qph")
 
 [node name="Node2D" type="Node2D" parent="World"]
 script = ExtResource("7_k0qph")
-
-[node name="WeaponStabUmbrella" parent="World" instance=ExtResource("8_pvxkr")]
-position = Vector2(-5922, -591)
 
 [node name="WeaponStabDrill" parent="World" instance=ExtResource("11_vvtmr")]
 y_sort_enabled = true
@@ -226,7 +208,7 @@ EnemyScenes = Array[PackedScene]([ExtResource("13_x3vg8"), ExtResource("14_cwau0
 MultiEnemySelectionMode = 1
 SpawnCount = 5
 SpawnInterval = 2.0
-SpawnParentPath = NodePath("..")
+SpawnParentPath = NodePath("../EnemySpawneManager2")
 TriggerArea = NodePath("Area2D")
 EnemySpawnOffset = Vector2(0, 100)
 EnemyAppearDelay = 1.0
@@ -243,7 +225,7 @@ position = Vector2(9536, 221)
 script = ExtResource("8_5klp8")
 EnemyScene = ExtResource("10_sfgmy")
 SpawnInterval = 2.0
-SpawnParentPath = NodePath("..")
+SpawnParentPath = NodePath("../EnemySpawneManager2")
 TriggerArea = NodePath("Area2D")
 EnemySpawnOffset = Vector2(0, 100)
 EnemyAppearDelay = 1.0

@@ -74,12 +74,10 @@ DetectionArea = NodePath("Sprite2D/ControllerDetectionArea")
 AttackArea = NodePath("Sprite2D/AttackArea")
 Speed = 200.0
 AttackDamage = 0.0
-AttackCooldown = 1.0
 MaxHealth = 40
 StateMachine = NodePath("StateMachine")
 EffectController = NodePath("EffectController")
 StatProfile = SubResource("Resource_ie6to")
-DamageFlashColor = Color(18.892157, 18.751299, 18.892157, 1)
 
 [node name="EffectController" type="Node" parent="."]
 script = ExtResource("12")
@@ -91,63 +89,12 @@ position = Vector2(0, 5)
 scale = Vector2(6, 1)
 texture = ExtResource("5_8xfgw")
 
-[node name="OutlineLayer" type="Node2D" parent="."]
-show_behind_parent = true
-
-[node name="OutlineSpineSprite_Left" type="SpineSprite" parent="OutlineLayer"]
-modulate = Color(0.02, 0.02, 0.02, 0.85)
-show_behind_parent = true
-position = Vector2(-7, 0)
-scale = Vector2(0.33, 0.33)
-skeleton_data_res = ExtResource("20_5i0uy")
-preview_skin = "Default"
-preview_animation = "hit"
-preview_frame = true
-preview_time = 2.0
-script = ExtResource("21_8xfgw")
-
-[node name="OutlineSpineSprite_Right" type="SpineSprite" parent="OutlineLayer"]
-modulate = Color(0.02, 0.02, 0.02, 0.85)
-show_behind_parent = true
-position = Vector2(7, 0)
-scale = Vector2(0.33, 0.33)
-skeleton_data_res = ExtResource("20_5i0uy")
-preview_skin = "Default"
-preview_animation = "hit"
-preview_frame = true
-preview_time = 2.0
-script = ExtResource("21_8xfgw")
-
-[node name="OutlineSpineSprite_Up" type="SpineSprite" parent="OutlineLayer"]
-modulate = Color(0.02, 0.02, 0.02, 0.85)
-show_behind_parent = true
-position = Vector2(0, -7)
-scale = Vector2(0.33, 0.33)
-skeleton_data_res = ExtResource("20_5i0uy")
-preview_skin = "Default"
-preview_animation = "hit"
-preview_frame = true
-preview_time = 2.0
-script = ExtResource("21_8xfgw")
-
-[node name="OutlineSpineSprite_Down" type="SpineSprite" parent="OutlineLayer"]
-modulate = Color(0.02, 0.02, 0.02, 0.85)
-show_behind_parent = true
-position = Vector2(0, 7)
-scale = Vector2(0.33, 0.33)
-skeleton_data_res = ExtResource("20_5i0uy")
-preview_skin = "Default"
-preview_animation = "hit"
-preview_frame = true
-preview_time = 2.0
-script = ExtResource("21_8xfgw")
-
 [node name="Sprite2D" type="Sprite2D" parent="."]
-visible = false
 modulate = Color(0.8, 0.6, 0.5, 1)
 position = Vector2(0, -60)
 
 [node name="ControllerDetectionArea" type="Area2D" parent="Sprite2D"]
+visible = false
 collision_layer = 0
 collision_mask = 4
 
@@ -156,6 +103,7 @@ scale = Vector2(3, 3)
 shape = SubResource("CircleShape2D_8xfgw")
 
 [node name="AttackDetectionArea" type="Area2D" parent="Sprite2D"]
+visible = false
 collision_layer = 0
 collision_mask = 4
 
@@ -185,7 +133,6 @@ position = Vector2(180, -70)
 shape = SubResource("RectangleShape2D_h8apo")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-visible = false
 position = Vector2(0, -20)
 rotation = 1.5707964
 shape = SubResource("3")
@@ -214,14 +161,14 @@ KickAttackAreaPath = NodePath("../../../../Sprite2D/KickArea")
 DashSpeed = 1500.0
 SnapshotDelaySeconds = 0.5
 KickDamage = 3
-WarmupDuration = 0.5
+KnockbackDistance = 25.0
+KnockbackDuration = 0.06
+KnockbackSpeed = 2000.0
+WarmupDuration = 0.51
 ActiveDuration = 1.2
 RecoveryDuration = 0.4
 CooldownDuration = 0.0
 AttackAreaPath = NodePath("../../../../Sprite2D/KickArea")
-KnockbackDistance = 25.0
-KnockbackDuration = 0.06
-KnockbackSpeed = 2000.0
 RequireAnimationHitTrigger = true
 AllowMultipleAnimationHits = true
 EnableSuperArmor = true
@@ -231,13 +178,13 @@ metadata/attack_weight = 60.0
 [node name="SimpleMeleeAttack" type="Node" parent="StateMachine/Attack/AttackController"]
 script = ExtResource("12_4a6st")
 Damage = 3
+KnockbackDistance = 30.0
+KnockbackDuration = 0.1
+KnockbackSpeed = 2500.0
 WarmupDuration = 0.5
 RecoveryDuration = 0.28
 CooldownDuration = 0.71
 AttackAreaPath = NodePath("../../../../Sprite2D/AttackArea")
-KnockbackDistance = 30.0
-KnockbackDuration = 0.1
-KnockbackSpeed = 2500.0
 RequireAnimationHitTrigger = true
 metadata/attack_weight = 40.0
 
@@ -274,9 +221,9 @@ FreezeDuration = 1.0
 scale = Vector2(0.33, 0.33)
 skeleton_data_res = ExtResource("20_5i0uy")
 preview_skin = "Default"
-preview_animation = "-- Empty --"
+preview_animation = "hit"
 preview_frame = true
-preview_time = 1.4
+preview_time = 2.0
 script = ExtResource("21_8xfgw")
 
 [node name="AnimationController" type="Node" parent="."]
@@ -287,7 +234,6 @@ AttackMixDuration = 0.2
 SkillMixDuration = 0.2
 
 [node name="EnemyThinSkillSpawneManager" type="Node2D" parent="." node_paths=PackedStringArray("TriggerArea")]
-visible = false
 script = ExtResource("25_fkymf")
 AutoTriggerDelay = 0.7
 EnemyScenes = Array[PackedScene]([ExtResource("22_wdcme"), ExtResource("23_ysbuf")])
