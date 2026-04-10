@@ -30,6 +30,8 @@ namespace Kuros.Actors.Enemies.Attacks
 
 		[ExportCategory("Escape")]
 		[Export(PropertyHint.Range, "0,10,0.1")] public float EscapeWindowSeconds = 0.0f;
+		[Export] public bool GrantInvincibilityOnEscape = true;
+		[Export(PropertyHint.Range, "0,5,0.01")] public float EscapeInvincibilityDuration = 0.0f;
 
 		private const float MinDashDistance = 32f;
 		private const float PostCooldownDuration = 1.0f;
@@ -343,6 +345,7 @@ namespace Kuros.Actors.Enemies.Attacks
 
 			if (player != null)
 			{
+				GrantPlayerInvincibilityAfterEscape(player, escaped);
 				OnEscapeSequenceFinished(player, escaped);
 			}
 
@@ -355,6 +358,25 @@ namespace Kuros.Actors.Enemies.Attacks
 		protected virtual void OnEscapeSequenceStarted(SamplePlayer player) { }
 
 		protected virtual void OnEscapeSequenceFinished(SamplePlayer player, bool escaped) { }
+
+		protected virtual void GrantPlayerInvincibilityAfterEscape(SamplePlayer player, bool escaped)
+		{
+			if (!escaped || !GrantInvincibilityOnEscape)
+			{
+				return;
+			}
+
+			if (player is not Kuros.Actors.Heroes.MainCharacter mainCharacter)
+			{
+				return;
+			}
+
+			float duration = EscapeInvincibilityDuration > 0f
+				? EscapeInvincibilityDuration
+				: mainCharacter.HitInvincibilityDuration;
+
+			mainCharacter.StartHitInvincibility(duration);
+		}
 
 		private void PrepareDashTowardsPlayer()
         {
@@ -413,6 +435,12 @@ namespace Kuros.Actors.Enemies.Attacks
             var player = Enemy.PlayerTarget;
 			if (player == null)
 			{
+				return false;
+			}
+
+			if (player is Kuros.Actors.Heroes.MainCharacter mainCharacter && mainCharacter.IsHitInvincible)
+			{
+				_playerInsideDetection = false;
 				return false;
 			}
 

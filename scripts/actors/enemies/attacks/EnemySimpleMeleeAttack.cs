@@ -13,11 +13,6 @@ namespace Kuros.Actors.Enemies.Attacks
         [ExportCategory("Basic Attack Settings")]
         [Export(PropertyHint.Range, "1,200,1")] public int Damage = 10;
 
-        [ExportCategory("Effects")]
-        [Export(PropertyHint.Range, "0,2000,1")] public float SimpleMeleeAttackKnockbackDistance = 0f;
-		[Export(PropertyHint.Range, "0.01,2,0.01")] public float SimpleMeleeAttackKnockbackDuration = 0.18f;
-        [Export(PropertyHint.Range, "0,6000,1")] public float SimpleMeleeAttackKnockbackSpeed = 0f;
-
         private SamplePlayer? _activeKnockbackTarget;
         private float _activeKnockbackTimer;
 
@@ -93,53 +88,27 @@ namespace Kuros.Actors.Enemies.Attacks
                 return;
             }
 
-            float distance = Mathf.Max(0f, SimpleMeleeAttackKnockbackDistance);
-            if ((distance <= 0f && SimpleMeleeAttackKnockbackSpeed <= 0f) || !IsPlayerInsideHitbox())
+            float distance = Mathf.Max(0f, KnockbackDistance);
+            if ((distance <= 0f && KnockbackSpeed <= 0f) || !IsPlayerInsideHitbox())
             {
                 return;
             }
 
-            float duration = Mathf.Max(SimpleMeleeAttackKnockbackDuration, 0.01f);
-            float speed = SimpleMeleeAttackKnockbackSpeed > 0f
-                ? SimpleMeleeAttackKnockbackSpeed
-                : distance / duration;
+            float duration = Mathf.Max(KnockbackDuration, 0.01f);
+            bool applied = TryApplyPlayerKnockback(
+                Player,
+                distance,
+                duration,
+                KnockbackSpeed,
+                Enemy.FacingRight ? Vector2.Right : Vector2.Left);
 
-            if (speed <= 0f)
+            if (!applied)
             {
                 return;
             }
 
-            Vector2 direction = Player.GlobalPosition - Enemy.GlobalPosition;
-            if (direction == Vector2.Zero)
-            {
-                direction = Enemy.FacingRight ? Vector2.Right : Vector2.Left;
-            }
-
-            Player.Velocity = direction.Normalized() * speed;
-            ApplyFrozenExternalDisplacement(Player, Player.Velocity, duration);
             _activeKnockbackTarget = Player;
             _activeKnockbackTimer = duration;
-        }
-
-        private static void ApplyFrozenExternalDisplacement(SamplePlayer player, Vector2 velocity, float duration)
-        {
-            var frozenState = player.StateMachine?.GetNodeOrNull<PlayerFrozenState>("Frozen");
-            if (frozenState == null)
-            {
-                return;
-            }
-
-            if (player.StateMachine?.CurrentState != frozenState)
-            {
-                return;
-            }
-
-            if (!frozenState.AllowExternalDisplacementWhileFrozen)
-            {
-                return;
-            }
-
-            frozenState.ApplyExternalDisplacement(velocity, duration);
         }
 
         private bool IsPlayerInsideHitbox()

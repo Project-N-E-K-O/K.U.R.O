@@ -74,6 +74,7 @@ DetectionArea = NodePath("Sprite2D/ControllerDetectionArea")
 AttackArea = NodePath("Sprite2D/AttackArea")
 Speed = 200.0
 AttackDamage = 0.0
+MaxHealth = 40
 StateMachine = NodePath("StateMachine")
 EffectController = NodePath("EffectController")
 StatProfile = SubResource("Resource_ie6to")
@@ -102,6 +103,7 @@ scale = Vector2(3, 3)
 shape = SubResource("CircleShape2D_8xfgw")
 
 [node name="AttackDetectionArea" type="Area2D" parent="Sprite2D"]
+visible = false
 collision_layer = 0
 collision_mask = 4
 
@@ -158,10 +160,10 @@ DetectionAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
 KickAttackAreaPath = NodePath("../../../../Sprite2D/KickArea")
 DashSpeed = 1500.0
 SnapshotDelaySeconds = 0.5
-KickDamage = 1
-KickKnockbackDistance = 25.0
-KickKnockbackDuration = 0.06
-KickKnockbackSpeed = 2000.0
+KickDamage = 3
+KnockbackDistance = 25.0
+KnockbackDuration = 0.06
+KnockbackSpeed = 2000.0
 WarmupDuration = 0.51
 ActiveDuration = 1.2
 RecoveryDuration = 0.4
@@ -175,10 +177,10 @@ metadata/attack_weight = 60.0
 
 [node name="SimpleMeleeAttack" type="Node" parent="StateMachine/Attack/AttackController"]
 script = ExtResource("12_4a6st")
-Damage = 1
-SimpleMeleeAttackKnockbackDistance = 30.0
-SimpleMeleeAttackKnockbackDuration = 0.1
-SimpleMeleeAttackKnockbackSpeed = 2500.0
+Damage = 3
+KnockbackDistance = 30.0
+KnockbackDuration = 0.1
+KnockbackSpeed = 2500.0
 WarmupDuration = 0.5
 RecoveryDuration = 0.28
 CooldownDuration = 0.71
@@ -245,7 +247,7 @@ EnemyAppearDelay = 0.95
 
 [node name="TriggerArea" type="Area2D" parent="EnemyThinSkillSpawneManager"]
 collision_layer = 0
-collision_mask = 4294967295
+collision_mask = 0
 monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="EnemyThinSkillSpawneManager/TriggerArea"]

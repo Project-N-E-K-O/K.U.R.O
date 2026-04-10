@@ -26,9 +26,6 @@ namespace Kuros.Actors.Enemies.Attacks
         [ExportCategory("Effects")]
 		[Export(PropertyHint.Range, "0,10,0.1")] public float AppliedStunDuration = 3.0f;
 		[Export] public StringName CooldownStateName = "CooldownFrozen";
-		[Export(PropertyHint.Range, "0,2000,1")] public float SmashAttackKnockbackDistance = 0f;
-		[Export(PropertyHint.Range, "0.01,2,0.01")] public float SmashAttackKnockbackDuration = 0.18f;
-		[Export(PropertyHint.Range, "0,6000,1")] public float SmashAttackKnockbackSpeed = 0f;
 
 		private const float PostCooldownDuration = 1.0f;
 
@@ -299,51 +296,14 @@ namespace Kuros.Actors.Enemies.Attacks
 		{
 			ApplySmashDamage(player);
 
-			Vector2 knockbackVelocity = Vector2.Zero;
-			float knockbackDuration = 0f;
-			bool hasKnockback = TryComputeSmashKnockback(player, out knockbackVelocity, out knockbackDuration);
-
-			if (hasKnockback)
-			{
-				player.Velocity = knockbackVelocity;
-			}
+			TryApplyPlayerKnockback(
+				player,
+				KnockbackDistance,
+				KnockbackDuration,
+				KnockbackSpeed,
+				_dashDirection);
 
 			ApplyStunState(player);
-
-			if (hasKnockback)
-			{
-				ApplyFrozenExternalDisplacement(player, knockbackVelocity, knockbackDuration);
-			}
-		}
-
-		private bool TryComputeSmashKnockback(SamplePlayer player, out Vector2 velocity, out float duration)
-		{
-			velocity = Vector2.Zero;
-			duration = Mathf.Max(SmashAttackKnockbackDuration, 0.01f);
-
-			if (Enemy == null) return false;
-
-			float distance = Mathf.Max(0f, SmashAttackKnockbackDistance);
-			float configuredSpeed = Mathf.Max(0f, SmashAttackKnockbackSpeed);
-			if (distance <= 0f && configuredSpeed <= 0f)
-			{
-				return false;
-			}
-
-			float speed = configuredSpeed > 0f ? configuredSpeed : distance / duration;
-			if (speed <= 0f)
-			{
-				return false;
-			}
-
-			Vector2 direction = player.GlobalPosition - Enemy.GlobalPosition;
-			if (direction == Vector2.Zero)
-			{
-				direction = _dashDirection;
-			}
-
-			velocity = direction.Normalized() * speed;
-			return true;
 		}
 
 		private void ApplyStunState(SamplePlayer player)
@@ -358,26 +318,6 @@ namespace Kuros.Actors.Enemies.Attacks
 			player.StateMachine?.ChangeState("Frozen");
         }
 
-		private static void ApplyFrozenExternalDisplacement(SamplePlayer player, Vector2 velocity, float duration)
-		{
-			var frozenState = player.StateMachine?.GetNodeOrNull<PlayerFrozenState>("Frozen");
-			if (frozenState == null)
-			{
-				return;
-			}
-
-			if (player.StateMachine?.CurrentState != frozenState)
-			{
-				return;
-			}
-
-			if (!frozenState.AllowExternalDisplacementWhileFrozen)
-			{
-				return;
-			}
-
-			frozenState.ApplyExternalDisplacement(velocity, duration);
-		}
 
 		private void StartPostCooldown()
         {

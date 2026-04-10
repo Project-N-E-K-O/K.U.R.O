@@ -23,12 +23,7 @@ namespace Kuros.Actors.Enemies.Attacks
 		[Export(PropertyHint.Range, "0,5,0.1")] public float SnapshotDelaySeconds = 0f; // 冲刺前等待一段时间再记录玩家位置
 		[Export(PropertyHint.Range, "0,9999,1")] public int OnePunchDmg = 25;
 
-        [ExportCategory("Effects")]
-		[Export(PropertyHint.Range, "0,2000,1")] public float OnePunchKnockbackDistance = 180f;
-		[Export(PropertyHint.Range, "0.01,2,0.01")] public float OnePunchKnockbackDuration = 0.18f;
-		[Export(PropertyHint.Range, "0,6000,1")] public float OnePunchKnockbackSpeed = 0f;
-
-		private const float MinDashDistance = 32f;
+        private const float MinDashDistance = 32f;
 		private const float PostCooldownDuration = 0.5f;
 
         private Area2D? _detectionArea;
@@ -357,50 +352,14 @@ namespace Kuros.Actors.Enemies.Attacks
 		{
 			if (Enemy == null) return;
 
-			float duration = Mathf.Max(OnePunchKnockbackDuration, 0.01f);
-			float distance = Mathf.Max(0f, OnePunchKnockbackDistance);
-			float configuredSpeed = Mathf.Max(0f, OnePunchKnockbackSpeed);
-			if (distance <= 0f && configuredSpeed <= 0f)
-			{
-				return;
-			}
-
-			float speed = configuredSpeed > 0f ? configuredSpeed : distance / duration;
-			if (speed <= 0f)
-			{
-				return;
-			}
-
-			Vector2 direction = player.GlobalPosition - Enemy.GlobalPosition;
-			if (direction == Vector2.Zero)
-			{
-				direction = _dashDirection;
-			}
-
-			player.Velocity = direction.Normalized() * speed;
-			ApplyFrozenExternalDisplacement(player, player.Velocity, duration);
+			TryApplyPlayerKnockback(
+				player,
+				KnockbackDistance,
+				KnockbackDuration,
+				KnockbackSpeed,
+				_dashDirection);
 		}
 
-		private static void ApplyFrozenExternalDisplacement(SamplePlayer player, Vector2 velocity, float duration)
-		{
-			var frozenState = player.StateMachine?.GetNodeOrNull<PlayerFrozenState>("Frozen");
-			if (frozenState == null)
-			{
-				return;
-			}
-
-			if (player.StateMachine?.CurrentState != frozenState)
-			{
-				return;
-			}
-
-			if (!frozenState.AllowExternalDisplacementWhileFrozen)
-			{
-				return;
-			}
-
-			frozenState.ApplyExternalDisplacement(velocity, duration);
-		}
 
 		private void StartPostCooldown()
         {

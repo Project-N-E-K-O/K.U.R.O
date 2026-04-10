@@ -36,10 +36,27 @@ namespace Kuros.Actors.Heroes
 	[Export] public string AttackAction { get; set; } = "attack";
 	[Export] public string RunAction { get; set; } = "run";
 
+	[ExportCategory("Combat/Invincible Frames")]
+	[Export] public bool EnableHitInvincibility { get; set; } = true;
+	[Export(PropertyHint.Range, "0,5,0.01,or_greater")]
+	public float HitInvincibilityDuration { get; set; } = 1.0f;
+	[Export] public bool EnableInvincibleFlash { get; set; } = true;
+	[Export(PropertyHint.Range, "0,1,0.01")]
+	public float InvincibleFlashMinAlpha { get; set; } = 0.35f;
+	[Export(PropertyHint.Range, "0,60,0.1,or_greater")]
+	public float InvincibleFlashSpeed { get; set; } = 18.0f;
+
 	// Spine 相关（使用 Node 引用，通过 Call 调用 GDScript 方法）
 	private Node? _spineController;
 	private CanvasItem? _spineBoneNode;
 	private string _currentAnimation = string.Empty;
+	private float _hitInvincibilityRemaining = 0.0f;
+	private float _invincibleFlashElapsed = 0.0f;
+	private float _defaultSpineAlpha = 1.0f;
+	private float _defaultSpriteAlpha = 1.0f;
+	private bool _pendingHitKnockback;
+
+	public bool IsHitInvincible => _hitInvincibilityRemaining > 0.0f;
 
 	public override void _Ready()
 	{
@@ -56,6 +73,8 @@ namespace Kuros.Actors.Heroes
 		// 注意：SamplePlayer._Ready() 已经会尝试查找 InventoryComponent 和 WeaponSkillController
 		// 如果场景中没有这些组件，会有警告但不会影响基本功能
 		InitializeSpine();
+		_defaultSpineAlpha = _spineCharacter != null ? _spineCharacter.Modulate.A : 1.0f;
+		_defaultSpriteAlpha = _sprite != null ? _sprite.Modulate.A : 1.0f;
 
 		// 检查并验证组件初始化
 		ValidateComponents();
@@ -174,6 +193,7 @@ namespace Kuros.Actors.Heroes
 	public override void _Process(double delta)
 	{
 		base._Process(delta);
+		UpdateHitInvincibility(delta);
 		UpdateSpineBoneNodeVisibility();
 	}
 
@@ -310,12 +330,120 @@ namespace Kuros.Actors.Heroes
 
 	public override void TakeDamage(int damage, Vector2? attackOrigin = null, GameActor? attacker = null)
 	{
+		if (damage > 0 && IsHitInvincible && !IsDeathSequenceActive && !IsDead)
+		{
+			// 无敌帧期间完全忽略受击：不掉血、不击退、不进入受击反应。
+			_pendingHitKnockback = false;
+			Velocity = Vector2.Zero;
+			GameLogger.Info(nameof(MainCharacter), $"{Name} is invincible and ignored incoming damage/knockback.");
+			return;
+		}
+
+		int previousHealth = CurrentHealth;
 		base.TakeDamage(damage, attackOrigin, attacker);
+		_pendingHitKnockback = CurrentHealth < previousHealth;
 		// 状态机会处理受伤状态切换，不需要额外逻辑
+	}
+
+	public bool ConsumePendingHitKnockback()
+	{
+		if (!_pendingHitKnockback)
+		{
+			return false;
+		}
+
+		_pendingHitKnockback = false;
+		return true;
+	}
+
+	public void StartHitInvincibility(float durationOverride = -1.0f)
+	{
+		if (!EnableHitInvincibility || IsDeathSequenceActive || IsDead)
+		{
+			return;
+		}
+
+		float duration = durationOverride >= 0.0f ? durationOverride : HitInvincibilityDuration;
+		_hitInvincibilityRemaining = Mathf.Max(0.0f, duration);
+		_invincibleFlashElapsed = 0.0f;
+
+		if (!EnableInvincibleFlash)
+		{
+			RestoreInvincibleFlash();
+			return;
+		}
+
+		ApplyInvincibleFlashAlpha(InvincibleFlashMinAlpha);
+	}
+
+	public void ClearHitInvincibility()
+	{
+		_hitInvincibilityRemaining = 0.0f;
+		_invincibleFlashElapsed = 0.0f;
+		_pendingHitKnockback = false;
+		RestoreInvincibleFlash();
+	}
+
+	private void UpdateHitInvincibility(double delta)
+	{
+		if (_hitInvincibilityRemaining <= 0.0f)
+		{
+			return;
+		}
+
+		_hitInvincibilityRemaining = Mathf.Max(0.0f, _hitInvincibilityRemaining - (float)delta);
+
+		if (EnableInvincibleFlash)
+		{
+			_invincibleFlashElapsed += (float)delta * InvincibleFlashSpeed;
+			float pulse = (Mathf.Sin(_invincibleFlashElapsed) + 1.0f) * 0.5f;
+			float alpha = Mathf.Lerp(InvincibleFlashMinAlpha, 1.0f, pulse);
+			ApplyInvincibleFlashAlpha(alpha);
+		}
+
+		if (_hitInvincibilityRemaining <= 0.0f)
+		{
+			RestoreInvincibleFlash();
+		}
+	}
+
+	private void ApplyInvincibleFlashAlpha(float alpha)
+	{
+		if (_spineCharacter != null && IsInstanceValid(_spineCharacter))
+		{
+			var color = _spineCharacter.Modulate;
+			color.A = alpha;
+			_spineCharacter.Modulate = color;
+		}
+
+		if (_sprite != null && IsInstanceValid(_sprite))
+		{
+			var color = _sprite.Modulate;
+			color.A = alpha;
+			_sprite.Modulate = color;
+		}
+	}
+
+	private void RestoreInvincibleFlash()
+	{
+		if (_spineCharacter != null && IsInstanceValid(_spineCharacter))
+		{
+			var color = _spineCharacter.Modulate;
+			color.A = _defaultSpineAlpha;
+			_spineCharacter.Modulate = color;
+		}
+
+		if (_sprite != null && IsInstanceValid(_sprite))
+		{
+			var color = _sprite.Modulate;
+			color.A = _defaultSpriteAlpha;
+			_sprite.Modulate = color;
+		}
 	}
 
 	protected override void OnDeathFinalized()
 		{
+			ClearHitInvincibility();
 			EffectController?.ClearAll();
 			GameLogger.Warn(nameof(MainCharacter), "角色死亡！");
 			// 可以在这里添加游戏结束逻辑

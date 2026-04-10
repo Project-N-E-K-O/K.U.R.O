@@ -23,4 +23,5 @@ MaxStackSize = 1
 AttributeEntries = Array[ExtResource("1_q00hu")]([SubResource("Attribute_AttackPower")])
 EffectEntries = Array[ExtResource("2_iq0we")]([null])
 WeaponSkillResources = Array[Resource]([ExtResource("4_jwwo8")])
+BuildClass = "machine"
 WorldScenePath = "res://scenes/weapons/Weapon_Stab_umbrella.tscn"

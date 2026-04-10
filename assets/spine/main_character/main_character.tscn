@@ -1,11 +1,12 @@
-[gd_scene load_steps=44 format=3 uid="uid://ufprfd4r8ijj"]
+[gd_scene load_steps=41 format=3 uid="uid://ufprfd4r8ijj"]
 
-[ext_resource type="SpineAtlasResource" uid="uid://c4cx1o154rxba" path="res://assets/spine/main_character/Enemy_A1_zhuA.atlas" id="1_kqj82"]
-[ext_resource type="Script" uid="uid://befx3l05f0eph" path="res://scripts/actors/heroes/MainCharacter.cs" id="1_om6pm"]
-[ext_resource type="Shader" uid="uid://bdu6bfs07ahhw" path="res://shaders/materials/shadow.gdshader" id="2_4ht1x"]
-[ext_resource type="SpineSkeletonFileResource" uid="uid://dpgx38fv62p11" path="res://assets/spine/main_character/Enemy_A1_zhuA.spine-json" id="2_om6pm"]
-[ext_resource type="Texture2D" uid="uid://bk5a020vl054x" path="res://assets/environments/影子.png" id="3_tdm7a"]
-[ext_resource type="Script" uid="uid://den5n78y0t6q5" path="res://scripts/controllers/SpineController.gd" id="4_ixg0x"]
+[ext_resource type="SpineAtlasResource" uid="uid://kpsje26gxbhr" path="res://assets/spine/main_character/Enemy_A1_zhuA.atlas" id="1_kqj82"]
+[ext_resource type="Script" uid="uid://12wblt72y8xt" path="res://scripts/actors/heroes/MainCharacter.cs" id="1_om6pm"]
+[ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="2_4ht1x"]
+[ext_resource type="SpineSkeletonFileResource" uid="uid://da5khn1084lrr" path="res://assets/spine/main_character/Enemy_A1_zhuA.spine-json" id="2_om6pm"]
+[ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="2_sprite_outline"]
+[ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="3_tdm7a"]
+[ext_resource type="Script" uid="uid://bbybuyitd10jr" path="res://scripts/controllers/SpineController.gd" id="4_ixg0x"]
 [ext_resource type="Script" uid="uid://cenpuhlcgesin" path="res://scripts/systems/fsm/StateMachine.cs" id="5_y1hyr"]
 [ext_resource type="Script" uid="uid://0u5whf0qv6i5" path="res://scripts/actors/heroes/states/PlayerIdleState.cs" id="6_r1uv4"]
 [ext_resource type="Script" uid="uid://cue6hp5ws2264" path="res://scripts/actors/heroes/states/PlayerWalkState.cs" id="7_mcamx"]
@@ -43,6 +44,9 @@ shader = ExtResource("2_4ht1x")
 shader_parameter/softness = 0.5
 shader_parameter/alpha = 0.4
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_sprite_outline"]
+shader = ExtResource("2_sprite_outline")
+
 [sub_resource type="SpineSkeletonDataResource" id="SpineSkeletonDataResource_rs5xn"]
 atlas_res = ExtResource("1_kqj82")
 skeleton_file_res = ExtResource("2_om6pm")
@@ -71,10 +75,17 @@ script = ExtResource("1_om6pm")
 WalkAnimationSpeed = 2.0
 RunAnimationSpeed = 3.0
 AttackArea = NodePath("AttackArea")
+HitInvincibilityDuration = 0.75
+InvincibleFlashSpeed = 60.0
+EnableStateDebugOverlay = true
+DebugOverlayOffset = Vector2(-1000, 150)
+DebugOverlayFontSize = 108
+DebugOverlayColor = Color(0, 1, 0, 1)
 AttackArea = NodePath("AttackArea")
 LeftHandAttachmentPath = NodePath("SpineSprite/SpineBoneNode")
 Speed = 500.0
-AttackDamage = 10.0
+AttackDamage = 1.0
+MaxHealth = 12
 StateMachine = NodePath("StateMachine")
 EffectController = NodePath("EffectController")
 
@@ -84,19 +95,20 @@ scale = Vector2(15, 2)
 texture = ExtResource("3_tdm7a")
 
 [node name="SpineSprite" type="SpineSprite" parent="."]
+material = SubResource("ShaderMaterial_sprite_outline")
 skeleton_data_res = SubResource("SpineSkeletonDataResource_rs5xn")
 bones_thickness = 10.09
 preview_skin = "Default"
-preview_animation = "walk"
+preview_animation = "-- Empty --"
 preview_frame = true
-preview_time = 0.46
+preview_time = 0.99
 script = ExtResource("4_ixg0x")
 
 [node name="SpineBoneNode" type="SpineBoneNode" parent="SpineSprite"]
 show_behind_parent = true
 z_index = -1
 y_sort_enabled = true
-position = Vector2(-0.025277136, -463.2896)
+position = Vector2(0.82191175, -473.95676)
 rotation = -1.6160004
 scale = Vector2(0.99999994, 0.99999994)
 bone_name = "Upper Body"

@@ -62,6 +62,7 @@ AttackArea = NodePath("Sprite2D/AttackArea")
 Speed = 120.0
 AttackDamage = 0.0
 AttackCooldown = 1.0
+MaxHealth = 20
 StateMachine = NodePath("StateMachine")
 EffectController = NodePath("EffectController")
 LootTable = ExtResource("2_ooggc")
@@ -141,7 +142,7 @@ script = ExtResource("9_rbnx7")
 
 [node name="AttackController" type="Node" parent="StateMachine/Attack"]
 script = ExtResource("9_ooggc")
-MeleeCountBeforeCharge = 10
+MeleeCountBeforeCharge = 3
 PlayerDetectionAreaPath = NodePath("../../../Sprite2D/ControllerDetectionArea")
 
 [node name="SmashAttack" type="Node" parent="StateMachine/Attack/AttackController"]
@@ -150,15 +151,15 @@ DetectionAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
 SmashAreaPath = NodePath("../../../../Sprite2D/SmashArea")
 DashSpeed = 800.0
 SnapshotDelaySeconds = 0.5
-SmashDmg = 1
+SmashDmg = 5
 AppliedStunDuration = 2.0
-SmashAttackKnockbackDistance = 500.0
-SmashAttackKnockbackDuration = 0.2
-SmashAttackKnockbackSpeed = 2500.0
 WarmupDuration = 0.6
 ActiveDuration = 0.43
 RecoveryDuration = 0.97
 AttackAreaPath = NodePath("../../../../Sprite2D/SmashArea")
+KnockbackDistance = 500.0
+KnockbackDuration = 0.09999999999999999
+KnockbackSpeed = 2500.0
 RequireAnimationHitTrigger = true
 EnableSuperArmor = true
 IgnoreEnemyCollisionDuringAttack = true
@@ -166,14 +167,14 @@ metadata/attack_weight = 60.0
 
 [node name="SimpleMeleeAttack" type="Node" parent="StateMachine/Attack/AttackController"]
 script = ExtResource("12_daw10")
-Damage = 1
-SimpleMeleeAttackKnockbackDistance = 50.0
-SimpleMeleeAttackKnockbackDuration = 0.1
-SimpleMeleeAttackKnockbackSpeed = 1000.0
+Damage = 3
 WarmupDuration = 1.0
 ActiveDuration = 0.11
 RecoveryDuration = 0.39
 AttackAreaPath = NodePath("../../../../Sprite2D/AttackArea")
+KnockbackDistance = 50.0
+KnockbackDuration = 0.1
+KnockbackSpeed = 1000.0
 RequireAnimationHitTrigger = true
 metadata/attack_weight = 40.0
 

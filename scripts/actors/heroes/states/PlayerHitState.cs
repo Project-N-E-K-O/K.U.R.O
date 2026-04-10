@@ -21,6 +21,7 @@ namespace Kuros.Actors.Heroes.States
                     ? "hit"
                     : SpineHitAnimationName;
                 PlayAnimation(spineAnim, false, HitAnimationSpeed);
+                mainChar.StartHitInvincibility();
             }
             
             if (Actor.AnimPlayer != null)

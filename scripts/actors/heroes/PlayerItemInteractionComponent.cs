@@ -327,11 +327,6 @@ namespace Kuros.Actors.Heroes
 
         private void TriggerPickupState()
         {
-            if (InventoryComponent?.HasSelectedItem == true)
-            {
-                return;
-            }
-
             if (_actor?.StateMachine == null)
             {
                 TryHandlePickup();
@@ -356,12 +351,6 @@ namespace Kuros.Actors.Heroes
             if (_actor == null)
             {
                 GD.PrintErr("[PlayerItemInteractionComponent] _actor 为 null");
-                return false;
-            }
-
-            if (InventoryComponent?.HasSelectedItem == true)
-            {
-                GD.Print($"[PlayerItemInteractionComponent] 玩家已有选中物品，无法拾取");
                 return false;
             }
 

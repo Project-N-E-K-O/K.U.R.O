@@ -32,6 +32,7 @@ namespace Kuros.Actors.Heroes
         private SamplePlayer? _player;
         private InventoryContainer? _currentQuickBar;
         private string _effectiveBuildClass = string.Empty;
+        private string _lastLoggedBuildClass = string.Empty;
 
         public override void _Ready()
         {
@@ -68,11 +69,17 @@ namespace Kuros.Actors.Heroes
                 return;
             }
 
+            int oldCount = CurrentBuildCount;
+            int oldLevel = CurrentBuildLevel;
+            string oldBuildClass = _lastLoggedBuildClass;
+
             int newCount = CountOwnedBuildWeapons();
             int newLevel = ResolveBuildLevel(newCount);
-            bool countChanged = newCount != CurrentBuildCount;
-            bool levelChanged = newLevel != CurrentBuildLevel;
+            bool countChanged = newCount != oldCount;
+            bool levelChanged = newLevel != oldLevel;
+            bool buildClassChanged = !string.Equals(_effectiveBuildClass, oldBuildClass, StringComparison.OrdinalIgnoreCase);
             string logBuildClass = string.IsNullOrWhiteSpace(_effectiveBuildClass) ? "<auto>" : _effectiveBuildClass;
+            string oldLogBuildClass = string.IsNullOrWhiteSpace(oldBuildClass) ? "<auto>" : oldBuildClass;
 
             if (levelChanged)
             {
@@ -83,15 +90,21 @@ namespace Kuros.Actors.Heroes
             {
                 CurrentBuildCount = newCount;
                 BuildCountChanged?.Invoke(CurrentBuildCount);
-                GD.Print($"[{Name}] 构筑 {logBuildClass} => Points={CurrentBuildCount}, Level={CurrentBuildLevel} (points changed)");
+                GD.Print($"[{Name}] 构筑 {logBuildClass} 点数变化: {oldCount} -> {CurrentBuildCount}, Level={CurrentBuildLevel}");
             }
 
             if (levelChanged)
             {
                 BuildLevelChanged?.Invoke(CurrentBuildLevel);
-                GD.Print($"[{Name}] 构筑 {logBuildClass} => Points={CurrentBuildCount}, Level={CurrentBuildLevel}");
+                GD.Print($"[{Name}] 构筑 {logBuildClass} 等级变化: {oldLevel} -> {CurrentBuildLevel}, Points={CurrentBuildCount}");
             }
 
+            if (buildClassChanged)
+            {
+                GD.Print($"[{Name}] 生效构筑类别变化: {oldLogBuildClass} -> {logBuildClass}");
+            }
+
+            _lastLoggedBuildClass = _effectiveBuildClass;
             SyncBuildEffects();
         }
 
@@ -295,6 +308,7 @@ namespace Kuros.Actors.Heroes
             foreach (var entry in GetSortedEntries())
             {
                 if (entry == null) continue;
+                if (!MatchesCurrentBuild(entry)) continue;
                 if (buildCount < entry.RequiredPoints) continue;
                 resolvedLevel = Math.Max(resolvedLevel, entry.Level);
             }
@@ -316,7 +330,7 @@ namespace Kuros.Actors.Heroes
                     continue;
                 }
 
-                bool shouldExist = CurrentBuildCount >= entry.RequiredPoints;
+                bool shouldExist = MatchesCurrentBuild(entry) && CurrentBuildCount >= entry.RequiredPoints;
                 EnsureEffect(shouldExist, entry.EffectId, () => CreateEffectFromEntry(entry));
             }
         }
@@ -345,6 +359,7 @@ namespace Kuros.Actors.Heroes
                 if (effect != null)
                 {
                     TargetEffectController.AddEffect(effect);
+                    GD.Print($"[{Name}] 添加构筑效果: {effectId}");
                 }
 
                 return;
@@ -352,6 +367,7 @@ namespace Kuros.Actors.Heroes
 
             if (existing != null)
             {
+                GD.Print($"[{Name}] 移除构筑效果: {effectId}");
                 TargetEffectController.RemoveEffect(existing);
             }
         }
@@ -362,12 +378,6 @@ namespace Kuros.Actors.Heroes
             foreach (var entry in LevelEntries)
             {
                 if (entry == null)
-                {
-                    continue;
-                }
-
-                if (!string.IsNullOrWhiteSpace(entry.BuildClass) &&
-                    !string.Equals(entry.BuildClass, _effectiveBuildClass, StringComparison.OrdinalIgnoreCase))
                 {
                     continue;
                 }
@@ -383,6 +393,26 @@ namespace Kuros.Actors.Heroes
             });
 
             return list.ToArray();
+        }
+
+        private bool MatchesCurrentBuild(BuildLevelEffectEntry entry)
+        {
+            if (entry == null)
+            {
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(entry.BuildClass))
+            {
+                return true;
+            }
+
+            if (string.IsNullOrWhiteSpace(_effectiveBuildClass))
+            {
+                return false;
+            }
+
+            return string.Equals(entry.BuildClass, _effectiveBuildClass, StringComparison.OrdinalIgnoreCase);
         }
 
         private string ResolveEffectiveBuildClass()

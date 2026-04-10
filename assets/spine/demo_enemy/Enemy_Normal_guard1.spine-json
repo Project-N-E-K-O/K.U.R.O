@@ -1193,7 +1193,7 @@
 			}
 		},
 		"events": [
-			{ "time": 0.3767, "name": "hit" }
+			{ "time": 0.4667, "name": "hit" }
 		],
 		"drawOrder": [
 			{

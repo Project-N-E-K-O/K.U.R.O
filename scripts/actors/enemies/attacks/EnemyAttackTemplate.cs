@@ -30,6 +30,11 @@ namespace Kuros.Actors.Enemies.Attacks
         [Export] public string AnimationName = "animations/attack";
         [Export] public NodePath AttackAreaPath = new NodePath();
 
+        [ExportCategory("Knockback")]
+        [Export(PropertyHint.Range, "0,2000,1")] public float KnockbackDistance = 0f;
+        [Export(PropertyHint.Range, "0.01,2,0.01")] public float KnockbackDuration = 0.18f;
+        [Export(PropertyHint.Range, "0,6000,1")] public float KnockbackSpeed = 0f;
+
         [ExportCategory("Animation Sync")]
         [Export] public bool RequireAnimationHitTrigger = false;
         [Export] public bool AllowMultipleAnimationHits = false;
@@ -355,6 +360,70 @@ namespace Kuros.Actors.Enemies.Attacks
             {
                 _animationHitReady = false;
             }
+        }
+
+        protected bool TryApplyPlayerKnockback(SamplePlayer player, float distance, float duration, float configuredSpeed, Vector2 fallbackDirection)
+        {
+            if (Enemy == null || player == null)
+            {
+                return false;
+            }
+
+            if (player is Kuros.Actors.Heroes.MainCharacter mainCharacter && mainCharacter.IsHitInvincible)
+            {
+                if (!mainCharacter.ConsumePendingHitKnockback())
+                {
+                    return false;
+                }
+            }
+
+            float clampedDuration = Mathf.Max(duration, 0.01f);
+            float clampedDistance = Mathf.Max(0f, distance);
+            float clampedConfiguredSpeed = Mathf.Max(0f, configuredSpeed);
+            if (clampedDistance <= 0f && clampedConfiguredSpeed <= 0f)
+            {
+                return false;
+            }
+
+            float speed = clampedConfiguredSpeed > 0f ? clampedConfiguredSpeed : clampedDistance / clampedDuration;
+            if (speed <= 0f)
+            {
+                return false;
+            }
+
+            Vector2 direction = player.GlobalPosition - Enemy.GlobalPosition;
+            if (direction == Vector2.Zero)
+            {
+                direction = fallbackDirection != Vector2.Zero
+                    ? fallbackDirection
+                    : (Enemy.FacingRight ? Vector2.Right : Vector2.Left);
+            }
+
+            Vector2 knockbackVelocity = direction.Normalized() * speed;
+            player.Velocity = knockbackVelocity;
+            ApplyFrozenExternalDisplacement(player, knockbackVelocity, clampedDuration);
+            return true;
+        }
+
+        protected static void ApplyFrozenExternalDisplacement(SamplePlayer player, Vector2 velocity, float duration)
+        {
+            var frozenState = player.StateMachine?.GetNodeOrNull<Kuros.Actors.Heroes.States.PlayerFrozenState>("Frozen");
+            if (frozenState == null)
+            {
+                return;
+            }
+
+            if (player.StateMachine?.CurrentState != frozenState)
+            {
+                return;
+            }
+
+            if (!frozenState.AllowExternalDisplacementWhileFrozen)
+            {
+                return;
+            }
+
+            frozenState.ApplyExternalDisplacement(velocity, duration);
         }
     }
 }

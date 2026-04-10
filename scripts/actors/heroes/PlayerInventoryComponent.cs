@@ -17,7 +17,9 @@ namespace Kuros.Actors.Heroes
     public partial class PlayerInventoryComponent : Node
     {
         [Export(PropertyHint.Range, "1,200,1")]
-        public int BackpackSlots { get; set; } = 4;
+        public int BackpackSlots { get; set; } = 5;
+        [Export(PropertyHint.Range, "1,20,1")]
+        public int MaxCarriedWeaponCount { get; set; } = 5;
 
         public InventoryContainer Backpack { get; private set; } = null!;
         public InventoryContainer? QuickBar { get; set; }
@@ -41,7 +43,14 @@ namespace Kuros.Actors.Heroes
         public IReadOnlyDictionary<string, SpecialInventorySlot> SpecialSlots => _specialSlots;
         public SpecialInventorySlot? WeaponSlot => GetSpecialSlot(SpecialInventorySlotIds.PrimaryWeapon);
         public int SelectedBackpackSlot { get; private set; }
-        public bool HasSelectedItem => GetSelectedBackpackStack() != null;
+        public bool HasSelectedItem
+        {
+            get
+            {
+                var stack = GetSelectedBackpackStack();
+                return stack != null && !stack.IsEmpty && stack.Item.ItemId != "empty_item";
+            }
+        }
         
         /// <summary>
         /// 當前選中的快捷欄槽位索引（0-4，對應快捷欄1-5）
@@ -161,7 +170,7 @@ namespace Kuros.Actors.Heroes
         /// 1. 優先放入當前選中的快捷欄槽位（左手選中的槽位）
         /// 2. 如果選中槽位已有物品，依次查看快捷欄的各個索引（1-4），優先放置在最左側的空槽位
         /// 3. 快捷欄1（索引0）是小木劍，永遠不會被更改
-        /// 4. 快捷欄滿時，溢出的物品放置到物品欄中
+        /// 4. 快捷欄滿時，溢出的物品放置到物品欄中；總武器攜帶上限由 MaxCarriedWeaponCount 控制
         /// </summary>
         public int AddItemSmart(ItemDefinition item, int amount, bool showPopupIfFirstTime = true)
         {
@@ -179,8 +188,22 @@ namespace Kuros.Actors.Heroes
                 return 0;
             }
 
+            int requestedAmount = amount;
+            if (IsWeaponItem(item))
+            {
+                int currentWeaponCount = GetCarriedWeaponCount();
+                int remainingWeaponCapacity = Math.Max(0, MaxCarriedWeaponCount - currentWeaponCount);
+                if (remainingWeaponCapacity <= 0)
+                {
+                    GameLogger.Info(nameof(PlayerInventoryComponent), $"AddItemSmart: 武器栏已满（{currentWeaponCount}/{MaxCarriedWeaponCount}），无法拾取 '{item.DisplayName}'。");
+                    return 0;
+                }
+
+                requestedAmount = Math.Min(requestedAmount, remainingWeaponCapacity);
+            }
+
             // 确保 remaining 从已验证的正数 amount 初始化
-            int remaining = amount;
+            int remaining = requestedAmount;
             bool isFirstTime = IsFirstTimeObtaining(item);
 
             // 优先放入快捷栏（默认包含索引0；若保留默认武器槽则从索引1开始）
@@ -253,7 +276,7 @@ namespace Kuros.Actors.Heroes
                 remaining -= addedToBackpack;
             }
 
-            int totalAdded = amount - remaining;
+            int totalAdded = requestedAmount - remaining;
 
             // 如果成功添加了物品且是第一次获得，标记为已获得
             if (totalAdded > 0 && isFirstTime)
@@ -650,6 +673,29 @@ namespace Kuros.Actors.Heroes
             return true;
         }
 
+        public int GetCarriedWeaponCount()
+        {
+            int total = 0;
+            total += CountWeaponStacksInContainer(Backpack);
+            total += CountWeaponStacksInContainer(QuickBar);
+
+            foreach (var slot in _specialSlots.Values)
+            {
+                var stack = slot?.Stack;
+                if (stack == null || stack.IsEmpty || stack.Item == null)
+                {
+                    continue;
+                }
+
+                if (IsWeaponItem(stack.Item))
+                {
+                    total += Math.Max(1, stack.Quantity);
+                }
+            }
+
+            return total;
+        }
+
         public float GetBackpackAttributeValue(string attributeId, float baseValue = 0f)
         {
             return Backpack?.GetAttributeValue(attributeId, baseValue) ?? baseValue;
@@ -693,6 +739,41 @@ namespace Kuros.Actors.Heroes
             if (resolved == null) return false;
             slot = resolved;
             return true;
+        }
+
+        private static bool IsWeaponItem(ItemDefinition? item)
+        {
+            if (item == null || string.IsNullOrWhiteSpace(item.ItemId) || item.ItemId == "empty_item")
+            {
+                return false;
+            }
+
+            return item.HasTag(ItemTagIds.Weapon) ||
+                   string.Equals(item.Category, "Weapon", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static int CountWeaponStacksInContainer(InventoryContainer? container)
+        {
+            if (container == null)
+            {
+                return 0;
+            }
+
+            int total = 0;
+            foreach (var stack in container.Slots)
+            {
+                if (stack == null || stack.IsEmpty || stack.Item == null)
+                {
+                    continue;
+                }
+
+                if (IsWeaponItem(stack.Item))
+                {
+                    total += Math.Max(1, stack.Quantity);
+                }
+            }
+
+            return total;
         }
 
         private void InitializeSpecialSlots()
