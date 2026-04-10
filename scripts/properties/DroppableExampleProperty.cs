@@ -448,10 +448,10 @@ public partial class DroppableExampleProperty : DroppablePickupProperty
         var triggerArea = itemInstance.GetNodeOrNull<Area2D>("TriggerArea");
         if (triggerArea != null)
         {
-            triggerArea.Monitoring = false;
-            triggerArea.Monitorable = false;
-            triggerArea.CollisionLayer = 0;
-            triggerArea.CollisionMask = 0;
+            triggerArea.SetDeferred(Area2D.PropertyName.Monitoring, false);
+            triggerArea.SetDeferred(Area2D.PropertyName.Monitorable, false);
+            triggerArea.SetDeferred(CollisionObject2D.PropertyName.CollisionLayer, 0u);
+            triggerArea.SetDeferred(CollisionObject2D.PropertyName.CollisionMask, 0u);
         }
 
         // 设置位置并添加到场景

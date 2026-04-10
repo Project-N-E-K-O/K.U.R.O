@@ -108,6 +108,14 @@ namespace Kuros.Actors.Enemies.Attacks
                 return;
             }
 
+            if (!GodotObject.IsInstanceValid(_currentAttack))
+            {
+                DebugLog("Queued attack instance became invalid before start.");
+                _currentAttack = null;
+                FinishControllerAttack("ChildInvalidBeforeStart");
+                return;
+            }
+
 			if (!_currentAttack.CanStart())
 			{
 				DebugLog($"Attack {_currentAttack.Name} cannot start (likely cooldown/range).");
@@ -151,6 +159,12 @@ namespace Kuros.Actors.Enemies.Attacks
         {
             base._PhysicsProcess(delta);
             if (_currentAttack == null) return;
+            if (!GodotObject.IsInstanceValid(_currentAttack))
+            {
+                _currentAttack = null;
+                FinishControllerAttack("ChildInvalid");
+                return;
+            }
 
             _currentAttack.Tick(delta);
             if (!_currentAttack.IsRunning)
@@ -440,6 +454,12 @@ namespace Kuros.Actors.Enemies.Attacks
         private void CleanupChildAttack(bool clearCooldown)
         {
             if (_currentAttack == null) return;
+            if (!GodotObject.IsInstanceValid(_currentAttack))
+            {
+                _currentAttack = null;
+                return;
+            }
+
             if (_currentAttack.IsRunning)
             {
                 _currentAttack.Cancel(clearCooldown);

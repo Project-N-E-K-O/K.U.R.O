@@ -25,7 +25,7 @@ namespace Kuros.Actors.Heroes.States
 			if (HandleDialogueGating(delta)) return;
 			
 			// Check for transitions
-			if (Input.IsActionJustPressed("attack") && Actor.AttackTimer <= 0)
+			if (IsActionJustPressed("attack") && Actor.AttackTimer <= 0)
 			{
 				MainCharacter.RequestAttackFromState(Name);
 				ChangeState("Attack");
@@ -35,7 +35,7 @@ namespace Kuros.Actors.Heroes.States
 			Vector2 input = GetMovementInput();
 			if (input != Vector2.Zero)
 			{
-				if (Input.IsActionPressed("run"))
+				if (IsActionPressed("run"))
 				{
 					ChangeState("Run");
 				}
@@ -46,7 +46,7 @@ namespace Kuros.Actors.Heroes.States
 				return;
 			}
 
-			if (Input.IsActionJustPressed("take_up"))
+			if (IsActionJustPressed("take_up"))
 			{
 				ChangeState("PickUp");
 				return;

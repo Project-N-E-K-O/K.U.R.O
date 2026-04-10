@@ -1,3 +1,4 @@
+using System;
 using Godot;
 using Kuros.Systems.Inventory;
 using Kuros.Core;
@@ -20,6 +21,7 @@ namespace Kuros.UI
 
         private const int InventorySlotCount = 16; // 4x4 网格
         private const int QuickBarSlotCount = 5;
+        private const string LockedQuickBarSlotItemId = "default_wooden_sword";
 
         private readonly ItemSlot[] _inventorySlots = new ItemSlot[InventorySlotCount];
         private readonly ItemSlot[] _quickBarSlots = new ItemSlot[QuickBarSlotCount];
@@ -242,16 +244,15 @@ namespace Kuros.UI
             // 如果处于精确换位模式，执行换位
             if (_selectedSlotIndex >= 0)
             {
-                // 檢查是否嘗試交換到快捷欄1（索引0），這是被鎖定的小木劍槽位
-                if (!isInventory && slotIndex == 0)
+                // 仅当槽位1实际放着默认小木剑时才锁定。
+                if (!isInventory && slotIndex == 0 && IsQuickBarSlot0Locked())
                 {
                     ClearAllSelections();
                     _selectedSlotIndex = -1;
                     return;
                 }
                 
-                // 檢查源槽位是否是快捷欄1（索引0）
-                if (!_isSelectedFromInventory && _selectedSlotIndex == 0)
+                if (!_isSelectedFromInventory && _selectedSlotIndex == 0 && IsQuickBarSlot0Locked())
                 {
                     ClearAllSelections();
                     _selectedSlotIndex = -1;
@@ -296,8 +297,7 @@ namespace Kuros.UI
 
         private void OnSlotDoubleClicked(int slotIndex, bool isInventory)
         {
-            // 檢查是否雙擊快捷欄1（索引0），這是被鎖定的小木劍槽位
-            if (!isInventory && slotIndex == 0)
+            if (!isInventory && slotIndex == 0 && IsQuickBarSlot0Locked())
             {
                 return;
             }
@@ -334,8 +334,7 @@ namespace Kuros.UI
 
         private void OnSlotDragStarted(int slotIndex, Vector2 position, bool isInventory)
         {
-            // 檢查是否嘗試拖拽快捷欄1（索引0），這是被鎖定的小木劍槽位
-            if (!isInventory && slotIndex == 0)
+            if (!isInventory && slotIndex == 0 && IsQuickBarSlot0Locked())
             {
                 return;
             }
@@ -442,7 +441,7 @@ namespace Kuros.UI
                 bool targetIsInventory = IsInventorySlot(targetSlot);
 
                 // 檢查是否嘗試拖拽到快捷欄1（索引0），這是被鎖定的小木劍槽位
-                if (!targetIsInventory && targetIndex == 0)
+                if (!targetIsInventory && targetIndex == 0 && IsQuickBarSlot0Locked())
                 {
                     DestroyDragPreview();
                     _draggingSlotIndex = -1;
@@ -461,7 +460,7 @@ namespace Kuros.UI
                     else
                     {
                         // 快捷欄內部移動，但跳過快捷欄1
-                        if (_draggingSlotIndex == 0 || targetIndex == 0)
+                        if (IsQuickBarSlot0Locked() && (_draggingSlotIndex == 0 || targetIndex == 0))
                         {
                             DestroyDragPreview();
                             _draggingSlotIndex = -1;
@@ -539,12 +538,11 @@ namespace Kuros.UI
 
         private void PerformSwap(int fromIndex, bool fromInventory, int toIndex, bool toInventory)
         {
-            // 保護快捷欄1（索引0）不被更改
-            if (!fromInventory && fromIndex == 0)
+            if (!fromInventory && fromIndex == 0 && IsQuickBarSlot0Locked())
             {
                 return;
             }
-            if (!toInventory && toIndex == 0)
+            if (!toInventory && toIndex == 0 && IsQuickBarSlot0Locked())
             {
                 return;
             }
@@ -582,6 +580,20 @@ namespace Kuros.UI
                 fromContainer.SetStack(fromIndex, toStackCopy);
                 toContainer.SetStack(toIndex, tempStack);
             }
+        }
+
+        private bool IsQuickBarSlot0Locked()
+        {
+            if (_quickBarContainer == null)
+            {
+                return false;
+            }
+
+            var stack = _quickBarContainer.GetStack(0);
+            return stack != null
+                && !stack.IsEmpty
+                && stack.Item != null
+                && string.Equals(stack.Item.ItemId, LockedQuickBarSlotItemId, StringComparison.Ordinal);
         }
 
         private void SwapSlotsInContainer(InventoryContainer? container, int index1, int index2)

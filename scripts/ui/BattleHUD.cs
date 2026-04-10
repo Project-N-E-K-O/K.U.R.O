@@ -94,6 +94,8 @@ namespace Kuros.UI
 				HealthFillBar = GetNodeOrNull<TextureProgressBar>("HealthBar/HealthFillBar");
 			}
 
+			ConfigureHealthFillBar();
+
 			if (HealthValueLabel == null)
 			{
 				HealthValueLabel = GetNodeOrNull<Label>("HealthBar/HealthValueLabel");
@@ -450,24 +452,28 @@ namespace Kuros.UI
 
 		private void UpdateDisplay()
 		{
+			int safeMaxHealth = Mathf.Max(1, _maxHealth);
+			int safeHealth = Mathf.Clamp(_currentHealth, 0, safeMaxHealth);
+
 			if (HealthBar != null)
 			{
 				// 保持 HealthBar 作为你在编辑器中布置好的容器/图标，不去修改其贴图
-				HealthBar.MaxValue = _maxHealth;
-				HealthBar.Value = _currentHealth;
+				HealthBar.MaxValue = safeMaxHealth;
+				HealthBar.Value = safeHealth;
 			}
 
 			// 使用单独的遮罩进度条来表现生命值长度
 			if (HealthFillBar != null)
 			{
-				HealthFillBar.MaxValue = _maxHealth;
-				HealthFillBar.Value = _currentHealth;
+				HealthFillBar.MinValue = 0;
+				HealthFillBar.MaxValue = safeMaxHealth;
+				HealthFillBar.Value = safeHealth;
 			}
 
 			// 在生命条中央叠加数值显示
 			if (HealthValueLabel != null)
 			{
-				HealthValueLabel.Text = $"{_currentHealth}/{_maxHealth}";
+				HealthValueLabel.Text = $"{safeHealth}/{safeMaxHealth}";
 			}
 			if (ScoreLabel != null)
 			{
@@ -475,6 +481,19 @@ namespace Kuros.UI
 				ScoreLabel.Text = $"{_score}";
 			}
 			// PlayerStatsLabel 保留原逻辑用于调试/回退需要
+		}
+
+		private void ConfigureHealthFillBar()
+		{
+			if (HealthFillBar == null)
+			{
+				return;
+			}
+
+			HealthFillBar.FillMode = (int)TextureProgressBar.FillModeEnum.LeftToRight;
+			HealthFillBar.MinValue = 0;
+			HealthFillBar.MaxValue = Mathf.Max(1, _maxHealth);
+			HealthFillBar.Value = Mathf.Clamp(_currentHealth, 0, Mathf.Max(1, _maxHealth));
 		}
 
 		/// <summary>
@@ -594,6 +613,10 @@ namespace Kuros.UI
 			if (actor is SamplePlayer samplePlayer)
 			{
 				_player = samplePlayer;
+
+				// 使用 C# 事件驱动血量/分数更新，避免仅依赖未触发的 Godot 信号。
+				samplePlayer.StatsUpdated -= OnPlayerStatsUpdated;
+				samplePlayer.StatsUpdated += OnPlayerStatsUpdated;
 				
 				// 连接玩家状态变化信号
 				if (!samplePlayer.IsConnected(SamplePlayer.SignalName.StatsChanged, new Callable(this, MethodName.OnPlayerStatsChanged)))
@@ -609,6 +632,9 @@ namespace Kuros.UI
 				
 				// 初始化金币显示
 				UpdateGoldDisplay(samplePlayer.GetGold());
+
+				// 绑定时立即刷新一次生命值，避免必须等待下一次事件才更新。
+				UpdateStats(samplePlayer.CurrentHealth, samplePlayer.MaxHealth, samplePlayer.Score);
 				
 				// 连接玩家物品栏组件
 				ConnectPlayerInventory(samplePlayer);
@@ -622,6 +648,8 @@ namespace Kuros.UI
 		{
 			if (player is SamplePlayer samplePlayer)
 			{
+				samplePlayer.StatsUpdated -= OnPlayerStatsUpdated;
+
 				if (samplePlayer.IsConnected(SamplePlayer.SignalName.StatsChanged, new Callable(this, MethodName.OnPlayerStatsChanged)))
 				{
 					samplePlayer.StatsChanged -= OnPlayerStatsChanged;
@@ -673,6 +701,11 @@ namespace Kuros.UI
 		{
 			// 从玩家获取最大生命值
 			int maxHealth = _player?.MaxHealth ?? 100;
+			UpdateStats(health, maxHealth, score);
+		}
+
+		private void OnPlayerStatsUpdated(int health, int maxHealth, int score)
+		{
 			UpdateStats(health, maxHealth, score);
 		}
 		

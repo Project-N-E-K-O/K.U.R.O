@@ -23,5 +23,4 @@ Tags = Array[String](["tag_weapon", "build_machine", "tag_brawl"])
 MaxStackSize = 1
 AttributeEntries = Array[ExtResource("1_ft51u")]([SubResource("Resource_nek6n")])
 WeaponSkillResources = Array[Resource]([ExtResource("4_ft51u")])
-BuildClass = "machine"
 WorldScenePath = "res://scenes/weapons/Weapon_Brawl_riotBracer.tscn"

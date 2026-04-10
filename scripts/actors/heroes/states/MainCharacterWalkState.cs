@@ -22,7 +22,7 @@ namespace Kuros.Actors.Heroes.States
 		{
 			if (HandleDialogueGating(delta)) return;
 			
-			if (Input.IsActionJustPressed("attack") && Actor.AttackTimer <= 0)
+			if (IsActionJustPressed("attack") && Actor.AttackTimer <= 0)
 			{
 				MainCharacter.RequestAttackFromState(Name);
 				ChangeState("Attack");
@@ -30,7 +30,7 @@ namespace Kuros.Actors.Heroes.States
 			}
 			
 			// Check for run
-			if (Input.IsActionPressed("run"))
+			if (IsActionPressed("run"))
 			{
 				ChangeState("Run");
 				return;

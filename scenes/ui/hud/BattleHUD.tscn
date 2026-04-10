@@ -1,13 +1,17 @@
-[gd_scene load_steps=11 format=3 uid="uid://c88kwpwoxtoev"]
+[gd_scene load_steps=12 format=3 uid="uid://c88kwpwoxtoev"]
 
 [ext_resource type="Script" uid="uid://3vrm8fkuw0da" path="res://scripts/ui/BattleHUD.cs" id="1_battle_hud"]
-[ext_resource type="Texture2D" uid="uid://bw7cloof3sie5" path="res://resources/ui/生命值.png" id="2_health_bar"]
+[ext_resource type="Texture2D" uid="uid://tw6du7s4uppx" path="res://resources/ui/生命值.png" id="2_health_bar"]
 [ext_resource type="Texture2D" uid="uid://b65npykj1n37g" path="res://resources/ui/生命值条.png" id="2_health_fill"]
 [ext_resource type="Texture2D" uid="uid://b4bnmx44vnatg" path="res://resources/ui/生命值栏.png" id="3_health_bg"]
-[ext_resource type="Texture2D" uid="uid://dabcvkkj7ddao" path="res://resources/ui/暂停.png" id="5_l8vag"]
+[ext_resource type="Texture2D" uid="uid://5u8i4btpv0vi" path="res://resources/ui/暂停.png" id="5_l8vag"]
 [ext_resource type="Texture2D" uid="uid://vgh6xkgwp8w4" path="res://resources/ui/金币.png" id="6_gold"]
 [ext_resource type="Texture2D" uid="uid://cy0qwoe0qpjfb" path="res://resources/ui/武器栏底.png" id="7_weapon_bg"]
-[ext_resource type="Texture2D" uid="uid://diqoct36b5bv4" path="res://resources/ui/武器栏框（未选中）.png" id="8_slot_normal"]
+[ext_resource type="Texture2D" uid="uid://dhj5yxqdvg6ju" path="res://resources/ui/武器栏框（未选中）.png" id="8_slot_normal"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_domk2"]
+atlas = ExtResource("2_health_fill")
+region = Rect2(416, 1992, 3184, 656)
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_weapon_bg"]
 texture = ExtResource("7_weapon_bg")
@@ -114,15 +118,15 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 50.0
-offset_top = -126.000015
-offset_right = 5120.0
-offset_bottom = 3864.0
+offset_left = 87.747
+offset_top = -8.385
+offset_right = 2981.747
+offset_bottom = 620.3506
 grow_horizontal = 2
 grow_vertical = 2
 scale = Vector2(0.09208033, 0.05920435)
 value = 100.0
-texture_progress = ExtResource("2_health_fill")
+texture_progress = SubResource("AtlasTexture_domk2")
 
 [node name="HealthValueLabel" type="Label" parent="HealthBar"]
 layout_mode = 1
@@ -130,9 +134,9 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 91.0
-offset_top = -3.0
+offset_top = -5.0
 offset_right = 91.0
-offset_bottom = -3.0
+offset_bottom = -5.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_font_sizes/font_size = 16

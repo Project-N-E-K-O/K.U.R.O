@@ -47,7 +47,7 @@ namespace Kuros.Actors.Heroes.States
         {
             if (HandleDialogueGating(delta)) return;
             
-            if (Input.IsActionJustPressed("attack") && Actor.AttackTimer <= 0)
+            if (IsActionJustPressed("attack") && Actor.AttackTimer <= 0)
             {
                 Player.RequestAttackFromState(Name);
                 ChangeState("Attack");
@@ -55,7 +55,7 @@ namespace Kuros.Actors.Heroes.States
             }
             
             // Stop running if shift is released
-            if (!Input.IsActionPressed("run"))
+            if (!IsActionPressed("run"))
             {
                 ChangeState("Walk");
                 return;

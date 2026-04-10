@@ -40,7 +40,17 @@ namespace Kuros.Actors.Heroes.States
         
         protected Vector2 GetMovementInput()
         {
-            return Input.GetVector("move_left", "move_right", "move_forward", "move_back");
+            return Player.GetControlledMovementInput();
+        }
+
+        protected bool IsActionPressed(string actionName)
+        {
+            return Player.IsControlledActionPressed(actionName);
+        }
+
+        protected bool IsActionJustPressed(string actionName)
+        {
+            return Player.ConsumeControlledActionJustPressed(actionName);
         }
         
         /// <summary>

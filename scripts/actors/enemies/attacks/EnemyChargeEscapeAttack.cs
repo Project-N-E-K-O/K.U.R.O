@@ -53,12 +53,12 @@ namespace Kuros.Actors.Enemies.Attacks
 
 			GD.Print($"[EscapeSeq] IsEvaluatingEscape={IsEvaluatingEscape} AreEscapeCountersCleared={AreEscapeCountersCleared}  timer={EscapeTimerRemaining:F2}s  L={_leftCount}/{RequiredLeftInputs}  R={_rightCount}/{RequiredRightInputs}");
 
-            if (Input.IsActionJustPressed("move_left"))
+			if (player.ConsumeControlledActionJustPressed("move_left"))
             {
                 _leftCount++;
             }
 
-            if (Input.IsActionJustPressed("move_right"))
+			if (player.ConsumeControlledActionJustPressed("move_right"))
             {
                 _rightCount++;
             }

@@ -69,10 +69,22 @@ namespace Kuros.Core
 		private bool _deathFinalized = false;
 		private Area2D? _cachedHitArea;
 		private bool _hitAreaResolved;
+		private ulong _lastDamageTakenAtMs = 0;
 
 		public bool IsDeathSequenceActive => _deathStarted && !_deathFinalized;
 		public bool IsDead => _deathFinalized;
 		public bool IgnoreHitStateOnDamage { get; set; } = false;
+
+		public float GetSecondsSinceLastDamageTaken()
+		{
+			if (_lastDamageTakenAtMs == 0)
+			{
+				return float.PositiveInfinity;
+			}
+
+			ulong now = Time.GetTicksMsec();
+			return (now - _lastDamageTakenAtMs) / 1000f;
+		}
 
 		public override void _Ready()
 		{
@@ -251,6 +263,7 @@ namespace Kuros.Core
 
 			CurrentHealth -= damage;
 			CurrentHealth = Mathf.Max(CurrentHealth, 0);
+			_lastDamageTakenAtMs = Time.GetTicksMsec();
 			NotifyHealthChanged();
 			DamageTaken?.Invoke(damage);
 			AnyDamageTaken?.Invoke(this, attacker, damage);
