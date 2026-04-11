@@ -9,5 +9,6 @@ SkillId = "Weapon_Brawl_MechGlove"
 DisplayName = "镇暴护腕攻击"
 AnimationName = "Weapon_Brawl_MechGlove"
 CooldownSeconds = 0.8
+ShowHitboxDebug = false
 Description = "攻击到敌人时击退该敌人0.5m"
 ActivationAction = "Weapon_Brawl_MechGlove"
