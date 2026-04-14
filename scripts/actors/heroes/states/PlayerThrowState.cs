@@ -8,7 +8,7 @@ namespace Kuros.Actors.Heroes.States
     /// </summary>
     public partial class PlayerThrowState : PlayerState
     {
-        public string ThrowAnimation = "animations/throw";
+        public string ThrowAnimation = "throw_holding_item";
         public float ThrowAnimationSpeed = 1.0f;
 
         private PlayerItemInteractionComponent? _interaction;
@@ -27,6 +27,7 @@ namespace Kuros.Actors.Heroes.States
         {
             if (_interaction == null)
             {
+                GD.PrintErr($"[PlayerThrowState] ItemInteraction 不存在，无法进行投掷");
                 ChangeState("Idle");
                 return;
             }
@@ -34,7 +35,7 @@ namespace Kuros.Actors.Heroes.States
             Player.Velocity = Vector2.Zero;
             _hasRequestedThrow = false;
             _animationFinished = false;
-            PlayAnimation();
+            PlayThrowAnimation();
         }
 
         public override void Exit()
@@ -61,6 +62,7 @@ namespace Kuros.Actors.Heroes.States
 
             if (_animationFinished && !_hasRequestedThrow)
             {
+                GD.Print($"[PlayerThrowState] 动画完成，触发投掷逻辑");
                 if (_interaction.TryTriggerThrowAfterAnimation())
                 {
                     _hasRequestedThrow = true;
@@ -73,36 +75,66 @@ namespace Kuros.Actors.Heroes.States
             }
         }
 
-        private void PlayAnimation()
+        private void PlayThrowAnimation()
         {
-            if (Actor.AnimPlayer != null && Actor.AnimPlayer.HasAnimation(ThrowAnimation))
+            GD.Print($"[PlayerThrowState] 尝试播放投掷动画: {ThrowAnimation}");
+            
+            // 首先尝试使用 PlayerState 的 PlayAnimation 方法（支持 Spine 和 AnimationPlayer）
+            if (Player is MainCharacter mainChar)
             {
-                // Save original speed scale before modifying
-                _originalSpeedScale = Actor.AnimPlayer.SpeedScale;
+                // MainCharacter 用 Spine 动画
+                GD.Print($"[PlayerThrowState] 检测到 MainCharacter，使用 Spine 动画");
+                mainChar.PlaySpineAnimation(ThrowAnimation, loop: false, timeScale: ThrowAnimationSpeed);
                 
-                Actor.AnimPlayer.Play(ThrowAnimation);
-                // Set animation playback speed only for throw animation
-                Actor.AnimPlayer.SpeedScale = ThrowAnimationSpeed;
+                // 估算动画长度（Spine 不容易获取动画长度，所以设个合理的默认值）
+                _animRemaining = 0.64f; // 假设投掷动画大约 1.5 秒
+                GD.Print($"[PlayerThrowState] Spine 动画已播放，预计时长: {_animRemaining}s");
+            }
+            else if (Actor.AnimPlayer != null)
+            {
+                // 使用 AnimationPlayer
+                GD.Print($"[PlayerThrowState] 检测到 AnimationPlayer");
+                if (Actor.AnimPlayer.HasAnimation(ThrowAnimation))
+                {
+                    _originalSpeedScale = Actor.AnimPlayer.SpeedScale;
+                    Actor.AnimPlayer.Play(ThrowAnimation);
+                    Actor.AnimPlayer.SpeedScale = ThrowAnimationSpeed;
 
-                var speed = Mathf.Max(Actor.AnimPlayer.SpeedScale, 0.0001f);
-                _animRemaining = (float)Actor.AnimPlayer.CurrentAnimationLength / speed;
+                    var speed = Mathf.Max(Actor.AnimPlayer.SpeedScale, 0.0001f);
+                    _animRemaining = (float)Actor.AnimPlayer.CurrentAnimationLength / speed;
+                    GD.Print($"[PlayerThrowState] AnimationPlayer 动画已播放，动画时长: {_animRemaining}s");
+                }
+                else
+                {
+                    GD.PrintErr($"[PlayerThrowState] AnimationPlayer 中找不到动画: {ThrowAnimation}");
+                    _animationFinished = true;
+                }
             }
             else
             {
+                GD.PrintErr($"[PlayerThrowState] 无法找到合适的动画播放方式 (MainCharacter={Player is MainCharacter}, AnimPlayer={Actor.AnimPlayer != null})");
                 _animationFinished = true;
             }
         }
 
         private void UpdateAnimationState()
         {
-            if (_animationFinished || Actor.AnimPlayer == null)
+            if (_animationFinished)
             {
                 return;
             }
 
             _animRemaining -= (float)GetPhysicsProcessDeltaTime();
-            if (_animRemaining <= 0f || !Actor.AnimPlayer.IsPlaying())
+            
+            // 检查动画是否播放完成
+            if (_animRemaining <= 0f)
             {
+                GD.Print($"[PlayerThrowState] 动画计时完成");
+                _animationFinished = true;
+            }
+            else if (Actor.AnimPlayer != null && !Actor.AnimPlayer.IsPlaying())
+            {
+                GD.Print($"[PlayerThrowState] AnimationPlayer 动画完成");
                 _animationFinished = true;
             }
         }

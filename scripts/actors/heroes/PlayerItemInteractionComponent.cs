@@ -147,6 +147,11 @@ namespace Kuros.Actors.Heroes
 
             if (Input.IsActionJustPressed("throw"))
             {
+                GD.Print($"[PlayerItemInteractionComponent] throw 快捷键被按下");
+                GD.Print($"[PlayerItemInteractionComponent] EnableInput={EnableInput}, Backpack={InventoryComponent?.Backpack != null}");
+                GD.Print($"[PlayerItemInteractionComponent] InventoryComponent={InventoryComponent?.Name ?? "null"}");
+                GD.Print($"[PlayerItemInteractionComponent] _actor={_actor?.Name ?? "null"}");
+                GD.Print($"[PlayerItemInteractionComponent] StateMachine={_actor?.StateMachine != null}");
                 TryHandleDrop(DropDisposition.Throw);
             }
 
@@ -186,23 +191,29 @@ namespace Kuros.Actors.Heroes
         {
             if (InventoryComponent == null)
             {
+                GD.PrintErr($"[PlayerItemInteractionComponent] TryHandleDrop 失败: InventoryComponent 为 null");
                 return false;
             }
 
             // 從快捷欄選中的槽位獲取物品（左手物品）
             var selectedStack = InventoryComponent.GetSelectedQuickBarStack();
+            GD.Print($"[PlayerItemInteractionComponent] TryHandleDrop({disposition}, skipAnimation={skipAnimation}): selectedStack={selectedStack?.Item?.ItemId ?? "null"}");
             if (selectedStack == null || selectedStack.IsEmpty || selectedStack.Item.ItemId == "empty_item")
             {
+                GD.PrintErr($"[PlayerItemInteractionComponent] TryHandleDrop 失败: 快捷栏为空或物品是empty_item (null={selectedStack==null}, empty={selectedStack?.IsEmpty ?? false}, itemId={selectedStack?.Item?.ItemId ?? "null"})");
                 return false;
             }
 
             if (!skipAnimation && disposition == DropDisposition.Throw)
             {
+                GD.Print($"[PlayerItemInteractionComponent] 触发 Throw 状态...");
                 if (TryTriggerThrowState())
                 {
+                    GD.Print($"[PlayerItemInteractionComponent] 成功进入 Throw 状态，等待动画完成");
                     return false;
                 }
 
+                GD.PrintErr($"[PlayerItemInteractionComponent] TryTriggerThrowState 失败");
                 return TryHandleDrop(disposition, skipAnimation: true);
             }
 
@@ -552,15 +563,19 @@ namespace Kuros.Actors.Heroes
         {
             if (_actor?.StateMachine == null)
             {
+                GD.PrintErr($"[PlayerItemInteractionComponent] TryTriggerThrowState 失败: StateMachine 为 null (_actor={_actor?.Name ?? "null"})");
                 return false;
             }
 
             if (!_actor.StateMachine.HasState(ThrowStateName))
             {
+                GD.PrintErr($"[PlayerItemInteractionComponent] TryTriggerThrowState 失败: StateMachine 中不存在 '{ThrowStateName}' 状态");
                 return false;
             }
 
+            GD.Print($"[PlayerItemInteractionComponent] 正在改变状态到: {ThrowStateName}");
             _actor.StateMachine.ChangeState(ThrowStateName);
+            GD.Print($"[PlayerItemInteractionComponent] 状态已改变，当前状态: {_actor.StateMachine.CurrentState?.Name ?? "null"}");
             return true;
         }
 
