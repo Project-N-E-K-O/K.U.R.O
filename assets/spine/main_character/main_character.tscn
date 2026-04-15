@@ -140,9 +140,9 @@ script = ExtResource("4_ixg0x")
 skeleton_data_res = ExtResource("4_o4xwm")
 bones_thickness = 10.09
 preview_skin = "Default"
-preview_animation = "Weapon_Slash_BarrierGate"
+preview_animation = "-- Empty --"
 preview_frame = true
-preview_time = 1.0
+preview_time = 1.33
 script = ExtResource("4_ixg0x")
 
 [node name="SpineBoneNode" type="SpineBoneNode" parent="SpineSprite"]
@@ -209,7 +209,9 @@ script = ExtResource("9_13pt2")
 AttackId = "umbrella_melee_attack"
 DisplayName = "Umbrella Melee Attack"
 Description = "雨伞专属攻击模板示例"
-RecoveryDuration = 0.0
+WarmupDuration = 0.17
+ActiveDuration = 0.63
+RecoveryDuration = 0.2
 AnimationName = "animations/attack_thrust"
 HitEffectScene = ExtResource("12_0y2r2")
 HitEffectAnchorMode = 2
@@ -251,14 +253,30 @@ script = ExtResource("9_13pt2")
 AttackId = "riot_bracer_melee_attack"
 DisplayName = "Riot Bracer Melee Attack"
 Description = "镇暴护腕专属攻击模板示例"
-ActiveDuration = 0.5
-RecoveryDuration = 0.35
+WarmupDuration = 0.17
+ActiveDuration = 0.4
+RecoveryDuration = 0.43
+CooldownDuration = 0.5
+AnimationName = "animations/Weapon_Brawl_RiotBracer"
+HitEffectScene = ExtResource("12_0y2r2")
+HitEffectAnchorMode = 2
+HitEffectForceTopLevel = true
+RequiredItemId = "Weapon_Brawl_riotBracer"
+
+[node name="MechGloveMeleeAttack" type="Node" parent="StateMachine/Attack"]
+script = ExtResource("9_13pt2")
+AttackId = "mech_glove_melee_attack"
+DisplayName = "Mech Glove Melee Attack"
+Description = "机械冲撞臂专属攻击模板示例"
+WarmupDuration = 0.5
+ActiveDuration = 0.43
+RecoveryDuration = 0.4
 CooldownDuration = 0.5
 AnimationName = "animations/Weapon_Brawl_MechGlove"
 HitEffectScene = ExtResource("12_0y2r2")
 HitEffectAnchorMode = 2
 HitEffectForceTopLevel = true
-RequiredItemId = "Weapon_Brawl_riotBracer"
+RequiredItemId = "Weapon_Brawl_mechGlove"
 
 [node name="Hit" type="Node" parent="StateMachine"]
 script = ExtResource("10_utqjm")
@@ -304,9 +322,18 @@ script = ExtResource("20_4ht1x")
 Inventory = NodePath("../Inventory")
 AttachmentParentPath = NodePath("../SpineSprite")
 SpineSlotNodePath = NodePath("../SpineSprite/SpineBoneNode")
-SpineBoneNodePaths = Array[NodePath]([NodePath("../SpineSprite/SpineBoneNode")])
-BoneIconOffset = Vector2(-55, -50)
+RotateBoneOffsetWithBone = true
 IconRotationDegrees = -120.0
+
+[node name="ItemHoldingAttachment" type="Node" parent="." node_paths=PackedStringArray("Inventory")]
+script = ExtResource("20_4ht1x")
+Inventory = NodePath("../Inventory")
+AttachmentParentPath = NodePath("../SpineSprite")
+SpineSlotNodePath = NodePath("../SpineSprite/SpineBoneNode")
+ShowHoldingItemStates = Array[String](["IdleHolding", "RunHolding", "Throw"])
+BoneIconOffset = Vector2(857, 0)
+RotateBoneOffsetWithBone = true
+IconRotationDegrees = -90.0
 
 [node name="EffectController" type="Node" parent="."]
 script = ExtResource("21_utqjm")
@@ -382,7 +409,6 @@ size_flags_vertical = 3
 scroll_following = true
 
 [node name="HitboxEditorPreview" type="Node2D" parent="."]
-visible = false
 z_as_relative = false
 position = Vector2(464.24234, -569.99994)
 scale = Vector2(0.9999999, 0.9999999)

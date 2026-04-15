@@ -9,7 +9,7 @@
 [sub_resource type="Resource" id="Attribute_AttackPower"]
 script = ExtResource("1_q00hu")
 AttributeId = "attack_power"
-Value = 4.0
+Value = 1.0
 
 [resource]
 script = ExtResource("5_vndrb")
@@ -24,4 +24,4 @@ AttributeEntries = Array[ExtResource("1_q00hu")]([SubResource("Attribute_AttackP
 EffectEntries = Array[ExtResource("2_iq0we")]([null])
 WeaponSkillResources = Array[Resource]([ExtResource("4_qwcde")])
 BuildClass = "Machine"
-WorldScenePath = "res://scenes/weapons/Weapon_Stab_umbrella.tscn"
+WorldScenePath = "uid://6ghjqyjkk37w"

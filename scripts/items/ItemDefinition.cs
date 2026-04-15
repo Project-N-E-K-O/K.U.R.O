@@ -62,6 +62,7 @@ namespace Kuros.Items
         }
         [Export] public string BuildClass { get; set; } = string.Empty;
         [Export(PropertyHint.Range, "0,99,1")] public int LevelCount { get; set; } = 1;
+        [Export] public bool IsThrowable { get; set; } = false; // 是否可投掷
 
         [ExportGroup("Durability")]
         [Export] public ItemDurabilityConfig? DurabilityConfig { get; set; }

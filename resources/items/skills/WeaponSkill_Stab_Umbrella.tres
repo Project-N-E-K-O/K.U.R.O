@@ -17,7 +17,6 @@ SkillId = "WeaponSkill_Stab_Umbrella"
 DisplayName = "雨伞攻击"
 AnimationName = "attack_thrust"
 CooldownSeconds = 2.5
-ShowHitboxDebug = false
 Description = "展开雨伞形成临时护盾，短时间内格挡正面攻击。"
 Effects = Array[ExtResource("1_w8ttm")]([SubResource("Resource_a5flt")])
 ActivationAction = "weapon_skill_block"

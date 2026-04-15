@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://qd5abd4opeob"]
+[gd_scene load_steps=22 format=3 uid="uid://qd5abd4opeob"]
 
 [ext_resource type="PackedScene" uid="uid://dd8xmpgwy0t2o" path="res://scenes/environments/scene2.tscn" id="1_7jsho"]
 [ext_resource type="Script" uid="uid://x1ic1ym4ykq8" path="res://scripts/scenes/BattleSceneManager.cs" id="1_ctuyy"]
@@ -12,11 +12,13 @@
 [ext_resource type="PackedScene" uid="uid://2pny8f8vuu3j" path="res://scenes/weapons/Weapon_Slash_barrierGate.tscn" id="10_f0l3g"]
 [ext_resource type="PackedScene" uid="uid://wqcdwpyo1nji" path="res://scenes/actors/enemies/Enemy_B1_thin.tscn" id="10_sfgmy"]
 [ext_resource type="PackedScene" uid="uid://bhjc0grsl76ep" path="res://scenes/weapons/Weapon_Brawl_riotBracer.tscn" id="11_3yw8j"]
+[ext_resource type="PackedScene" uid="uid://0g621ssvm2cp" path="res://scenes/items/Weapon_A2_table.tscn" id="11_my5nm"]
 [ext_resource type="PackedScene" uid="uid://cdnitqquebaw6" path="res://scenes/weapons/Weapon_Stab_drill.tscn" id="11_vvtmr"]
+[ext_resource type="PackedScene" uid="uid://bmp8leplbbuak" path="res://scenes/items/Weapon_A1_bed2.tscn" id="12_axd6b"]
 [ext_resource type="PackedScene" uid="uid://wrebd662va23" path="res://scenes/actors/enemies/Enemy_B2_fat02.tscn" id="13_f0l3g"]
 [ext_resource type="PackedScene" uid="uid://byi2utn347fwu" path="res://scenes/actors/enemies/Enemy_Normal_guard1.tscn" id="13_x3vg8"]
 [ext_resource type="PackedScene" uid="uid://djio6ojcqw8yf" path="res://scenes/actors/enemies/Enemy_Normal_guard2.tscn" id="14_cwau0"]
-[ext_resource type="PackedScene" uid="uid://dnwhjf0qt2753" path="res://scenes/items/Supplies_A0_cake.tscn" id="17_pvxkr"]
+[ext_resource type="PackedScene" uid="uid://ctpw5uqly3yu5" path="res://scenes/weapons/Weapon_Brawl_mechGlove.tscn" id="19_t6vgq"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2l4aj"]
 size = Vector2(1112.5, 1843)
@@ -70,32 +72,35 @@ PlayerAttackKillHitStopDuration = 0.3
 HitStopDelay = 0.1
 
 [node name="DroopTest" type="Node2D" parent="World"]
-z_index = 1
 
 [node name="WeaponStabUmbrella" parent="World/DroopTest" instance=ExtResource("8_pvxkr")]
-z_index = 0
 position = Vector2(-5922, -591)
 
 [node name="WeaponStabDrill" parent="World/DroopTest" instance=ExtResource("11_vvtmr")]
-z_index = 0
-y_sort_enabled = true
 position = Vector2(-5435, -203)
 
 [node name="WeaponSlashBarrierGate" parent="World/DroopTest" instance=ExtResource("10_f0l3g")]
-z_index = 0
 position = Vector2(-5952, -208)
 
 [node name="WeaponBrawlRiotBracer" parent="World/DroopTest" instance=ExtResource("11_3yw8j")]
-z_index = 0
 position = Vector2(-6552, -156)
 
 [node name="WeaponBrawlRiotBracer2" parent="World/DroopTest" instance=ExtResource("11_3yw8j")]
-z_index = 0
 position = Vector2(-7153, -66)
 
 [node name="WeaponBrawlRiotBracer3" parent="World/DroopTest" instance=ExtResource("11_3yw8j")]
-z_index = 0
 position = Vector2(-6984, -463)
+
+[node name="WeaponMechGlove" parent="World/DroopTest" instance=ExtResource("19_t6vgq")]
+position = Vector2(-6374, -494)
+
+[node name="Kitchen_table" parent="World/DroopTest" instance=ExtResource("11_my5nm")]
+z_index = 1
+position = Vector2(-6455, 291)
+scale = Vector2(2, 2)
+
+[node name="Bed_Blue" parent="World/DroopTest" instance=ExtResource("12_axd6b")]
+position = Vector2(-6003, 1184)
 
 [node name="DropDebug" type="Node2D" parent="World"]
 script = ExtResource("7_k0qph")
@@ -179,6 +184,3 @@ collision_mask = 4
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="World/EnemySpawneManager4/Area2D"]
 shape = SubResource("RectangleShape2D_f0l3g")
-
-[node name="Supplies_A0_cake" parent="World" instance=ExtResource("17_pvxkr")]
-position = Vector2(-6066, 221)
