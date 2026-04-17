@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=3 uid="uid://qd5abd4opeob"]
+[gd_scene load_steps=24 format=3 uid="uid://qd5abd4opeob"]
 
 [ext_resource type="PackedScene" uid="uid://dd8xmpgwy0t2o" path="res://scenes/environments/scene2.tscn" id="1_7jsho"]
 [ext_resource type="Script" uid="uid://x1ic1ym4ykq8" path="res://scripts/scenes/BattleSceneManager.cs" id="1_ctuyy"]
@@ -13,14 +13,13 @@
 [ext_resource type="PackedScene" uid="uid://2pny8f8vuu3j" path="res://scenes/weapons/Weapon_Slash_barrierGate.tscn" id="10_f0l3g"]
 [ext_resource type="PackedScene" uid="uid://wqcdwpyo1nji" path="res://scenes/actors/enemies/Enemy_B1_thin.tscn" id="10_sfgmy"]
 [ext_resource type="PackedScene" uid="uid://bhjc0grsl76ep" path="res://scenes/weapons/Weapon_Brawl_riotBracer.tscn" id="11_3yw8j"]
-[ext_resource type="PackedScene" uid="uid://0g621ssvm2cp" path="res://scenes/items/Weapon_A2_table.tscn" id="11_my5nm"]
 [ext_resource type="PackedScene" uid="uid://cdnitqquebaw6" path="res://scenes/weapons/Weapon_Stab_drill.tscn" id="11_vvtmr"]
 [ext_resource type="PackedScene" uid="uid://dfmke56wtqt2x" path="res://scenes/weapons/Weapon_Throw_metalSpike.tscn" id="13_eyity"]
 [ext_resource type="PackedScene" uid="uid://wrebd662va23" path="res://scenes/actors/enemies/Enemy_B2_fat02.tscn" id="13_f0l3g"]
 [ext_resource type="PackedScene" uid="uid://byi2utn347fwu" path="res://scenes/actors/enemies/Enemy_Normal_guard1.tscn" id="13_x3vg8"]
 [ext_resource type="PackedScene" uid="uid://djio6ojcqw8yf" path="res://scenes/actors/enemies/Enemy_Normal_guard2.tscn" id="14_cwau0"]
 [ext_resource type="PackedScene" uid="uid://bvvyo3wubh12j" path="res://scenes/weapons/Weapon_Throw_gravityGrenade.tscn" id="14_t6vgq"]
-[ext_resource type="PackedScene" uid="uid://djpr7gcy077em" path="res://scenes/items/Furniture_B_CounterB.tscn" id="15_22xbq"]
+[ext_resource type="PackedScene" uid="uid://djpr7gcy077em" path="res://scenes/items/Furniture_B_counterB.tscn" id="15_22xbq"]
 [ext_resource type="PackedScene" uid="uid://ctpw5uqly3yu5" path="res://scenes/weapons/Weapon_Brawl_mechGlove.tscn" id="19_t6vgq"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2l4aj"]
@@ -100,10 +99,6 @@ position = Vector2(-6984, -463)
 [node name="WeaponMechGlove" parent="World/DroopTest" instance=ExtResource("19_t6vgq")]
 position = Vector2(-6374, -494)
 
-[node name="Kitchen_table" parent="World/DroopTest" instance=ExtResource("11_my5nm")]
-z_index = 1
-position = Vector2(-6455, 291)
-
 [node name="WeaponThrowMetalSpike" parent="World/DroopTest" instance=ExtResource("13_eyity")]
 position = Vector2(-7149, 606)
 
@@ -114,7 +109,7 @@ position = Vector2(-7027, 983)
 position = Vector2(-5721, 885)
 
 [node name="Furniture_B_CounterB" parent="World/DroopTest" instance=ExtResource("15_22xbq")]
-position = Vector2(-5783, 470)
+position = Vector2(-5818, 359)
 
 [node name="DropDebug" type="Node2D" parent="World"]
 script = ExtResource("7_k0qph")

@@ -1,18 +1,19 @@
-[gd_scene load_steps=11 format=3 uid="uid://djpr7gcy077em"]
+[gd_scene load_steps=12 format=3 uid="uid://0anrcfm2pnsd"]
 
-[ext_resource type="Script" uid="uid://dhfq2rrha0awm" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_bqitj"]
-[ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="2_dlyjq"]
-[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="3_5qm6d"]
-[ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="5_l7n3o"]
-[ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="5_q1cp2"]
-[ext_resource type="Texture2D" uid="uid://c0ao8pdrenk5f" path="res://assets/furnitures/hotel_scene2/CounterB.png" id="6_l3q27"]
+[ext_resource type="Script" uid="uid://dhfq2rrha0awm" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_ukya5"]
+[ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="2_qa1uh"]
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="3_ll8va"]
+[ext_resource type="Texture2D" uid="uid://c0ao8pdrenk5f" path="res://assets/furnitures/hotel_scene2/CounterB.png" id="4_kbhgj"]
+[ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="5_ii2vh"]
+[ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="6_8deyr"]
+[ext_resource type="Texture2D" uid="uid://j5yfe8op7l0j" path="res://assets/furnitures/hotel_scene2/LuggageCartA.png" id="7_qa1uh"]
 
 [sub_resource type="Resource" id="Resource_tdtid"]
-script = ExtResource("5_q1cp2")
+script = ExtResource("5_ii2vh")
 ItemId = "Furniture_B_CounterB"
 DisplayName = "昂贵的酒店柜台"
 Description = "一次性投掷道具：昂贵的酒店柜台"
-Icon = ExtResource("6_l3q27")
+Icon = ExtResource("4_kbhgj")
 Category = "Furniture"
 Tags = Array[String](["tag_throw", "furniture"])
 MaxStackSize = 1
@@ -26,7 +27,7 @@ ThrowParabolicLandingYOffset = 250.0
 metadata/_custom_type_script = "uid://dfgtff7mly02w"
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_5sin4"]
-shader = ExtResource("5_l7n3o")
+shader = ExtResource("6_8deyr")
 shader_parameter/outline_color = Color(0.02, 0.02, 0.02, 1)
 shader_parameter/outline_size = 16.0
 shader_parameter/alpha_threshold = 0.5
@@ -34,14 +35,14 @@ shader_parameter/edge_softness = 0.12
 shader_parameter/preserve_fill = true
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jyvv2"]
-size = Vector2(1631, 431)
+size = Vector2(151.47058, 186.47061)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_gy46y"]
-size = Vector2(1639, 452)
+size = Vector2(444, 621)
 
-[node name="FurnitureCounterB" type="Node2D"]
+[node name="Furniture_B_CounterB" type="Node2D"]
 z_index = 1
-script = ExtResource("1_bqitj")
+script = ExtResource("1_ukya5")
 ItemDefinition = SubResource("Resource_tdtid")
 GrabAreaPath = NodePath("RigidBody2D/CollisionArea")
 HighlightSpritePath = NodePath("RigidBody2D/Outline")
@@ -62,26 +63,25 @@ freeze_mode = 1
 
 [node name="Outline" type="Sprite2D" parent="RigidBody2D"]
 material = SubResource("ShaderMaterial_5sin4")
-texture = ExtResource("6_l3q27")
+texture = ExtResource("7_qa1uh")
 
 [node name="Sprite2D" type="Sprite2D" parent="RigidBody2D/Outline"]
-texture = ExtResource("6_l3q27")
+texture = ExtResource("7_qa1uh")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D"]
 visible = false
-position = Vector2(12.5, 72.50001)
+scale = Vector2(3.4, 3.4)
 shape = SubResource("RectangleShape2D_jyvv2")
 
 [node name="CollisionArea" type="Area2D" parent="RigidBody2D"]
 visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/CollisionArea"]
-position = Vector2(0, 88)
+position = Vector2(11, -11.5)
 shape = SubResource("RectangleShape2D_gy46y")
 
 [node name="AttackArea" type="Area2D" parent="RigidBody2D"]
-visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/AttackArea"]
-position = Vector2(10.5, 60.25)
+position = Vector2(3, 6)
 shape = SubResource("RectangleShape2D_gy46y")
