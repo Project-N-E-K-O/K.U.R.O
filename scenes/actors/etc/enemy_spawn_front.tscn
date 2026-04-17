@@ -270,8 +270,8 @@ animations = [{
 "speed": 25.0
 }]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_qxcqd"]
-radius = 650.0
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_qxcqd"]
+size = Vector2(1200, 800)
 
 [node name="SpawnPodFront" type="AnimatedSprite2D"]
 z_index = 2
@@ -285,8 +285,8 @@ frame_progress = 0.2302999
 offset = Vector2(0, -800)
 
 [node name="CharacterBody2D" type="CharacterBody2D" parent="."]
-scale = Vector2(1, 0.65)
 collision_mask = 7
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CharacterBody2D"]
-shape = SubResource("CircleShape2D_qxcqd")
+position = Vector2(0, 30)
+shape = SubResource("RectangleShape2D_qxcqd")

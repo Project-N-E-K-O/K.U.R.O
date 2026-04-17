@@ -543,5 +543,26 @@ namespace Kuros.Core
 		{
 			HealthChanged?.Invoke(CurrentHealth, MaxHealth);
 		}
+
+		/// <summary>
+		/// 禁用自身及所有子节点的 CollisionShape2D。
+		/// </summary>
+		public void DisableCollisionShape()
+		{
+			DisableCollisionShapeInNode(this);
+		}
+
+		private void DisableCollisionShapeInNode(Node node)
+		{
+			foreach (Node child in node.GetChildren())
+			{
+				if (child is CollisionShape2D shape)
+				{
+					shape.Disabled = true;
+				}
+				// 递归处理所有子节点
+				DisableCollisionShapeInNode(child);
+			}
+		}
 	}
 }

@@ -34,6 +34,12 @@ namespace Kuros.Items.World
 		[Export] public uint GrabAreaCollisionLayer { get; set; } = 1u << 1;  // collision_layer = 2
 		[Export] public uint GrabAreaCollisionMask { get; set; } = 1u;        // collision_mask = 1
 
+		[ExportGroup("Outline Highlight")]
+		[Export] public bool EnableGrabAreaOutlineHighlight { get; set; } = true;
+		[Export] public NodePath HighlightSpritePath { get; set; } = new("Outline");
+		[Export] public Color DefaultOutlineColor { get; set; } = new Color(0f, 0f, 0f, 1f);
+		[Export] public Color HighlightOutlineColor { get; set; } = new Color(1f, 1f, 1f, 1f);
+
 		[ExportGroup("Combat")]
 		[Export] public float ThrowDamage {get; set;} = 4f;
 		[Export] public float MinDamageVelocity { get; set; } = 300f; // 造成伤害的最小速度阈值
@@ -41,17 +47,17 @@ namespace Kuros.Items.World
 		[Export] public bool StopOnHit { get; set; } = false; // 命中敌人后是否停止（false = 穿过敌人）
 
 		[ExportGroup("Durability")]
-		[Export(PropertyHint.Range, "0,100,1")] public int MaxDurability { get; set; } = 0; // 最大耐久度（0 = 无限耐久）
-		[Export] public bool ConsumeDurabilityOnHit { get; set; } = true; // 每次命中是否消耗耐久度
+		[Export] public bool IsThrowWeapon { get; set; } = false; // 是否为投掷武器（true=不从背包销毁，进入CD；false=投掷后在LandingHideDelay后销毁）
+		[Export(PropertyHint.Range, "0.1,60,0.1")] public float ThrowWeaponCooldown { get; set; } = 2.0f; // 投掷武器的使用冷却时间
 		[Export] public NodePath DestructionAnimationPlayerPath { get; set; } = new NodePath(""); // 销毁动画播放器路径
 		[Export] public string DestructionAnimationName { get; set; } = "destroy"; // 销毁动画名称
 		[Export] public float DestructionAnimationDuration { get; set; } = 0.5f; // 销毁动画时长（如果动画播放器不存在，使用固定时长）
+		[Export(PropertyHint.Range, "0.1,10,0.1")] public float LandingHideDelay { get; set; } = 2.0f; // 落点处隐藏延迟（秒）：投掷武器落地后隐藏视觉的等待时间；到达 ThrowWeaponCooldown 后才归还背包并销毁节点
+		[Export(PropertyHint.File, "*.tscn")] public string DestructionEffectScene { get; set; } = string.Empty; // 销毁时生成的特效Scene（可选）
 
 		[ExportGroup("Physics")]
 		[Export] public NodePath RigidBodyPath { get; set; } = new NodePath(".");
 		[Export] public NodePath HitboxAreaPath { get; set; } = new NodePath("Rigidbody2D/Hitbox");
-		[Export] public double FlightDurationSeconds = 0.4; // how long the item keeps flying before dropping
-		[Export] public float DropLimitDistance { get; set; } = 64f;
 		[Export] public uint ThrowCollisionLayer { get; set; } = 1u << 2; // 投掷时的碰撞层（默认第3层：1u<<2=4，占用第3层；墙/地面的Mask需包含第3层才能检测到投掷物品）
 		[Export] public uint ThrowCollisionMask { get; set; } = 0; // 投掷时的碰撞遮罩（0=不检测任何层；如果碰撞只依赖layer，则设为0；如果需要双向检测，则设置为包含墙所在层的值）
 
@@ -74,8 +80,8 @@ namespace Kuros.Items.World
 		private float _initialGravityScale = 0.0f;
 		private bool _inFlight = false;
 		private double _flightTimer = 0.0;
-		private const float DropVerticalSpeed = 240f; // downward speed when starting drop
-		private const float DropHorizontalDamping = 0.6f; // horizontal speed multiplier when dropping
+		private float _throwStartY = 0f; // 投掷起始的Y坐标
+		private float _throwHorizontalVelocity = 0f; // 投掷的水平速度
 		private bool _isDropping = false;
 		private float _dropStartY = 0f;
 		private bool _initialMonitoring;
@@ -89,22 +95,57 @@ namespace Kuros.Items.World
 		private bool _hasDealtDamage = false; // 是否已造成伤害
 		private readonly System.Collections.Generic.HashSet<GameActor> _hitActors = new(); // 已命中的 Actor，防止重复伤害
 		private Area2D? _hitboxArea; // 用于伤害检测的 Area2D
-		private int _currentDurability = 0; // 当前耐久度
 		private bool _isDestroying = false; // 是否正在销毁中
 		private AnimationPlayer? _destructionAnimPlayer; // 销毁动画播放器引用
 		private bool _isThrown = false; // 是否正在投掷中
+		private Sprite2D? _highlightSprite; // Outline highlight 精灵
+		private ShaderMaterial? _outlineMaterial; // Outline 着色器材料
+		private Area2D? _cachedPlayerGrabArea; // 缓存的玩家 GrabArea
+		private bool _isOutlineHighlighted; // 是否正在高亮显示
+		private double _throwCooldownTimer = 0.0; // 投掷武器冷却计时器
+		private bool _isInCooldown = false; // 是否在冷却中
+		private double _landingHideTimer = 0.0; // 落点隐藏计时器（LandingHideDelay：到期后隐藏视觉，不销毁节点）
+		private double _inventoryReturnTimer = 0.0; // 落地后归还背包的计时器（由 ThrowWeaponCooldown 决定，到期后真正销毁节点）
+		private int _reservedQuickBarSlotIndex = -1; // 投掷武器飞行期间预留的快捷栏槽位索引
 
 		public GameActor? LastDroppedBy { get; set; }
 		
 		/// <summary>
-		/// 获取当前耐久度
+		/// 检查投掷武器是否在冷却中
 		/// </summary>
-		public int CurrentDurability => _currentDurability;
-		
+		public bool IsThrowWeaponInCooldown => _isInCooldown;
+
 		/// <summary>
-		/// 获取耐久度百分比（0.0 - 1.0）
+		/// 投掷武器预留的快捷栏槽位索引（-1 = 未预留）
 		/// </summary>
-		public float DurabilityPercent => MaxDurability > 0 ? (float)_currentDurability / MaxDurability : 1.0f;
+		public int ReservedQuickBarSlotIndex => _reservedQuickBarSlotIndex;
+
+		/// <summary>
+		/// 冷却进度 0→1（1 = 冷却刚开始 / 完全覆盖，0 = 冷却结束）
+		/// </summary>
+		public float ThrowCooldownProgress => ThrowWeaponCooldown > 0f
+			? Mathf.Clamp((float)(_throwCooldownTimer / ThrowWeaponCooldown), 0f, 1f)
+			: 0f;
+
+		/// <summary>
+		/// 从 ItemDefinition 读取投掷参数，ItemDefinition 为 null 时回退到内置默认值。
+		/// </summary>
+		private double GetEffectiveThrowParabolicDuration()
+			=> ItemDefinition?.ThrowParabolicDuration is > 0 ? ItemDefinition.ThrowParabolicDuration : 0.6;
+
+		private float GetEffectiveThrowParabolicPeakHeight()
+			=> ItemDefinition?.ThrowParabolicPeakHeight is > 0 ? ItemDefinition.ThrowParabolicPeakHeight : 200f;
+
+		private float GetEffectiveThrowHorizontalDistance()
+			=> ItemDefinition?.ThrowHorizontalDistance is > 0 ? ItemDefinition.ThrowHorizontalDistance : 600f;
+
+		private float GetEffectiveThrowParabolicLandingYOffset()
+			=> ItemDefinition?.ThrowParabolicLandingYOffset ?? 100f;
+
+		private Vector2 GetEffectiveThrowStartOffset()
+			=> (ItemDefinition != null && ItemDefinition.ThrowStartOffset != Vector2.Zero)
+				? ItemDefinition.ThrowStartOffset
+				: new Vector2(0, -200);
 		
 		/// <summary>
 		/// 检查指定 Actor 是否在 GrabArea 范围内
@@ -137,8 +178,9 @@ namespace Kuros.Items.World
 			ResolveRigidBody();
 			ResolveGrabArea();
 			ResolveHitboxArea();
-			InitializeDurability();
 			UpdateSprite();
+			ResolveOutlineHighlight();
+			UpdateOutlineHighlight(force: true);
 			SetProcess(true);
 		}
 
@@ -181,6 +223,8 @@ namespace Kuros.Items.World
 		{
 			base._Process(delta);
 
+			UpdateOutlineHighlight();
+			
 			if (_isPicked || _focusedActor == null)
 			{
 				return;
@@ -239,6 +283,122 @@ namespace Kuros.Items.World
 			}
 		}
 
+		private void ResolveOutlineHighlight()
+		{
+			if (!EnableGrabAreaOutlineHighlight)
+			{
+				_outlineMaterial = null;
+				return;
+			}
+
+			if (_highlightSprite == null || !GodotObject.IsInstanceValid(_highlightSprite))
+			{
+				_highlightSprite = !HighlightSpritePath.IsEmpty
+					? GetNodeOrNull<Sprite2D>(HighlightSpritePath)
+					: null;
+
+				_highlightSprite ??= _rigidBody?.GetNodeOrNull<Sprite2D>("Sprite2D");
+			}
+
+			if (_highlightSprite?.Material is ShaderMaterial spriteMaterial)
+			{
+				if (!ReferenceEquals(spriteMaterial, _outlineMaterial))
+				{
+					_outlineMaterial = spriteMaterial.Duplicate() as ShaderMaterial;
+					if (_outlineMaterial != null)
+					{
+						_outlineMaterial.ResourceLocalToScene = true;
+						_highlightSprite.Material = _outlineMaterial;
+					}
+				}
+			}
+			else
+			{
+				_outlineMaterial = null;
+			}
+		}
+
+		private Area2D? ResolvePlayerGrabArea()
+		{
+			if (_cachedPlayerGrabArea != null && GodotObject.IsInstanceValid(_cachedPlayerGrabArea))
+			{
+				return _cachedPlayerGrabArea;
+			}
+
+			GameActor? actor = _focusedActor;
+			if ((actor == null || !GodotObject.IsInstanceValid(actor)) && GetTree() != null)
+			{
+				actor = GetTree().GetFirstNodeInGroup("player") as GameActor;
+			}
+
+			if (actor == null || !GodotObject.IsInstanceValid(actor))
+			{
+				return null;
+			}
+
+			_cachedPlayerGrabArea = actor.GetNodeOrNull<Area2D>("GrabArea")
+				?? actor.GetNodeOrNull<Area2D>("SpineCharacter/GrabArea")
+				?? actor.FindChild("GrabArea", recursive: true, owned: false) as Area2D;
+
+			return _cachedPlayerGrabArea;
+		}
+
+		/// <summary>
+		/// 检查该实例是否处于投掷生命周期中（飞行、落地隐藏、等待归还阶段均视为投掷中）
+		/// </summary>
+		private bool IsInThrowLifecycle =>
+			_isThrown || _inFlight || _landingHideTimer > 0.0 || _inventoryReturnTimer > 0.0;
+
+		private void UpdateOutlineHighlight(bool force = false)
+		{
+			ResolveOutlineHighlight();
+			if (_outlineMaterial == null)
+			{
+				return;
+			}
+
+			// 只高亮离玩家最近的那一件
+			// 投掷中的武器实例本身不参与高亮（但不影响场上其他同名武器）
+			bool shouldHighlight = false;
+			if (EnableGrabAreaOutlineHighlight && !_isPicked && !IsInThrowLifecycle && _grabArea != null && GodotObject.IsInstanceValid(_grabArea))
+			{
+				var grabArea = ResolvePlayerGrabArea();
+				if (grabArea != null && GodotObject.IsInstanceValid(grabArea))
+				{
+					RigidBodyWorldItemEntity? closest = null;
+					float minDist = float.MaxValue;
+					foreach (var node in GetTree().GetNodesInGroup("world_items"))
+					{
+						if (node is RigidBodyWorldItemEntity item
+							&& item.EnableGrabAreaOutlineHighlight
+							&& !item._isPicked
+							&& !item.IsInThrowLifecycle  // 排除投掷中的实例，不参与最近候选
+							&& item._grabArea != null && GodotObject.IsInstanceValid(item._grabArea))
+						{
+							if (item._grabArea.OverlapsArea(grabArea))
+							{
+								float dist = item.GlobalPosition.DistanceSquaredTo(grabArea.GlobalPosition);
+								if (dist < minDist)
+								{
+									minDist = dist;
+									closest = item;
+								}
+							}
+						}
+					}
+					shouldHighlight = ReferenceEquals(this, closest);
+				}
+			}
+
+			if (!force && _isOutlineHighlighted == shouldHighlight)
+			{
+				return;
+			}
+
+			_outlineMaterial.SetShaderParameter("outline_color", shouldHighlight ? HighlightOutlineColor : DefaultOutlineColor);
+			_isOutlineHighlighted = shouldHighlight;
+		}
+
 		public virtual void ApplyThrowImpulse(Vector2 velocity)
 		{
 			if (_rigidBody == null)
@@ -268,7 +428,8 @@ namespace Kuros.Items.World
 					// ignore if property not available on this build
 				}
 				// Ensure the physics body position lines up with the Node2D root
-				_rigidBody.GlobalPosition = GlobalPosition;
+				// 应用投掷起点偏移（优先使用 ItemDefinition 参数）
+				_rigidBody.GlobalPosition = GlobalPosition + GetEffectiveThrowStartOffset();
 				// Set linear velocity and apply impulse to simulate a throw
 				_rigidBody.LinearVelocity = velocity;
 				// ApplyImpulse may be available; call defensively
@@ -281,6 +442,15 @@ namespace Kuros.Items.World
 					// fallback: no-op
 				}
 				
+// 根据飞行距离和持续时间计算实际水平速度
+			// 水平速度 = 距离 / 时间，方向由 velocity.X 的符号决定
+			float horizontalDistance = GetEffectiveThrowHorizontalDistance();
+			float duration = (float)GetEffectiveThrowParabolicDuration();
+			float horizontalVelocity = duration > 0 ? (horizontalDistance / duration) : 0f;
+			_throwHorizontalVelocity = velocity.X > 0 ? horizontalVelocity : -horizontalVelocity;
+			// 记录抛物线飞行相关数据
+			_throwStartY = _rigidBody.GlobalPosition.Y;
+				
 				// 激活伤害检测并应用投掷时的碰撞设置
 				if (velocity.LengthSquared() > 0.01f)
 				{
@@ -288,6 +458,34 @@ namespace Kuros.Items.World
 					_hasDealtDamage = false;
 					_hitActors.Clear();
 					_isThrown = true;
+					
+					// 立即清除高亮（进入投掷生命周期后本实例不再参与高亮）
+					UpdateOutlineHighlight(force: true);
+
+					// 构筑效果已在 PlayerItemInteractionComponent.TryHandleDrop 中预注册，此处无需重复注册
+					
+					// 投掷武器：进入冷却状态，并预占原快捷栏槽位
+					if (IsThrowWeapon)
+					{
+						_isInCooldown = true;
+						_throwCooldownTimer = ThrowWeaponCooldown;
+						
+						// 记录原槽位、加入ReservedQuickBarSlots并写入 empty_item 占位
+						// 防止拾取其他物品时占用该槽
+						if (LastDroppedBy is SamplePlayer throwPlayer && throwPlayer.InventoryComponent?.QuickBar != null)
+						{
+							_reservedQuickBarSlotIndex = throwPlayer.InventoryComponent.SelectedQuickBarSlot;
+							if (_reservedQuickBarSlotIndex >= 0)
+							{
+								throwPlayer.InventoryComponent.ReservedQuickBarSlots.Add(_reservedQuickBarSlotIndex);
+								var emptyItem = GD.Load<ItemDefinition>("res://data/EmptyItem.tres");
+								if (emptyItem != null)
+								{
+									throwPlayer.InventoryComponent.QuickBar.TryAddItemToSlot(emptyItem, 1, _reservedQuickBarSlotIndex);
+								}
+							}
+						}
+					}
 					
 				// 立即应用投掷时的碰撞设置，避免与敌人/玩家/其他物品碰撞
 				// 先立即设置
@@ -319,6 +517,48 @@ namespace Kuros.Items.World
 
 			if (_rigidBody == null) return;
 
+			// 更新投掷武器冷却计时器
+			if (_isInCooldown)
+			{
+				_throwCooldownTimer -= delta;
+				if (_throwCooldownTimer <= 0.0)
+				{
+					_isInCooldown = false;
+					_throwCooldownTimer = 0.0;
+				}
+			}
+
+			// 更新落点隐藏计时器（LandingHideDelay：到期后隐藏视觉；投掷武器不销毁节点，等 ThrowWeaponCooldown）
+			if (_landingHideTimer > 0.0 && !_inFlight && !_isDestroying)
+			{
+				_landingHideTimer -= delta;
+				if (_landingHideTimer <= 0.0)
+				{
+					if (IsThrowWeapon)
+					{
+						HideItemAtLanding(); // 投掷武器：仅隐藏，等 _inventoryReturnTimer 到期后销毁
+					}
+					else
+					{
+						DestroyItemAtLanding(); // 非投掷武器：正常播放动画并销毁
+					}
+					return;
+				}
+			}
+
+			// 更新落地后归还背包计时器（ThrowWeaponCooldown：到期后归还背包并销毁节点）
+			// 武器此时已被 HideItemAtLanding 隐藏，直接 QueueFree 无需动画
+			if (_inventoryReturnTimer > 0.0 && !_inFlight)
+			{
+				_inventoryReturnTimer -= delta;
+				if (_inventoryReturnTimer <= 0.0)
+				{
+					_inventoryReturnTimer = 0.0;
+					ReturnToInventory();
+					QueueFree();
+				}
+			}
+
 			// 如果正在投掷中，确保碰撞设置正确（防止被其他代码覆盖）
 			if (_isThrown)
 			{
@@ -333,53 +573,91 @@ namespace Kuros.Items.World
 				}
 			}
 
-			// Flight handling: keep flying for a short duration, then start drop
+			// 抛物线飞行逻辑：平顺的参数化抛物线轨迹
 			if (_inFlight)
 			{
 				_flightTimer += delta;
-				var vel = _rigidBody.LinearVelocity;
-				// keep vertical velocity minimal during flight so it travels horizontally
-				try { _rigidBody.LinearVelocity = new Vector2(vel.X, 0); } catch { }
-				if (_flightTimer >= FlightDurationSeconds)
-				{
-					_inFlight = false;
-					// restore gravity so the item drops
-					try { _rigidBody.GravityScale = _initialGravityScale; } catch { try { _rigidBody.Set("gravity_scale", _initialGravityScale); } catch { } }
-					// apply downward velocity while damping horizontal speed
-					try { _rigidBody.LinearVelocity = new Vector2(vel.X * DropHorizontalDamping, DropVerticalSpeed); } catch { }
-					// start drop tracking and refreeze detection
-					_isDropping = true;
-					try { _dropStartY = _rigidBody.GlobalPosition.Y; } catch { _dropStartY = GlobalPosition.Y; }
-					_refreezePending = true;
+			double phase = _flightTimer / GetEffectiveThrowParabolicDuration();
+			
+			// 安全夹叶 phase 到 [0, 1] 范围
+			if (phase > 1.0) phase = 1.0;
+			
+			// 计算目标落点Y坐标（优先使用 ItemDefinition 参数）
+			float landingY = _throwStartY + GetEffectiveThrowParabolicLandingYOffset();
+			float peakY = _throwStartY - GetEffectiveThrowParabolicPeakHeight();
+			
+			// 统一的平顺抛物线公式：使用 sin(phase * π) 生成平顺曲线
+			// 这确保了速度导数在 0 和 1 处连续
+			// verticalHeight = sin(phase * π) * peakHeight + (1 - sin(phase * π)) * landingOffset
+			
+			float heightAtPhase;
+			
+			// 使用改进的参数方程，替代分段处理以消除卡顿
+			// 设置一个虚拟的"初始上升速度"和"重力加速度"
+			// 确保在 phase=0 时：y=startY, v=0
+			// 确保在 phase=1 时：y=landingY, v=0
+			
+			// 使用对称的钟形曲线（bell curve）：使速度在起点、峰值、落点处连续
+			// 上升权重：sin(phase*π) 从 0 平顺上升到 1 再下降到 0
+			// 注意：Godot中Y向下为正，所以要减去峰值来向上飞
+			float upDown = (float)Mathf.Sin(phase * Mathf.Pi);
+			
+			// 计算相对于起点的高度
+			// 当offset=0时，形成对称抛物线
+			// 当offset!=0时，自动调整以确保平顺达到目标落点
+			heightAtPhase = Mathf.Lerp(_throwStartY, landingY, (float)phase)  // 线性从start到landing
+				- upDown * GetEffectiveThrowParabolicPeakHeight();  // 减去钟形峰值（使物体向上飞）
+			
+			// 应用到实际位置
+			float newY = heightAtPhase;
+			float newX = _rigidBody.GlobalPosition.X + (float)(_throwHorizontalVelocity * delta);
+			
+			_rigidBody.GlobalPosition = new Vector2(newX, newY);
+			
+			// 计算虚拟速度用于碰撞检测（在飞行时维持水平速度）
+			Vector2 simulatedVelocity = new Vector2(
+				_throwHorizontalVelocity,
+				0f  // 不需要Y速度，水平速度足以通过最小伤害阈值检查
+			);
+			_rigidBody.LinearVelocity = simulatedVelocity;
+			
+			// 当抛物线完成，且到达配置的落点高度时，停止飞行
+			if (phase >= 1.0)
+			{
+				_inFlight = false;
+				_isDropping = false;
+					_refreezePending = false;
 					_refreezeTimer = 0.0;
+					
+					// 确保最终位置精确在落点
+					_rigidBody.GlobalPosition = new Vector2(newX, landingY);
+					
+					// 停止伤害检测并恢复原始碰撞设置
+					_impactArmed = false;
+					_rigidBody.LinearVelocity = Vector2.Zero;
+					try { _rigidBody.Set("freeze", true); } catch { }
+					RestoreRigidBodyCollision();
+					
+					// 开始落点隐藏计时（LandingHideDelay：到期后隐藏视觉）
+					// 归还背包由 _inventoryReturnTimer（ThrowWeaponCooldown）独立控制
+					if (!_isDestroying)
+					{
+						_landingHideTimer = LandingHideDelay;
+
+						if (IsThrowWeapon)
+						{
+							// 投掷武器：LandingHideDelay 后隐藏，ThrowWeaponCooldown 后归还背包
+							_inventoryReturnTimer = ThrowWeaponCooldown;
+						}
+						// 非投掷武器：LandingHideDelay 后直接销毁（由 _PhysicsProcess 中 DestroyItemAtLanding 处理）
+					}
+					return;
 				}
-				return;
 			}
 
-			if (_refreezePending && !_isPicked)
+			// 传统的物理冻结处理（用于非飞行中的状态）
+			if (_refreezePending && !_isPicked && !_inFlight)
 			{
-				// If we're in a dropping phase, check vertical drop limit first
-				if (_isDropping)
-				{
-					try
-					{
-						var currentY = _rigidBody.GlobalPosition.Y;
-						if (currentY - _dropStartY >= DropLimitDistance)
-						{
-							// hit drop limit — consider touching ground
-							try { _rigidBody.Set("freeze", true); } catch { }
-							try { _rigidBody.LinearVelocity = Vector2.Zero; } catch { }
-							_isDropping = false;
-							_refreezePending = false;
-							_refreezeTimer = 0.0;
-							// 停止伤害检测并恢复原始碰撞设置
-							_impactArmed = false;
-							RestoreRigidBodyCollision();
-							return;
-						}
-					}
-					catch { }
-				}
 				var speed = _rigidBody.LinearVelocity.Length();
 				if (speed <= RefreezeSpeedThreshold)
 				{
@@ -410,10 +688,10 @@ namespace Kuros.Items.World
 				return false;
 			}
 
-			// 如果正在投掷中，先恢复碰撞设置
-			if (_isThrown)
+			// 禁止在投掷到归还/销毁的全程拾取（飞行中、落地隐藏期间、冷却归还期间均不可拾取）
+			if (_isThrown || _inFlight || _landingHideTimer > 0.0 || _inventoryReturnTimer > 0.0)
 			{
-				RestoreRigidBodyCollision();
+				return false;
 			}
 
 			if (!TryTransferToActor(actor))
@@ -741,12 +1019,6 @@ namespace Kuros.Items.World
 			target.TakeDamage(damage, GlobalPosition, LastDroppedBy);
 			_hitActors.Add(target);
 
-			// 消耗耐久度
-			if (ConsumeDurabilityOnHit && MaxDurability > 0)
-			{
-				ConsumeDurability(1);
-			}
-
 			// 应用击退效果
 			if (KnockbackForce > 0)
 			{
@@ -761,16 +1033,41 @@ namespace Kuros.Items.World
 				target.Velocity += knockbackVelocity;
 			}
 
-			// 如果设置为命中后停止，则停止物品移动
+			// 飞行中命中敌人（必须在 StopItemMovement 之前判断，否则 _inFlight 会被提前清除）
+			if (_inFlight)
+			{
+				if (StopOnHit)
+				{
+					// StopOnHit=true：立即停止飞行，走与落地相同的 LandingHideDelay 流程
+					_inFlight = false;
+					_flightTimer = 0.0;
+					_impactArmed = false;
+					if (_rigidBody != null)
+					{
+						_rigidBody.LinearVelocity = Vector2.Zero;
+						try { _rigidBody.Set("freeze", true); } catch { }
+					}
+					RestoreRigidBodyCollision();
+					if (!_isDestroying)
+					{
+						_landingHideTimer = LandingHideDelay;
+
+						if (IsThrowWeapon)
+						{
+							_inventoryReturnTimer = ThrowWeaponCooldown;
+						}
+						// 非投掷武器：LandingHideDelay 后直接销毁
+					}
+				}
+				// StopOnHit=false：穿透敌人，飞行轨迹不受影响，继续按抛物线运动
+				return true;
+			}
+
+			// 非飞行状态（已落地）命中后根据 StopOnHit 决定是否停止移动
 			if (StopOnHit)
 			{
 				StopItemMovement();
 			}
-
-			// 注意：这里不立即禁用伤害检测，允许对多个目标造成伤害
-			// 如果需要只造成一次伤害，可以取消下面的注释
-			// _hasDealtDamage = true;
-			// _impactArmed = false;
 
 			return true;
 		}
@@ -926,43 +1223,204 @@ namespace Kuros.Items.World
 		}
 
 		/// <summary>
-		/// 初始化耐久度
+		/// 将此物品归还背包（投掷武器落地后归还，仍有剩余使用次数时调用）
 		/// </summary>
-		private void InitializeDurability()
+		private void ReturnToInventory()
 		{
-			if (MaxDurability > 0)
+			if (!(LastDroppedBy is SamplePlayer player) || player.InventoryComponent == null)
+				return;
+
+			var item = ItemDefinition ?? CurrentStack?.Item;
+			if (item == null) return;
+
+			var buildController = player.FindChild("BuildController", recursive: true, owned: false) as PlayerBuildController;
+
+			// 先把物品放回背包/快捷栏，再注销飞行列表。
+			// 顺序关键：若先 UnregisterThrowInFlight，RefreshBuildState 会在物品尚未入背包时移除构筑效果，
+			// 随后 InventoryChanged 又重新添加效果，导致冷却计时器归零。
+			// 先放回背包后，InventoryChanged 触发时效果仍存在（由飞行列表保障），
+			// SyncBuildEffects 检测到 existing != null 直接 return，冷却不重置；
+			// 紧接着 UnregisterThrowInFlight 再次 RefreshBuildState，此时物品已在背包，效果继续保留。
+
+			// Step 1：优先归还到投掷前记录的槽位（该槽位已被 empty_item 占位）
+			bool returnedToSlot = false;
+			if (_reservedQuickBarSlotIndex >= 0 && player.InventoryComponent.QuickBar != null)
 			{
-				_currentDurability = MaxDurability;
+				int added = player.InventoryComponent.QuickBar.TryAddItemToSlot(item, 1, _reservedQuickBarSlotIndex);
+				returnedToSlot = added > 0;
 			}
-			else
+
+			// 若原槽已被其他物品占用，则走智能放入逻辑
+			if (!returnedToSlot)
 			{
-				_currentDurability = -1; // -1 表示无限耐久
+				player.InventoryComponent.AddItemSmart(item, 1, showPopupIfFirstTime: false);
 			}
+
+			// 释放预占
+			if (_reservedQuickBarSlotIndex >= 0)
+			{
+				player.InventoryComponent.ReservedQuickBarSlots.Remove(_reservedQuickBarSlotIndex);
+				_reservedQuickBarSlotIndex = -1;
+			}
+
+			// Step 2：物品已回到背包后再注销飞行列表，此时 RefreshBuildState 能正确计入背包中的武器
+			buildController?.UnregisterThrowInFlight(item);
+
+			SyncPlayerHandAndQuickBar(player);
 		}
 
 		/// <summary>
-		/// 消耗耐久度
+		/// 飞行中击中敌人时销毁自身并生成特效
 		/// </summary>
-		/// <param name="amount">消耗的数量</param>
-		private void ConsumeDurability(int amount)
+		private void DestroyItemOnImpact()
 		{
-			if (MaxDurability <= 0 || _isDestroying)
+			if (_isDestroying)
 			{
-				return; // 无限耐久或正在销毁中
+				return;
 			}
 
-			_currentDurability = Mathf.Max(0, _currentDurability - amount);
+			_isDestroying = true;
+			_inFlight = false;
+			_landingHideTimer = 0.0;
+			_inventoryReturnTimer = 0.0; // 飞行中命中：取消归还计划
 
-			// 检查耐久度是否耗尽
-			if (_currentDurability <= 0)
+			// 飞行中命中销毁：释放预占槽位（道具不归还），同时注销构筑效果保留
+			if (LastDroppedBy is SamplePlayer impactSPlayer)
 			{
-				DestroyItem();
+				if (_reservedQuickBarSlotIndex >= 0 && impactSPlayer.InventoryComponent != null)
+				{
+					impactSPlayer.InventoryComponent.ReservedQuickBarSlots.Remove(_reservedQuickBarSlotIndex);
+					_reservedQuickBarSlotIndex = -1;
+				}
+				var impactBuildController = impactSPlayer.FindChild("BuildController", recursive: true, owned: false) as PlayerBuildController;
+				var destroyedItem = ItemDefinition ?? CurrentStack?.Item;
+				if (impactBuildController != null && destroyedItem != null)
+				{
+					impactBuildController.UnregisterThrowInFlight(destroyedItem);
+				}
 			}
+
+			// 禁用碰撞和伤害检测
+			_impactArmed = false;
+			if (_hitboxArea != null)
+			{
+				_hitboxArea.SetDeferred(Area2D.PropertyName.Monitoring, false);
+			}
+			if (_grabArea != null)
+			{
+				DisableGrabArea();
+			}
+
+			// 生成特效（如果有）
+			SpawnDestructionEffect();
+
+			// 播放销毁动画
+			PlayDestructionAnimation();
 		}
 
 		/// <summary>
-		/// 销毁物品（播放动画后销毁）
+		/// 在落点处销毁自身并生成特效
 		/// </summary>
+		private void DestroyItemAtLanding()
+		{
+			if (_isDestroying)
+			{
+				return;
+			}
+
+			_isDestroying = true;
+			_landingHideTimer = 0.0;
+
+			// 禁用碰撞和伤害检测
+			_impactArmed = false;
+			if (_hitboxArea != null)
+			{
+				_hitboxArea.SetDeferred(Area2D.PropertyName.Monitoring, false);
+			}
+			if (_grabArea != null)
+			{
+				DisableGrabArea();
+			}
+
+			// 生成特效（如果有）
+			SpawnDestructionEffect();
+
+			// 播放销毁动画
+			PlayDestructionAnimation();
+		}
+
+		/// <summary>
+		/// 投掷武器落地隐藏（不销毁节点，等待 ThrowWeaponCooldown 到期后归还背包并 QueueFree）
+		/// </summary>
+		private void HideItemAtLanding()
+		{
+			// 隐藏视觉表现
+			if (_rigidBody != null)
+			{
+				_rigidBody.Visible = false;
+			}
+			Visible = false;
+
+			// 禁用碰撞和伤害检测
+			_impactArmed = false;
+			if (_hitboxArea != null)
+			{
+				_hitboxArea.SetDeferred(Area2D.PropertyName.Monitoring, false);
+			}
+			if (_grabArea != null)
+			{
+				DisableGrabArea();
+			}
+
+			// 生成落点特效（如果有配置）
+			SpawnDestructionEffect();
+		}
+
+		/// <summary>
+		/// 生成销毁特效
+		/// </summary>
+		private void SpawnDestructionEffect()
+		{
+			// 如果配置了销毁特效Scene，则实例化它
+			if (!string.IsNullOrWhiteSpace(DestructionEffectScene))
+			{
+				try
+				{
+					var scene = GD.Load<PackedScene>(DestructionEffectScene);
+					if (scene != null)
+					{
+						var effect = scene.Instantiate();
+						if (effect is Node2D effect2D)
+						{
+							// 使用 RigidBody2D 的实际坐标：飞行期间只有 _rigidBody 随武器移动，
+							// 脚本所在的 Node2D 根节点停留在初始生成位置（玩家附近），直接用 GlobalPosition 会导致特效生成在玩家处
+							GetParent()?.AddChild(effect2D);
+							effect2D.GlobalPosition = _rigidBody?.GlobalPosition ?? GlobalPosition;
+						}
+						else if (effect != null)
+						{
+							GetParent()?.AddChild(effect);
+						}
+					}
+				}
+				catch (Exception ex)
+				{
+					GD.PushWarning($"[{Name}] 无法生成销毁特效: {ex.Message}");
+				}
+			}
+		}
+
+		private void DisableGrabArea()
+		{
+			if (_grabArea == null) return;
+
+			// 使用 SetDeferred 避免在信号回调期间修改监控状态
+			_grabArea.SetDeferred(Area2D.PropertyName.Monitoring, false);
+			_grabArea.SetDeferred(Area2D.PropertyName.Monitorable, false);
+			_grabArea.CollisionLayer = 0;
+			_grabArea.CollisionMask = 0;
+		}
+
 		private void DestroyItem()
 		{
 			if (_isDestroying)
@@ -1078,19 +1536,8 @@ namespace Kuros.Items.World
 				_destructionAnimPlayer.AnimationFinished -= _OnDestructionAnimationFinished;
 				_destructionAnimPlayer = null;
 			}
-			
+
 			QueueFree();
-		}
-
-		private void DisableGrabArea()
-		{
-			if (_grabArea == null) return;
-
-			// 使用 SetDeferred 避免在信号回调期间修改监控状态
-			_grabArea.SetDeferred(Area2D.PropertyName.Monitoring, false);
-			_grabArea.SetDeferred(Area2D.PropertyName.Monitorable, false);
-			_grabArea.CollisionLayer = 0;
-			_grabArea.CollisionMask = 0;
 		}
 
 		private void RestoreGrabArea()

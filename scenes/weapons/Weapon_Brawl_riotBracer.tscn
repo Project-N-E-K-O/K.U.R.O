@@ -48,7 +48,6 @@ scale = Vector2(0.5, 0.5)
 shape = SubResource("BodyShape_rr6vl")
 
 [node name="AttackArea" type="Area2D" parent="."]
-visible = false
 scale = Vector2(0.5, 0.5)
 collision_layer = 0
 

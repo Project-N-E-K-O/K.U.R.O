@@ -32,8 +32,11 @@ namespace Kuros.Builds
         {
             base.OnApply();
 
+            //GD.Print("[BuildMachineLevel1Effect] OnApply called");
+
             if (Actor == null || _subscribed)
             {
+                //GD.Print("[BuildMachineLevel1Effect] OnApply skipped: Actor is null or already subscribed");
                 return;
             }
 
@@ -48,6 +51,8 @@ namespace Kuros.Builds
                 return;
             }
 
+            //GD.Print($"[BuildMachineLevel1Effect] OnTick called, pendingKnockbackAdjustTime: {_pendingKnockbackAdjustTime}");
+
             _pendingKnockbackAdjustTime = Math.Max(0d, _pendingKnockbackAdjustTime - delta);
             Vector2 velocity = Actor.Velocity;
             if (velocity == Vector2.Zero || velocity == _lastAdjustedVelocity)
@@ -55,6 +60,7 @@ namespace Kuros.Builds
                 return;
             }
 
+            //GD.Print($"[BuildMachineLevel1Effect] Adjusting velocity from {velocity} to {velocity * Mathf.Clamp(KnockbackMultiplier, 0f, 1f)}");
             Actor.Velocity = velocity * Mathf.Clamp(KnockbackMultiplier, 0f, 1f);
             _lastAdjustedVelocity = Actor.Velocity;
             _pendingKnockbackAdjustTime = 0d;
@@ -67,6 +73,7 @@ namespace Kuros.Builds
                 GameActor.AnyDamageTaken -= OnAnyDamageTaken;
             }
 
+            //GD.Print("[BuildMachineLevel1Effect] OnRemoved called");
             _subscribed = false;
             base.OnRemoved();
         }
@@ -78,6 +85,7 @@ namespace Kuros.Builds
                 return;
             }
 
+            //GD.Print($"[BuildMachineLevel1Effect] OnAnyDamageTaken: victim={victim?.Name}, attacker={attacker?.Name}, damage={damage}");
             _pendingKnockbackAdjustTime = KnockbackAdjustWindowSeconds;
             _lastAdjustedVelocity = Vector2.Zero;
         }

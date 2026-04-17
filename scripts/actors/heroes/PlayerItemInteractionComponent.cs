@@ -147,6 +147,11 @@ namespace Kuros.Actors.Heroes
 
             if (Input.IsActionJustPressed("throw"))
             {
+                GD.Print($"[PlayerItemInteractionComponent] throw 快捷键被按下");
+                GD.Print($"[PlayerItemInteractionComponent] EnableInput={EnableInput}, Backpack={InventoryComponent?.Backpack != null}");
+                GD.Print($"[PlayerItemInteractionComponent] InventoryComponent={InventoryComponent?.Name ?? "null"}");
+                GD.Print($"[PlayerItemInteractionComponent] _actor={_actor?.Name ?? "null"}");
+                GD.Print($"[PlayerItemInteractionComponent] StateMachine={_actor?.StateMachine != null}");
                 TryHandleDrop(DropDisposition.Throw);
             }
 
@@ -186,29 +191,62 @@ namespace Kuros.Actors.Heroes
         {
             if (InventoryComponent == null)
             {
+                GD.PrintErr($"[PlayerItemInteractionComponent] TryHandleDrop 失败: InventoryComponent 为 null");
                 return false;
             }
 
             // 從快捷欄選中的槽位獲取物品（左手物品）
             var selectedStack = InventoryComponent.GetSelectedQuickBarStack();
+            GD.Print($"[PlayerItemInteractionComponent] TryHandleDrop({disposition}, skipAnimation={skipAnimation}): selectedStack={selectedStack?.Item?.ItemId ?? "null"}");
             if (selectedStack == null || selectedStack.IsEmpty || selectedStack.Item.ItemId == "empty_item")
             {
+                GD.PrintErr($"[PlayerItemInteractionComponent] TryHandleDrop 失败: 快捷栏为空或物品是empty_item (null={selectedStack==null}, empty={selectedStack?.IsEmpty ?? false}, itemId={selectedStack?.Item?.ItemId ?? "null"})");
                 return false;
             }
 
             if (!skipAnimation && disposition == DropDisposition.Throw)
             {
+                GD.Print($"[PlayerItemInteractionComponent] 触发 Throw 状态...");
                 if (TryTriggerThrowState())
                 {
+                    GD.Print($"[PlayerItemInteractionComponent] 成功进入 Throw 状态，等待动画完成");
                     return false;
                 }
 
+                GD.PrintErr($"[PlayerItemInteractionComponent] TryTriggerThrowState 失败");
                 return TryHandleDrop(disposition, skipAnimation: true);
+            }
+
+            // 投掷武器时：在物品从背包移除（InventoryChanged）之前预注册飞行状态
+            // 防止 RefreshBuildState 因背包变化而提前移除构筑效果
+            PlayerBuildController? buildController = null;
+            bool preRegisteredBuild = false;
+            if (disposition == DropDisposition.Throw && selectedStack.Item.IsThrowable)
+            {
+                buildController = _actor?.FindChild("BuildController", recursive: true, owned: false) as PlayerBuildController;
+                // GD.Print($"[PlayerItemInteractionComponent][InFlight] 预注册: IsThrowable={selectedStack.Item.IsThrowable}, buildController={(buildController != null ? buildController.Name : \"NULL\")}, item={selectedStack.Item.ItemId}");
+                if (buildController != null)
+                {
+                    buildController.RegisterThrowInFlight(selectedStack.Item);
+                    preRegisteredBuild = true;
+                    // GD.Print($"[PlayerItemInteractionComponent][InFlight] 预注册成功，即将提取物品");
+                }
+                else
+                {
+                    // GD.PrintErr($"[PlayerItemInteractionComponent][InFlight] 未找到 BuildController，预注册失败！actor={_actor?.Name ?? \"null\"}");
+                }
+            }
+            else
+            {
+                // GD.Print($"[PlayerItemInteractionComponent][InFlight] 跳过预注册: disposition={disposition}, IsThrowable={selectedStack.Item.IsThrowable}");
             }
 
             // 從快捷欄提取物品
             if (!InventoryComponent.TryExtractFromSelectedQuickBarSlot(selectedStack.Quantity, out var extracted) || extracted == null || extracted.IsEmpty)
             {
+                // 提取失败：回滚预注册的飞行状态
+                if (preRegisteredBuild && buildController != null)
+                    buildController.UnregisterThrowInFlight(selectedStack.Item);
                 return false;
             }
 
@@ -220,6 +258,9 @@ namespace Kuros.Actors.Heroes
                 // Recovery path: spawn failed, try to return extracted items to quickbar
                 if (extracted == null || extracted.IsEmpty)
                 {
+                    // Spawn 失败且无法恢复：回滚预注册
+                    if (preRegisteredBuild && buildController != null)
+                        buildController.UnregisterThrowInFlight(selectedStack.Item);
                     return false;
                 }
 
@@ -285,6 +326,10 @@ namespace Kuros.Actors.Heroes
                     // Note: These items are lost - inventory is full
                     extracted.Remove(lostQuantity);
                 }
+
+                // Spawn 失败，物品已放回背包（InventoryChanged 会重新计算构筑点），回滚预注册
+                if (preRegisteredBuild && buildController != null)
+                    buildController.UnregisterThrowInFlight(selectedStack.Item);
 
                 return false;
             }
@@ -552,15 +597,19 @@ namespace Kuros.Actors.Heroes
         {
             if (_actor?.StateMachine == null)
             {
+                GD.PrintErr($"[PlayerItemInteractionComponent] TryTriggerThrowState 失败: StateMachine 为 null (_actor={_actor?.Name ?? "null"})");
                 return false;
             }
 
             if (!_actor.StateMachine.HasState(ThrowStateName))
             {
+                GD.PrintErr($"[PlayerItemInteractionComponent] TryTriggerThrowState 失败: StateMachine 中不存在 '{ThrowStateName}' 状态");
                 return false;
             }
 
+            GD.Print($"[PlayerItemInteractionComponent] 正在改变状态到: {ThrowStateName}");
             _actor.StateMachine.ChangeState(ThrowStateName);
+            GD.Print($"[PlayerItemInteractionComponent] 状态已改变，当前状态: {_actor.StateMachine.CurrentState?.Name ?? "null"}");
             return true;
         }
 

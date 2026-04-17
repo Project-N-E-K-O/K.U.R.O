@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=6 format=3 uid="uid://j6kveph5wqjm"]
+
+[ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="1_4dfom"]
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="2_x7tnj"]
+[ext_resource type="Texture2D" uid="uid://b1awmq0je57lj" path="res://assets/weapons/金属地刺.png" id="3_4dfom"]
+[ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="4_fdlpx"]
+
+[sub_resource type="Resource" id="Attribute_AttackPower"]
+script = ExtResource("1_4dfom")
+AttributeId = "attack_power"
+
+[resource]
+script = ExtResource("4_fdlpx")
+ItemId = "Weapon_Throw_MetalSpike"
+DisplayName = "金属地刺"
+Description = "机械类投掷武器：金属地刺"
+Icon = ExtResource("3_4dfom")
+Category = "Weapon"
+Tags = Array[String](["tag_weapon", "build_machine", "tag_throw"])
+MaxStackSize = 1
+AttributeEntries = Array[ExtResource("1_4dfom")]([SubResource("Attribute_AttackPower")])
+BuildClass = "machine"
+IsThrowable = true
+ThrowStartOffset = Vector2(0, -400)
+ThrowParabolicDuration = 0.4
+ThrowParabolicPeakHeight = 50.0
+ThrowHorizontalDistance = 400.0
+ThrowParabolicLandingYOffset = 250.0
+WorldScenePath = "uid://dfmke56wtqt2x"

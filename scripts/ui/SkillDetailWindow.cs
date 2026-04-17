@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Kuros.Actors.Heroes;
 using Kuros.Managers;
 
@@ -18,6 +19,11 @@ namespace Kuros.UI
         [Export] public VBoxContainer SkillsContainer { get; private set; } = null!;
 
         private bool _isOpen = false;
+
+        /// <summary>
+        /// 获取窗口是否开启
+        /// </summary>
+        public bool IsOpen => _isOpen;
 
         // 技能数据（从SkillWindow获取或独立管理）
         private readonly List<SkillDetailData> _allSkills = new();
@@ -66,7 +72,7 @@ namespace Kuros.UI
         }
 
         /// <summary>
-        /// 初始化技能数据：显示当前已拥有（已生效）的构筑效果
+        /// 初始化技能数据：显示当前已拥有（已生效）的构筑效果（支持多个构筑类型）
         /// </summary>
         private void InitializePlaceholderSkills()
         {
@@ -92,7 +98,10 @@ namespace Kuros.UI
             }
 
             buildController.RefreshBuildState();
-            int currentPoints = buildController.CurrentBuildCount;
+            int totalPoints = buildController.CurrentBuildCount;
+            var activeBuildClasses = buildController.ActiveBuildClasses;
+            var buildCountByClass = buildController.BuildCountByClass;
+            var buildLevelByClass = buildController.BuildLevelByClass;
 
             var entries = new List<BuildLevelEffectEntry>();
             foreach (var entry in buildController.LevelEntries)
@@ -105,27 +114,58 @@ namespace Kuros.UI
 
             entries.Sort((a, b) =>
             {
-                int byPoints = a.RequiredPoints.CompareTo(b.RequiredPoints);
-                if (byPoints != 0) return byPoints;
+                // 先按构筑类型（BuildClass）排序
+                int byBuildClass = string.Compare(
+                    a.BuildClass?.Trim() ?? "", 
+                    b.BuildClass?.Trim() ?? "", 
+                    StringComparison.OrdinalIgnoreCase);
+                if (byBuildClass != 0) return byBuildClass;
+                
+                // 再按等级（Level）排序
                 return a.Level.CompareTo(b.Level);
             });
 
+            // 遍历所有条目，为每个活跃的构筑类型显示其对应的效果
             foreach (var entry in entries)
             {
-                bool isUnlocked = currentPoints >= entry.RequiredPoints;
+                // 如果条目没有指定构筑类型，跳过
+                if (string.IsNullOrWhiteSpace(entry.BuildClass))
+                {
+                    continue;
+                }
+
+                string buildClass = entry.BuildClass.Trim();
+
+                // 检查该构筑类型是否活跃
+                bool isActiveBuildClass = activeBuildClasses.Any(bc => string.Equals(bc, buildClass, StringComparison.OrdinalIgnoreCase));
+                if (!isActiveBuildClass)
+                {
+                    continue;
+                }
+
+                // 获取该构筑的点数
+                if (!buildCountByClass.ContainsKey(buildClass))
+                {
+                    continue;
+                }
+
+                int classPoints = buildCountByClass[buildClass];
+                bool isUnlocked = classPoints >= entry.RequiredPoints;
+
+                // 只显示已生效的构筑效果
                 if (!isUnlocked)
                 {
                     continue;
                 }
 
-                // string statusText = $"已拥有（需求点数: {entry.RequiredPoints}, 当前点数: {currentPoints}）";
-
                 _allSkills.Add(new SkillDetailData
                 {
-                    Id = string.IsNullOrWhiteSpace(entry.BuildId) ? $"build_level_{entry.Level}" : entry.BuildId,
-                    Name = string.IsNullOrWhiteSpace(entry.BuildName) ? $"构筑等级 {entry.Level}" : entry.BuildName,
+                    Id = $"{buildClass}_level_{entry.Level}",
+                    Name = string.IsNullOrWhiteSpace(entry.BuildName) 
+                        ? $"{buildClass} 等级 {entry.Level}" 
+                        : entry.BuildName,
                     Description = string.IsNullOrWhiteSpace(entry.Description)
-                        ? ""
+                        ? $"[{buildClass}] 构筑效果等级 {entry.Level}"
                         : entry.Description,
                     Icon = LoadBuildIcon(entry.IconPath),
                     Cooldown = 0.0f,
@@ -136,7 +176,7 @@ namespace Kuros.UI
                     IsUnlocked = isUnlocked,
                     BuildLevel = entry.Level,
                     RequiredPoints = entry.RequiredPoints,
-                    CurrentPoints = currentPoints
+                    CurrentPoints = classPoints
                 });
             }
 
@@ -155,7 +195,7 @@ namespace Kuros.UI
                     IsUnlocked = false,
                     BuildLevel = 0,
                     RequiredPoints = 0,
-                    CurrentPoints = currentPoints
+                    CurrentPoints = totalPoints
                 });
             }
         }
@@ -558,12 +598,10 @@ namespace Kuros.UI
             return result;
         }
 
-        public bool IsOpen => _isOpen;
-
         /// <summary>
         /// 技能详情数据类
         /// </summary>
-        private class SkillDetailData
+        internal class SkillDetailData
         {
             public string Id { get; set; } = string.Empty;
             public string Name { get; set; } = string.Empty;

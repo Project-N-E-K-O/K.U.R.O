@@ -1,0 +1,64 @@
+[gd_scene load_steps=8 format=3 uid="uid://bvvyo3wubh12j"]
+
+[ext_resource type="Script" uid="uid://dhfq2rrha0awm" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_eecfu"]
+[ext_resource type="Resource" uid="uid://b8vf1obgnfb2y" path="res://resources/items/Weapon_Throw_GravityGrenade.tres" id="2_v5ky2"]
+[ext_resource type="Texture2D" uid="uid://cbs8s6snkb78b" path="res://assets/weapons/引力手雷.png" id="4_q0htg"]
+[ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="6_uxlca"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ly8n5"]
+shader = ExtResource("6_uxlca")
+shader_parameter/outline_color = Color(0.02, 0.02, 0.02, 1)
+shader_parameter/outline_size = 32.0
+shader_parameter/alpha_threshold = 0.5
+shader_parameter/edge_softness = 0.12
+shader_parameter/preserve_fill = true
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_w5uvq"]
+radius = 110.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_5ow4b"]
+radius = 100.0
+
+[node name="WeaponThrowGravityGrenade" type="Node2D"]
+z_index = 1
+script = ExtResource("1_eecfu")
+ItemDefinition = ExtResource("2_v5ky2")
+GrabAreaPath = NodePath("RigidBody2D/CollisionArea")
+HighlightSpritePath = NodePath("RigidBody2D/Outline")
+DefaultOutlineColor = Color(0, 0, 0, 0)
+ThrowDamage = 0.0
+MinDamageVelocity = 0.0
+KnockbackForce = 0.0
+StopOnHit = true
+IsThrowWeapon = true
+ThrowWeaponCooldown = 5.0
+RigidBodyPath = NodePath("RigidBody2D")
+HitboxAreaPath = NodePath("RigidBody2D/AttackArea")
+
+[node name="RigidBody2D" type="RigidBody2D" parent="."]
+gravity_scale = 0.0
+can_sleep = false
+freeze = true
+freeze_mode = 1
+
+[node name="Outline" type="Sprite2D" parent="RigidBody2D"]
+material = SubResource("ShaderMaterial_ly8n5")
+scale = Vector2(0.33, 0.33)
+texture = ExtResource("4_q0htg")
+region_rect = Rect2(-100, -100, 700, 700)
+
+[node name="Sprite2D" type="Sprite2D" parent="RigidBody2D/Outline"]
+texture = ExtResource("4_q0htg")
+region_rect = Rect2(-100, -100, 700, 700)
+
+[node name="CollisionArea" type="Area2D" parent="RigidBody2D"]
+visible = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/CollisionArea"]
+shape = SubResource("CircleShape2D_w5uvq")
+
+[node name="AttackArea" type="Area2D" parent="RigidBody2D"]
+visible = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/AttackArea"]
+shape = SubResource("CircleShape2D_5ow4b")

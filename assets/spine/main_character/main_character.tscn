@@ -1,12 +1,10 @@
-[gd_scene load_steps=47 format=3 uid="uid://ufprfd4r8ijj"]
+[gd_scene load_steps=49 format=3 uid="uid://ufprfd4r8ijj"]
 
-[ext_resource type="SpineAtlasResource" uid="uid://c4cx1o154rxba" path="res://assets/spine/main_character/Enemy_A1_zhuA.atlas" id="1_kqj82"]
-[ext_resource type="Script" uid="uid://befx3l05f0eph" path="res://scripts/actors/heroes/MainCharacter.cs" id="1_om6pm"]
-[ext_resource type="Shader" uid="uid://bdu6bfs07ahhw" path="res://shaders/materials/shadow.gdshader" id="2_4ht1x"]
-[ext_resource type="SpineSkeletonFileResource" uid="uid://dpgx38fv62p11" path="res://assets/spine/main_character/Enemy_A1_zhuA.spine-json" id="2_om6pm"]
-[ext_resource type="Shader" uid="uid://rvlvejer46bm" path="res://shaders/materials/sprite_outline.gdshader" id="2_sprite_outline"]
-[ext_resource type="Texture2D" uid="uid://bk5a020vl054x" path="res://assets/environments/影子.png" id="3_tdm7a"]
-[ext_resource type="Script" uid="uid://den5n78y0t6q5" path="res://scripts/controllers/SpineController.gd" id="4_ixg0x"]
+[ext_resource type="Script" uid="uid://12wblt72y8xt" path="res://scripts/actors/heroes/MainCharacter.cs" id="1_om6pm"]
+[ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="2_4ht1x"]
+[ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="3_tdm7a"]
+[ext_resource type="Script" uid="uid://bbybuyitd10jr" path="res://scripts/controllers/SpineController.gd" id="4_ixg0x"]
+[ext_resource type="SpineSkeletonDataResource" uid="uid://bvd366fnel6yq" path="res://animations/spine/Enemy_A1_zhuA.tres" id="4_o4xwm"]
 [ext_resource type="Script" uid="uid://cenpuhlcgesin" path="res://scripts/systems/fsm/StateMachine.cs" id="5_y1hyr"]
 [ext_resource type="Script" uid="uid://0u5whf0qv6i5" path="res://scripts/actors/heroes/states/PlayerIdleState.cs" id="6_r1uv4"]
 [ext_resource type="Script" uid="uid://cue6hp5ws2264" path="res://scripts/actors/heroes/states/PlayerWalkState.cs" id="7_mcamx"]
@@ -18,43 +16,38 @@
 [ext_resource type="Script" uid="uid://ba1kd5qgh17ag" path="res://scripts/actors/heroes/states/PlayerRunState.cs" id="12_4ht1x"]
 [ext_resource type="Script" uid="uid://bsa4kolrnan6p" path="res://scripts/actors/heroes/states/PlayerDyingState.cs" id="13_tdm7a"]
 [ext_resource type="Script" uid="uid://cp40kowtn1ho3" path="res://scripts/actors/heroes/states/PlayerDeadState.cs" id="14_0y2r2"]
-[ext_resource type="Script" uid="uid://ch33kuwv8bhip" path="res://scripts/actors/heroes/states/PlayerPickUpState.cs" id="15_0y6jy"]
-[ext_resource type="Script" uid="uid://b162xt2i3qc4e" path="res://scripts/actors/heroes/states/PlayerThrowState.cs" id="16_oc5yk"]
+[ext_resource type="Script" uid="uid://vr51ymsfyxws" path="res://scripts/actors/heroes/states/PlayerPickUpState.cs" id="15_0y6jy"]
+[ext_resource type="Script" uid="uid://dijk8ngvrs5g0" path="res://scripts/actors/heroes/states/PlayerThrowState.cs" id="16_oc5yk"]
 [ext_resource type="Script" uid="uid://b6vgqpdrtg1lh" path="res://scripts/actors/heroes/PlayerInventoryComponent.cs" id="17_13pt2"]
-[ext_resource type="Script" uid="uid://v8exb3wpvh6d" path="res://scripts/actors/heroes/PlayerWeaponSkillController.cs" id="18_utqjm"]
+[ext_resource type="Script" uid="uid://c6x6k6mpo2qcy" path="res://scripts/actors/heroes/PlayerWeaponSkillController.cs" id="18_utqjm"]
 [ext_resource type="Script" uid="uid://b0t8cfl3khjix" path="res://scripts/actors/heroes/PlayerItemInteractionComponent.cs" id="19_t3prk"]
-[ext_resource type="Script" uid="uid://6uws0lovsucd" path="res://scripts/actors/heroes/PlayerItemAttachment.cs" id="20_4ht1x"]
+[ext_resource type="Script" uid="uid://h02ofhsj1qa4" path="res://scripts/actors/heroes/PlayerItemAttachment.cs" id="20_4ht1x"]
+[ext_resource type="Script" uid="uid://b6l0u6d5v5npj" path="res://scripts/actors/heroes/states/PlayerIdleHoldingState.cs" id="20_h3qap"]
+[ext_resource type="Script" uid="uid://stu62fj3xe3k" path="res://scripts/actors/heroes/states/PlayerRunHoldingState.cs" id="21_6hy0m"]
 [ext_resource type="Script" uid="uid://d6ppl6a6djpr" path="res://scripts/core/effects/EffectController.cs" id="21_utqjm"]
 [ext_resource type="Script" uid="uid://c060w6pctgir3" path="res://scripts/actors/heroes/attacks/AttackHitboxDebugDrawer.cs" id="22_hitbox_debug"]
 [ext_resource type="PackedScene" uid="uid://ch7507iroiljg" path="res://scenes/ui/hud/EscapeHUD.tscn" id="24_tdm7a"]
 [ext_resource type="Resource" uid="uid://dc7u7akvpcjtn" path="res://resources/items/skills/WeaponSkill_Stab_Umbrella.tres" id="26_hitbox_preview_skill"]
-[ext_resource type="Script" uid="uid://bwok3hmgrj42p" path="res://scripts/systems/ai/GameStateProvider.cs" id="27_game_state_provider"]
-[ext_resource type="Script" uid="uid://c5utxtiab6ieq" path="res://scripts/systems/ai/OllamaGenerateClient.cs" id="28_ollama_client"]
-[ext_resource type="Script" uid="uid://b1aajvkx1qt0e" path="res://scripts/actors/heroes/PlayerBuildController.cs" id="28_rs5xn"]
-[ext_resource type="Script" uid="uid://5y0siu0cpkp" path="res://scripts/systems/ai/AiDecisionBridge.cs" id="29_ai_decision_bridge"]
+[ext_resource type="Script" uid="uid://bi2qqqs7h8pdp" path="res://scripts/systems/ai/GameStateProvider.cs" id="27_game_state_provider"]
+[ext_resource type="Script" uid="uid://b04ejw6pwys28" path="res://scripts/systems/ai/OllamaGenerateClient.cs" id="28_ollama_client"]
+[ext_resource type="Script" uid="uid://ju5its2xwou2" path="res://scripts/actors/heroes/PlayerBuildController.cs" id="28_rs5xn"]
+[ext_resource type="Script" uid="uid://dv3qa4rhngv5v" path="res://scripts/systems/ai/AiDecisionBridge.cs" id="29_ai_decision_bridge"]
 [ext_resource type="Resource" uid="uid://dlngh4ui567ss" path="res://resources/builds/Build_Machine_level1.tres" id="30_6tvdn"]
-[ext_resource type="Script" uid="uid://jdkrte1ds1cg" path="res://scripts/systems/ai/GameStateDebugPanel.cs" id="30_game_state_debug_panel"]
+[ext_resource type="Script" uid="uid://wi8yrx6su0t7" path="res://scripts/systems/ai/GameStateDebugPanel.cs" id="30_game_state_debug_panel"]
 [ext_resource type="Resource" uid="uid://dhrqhkm1koxla" path="res://resources/builds/Build_Machine_level2.tres" id="31_a5ycu"]
-[ext_resource type="Script" uid="uid://c4vf2e3jvlhg7" path="res://scripts/systems/ai/AiOutputDebugPanel.cs" id="31_ai_output_debug_panel"]
+[ext_resource type="Script" uid="uid://ihixldc0uwkm" path="res://scripts/systems/ai/AiOutputDebugPanel.cs" id="31_ai_output_debug_panel"]
 [ext_resource type="Resource" uid="uid://cg1ohbn3itor0" path="res://resources/builds/Build_Machine_level3.tres" id="32_a8ffv"]
-[ext_resource type="Script" uid="uid://dngshl7bfcxqd" path="res://scripts/systems/ai/AiDecisionExecutor.cs" id="33_ai_decision_executor"]
-[ext_resource type="Script" uid="uid://bn5bwn56rqmd3" path="res://scripts/actors/heroes/BuildLevelEffectEntry.cs" id="36_26vrv"]
+[ext_resource type="Script" uid="uid://ddrw67q4fyjya" path="res://scripts/systems/ai/AiDecisionExecutor.cs" id="33_ai_decision_executor"]
+[ext_resource type="Script" uid="uid://ba5xnpfo03sgb" path="res://scripts/actors/heroes/BuildLevelEffectEntry.cs" id="35_hyeo7"]
+[ext_resource type="Resource" uid="uid://b14bb35ful4ke" path="res://resources/builds/Build_Guard_level1.tres" id="39_26vrv"]
+[ext_resource type="Resource" uid="uid://c42i4clr4tuwh" path="res://resources/builds/Build_Guard_level2.tres" id="40_8fw8m"]
+[ext_resource type="Resource" uid="uid://vgnowuoegwns" path="res://resources/builds/Build_Guard_level3.tres" id="41_o4xwm"]
+[ext_resource type="Script" uid="uid://0jtxqm11tc2f" path="res://scripts/items/world/ThrowTrajectoryPreview.cs" id="43_throwpreview"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_0y2r2"]
 shader = ExtResource("2_4ht1x")
 shader_parameter/softness = 0.5
 shader_parameter/alpha = 0.4
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_sprite_outline"]
-shader = ExtResource("2_sprite_outline")
-shader_parameter/outline_color = Color(0.02, 0.02, 0.02, 1)
-shader_parameter/outline_size = 2.0
-shader_parameter/alpha_threshold = 0.01
-shader_parameter/preserve_fill = true
-
-[sub_resource type="SpineSkeletonDataResource" id="SpineSkeletonDataResource_rs5xn"]
-atlas_res = ExtResource("1_kqj82")
-skeleton_file_res = ExtResource("2_om6pm")
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_0y6jy"]
 radius = 121.11756
@@ -80,21 +73,17 @@ script = ExtResource("1_om6pm")
 WalkAnimationSpeed = 2.0
 RunAnimationSpeed = 3.0
 AttackArea = NodePath("AttackArea")
-HitInvincibilityDuration = 0.75
-InvincibleFlashSpeed = 60.0
 EnableStateDebugOverlay = true
-DebugOverlayOffset = Vector2(-1000, 150)
-DebugOverlayFontSize = 108
-DebugOverlayColor = Color(0, 1, 0, 1)
+DebugOverlayOffset = Vector2(-1200, 200)
+DebugOverlayFontSize = 128
 AttackArea = NodePath("AttackArea")
 LeftHandAttachmentPath = NodePath("SpineSprite/SpineBoneNode")
 Speed = 500.0
 AttackDamage = 1.0
-MaxHealth = 1000
+MaxHealth = 12
 StateMachine = NodePath("StateMachine")
 EffectController = NodePath("EffectController")
 DamageFlashColor = Color(18.892157, 18.892157, 18.892157, 1)
-DamageFlashDuration = 0.15
 
 [node name="Shadow" type="Sprite2D" parent="."]
 material = SubResource("ShaderMaterial_0y2r2")
@@ -108,7 +97,7 @@ show_behind_parent = true
 modulate = Color(0.02, 0.02, 0.02, 0.85)
 show_behind_parent = true
 position = Vector2(-20, 0)
-skeleton_data_res = SubResource("SpineSkeletonDataResource_rs5xn")
+skeleton_data_res = ExtResource("4_o4xwm")
 preview_skin = "Default"
 preview_animation = "-- Empty --"
 preview_frame = true
@@ -119,7 +108,7 @@ script = ExtResource("4_ixg0x")
 modulate = Color(0.02, 0.02, 0.02, 0.85)
 show_behind_parent = true
 position = Vector2(20, 0)
-skeleton_data_res = SubResource("SpineSkeletonDataResource_rs5xn")
+skeleton_data_res = ExtResource("4_o4xwm")
 preview_skin = "Default"
 preview_animation = "-- Empty --"
 preview_frame = true
@@ -130,7 +119,7 @@ script = ExtResource("4_ixg0x")
 modulate = Color(0.02, 0.02, 0.02, 0.85)
 show_behind_parent = true
 position = Vector2(0, -20)
-skeleton_data_res = SubResource("SpineSkeletonDataResource_rs5xn")
+skeleton_data_res = ExtResource("4_o4xwm")
 preview_skin = "Default"
 preview_animation = "-- Empty --"
 preview_frame = true
@@ -141,7 +130,7 @@ script = ExtResource("4_ixg0x")
 modulate = Color(0.02, 0.02, 0.02, 0.85)
 show_behind_parent = true
 position = Vector2(0, 20)
-skeleton_data_res = SubResource("SpineSkeletonDataResource_rs5xn")
+skeleton_data_res = ExtResource("4_o4xwm")
 preview_skin = "Default"
 preview_animation = "-- Empty --"
 preview_frame = true
@@ -149,17 +138,24 @@ preview_time = 0.99
 script = ExtResource("4_ixg0x")
 
 [node name="SpineSprite" type="SpineSprite" parent="."]
-skeleton_data_res = SubResource("SpineSkeletonDataResource_rs5xn")
+skeleton_data_res = ExtResource("4_o4xwm")
 bones_thickness = 10.09
 preview_skin = "Default"
 preview_animation = "-- Empty --"
 preview_frame = true
-preview_time = 1.0
+preview_time = 1.33
 script = ExtResource("4_ixg0x")
 
 [node name="SpineBoneNode" type="SpineBoneNode" parent="SpineSprite"]
 show_behind_parent = true
 z_index = -1
+position = Vector2(0.82191175, -473.95676)
+rotation = -1.6160004
+scale = Vector2(0.99999994, 0.99999994)
+bone_name = "Upper Body"
+
+[node name="SpineHoldingBoneNode" type="SpineBoneNode" parent="SpineSprite"]
+show_behind_parent = true
 position = Vector2(0.82191175, -473.95676)
 rotation = -1.6160004
 scale = Vector2(0.99999994, 0.99999994)
@@ -189,7 +185,6 @@ scale = Vector2(0.9999999, 0.9999999)
 shape = SubResource("RectangleShape2D_kqj82")
 
 [node name="GrabArea" type="Area2D" parent="."]
-visible = false
 collision_layer = 7
 collision_mask = 7
 
@@ -221,7 +216,9 @@ script = ExtResource("9_13pt2")
 AttackId = "umbrella_melee_attack"
 DisplayName = "Umbrella Melee Attack"
 Description = "雨伞专属攻击模板示例"
-RecoveryDuration = 0.0
+WarmupDuration = 0.17
+ActiveDuration = 0.63
+RecoveryDuration = 0.2
 AnimationName = "animations/attack_thrust"
 HitEffectScene = ExtResource("12_0y2r2")
 HitEffectAnchorMode = 2
@@ -233,7 +230,10 @@ script = ExtResource("9_13pt2")
 AttackId = "drill_melee_attack"
 DisplayName = "Drill Melee Attack"
 Description = "合金钻头专属攻击模板示例"
-RecoveryDuration = 0.0
+WarmupDuration = 0.46
+ActiveDuration = 0.2
+RecoveryDuration = 0.34
+CooldownDuration = 0.5
 AnimationName = "animations/Weapon_Stab_Drill"
 HitEffectScene = ExtResource("12_0y2r2")
 HitEffectAnchorMode = 2
@@ -245,6 +245,10 @@ script = ExtResource("9_13pt2")
 AttackId = "barrier_gate_melee_attack"
 DisplayName = "Barrier Gate Melee Attack"
 Description = "开刃升降杆门专属攻击模板示例"
+WarmupDuration = 0.53
+ActiveDuration = 0.31
+RecoveryDuration = 0.16
+CooldownDuration = 0.5
 AnimationName = "animations/attack_swing"
 HitEffectScene = ExtResource("12_0y2r2")
 HitEffectAnchorMode = 2
@@ -256,13 +260,30 @@ script = ExtResource("9_13pt2")
 AttackId = "riot_bracer_melee_attack"
 DisplayName = "Riot Bracer Melee Attack"
 Description = "镇暴护腕专属攻击模板示例"
-ActiveDuration = 0.5
-RecoveryDuration = 0.35
-AnimationName = "animations/Weapon_Brawl_MechGlove"
+WarmupDuration = 0.17
+ActiveDuration = 0.4
+RecoveryDuration = 0.43
+CooldownDuration = 0.5
+AnimationName = "animations/Weapon_Brawl_RiotBracer"
 HitEffectScene = ExtResource("12_0y2r2")
 HitEffectAnchorMode = 2
 HitEffectForceTopLevel = true
 RequiredItemId = "Weapon_Brawl_riotBracer"
+
+[node name="MechGloveMeleeAttack" type="Node" parent="StateMachine/Attack"]
+script = ExtResource("9_13pt2")
+AttackId = "mech_glove_melee_attack"
+DisplayName = "Mech Glove Melee Attack"
+Description = "机械冲撞臂专属攻击模板示例"
+WarmupDuration = 0.5
+ActiveDuration = 0.43
+RecoveryDuration = 0.4
+CooldownDuration = 0.5
+AnimationName = "animations/Weapon_Brawl_MechGlove"
+HitEffectScene = ExtResource("12_0y2r2")
+HitEffectAnchorMode = 2
+HitEffectForceTopLevel = true
+RequiredItemId = "Weapon_Brawl_mechGlove"
 
 [node name="Hit" type="Node" parent="StateMachine"]
 script = ExtResource("10_utqjm")
@@ -285,6 +306,12 @@ script = ExtResource("15_0y6jy")
 [node name="Throw" type="Node" parent="StateMachine"]
 script = ExtResource("16_oc5yk")
 
+[node name="IdleHolding" type="Node" parent="StateMachine"]
+script = ExtResource("20_h3qap")
+
+[node name="RunHolding" type="Node" parent="StateMachine"]
+script = ExtResource("21_6hy0m")
+
 [node name="Inventory" type="Node" parent="."]
 script = ExtResource("17_13pt2")
 
@@ -295,15 +322,25 @@ Inventory = NodePath("../Inventory")
 [node name="ItemInteraction" type="Node" parent="." node_paths=PackedStringArray("InventoryComponent")]
 script = ExtResource("19_t3prk")
 InventoryComponent = NodePath("../Inventory")
-InteractionAreaPath = NodePath("")
+InteractionAreaPath = NodePath("../GrabArea")
 
 [node name="ItemAttachment" type="Node" parent="." node_paths=PackedStringArray("Inventory")]
 script = ExtResource("20_4ht1x")
 Inventory = NodePath("../Inventory")
 AttachmentParentPath = NodePath("../SpineSprite")
 SpineSlotNodePath = NodePath("../SpineSprite/SpineBoneNode")
-SpineBoneNodePaths = Array[NodePath]([NodePath("../SpineSprite/SpineBoneNode")])
 RotateBoneOffsetWithBone = true
+IconRotationDegrees = -120.0
+
+[node name="ItemHoldingAttachment" type="Node" parent="." node_paths=PackedStringArray("Inventory")]
+script = ExtResource("20_4ht1x")
+Inventory = NodePath("../Inventory")
+AttachmentParentPath = NodePath("../SpineSprite")
+SpineSlotNodePath = NodePath("../SpineSprite/SpineHoldingBoneNode")
+ShowHoldingItemStates = Array[String](["IdleHolding", "RunHolding", "Throw"])
+BoneIconOffset = Vector2(1024, 0)
+RotateBoneOffsetWithBone = true
+IconRotationDegrees = 90.0
 
 [node name="EffectController" type="Node" parent="."]
 script = ExtResource("21_utqjm")
@@ -314,11 +351,11 @@ PlayerPath = NodePath("..")
 
 [node name="OllamaClient" type="Node" parent="."]
 script = ExtResource("28_ollama_client")
-DefaultModel = "qwen3.5:9b"
+DefaultModel = "qwen3.5:latest"
 
 [node name="AiDecisionBridge" type="Node" parent="."]
 script = ExtResource("29_ai_decision_bridge")
-Model = "qwen3.5:9b"
+Model = "qwen3.5:latest"
 Stream = false
 
 [node name="AiDecisionExecutor" type="Node" parent="."]
@@ -326,6 +363,7 @@ script = ExtResource("33_ai_decision_executor")
 
 [node name="GameStateDebugPanel" type="CanvasLayer" parent="."]
 layer = 100
+visible = false
 script = ExtResource("30_game_state_debug_panel")
 
 [node name="Panel" type="PanelContainer" parent="GameStateDebugPanel"]
@@ -353,6 +391,7 @@ scroll_following = true
 
 [node name="AiOutputDebugPanel" type="CanvasLayer" parent="."]
 layer = 101
+visible = false
 script = ExtResource("31_ai_output_debug_panel")
 
 [node name="Panel" type="PanelContainer" parent="AiOutputDebugPanel"]
@@ -393,4 +432,12 @@ scale = Vector2(2.205, 2.205)
 
 [node name="BuildController" type="Node" parent="."]
 script = ExtResource("28_rs5xn")
-LevelEntries = Array[ExtResource("36_26vrv")]([ExtResource("30_6tvdn"), ExtResource("31_a5ycu"), ExtResource("32_a8ffv")])
+LevelEntries = Array[ExtResource("35_hyeo7")]([ExtResource("30_6tvdn"), ExtResource("31_a5ycu"), ExtResource("32_a8ffv"), ExtResource("39_26vrv"), ExtResource("40_8fw8m"), ExtResource("41_o4xwm")])
+
+[node name="ThrowTrajectoryPreview" type="Node2D" parent="."]
+z_index = 2
+y_sort_enabled = true
+script = ExtResource("43_throwpreview")
+TrailColor = Color(1, 1, 1, 1)
+DotRadius = 20.0
+DotStep = 1

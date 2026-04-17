@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=6 format=3 uid="uid://b8vf1obgnfb2y"]
+
+[ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="1_ecuim"]
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="2_vcim5"]
+[ext_resource type="Texture2D" uid="uid://cbs8s6snkb78b" path="res://assets/weapons/引力手雷.png" id="3_ecuim"]
+[ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="4_srbfh"]
+
+[sub_resource type="Resource" id="Attribute_AttackPower"]
+script = ExtResource("1_ecuim")
+AttributeId = "attack_power"
+
+[resource]
+script = ExtResource("4_srbfh")
+ItemId = "Weapon_Throw_GravityGrenade"
+DisplayName = "引力手雷"
+Description = "机械类投掷武器：引力手雷"
+Icon = ExtResource("3_ecuim")
+Category = "Weapon"
+Tags = Array[String](["tag_weapon", "build_machine", "tag_throw"])
+MaxStackSize = 1
+AttributeEntries = Array[ExtResource("1_ecuim")]([SubResource("Attribute_AttackPower")])
+BuildClass = "Machine"
+IsThrowable = true
+ThrowStartOffset = Vector2(0, -300)
+ThrowParabolicDuration = 0.4
+ThrowParabolicLandingYOffset = 200.0
+WorldScenePath = "uid://bvvyo3wubh12j"

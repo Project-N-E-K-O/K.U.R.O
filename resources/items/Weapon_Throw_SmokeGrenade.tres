@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=6 format=3 uid="uid://dknruw00xelvv"]
+
+[ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="1_0ac3k"]
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="2_letw0"]
+[ext_resource type="Texture2D" uid="uid://n0ciynpx53jh" path="res://assets/weapons/镇暴烟雾弹.png" id="3_vod1j"]
+[ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="5_3rggb"]
+
+[sub_resource type="Resource" id="Attribute_AttackPower"]
+script = ExtResource("1_0ac3k")
+AttributeId = "attack_power"
+
+[resource]
+script = ExtResource("5_3rggb")
+ItemId = "Weapon_Throw_SmokeGrenade"
+DisplayName = "镇暴烟雾弹"
+Description = "安保类投掷武器：镇暴烟雾弹"
+Icon = ExtResource("3_vod1j")
+Category = "Weapon"
+Tags = Array[String](["tag_weapon", "build_guard", "tag_throw"])
+MaxStackSize = 1
+AttributeEntries = Array[ExtResource("1_0ac3k")]([SubResource("Attribute_AttackPower")])
+BuildClass = "guard"
+IsThrowable = true
+ThrowStartOffset = Vector2(0, -300)
+ThrowParabolicDuration = 0.4
+ThrowParabolicLandingYOffset = 200.0
+WorldScenePath = "uid://cipwjj7xx121y"

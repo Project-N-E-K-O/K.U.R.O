@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://dd8xmpgwy0t2o"]
+[gd_scene load_steps=22 format=3 uid="uid://dd8xmpgwy0t2o"]
 
 [ext_resource type="Texture2D" uid="uid://rpleid8er0tq" path="res://assets/environments/scene_2_hotel/去掉遮挡墙面的大门底图.png" id="1_qqgfp"]
 [ext_resource type="Texture2D" uid="uid://bldctlu6nwf6g" path="res://assets/environments/scene_2_hotel/地板.png" id="2_fsr21"]
@@ -8,6 +8,39 @@
 [ext_resource type="Texture2D" uid="uid://dtmefhuw7vvci" path="res://assets/environments/scene_2_hotel/酒吧吧台.png" id="5_fsr21"]
 [ext_resource type="Texture2D" uid="uid://c2cdvsj12ngr1" path="res://assets/environments/scene_2_hotel/电梯墙后.png" id="6_hsu0y"]
 [ext_resource type="Texture2D" uid="uid://dkpv0dxfg1rx7" path="res://assets/environments/scene_2_hotel/酒店大门口墙后.png" id="8_qqgfp"]
+[ext_resource type="Texture2D" uid="uid://pl67o3rwu44h" path="res://assets/environments/scene_2_hotel/酒店大门口墙前.png" id="10_hsu0y"]
+[ext_resource type="Script" uid="uid://ch3pldopfd7tr" path="res://scripts/effects/AreaSpriteFadeTrigger.cs" id="11_ttjsf"]
+[ext_resource type="Texture2D" uid="uid://pan0auvatm1f" path="res://assets/environments/scene_2_hotel/电梯墙前.png" id="12_qbr0m"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_eyc65"]
+size = Vector2(877.5, 3200)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hsu0y"]
+size = Vector2(16974, 774)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ttjsf"]
+size = Vector2(21320, 173)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_qbr0m"]
+size = Vector2(767, 1375)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_nb4ow"]
+size = Vector2(855, 604.375)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_yeiui"]
+size = Vector2(172.5, 1720)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_cyngy"]
+size = Vector2(367.03125, 573.125)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_gmber"]
+size = Vector2(408, 853)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_j0a2g"]
+size = Vector2(4509, 130)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_j0gwi"]
+size = Vector2(193.5, 3232.25)
 
 [node name="Scene2" type="Node2D"]
 
@@ -88,30 +121,29 @@ region_enabled = true
 region_rect = Rect2(90, 0, 1811, 727)
 
 [node name="items" type="Node2D" parent="."]
-position = Vector2(9197, 328)
 
 [node name="carpets" type="Node2D" parent="items"]
 
 [node name="carpet1" type="Sprite2D" parent="items/carpets"]
-position = Vector2(-11805, -50)
+position = Vector2(-2608, 282)
 texture = ExtResource("5_7oy14")
 region_enabled = true
 region_rect = Rect2(0, 1, 4250, 854)
 
 [node name="carpet2" type="Sprite2D" parent="items/carpets"]
-position = Vector2(-7555, -50)
+position = Vector2(1642, 282)
 texture = ExtResource("5_7oy14")
 region_enabled = true
 region_rect = Rect2(0, 1, 4250, 854)
 
 [node name="carpet3" type="Sprite2D" parent="items/carpets"]
-position = Vector2(-3310, -50)
+position = Vector2(5887, 282)
 texture = ExtResource("5_7oy14")
 region_enabled = true
 region_rect = Rect2(0, 1, 4250, 854)
 
 [node name="carpet4" type="Sprite2D" parent="items/carpets"]
-position = Vector2(940, -50)
+position = Vector2(10137, 282)
 texture = ExtResource("5_7oy14")
 region_enabled = true
 region_rect = Rect2(0, 1, 4250, 854)
@@ -131,3 +163,69 @@ position = Vector2(-4760, -879)
 texture = ExtResource("8_qqgfp")
 region_enabled = true
 region_rect = Rect2(0, 0, 437, 1307)
+
+[node name="FrontWall" type="Node2D" parent="."]
+z_index = 3
+
+[node name="GateFrontWall" type="Sprite2D" parent="FrontWall"]
+z_index = 3
+position = Vector2(-4193, 18)
+texture = ExtResource("10_hsu0y")
+region_enabled = true
+region_rect = Rect2(1, 0, 1689, 3059)
+script = ExtResource("11_ttjsf")
+TriggerAreaPath = NodePath("Area2D")
+TargetPath = NodePath(".")
+
+[node name="Area2D" type="Area2D" parent="FrontWall/GateFrontWall"]
+collision_mask = 4
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="FrontWall/GateFrontWall/Area2D"]
+position = Vector2(227.25, 0)
+shape = SubResource("RectangleShape2D_eyc65")
+
+[node name="ElevatorFrontWall" type="Sprite2D" parent="FrontWall"]
+z_index = 3
+position = Vector2(11336, 741)
+texture = ExtResource("12_qbr0m")
+region_enabled = true
+region_rect = Rect2(0, 0, 352, 1612)
+
+[node name="AirWall" type="StaticBody2D" parent="."]
+position = Vector2(-4853.25, -737.5)
+
+[node name="wall1" type="CollisionShape2D" parent="AirWall"]
+position = Vector2(8441.25, -440.5)
+shape = SubResource("RectangleShape2D_hsu0y")
+
+[node name="wall2" type="CollisionShape2D" parent="AirWall"]
+position = Vector2(6197.25, 2363.5)
+shape = SubResource("RectangleShape2D_ttjsf")
+
+[node name="wall3" type="CollisionShape2D" parent="AirWall"]
+position = Vector2(16462.75, 604)
+shape = SubResource("RectangleShape2D_qbr0m")
+
+[node name="wall4" type="CollisionShape2D" parent="AirWall"]
+position = Vector2(16415.75, 1977.5)
+shape = SubResource("RectangleShape2D_nb4ow")
+
+[node name="wall5" type="CollisionShape2D" parent="AirWall"]
+position = Vector2(16710.75, 1474.5)
+shape = SubResource("RectangleShape2D_yeiui")
+
+[node name="gatewall1" type="CollisionShape2D" parent="AirWall"]
+position = Vector2(61.734375, 228.9375)
+shape = SubResource("RectangleShape2D_cyngy")
+
+[node name="gatewall2" type="CollisionShape2D" parent="AirWall"]
+position = Vector2(95.25, 1861)
+shape = SubResource("RectangleShape2D_gmber")
+
+[node name="streetwall1" type="CollisionShape2D" parent="AirWall"]
+position = Vector2(-2273.75, -798.5)
+shape = SubResource("RectangleShape2D_j0a2g")
+
+[node name="streetwall2" type="CollisionShape2D" parent="AirWall"]
+position = Vector2(-4538.75, 830.5)
+shape = SubResource("RectangleShape2D_j0gwi")

@@ -1,0 +1,66 @@
+[gd_scene load_steps=8 format=3 uid="uid://dfmke56wtqt2x"]
+
+[ext_resource type="Texture2D" uid="uid://b1awmq0je57lj" path="res://assets/weapons/金属地刺.png" id="1_0wnlg"]
+[ext_resource type="Script" uid="uid://dhfq2rrha0awm" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_owowg"]
+[ext_resource type="Resource" uid="uid://j6kveph5wqjm" path="res://resources/items/Weapon_Throw_MetalSpike.tres" id="2_ussve"]
+[ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="6_8av3o"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_4hafc"]
+shader = ExtResource("6_8av3o")
+shader_parameter/outline_color = Color(0.02, 0.02, 0.02, 1)
+shader_parameter/outline_size = 32.0
+shader_parameter/alpha_threshold = 0.5
+shader_parameter/edge_softness = 0.12
+shader_parameter/preserve_fill = true
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_0wnlg"]
+size = Vector2(450, 150)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ec1yi"]
+size = Vector2(380, 213.5)
+
+[node name="WeaponThrowMetalSpike" type="Node2D"]
+script = ExtResource("1_owowg")
+ItemDefinition = ExtResource("2_ussve")
+GrabAreaPath = NodePath("RigidBody2D/CollisionArea")
+HighlightSpritePath = NodePath("RigidBody2D/Outline")
+DefaultOutlineColor = Color(0, 0, 0, 0)
+ThrowDamage = 0.0
+MinDamageVelocity = 0.0
+KnockbackForce = 0.0
+StopOnHit = true
+IsThrowWeapon = true
+ThrowWeaponCooldown = 0.1
+LandingHideDelay = 0.1
+RigidBodyPath = NodePath("RigidBody2D")
+HitboxAreaPath = NodePath("RigidBody2D/AttackArea")
+
+[node name="RigidBody2D" type="RigidBody2D" parent="."]
+gravity_scale = 0.0
+can_sleep = false
+freeze = true
+freeze_mode = 1
+
+[node name="Outline" type="Sprite2D" parent="RigidBody2D"]
+z_index = 1
+material = SubResource("ShaderMaterial_4hafc")
+scale = Vector2(0.33, 0.33)
+texture = ExtResource("1_0wnlg")
+region_rect = Rect2(-110, -50, 1400, 1200)
+
+[node name="Sprite2D" type="Sprite2D" parent="RigidBody2D/Outline"]
+texture = ExtResource("1_0wnlg")
+region_rect = Rect2(-110, -50, 1400, 1200)
+
+[node name="CollisionArea" type="Area2D" parent="RigidBody2D"]
+visible = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/CollisionArea"]
+position = Vector2(0, 30)
+shape = SubResource("RectangleShape2D_0wnlg")
+
+[node name="AttackArea" type="Area2D" parent="RigidBody2D"]
+visible = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/AttackArea"]
+shape = SubResource("RectangleShape2D_ec1yi")

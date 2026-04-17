@@ -54,6 +54,10 @@ namespace Kuros.UI
 		// 武器栏框贴图样式：未选中 / 选中（用于 UpdateSlotPanelStyle）
 		private StyleBoxTexture? _quickSlotStyleNormal;
 		private StyleBoxTexture? _quickSlotStyleSelected;
+		// 投掷武器冷却遮罩覆盖层（每个快捷槽一个）
+		private readonly ThrowCooldownOverlay?[] _quickSlotCooldownOverlays = new ThrowCooldownOverlay?[5];
+		private float _throwCooldownUpdateTimer = 0f;
+		private const float ThrowCooldownUpdateInterval = 0.05f;
 		
 		// 小地图相关
 		private Vector2 _mapSize = new Vector2(2000, 1500); // 地图总大小（可以根据实际地图调整）
@@ -299,24 +303,35 @@ namespace Kuros.UI
 			var stack = _quickBarContainer.GetStack(slotIndex);
 			bool isEmpty = stack == null || stack.IsEmpty;
 			bool isEmptyItem = !isEmpty && stack!.Item.ItemId == "empty_item";
+
+			// 检测是否为投掷武器预占槽：empty_item 且槽位在预留集合中
+			Kuros.Items.World.RigidBodyWorldItemEntity? thrownWeapon = null;
+			if (isEmptyItem && _player?.InventoryComponent?.ReservedQuickBarSlots.Contains(slotIndex) == true)
+			{
+				thrownWeapon = FindThrownWeaponInSlot(slotIndex);
+			}
 			
 			// 更新标签文字
 			if (_quickSlotLabels[slotIndex] != null)
 			{
-				if (isEmpty || isEmptyItem)
-				{
+				if (thrownWeapon != null)
+					_quickSlotLabels[slotIndex].Text = thrownWeapon.ItemDefinition?.DisplayName ?? "";
+				else if (isEmpty || isEmptyItem)
 					_quickSlotLabels[slotIndex].Text = "";
-				}
 				else
-				{
 					_quickSlotLabels[slotIndex].Text = stack!.Item.DisplayName;
-				}
 			}
 			
 			// 更新图标
 			if (_quickSlotIcons[slotIndex] != null)
 			{
-				if (isEmpty || isEmptyItem)
+				if (thrownWeapon != null)
+				{
+					// 显示投掷武器图标，半透明表示不可用状态
+					_quickSlotIcons[slotIndex].Texture = thrownWeapon.ItemDefinition?.Icon;
+					_quickSlotIcons[slotIndex].Modulate = new Color(1f, 1f, 1f, 0.55f);
+				}
+				else if (isEmpty || isEmptyItem)
 				{
 					_quickSlotIcons[slotIndex].Texture = null;
 					_quickSlotIcons[slotIndex].Modulate = new Color(1, 1, 1, 0.3f);
@@ -327,6 +342,9 @@ namespace Kuros.UI
 					_quickSlotIcons[slotIndex].Modulate = Colors.White;
 				}
 			}
+
+			// 更新投掷冷却遮罩
+			UpdateThrowCooldownOverlay(slotIndex, thrownWeapon);
 		}
 		
 		/// <summary>
@@ -722,6 +740,82 @@ namespace Kuros.UI
 			}
 		}
 
+		public override void _Process(double delta)
+		{
+			base._Process(delta);
+			// 定期刷新飞行中投掷武器的冷却遮罩进度
+			if (_player?.InventoryComponent?.ReservedQuickBarSlots.Count > 0)
+			{
+				_throwCooldownUpdateTimer -= (float)delta;
+				if (_throwCooldownUpdateTimer <= 0f)
+				{
+					_throwCooldownUpdateTimer = ThrowCooldownUpdateInterval;
+					foreach (int i in _player.InventoryComponent.ReservedQuickBarSlots)
+					{
+						if (i >= 0 && i < 5) UpdateQuickBarSlot(i);
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// 在 world_items 组中查找指定槽位的飞行中投掷武器实体
+		/// </summary>
+		private Kuros.Items.World.RigidBodyWorldItemEntity? FindThrownWeaponInSlot(int slotIndex)
+		{
+			var tree = GetTree();
+			if (tree == null) return null;
+			foreach (var node in tree.GetNodesInGroup("world_items"))
+			{
+				if (node is Kuros.Items.World.RigidBodyWorldItemEntity entity
+					&& entity.ReservedQuickBarSlotIndex == slotIndex
+					&& entity.LastDroppedBy == _player)
+				{
+					return entity;
+				}
+			}
+			return null;
+		}
+
+		/// <summary>
+		/// 更新指定槽位的投掷冷却扇形遮罩
+		/// </summary>
+		private void UpdateThrowCooldownOverlay(int slotIndex, Kuros.Items.World.RigidBodyWorldItemEntity? thrownWeapon)
+		{
+			if (_quickSlotIcons[slotIndex] == null) return;
+
+			if (thrownWeapon != null && thrownWeapon.IsThrowWeaponInCooldown)
+			{
+				var overlay = GetOrCreateCooldownOverlay(slotIndex);
+				overlay.Progress = thrownWeapon.ThrowCooldownProgress;
+				overlay.Visible = true;
+			}
+			else
+			{
+				if (_quickSlotCooldownOverlays[slotIndex] != null)
+					_quickSlotCooldownOverlays[slotIndex]!.Visible = false;
+			}
+		}
+
+		/// <summary>
+		/// 懒加载创建冷却遮罩节点（添加到图标节点的子节点，自动跟随尺寸）
+		/// </summary>
+		private ThrowCooldownOverlay GetOrCreateCooldownOverlay(int slotIndex)
+		{
+			if (_quickSlotCooldownOverlays[slotIndex] != null
+				&& GodotObject.IsInstanceValid(_quickSlotCooldownOverlays[slotIndex]))
+				return _quickSlotCooldownOverlays[slotIndex]!;
+
+			var icon = _quickSlotIcons[slotIndex];
+			var overlay = new ThrowCooldownOverlay();
+			overlay.SetAnchorsPreset(Control.LayoutPreset.FullRect);
+			overlay.OffsetLeft = 0; overlay.OffsetTop = 0;
+			overlay.OffsetRight = 0; overlay.OffsetBottom = 0;
+			icon.AddChild(overlay);
+			_quickSlotCooldownOverlays[slotIndex] = overlay;
+			return overlay;
+		}
+
 		public override void _UnhandledInput(InputEvent @event)
 		{
 			if (@event.IsActionPressed("open_inventory"))
@@ -738,6 +832,65 @@ namespace Kuros.UI
 					}
 					GetViewport().SetInputAsHandled();
 				}
+			}
+		}
+		/// <summary>
+		/// 投掷武器冷却扇形遮罩控件
+		/// 从12点钟方向顺时针绘制半透明扇形，覆盖图标表示冷却剩余时间
+		/// </summary>
+		private partial class ThrowCooldownOverlay : Control
+		{
+			private float _progress;
+			public float Progress
+			{
+				get => _progress;
+				set { _progress = Mathf.Clamp(value, 0f, 1f); QueueRedraw(); }
+			}
+
+			public override void _Ready()
+			{
+				base._Ready();
+				MouseFilter = MouseFilterEnum.Ignore;
+			}
+
+			public override void _Draw()
+			{
+				base._Draw();
+				if (_progress <= 0f) return;
+
+				Vector2 rectSize = Size;
+				Vector2 center = rectSize * 0.5f;
+				Vector2 halfSize = rectSize * 0.5f;
+
+				var overlayColor = new Color(0f, 0f, 0f, 0.5f);
+
+				int steps = 48;
+				float startAngle = -Mathf.Pi / 2f; // 从12点钟方向开始
+				float endAngle = startAngle + Mathf.Pi * 2f * _progress;
+				var points = new Vector2[steps + 2];
+				points[0] = center;
+				for (int i = 0; i <= steps; i++)
+				{
+					float t = (float)i / steps;
+					float angle = Mathf.Lerp(startAngle, endAngle, t);
+					Vector2 dir = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
+					points[i + 1] = center + GetRectEdgePoint(dir, halfSize);
+				}
+				DrawPolygon(points, new Color[] { overlayColor });
+			}
+
+			private static Vector2 GetRectEdgePoint(Vector2 direction, Vector2 halfSize)
+			{
+				if (direction == Vector2.Zero) return Vector2.Zero;
+				float tx = direction.X != 0f ? halfSize.X / Mathf.Abs(direction.X) : float.MaxValue;
+				float ty = direction.Y != 0f ? halfSize.Y / Mathf.Abs(direction.Y) : float.MaxValue;
+				return direction * Mathf.Min(tx, ty);
+			}
+
+			public override void _Notification(int what)
+			{
+				base._Notification(what);
+				if (what == NotificationResized) QueueRedraw();
 			}
 		}
 	}

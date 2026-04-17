@@ -9,7 +9,8 @@ namespace Kuros.Items.Effects
         OnPickup = 0,
         OnEquip = 1,
         OnConsume = 2,
-        OnBreak = 3
+        OnBreak = 3,
+        OnThrowDestroy = 4  // 投掷物品销毁时触发（击中敌人或落点销毁）
     }
 
     /// <summary>

@@ -32,7 +32,7 @@ float sample_neighbor_alpha(sampler2D tex, vec2 uv, vec2 offset)
 
 void fragment()
 {
-	vec4 source_col = texture(TEXTURE, UV) * COLOR;
+	vec4 base = texture(TEXTURE, UV) * COLOR;
 	vec2 offset = TEXTURE_PIXEL_SIZE * outline_size;
 	float neighbor_alpha = sample_neighbor_alpha(TEXTURE, UV, offset);
 

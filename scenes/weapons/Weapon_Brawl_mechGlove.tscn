@@ -1,0 +1,56 @@
+[gd_scene load_steps=8 format=3 uid="uid://ctpw5uqly3yu5"]
+
+[ext_resource type="Script" uid="uid://dtgdjgrqgype7" path="res://scripts/items/world/WorldItemEntity.cs" id="1_f06cv"]
+[ext_resource type="Resource" uid="uid://dsmyr3iwkk7n5" path="res://resources/items/Weapon_Brawl_MechGlove.tres" id="2_f06cv"]
+[ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="3_15lfw"]
+[ext_resource type="Texture2D" uid="uid://cvlce2kc8uucx" path="res://assets/weapons/机械冲撞臂.png" id="4_f06cv"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_2q28g"]
+shader = ExtResource("3_15lfw")
+shader_parameter/outline_color = Color(0.02, 0.02, 0.02, 1)
+shader_parameter/outline_size = 32.0
+shader_parameter/alpha_threshold = 0.5
+shader_parameter/edge_softness = 0.12
+shader_parameter/preserve_fill = true
+
+[sub_resource type="RectangleShape2D" id="BodyShape_rr6vl"]
+size = Vector2(500, 500)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_82c6d"]
+size = Vector2(700, 400)
+
+[node name="WeaponMechGlove" type="CharacterBody2D"]
+z_index = 1
+scale = Vector2(0.5, 0.5)
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_f06cv")
+ItemDefinition = ExtResource("2_f06cv")
+DefaultOutlineColor = Color(0, 0, 0, 0)
+
+[node name="Outline" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_2q28g")
+scale = Vector2(0.75, 0.75)
+texture = ExtResource("4_f06cv")
+region_rect = Rect2(-13, -11, 156, 151)
+
+[node name="Sprite2D" type="Sprite2D" parent="Outline"]
+texture = ExtResource("4_f06cv")
+region_rect = Rect2(0, 64, 776, 344)
+
+[node name="CollisionArea" type="Area2D" parent="."]
+visible = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CollisionArea"]
+z_index = 1
+position = Vector2(-2, 0)
+scale = Vector2(0.5, 0.5)
+shape = SubResource("BodyShape_rr6vl")
+
+[node name="AttackArea" type="Area2D" parent="."]
+scale = Vector2(0.5, 0.5)
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AttackArea"]
+position = Vector2(99.5, 4)
+shape = SubResource("RectangleShape2D_82c6d")

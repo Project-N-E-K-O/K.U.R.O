@@ -3,16 +3,13 @@
 [ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="1_q00hu"]
 [ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="2_iq0we"]
 [ext_resource type="Texture2D" uid="uid://cuysvmaku41f8" path="res://assets/weapons/伞.png" id="3_pudjd"]
-[ext_resource type="Resource" uid="uid://ckgxa7plx2tf7" path="res://resources/items/skills/WeaponSkill_Stab_Umbrella.tres" id="4_jwwo8"]
+[ext_resource type="Resource" uid="uid://dc7u7akvpcjtn" path="res://resources/items/skills/WeaponSkill_Stab_Umbrella.tres" id="4_qwcde"]
 [ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="5_vndrb"]
 
 [sub_resource type="Resource" id="Attribute_AttackPower"]
 script = ExtResource("1_q00hu")
 AttributeId = "attack_power"
-Value = 4.0
-
-[sub_resource type="Resource" id="Resource_msp6b"]
-metadata/__load_path__ = "res://resources/items/skills/WeaponStabSkill_Umbrella.tres"
+Value = 1.0
 
 [resource]
 script = ExtResource("5_vndrb")
@@ -25,6 +22,6 @@ Tags = Array[String](["戳刺类"])
 MaxStackSize = 1
 AttributeEntries = Array[ExtResource("1_q00hu")]([SubResource("Attribute_AttackPower")])
 EffectEntries = Array[ExtResource("2_iq0we")]([null])
-WeaponSkillResources = Array[Resource]([SubResource("Resource_msp6b")])
-BuildClass = "machine"
-WorldScenePath = "res://scenes/weapons/Weapon_Stab_umbrella.tscn"
+WeaponSkillResources = Array[Resource]([ExtResource("4_qwcde")])
+BuildClass = "Machine"
+WorldScenePath = "uid://6ghjqyjkk37w"

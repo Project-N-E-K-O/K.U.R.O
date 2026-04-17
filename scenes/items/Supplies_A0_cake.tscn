@@ -1,7 +1,7 @@
 [gd_scene load_steps=9 format=3 uid="uid://dnwhjf0qt2753"]
 
 [ext_resource type="Texture2D" uid="uid://bjoe68nbi1smd" path="res://assets/furnitures/房间卧室家具导出_0000_蛋糕.png" id="1_ccqri"]
-[ext_resource type="Script" uid="uid://rpt50t16vkk7" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_uqjai"]
+[ext_resource type="Script" uid="uid://dhfq2rrha0awm" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_uqjai"]
 [ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="2_tuvwh"]
 [ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="3_mpx87"]
 [ext_resource type="Texture2D" uid="uid://b1n54555yniwu" path="res://resources/assets/supplies/Supplies_A0_cake.png" id="4_ifnd6"]
@@ -26,6 +26,7 @@ StopOnHit = true
 MaxDurability = 1
 
 [node name="Rigidbody2D" type="RigidBody2D" parent="."]
+gravity_scale = 0.0
 
 [node name="Sprite2D" type="Sprite2D" parent="Rigidbody2D"]
 scale = Vector2(0.36, 0.36)

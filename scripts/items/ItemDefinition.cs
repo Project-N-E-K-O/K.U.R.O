@@ -62,9 +62,18 @@ namespace Kuros.Items
         }
         [Export] public string BuildClass { get; set; } = string.Empty;
         [Export(PropertyHint.Range, "0,99,1")] public int LevelCount { get; set; } = 1;
+        [Export] public bool IsThrowable { get; set; } = false; // 是否可投掷
+        [Export] public bool IsFurniture { get; set; } = false; // 是否为家具
 
         [ExportGroup("Durability")]
         [Export] public ItemDurabilityConfig? DurabilityConfig { get; set; }
+
+        [ExportGroup("Throw Physics")]
+        [Export(PropertyHint.Range, "-1000,1000,1")] public Vector2 ThrowStartOffset { get; set; } = new Vector2(0, -200); // 投掷时相对于玩家的偏移
+        [Export(PropertyHint.Range, "0.1,10,0.1")] public double ThrowParabolicDuration { get; set; } = 0.6;    // 投掷物飞行的总时间（秒）
+        [Export(PropertyHint.Range, "10,500,10")] public float ThrowParabolicPeakHeight { get; set; } = 100f;   // 投掷物飞行过程中达到的最高点相对于起始点的高度
+        [Export(PropertyHint.Range, "100,2000,50")] public float ThrowHorizontalDistance { get; set; } = 600f;   // 投掷物在水平方向的飞行距离（像素），速度由此和ThrowParabolicDuration决定
+        [Export(PropertyHint.Range, "-1000,1000,1")] public float ThrowParabolicLandingYOffset { get; set; } = 100f;    // 投掷物落地点相对于目标点的垂直偏移
 
         private Godot.Collections.Array<string> _tags = new();
         private HashSet<string>? _tagCache;

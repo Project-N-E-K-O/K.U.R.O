@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="ItemDefinition" load_steps=7 format=3 uid="uid://db23sdg46k031"]
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=7 format=3 uid="uid://ba0kuifke6v7o"]
 
 [ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="1_kq0dh"]
 [ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="2_fgsqv"]
@@ -11,18 +11,16 @@ script = ExtResource("1_kq0dh")
 AttributeId = "attack_power"
 Value = 5.0
 
-[sub_resource type="Resource" id="Resource_r7li3"]
-metadata/__load_path__ = "res://resources/items/skills/WeaponStabSkill_Drill.tres"
-
 [resource]
 script = ExtResource("5_i15sv")
 ItemId = "Weapon_Stab_drill"
 DisplayName = "钻头"
 Description = "机械武器：钻头"
-Icon = ExtResource("3_r7li3")
+Icon = ExtResource("3_xvvcl")
 Category = "Weapon"
 Tags = Array[String](["tag_weapon", "build_machine", "tag_stab"])
 MaxStackSize = 1
 AttributeEntries = Array[ExtResource("1_kq0dh")]([SubResource("Attribute_AttackPower")])
-WeaponSkillResources = Array[Resource]([SubResource("Resource_r7li3")])
+WeaponSkillResources = Array[Resource]([ExtResource("4_kq0dh")])
+BuildClass = "Machine"
 WorldScenePath = "res://scenes/weapons/Weapon_Stab_drill.tscn"

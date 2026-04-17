@@ -1,7 +1,9 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Kuros.Actors.Heroes;
+using Kuros.Core.Effects;
 
 namespace Kuros.UI
 {
@@ -22,6 +24,7 @@ namespace Kuros.UI
         private InventoryWindow? _cachedInventoryWindow;
         private PlayerBuildController? _buildController;
         private readonly List<OwnedBuildViewData> _ownedBuilds = new();
+        private float _cooldownRefreshTimer = 0.1f;
 
         public override void _Ready()
         {
@@ -45,6 +48,21 @@ namespace Kuros.UI
         public override void _Process(double delta)
         {
             base._Process(delta);
+
+            if (!_isOpen || !Visible)
+            {
+                return;
+            }
+
+            if (_ownedBuilds.Exists(b => b.CooldownDuration > 0f))
+            {
+                _cooldownRefreshTimer -= (float)delta;
+                if (_cooldownRefreshTimer <= 0f)
+                {
+                    _cooldownRefreshTimer = 0.1f;
+                    RefreshBuildIcons();
+                }
+            }
         }
 
         public override void _UnhandledInput(InputEvent @event)
@@ -96,7 +114,8 @@ namespace Kuros.UI
         }
 
         /// <summary>
-        /// 初始化构筑图标数据：根据当前武器构筑，仅显示已拥有的 build 图标。
+        /// 初始化构筑图标数据：根据当前活跃的所有构筑类型，显示已拥有的 build 图标。
+        /// 支持多个构筑类型同时显示。
         /// </summary>
         private void InitializePlaceholderSkills()
         {
@@ -110,8 +129,10 @@ namespace Kuros.UI
             }
 
             buildController.RefreshBuildState();
-            int currentPoints = buildController.CurrentBuildCount;
-            string currentBuildClass = ResolveCurrentBuildClass(buildController);
+            int totalPoints = buildController.CurrentBuildCount;
+            var activeBuildClasses = buildController.ActiveBuildClasses;
+            var buildCountByClass = buildController.BuildCountByClass;
+            var buildLevelByClass = buildController.BuildLevelByClass;
 
             var entries = new List<BuildLevelEffectEntry>();
             foreach (var entry in buildController.LevelEntries)
@@ -124,31 +145,61 @@ namespace Kuros.UI
 
             entries.Sort((a, b) =>
             {
-                int byPoints = a.RequiredPoints.CompareTo(b.RequiredPoints);
-                if (byPoints != 0) return byPoints;
+                // 先按构筑类型（BuildClass）排序
+                int byBuildClass = string.Compare(
+                    a.BuildClass?.Trim() ?? "", 
+                    b.BuildClass?.Trim() ?? "", 
+                    StringComparison.OrdinalIgnoreCase);
+                if (byBuildClass != 0) return byBuildClass;
+                
+                // 再按等级（Level）排序
                 return a.Level.CompareTo(b.Level);
             });
 
+            // 遍历所有条目，如果属于活跃的任何构筑类型且点数充足，则添加
             foreach (var entry in entries)
             {
-                if (currentPoints < entry.RequiredPoints)
+                // 如果条目没有指定构筑类型，跳过
+                if (string.IsNullOrWhiteSpace(entry.BuildClass))
                 {
                     continue;
                 }
 
-                if (!string.IsNullOrWhiteSpace(currentBuildClass) &&
-                    !string.IsNullOrWhiteSpace(entry.BuildClass) &&
-                    !string.Equals(entry.BuildClass.Trim(), currentBuildClass, StringComparison.OrdinalIgnoreCase))
+                string buildClass = entry.BuildClass.Trim();
+
+                // 检查该构筑类型是否活跃
+                bool isActiveBuildClass = activeBuildClasses.Any(bc => string.Equals(bc, buildClass, StringComparison.OrdinalIgnoreCase));
+                if (!isActiveBuildClass)
                 {
                     continue;
                 }
 
-                _ownedBuilds.Add(new OwnedBuildViewData
+                // 检查该构筑的点数是否满足此条目的需求
+                if (!buildCountByClass.ContainsKey(buildClass) || buildCountByClass[buildClass] < entry.RequiredPoints)
                 {
-                    Name = string.IsNullOrWhiteSpace(entry.BuildName) ? $"构筑 Lv.{entry.Level}" : entry.BuildName,
+                    continue;
+                }
+
+                var viewData = new OwnedBuildViewData
+                {
+                    Name = string.IsNullOrWhiteSpace(entry.BuildName) ? $"{buildClass} Lv.{entry.Level}" : entry.BuildName,
                     IconPath = entry.IconPath ?? string.Empty,
-                    Icon = LoadBuildIcon(entry.IconPath ?? string.Empty)
-                });
+                    Icon = LoadBuildIcon(entry.IconPath ?? string.Empty),
+                    EffectId = entry.EffectId ?? string.Empty,
+                };
+
+                if (!string.IsNullOrWhiteSpace(viewData.EffectId) && buildController.TargetEffectController != null)
+                {
+                    var effect = buildController.TargetEffectController.GetEffect(viewData.EffectId);
+                    if (effect is ICooldownEffect cooldownEffect)
+                    {
+                        viewData.HasCooldown = cooldownEffect.IsOnCooldown;
+                        viewData.CooldownRemaining = cooldownEffect.CooldownRemaining;
+                        viewData.CooldownDuration = cooldownEffect.CooldownDuration;
+                    }
+                }
+
+                _ownedBuilds.Add(viewData);
             }
         }
 
@@ -203,22 +254,6 @@ namespace Kuros.UI
             {
                 CallDeferred(nameof(RefreshBuildIcons));
             }
-        }
-
-        private static string ResolveCurrentBuildClass(PlayerBuildController buildController)
-        {
-            if (!string.IsNullOrWhiteSpace(buildController.BuildClass))
-            {
-                return buildController.BuildClass.Trim();
-            }
-
-            var activeWeapon = buildController.Inventory?.GetActiveCombatWeaponDefinition();
-            if (!string.IsNullOrWhiteSpace(activeWeapon?.BuildClass))
-            {
-                return activeWeapon.BuildClass.Trim();
-            }
-
-            return string.Empty;
         }
 
         /// <summary>
@@ -279,6 +314,19 @@ namespace Kuros.UI
                 iconRect.ExpandMode = TextureRect.ExpandModeEnum.FitWidthProportional;
                 iconRect.Texture = _ownedBuilds[i].Icon;
                 centerContainer.AddChild(iconRect);
+
+                if (_ownedBuilds[i].HasCooldown && _ownedBuilds[i].CooldownDuration > 0f)
+                {
+                    var overlay = new CooldownRing();
+                    overlay.Progress = Mathf.Clamp(
+                        _ownedBuilds[i].CooldownRemaining / _ownedBuilds[i].CooldownDuration,
+                        0f,
+                        1f);
+                    overlay.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+                    overlay.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
+                    overlay.CustomMinimumSize = new Vector2(96, 96);
+                    iconRect.AddChild(overlay);
+                }
             }
 
             return margin;
@@ -457,6 +505,81 @@ namespace Kuros.UI
             public string Name { get; set; } = string.Empty;
             public string IconPath { get; set; } = string.Empty;
             public Texture2D? Icon { get; set; }
+            public string EffectId { get; set; } = string.Empty;
+            public bool HasCooldown { get; set; }
+            public float CooldownRemaining { get; set; }
+            public float CooldownDuration { get; set; }
+        }
+
+        private partial class CooldownRing : Control
+        {
+            private float _progress;
+            public float Progress
+            {
+                get => _progress;
+                set
+                {
+                    _progress = Mathf.Clamp(value, 0f, 1f);
+                    QueueRedraw();
+                }
+            }
+
+            public override void _Ready()
+            {
+                base._Ready();
+                MouseFilter = MouseFilterEnum.Ignore;
+            }
+
+            public override void _Draw()
+            {
+                base._Draw();
+                Vector2 rectSize = Size;
+                Vector2 center = rectSize * 0.5f;
+                Vector2 halfSize = rectSize * 0.5f;
+
+                var overlayColor = new Color(0f, 0f, 0f, 0.45f);
+
+                if (Progress > 0f)
+                {
+                    int steps = 48;
+                    float startAngle = -Mathf.Pi / 2f;
+                    float endAngle = startAngle + Mathf.Pi * 2f * Progress;
+                    var points = new Vector2[steps + 2];
+                    points[0] = center;
+
+                    for (int i = 0; i <= steps; i++)
+                    {
+                        float t = (float)i / steps;
+                        float angle = Mathf.Lerp(startAngle, endAngle, t);
+                        Vector2 direction = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
+                        points[i + 1] = center + GetRectEdgePoint(direction, halfSize);
+                    }
+
+                    DrawPolygon(points, new Color[] { overlayColor });
+                }
+            }
+
+            private static Vector2 GetRectEdgePoint(Vector2 direction, Vector2 halfSize)
+            {
+                if (direction == Vector2.Zero)
+                {
+                    return Vector2.Zero;
+                }
+
+                float tx = direction.X != 0f ? halfSize.X / Mathf.Abs(direction.X) : float.MaxValue;
+                float ty = direction.Y != 0f ? halfSize.Y / Mathf.Abs(direction.Y) : float.MaxValue;
+                float t = Mathf.Min(tx, ty);
+                return direction * t;
+            }
+
+            public override void _Notification(int what)
+            {
+                base._Notification(what);
+                if (what == NotificationResized)
+                {
+                    QueueRedraw();
+                }
+            }
         }
 
         /// <summary>

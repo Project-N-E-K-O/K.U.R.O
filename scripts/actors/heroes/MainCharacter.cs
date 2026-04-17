@@ -22,6 +22,8 @@ namespace Kuros.Actors.Heroes
 	[Export] public string WalkAnimationName { get; set; } = "walk";
 	[Export] public string RunAnimationName { get; set; } = "run";
 	[Export] public string AttackAnimationName { get; set; } = "attack";
+	[Export] public string IdleHoldingAnimationName { get; set; } = "idle_holding_item";
+	[Export] public string RunHoldingAnimationName { get; set; } = "run_holding_item";
 	[Export] public float WalkAnimationSpeed { get; set; } = 1.5f;
 	[Export] public float RunAnimationSpeed { get; set; } = 2.0f;
 	[Export] public float RunSpeedMultiplier { get; set; } = 2.0f; // 跑步速度倍数
@@ -330,7 +332,11 @@ namespace Kuros.Actors.Heroes
 			|| stateOrAnimationName.Equals(IdleAnimationName, StringComparison.OrdinalIgnoreCase)
 			|| stateOrAnimationName.Equals(WalkAnimationName, StringComparison.OrdinalIgnoreCase)
 			|| stateOrAnimationName.Equals(RunAnimationName, StringComparison.OrdinalIgnoreCase)
-			|| stateOrAnimationName.Equals("stun", StringComparison.OrdinalIgnoreCase);
+			|| stateOrAnimationName.Equals("stun", StringComparison.OrdinalIgnoreCase)
+			|| stateOrAnimationName.Equals("IdleHolding", StringComparison.OrdinalIgnoreCase)
+			|| stateOrAnimationName.Equals("RunHolding", StringComparison.OrdinalIgnoreCase)
+			|| stateOrAnimationName.Equals("Throw", StringComparison.OrdinalIgnoreCase);
+			
 	}
 
 	private void ResolveSpineBoneNode()

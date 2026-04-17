@@ -1,0 +1,23 @@
+[gd_scene load_steps=3 format=3 uid="uid://bo6r21cbk3ftm"]
+
+[ext_resource type="Texture2D" uid="uid://c72hb4tqgnj5f" path="res://assets/furnitures/hotel_scene2/ColumnsB.png" id="1_mbnq6"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_3yw8j"]
+size = Vector2(300, 350)
+
+[node name="columnsB1" type="RigidBody2D"]
+z_index = 2
+y_sort_enabled = true
+collision_mask = 7
+gravity_scale = 0.0
+can_sleep = false
+freeze = true
+freeze_mode = 1
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_mbnq6")
+offset = Vector2(0, -250)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 150)
+shape = SubResource("RectangleShape2D_3yw8j")

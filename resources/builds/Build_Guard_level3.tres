@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="BuildLevelEffectEntry" load_steps=2 format=3 uid="uid://vgnowuoegwns"]
+
+[ext_resource type="Script" uid="uid://ba5xnpfo03sgb" path="res://scripts/actors/heroes/BuildLevelEffectEntry.cs" id="1_qluaa"]
+
+[resource]
+script = ExtResource("1_qluaa")
+BuildId = "Build_Guard_level3"
+BuildClass = "guard"
+BuildName = "三级安保"
+Level = 3
+RequiredPoints = 3
+EffectId = "Build_Guard_level3"
+EffectScript = "BuildGuardLevel3Effect"
+Description = "抵消玩家受到的下次伤害(8秒CD)"
+IconPath = "uid://fp80v1giqjpi"

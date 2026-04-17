@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="BuildLevelEffectEntry" load_steps=2 format=3 uid="uid://b14bb35ful4ke"]
+
+[ext_resource type="Script" uid="uid://ba5xnpfo03sgb" path="res://scripts/actors/heroes/BuildLevelEffectEntry.cs" id="1_dj0j1"]
+
+[resource]
+script = ExtResource("1_dj0j1")
+BuildId = "Build_Guard_level1"
+BuildClass = "guard"
+BuildName = "一级安保"
+EffectId = "Build_Guard_level1"
+EffectScript = "BuildGuardLevel1Effect"
+Description = "略微减少玩家受到敌人的伤害"
+IconPath = "uid://co2lxjpde2r5t"

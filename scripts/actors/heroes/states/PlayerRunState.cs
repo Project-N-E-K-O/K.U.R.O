@@ -47,6 +47,15 @@ namespace Kuros.Actors.Heroes.States
         {
             if (HandleDialogueGating(delta)) return;
             
+            // // 检查是否转换到 RunHolding（持握可投掷物品的奔跑）
+            // var selectedStack = Player.GetComponent<PlayerInventoryComponent>("Inventory")?.GetSelectedQuickBarStack();
+            // if (selectedStack != null && !selectedStack.IsEmpty && selectedStack.Item.IsThrowable)
+            // {
+            //     GD.Print($"[PlayerRunState] 检测到可投掷物品: {selectedStack.Item.ItemId}，转换到 RunHolding");
+            //     ChangeState("RunHolding");
+            //     return;
+            // }
+            
             if (IsActionJustPressed("attack") && Actor.AttackTimer <= 0)
             {
                 Player.RequestAttackFromState(Name);

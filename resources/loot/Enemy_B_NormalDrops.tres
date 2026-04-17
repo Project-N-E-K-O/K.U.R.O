@@ -1,8 +1,8 @@
 [gd_resource type="Resource" script_class="LootDropTable" load_steps=11 format=3 uid="uid://d2yxetxicyb1b"]
 
-[ext_resource type="Resource" uid="uid://c01sltuo7404y" path="res://resources/items/Weapon_Stab_umbrella.tres" id="1_geg3s"]
+[ext_resource type="Resource" uid="uid://c01sltuo7404y" path="res://resources/items/Weapon_Stab_Umbrella.tres" id="1_geg3s"]
 [ext_resource type="Script" uid="uid://nd1f744icb05" path="res://scripts/systems/loot/LootDropEntry.cs" id="2_1ee31"]
-[ext_resource type="Resource" uid="uid://db23sdg46k031" path="res://resources/items/Weapon_Stab_drill.tres" id="3_e2vn0"]
+[ext_resource type="Resource" uid="uid://ba0kuifke6v7o" path="res://resources/items/Weapon_Stab_Drill.tres" id="3_e2vn0"]
 [ext_resource type="Resource" uid="uid://b1jpt8qriaub8" path="res://resources/items/Weapon_Slash_BarrierGate.tres" id="4_syeeu"]
 [ext_resource type="Resource" uid="uid://c0h5f2yocbgcw" path="res://resources/items/Weapon_Brawl_RiotBracer.tres" id="5_dm5et"]
 [ext_resource type="Script" uid="uid://dpdpwmf4dwu8k" path="res://scripts/systems/loot/LootDropTable.cs" id="6_p7jmf"]

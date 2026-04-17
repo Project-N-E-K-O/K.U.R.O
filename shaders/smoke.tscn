@@ -32,9 +32,11 @@ color_ramp = SubResource("GradientTexture1D_ofetj")
 turbulence_enabled = true
 
 [node name="Smoke" type="GPUParticles2D"]
+z_index = 3
 texture_filter = 1
+scale = Vector2(10, 10)
 amount = 12
 texture = ExtResource("1_kqt4o")
-lifetime = 1.6300000000000001
+lifetime = 1.63
 explosiveness = 1.0
 process_material = SubResource("ParticleProcessMaterial_srf2u")
