@@ -1,0 +1,30 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/companions/P2DebugPanel.cs" id="1_p2debug_script"]
+
+[node name="P2DebugPanel" type="CanvasLayer"]
+layer = 102
+script = ExtResource("1_p2debug_script")
+
+[node name="Panel" type="PanelContainer" parent="."]
+offset_left = 16.0
+offset_top = 430.0
+offset_right = 600.0
+offset_bottom = 760.0
+
+[node name="VBox" type="VBoxContainer" parent="Panel"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Panel/VBox"]
+layout_mode = 2
+text = "P2 Debug"
+
+[node name="ToggleButton" type="Button" parent="Panel/VBox"]
+layout_mode = 2
+text = "Hide"
+
+[node name="OutputText" type="RichTextLabel" parent="Panel/VBox"]
+custom_minimum_size = Vector2(560, 250)
+layout_mode = 2
+size_flags_vertical = 3
+scroll_following = true

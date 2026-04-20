@@ -1,4 +1,4 @@
-[gd_scene load_steps=32 format=3 uid="uid://qd5abd4opeob"]
+[gd_scene load_steps=34 format=3 uid="uid://qd5abd4opeob"]
 
 [ext_resource type="PackedScene" uid="uid://dd8xmpgwy0t2o" path="res://scenes/environments/scene2.tscn" id="1_7jsho"]
 [ext_resource type="Script" uid="uid://x1ic1ym4ykq8" path="res://scripts/scenes/BattleSceneManager.cs" id="1_ctuyy"]
@@ -19,6 +19,8 @@
 [ext_resource type="PackedScene" uid="uid://byi2utn347fwu" path="res://scenes/actors/enemies/Enemy_Normal_guard1.tscn" id="13_x3vg8"]
 [ext_resource type="PackedScene" uid="uid://djio6ojcqw8yf" path="res://scenes/actors/enemies/Enemy_Normal_guard2.tscn" id="14_cwau0"]
 [ext_resource type="PackedScene" uid="uid://cgjrdwkemgrcy" path="res://scenes/actors/heroes/P2.tscn" id="15_p2a1"]
+[ext_resource type="Resource" uid="uid://vw50ca7hbr1m" path="res://resources/items/Supplies_p2_support_test.tres" id="15_t6vgq"]
+[ext_resource type="PackedScene" uid="uid://cqf62jji3ig7y" path="res://scenes/items/Supplies_P2_support_test.tscn" id="16_p2item"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_pvxkr"]
 size = Vector2(877.5, 3200)
@@ -68,7 +70,7 @@ y_sort_enabled = true
 position = Vector2(0, 20)
 
 [node name="MainCharacter" parent="World" instance=ExtResource("2_s0pgc")]
-position = Vector2(-6031.9985, 586.00006)
+position = Vector2(-6000, 586)
 
 [node name="Camera2D" type="Camera2D" parent="World/MainCharacter"]
 position = Vector2(0, -15.15156)
@@ -178,6 +180,10 @@ position = Vector2(-5952, -208)
 
 [node name="WeaponBrawlRiotBracer" parent="World" instance=ExtResource("11_3yw8j")]
 position = Vector2(-6585, -172)
+
+[node name="SuppliesP2SupportTest" parent="World" instance=ExtResource("16_p2item")]
+position = Vector2(-5654, -198)
+ItemDefinition = ExtResource("15_t6vgq")
 
 [node name="EnemySpawneManager" type="Node2D" parent="World" node_paths=PackedStringArray("TriggerArea")]
 top_level = true

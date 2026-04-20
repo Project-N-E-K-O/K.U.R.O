@@ -1,10 +1,9 @@
-[gd_scene load_steps=47 format=3 uid="uid://ufprfd4r8ijj"]
+[gd_scene load_steps=45 format=3 uid="uid://ufprfd4r8ijj"]
 
 [ext_resource type="SpineAtlasResource" uid="uid://c4cx1o154rxba" path="res://assets/spine/main_character/Enemy_A1_zhuA.atlas" id="1_kqj82"]
 [ext_resource type="Script" uid="uid://befx3l05f0eph" path="res://scripts/actors/heroes/MainCharacter.cs" id="1_om6pm"]
 [ext_resource type="Shader" uid="uid://bdu6bfs07ahhw" path="res://shaders/materials/shadow.gdshader" id="2_4ht1x"]
 [ext_resource type="SpineSkeletonFileResource" uid="uid://dpgx38fv62p11" path="res://assets/spine/main_character/Enemy_A1_zhuA.spine-json" id="2_om6pm"]
-[ext_resource type="Shader" uid="uid://rvlvejer46bm" path="res://shaders/materials/sprite_outline.gdshader" id="2_sprite_outline"]
 [ext_resource type="Texture2D" uid="uid://bk5a020vl054x" path="res://assets/environments/影子.png" id="3_tdm7a"]
 [ext_resource type="Script" uid="uid://den5n78y0t6q5" path="res://scripts/controllers/SpineController.gd" id="4_ixg0x"]
 [ext_resource type="Script" uid="uid://cenpuhlcgesin" path="res://scripts/systems/fsm/StateMachine.cs" id="5_y1hyr"]
@@ -45,13 +44,6 @@ shader = ExtResource("2_4ht1x")
 shader_parameter/softness = 0.5
 shader_parameter/alpha = 0.4
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_sprite_outline"]
-shader = ExtResource("2_sprite_outline")
-shader_parameter/outline_color = Color(0.02, 0.02, 0.02, 1)
-shader_parameter/outline_size = 2.0
-shader_parameter/alpha_threshold = 0.01
-shader_parameter/preserve_fill = true
-
 [sub_resource type="SpineSkeletonDataResource" id="SpineSkeletonDataResource_rs5xn"]
 atlas_res = ExtResource("1_kqj82")
 skeleton_file_res = ExtResource("2_om6pm")
@@ -90,7 +82,7 @@ AttackArea = NodePath("AttackArea")
 LeftHandAttachmentPath = NodePath("SpineSprite/SpineBoneNode")
 Speed = 500.0
 AttackDamage = 1.0
-MaxHealth = 1000
+MaxHealth = 20
 StateMachine = NodePath("StateMachine")
 EffectController = NodePath("EffectController")
 DamageFlashColor = Color(18.892157, 18.892157, 18.892157, 1)

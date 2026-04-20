@@ -1,10 +1,11 @@
-[gd_scene load_steps=7 format=3 uid="uid://cgjrdwkemgrcy"]
+[gd_scene load_steps=8 format=3 uid="uid://cgjrdwkemgrcy"]
 
 [ext_resource type="Texture2D" uid="uid://cenc4nc8osv28" path="res://assets/p2/p2.png" id="1_fj31g"]
 [ext_resource type="Script" path="res://scripts/companions/P2CompanionController.cs" id="2_p2follow"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hud/P2HintBubble.tscn" id="3_p2hint_scene"]
 [ext_resource type="Script" path="res://scripts/companions/P2SupportBrain.cs" id="4_p2brain"]
 [ext_resource type="Script" path="res://scripts/companions/P2SupportExecutor.cs" id="5_p2executor"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud/P2DebugPanel.tscn" id="6_p2debug_scene"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_fj31g"]
 radius = 220.0
@@ -31,3 +32,5 @@ SupportExecutorPath = NodePath("../SupportExecutor")
 [node name="SupportExecutor" type="Node" parent="."]
 script = ExtResource("5_p2executor")
 CompanionControllerPath = NodePath("..")
+
+[node name="DebugPanel" parent="." instance=ExtResource("6_p2debug_scene")]

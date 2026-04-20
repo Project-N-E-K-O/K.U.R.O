@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Godot;
+using Kuros.Items.Tags;
 using Kuros.Systems.AI;
 
 namespace Kuros.Companions
@@ -28,6 +29,10 @@ namespace Kuros.Companions
         private ulong _globalNextHintAtMs;
         private readonly Dictionary<string, ulong> _ruleCooldownUntilMs = new();
 
+        public ulong LastEvaluateAtMs { get; private set; }
+        public string LastTriggeredRuleKey { get; private set; } = string.Empty;
+        public string LastDecisionJson { get; private set; } = string.Empty;
+
         public override void _Process(double delta)
         {
             ResolveDependencies();
@@ -48,6 +53,8 @@ namespace Kuros.Companions
 
         private void Evaluate(GameState state)
         {
+            LastEvaluateAtMs = Time.GetTicksMsec();
+
             if (state.PlayerMaxHp <= 0)
             {
                 return;
@@ -59,12 +66,11 @@ namespace Kuros.Companions
             {
                 TryEmitDecision(
                     ruleKey: "low_hp_under_attack",
-                    decision: SupportDecision.Hint(
-                        message: "血量危险，先拉开再恢复",
+                    decision: SupportDecision.UseSupportItem(
                         sourceRule: "low_hp_under_attack",
                         reason: "player hp below threshold while under attack",
-                        urgency: "high",
-                        durationSeconds: 2.2f),
+                        itemTag: ItemTagIds.Food,
+                        urgency: "high"),
                     perRuleCooldownSeconds: 5.5f);
                 return;
             }
@@ -73,12 +79,11 @@ namespace Kuros.Companions
             {
                 TryEmitDecision(
                     ruleKey: "enemy_too_close",
-                    decision: SupportDecision.Hint(
-                        message: "敌人贴脸了，注意走位",
+                    decision: SupportDecision.TriggerSupportSkill(
                         sourceRule: "enemy_too_close",
                         reason: "nearest enemy is within danger distance",
-                        urgency: "medium",
-                        durationSeconds: 1.8f),
+                        target: "shield",
+                        urgency: "medium"),
                     perRuleCooldownSeconds: 4.0f);
                 return;
             }
@@ -110,9 +115,44 @@ namespace Kuros.Companions
                 return;
             }
 
-            _supportExecutor?.TryExecute(decision);
+            LastTriggeredRuleKey = ruleKey;
+            LastDecisionJson = decision.ToJson(pretty: false);
+
+            bool applied = _supportExecutor?.TryExecute(decision) == true;
+            if (!applied && _supportExecutor != null)
+            {
+                string fallbackMessage = BuildFallbackHint(ruleKey, _supportExecutor.LastRejectedReason);
+                var fallback = SupportDecision.Hint(
+                    message: fallbackMessage,
+                    sourceRule: $"{ruleKey}_fallback_hint",
+                    reason: $"fallback because primary decision rejected: {_supportExecutor.LastRejectedReason}",
+                    urgency: "medium",
+                    durationSeconds: 1.8f);
+
+                LastTriggeredRuleKey = $"{ruleKey}_fallback_hint";
+                LastDecisionJson = fallback.ToJson(pretty: false);
+                _supportExecutor.TryExecute(fallback);
+            }
+
             _globalNextHintAtMs = now + SecondsToMs(GlobalHintCooldownSeconds);
             _ruleCooldownUntilMs[ruleKey] = now + SecondsToMs(perRuleCooldownSeconds);
+        }
+
+        private static string BuildFallbackHint(string ruleKey, string rejectReason)
+        {
+            if (ruleKey == "low_hp_under_attack")
+            {
+                return "补给暂不可用，先撤一步保命";
+            }
+
+            if (ruleKey == "enemy_too_close")
+            {
+                return "护盾暂不可用，注意拉开距离";
+            }
+
+            return string.IsNullOrWhiteSpace(rejectReason)
+                ? "当前辅助动作不可用"
+                : $"当前辅助不可用：{rejectReason}";
         }
 
         private void ResolveDependencies()

@@ -30,6 +30,8 @@ namespace Kuros.Companions
         private float _alpha = 0f;
 
         public bool IsShowing => !string.IsNullOrEmpty(_currentText) && _remaining > 0f;
+        public string CurrentMessage => _currentText;
+        public int QueueCount => _queue.Count;
 
         public override void _Process(double delta)
         {
