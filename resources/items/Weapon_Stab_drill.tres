@@ -13,7 +13,7 @@ Value = 5.0
 
 [resource]
 script = ExtResource("5_i15sv")
-ItemId = "Weapon_Stab_drill"
+ItemId = "Weapon_Stab_Drill"
 DisplayName = "钻头"
 Description = "机械武器：钻头"
 Icon = ExtResource("3_xvvcl")
@@ -22,5 +22,5 @@ Tags = Array[String](["tag_weapon", "build_machine", "tag_stab"])
 MaxStackSize = 1
 AttributeEntries = Array[ExtResource("1_kq0dh")]([SubResource("Attribute_AttackPower")])
 WeaponSkillResources = Array[Resource]([ExtResource("4_kq0dh")])
-BuildClass = "Machine"
+BuildClass = "machine"
 WorldScenePath = "res://scenes/weapons/Weapon_Stab_drill.tscn"

@@ -9,6 +9,7 @@ using Kuros.Core.Events;
 
 namespace Kuros.Core
 {
+	[GlobalClass]
 	public partial class GameActor : CharacterBody2D
 	{
 		public event Action<int, int>? HealthChanged;
@@ -557,9 +558,11 @@ namespace Kuros.Core
 			foreach (Node child in node.GetChildren())
 			{
 				if (child is CollisionShape2D shape)
-				{
-					shape.Disabled = true;
+				{	
+					//shape.Disabled = true;
+					shape.SetDeferred(CollisionShape2D.PropertyName.Disabled, true);
 				}
+
 				// 递归处理所有子节点
 				DisableCollisionShapeInNode(child);
 			}

@@ -53,7 +53,6 @@ namespace Kuros.Items.World
 		[Export] public string DestructionAnimationName { get; set; } = "destroy"; // 销毁动画名称
 		[Export] public float DestructionAnimationDuration { get; set; } = 0.5f; // 销毁动画时长（如果动画播放器不存在，使用固定时长）
 		[Export(PropertyHint.Range, "0.1,10,0.1")] public float LandingHideDelay { get; set; } = 2.0f; // 落点处隐藏延迟（秒）：投掷武器落地后隐藏视觉的等待时间；到达 ThrowWeaponCooldown 后才归还背包并销毁节点
-		[Export(PropertyHint.File, "*.tscn")] public string DestructionEffectScene { get; set; } = string.Empty; // 销毁时生成的特效Scene（可选）
 
 		[ExportGroup("Physics")]
 		[Export] public NodePath RigidBodyPath { get; set; } = new NodePath(".");
@@ -109,6 +108,11 @@ namespace Kuros.Items.World
 		private int _reservedQuickBarSlotIndex = -1; // 投掷武器飞行期间预留的快捷栏槽位索引
 
 		public GameActor? LastDroppedBy { get; set; }
+
+		/// <summary>
+		/// 当前被高亮的实体（由 PlayerItemInteractionComponent 每帧设置，避免 O(N²) 遍历）
+		/// </summary>
+		internal static RigidBodyWorldItemEntity? CurrentHighlightedEntity { get; set; }
 		
 		/// <summary>
 		/// 检查投掷武器是否在冷却中
@@ -349,6 +353,18 @@ namespace Kuros.Items.World
 		private bool IsInThrowLifecycle =>
 			_isThrown || _inFlight || _landingHideTimer > 0.0 || _inventoryReturnTimer > 0.0;
 
+		/// <summary>
+		/// 判断此实例是否有资格参与高亮候选（供 PlayerItemInteractionComponent 调用）
+		/// </summary>
+		internal bool IsHighlightCandidate =>
+			EnableGrabAreaOutlineHighlight && !_isPicked && !IsInThrowLifecycle
+			&& _grabArea != null && GodotObject.IsInstanceValid(_grabArea);
+
+		/// <summary>
+		/// 获取此实例的 GrabArea（供 PlayerItemInteractionComponent 进行距离判断）
+		/// </summary>
+		internal Area2D? GrabArea => _grabArea;
+
 		private void UpdateOutlineHighlight(bool force = false)
 		{
 			ResolveOutlineHighlight();
@@ -357,38 +373,9 @@ namespace Kuros.Items.World
 				return;
 			}
 
-			// 只高亮离玩家最近的那一件
-			// 投掷中的武器实例本身不参与高亮（但不影响场上其他同名武器）
-			bool shouldHighlight = false;
-			if (EnableGrabAreaOutlineHighlight && !_isPicked && !IsInThrowLifecycle && _grabArea != null && GodotObject.IsInstanceValid(_grabArea))
-			{
-				var grabArea = ResolvePlayerGrabArea();
-				if (grabArea != null && GodotObject.IsInstanceValid(grabArea))
-				{
-					RigidBodyWorldItemEntity? closest = null;
-					float minDist = float.MaxValue;
-					foreach (var node in GetTree().GetNodesInGroup("world_items"))
-					{
-						if (node is RigidBodyWorldItemEntity item
-							&& item.EnableGrabAreaOutlineHighlight
-							&& !item._isPicked
-							&& !item.IsInThrowLifecycle  // 排除投掷中的实例，不参与最近候选
-							&& item._grabArea != null && GodotObject.IsInstanceValid(item._grabArea))
-						{
-							if (item._grabArea.OverlapsArea(grabArea))
-							{
-								float dist = item.GlobalPosition.DistanceSquaredTo(grabArea.GlobalPosition);
-								if (dist < minDist)
-								{
-									minDist = dist;
-									closest = item;
-								}
-							}
-						}
-					}
-					shouldHighlight = ReferenceEquals(this, closest);
-				}
-			}
+			// 由 PlayerItemInteractionComponent 每帧设置 CurrentHighlightedEntity，
+			// 此处只需检查自己是否为当前高亮实体（O(1)）
+			bool shouldHighlight = ReferenceEquals(this, CurrentHighlightedEntity);
 
 			if (!force && _isOutlineHighlighted == shouldHighlight)
 			{
@@ -1311,8 +1298,8 @@ namespace Kuros.Items.World
 				DisableGrabArea();
 			}
 
-			// 生成特效（如果有）
-			SpawnDestructionEffect();
+			// 生成 OnThrowDestroy 效果（Node2D 在世界坐标生成，ActorEffect 应用到投掷者）
+			SpawnThrowDestroyEffects();
 
 			// 播放销毁动画
 			PlayDestructionAnimation();
@@ -1342,11 +1329,12 @@ namespace Kuros.Items.World
 				DisableGrabArea();
 			}
 
-			// 生成特效（如果有）
-			SpawnDestructionEffect();
+			// 生成 OnThrowDestroy 效果（Node2D 在世界坐标生成，ActorEffect 应用到投掷者）
+			SpawnThrowDestroyEffects();
 
 			// 播放销毁动画
 			PlayDestructionAnimation();
+			GD.Print($"[{Name}] 在落点销毁物品");
 		}
 
 		/// <summary>
@@ -1372,42 +1360,8 @@ namespace Kuros.Items.World
 				DisableGrabArea();
 			}
 
-			// 生成落点特效（如果有配置）
-			SpawnDestructionEffect();
-		}
-
-		/// <summary>
-		/// 生成销毁特效
-		/// </summary>
-		private void SpawnDestructionEffect()
-		{
-			// 如果配置了销毁特效Scene，则实例化它
-			if (!string.IsNullOrWhiteSpace(DestructionEffectScene))
-			{
-				try
-				{
-					var scene = GD.Load<PackedScene>(DestructionEffectScene);
-					if (scene != null)
-					{
-						var effect = scene.Instantiate();
-						if (effect is Node2D effect2D)
-						{
-							// 使用 RigidBody2D 的实际坐标：飞行期间只有 _rigidBody 随武器移动，
-							// 脚本所在的 Node2D 根节点停留在初始生成位置（玩家附近），直接用 GlobalPosition 会导致特效生成在玩家处
-							GetParent()?.AddChild(effect2D);
-							effect2D.GlobalPosition = _rigidBody?.GlobalPosition ?? GlobalPosition;
-						}
-						else if (effect != null)
-						{
-							GetParent()?.AddChild(effect);
-						}
-					}
-				}
-				catch (Exception ex)
-				{
-					GD.PushWarning($"[{Name}] 无法生成销毁特效: {ex.Message}");
-				}
-			}
+			// 生成 OnThrowDestroy 效果（Node2D 在世界坐标生成，ActorEffect 应用到投掷者）
+			SpawnThrowDestroyEffects();
 		}
 
 		private void DisableGrabArea()
@@ -1664,6 +1618,50 @@ namespace Kuros.Items.World
 		private void ApplyItemEffects(GameActor actor, ItemEffectTrigger trigger)
 		{
 			ItemDefinition?.ApplyEffects(actor, trigger);
+		}
+
+		/// <summary>
+		/// 在落点/命中点处理 OnThrowDestroy 效果：
+		/// - Node2D 类型场景：在世界坐标实例化（烟雾、爆炸等视觉效果）
+		/// - ActorEffect 类型：应用到投掷者身上
+		/// </summary>
+		private void SpawnThrowDestroyEffects()
+		{
+			if (ItemDefinition == null) return;
+
+			Vector2 spawnPos = _rigidBody?.GlobalPosition ?? GlobalPosition;
+
+			foreach (var entry in ItemDefinition.GetEffectEntries(ItemEffectTrigger.OnThrowDestroy))
+			{
+				if (entry?.EffectScene == null) continue;
+
+				try
+				{
+					var node = entry.EffectScene.Instantiate();
+					if (node is Node2D node2D)
+					{
+						// 视觉效果：在世界坐标生成，使用 RigidBody 的实际落点位置
+						GetParent()?.AddChild(node2D);
+						node2D.GlobalPosition = spawnPos;
+					}
+					else if (node is Kuros.Core.Effects.ActorEffect actorEffect)
+					{
+						// Actor 效果：应用到投掷者
+						if (LastDroppedBy?.EffectController != null)
+							LastDroppedBy.ApplyEffect(actorEffect);
+						else
+							actorEffect.QueueFree();
+					}
+					else
+					{
+						node?.QueueFree();
+					}
+				}
+				catch (Exception ex)
+				{
+					GD.PushWarning($"[{Name}] 无法生成 OnThrowDestroy 效果: {ex.Message}");
+				}
+			}
 		}
 
 		private static T? FindChildComponent<T>(Node root) where T : Node

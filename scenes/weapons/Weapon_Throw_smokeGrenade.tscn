@@ -32,7 +32,6 @@ KnockbackForce = 0.0
 IsThrowWeapon = true
 ThrowWeaponCooldown = 10.0
 LandingHideDelay = 0.5
-DestructionEffectScene = "uid://ckvi05o7l1mv4"
 RigidBodyPath = NodePath("RigidBody2D")
 HitboxAreaPath = NodePath("RigidBody2D/AttackArea")
 

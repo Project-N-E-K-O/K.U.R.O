@@ -31,7 +31,8 @@ MinDamageVelocity = 0.0
 KnockbackForce = 0.0
 StopOnHit = true
 IsThrowWeapon = true
-ThrowWeaponCooldown = 5.0
+ThrowWeaponCooldown = 10.0
+LandingHideDelay = 0.5
 RigidBodyPath = NodePath("RigidBody2D")
 HitboxAreaPath = NodePath("RigidBody2D/AttackArea")
 
