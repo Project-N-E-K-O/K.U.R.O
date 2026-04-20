@@ -57,8 +57,9 @@ namespace Kuros.Items.World
 		[ExportGroup("Physics")]
 		[Export] public NodePath RigidBodyPath { get; set; } = new NodePath(".");
 		[Export] public NodePath HitboxAreaPath { get; set; } = new NodePath("Rigidbody2D/Hitbox");
-		[Export] public uint ThrowCollisionLayer { get; set; } = 1u << 2; // 投掷时的碰撞层（默认第3层：1u<<2=4，占用第3层；墙/地面的Mask需包含第3层才能检测到投掷物品）
-		[Export] public uint ThrowCollisionMask { get; set; } = 0; // 投掷时的碰撞遮罩（0=不检测任何层；如果碰撞只依赖layer，则设为0；如果需要双向检测，则设置为包含墙所在层的值）
+		[Export] public NodePath ShadowPath { get; set; } = new NodePath("Shadow"); // 阴影节点路径，投掷飞行期间隐藏
+		[Export] public uint ThrowCollisionLayer { get; set; } = 1u << 2;
+		[Export] public uint ThrowCollisionMask { get; set; } = 0;
 
 
 		public InventoryItemStack? CurrentStack { get; private set; }
@@ -101,6 +102,7 @@ namespace Kuros.Items.World
 		private ShaderMaterial? _outlineMaterial; // Outline 着色器材料
 		private Area2D? _cachedPlayerGrabArea; // 缓存的玩家 GrabArea
 		private bool _isOutlineHighlighted; // 是否正在高亮显示
+		private Node2D? _shadowNode; // 阴影节点缓存
 		private double _throwCooldownTimer = 0.0; // 投掷武器冷却计时器
 		private bool _isInCooldown = false; // 是否在冷却中
 		private double _landingHideTimer = 0.0; // 落点隐藏计时器（LandingHideDelay：到期后隐藏视觉，不销毁节点）
@@ -184,6 +186,7 @@ namespace Kuros.Items.World
 			ResolveHitboxArea();
 			UpdateSprite();
 			ResolveOutlineHighlight();
+			ResolveShadowNode();
 			UpdateOutlineHighlight(force: true);
 			SetProcess(true);
 		}
@@ -285,6 +288,26 @@ namespace Kuros.Items.World
 					sprite.Texture = ItemDefinition.Icon;
 				}
 			}
+		}
+
+		private void ResolveShadowNode()
+		{
+			if (!ShadowPath.IsEmpty)
+			{
+				_shadowNode = GetNodeOrNull<Node2D>(ShadowPath);
+			}
+			// 若路径未找到，尝试常见名称
+			if (_shadowNode == null)
+			{
+				_shadowNode = GetNodeOrNull<Node2D>("Shadow")
+					?? _rigidBody?.GetNodeOrNull<Node2D>("Shadow");
+			}
+		}
+
+		private void SetShadowVisible(bool visible)
+		{
+			if (_shadowNode != null && GodotObject.IsInstanceValid(_shadowNode))
+				_shadowNode.Visible = visible;
 		}
 
 		private void ResolveOutlineHighlight()
@@ -446,8 +469,9 @@ namespace Kuros.Items.World
 					_hitActors.Clear();
 					_isThrown = true;
 					
-					// 立即清除高亮（进入投掷生命周期后本实例不再参与高亮）
-					UpdateOutlineHighlight(force: true);
+				// 投掷飞行期间隐藏阴影
+				SetShadowVisible(false);
+				
 
 					// 构筑效果已在 PlayerItemInteractionComponent.TryHandleDrop 中预注册，此处无需重复注册
 					
@@ -624,6 +648,9 @@ namespace Kuros.Items.World
 					_rigidBody.LinearVelocity = Vector2.Zero;
 					try { _rigidBody.Set("freeze", true); } catch { }
 					RestoreRigidBodyCollision();
+					
+					// 落地时恢复阴影显示
+					SetShadowVisible(true);
 					
 					// 开始落点隐藏计时（LandingHideDelay：到期后隐藏视觉）
 					// 归还背包由 _inventoryReturnTimer（ThrowWeaponCooldown）独立控制

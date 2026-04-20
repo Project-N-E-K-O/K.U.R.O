@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=5 format=3 uid="uid://4m8yhblax0ju"]
+
+[ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="1_8qmrl"]
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="2_q4cac"]
+[ext_resource type="Texture2D" uid="uid://71014jgtkruj" path="res://assets/furnitures/hotel_scene2/TableRoundB.png" id="3_8qmrl"]
+[ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="4_fwe2t"]
+
+[resource]
+script = ExtResource("4_fwe2t")
+ItemId = "Furniture_B_TableRoundB"
+DisplayName = "迎宾茶几"
+Description = "一次性投掷道具：迎宾茶几"
+Icon = ExtResource("3_8qmrl")
+Category = "Furniture"
+Tags = Array[String](["tag_throw", "furniture"])
+MaxStackSize = 1
+LevelCount = 0
+IsThrowable = true
+IsFurniture = true
+ThrowStartOffset = Vector2(0, -450)
+ThrowParabolicDuration = 0.30000000000000004
+ThrowHorizontalDistance = 500.0
+ThrowParabolicLandingYOffset = 325.0
+WorldScenePath = "uid://1mc4twnj45va"

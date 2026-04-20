@@ -3,11 +3,12 @@
 [ext_resource type="Texture2D" uid="uid://c72hb4tqgnj5f" path="res://assets/furnitures/hotel_scene2/ColumnsB.png" id="1_mbnq6"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_3yw8j"]
-size = Vector2(300, 350)
+size = Vector2(900, 942.4243)
 
 [node name="columnsB1" type="RigidBody2D"]
 z_index = 2
 y_sort_enabled = true
+scale = Vector2(0.33, 0.33)
 collision_mask = 7
 gravity_scale = 0.0
 can_sleep = false
@@ -16,8 +17,9 @@ freeze_mode = 1
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("1_mbnq6")
-offset = Vector2(0, -250)
+offset = Vector2(0, -1200)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, 150)
+position = Vector2(9.090907, -83.33331)
+scale = Vector2(0.9999999, 0.9999999)
 shape = SubResource("RectangleShape2D_3yw8j")

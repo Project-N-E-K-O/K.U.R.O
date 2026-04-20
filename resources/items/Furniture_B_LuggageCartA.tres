@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=5 format=3 uid="uid://bamqly62hhrb7"]
+
+[ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="1_7ti4r"]
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="2_qs3ja"]
+[ext_resource type="Texture2D" uid="uid://j5yfe8op7l0j" path="res://assets/furnitures/hotel_scene2/LuggageCartA.png" id="3_7ti4r"]
+[ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="4_4k75e"]
+
+[resource]
+script = ExtResource("4_4k75e")
+ItemId = "Furniture_B_LuggageCartA"
+DisplayName = "行李推车"
+Description = "一次性投掷道具：行李推车"
+Icon = ExtResource("3_7ti4r")
+Category = "Furniture"
+Tags = Array[String](["tag_throw", "furniture"])
+MaxStackSize = 1
+LevelCount = 0
+IsThrowable = true
+IsFurniture = true
+ThrowStartOffset = Vector2(0, -350)
+ThrowParabolicDuration = 0.30000000000000004
+ThrowHorizontalDistance = 500.0
+ThrowParabolicLandingYOffset = 200.0
+WorldScenePath = "uid://0anrcfm2pnsd"

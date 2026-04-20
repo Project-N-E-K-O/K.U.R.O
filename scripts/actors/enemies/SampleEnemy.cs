@@ -8,7 +8,7 @@ public partial class SampleEnemy : GameActor
 	[ExportCategory("Debug")]
 	[Export] public bool EnableStateDebugOverlay = false;
 	[Export] public Vector2 DebugOverlayOffset = new(-90f, -90f);
-	[Export(PropertyHint.Range, "8,48,1")] public int DebugOverlayFontSize = 14;
+	[Export(PropertyHint.Range, "8,128,1")] public int DebugOverlayFontSize = 14;
 	[Export] public Color DebugOverlayColor = new(1f, 0.95f, 0.2f, 1f);
 
 	[ExportCategory("Detection")]

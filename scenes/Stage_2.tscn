@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=3 uid="uid://qd5abd4opeob"]
+[gd_scene load_steps=28 format=3 uid="uid://qd5abd4opeob"]
 
 [ext_resource type="PackedScene" uid="uid://dd8xmpgwy0t2o" path="res://scenes/environments/scene2.tscn" id="1_7jsho"]
 [ext_resource type="Script" uid="uid://x1ic1ym4ykq8" path="res://scripts/scenes/BattleSceneManager.cs" id="1_ctuyy"]
@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://del8hgcg3sr4i" path="res://scripts/managers/CameraFollow.cs" id="4_vvtmr"]
 [ext_resource type="PackedScene" uid="uid://cipwjj7xx121y" path="res://scenes/weapons/Weapon_Throw_smokeGrenade.tscn" id="6_axd6b"]
 [ext_resource type="PackedScene" uid="uid://cofm45kotvgto" path="res://scenes/actors/enemies/Enemy_B1_fat.tscn" id="6_ctuyy"]
+[ext_resource type="PackedScene" uid="uid://cqpk38oxthrr1" path="res://scenes/items/Furniture_B_tableRoundA.tscn" id="6_sxiib"]
 [ext_resource type="Script" uid="uid://b7afb3wjghskq" path="res://scripts/items/world/DropItemDebugger.cs" id="7_k0qph"]
 [ext_resource type="Script" uid="uid://b3iq6dm2pc5y0" path="res://scripts/controllers/EnemySpawnManager.cs" id="8_5klp8"]
 [ext_resource type="PackedScene" uid="uid://6ghjqyjkk37w" path="res://scenes/weapons/Weapon_Stab_umbrella.tscn" id="8_pvxkr"]
@@ -19,8 +20,11 @@
 [ext_resource type="PackedScene" uid="uid://byi2utn347fwu" path="res://scenes/actors/enemies/Enemy_Normal_guard1.tscn" id="13_x3vg8"]
 [ext_resource type="PackedScene" uid="uid://djio6ojcqw8yf" path="res://scenes/actors/enemies/Enemy_Normal_guard2.tscn" id="14_cwau0"]
 [ext_resource type="PackedScene" uid="uid://bvvyo3wubh12j" path="res://scenes/weapons/Weapon_Throw_gravityGrenade.tscn" id="14_t6vgq"]
-[ext_resource type="PackedScene" uid="uid://djpr7gcy077em" path="res://scenes/items/Furniture_B_counterB.tscn" id="15_22xbq"]
+[ext_resource type="PackedScene" uid="uid://bkbhucnxqiys2" path="res://scenes/items/Furniture_B_counterB.tscn" id="15_22xbq"]
+[ext_resource type="PackedScene" uid="uid://3c5l27vhvwni" path="res://scenes/items/Furniture_B_sofaA.tscn" id="16_ly1ch"]
 [ext_resource type="PackedScene" uid="uid://ctpw5uqly3yu5" path="res://scenes/weapons/Weapon_Brawl_mechGlove.tscn" id="19_t6vgq"]
+[ext_resource type="PackedScene" uid="uid://0anrcfm2pnsd" path="res://scenes/items/Furniture_B_luggageCartA.tscn" id="22_22xbq"]
+[ext_resource type="PackedScene" uid="uid://1mc4twnj45va" path="res://scenes/items/Furniture_B_tableRoundB.tscn" id="24_nosxg"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2l4aj"]
 size = Vector2(1112.5, 1843)
@@ -37,14 +41,31 @@ LevelName = "关卡 2"
 y_sort_enabled = true
 
 [node name="columnsB1" parent="World" instance=ExtResource("3_3yw8j")]
-position = Vector2(-2666, -500)
+position = Vector2(-2666, -307)
 
 [node name="columnsB2" parent="World" instance=ExtResource("3_3yw8j")]
-position = Vector2(-2666, 750)
+position = Vector2(-2666, 943)
+
+[node name="FurnitureCounterB" parent="World" instance=ExtResource("15_22xbq")]
+position = Vector2(-3580, -326)
+
+[node name="FurnitureLuggageCartA" parent="World" instance=ExtResource("22_22xbq")]
+position = Vector2(-5392, -614)
+
+[node name="FurnitureSofaA" parent="World" instance=ExtResource("16_ly1ch")]
+position = Vector2(-6217, 417)
+
+[node name="FurnitureTableRoundB2" parent="World" instance=ExtResource("6_sxiib")]
+position = Vector2(-5266, 855)
+GrabAreaPath = NodePath("../FurnitureTableRoundB/RigidBody2D/CollisionArea")
+HighlightSpritePath = NodePath("../FurnitureTableRoundB/RigidBody2D/Outline")
+RigidBodyPath = NodePath("../FurnitureTableRoundB/RigidBody2D")
+HitboxAreaPath = NodePath("../FurnitureTableRoundB/RigidBody2D/AttackArea")
+
+[node name="FurnitureTableRoundB" parent="World" instance=ExtResource("24_nosxg")]
+position = Vector2(-6176, 1016)
 
 [node name="Scene2" parent="World" instance=ExtResource("1_7jsho")]
-
-[node name="Items" type="Node2D" parent="World"]
 
 [node name="MainCharacter" parent="World" instance=ExtResource("2_s0pgc")]
 position = Vector2(-5636, 246.00003)
@@ -75,9 +96,6 @@ HitStopDelay = 0.1
 
 [node name="DroopTest" type="Node2D" parent="World"]
 
-[node name="WeaponThrowSmokeGrenade" parent="World/DroopTest" instance=ExtResource("6_axd6b")]
-position = Vector2(-6435, 885)
-
 [node name="WeaponStabUmbrella" parent="World/DroopTest" instance=ExtResource("8_pvxkr")]
 position = Vector2(-5922, -591)
 
@@ -90,26 +108,17 @@ position = Vector2(-5952, -208)
 [node name="WeaponBrawlRiotBracer" parent="World/DroopTest" instance=ExtResource("11_3yw8j")]
 position = Vector2(-6552, -156)
 
-[node name="WeaponBrawlRiotBracer2" parent="World/DroopTest" instance=ExtResource("11_3yw8j")]
-position = Vector2(-7153, -66)
-
-[node name="WeaponBrawlRiotBracer3" parent="World/DroopTest" instance=ExtResource("11_3yw8j")]
-position = Vector2(-6984, -463)
-
 [node name="WeaponMechGlove" parent="World/DroopTest" instance=ExtResource("19_t6vgq")]
 position = Vector2(-6374, -494)
+
+[node name="WeaponThrowSmokeGrenade" parent="World/DroopTest" instance=ExtResource("6_axd6b")]
+position = Vector2(-7212, 204)
 
 [node name="WeaponThrowMetalSpike" parent="World/DroopTest" instance=ExtResource("13_eyity")]
 position = Vector2(-7149, 606)
 
 [node name="WeaponThrowGravityGrenade" parent="World/DroopTest" instance=ExtResource("14_t6vgq")]
 position = Vector2(-7027, 983)
-
-[node name="WeaponThrowSmokeGrenade2" parent="World/DroopTest" instance=ExtResource("6_axd6b")]
-position = Vector2(-5721, 885)
-
-[node name="Furniture_B_CounterB" parent="World/DroopTest" instance=ExtResource("15_22xbq")]
-position = Vector2(-5818, 359)
 
 [node name="DropDebug" type="Node2D" parent="World"]
 script = ExtResource("7_k0qph")

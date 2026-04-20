@@ -23,5 +23,6 @@ BuildClass = "machine"
 IsThrowable = true
 ThrowStartOffset = Vector2(0, -300)
 ThrowParabolicDuration = 0.4
+ThrowHorizontalDistance = 700.0
 ThrowParabolicLandingYOffset = 200.0
 WorldScenePath = "uid://bvvyo3wubh12j"

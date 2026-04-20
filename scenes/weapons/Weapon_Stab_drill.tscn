@@ -1,9 +1,16 @@
-[gd_scene load_steps=8 format=3 uid="uid://cdnitqquebaw6"]
+[gd_scene load_steps=11 format=3 uid="uid://cdnitqquebaw6"]
 
 [ext_resource type="Script" uid="uid://dtgdjgrqgype7" path="res://scripts/items/world/WorldItemEntity.cs" id="1_0qove"]
 [ext_resource type="Resource" uid="uid://ba0kuifke6v7o" path="res://resources/items/Weapon_Stab_Drill.tres" id="2_0qove"]
 [ext_resource type="Texture2D" uid="uid://dkgk5xhiddujd" path="res://assets/weapons/钻头.png" id="3_0qove"]
+[ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="3_1l2vw"]
 [ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="3_emqd7"]
+[ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="4_ie112"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_g0q5t"]
+shader = ExtResource("3_1l2vw")
+shader_parameter/softness = 0.5
+shader_parameter/alpha = 0.4
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ywkyd"]
 shader = ExtResource("3_emqd7")
@@ -14,23 +21,28 @@ shader_parameter/edge_softness = 0.12
 shader_parameter/preserve_fill = true
 
 [sub_resource type="RectangleShape2D" id="BodyShape_rr6vl"]
-size = Vector2(500, 120)
+size = Vector2(1200, 330)
 
 [sub_resource type="RectangleShape2D" id="TriggerShape_yahcm"]
 size = Vector2(2072.0605, 465.9394)
 
 [node name="WeaponStabDrill" type="CharacterBody2D"]
 z_index = 1
-scale = Vector2(0.66, 0.66)
+scale = Vector2(0.33, 0.33)
 collision_layer = 0
 collision_mask = 0
 script = ExtResource("1_0qove")
 ItemDefinition = ExtResource("2_0qove")
 DefaultOutlineColor = Color(0, 0, 0, 0)
 
+[node name="Shadow" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_g0q5t")
+position = Vector2(0, 100)
+scale = Vector2(16, 4)
+texture = ExtResource("4_ie112")
+
 [node name="Outline" type="Sprite2D" parent="."]
 material = SubResource("ShaderMaterial_ywkyd")
-scale = Vector2(0.5, 0.5)
 texture = ExtResource("3_0qove")
 
 [node name="Sprite2D" type="Sprite2D" parent="Outline"]
@@ -40,10 +52,12 @@ texture = ExtResource("3_0qove")
 visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CollisionArea"]
-position = Vector2(-5, -1)
+position = Vector2(0, 18)
+scale = Vector2(0.9999999, 0.9999999)
 shape = SubResource("BodyShape_rr6vl")
 
 [node name="AttackArea" type="Area2D" parent="."]
+visible = false
 scale = Vector2(0.5, 0.5)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AttackArea"]

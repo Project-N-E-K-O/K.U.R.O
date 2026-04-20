@@ -1,9 +1,16 @@
-[gd_scene load_steps=8 format=3 uid="uid://2pny8f8vuu3j"]
+[gd_scene load_steps=11 format=3 uid="uid://2pny8f8vuu3j"]
 
 [ext_resource type="Script" uid="uid://dtgdjgrqgype7" path="res://scripts/items/world/WorldItemEntity.cs" id="1_64hvb"]
 [ext_resource type="Resource" uid="uid://b1jpt8qriaub8" path="res://resources/items/Weapon_Slash_BarrierGate.tres" id="2_64hvb"]
 [ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="3_07ll6"]
 [ext_resource type="Texture2D" uid="uid://dgvv4023kntq7" path="res://assets/weapons/闸门刀.png" id="3_64hvb"]
+[ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="3_aybeu"]
+[ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="4_ofv0e"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_nqlfu"]
+shader = ExtResource("3_aybeu")
+shader_parameter/softness = 0.5
+shader_parameter/alpha = 0.4
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_waoek"]
 shader = ExtResource("3_07ll6")
@@ -14,23 +21,29 @@ shader_parameter/edge_softness = 0.12
 shader_parameter/preserve_fill = true
 
 [sub_resource type="RectangleShape2D" id="BodyShape_rr6vl"]
-size = Vector2(1836, 184)
+size = Vector2(3606.0605, 388.96973)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_64hvb"]
 radius = 800.0
 
 [node name="WeaponSlashBarrierGate" type="CharacterBody2D"]
 z_index = 1
-scale = Vector2(0.66, 0.66)
+scale = Vector2(0.33, 0.33)
 collision_layer = 0
 collision_mask = 0
 script = ExtResource("1_64hvb")
 ItemDefinition = ExtResource("2_64hvb")
 DefaultOutlineColor = Color(0, 0, 0, 0)
 
+[node name="Shadow" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_nqlfu")
+position = Vector2(-3.0547386e-07, 87.878784)
+rotation = -0.05235988
+scale = Vector2(30, 2)
+texture = ExtResource("4_ofv0e")
+
 [node name="Outline" type="Sprite2D" parent="."]
 material = SubResource("ShaderMaterial_waoek")
-scale = Vector2(0.5, 0.5)
 texture = ExtResource("3_64hvb")
 region_rect = Rect2(0, 424, 1832, 177)
 
@@ -41,10 +54,12 @@ texture = ExtResource("3_64hvb")
 visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CollisionArea"]
-scale = Vector2(0.5, 0.5)
+position = Vector2(-1.5151281, 51.24242)
+scale = Vector2(0.49999994, 0.49999994)
 shape = SubResource("BodyShape_rr6vl")
 
 [node name="AttackArea" type="Area2D" parent="."]
+visible = false
 scale = Vector2(0.5, 0.5)
 collision_layer = 0
 
