@@ -1,7 +1,9 @@
-[gd_scene load_steps=2 format=3 uid="uid://heavy_carry_slow_effect"]
+[gd_scene load_steps=2 format=3 uid="uid://bi7guxtti6ocl"]
 
-[ext_resource type="Script" path="res://scripts/effects/HeavyCarrySlowEffect.cs" id="1_slow_effect_script"]
+[ext_resource type="Script" uid="uid://b6hqlfeol6wnb" path="res://scripts/effects/HeavyCarrySlowEffect.cs" id="1_slow_effect_script"]
 
 [node name="HeavyCarrySlowEffect" type="Node"]
 script = ExtResource("1_slow_effect_script")
-
+EffectId = "7cdfd3cb-19a2-4355-a11a-a6dafb9be6d0"
+IsBuff = false
+Duration = 0.0

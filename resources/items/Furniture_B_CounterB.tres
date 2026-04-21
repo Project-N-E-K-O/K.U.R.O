@@ -1,9 +1,27 @@
-[gd_resource type="Resource" script_class="ItemDefinition" load_steps=5 format=3 uid="uid://cbb56n2xt45k6"]
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=9 format=3 uid="uid://cbb56n2xt45k6"]
 
 [ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="1_lq6dd"]
 [ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="3_247hv"]
+[ext_resource type="PackedScene" uid="uid://bi7guxtti6ocl" path="res://resources/effects/HeavyCarrySlowEffect.tscn" id="3_a4hte"]
 [ext_resource type="Texture2D" uid="uid://c0ao8pdrenk5f" path="res://assets/furnitures/hotel_scene2/CounterB.png" id="4_a4hte"]
+[ext_resource type="PackedScene" uid="uid://ciwlpetibguab" path="res://shaders/destroy_somke.tscn" id="4_lq6dd"]
 [ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="6_phd83"]
+
+[sub_resource type="Resource" id="Resource_a4hte"]
+script = ExtResource("3_247hv")
+Trigger = 1
+EffectScene = ExtResource("3_a4hte")
+Notes = "大型家具：减速70%"
+PropertyOverrides = Dictionary[String, Variant]({
+"SpeedMultiplierPerStack": 0.3
+})
+metadata/_custom_type_script = "uid://bv0es4osw3x0r"
+
+[sub_resource type="Resource" id="Resource_x548b"]
+script = ExtResource("3_247hv")
+Trigger = 4
+EffectScene = ExtResource("4_lq6dd")
+metadata/_custom_type_script = "uid://bv0es4osw3x0r"
 
 [resource]
 script = ExtResource("6_phd83")
@@ -14,6 +32,7 @@ Icon = ExtResource("4_a4hte")
 Category = "Furniture"
 Tags = Array[String](["tag_throw", "furniture"])
 MaxStackSize = 1
+EffectEntries = Array[ExtResource("3_247hv")]([SubResource("Resource_a4hte"), SubResource("Resource_x548b")])
 LevelCount = 0
 IsThrowable = true
 IsFurniture = true

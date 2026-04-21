@@ -24,7 +24,7 @@ shader_parameter/preserve_fill = true
 size = Vector2(218.52942, 139.41177)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_gy46y"]
-size = Vector2(754, 421)
+size = Vector2(754, 596)
 
 [node name="FurnitureTableRoundB" type="Node2D"]
 z_index = 2
@@ -38,7 +38,8 @@ ThrowDamage = 10.0
 MinDamageVelocity = 0.0
 KnockbackForce = 0.0
 StopOnHit = true
-LandingHideDelay = 0.5
+DestructionAnimationDuration = 0.0
+LandingHideDelay = 0.01
 RigidBodyPath = NodePath("RigidBody2D")
 HitboxAreaPath = NodePath("RigidBody2D/AttackArea")
 
@@ -76,7 +77,8 @@ position = Vector2(-11, -96.25)
 shape = SubResource("RectangleShape2D_gy46y")
 
 [node name="AttackArea" type="Area2D" parent="RigidBody2D"]
+visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/AttackArea"]
-position = Vector2(0, -59.5)
+position = Vector2(0, 90)
 shape = SubResource("RectangleShape2D_gy46y")

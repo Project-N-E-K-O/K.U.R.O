@@ -21,10 +21,10 @@ shader_parameter/edge_softness = 0.12
 shader_parameter/preserve_fill = true
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jyvv2"]
-size = Vector2(146.17648, 79.11765)
+size = Vector2(145.58826, 94.70589)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_gy46y"]
-size = Vector2(380, 328)
+size = Vector2(452, 637)
 
 [node name="FurnitureTableRoundA" type="Node2D"]
 z_index = 2
@@ -38,7 +38,8 @@ ThrowDamage = 10.0
 MinDamageVelocity = 0.0
 KnockbackForce = 0.0
 StopOnHit = true
-LandingHideDelay = 0.5
+DestructionAnimationDuration = 0.0
+LandingHideDelay = 0.01
 RigidBodyPath = NodePath("RigidBody2D")
 HitboxAreaPath = NodePath("RigidBody2D/AttackArea")
 
@@ -50,7 +51,7 @@ freeze_mode = 1
 
 [node name="Shadow" type="Sprite2D" parent="RigidBody2D"]
 material = SubResource("ShaderMaterial_aa7cv")
-position = Vector2(0, 5)
+position = Vector2(-8, 42.000004)
 scale = Vector2(7, 5)
 texture = ExtResource("4_1l8mh")
 
@@ -64,7 +65,7 @@ texture = ExtResource("5_xulvd")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D"]
 visible = false
-position = Vector2(6.4999933, -46.500008)
+position = Vector2(-0.5000038, -43)
 scale = Vector2(3.4, 3.4)
 shape = SubResource("RectangleShape2D_jyvv2")
 
@@ -72,12 +73,12 @@ shape = SubResource("RectangleShape2D_jyvv2")
 visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/CollisionArea"]
-position = Vector2(6.5, -149)
+position = Vector2(6, -123.5)
 shape = SubResource("RectangleShape2D_gy46y")
 
 [node name="AttackArea" type="Area2D" parent="RigidBody2D"]
 visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/AttackArea"]
-position = Vector2(2, -76)
+position = Vector2(2, 21.5)
 shape = SubResource("RectangleShape2D_gy46y")

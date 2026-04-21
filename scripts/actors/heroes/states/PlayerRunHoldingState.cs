@@ -96,8 +96,8 @@ namespace Kuros.Actors.Heroes.States
             
             // 奔跑移动逻辑（x倍速度）
             Vector2 velocity = Actor.Velocity;
-            velocity.X = input.X * (Actor.Speed * 1.5f);
-            velocity.Y = input.Y * (Actor.Speed * 1.5f);
+            velocity.X = input.X * (Actor.Speed * 2f);
+            velocity.Y = input.Y * (Actor.Speed * 2f);
             
             Actor.Velocity = velocity;
             

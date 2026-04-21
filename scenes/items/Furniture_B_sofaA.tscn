@@ -24,7 +24,7 @@ shader_parameter/preserve_fill = true
 size = Vector2(372.64706, 88.82353)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_gy46y"]
-size = Vector2(1115, 328)
+size = Vector2(1115, 681)
 
 [node name="FurnitureSofaA" type="Node2D"]
 z_index = 2
@@ -34,11 +34,12 @@ ItemDefinition = ExtResource("2_6f5qb")
 GrabAreaPath = NodePath("RigidBody2D/CollisionArea")
 HighlightSpritePath = NodePath("RigidBody2D/Outline")
 DefaultOutlineColor = Color(0, 0, 0, 0)
-ThrowDamage = 10.0
+ThrowDamage = 15.0
 MinDamageVelocity = 0.0
 KnockbackForce = 0.0
 StopOnHit = true
-LandingHideDelay = 0.5
+DestructionAnimationDuration = 0.0
+LandingHideDelay = 0.01
 RigidBodyPath = NodePath("RigidBody2D")
 HitboxAreaPath = NodePath("RigidBody2D/AttackArea")
 
@@ -79,5 +80,5 @@ shape = SubResource("RectangleShape2D_gy46y")
 visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/AttackArea"]
-position = Vector2(15.5, 57)
+position = Vector2(15.5, 180.5)
 shape = SubResource("RectangleShape2D_gy46y")

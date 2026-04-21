@@ -14,6 +14,12 @@ namespace Kuros.Core.Effects
 
         [Export] public bool ResumePreviousState = true;
 
+        /// <summary>
+        /// EnemyFrozenState 被 Hit 等外部状态打断时，将剩余时间保存于此，
+        /// 以便 Hit 结束后重新进入 Frozen 时恢复正确时长。
+        /// </summary>
+        public float PendingRemainingTime { get; set; } = 0f;
+
         private string _previousState = string.Empty;
         private EnemyAttackController? _cachedAttackController;
 
@@ -24,7 +30,7 @@ namespace Kuros.Core.Effects
             if (Actor.StateMachine == null) return;
 
             _previousState = Actor.StateMachine.CurrentState?.Name ?? FallbackStateName;
-            //Actor.StateMachine.ChangeState(FrozenStateName);
+            Actor.StateMachine.ChangeState(FrozenStateName);//？
 
             Actor.Velocity = Vector2.Zero;
             Actor.MoveAndSlide();

@@ -4,6 +4,7 @@ using System.Linq;
 using Godot;
 using Kuros.Actors.Heroes;
 using Kuros.Core;
+using Kuros.Effects;
 using Kuros.Items.Effects;
 using Kuros.Items;
 using Kuros.Managers;
@@ -52,7 +53,7 @@ namespace Kuros.Items.World
 		[Export] public NodePath DestructionAnimationPlayerPath { get; set; } = new NodePath(""); // 销毁动画播放器路径
 		[Export] public string DestructionAnimationName { get; set; } = "destroy"; // 销毁动画名称
 		[Export] public float DestructionAnimationDuration { get; set; } = 0.5f; // 销毁动画时长（如果动画播放器不存在，使用固定时长）
-		[Export(PropertyHint.Range, "0.1,10,0.1")] public float LandingHideDelay { get; set; } = 2.0f; // 落点处隐藏延迟（秒）：投掷武器落地后隐藏视觉的等待时间；到达 ThrowWeaponCooldown 后才归还背包并销毁节点
+		[Export(PropertyHint.Range, "0.01,10,0.01")] public float LandingHideDelay { get; set; } = 2.0f; // 落点处隐藏延迟（秒）：投掷武器落地后隐藏视觉的等待时间；到达 ThrowWeaponCooldown 后才归还背包并销毁节点
 
 		[ExportGroup("Physics")]
 		[Export] public NodePath RigidBodyPath { get; set; } = new NodePath(".");
@@ -1575,7 +1576,7 @@ namespace Kuros.Items.World
 				return false;
 			}
 
-			int accepted = inventory.AddItemSmart(stack.Item, stack.Quantity, showPopupIfFirstTime: true);
+			int accepted = inventory.AddItemSmart(stack.Item, stack.Quantity, actor, showPopupIfFirstTime: true);
 			if (accepted <= 0)
 			{
 				return false;
@@ -1665,6 +1666,7 @@ namespace Kuros.Items.World
 				try
 				{
 					var node = entry.EffectScene.Instantiate();
+
 					if (node is Node2D node2D)
 					{
 						// 视觉效果：在世界坐标生成，使用 RigidBody 的实际落点位置
@@ -1673,11 +1675,24 @@ namespace Kuros.Items.World
 					}
 					else if (node is Kuros.Core.Effects.ActorEffect actorEffect)
 					{
-						// Actor 效果：应用到投掷者
+						// 若效果支持落点定位，传入世界坐标
+						if (actorEffect is StunEnemiesEffect stunEffect)
+						{
+							stunEffect.WorldSpawnPosition = spawnPos;
+						}
+						else if (actorEffect is Kuros.Effects.SpikeAttackEffect spikeEffect)
+						{
+							spikeEffect.WorldSpawnPosition = spawnPos;
+						}
+
 						if (LastDroppedBy?.EffectController != null)
+						{
 							LastDroppedBy.ApplyEffect(actorEffect);
+						}
 						else
+						{
 							actorEffect.QueueFree();
+						}
 					}
 					else
 					{

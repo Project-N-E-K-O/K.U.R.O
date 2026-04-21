@@ -23,8 +23,8 @@ shader_parameter/preserve_fill = true
 [sub_resource type="CircleShape2D" id="CircleShape2D_w5uvq"]
 radius = 100.0
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_5ow4b"]
-radius = 80.0
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_eecfu"]
+size = Vector2(199, 318)
 
 [node name="WeaponThrowGravityGrenade" type="Node2D"]
 z_index = 1
@@ -76,4 +76,5 @@ shape = SubResource("CircleShape2D_w5uvq")
 visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/AttackArea"]
-shape = SubResource("CircleShape2D_5ow4b")
+position = Vector2(-1.5, 99)
+shape = SubResource("RectangleShape2D_eecfu")

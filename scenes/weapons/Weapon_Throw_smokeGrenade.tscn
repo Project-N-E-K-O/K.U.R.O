@@ -24,7 +24,7 @@ shader_parameter/preserve_fill = true
 size = Vector2(181.00002, 106.000015)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_u1cg1"]
-size = Vector2(190.00003, 106.000015)
+size = Vector2(190.00003, 382.00003)
 
 [node name="WeaponThrowSmokeGrenade" type="Node2D"]
 z_index = 1
@@ -78,6 +78,6 @@ shape = SubResource("RectangleShape2D_rp6mi")
 visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/AttackArea"]
-position = Vector2(3, 3.9999924)
+position = Vector2(3, 94)
 scale = Vector2(0.9999999, 0.9999999)
 shape = SubResource("RectangleShape2D_u1cg1")

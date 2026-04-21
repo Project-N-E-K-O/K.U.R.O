@@ -1,70 +1,131 @@
 using Godot;
-using System;
+using System.Collections.Generic;
 using Kuros.Core;
 using Kuros.Core.Effects;
 
 namespace Kuros.Effects
 {
     /// <summary>
-    /// 眩晕/冻结玩家前方范围内的敌人。
+    /// 持续区域眩晕效果。
+    /// 效果存活期间，Area2D 范围内所有 Enemies 层的敌人持续被冻结；
+    /// 效果到期时自动解除全部眩晕。
     /// </summary>
     [GlobalClass]
     public partial class StunEnemiesEffect : ActorEffect
     {
-        [Export(PropertyHint.Range, "0.1,10,0.1")] public float StunDuration = 0f;
-        [Export(PropertyHint.Range, "10,1000,10")] public float Radius = 200f;
-        [Export(PropertyHint.Range, "30,360,5")] public float ArcDegrees = 180f;
-        [Export] public string TargetGroup = "enemies";
-        [Export] public bool RequiresFacingCheck = true;
+        private const uint EnemiesLayerMask = 2u;
+
+        /// <summary>
+        /// 由 SpawnThrowDestroyEffects 在应用前设置，将 Area2D 定位到抛物落点。
+        /// </summary>
+        public Vector2 WorldSpawnPosition { get; set; } = Vector2.Zero;
+
+        private Area2D? _area;
+        private readonly HashSet<GameActor> _stunnedEnemies = new();
+        private bool _cleaned = false;
+        // 每个实例唯一前缀，便于精确移除 FreezeEffect
+        private string _idPrefix = "";
 
         protected override void OnApply()
         {
             base.OnApply();
-            TryStunTargets();
-            Controller?.RemoveEffect(this);
+            _idPrefix = $"area_stun_{GetInstanceId()}";
+
+            _area = GetNodeOrNull<Area2D>("Area2D");
+            if (_area == null)
+            {
+                return;
+            }
+
+            _area.CollisionMask = EnemiesLayerMask;
+            _area.Monitoring = true;
+            _area.BodyEntered += OnBodyEntered;
+
+            // 等物理帧同步后扫描已在范围内的敌人
+            CallDeferred(MethodName.InitialScan);
         }
 
-        private void TryStunTargets()
+        private void InitialScan()
         {
-            if (Actor == null) return;
-            var tree = Actor.GetTree();
-            if (tree == null) return;
+            if (_area == null || !IsInstanceValid(_area)) return;
 
-            var nodes = tree.GetNodesInGroup(TargetGroup);
-            if (nodes == null || nodes.Count == 0) return;
+            // 修正 Area2D 到世界坐标落点（ActorEffect 挂在玩家树下，默认跟随玩家）
+            if (WorldSpawnPosition != Vector2.Zero)
+                _area.GlobalPosition = WorldSpawnPosition;
 
-            foreach (var node in nodes)
+            // GetOverlappingBodies() 依赖物理帧，移动 Area2D 后立刻调用结果为空。
+            // 改用直接空间查询，立即得到落点处的所有敌人。
+            var shapeNode = _area.GetNodeOrNull<CollisionShape2D>("CollisionShape2D");
+            if (shapeNode?.Shape == null) return;
+
+            var spaceState = _area.GetWorld2D().DirectSpaceState;
+            if (spaceState == null) return;
+
+            Vector2 center = WorldSpawnPosition != Vector2.Zero ? WorldSpawnPosition : _area.GlobalPosition;
+            var queryParams = new PhysicsShapeQueryParameters2D
             {
-                if (node is not GameActor enemy) continue;
-                if (enemy == Actor) continue;
+                Shape = shapeNode.Shape,
+                Transform = new Transform2D(0f, center),
+                CollisionMask = EnemiesLayerMask,
+                CollideWithBodies = true,
+                CollideWithAreas = false
+            };
 
-                Vector2 toEnemy = enemy.GlobalPosition - Actor.GlobalPosition;
-                if (toEnemy.Length() > Radius) continue;
-
-                if (RequiresFacingCheck && !IsWithinArc(toEnemy))
-                {
-                    continue;
-                }
-
-                var freeze = new FreezeEffect
-                {
-                    Duration = StunDuration,
-                    EffectId = $"weapon_stun_{Actor.GetInstanceId()}_{enemy.GetInstanceId()}_{Time.GetUnixTimeFromSystem()}"
-                };
-                enemy.ApplyEffect(freeze);
+            foreach (var result in spaceState.IntersectShape(queryParams))
+            {
+                if (!result.TryGetValue("collider", out var colliderVar)) continue;
+                if (colliderVar.As<GodotObject>() is GameActor enemy)
+                    StunEnemy(enemy);
             }
         }
 
-        private bool IsWithinArc(Vector2 toEnemy)
+        private void OnBodyEntered(Node2D body)
         {
-            if (Actor == null) return true;
-            var forward = Actor.FacingRight ? Vector2.Right : Vector2.Left;
-            var dir = toEnemy.Normalized();
-            float dot = Mathf.Clamp(forward.Dot(dir), -1f, 1f);
-            float angle = Mathf.RadToDeg(Mathf.Acos(dot));
-            return angle <= ArcDegrees * 0.5f;
+            if (body is GameActor enemy)
+                StunEnemy(enemy);
+        }
+
+        private void StunEnemy(GameActor enemy)
+        {
+            if (_cleaned) return;
+            if (!IsInstanceValid(enemy)) return;
+            if (_stunnedEnemies.Contains(enemy)) return;
+
+            _stunnedEnemies.Add(enemy);
+            var freeze = new FreezeEffect
+            {
+                Duration = 99999f,   // 由本效果统一管理生命周期，不自行到期
+                EffectId = $"{_idPrefix}_{enemy.GetInstanceId()}"
+            };
+            enemy.ApplyEffect(freeze);
+        }
+
+        protected override void OnExpire()
+        {
+            Cleanup();
+            base.OnExpire();
+        }
+
+        public override void OnRemoved()
+        {
+            Cleanup();
+            base.OnRemoved();
+        }
+
+        private void Cleanup()
+        {
+            if (_cleaned) return;
+            _cleaned = true;
+
+            if (_area != null && IsInstanceValid(_area))
+                _area.BodyEntered -= OnBodyEntered;
+
+            foreach (var enemy in _stunnedEnemies)
+            {
+                if (!IsInstanceValid(enemy)) continue;
+                enemy.RemoveEffect($"{_idPrefix}_{enemy.GetInstanceId()}");
+            }
+            _stunnedEnemies.Clear();
         }
     }
 }
-
-

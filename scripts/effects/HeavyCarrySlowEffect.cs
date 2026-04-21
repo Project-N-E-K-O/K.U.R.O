@@ -10,7 +10,7 @@ namespace Kuros.Effects
     public partial class HeavyCarrySlowEffect : ActorEffect
     {
         [Export(PropertyHint.Range, "0.1,1,0.01")]
-        public float SpeedMultiplierPerStack { get; set; } = 0.85f;
+        public float SpeedMultiplierPerStack { get; set; } = 0.7f;
 
         private float _originalSpeed;
 

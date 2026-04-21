@@ -515,7 +515,7 @@ namespace Kuros.Items.World
 			}
 
 			// 使用 AddItemSmart 优先添加到快捷栏，溢出放入背包
-			int accepted = inventory.AddItemSmart(stack.Item, stack.Quantity, showPopupIfFirstTime: true);
+			int accepted = inventory.AddItemSmart(stack.Item, stack.Quantity, actor, showPopupIfFirstTime: true);
 			if (accepted <= 0)
 			{
 				GameLogger.Info(nameof(WorldItemEntity), $"Actor {actor.Name} 的物品栏已满，无法拾取 {ItemId}。");

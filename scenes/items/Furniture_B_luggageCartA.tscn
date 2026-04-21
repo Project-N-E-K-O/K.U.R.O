@@ -24,7 +24,7 @@ shader_parameter/preserve_fill = true
 size = Vector2(143.82353, 82.79411)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_gy46y"]
-size = Vector2(444, 262)
+size = Vector2(444, 587)
 
 [node name="FurnitureLuggageCartA" type="Node2D"]
 z_index = 2
@@ -38,7 +38,8 @@ ThrowDamage = 10.0
 MinDamageVelocity = 0.0
 KnockbackForce = 0.0
 StopOnHit = true
-LandingHideDelay = 0.5
+DestructionAnimationDuration = 0.0
+LandingHideDelay = 0.01
 RigidBodyPath = NodePath("RigidBody2D")
 HitboxAreaPath = NodePath("RigidBody2D/AttackArea")
 
@@ -80,5 +81,5 @@ shape = SubResource("RectangleShape2D_gy46y")
 visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/AttackArea"]
-position = Vector2(3, -1)
+position = Vector2(3, 161.5)
 shape = SubResource("RectangleShape2D_gy46y")

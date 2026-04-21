@@ -304,7 +304,7 @@ namespace Kuros.Actors.Heroes
             }
 
             // 從快捷欄提取物品
-            if (!InventoryComponent.TryExtractFromSelectedQuickBarSlot(selectedStack.Quantity, out var extracted) || extracted == null || extracted.IsEmpty)
+            if (!InventoryComponent.TryExtractFromSelectedQuickBarSlot(selectedStack.Quantity, out var extracted, _actor) || extracted == null || extracted.IsEmpty)
             {
                 // 提取失败：回滚预注册的飞行状态
                 if (preRegisteredBuild && buildController != null)

@@ -44,7 +44,7 @@ radius = 1024.0
 radius = 1024.0
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_8xfgw"]
-radius = 169.69696
+radius = 150.0
 height = 600.0
 
 [sub_resource type="RectangleShape2D" id="2"]

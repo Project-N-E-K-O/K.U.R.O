@@ -24,7 +24,7 @@ shader_parameter/preserve_fill = true
 size = Vector2(381.00006, 258.00003)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ec1yi"]
-size = Vector2(387.00006, 232.00003)
+size = Vector2(387.00006, 409.00006)
 
 [node name="WeaponThrowMetalSpike" type="Node2D"]
 script = ExtResource("1_owowg")
@@ -35,7 +35,6 @@ DefaultOutlineColor = Color(0, 0, 0, 0)
 ThrowDamage = 0.0
 MinDamageVelocity = 0.0
 KnockbackForce = 0.0
-StopOnHit = true
 IsThrowWeapon = true
 ThrowWeaponCooldown = 10.0
 LandingHideDelay = 0.1
@@ -78,6 +77,6 @@ shape = SubResource("RectangleShape2D_0wnlg")
 visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/AttackArea"]
-position = Vector2(4.5000153, 42)
+position = Vector2(4.5000153, 130.5)
 scale = Vector2(0.9999999, 0.9999999)
 shape = SubResource("RectangleShape2D_ec1yi")

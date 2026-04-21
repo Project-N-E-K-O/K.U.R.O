@@ -1,9 +1,10 @@
-[gd_scene load_steps=28 format=3 uid="uid://qd5abd4opeob"]
+[gd_scene load_steps=33 format=3 uid="uid://qd5abd4opeob"]
 
 [ext_resource type="PackedScene" uid="uid://dd8xmpgwy0t2o" path="res://scenes/environments/scene2.tscn" id="1_7jsho"]
 [ext_resource type="Script" uid="uid://x1ic1ym4ykq8" path="res://scripts/scenes/BattleSceneManager.cs" id="1_ctuyy"]
 [ext_resource type="PackedScene" uid="uid://ufprfd4r8ijj" path="res://assets/spine/main_character/main_character.tscn" id="2_s0pgc"]
 [ext_resource type="PackedScene" uid="uid://bo6r21cbk3ftm" path="res://scenes/environments/columnsB.tscn" id="3_3yw8j"]
+[ext_resource type="PackedScene" uid="uid://51x1ik7ixw7w" path="res://scenes/items/Furniture_B_counterA.tscn" id="3_bjupw"]
 [ext_resource type="Script" uid="uid://del8hgcg3sr4i" path="res://scripts/managers/CameraFollow.cs" id="4_vvtmr"]
 [ext_resource type="PackedScene" uid="uid://cipwjj7xx121y" path="res://scenes/weapons/Weapon_Throw_smokeGrenade.tscn" id="6_axd6b"]
 [ext_resource type="PackedScene" uid="uid://cofm45kotvgto" path="res://scenes/actors/enemies/Enemy_B1_fat.tscn" id="6_ctuyy"]
@@ -11,7 +12,9 @@
 [ext_resource type="Script" uid="uid://b7afb3wjghskq" path="res://scripts/items/world/DropItemDebugger.cs" id="7_k0qph"]
 [ext_resource type="Script" uid="uid://b3iq6dm2pc5y0" path="res://scripts/controllers/EnemySpawnManager.cs" id="8_5klp8"]
 [ext_resource type="PackedScene" uid="uid://6ghjqyjkk37w" path="res://scenes/weapons/Weapon_Stab_umbrella.tscn" id="8_pvxkr"]
+[ext_resource type="PackedScene" uid="uid://dmg1hgmpmsc05" path="res://scenes/items/Furniture_B_coffeeMachineA.tscn" id="9_4r5ho"]
 [ext_resource type="PackedScene" uid="uid://2pny8f8vuu3j" path="res://scenes/weapons/Weapon_Slash_barrierGate.tscn" id="10_f0l3g"]
+[ext_resource type="PackedScene" uid="uid://c5bi1g6rymvgo" path="res://scenes/items/Furniture_B_vendingMachineA.tscn" id="10_mdjvw"]
 [ext_resource type="PackedScene" uid="uid://wqcdwpyo1nji" path="res://scenes/actors/enemies/Enemy_B1_thin.tscn" id="10_sfgmy"]
 [ext_resource type="PackedScene" uid="uid://bhjc0grsl76ep" path="res://scenes/weapons/Weapon_Brawl_riotBracer.tscn" id="11_3yw8j"]
 [ext_resource type="PackedScene" uid="uid://cdnitqquebaw6" path="res://scenes/weapons/Weapon_Stab_drill.tscn" id="11_vvtmr"]
@@ -25,6 +28,8 @@
 [ext_resource type="PackedScene" uid="uid://ctpw5uqly3yu5" path="res://scenes/weapons/Weapon_Brawl_mechGlove.tscn" id="19_t6vgq"]
 [ext_resource type="PackedScene" uid="uid://0anrcfm2pnsd" path="res://scenes/items/Furniture_B_luggageCartA.tscn" id="22_22xbq"]
 [ext_resource type="PackedScene" uid="uid://1mc4twnj45va" path="res://scenes/items/Furniture_B_tableRoundB.tscn" id="24_nosxg"]
+[ext_resource type="PackedScene" uid="uid://kwbg3wy7rik" path="res://scenes/items/Furniture_B_chairA.tscn" id="26_cd8hr"]
+[ext_resource type="PackedScene" uid="uid://dsfadn8x6iwkh" path="res://scenes/items/Furniture_B_plantA.tscn" id="29_edhkl"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2l4aj"]
 size = Vector2(1112.5, 1843)
@@ -46,29 +51,40 @@ position = Vector2(-2666, -307)
 [node name="columnsB2" parent="World" instance=ExtResource("3_3yw8j")]
 position = Vector2(-2666, 943)
 
+[node name="FurnitureCounterA" parent="World" instance=ExtResource("3_bjupw")]
+position = Vector2(-7275, -113)
+
 [node name="FurnitureCounterB" parent="World" instance=ExtResource("15_22xbq")]
 position = Vector2(-3580, -326)
 
 [node name="FurnitureLuggageCartA" parent="World" instance=ExtResource("22_22xbq")]
-position = Vector2(-5392, -614)
+position = Vector2(-8186, 608)
 
 [node name="FurnitureSofaA" parent="World" instance=ExtResource("16_ly1ch")]
-position = Vector2(-6217, 417)
+position = Vector2(-7035, 523)
 
-[node name="FurnitureTableRoundB2" parent="World" instance=ExtResource("6_sxiib")]
-position = Vector2(-5266, 855)
-GrabAreaPath = NodePath("../FurnitureTableRoundB/RigidBody2D/CollisionArea")
-HighlightSpritePath = NodePath("../FurnitureTableRoundB/RigidBody2D/Outline")
-RigidBodyPath = NodePath("../FurnitureTableRoundB/RigidBody2D")
-HitboxAreaPath = NodePath("../FurnitureTableRoundB/RigidBody2D/AttackArea")
+[node name="FurnitureTableRoundA" parent="World" instance=ExtResource("6_sxiib")]
+position = Vector2(-3304, 367)
 
 [node name="FurnitureTableRoundB" parent="World" instance=ExtResource("24_nosxg")]
-position = Vector2(-6176, 1016)
+position = Vector2(-5239, 1094)
+
+[node name="FurnitureChairA" parent="World" instance=ExtResource("26_cd8hr")]
+position = Vector2(-5537, 484)
+
+[node name="FurnitureCoffeeMachineA" parent="World" instance=ExtResource("9_4r5ho")]
+position = Vector2(-7232, -698)
+
+[node name="FurnitureVendingMachineA" parent="World" instance=ExtResource("10_mdjvw")]
+position = Vector2(-6774, -698)
+
+[node name="FurniturePlantA" parent="World" instance=ExtResource("29_edhkl")]
+position = Vector2(-7731, -574)
 
 [node name="Scene2" parent="World" instance=ExtResource("1_7jsho")]
 
 [node name="MainCharacter" parent="World" instance=ExtResource("2_s0pgc")]
-position = Vector2(-5636, 246.00003)
+position = Vector2(-5952.001, 288.00006)
 
 [node name="Camera2D" type="Camera2D" parent="World/MainCharacter"]
 position = Vector2(0, -15.15156)
@@ -94,6 +110,9 @@ PlayerAttackHitHitStopDuration = 0.1
 PlayerAttackKillHitStopDuration = 0.3
 HitStopDelay = 0.1
 
+[node name="Enemy_Normal_guard1" parent="World" instance=ExtResource("13_x3vg8")]
+position = Vector2(-8715, 30)
+
 [node name="DroopTest" type="Node2D" parent="World"]
 
 [node name="WeaponStabUmbrella" parent="World/DroopTest" instance=ExtResource("8_pvxkr")]
@@ -112,13 +131,13 @@ position = Vector2(-6552, -156)
 position = Vector2(-6374, -494)
 
 [node name="WeaponThrowSmokeGrenade" parent="World/DroopTest" instance=ExtResource("6_axd6b")]
-position = Vector2(-7212, 204)
+position = Vector2(-5337, -619)
 
 [node name="WeaponThrowMetalSpike" parent="World/DroopTest" instance=ExtResource("13_eyity")]
-position = Vector2(-7149, 606)
+position = Vector2(-5270, -965)
 
 [node name="WeaponThrowGravityGrenade" parent="World/DroopTest" instance=ExtResource("14_t6vgq")]
-position = Vector2(-7027, 983)
+position = Vector2(-5938, -924)
 
 [node name="DropDebug" type="Node2D" parent="World"]
 script = ExtResource("7_k0qph")

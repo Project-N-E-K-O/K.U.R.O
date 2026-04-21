@@ -1,0 +1,40 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=9 format=3 uid="uid://hvsaxvjkbran"]
+
+[ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="1_iojcn"]
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="2_go0k2"]
+[ext_resource type="PackedScene" uid="uid://bi7guxtti6ocl" path="res://resources/effects/HeavyCarrySlowEffect.tscn" id="3_go0k2"]
+[ext_resource type="Texture2D" uid="uid://b2ayj5n4oq8xr" path="res://assets/furnitures/hotel_scene2/PlantA.png" id="3_iojcn"]
+[ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="4_jx5cc"]
+[ext_resource type="PackedScene" uid="uid://ciwlpetibguab" path="res://shaders/destroy_somke.tscn" id="4_qoudf"]
+
+[sub_resource type="Resource" id="Resource_qoudf"]
+script = ExtResource("2_go0k2")
+Trigger = 1
+EffectScene = ExtResource("3_go0k2")
+Notes = "小型家具减速30%"
+metadata/_custom_type_script = "uid://bv0es4osw3x0r"
+
+[sub_resource type="Resource" id="Resource_jx5cc"]
+script = ExtResource("2_go0k2")
+Trigger = 4
+EffectScene = ExtResource("4_qoudf")
+metadata/_custom_type_script = "uid://bv0es4osw3x0r"
+
+[resource]
+script = ExtResource("4_jx5cc")
+ItemId = "Furniture_B_PlantA"
+DisplayName = "大堂盆栽"
+Description = "一次性投掷道具：大堂盆栽"
+Icon = ExtResource("3_iojcn")
+Category = "Furniture"
+Tags = Array[String](["tag_throw", "furniture"])
+MaxStackSize = 1
+EffectEntries = Array[ExtResource("2_go0k2")]([SubResource("Resource_qoudf"), SubResource("Resource_jx5cc")])
+LevelCount = 0
+IsThrowable = true
+IsFurniture = true
+ThrowStartOffset = Vector2(0, -450)
+ThrowParabolicDuration = 0.30000000000000004
+ThrowHorizontalDistance = 700.0
+ThrowParabolicLandingYOffset = 325.0
+WorldScenePath = "uid://dsfadn8x6iwkh"
