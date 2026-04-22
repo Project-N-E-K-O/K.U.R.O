@@ -60,7 +60,7 @@ DebugOverlayOffset = Vector2(-1200, 200)
 DebugOverlayFontSize = 128
 DetectionArea = NodePath("Sprite2D/ControllerDetectionArea")
 AttackArea = NodePath("Sprite2D/AttackArea")
-Speed = 150.0
+Speed = 350.0
 AttackDamage = 0.0
 AttackCooldown = 1.0
 MaxHealth = 15
@@ -263,3 +263,14 @@ HitMixDuration = 0.0
 DieMixDuration = 0.0
 AttackMixDuration = 0.0
 SkillMixDuration = 0.0
+
+[node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
+path_desired_distance = 64.0
+target_desired_distance = 50.0
+path_max_distance = 500.0
+avoidance_enabled = true
+radius = 100.0
+max_speed = 10000.0
+debug_enabled = true
+debug_use_custom = true
+debug_path_custom_line_width = 2.0

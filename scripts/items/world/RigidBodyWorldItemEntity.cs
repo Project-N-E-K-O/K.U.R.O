@@ -190,11 +190,32 @@ namespace Kuros.Items.World
 			ResolveShadowNode();
 			UpdateOutlineHighlight(force: true);
 			SetProcess(true);
+
+			// 如果该物品包含导航源几何子节点，进入场景树后延迟烘焙，使障碍区域生效
+			if (HasNavigationSourceGeometryDescendant(this))
+			{
+				GetTree().CreateTimer(0.0).Timeout += () =>
+				{
+					var scene = GetTree()?.CurrentScene;
+					if (scene != null) RebakeAllNavigationRegions(scene);
+				};
+			}
 		}
 
 		public override void _ExitTree()
 		{
 			base._ExitTree();
+
+			// 如果该物品有子节点属于导航源几何组，移除后触发延迟重新烘焙导航网格
+			if (HasNavigationSourceGeometryDescendant(this))
+			{
+				var scene = GetTree()?.CurrentScene;
+				if (scene != null)
+				{
+					GetTree()!.CreateTimer(0.0).Timeout += () => RebakeAllNavigationRegions(scene);
+				}
+			}
+
 			if (_grabArea != null)
 			{
 				var entered = new Callable(this, MethodName.OnBodyEntered);
@@ -408,6 +429,22 @@ namespace Kuros.Items.World
 
 			_outlineMaterial.SetShaderParameter("outline_color", shouldHighlight ? HighlightOutlineColor : DefaultOutlineColor);
 			_isOutlineHighlighted = shouldHighlight;
+		}
+
+		/// <inheritdoc/>
+		public virtual void ApplyScatterImpulse(Vector2 velocity)
+		{
+			// 仅做物理弹出，不进入投掷状态机，不触发 OnThrowDestroy 效果
+			if (_rigidBody == null) ResolveRigidBody();
+			if (_rigidBody == null) return;
+			try { _rigidBody.Set("freeze", false); } catch { }
+			_rigidBody.Sleeping = false;
+			// 添加线性阻尼确保物体能自然减速停止（gravity_scale=0 时无自然减速）
+			_rigidBody.LinearDamp = 4.0f;
+			_rigidBody.LinearVelocity = velocity;
+			// 速度归零后自动重新冻结（由 _refreezePending 逻辑处理）
+			_refreezePending = true;
+			_refreezeTimer = 0.0;
 		}
 
 		public virtual void ApplyThrowImpulse(Vector2 velocity)
@@ -682,6 +719,8 @@ namespace Kuros.Items.World
 						// re-freeze the body and clear velocity
 						try { _rigidBody.Set("freeze", true); } catch { }
 						try { _rigidBody.LinearVelocity = Vector2.Zero; } catch { }
+						// 还原 LinearDamp（由 ApplyScatterImpulse 临时设置）
+						_rigidBody.LinearDamp = 0.0f;
 						_refreezePending = false;
 						_refreezeTimer = 0.0;
 						// 停止伤害检测并恢复原始碰撞设置
@@ -1543,6 +1582,34 @@ namespace Kuros.Items.World
 			QueueFree();
 		}
 
+		/// <summary>
+		/// 检查该节点的子树中是否有属于导航源几何组的节点。
+		/// </summary>
+		private static bool HasNavigationSourceGeometryDescendant(Node node)
+		{
+			foreach (Node child in node.GetChildren())
+			{
+				if (child.IsInGroup("navigation_polygon_source_geometry_group")) return true;
+				if (HasNavigationSourceGeometryDescendant(child)) return true;
+			}
+			return false;
+		}
+
+		/// <summary>
+		/// 递归查找场景中所有 NavigationRegion2D 并触发重新烘焙。
+		/// </summary>
+		private static void RebakeAllNavigationRegions(Node node)
+		{
+			if (!GodotObject.IsInstanceValid(node)) return;
+			if (node is NavigationRegion2D navRegion)
+			{
+				navRegion.BakeNavigationPolygon();
+				return;
+			}
+			foreach (Node child in node.GetChildren())
+				RebakeAllNavigationRegions(child);
+		}
+
 		private void InitializeStack()
 		{
 			if (CurrentStack != null) return;
@@ -1675,6 +1742,9 @@ namespace Kuros.Items.World
 					}
 					else if (node is Kuros.Core.Effects.ActorEffect actorEffect)
 					{
+						// 应用 PropertyOverrides（覆盖场景默认属性值）
+						entry.ApplyOverrides(actorEffect);
+
 						// 若效果支持落点定位，传入世界坐标
 						if (actorEffect is StunEnemiesEffect stunEffect)
 						{

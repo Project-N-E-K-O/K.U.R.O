@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="ItemDefinition" load_steps=9 format=3 uid="uid://4m8yhblax0ju"]
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=11 format=3 uid="uid://4m8yhblax0ju"]
 
 [ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="1_8qmrl"]
 [ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="2_q4cac"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://bi7guxtti6ocl" path="res://resources/effects/HeavyCarrySlowEffect.tscn" id="3_q4cac"]
 [ext_resource type="PackedScene" uid="uid://ciwlpetibguab" path="res://shaders/destroy_somke.tscn" id="4_48rr8"]
 [ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="4_fwe2t"]
+[ext_resource type="PackedScene" uid="uid://cmh3bnabinwi0" path="res://resources/effects/CameraShakeEffect.tscn" id="5_fwe2t"]
 
 [sub_resource type="Resource" id="Resource_48rr8"]
 script = ExtResource("2_q4cac")
@@ -23,6 +24,15 @@ Trigger = 4
 EffectScene = ExtResource("4_48rr8")
 metadata/_custom_type_script = "uid://bv0es4osw3x0r"
 
+[sub_resource type="Resource" id="Resource_27clv"]
+script = ExtResource("2_q4cac")
+Trigger = 4
+EffectScene = ExtResource("5_fwe2t")
+PropertyOverrides = Dictionary[String, Variant]({
+"ShakeStrength": 18.0
+})
+metadata/_custom_type_script = "uid://bv0es4osw3x0r"
+
 [resource]
 script = ExtResource("4_fwe2t")
 ItemId = "Furniture_B_TableRoundB"
@@ -32,7 +42,7 @@ Icon = ExtResource("3_8qmrl")
 Category = "Furniture"
 Tags = Array[String](["tag_throw", "furniture"])
 MaxStackSize = 1
-EffectEntries = Array[ExtResource("2_q4cac")]([SubResource("Resource_48rr8"), SubResource("Resource_fwe2t")])
+EffectEntries = Array[ExtResource("2_q4cac")]([SubResource("Resource_48rr8"), SubResource("Resource_fwe2t"), SubResource("Resource_27clv")])
 LevelCount = 0
 IsThrowable = true
 IsFurniture = true

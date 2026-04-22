@@ -1,6 +1,7 @@
-[gd_scene load_steps=28 format=3 uid="uid://djio6ojcqw8yf"]
+[gd_scene load_steps=29 format=3 uid="uid://djio6ojcqw8yf"]
 
 [ext_resource type="Script" uid="uid://5imf5agux4ch" path="res://scripts/actors/enemies/EnemyNormalGuard2.cs" id="1_wixbd"]
+[ext_resource type="Resource" uid="uid://d2yxetxicyb1b" path="res://resources/loot/Enemy_B_NormalDrops.tres" id="2_d5sdg"]
 [ext_resource type="Script" uid="uid://d6ppl6a6djpr" path="res://scripts/core/effects/EffectController.cs" id="2_gkl6r"]
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="3_d5sdg"]
 [ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="4_kwxxm"]
@@ -59,12 +60,13 @@ DebugOverlayOffset = Vector2(-1200, 200)
 DebugOverlayFontSize = 128
 DetectionArea = NodePath("Sprite2D/ControllerDetectionArea")
 AttackArea = NodePath("Sprite2D/AttackArea")
-Speed = 150.0
+Speed = 350.0
 AttackDamage = 0.0
 AttackCooldown = 1.0
 MaxHealth = 15
 StateMachine = NodePath("StateMachine")
 EffectController = NodePath("EffectController")
+LootTable = ExtResource("2_d5sdg")
 DamageFlashColor = Color(18.892157, 18.892157, 18.892157, 1)
 
 [node name="Shadow" type="Sprite2D" parent="."]
@@ -257,3 +259,14 @@ script = ExtResource("17_2j78c")
 [node name="AnimationController" type="Node" parent="."]
 script = ExtResource("19_d5sdg")
 AttackMixDuration = 0.2
+
+[node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
+path_desired_distance = 64.0
+target_desired_distance = 50.0
+path_max_distance = 500.0
+avoidance_enabled = true
+radius = 100.0
+max_speed = 10000.0
+debug_enabled = true
+debug_use_custom = true
+debug_path_custom_line_width = 2.0

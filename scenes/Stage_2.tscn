@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=3 uid="uid://qd5abd4opeob"]
+[gd_scene load_steps=35 format=3 uid="uid://qd5abd4opeob"]
 
 [ext_resource type="PackedScene" uid="uid://dd8xmpgwy0t2o" path="res://scenes/environments/scene2.tscn" id="1_7jsho"]
 [ext_resource type="Script" uid="uid://x1ic1ym4ykq8" path="res://scripts/scenes/BattleSceneManager.cs" id="1_ctuyy"]
@@ -30,12 +30,20 @@
 [ext_resource type="PackedScene" uid="uid://1mc4twnj45va" path="res://scenes/items/Furniture_B_tableRoundB.tscn" id="24_nosxg"]
 [ext_resource type="PackedScene" uid="uid://kwbg3wy7rik" path="res://scenes/items/Furniture_B_chairA.tscn" id="26_cd8hr"]
 [ext_resource type="PackedScene" uid="uid://dsfadn8x6iwkh" path="res://scenes/items/Furniture_B_plantA.tscn" id="29_edhkl"]
+[ext_resource type="PackedScene" uid="uid://ds87c8d0i4h8a" path="res://shaders/black_hole.tscn" id="31_pdblb"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2l4aj"]
 size = Vector2(1112.5, 1843)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_f0l3g"]
 size = Vector2(1000, 1500)
+
+[sub_resource type="NavigationPolygon" id="NavigationPolygon_bjupw"]
+vertices = PackedVector2Array(12051.992, 788.8125, 12031.75, 788.8125, 12031.75, 605, 12053.406, 605, 11023, 1390.5, -4466, 1390.5, -2414, 1161, 11023, 788.8125, -7758, 1005, -6291, 1005, -7860, 1104.5, -2918, 1161, -5288, 628, -5074, 691, -5728, 691, -5816, 628, -7860, 623, -7758, 503, -5728, 1337, -6291, 503, -5074, 548, -5288, 279, -5816, 279, -6519, -99, -6470, -728, -6470, -1185, -5087.0313, -944.1328, -5087.0313, -171, -2969, 536, -2918, 707, -4466, 548, -3664, 536, -2414, -89, -2414, -543, 11114, -740, 11114, 605, 11659.25, 788.8125, -2414, 707, -2969, 14, -2918, -89, -2918, -207, -3664, 14, -4520, -171, -5011, -1420, -5011, -944.1328, -9207.25, -1420, -6952, -1203.5, -6952, -1185, -7560, -1203.5, -7560, -1053, -7953, -1053, -9207.25, 1390.5, -7953, -678, -8535, 623, -7535, -678, -7535, -728.5, -7111, -728.5, -7111, -728, -2707, -543, -2707, -633, 11659.25, 605, -5074, 1337, -5074, 1390.5, -8535, 1104.5, -7919, -99, -7919, -566.5, -6519, -566.5, -4520, -740, -4482, -633, -4482, -207)
+polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3), PackedInt32Array(4, 5, 6, 7), PackedInt32Array(8, 9, 10), PackedInt32Array(11, 6, 5), PackedInt32Array(12, 13, 14, 15), PackedInt32Array(8, 10, 16, 17), PackedInt32Array(14, 18, 9, 19, 15), PackedInt32Array(20, 13, 12, 21), PackedInt32Array(22, 15, 19, 23), PackedInt32Array(24, 25, 26, 27), PackedInt32Array(28, 29, 11, 5, 30, 31), PackedInt32Array(32, 33, 34, 35), PackedInt32Array(32, 35, 36, 7, 37, 28, 38, 39), PackedInt32Array(40, 39, 38, 41, 23, 42), PackedInt32Array(7, 6, 37), PackedInt32Array(43, 44, 26, 25), PackedInt32Array(45, 43, 25, 46), PackedInt32Array(25, 47, 46), PackedInt32Array(45, 46, 48), PackedInt32Array(48, 49, 50, 45), PackedInt32Array(51, 45, 50, 52, 53), PackedInt32Array(54, 55, 56, 57), PackedInt32Array(33, 58, 59, 34), PackedInt32Array(35, 60, 36), PackedInt32Array(28, 37, 29), PackedInt32Array(18, 61, 62, 51), PackedInt32Array(9, 18, 51, 10), PackedInt32Array(63, 10, 51), PackedInt32Array(21, 41, 31, 30, 20), PackedInt32Array(53, 63, 51), PackedInt32Array(23, 41, 21, 22), PackedInt32Array(23, 19, 17, 64), PackedInt32Array(64, 17, 16, 53), PackedInt32Array(64, 53, 52, 65), PackedInt32Array(65, 52, 54, 66), PackedInt32Array(66, 54, 57, 24), PackedInt32Array(66, 24, 27, 23), PackedInt32Array(67, 34, 59, 68), PackedInt32Array(42, 67, 68, 69), PackedInt32Array(42, 69, 40), PackedInt32Array(23, 27, 42)])
+outlines = Array[PackedVector2Array]([PackedVector2Array(-9573, -1692, -9566, 1812, 12144, 1825, 12171, -1675)])
+source_geometry_mode = 2
+agent_radius = 100.0
 
 [node name="BattleScene" type="Node2D" node_paths=PackedStringArray("Player")]
 script = ExtResource("1_ctuyy")
@@ -52,16 +60,16 @@ position = Vector2(-2666, -307)
 position = Vector2(-2666, 943)
 
 [node name="FurnitureCounterA" parent="World" instance=ExtResource("3_bjupw")]
-position = Vector2(-7275, -113)
+position = Vector2(-7207, -303)
 
 [node name="FurnitureCounterB" parent="World" instance=ExtResource("15_22xbq")]
 position = Vector2(-3580, -326)
 
 [node name="FurnitureLuggageCartA" parent="World" instance=ExtResource("22_22xbq")]
-position = Vector2(-8186, 608)
+position = Vector2(-8186, 893)
 
 [node name="FurnitureSofaA" parent="World" instance=ExtResource("16_ly1ch")]
-position = Vector2(-7035, 523)
+position = Vector2(-7035, 762)
 
 [node name="FurnitureTableRoundA" parent="World" instance=ExtResource("6_sxiib")]
 position = Vector2(-3304, 367)
@@ -73,13 +81,13 @@ position = Vector2(-5239, 1094)
 position = Vector2(-5537, 484)
 
 [node name="FurnitureCoffeeMachineA" parent="World" instance=ExtResource("9_4r5ho")]
-position = Vector2(-7232, -698)
+position = Vector2(-7244, -917)
 
 [node name="FurnitureVendingMachineA" parent="World" instance=ExtResource("10_mdjvw")]
-position = Vector2(-6774, -698)
+position = Vector2(-6774, -933)
 
 [node name="FurniturePlantA" parent="World" instance=ExtResource("29_edhkl")]
-position = Vector2(-7731, -574)
+position = Vector2(-7731, -847)
 
 [node name="Scene2" parent="World" instance=ExtResource("1_7jsho")]
 
@@ -110,9 +118,6 @@ PlayerAttackHitHitStopDuration = 0.1
 PlayerAttackKillHitStopDuration = 0.3
 HitStopDelay = 0.1
 
-[node name="Enemy_Normal_guard1" parent="World" instance=ExtResource("13_x3vg8")]
-position = Vector2(-8715, 30)
-
 [node name="DroopTest" type="Node2D" parent="World"]
 
 [node name="WeaponStabUmbrella" parent="World/DroopTest" instance=ExtResource("8_pvxkr")]
@@ -125,7 +130,7 @@ position = Vector2(-5435, -203)
 position = Vector2(-5952, -208)
 
 [node name="WeaponBrawlRiotBracer" parent="World/DroopTest" instance=ExtResource("11_3yw8j")]
-position = Vector2(-6552, -156)
+position = Vector2(-6374, -797.99994)
 
 [node name="WeaponMechGlove" parent="World/DroopTest" instance=ExtResource("19_t6vgq")]
 position = Vector2(-6374, -494)
@@ -147,7 +152,7 @@ top_level = true
 position = Vector2(-997, 337)
 scale = Vector2(1.2, 1.2)
 script = ExtResource("8_5klp8")
-EnemyScenes = Array[PackedScene]([ExtResource("14_cwau0"), ExtResource("13_x3vg8")])
+EnemyScenes = Array[PackedScene]([ExtResource("13_x3vg8"), ExtResource("14_cwau0")])
 SpawnCount = 4
 SpawnInterval = 1.35
 SpawnParentPath = NodePath("..")
@@ -221,3 +226,11 @@ collision_mask = 4
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="World/EnemySpawneManager4/Area2D"]
 shape = SubResource("RectangleShape2D_f0l3g")
+
+[node name="NavigationRegion2D" type="NavigationRegion2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
+position = Vector2(12, 49)
+navigation_polygon = SubResource("NavigationPolygon_bjupw")
+
+[node name="BlackHole" parent="." instance=ExtResource("31_pdblb")]
+position = Vector2(-6820, 207)
+scale = Vector2(2, 2)

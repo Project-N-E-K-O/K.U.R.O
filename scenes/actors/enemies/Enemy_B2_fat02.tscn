@@ -38,7 +38,7 @@ radius = 350.0
 height = 800.0
 
 [sub_resource type="RectangleShape2D" id="2"]
-size = Vector2(1600, 1200)
+size = Vector2(1600, 700)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_6yc1u"]
 radius = 600.0
@@ -60,7 +60,6 @@ DebugOverlayOffset = Vector2(-1200, 200)
 DebugOverlayFontSize = 128
 DetectionArea = NodePath("Sprite2D/ControllerDetectionArea")
 AttackArea = NodePath("Sprite2D/AttackArea")
-Speed = 120.0
 AttackDamage = 0.0
 AttackCooldown = 1.0
 MaxHealth = 20
@@ -163,12 +162,12 @@ rotation = 1.5707964
 shape = SubResource("CapsuleShape2D_gvrrx")
 
 [node name="AttackArea" type="Area2D" parent="Sprite2D"]
-visible = false
 collision_layer = 0
 monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/AttackArea"]
-position = Vector2(900, 0)
+position = Vector2(900, 80)
+scale = Vector2(0.9999999, 0.9999999)
 shape = SubResource("2")
 
 [node name="SmashArea" type="Area2D" parent="Sprite2D"]
@@ -260,3 +259,14 @@ FreezeDuration = 1.0
 
 [node name="AnimationController" type="Node" parent="."]
 script = ExtResource("20_xrpf5")
+
+[node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
+path_desired_distance = 64.0
+target_desired_distance = 50.0
+path_max_distance = 500.0
+avoidance_enabled = true
+radius = 100.0
+max_speed = 10000.0
+debug_enabled = true
+debug_use_custom = true
+debug_path_custom_line_width = 2.0

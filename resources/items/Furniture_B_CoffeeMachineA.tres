@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="ItemDefinition" load_steps=9 format=3 uid="uid://3otbbdidxw0h"]
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=11 format=3 uid="uid://3otbbdidxw0h"]
 
 [ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="1_0v566"]
 [ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="2_lb4p1"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://bi7guxtti6ocl" path="res://resources/effects/HeavyCarrySlowEffect.tscn" id="3_lb4p1"]
 [ext_resource type="PackedScene" uid="uid://ciwlpetibguab" path="res://shaders/destroy_somke.tscn" id="4_1sllh"]
 [ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="4_71b4q"]
+[ext_resource type="PackedScene" uid="uid://cmh3bnabinwi0" path="res://resources/effects/CameraShakeEffect.tscn" id="5_71b4q"]
 
 [sub_resource type="Resource" id="Resource_0v566"]
 script = ExtResource("2_lb4p1")
@@ -23,6 +24,15 @@ Trigger = 4
 EffectScene = ExtResource("4_1sllh")
 metadata/_custom_type_script = "uid://bv0es4osw3x0r"
 
+[sub_resource type="Resource" id="Resource_bycld"]
+script = ExtResource("2_lb4p1")
+Trigger = 4
+EffectScene = ExtResource("5_71b4q")
+PropertyOverrides = Dictionary[String, Variant]({
+"ShakeStrength": 18.0
+})
+metadata/_custom_type_script = "uid://bv0es4osw3x0r"
+
 [resource]
 script = ExtResource("4_71b4q")
 ItemId = "Furniture_B_CoffeeMachineA"
@@ -32,7 +42,7 @@ Icon = ExtResource("3_0v566")
 Category = "Furniture"
 Tags = Array[String](["tag_throw", "furniture"])
 MaxStackSize = 1
-EffectEntries = Array[ExtResource("2_lb4p1")]([SubResource("Resource_0v566"), SubResource("Resource_71b4q")])
+EffectEntries = Array[ExtResource("2_lb4p1")]([SubResource("Resource_0v566"), SubResource("Resource_71b4q"), SubResource("Resource_bycld")])
 LevelCount = 0
 IsThrowable = true
 IsFurniture = true

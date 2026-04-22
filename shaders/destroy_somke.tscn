@@ -1,11 +1,15 @@
-[gd_scene load_steps=17 format=3 uid="uid://ciwlpetibguab"]
+[gd_scene load_steps=21 format=3 uid="uid://ciwlpetibguab"]
 
+[ext_resource type="Script" uid="uid://cur7ohvi004bi" path="res://scripts/fx/RandomLitterPartDisplay.cs" id="1_50drn"]
 [ext_resource type="Texture2D" uid="uid://bk0ipufx3kn76" path="res://assets/environments/26.3.17 烟.png" id="1_smoke"]
-[ext_resource type="Texture2D" uid="uid://b2rnkbdmghqi" path="res://assets/effect/ItemBrokenEffect.png" id="2_broken"]
 [ext_resource type="Texture2D" uid="uid://djwpndlb3ggb" path="res://assets/effect/MetalA.png" id="3_50drn"]
 [ext_resource type="Texture2D" uid="uid://undrxhl85nk5" path="res://assets/effect/NailA.png" id="4_0p68k"]
+[ext_resource type="Texture2D" uid="uid://cb5tlkprmeeek" path="res://assets/effect/MetalB.png" id="4_cklsf"]
 [ext_resource type="Texture2D" uid="uid://di0o1m3ofpqrx" path="res://assets/effect/WoodA.png" id="5_gi07o"]
 [ext_resource type="Texture2D" uid="uid://8ejp3d5qqx5t" path="res://assets/effect/SpringA.png" id="6_hangd"]
+[ext_resource type="Texture2D" uid="uid://6nc4lmjgiend" path="res://assets/effect/NailB.png" id="6_piy5f"]
+[ext_resource type="Texture2D" uid="uid://cch3g32umpcvm" path="res://assets/effect/WoodC.png" id="8_7ftuu"]
+[ext_resource type="Texture2D" uid="uid://j3pb4tr7nx6o" path="res://assets/effect/SpringB.png" id="10_3pm0g"]
 
 [sub_resource type="Gradient" id="Gradient_large"]
 offsets = PackedFloat32Array(0, 0.2, 1)
@@ -73,7 +77,10 @@ turbulence_enabled = true
 turbulence_noise_strength = 0.5
 turbulence_noise_scale = 3.5
 
-[node name="DestroySomke" type="Node2D"]
+[node name="DestroySomke" type="Node2D" node_paths=PackedStringArray("SelectedLitterParts")]
+script = ExtResource("1_50drn")
+SelectedLitterParts = [NodePath("LitterPartA"), NodePath("LitterPartA2"), NodePath("LitterPartB"), NodePath("LitterPartB2"), NodePath("LitterPartC"), NodePath("LitterPartC2"), NodePath("LitterPartD"), NodePath("LitterPartD2")]
+DisplayCount = 2
 
 [node name="LargeSmoke" type="GPUParticles2D" parent="."]
 z_index = 3
@@ -87,25 +94,25 @@ explosiveness = 0.95
 randomness = 0.2
 process_material = SubResource("PPMat_large")
 
-[node name="SmallDebris" type="GPUParticles2D" parent="."]
-z_index = 3
-texture_filter = 1
-scale = Vector2(10, 10)
-emitting = true
-amount = 6
-texture = ExtResource("2_broken")
-one_shot = true
-explosiveness = 0.95
-randomness = 0.25
-process_material = SubResource("PPMat_small")
-
 [node name="LitterPartA" type="GPUParticles2D" parent="."]
 z_index = 3
 texture_filter = 1
 scale = Vector2(10, 10)
 emitting = true
-amount = 6
+amount = 2
 texture = ExtResource("3_50drn")
+one_shot = true
+explosiveness = 0.95
+randomness = 0.25
+process_material = SubResource("PPMat_small")
+
+[node name="LitterPartA2" type="GPUParticles2D" parent="."]
+z_index = 3
+texture_filter = 1
+scale = Vector2(10, 10)
+emitting = true
+amount = 2
+texture = ExtResource("4_cklsf")
 one_shot = true
 explosiveness = 0.95
 randomness = 0.25
@@ -116,8 +123,20 @@ z_index = 3
 texture_filter = 1
 scale = Vector2(10, 10)
 emitting = true
-amount = 6
+amount = 2
 texture = ExtResource("4_0p68k")
+one_shot = true
+explosiveness = 0.95
+randomness = 0.25
+process_material = SubResource("PPMat_small")
+
+[node name="LitterPartB2" type="GPUParticles2D" parent="."]
+z_index = 3
+texture_filter = 1
+scale = Vector2(10, 10)
+emitting = true
+amount = 2
+texture = ExtResource("6_piy5f")
 one_shot = true
 explosiveness = 0.95
 randomness = 0.25
@@ -128,8 +147,20 @@ z_index = 3
 texture_filter = 1
 scale = Vector2(10, 10)
 emitting = true
-amount = 6
+amount = 3
 texture = ExtResource("5_gi07o")
+one_shot = true
+explosiveness = 0.95
+randomness = 0.25
+process_material = SubResource("PPMat_small")
+
+[node name="LitterPartC2" type="GPUParticles2D" parent="."]
+z_index = 3
+texture_filter = 1
+scale = Vector2(10, 10)
+emitting = true
+amount = 3
+texture = ExtResource("8_7ftuu")
 one_shot = true
 explosiveness = 0.95
 randomness = 0.25
@@ -140,8 +171,20 @@ z_index = 3
 texture_filter = 1
 scale = Vector2(10, 10)
 emitting = true
-amount = 6
+amount = 3
 texture = ExtResource("6_hangd")
+one_shot = true
+explosiveness = 0.95
+randomness = 0.25
+process_material = SubResource("PPMat_small")
+
+[node name="LitterPartD2" type="GPUParticles2D" parent="."]
+z_index = 3
+texture_filter = 1
+scale = Vector2(10, 10)
+emitting = true
+amount = 3
+texture = ExtResource("10_3pm0g")
 one_shot = true
 explosiveness = 0.95
 randomness = 0.25

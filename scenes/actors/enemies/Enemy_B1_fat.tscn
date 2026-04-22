@@ -38,7 +38,7 @@ radius = 350.0
 height = 800.0
 
 [sub_resource type="RectangleShape2D" id="2"]
-size = Vector2(1600, 1200)
+size = Vector2(1600, 700)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_otg7e"]
 size = Vector2(800, 500)
@@ -60,7 +60,6 @@ DebugOverlayOffset = Vector2(-1200, 200)
 DebugOverlayFontSize = 128
 DetectionArea = NodePath("Sprite2D/ControllerDetectionArea")
 AttackArea = NodePath("Sprite2D/AttackArea")
-Speed = 120.0
 AttackDamage = 0.0
 AttackCooldown = 1.0
 MaxHealth = 20
@@ -164,12 +163,11 @@ rotation = 1.5707964
 shape = SubResource("CapsuleShape2D_otg7e")
 
 [node name="AttackArea" type="Area2D" parent="Sprite2D"]
-visible = false
 collision_layer = 0
 monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/AttackArea"]
-position = Vector2(900, 0)
+position = Vector2(900, 80)
 scale = Vector2(0.9999999, 0.9999999)
 shape = SubResource("2")
 
@@ -182,7 +180,6 @@ scale = Vector2(0.9999999, 0.9999999)
 shape = SubResource("RectangleShape2D_otg7e")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-visible = false
 position = Vector2(0, -160)
 rotation = 1.5707964
 shape = SubResource("3")
@@ -263,3 +260,14 @@ FreezeDuration = 1.0
 script = ExtResource("17")
 AttackMixDuration = 0.2
 SkillMixDuration = 0.2
+
+[node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
+path_desired_distance = 64.0
+target_desired_distance = 50.0
+path_max_distance = 500.0
+avoidance_enabled = true
+radius = 100.0
+max_speed = 10000.0
+debug_enabled = true
+debug_use_custom = true
+debug_path_custom_line_width = 2.0

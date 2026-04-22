@@ -20,11 +20,11 @@ shader_parameter/alpha_threshold = 0.5
 shader_parameter/edge_softness = 0.12
 shader_parameter/preserve_fill = true
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_jyvv2"]
-size = Vector2(1309, 229)
-
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_gy46y"]
 size = Vector2(1176, 458)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_jyvv2"]
+size = Vector2(1200, 267.5)
 
 [node name="FurnitureCounterA" type="Node2D"]
 z_index = 2
@@ -64,11 +64,6 @@ texture = ExtResource("6_1w766")
 [node name="Sprite2D" type="Sprite2D" parent="RigidBody2D/Outline"]
 texture = ExtResource("6_1w766")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D"]
-visible = false
-position = Vector2(4.5, 35.5)
-shape = SubResource("RectangleShape2D_jyvv2")
-
 [node name="CollisionArea" type="Area2D" parent="RigidBody2D"]
 visible = false
 
@@ -82,3 +77,9 @@ visible = false
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/AttackArea"]
 position = Vector2(6, 183)
 shape = SubResource("RectangleShape2D_gy46y")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="RigidBody2D" groups=["navigation_polygon_source_geometry_group"]]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/StaticBody2D"]
+position = Vector2(0, 19.25)
+shape = SubResource("RectangleShape2D_jyvv2")

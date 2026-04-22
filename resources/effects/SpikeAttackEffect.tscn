@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dj1eglv2letl3" path="res://scripts/effects/SpikeAttackEffect.cs" id="1_61h07"]
 [ext_resource type="Texture2D" uid="uid://b1awmq0je57lj" path="res://assets/weapons/金属地刺.png" id="2_dmpqe"]
-[ext_resource type="Shader" uid="uid://caxdo713k5kug" path="res://shaders/sparkling.gdshader" id="3_x9m8k"]
+[ext_resource type="Shader" uid="uid://caxdo713k5kug" path="res://shaders/materials/sparkling.gdshader" id="3_x9m8k"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_sp1k1"]
 shader = ExtResource("3_x9m8k")

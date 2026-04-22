@@ -298,6 +298,14 @@ namespace Kuros.Items.World
 			Velocity = velocity;
 		}
 
+		/// <inheritdoc/>
+		public virtual void ApplyScatterImpulse(Vector2 velocity)
+		{
+			// 仅做物理弹出，不进入投掷状态机
+			_pendingVelocity = velocity;
+			Velocity = velocity;
+		}
+
 		/// <summary>
 		/// 供外部调用的拾取方法（如状态机或其他组件触发）
 		/// </summary>

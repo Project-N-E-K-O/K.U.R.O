@@ -69,6 +69,7 @@ y_sort_enabled = true
 scale = Vector2(0.33, 0.33)
 collision_layer = 4
 collision_mask = 7
+motion_mode = 1
 script = ExtResource("1_om6pm")
 WalkAnimationSpeed = 2.0
 RunAnimationSpeed = 3.0

@@ -36,7 +36,7 @@ namespace Kuros.Items.Effects
             return effect;
         }
 
-        private void ApplyOverrides(ActorEffect effect)
+        public void ApplyOverrides(ActorEffect effect)
         {
             if (effect == null || PropertyOverrides == null || PropertyOverrides.Count == 0)
             {

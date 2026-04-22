@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="ItemDefinition" load_steps=9 format=3 uid="uid://dn02737ydt76r"]
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=11 format=3 uid="uid://dn02737ydt76r"]
 
 [ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="1_at7xc"]
 [ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="2_jk2vw"]
@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://dwo8i8epusdsy" path="res://assets/furnitures/hotel_scene2/CounterA.png" id="4_at7xc"]
 [ext_resource type="PackedScene" uid="uid://ciwlpetibguab" path="res://shaders/destroy_somke.tscn" id="4_jk2vw"]
 [ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="5_tgrdm"]
+[ext_resource type="PackedScene" uid="uid://cmh3bnabinwi0" path="res://resources/effects/CameraShakeEffect.tscn" id="6_shake"]
 
 [sub_resource type="Resource" id="Resource_a4hte"]
 script = ExtResource("2_jk2vw")
@@ -17,10 +18,20 @@ PropertyOverrides = Dictionary[String, Variant]({
 })
 metadata/_custom_type_script = "uid://bv0es4osw3x0r"
 
-[sub_resource type="Resource" id="Resource_olq47"]
+[sub_resource type="Resource" id="Resource_jk2vw"]
 script = ExtResource("2_jk2vw")
 Trigger = 4
 EffectScene = ExtResource("4_jk2vw")
+metadata/_custom_type_script = "uid://bv0es4osw3x0r"
+
+[sub_resource type="Resource" id="Resource_shake"]
+script = ExtResource("2_jk2vw")
+Trigger = 4
+EffectScene = ExtResource("6_shake")
+Notes = "投掷销毁时触发镜头震动"
+PropertyOverrides = Dictionary[String, Variant]({
+"ShakeStrength": 12.0
+})
 metadata/_custom_type_script = "uid://bv0es4osw3x0r"
 
 [resource]
@@ -32,7 +43,7 @@ Icon = ExtResource("4_at7xc")
 Category = "Furniture"
 Tags = Array[String](["tag_throw", "furniture"])
 MaxStackSize = 1
-EffectEntries = Array[ExtResource("2_jk2vw")]([SubResource("Resource_a4hte"), SubResource("Resource_olq47")])
+EffectEntries = Array[ExtResource("2_jk2vw")]([SubResource("Resource_a4hte"), SubResource("Resource_jk2vw"), SubResource("Resource_shake")])
 LevelCount = 0
 IsThrowable = true
 IsFurniture = true
