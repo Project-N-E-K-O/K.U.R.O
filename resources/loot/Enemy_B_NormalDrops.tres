@@ -1,38 +1,40 @@
 [gd_resource type="Resource" script_class="LootDropTable" load_steps=11 format=3 uid="uid://d2yxetxicyb1b"]
 
-[ext_resource type="Resource" uid="uid://c01sltuo7404y" path="res://resources/items/Weapon_Stab_Umbrella.tres" id="1_geg3s"]
 [ext_resource type="Script" uid="uid://nd1f744icb05" path="res://scripts/systems/loot/LootDropEntry.cs" id="2_1ee31"]
 [ext_resource type="Resource" uid="uid://ba0kuifke6v7o" path="res://resources/items/Weapon_Stab_Drill.tres" id="3_e2vn0"]
 [ext_resource type="Resource" uid="uid://b1jpt8qriaub8" path="res://resources/items/Weapon_Slash_BarrierGate.tres" id="4_syeeu"]
-[ext_resource type="Resource" uid="uid://c0h5f2yocbgcw" path="res://resources/items/Weapon_Brawl_RiotBracer.tres" id="5_dm5et"]
+[ext_resource type="Resource" uid="uid://dsmyr3iwkk7n5" path="res://resources/items/Weapon_Brawl_MechGlove.tres" id="5_1ee31"]
+[ext_resource type="Resource" uid="uid://j6kveph5wqjm" path="res://resources/items/Weapon_Throw_MetalSpike.tres" id="5_geg3s"]
 [ext_resource type="Script" uid="uid://dpdpwmf4dwu8k" path="res://scripts/systems/loot/LootDropTable.cs" id="6_p7jmf"]
 
-[sub_resource type="Resource" id="Resource_5acox"]
-script = ExtResource("2_1ee31")
-Item = ExtResource("1_geg3s")
-DropChance = 0.33
-metadata/_custom_type_script = "uid://nd1f744icb05"
-
-[sub_resource type="Resource" id="Resource_0syin"]
-script = ExtResource("2_1ee31")
-Item = ExtResource("3_e2vn0")
-DropChance = 0.33
-metadata/_custom_type_script = "uid://nd1f744icb05"
-
-[sub_resource type="Resource" id="Resource_rsspt"]
+[sub_resource type="Resource" id="Resource_5a13u"]
 script = ExtResource("2_1ee31")
 Item = ExtResource("4_syeeu")
-DropChance = 0.33
+DropChance = 0.25
 metadata/_custom_type_script = "uid://nd1f744icb05"
 
-[sub_resource type="Resource" id="Resource_13qse"]
+[sub_resource type="Resource" id="Resource_rv3sv"]
 script = ExtResource("2_1ee31")
-Item = ExtResource("5_dm5et")
+Item = ExtResource("5_geg3s")
+DropChance = 0.25
+metadata/_custom_type_script = "uid://nd1f744icb05"
+
+[sub_resource type="Resource" id="Resource_e2vn0"]
+script = ExtResource("2_1ee31")
+Item = ExtResource("3_e2vn0")
+DropChance = 0.25
+metadata/_custom_type_script = "uid://nd1f744icb05"
+
+[sub_resource type="Resource" id="Resource_syeeu"]
+script = ExtResource("2_1ee31")
+Item = ExtResource("5_1ee31")
+DropChance = 0.25
 metadata/_custom_type_script = "uid://nd1f744icb05"
 
 [resource]
 script = ExtResource("6_p7jmf")
-MaxDrops = 6
+GlobalDropChance = 0.2
+MaxDrops = 1
 ScatterRadius = 48.0
 DefaultImpulse = 400.0
-Entries = [SubResource("Resource_5acox"), SubResource("Resource_0syin"), SubResource("Resource_rsspt"), SubResource("Resource_13qse")]
+Entries = [SubResource("Resource_5a13u"), SubResource("Resource_rv3sv"), SubResource("Resource_e2vn0"), SubResource("Resource_syeeu")]

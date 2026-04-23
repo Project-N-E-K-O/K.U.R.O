@@ -34,32 +34,32 @@ radius = 1024.0
 radius = 1024.0
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_gvrrx"]
-radius = 120.0
-height = 300.0
+radius = 350.0
+height = 800.0
 
 [sub_resource type="RectangleShape2D" id="2"]
-size = Vector2(400, 170)
+size = Vector2(1600, 700)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_6yc1u"]
-radius = 250.0
+radius = 600.0
 
 [sub_resource type="CapsuleShape2D" id="3"]
-radius = 60.0
-height = 240.0
+radius = 200.0
+height = 900.0
 
 [node name="Enemy_B2_fat02" type="CharacterBody2D" node_paths=PackedStringArray("DetectionArea", "AttackArea", "StateMachine", "EffectController")]
 z_index = 2
 y_sort_enabled = true
+scale = Vector2(0.33, 0.33)
 collision_layer = 2
 collision_mask = 7
 motion_mode = 1
 script = ExtResource("1_gvrrx")
 EnableStateDebugOverlay = true
-DebugOverlayOffset = Vector2(-300, 60)
-DebugOverlayFontSize = 32
+DebugOverlayOffset = Vector2(-1200, 200)
+DebugOverlayFontSize = 128
 DetectionArea = NodePath("Sprite2D/ControllerDetectionArea")
 AttackArea = NodePath("Sprite2D/AttackArea")
-Speed = 120.0
 AttackDamage = 0.0
 AttackCooldown = 1.0
 MaxHealth = 20
@@ -68,13 +68,10 @@ EffectController = NodePath("EffectController")
 LootTable = ExtResource("2_ooggc")
 DamageFlashColor = Color(18.892157, 18.892157, 18.892157, 1)
 
-[node name="EffectController" type="Node" parent="."]
-script = ExtResource("3_6yc1u")
-
 [node name="Shadow" type="Sprite2D" parent="."]
 show_behind_parent = true
 material = SubResource("ShaderMaterial_b5vhy")
-scale = Vector2(8, 1.5)
+scale = Vector2(24, 4.5)
 texture = ExtResource("5_bb8mk")
 
 [node name="OutlineLayer" type="Node2D" parent="."]
@@ -83,8 +80,7 @@ show_behind_parent = true
 [node name="OutlineSpineSprite_Left" type="SpineSprite" parent="OutlineLayer"]
 modulate = Color(0.02, 0.02, 0.02, 0.85)
 show_behind_parent = true
-position = Vector2(-7, 0)
-scale = Vector2(0.33, 0.33)
+position = Vector2(-20, 0)
 skeleton_data_res = ExtResource("19_gvrrx")
 preview_skin = "Default"
 preview_animation = "-- Empty --"
@@ -95,8 +91,7 @@ script = ExtResource("20_ooggc")
 [node name="OutlineSpineSprite_Right" type="SpineSprite" parent="OutlineLayer"]
 modulate = Color(0.02, 0.02, 0.02, 0.85)
 show_behind_parent = true
-position = Vector2(7, 0)
-scale = Vector2(0.33, 0.33)
+position = Vector2(20, 0)
 skeleton_data_res = ExtResource("19_gvrrx")
 preview_skin = "Default"
 preview_animation = "-- Empty --"
@@ -107,8 +102,7 @@ script = ExtResource("20_ooggc")
 [node name="OutlineSpineSprite_Up" type="SpineSprite" parent="OutlineLayer"]
 modulate = Color(0.02, 0.02, 0.02, 0.85)
 show_behind_parent = true
-position = Vector2(0, -7)
-scale = Vector2(0.33, 0.33)
+position = Vector2(0, -20)
 skeleton_data_res = ExtResource("19_gvrrx")
 preview_skin = "Default"
 preview_animation = "-- Empty --"
@@ -119,8 +113,15 @@ script = ExtResource("20_ooggc")
 [node name="OutlineSpineSprite_Down" type="SpineSprite" parent="OutlineLayer"]
 modulate = Color(0.02, 0.02, 0.02, 0.85)
 show_behind_parent = true
-position = Vector2(0, 7)
-scale = Vector2(0.33, 0.33)
+position = Vector2(0, 20)
+skeleton_data_res = ExtResource("19_gvrrx")
+preview_skin = "Default"
+preview_animation = "-- Empty --"
+preview_frame = true
+preview_time = 1.04
+script = ExtResource("20_ooggc")
+
+[node name="SpineSprite" type="SpineSprite" parent="."]
 skeleton_data_res = ExtResource("19_gvrrx")
 preview_skin = "Default"
 preview_animation = "-- Empty --"
@@ -129,29 +130,31 @@ preview_time = 1.04
 script = ExtResource("20_ooggc")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-visible = false
 modulate = Color(0.8, 0.6, 0.5, 1)
-position = Vector2(0, -340)
+position = Vector2(0, -900)
 
 [node name="ControllerDetectionArea" type="Area2D" parent="Sprite2D"]
+visible = false
 collision_layer = 0
 collision_mask = 4
 monitorable = false
 
 [node name="ControllerDetectionShape" type="CollisionShape2D" parent="Sprite2D/ControllerDetectionArea"]
-scale = Vector2(3, 3)
+scale = Vector2(9, 9)
 shape = SubResource("CircleShape2D_ooggc")
 
 [node name="AttackDetectionArea" type="Area2D" parent="Sprite2D"]
+visible = false
 collision_layer = 0
 collision_mask = 4
 monitorable = false
 
 [node name="AttackDetectionShape" type="CollisionShape2D" parent="Sprite2D/AttackDetectionArea"]
-scale = Vector2(1.2, 1.2)
+scale = Vector2(3.6, 3.6)
 shape = SubResource("CircleShape2D_gvrrx")
 
 [node name="HitArea" type="Area2D" parent="Sprite2D"]
+visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/HitArea"]
 position = Vector2(0, 70)
@@ -163,19 +166,21 @@ collision_layer = 0
 monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/AttackArea"]
-position = Vector2(270, 130)
+position = Vector2(900, 80)
+scale = Vector2(0.9999999, 0.9999999)
 shape = SubResource("2")
 
 [node name="SmashArea" type="Area2D" parent="Sprite2D"]
+visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/SmashArea"]
-position = Vector2(150, 200)
-scale = Vector2(1.5, 1)
+position = Vector2(900, 900)
+scale = Vector2(1.4, 1.2)
 shape = SubResource("CircleShape2D_6yc1u")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 visible = false
-position = Vector2(0, -58)
+position = Vector2(0, -160)
 rotation = 1.5707964
 shape = SubResource("3")
 
@@ -245,18 +250,23 @@ script = ExtResource("16_23m8e")
 [node name="Dead" type="Node" parent="StateMachine"]
 script = ExtResource("17_oq0qc")
 
+[node name="EffectController" type="Node" parent="."]
+script = ExtResource("3_6yc1u")
+
 [node name="FreezeOnTurnMovement" type="Node" parent="."]
 script = ExtResource("18_qelwu")
 FreezeDuration = 1.0
 
-[node name="SpineSprite" type="SpineSprite" parent="."]
-scale = Vector2(0.33, 0.33)
-skeleton_data_res = ExtResource("19_gvrrx")
-preview_skin = "Default"
-preview_animation = "-- Empty --"
-preview_frame = true
-preview_time = 1.04
-script = ExtResource("20_ooggc")
-
 [node name="AnimationController" type="Node" parent="."]
 script = ExtResource("20_xrpf5")
+
+[node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
+path_desired_distance = 64.0
+target_desired_distance = 50.0
+path_max_distance = 500.0
+avoidance_enabled = true
+radius = 100.0
+max_speed = 300.0
+debug_enabled = true
+debug_use_custom = true
+debug_path_custom_line_width = 2.0

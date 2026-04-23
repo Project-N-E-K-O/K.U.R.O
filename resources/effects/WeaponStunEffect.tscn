@@ -1,11 +1,17 @@
-[gd_scene load_steps=2 format=3 uid="uid://weapon_stun_effect"]
+[gd_scene load_steps=3 format=3 uid="uid://dm13v6vu200sa"]
 
-[ext_resource type="Script" path="res://scripts/effects/StunEnemiesEffect.cs" id="1_stun_script"]
+[ext_resource type="Script" uid="uid://b3nhftj45ban3" path="res://scripts/effects/StunEnemiesEffect.cs" id="1_stun_script"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_27qv0"]
+radius = 400.0
 
 [node name="StunEnemiesEffect" type="Node"]
 script = ExtResource("1_stun_script")
-StunDuration = 2.0
-Radius = 220.0
-ArcDegrees = 200.0
-RequiresFacingCheck = true
+EffectId = "3398c942-9a7d-4def-aab8-84941fb90599"
+Duration = 4.0
 
+[node name="Area2D" type="Area2D" parent="."]
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("CircleShape2D_27qv0")

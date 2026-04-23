@@ -4,6 +4,7 @@ using System.Linq;
 using Godot;
 using Kuros.Actors.Heroes;
 using Kuros.Core;
+using Kuros.Effects;
 using Kuros.Items.Effects;
 using Kuros.Items;
 using Kuros.Managers;
@@ -21,6 +22,10 @@ namespace Kuros.Items.World
 	{
 		[Signal] public delegate void ItemTransferredEventHandler(RigidBodyWorldItemEntity entity, GameActor actor, ItemDefinition item, int amount);
 		[Signal] public delegate void ItemTransferFailedEventHandler(RigidBodyWorldItemEntity entity, GameActor actor);
+
+		// 防抖：待烘焙的场景树（避免多物品重复遍历场景树）
+		private static readonly HashSet<SceneTree> PendingRebakeScenes = new();
+		private static bool _rebakeTimerScheduled = false;
 
 		[ExportGroup("Item")]
 		[Export] public ItemDefinition? ItemDefinition { get; set; }
@@ -52,14 +57,14 @@ namespace Kuros.Items.World
 		[Export] public NodePath DestructionAnimationPlayerPath { get; set; } = new NodePath(""); // 销毁动画播放器路径
 		[Export] public string DestructionAnimationName { get; set; } = "destroy"; // 销毁动画名称
 		[Export] public float DestructionAnimationDuration { get; set; } = 0.5f; // 销毁动画时长（如果动画播放器不存在，使用固定时长）
-		[Export(PropertyHint.Range, "0.1,10,0.1")] public float LandingHideDelay { get; set; } = 2.0f; // 落点处隐藏延迟（秒）：投掷武器落地后隐藏视觉的等待时间；到达 ThrowWeaponCooldown 后才归还背包并销毁节点
-		[Export(PropertyHint.File, "*.tscn")] public string DestructionEffectScene { get; set; } = string.Empty; // 销毁时生成的特效Scene（可选）
+		[Export(PropertyHint.Range, "0.01,10,0.01")] public float LandingHideDelay { get; set; } = 2.0f; // 落点处隐藏延迟（秒）：投掷武器落地后隐藏视觉的等待时间；到达 ThrowWeaponCooldown 后才归还背包并销毁节点
 
 		[ExportGroup("Physics")]
 		[Export] public NodePath RigidBodyPath { get; set; } = new NodePath(".");
 		[Export] public NodePath HitboxAreaPath { get; set; } = new NodePath("Rigidbody2D/Hitbox");
-		[Export] public uint ThrowCollisionLayer { get; set; } = 1u << 2; // 投掷时的碰撞层（默认第3层：1u<<2=4，占用第3层；墙/地面的Mask需包含第3层才能检测到投掷物品）
-		[Export] public uint ThrowCollisionMask { get; set; } = 0; // 投掷时的碰撞遮罩（0=不检测任何层；如果碰撞只依赖layer，则设为0；如果需要双向检测，则设置为包含墙所在层的值）
+		[Export] public NodePath ShadowPath { get; set; } = new NodePath("Shadow"); // 阴影节点路径，投掷飞行期间隐藏
+		[Export] public uint ThrowCollisionLayer { get; set; } = 1u << 2;
+		[Export] public uint ThrowCollisionMask { get; set; } = 0;
 
 
 		public InventoryItemStack? CurrentStack { get; private set; }
@@ -102,6 +107,7 @@ namespace Kuros.Items.World
 		private ShaderMaterial? _outlineMaterial; // Outline 着色器材料
 		private Area2D? _cachedPlayerGrabArea; // 缓存的玩家 GrabArea
 		private bool _isOutlineHighlighted; // 是否正在高亮显示
+		private Node2D? _shadowNode; // 阴影节点缓存
 		private double _throwCooldownTimer = 0.0; // 投掷武器冷却计时器
 		private bool _isInCooldown = false; // 是否在冷却中
 		private double _landingHideTimer = 0.0; // 落点隐藏计时器（LandingHideDelay：到期后隐藏视觉，不销毁节点）
@@ -109,6 +115,11 @@ namespace Kuros.Items.World
 		private int _reservedQuickBarSlotIndex = -1; // 投掷武器飞行期间预留的快捷栏槽位索引
 
 		public GameActor? LastDroppedBy { get; set; }
+
+		/// <summary>
+		/// 当前被高亮的实体（由 PlayerItemInteractionComponent 每帧设置，避免 O(N²) 遍历）
+		/// </summary>
+		internal static RigidBodyWorldItemEntity? CurrentHighlightedEntity { get; set; }
 		
 		/// <summary>
 		/// 检查投掷武器是否在冷却中
@@ -180,13 +191,27 @@ namespace Kuros.Items.World
 			ResolveHitboxArea();
 			UpdateSprite();
 			ResolveOutlineHighlight();
+			ResolveShadowNode();
 			UpdateOutlineHighlight(force: true);
 			SetProcess(true);
+
+			// 如果该物品包含导航源几何子节点，进入场景树后延迟烘焙，使障碍区域生效
+			if (HasNavigationSourceGeometryDescendant(this))
+			{
+				ScheduleNavigationRebake();
+			}
 		}
 
 		public override void _ExitTree()
 		{
 			base._ExitTree();
+
+			// 如果该物品有子节点属于导航源几何组，移除后触发延迟重新烘焙导航网格
+			if (HasNavigationSourceGeometryDescendant(this))
+			{
+				ScheduleNavigationRebake();
+			}
+
 			if (_grabArea != null)
 			{
 				var entered = new Callable(this, MethodName.OnBodyEntered);
@@ -283,6 +308,26 @@ namespace Kuros.Items.World
 			}
 		}
 
+		private void ResolveShadowNode()
+		{
+			if (!ShadowPath.IsEmpty)
+			{
+				_shadowNode = GetNodeOrNull<Node2D>(ShadowPath);
+			}
+			// 若路径未找到，尝试常见名称
+			if (_shadowNode == null)
+			{
+				_shadowNode = GetNodeOrNull<Node2D>("Shadow")
+					?? _rigidBody?.GetNodeOrNull<Node2D>("Shadow");
+			}
+		}
+
+		private void SetShadowVisible(bool visible)
+		{
+			if (_shadowNode != null && GodotObject.IsInstanceValid(_shadowNode))
+				_shadowNode.Visible = visible;
+		}
+
 		private void ResolveOutlineHighlight()
 		{
 			if (!EnableGrabAreaOutlineHighlight)
@@ -349,6 +394,18 @@ namespace Kuros.Items.World
 		private bool IsInThrowLifecycle =>
 			_isThrown || _inFlight || _landingHideTimer > 0.0 || _inventoryReturnTimer > 0.0;
 
+		/// <summary>
+		/// 判断此实例是否有资格参与高亮候选（供 PlayerItemInteractionComponent 调用）
+		/// </summary>
+		internal bool IsHighlightCandidate =>
+			EnableGrabAreaOutlineHighlight && !_isPicked && !IsInThrowLifecycle
+			&& _grabArea != null && GodotObject.IsInstanceValid(_grabArea);
+
+		/// <summary>
+		/// 获取此实例的 GrabArea（供 PlayerItemInteractionComponent 进行距离判断）
+		/// </summary>
+		internal Area2D? GrabArea => _grabArea;
+
 		private void UpdateOutlineHighlight(bool force = false)
 		{
 			ResolveOutlineHighlight();
@@ -357,38 +414,9 @@ namespace Kuros.Items.World
 				return;
 			}
 
-			// 只高亮离玩家最近的那一件
-			// 投掷中的武器实例本身不参与高亮（但不影响场上其他同名武器）
-			bool shouldHighlight = false;
-			if (EnableGrabAreaOutlineHighlight && !_isPicked && !IsInThrowLifecycle && _grabArea != null && GodotObject.IsInstanceValid(_grabArea))
-			{
-				var grabArea = ResolvePlayerGrabArea();
-				if (grabArea != null && GodotObject.IsInstanceValid(grabArea))
-				{
-					RigidBodyWorldItemEntity? closest = null;
-					float minDist = float.MaxValue;
-					foreach (var node in GetTree().GetNodesInGroup("world_items"))
-					{
-						if (node is RigidBodyWorldItemEntity item
-							&& item.EnableGrabAreaOutlineHighlight
-							&& !item._isPicked
-							&& !item.IsInThrowLifecycle  // 排除投掷中的实例，不参与最近候选
-							&& item._grabArea != null && GodotObject.IsInstanceValid(item._grabArea))
-						{
-							if (item._grabArea.OverlapsArea(grabArea))
-							{
-								float dist = item.GlobalPosition.DistanceSquaredTo(grabArea.GlobalPosition);
-								if (dist < minDist)
-								{
-									minDist = dist;
-									closest = item;
-								}
-							}
-						}
-					}
-					shouldHighlight = ReferenceEquals(this, closest);
-				}
-			}
+			// 由 PlayerItemInteractionComponent 每帧设置 CurrentHighlightedEntity，
+			// 此处只需检查自己是否为当前高亮实体（O(1)）
+			bool shouldHighlight = ReferenceEquals(this, CurrentHighlightedEntity);
 
 			if (!force && _isOutlineHighlighted == shouldHighlight)
 			{
@@ -397,6 +425,22 @@ namespace Kuros.Items.World
 
 			_outlineMaterial.SetShaderParameter("outline_color", shouldHighlight ? HighlightOutlineColor : DefaultOutlineColor);
 			_isOutlineHighlighted = shouldHighlight;
+		}
+
+		/// <inheritdoc/>
+		public virtual void ApplyScatterImpulse(Vector2 velocity)
+		{
+			// 仅做物理弹出，不进入投掷状态机，不触发 OnThrowDestroy 效果
+			if (_rigidBody == null) ResolveRigidBody();
+			if (_rigidBody == null) return;
+			try { _rigidBody.Set("freeze", false); } catch { }
+			_rigidBody.Sleeping = false;
+			// 添加线性阻尼确保物体能自然减速停止（gravity_scale=0 时无自然减速）
+			_rigidBody.LinearDamp = 4.0f;
+			_rigidBody.LinearVelocity = velocity;
+			// 速度归零后自动重新冻结（由 _refreezePending 逻辑处理）
+			_refreezePending = true;
+			_refreezeTimer = 0.0;
 		}
 
 		public virtual void ApplyThrowImpulse(Vector2 velocity)
@@ -459,8 +503,9 @@ namespace Kuros.Items.World
 					_hitActors.Clear();
 					_isThrown = true;
 					
-					// 立即清除高亮（进入投掷生命周期后本实例不再参与高亮）
-					UpdateOutlineHighlight(force: true);
+				// 投掷飞行期间隐藏阴影
+				SetShadowVisible(false);
+				
 
 					// 构筑效果已在 PlayerItemInteractionComponent.TryHandleDrop 中预注册，此处无需重复注册
 					
@@ -638,6 +683,9 @@ namespace Kuros.Items.World
 					try { _rigidBody.Set("freeze", true); } catch { }
 					RestoreRigidBodyCollision();
 					
+					// 落地时恢复阴影显示
+					SetShadowVisible(true);
+					
 					// 开始落点隐藏计时（LandingHideDelay：到期后隐藏视觉）
 					// 归还背包由 _inventoryReturnTimer（ThrowWeaponCooldown）独立控制
 					if (!_isDestroying)
@@ -667,6 +715,8 @@ namespace Kuros.Items.World
 						// re-freeze the body and clear velocity
 						try { _rigidBody.Set("freeze", true); } catch { }
 						try { _rigidBody.LinearVelocity = Vector2.Zero; } catch { }
+						// 还原 LinearDamp（由 ApplyScatterImpulse 临时设置）
+						_rigidBody.LinearDamp = 0.0f;
 						_refreezePending = false;
 						_refreezeTimer = 0.0;
 						// 停止伤害检测并恢复原始碰撞设置
@@ -1311,8 +1361,8 @@ namespace Kuros.Items.World
 				DisableGrabArea();
 			}
 
-			// 生成特效（如果有）
-			SpawnDestructionEffect();
+			// 生成 OnThrowDestroy 效果（Node2D 在世界坐标生成，ActorEffect 应用到投掷者）
+			SpawnThrowDestroyEffects();
 
 			// 播放销毁动画
 			PlayDestructionAnimation();
@@ -1342,11 +1392,12 @@ namespace Kuros.Items.World
 				DisableGrabArea();
 			}
 
-			// 生成特效（如果有）
-			SpawnDestructionEffect();
+			// 生成 OnThrowDestroy 效果（Node2D 在世界坐标生成，ActorEffect 应用到投掷者）
+			SpawnThrowDestroyEffects();
 
 			// 播放销毁动画
 			PlayDestructionAnimation();
+			GD.Print($"[{Name}] 在落点销毁物品");
 		}
 
 		/// <summary>
@@ -1372,42 +1423,8 @@ namespace Kuros.Items.World
 				DisableGrabArea();
 			}
 
-			// 生成落点特效（如果有配置）
-			SpawnDestructionEffect();
-		}
-
-		/// <summary>
-		/// 生成销毁特效
-		/// </summary>
-		private void SpawnDestructionEffect()
-		{
-			// 如果配置了销毁特效Scene，则实例化它
-			if (!string.IsNullOrWhiteSpace(DestructionEffectScene))
-			{
-				try
-				{
-					var scene = GD.Load<PackedScene>(DestructionEffectScene);
-					if (scene != null)
-					{
-						var effect = scene.Instantiate();
-						if (effect is Node2D effect2D)
-						{
-							// 使用 RigidBody2D 的实际坐标：飞行期间只有 _rigidBody 随武器移动，
-							// 脚本所在的 Node2D 根节点停留在初始生成位置（玩家附近），直接用 GlobalPosition 会导致特效生成在玩家处
-							GetParent()?.AddChild(effect2D);
-							effect2D.GlobalPosition = _rigidBody?.GlobalPosition ?? GlobalPosition;
-						}
-						else if (effect != null)
-						{
-							GetParent()?.AddChild(effect);
-						}
-					}
-				}
-				catch (Exception ex)
-				{
-					GD.PushWarning($"[{Name}] 无法生成销毁特效: {ex.Message}");
-				}
-			}
+			// 生成 OnThrowDestroy 效果（Node2D 在世界坐标生成，ActorEffect 应用到投掷者）
+			SpawnThrowDestroyEffects();
 		}
 
 		private void DisableGrabArea()
@@ -1561,6 +1578,60 @@ namespace Kuros.Items.World
 			QueueFree();
 		}
 
+		/// <summary>
+		/// 检查该节点的子树中是否有属于导航源几何组的节点。
+		/// </summary>
+		private static bool HasNavigationSourceGeometryDescendant(Node node)
+		{
+			foreach (Node child in node.GetChildren())
+			{
+				if (child.IsInGroup("navigation_polygon_source_geometry_group")) return true;
+				if (HasNavigationSourceGeometryDescendant(child)) return true;
+			}
+			return false;
+		}
+
+		/// <summary>
+		/// 递归查找场景中所有 NavigationRegion2D 并触发重新烘焙。
+		/// </summary>
+		private static void RebakeAllNavigationRegions(Node node)
+		{
+			if (!GodotObject.IsInstanceValid(node)) return;
+			if (node is NavigationRegion2D navRegion)
+			{
+				navRegion.BakeNavigationPolygon();
+				return;
+			}
+			foreach (Node child in node.GetChildren())
+				RebakeAllNavigationRegions(child);
+		}
+
+		/// <summary>
+		/// 防抖机制：将烘焙请求加入待处理列表，统一在下一帧执行（避免多物品重复遍历场景树）。
+		/// </summary>
+		private static void ScheduleNavigationRebake()
+		{
+			var tree = Engine.GetMainLoop() as SceneTree;
+			if (tree == null) return;
+
+			PendingRebakeScenes.Add(tree);
+
+			// 只在首次请求时创建定时器
+			if (_rebakeTimerScheduled) return;
+
+			_rebakeTimerScheduled = true;
+			tree.CreateTimer(0.0).Timeout += () =>
+			{
+				_rebakeTimerScheduled = false;
+				foreach (var sceneTree in PendingRebakeScenes)
+				{
+					var scene = sceneTree.CurrentScene;
+					if (scene != null) RebakeAllNavigationRegions(scene);
+				}
+				PendingRebakeScenes.Clear();
+			};
+		}
+
 		private void InitializeStack()
 		{
 			if (CurrentStack != null) return;
@@ -1594,7 +1665,7 @@ namespace Kuros.Items.World
 				return false;
 			}
 
-			int accepted = inventory.AddItemSmart(stack.Item, stack.Quantity, showPopupIfFirstTime: true);
+			int accepted = inventory.AddItemSmart(stack.Item, stack.Quantity, actor, showPopupIfFirstTime: true);
 			if (accepted <= 0)
 			{
 				return false;
@@ -1664,6 +1735,68 @@ namespace Kuros.Items.World
 		private void ApplyItemEffects(GameActor actor, ItemEffectTrigger trigger)
 		{
 			ItemDefinition?.ApplyEffects(actor, trigger);
+		}
+
+		/// <summary>
+		/// 在落点/命中点处理 OnThrowDestroy 效果：
+		/// - Node2D 类型场景：在世界坐标实例化（烟雾、爆炸等视觉效果）
+		/// - ActorEffect 类型：应用到投掷者身上
+		/// </summary>
+		private void SpawnThrowDestroyEffects()
+		{
+			if (ItemDefinition == null) return;
+
+			Vector2 spawnPos = _rigidBody?.GlobalPosition ?? GlobalPosition;
+
+			foreach (var entry in ItemDefinition.GetEffectEntries(ItemEffectTrigger.OnThrowDestroy))
+			{
+				if (entry?.EffectScene == null) continue;
+
+				try
+				{
+					// 通用方式实例化，兼容 Node2D 和 ActorEffect
+					var node = entry.EffectScene.Instantiate();
+
+					if (node is Node2D node2D)
+					{
+						// 视觉效果：在世界坐标生成，使用 RigidBody 的实际落点位置
+						GetParent()?.AddChild(node2D);
+						node2D.GlobalPosition = spawnPos;
+					}
+					else if (node is Kuros.Core.Effects.ActorEffect actorEffect)
+					{
+						// 使用 ItemEffectEntry 的方式来应用属性覆盖
+						entry.ApplyOverrides(actorEffect);
+
+						// 若效果支持落点定位，传入世界坐标
+						if (actorEffect is StunEnemiesEffect stunEffect)
+						{
+							stunEffect.WorldSpawnPosition = spawnPos;
+						}
+						else if (actorEffect is Kuros.Effects.SpikeAttackEffect spikeEffect)
+						{
+							spikeEffect.WorldSpawnPosition = spawnPos;
+						}
+
+						if (LastDroppedBy?.EffectController != null)
+						{
+							LastDroppedBy.ApplyEffect(actorEffect);
+						}
+						else
+						{
+							actorEffect.QueueFree();
+						}
+					}
+					else
+					{
+						node?.QueueFree();
+					}
+				}
+				catch (Exception ex)
+				{
+					GD.PushWarning($"[{Name}] 无法生成 OnThrowDestroy 效果: {ex.Message}");
+				}
+			}
 		}
 
 		private static T? FindChildComponent<T>(Node root) where T : Node

@@ -1,8 +1,8 @@
 [gd_resource type="Resource" script_class="LootDropTable" load_steps=7 format=3 uid="uid://xsa2wlasoj6i"]
 
-[ext_resource type="Resource" uid="uid://chf7hf1k2q2n2" path="res://resources/items/Supplies_watermelon.tres" id="1_f534h"]
+[ext_resource type="Resource" uid="uid://c0h5f2yocbgcw" path="res://resources/items/Weapon_Brawl_RiotBracer.tres" id="1_f534h"]
 [ext_resource type="Script" uid="uid://nd1f744icb05" path="res://scripts/systems/loot/LootDropEntry.cs" id="2_3hqkn"]
-[ext_resource type="Resource" uid="uid://dnjatms64g670" path="res://resources/items/Supplies_pudding.tres" id="3_bbq0j"]
+[ext_resource type="Resource" uid="uid://dknruw00xelvv" path="res://resources/items/Weapon_Throw_SmokeGrenade.tres" id="3_3hqkn"]
 [ext_resource type="Script" uid="uid://dpdpwmf4dwu8k" path="res://scripts/systems/loot/LootDropTable.cs" id="4_dlggc"]
 
 [sub_resource type="Resource" id="Drop_Common"]
@@ -15,13 +15,14 @@ ImpulseSpreadDegrees = 120.0
 
 [sub_resource type="Resource" id="Drop_Rare"]
 script = ExtResource("2_3hqkn")
-Item = ExtResource("3_bbq0j")
+Item = ExtResource("3_3hqkn")
 DropChance = 0.25
 ImpulseStrength = 220.0
 ImpulseSpreadDegrees = 90.0
 
 [resource]
 script = ExtResource("4_dlggc")
+GlobalDropChance = 0.2
 ScatterRadius = 32.0
 DefaultImpulse = 180.0
 Entries = [SubResource("Drop_Common"), SubResource("Drop_Rare")]

@@ -69,6 +69,7 @@ y_sort_enabled = true
 scale = Vector2(0.33, 0.33)
 collision_layer = 4
 collision_mask = 7
+motion_mode = 1
 script = ExtResource("1_om6pm")
 WalkAnimationSpeed = 2.0
 RunAnimationSpeed = 3.0
@@ -169,7 +170,6 @@ scale = Vector2(0.9999999, 0.9999999)
 shape = SubResource("CapsuleShape2D_0y6jy")
 
 [node name="HitArea" type="Area2D" parent="."]
-visible = false
 scale = Vector2(0.99999994, 0.99999994)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HitArea"]
@@ -185,6 +185,7 @@ scale = Vector2(0.9999999, 0.9999999)
 shape = SubResource("RectangleShape2D_kqj82")
 
 [node name="GrabArea" type="Area2D" parent="."]
+visible = false
 collision_layer = 7
 collision_mask = 7
 
@@ -435,7 +436,7 @@ script = ExtResource("28_rs5xn")
 LevelEntries = Array[ExtResource("35_hyeo7")]([ExtResource("30_6tvdn"), ExtResource("31_a5ycu"), ExtResource("32_a8ffv"), ExtResource("39_26vrv"), ExtResource("40_8fw8m"), ExtResource("41_o4xwm")])
 
 [node name="ThrowTrajectoryPreview" type="Node2D" parent="."]
-z_index = 2
+z_index = 10
 y_sort_enabled = true
 script = ExtResource("43_throwpreview")
 TrailColor = Color(1, 1, 1, 1)

@@ -194,7 +194,7 @@ private readonly HashSet<string> _obtainedItemIds = new HashSet<string>();
         /// 3. 快捷欄1（索引0）是小木劍，永遠不會被更改
         /// 4. 快捷欄滿時，溢出的物品放置到物品欄中；總武器攜帶上限由 MaxCarriedWeaponCount 控制
         /// </summary>
-        public int AddItemSmart(ItemDefinition item, int amount, bool showPopupIfFirstTime = true)
+        public int AddItemSmart(ItemDefinition item, int amount, GameActor? owner = null, bool showPopupIfFirstTime = true)
         {
             // 参数验证：检查 item 是否为 null
             if (item == null)
@@ -213,7 +213,7 @@ private readonly HashSet<string> _obtainedItemIds = new HashSet<string>();
             // 家具物品：路由到家具槽位（隐藏第6格）
             if (item.IsFurniture)
             {
-                return AddFurnitureItem(item, amount, showPopupIfFirstTime);
+                return AddFurnitureItem(item, amount, owner, showPopupIfFirstTime);
             }
 
             int requestedAmount = amount;
@@ -327,7 +327,7 @@ private readonly HashSet<string> _obtainedItemIds = new HashSet<string>();
         /// 将家具物品放入家具槽位（隐藏第6格）。
         /// 家具槽只能容纳1件 IsFurniture=true 的物品。
         /// </summary>
-        private int AddFurnitureItem(ItemDefinition item, int amount, bool showPopupIfFirstTime)
+        private int AddFurnitureItem(ItemDefinition item, int amount, GameActor? owner, bool showPopupIfFirstTime)
         {
             if (HasFurnitureItem)
             {
@@ -338,6 +338,11 @@ private readonly HashSet<string> _obtainedItemIds = new HashSet<string>();
             bool isFirstTime = IsFirstTimeObtaining(item);
             FurnitureSlotStack = new InventoryItemStack(item, 1);
             int totalAdded = 1;
+
+            if (owner != null)
+            {
+                item.ApplyEffects(owner, ItemEffectTrigger.OnEquip);
+            }
 
             FurnitureSlotChanged?.Invoke();
 
@@ -356,7 +361,7 @@ private readonly HashSet<string> _obtainedItemIds = new HashSet<string>();
         /// <summary>
         /// 从家具槽提取物品
         /// </summary>
-        public bool TryExtractFromFurnitureSlot(int amount, out InventoryItemStack? extracted)
+        public bool TryExtractFromFurnitureSlot(int amount, out InventoryItemStack? extracted, GameActor? owner = null)
         {
             extracted = null;
             if (!HasFurnitureItem)
@@ -365,6 +370,10 @@ private readonly HashSet<string> _obtainedItemIds = new HashSet<string>();
             }
 
             extracted = new InventoryItemStack(FurnitureSlotStack!.Item, 1);
+            if (owner != null)
+            {
+                FurnitureSlotStack.Item.RemoveEffects(owner, ItemEffectTrigger.OnEquip);
+            }
             FurnitureSlotStack = null;
             FurnitureSlotChanged?.Invoke();
             return true;
@@ -373,8 +382,12 @@ private readonly HashSet<string> _obtainedItemIds = new HashSet<string>();
         /// <summary>
         /// 清除家具槽（用于丢弃/投掷后清除）
         /// </summary>
-        public void ClearFurnitureSlot()
+        public void ClearFurnitureSlot(GameActor? owner = null)
         {
+            if (owner != null && FurnitureSlotStack != null)
+            {
+                FurnitureSlotStack.Item.RemoveEffects(owner, ItemEffectTrigger.OnEquip);
+            }
             FurnitureSlotStack = null;
         }
         private void ShowItemObtainedPopup(ItemDefinition item)
@@ -721,14 +734,14 @@ private readonly HashSet<string> _obtainedItemIds = new HashSet<string>();
         /// 嘗試從選中的快捷欄槽位提取物品。
         /// 如果家具槽有物品，优先从家具槽提取。
         /// </summary>
-        public bool TryExtractFromSelectedQuickBarSlot(int amount, out InventoryItemStack? extracted)
+        public bool TryExtractFromSelectedQuickBarSlot(int amount, out InventoryItemStack? extracted, GameActor? owner = null)
         {
             extracted = null;
 
             // 家具槽优先
             if (HasFurnitureItem)
             {
-                return TryExtractFromFurnitureSlot(amount, out extracted);
+                return TryExtractFromFurnitureSlot(amount, out extracted, owner);
             }
 
             if (QuickBar == null || SelectedQuickBarSlot < 0 || SelectedQuickBarSlot > 4)

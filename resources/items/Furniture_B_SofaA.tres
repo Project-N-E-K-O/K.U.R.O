@@ -1,0 +1,53 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=11 format=3 uid="uid://dcplas0yitt7q"]
+
+[ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="1_3yrju"]
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="2_ry8bs"]
+[ext_resource type="Texture2D" uid="uid://ky3ykwe70g0f" path="res://assets/furnitures/hotel_scene2/SofaA.png" id="3_3yrju"]
+[ext_resource type="PackedScene" uid="uid://bi7guxtti6ocl" path="res://resources/effects/HeavyCarrySlowEffect.tscn" id="3_ry8bs"]
+[ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="4_nt0ao"]
+[ext_resource type="PackedScene" uid="uid://ciwlpetibguab" path="res://shaders/destroy_somke.tscn" id="4_rqaa5"]
+[ext_resource type="PackedScene" uid="uid://cmh3bnabinwi0" path="res://resources/effects/CameraShakeEffect.tscn" id="5_nt0ao"]
+
+[sub_resource type="Resource" id="Resource_rqaa5"]
+script = ExtResource("2_ry8bs")
+Trigger = 1
+EffectScene = ExtResource("3_ry8bs")
+Notes = "大型家具：减速70%"
+PropertyOverrides = Dictionary[String, Variant]({
+"SpeedMultiplierPerStack": 0.3
+})
+metadata/_custom_type_script = "uid://bv0es4osw3x0r"
+
+[sub_resource type="Resource" id="Resource_nt0ao"]
+script = ExtResource("2_ry8bs")
+Trigger = 4
+EffectScene = ExtResource("4_rqaa5")
+metadata/_custom_type_script = "uid://bv0es4osw3x0r"
+
+[sub_resource type="Resource" id="Resource_dj6ea"]
+script = ExtResource("2_ry8bs")
+Trigger = 4
+EffectScene = ExtResource("5_nt0ao")
+PropertyOverrides = Dictionary[String, Variant]({
+"ShakeStrength": 18.0
+})
+metadata/_custom_type_script = "uid://bv0es4osw3x0r"
+
+[resource]
+script = ExtResource("4_nt0ao")
+ItemId = "Furniture_B_SofaA"
+DisplayName = "迎宾沙发"
+Description = "一次性投掷道具：迎宾沙发"
+Icon = ExtResource("3_3yrju")
+Category = "Furniture"
+Tags = Array[String](["tag_throw", "furniture"])
+MaxStackSize = 1
+EffectEntries = Array[ExtResource("2_ry8bs")]([SubResource("Resource_rqaa5"), SubResource("Resource_nt0ao"), SubResource("Resource_dj6ea")])
+LevelCount = 0
+IsThrowable = true
+IsFurniture = true
+ThrowStartOffset = Vector2(0, -450)
+ThrowParabolicDuration = 0.30000000000000004
+ThrowHorizontalDistance = 300.0
+ThrowParabolicLandingYOffset = 200.0
+WorldScenePath = "uid://3c5l27vhvwni"

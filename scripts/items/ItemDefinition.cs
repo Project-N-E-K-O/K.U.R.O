@@ -161,6 +161,19 @@ namespace Kuros.Items
             }
         }
 
+        public void RemoveEffects(GameActor actor, ItemEffectTrigger trigger)
+        {
+            if (actor == null || actor.EffectController == null) return;
+
+            foreach (var entry in GetEffectEntries(trigger))
+            {
+                var tempEffect = entry.InstantiateEffect();
+                if (tempEffect == null) continue;
+                actor.RemoveEffect(tempEffect.EffectId);
+                tempEffect.Free();
+            }
+        }
+
         public IEnumerable<WeaponSkillDefinition> GetWeaponSkillDefinitions()
         {
             foreach (var skillResource in _weaponSkillResources)

@@ -191,7 +191,7 @@ texture = ExtResource("12_qbr0m")
 region_enabled = true
 region_rect = Rect2(0, 0, 352, 1612)
 
-[node name="AirWall" type="StaticBody2D" parent="."]
+[node name="AirWall" type="StaticBody2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
 position = Vector2(-4853.25, -737.5)
 
 [node name="wall1" type="CollisionShape2D" parent="AirWall"]

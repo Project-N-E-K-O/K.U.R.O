@@ -86,7 +86,7 @@ namespace Kuros.Actors.Enemies.Animation
                     PlayOnceIfNeeded("Die", DieAnimation, DieMixDuration, enqueueIdle: false);
                     break;
                 case "Frozen":
-                    PlayLoopIfNeeded("Stun", StunAnimation, HitMixDuration);
+                    PlayLoopIfNeeded("Frozen", StunAnimation, HitMixDuration);
                     break;
                 case "Dead":
                     PlayEmptyIfNeeded();

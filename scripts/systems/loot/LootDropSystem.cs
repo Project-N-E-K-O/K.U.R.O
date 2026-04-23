@@ -102,7 +102,7 @@ namespace Kuros.Systems.Loot
                 direction = Vector2.Right;
             }
 
-            entity.ApplyThrowImpulse(direction.Normalized() * impulse);
+            entity.ApplyScatterImpulse(direction.Normalized() * impulse);
         }
     }
 }

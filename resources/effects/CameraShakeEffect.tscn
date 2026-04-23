@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://cmh3bnabinwi0"]
+
+[ext_resource type="Script" uid="uid://bm8fe203hu3yh" path="res://scripts/effects/CameraShakeEffect.cs" id="1_shake"]
+
+[node name="CameraShakeEffect" type="Node"]
+script = ExtResource("1_shake")
+EffectId = "31eaf7d0-f612-4a4d-a41e-fab901ed70d8"
+DisplayName = "镜头震动"
+Duration = 0.05

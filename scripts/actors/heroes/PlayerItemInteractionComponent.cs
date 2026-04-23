@@ -175,6 +175,68 @@ namespace Kuros.Actors.Heroes
                 GD.Print($"[PlayerItemInteractionComponent] take_up 按键被按下");
                 TriggerPickupState();
             }
+
+            // 每帧计算一次最近的可高亮物品（O(N) 替代原先每个物品 O(N) → 总 O(N²)）
+            UpdateClosestHighlight();
+        }
+
+        /// <summary>
+        /// 遍历 world_items 组，找到距离玩家 GrabArea 最近且重叠的物品，设为高亮。
+        /// 每帧只运行一次（在 PlayerItemInteractionComponent._Process 中调用）。
+        /// </summary>
+        private void UpdateClosestHighlight()
+        {
+            RigidBodyWorldItemEntity? closestRigid = null;
+            WorldItemEntity? closestWorld = null;
+            float minDistRigid = float.MaxValue;
+            float minDistWorld = float.MaxValue;
+
+            if (_interactionArea != null && GodotObject.IsInstanceValid(_interactionArea))
+            {
+                var tree = GetTree();
+                if (tree != null)
+                {
+                    foreach (var node in tree.GetNodesInGroup("world_items"))
+                    {
+                        if (node is RigidBodyWorldItemEntity rigidItem && rigidItem.IsHighlightCandidate)
+                        {
+                            if (rigidItem.GrabArea!.OverlapsArea(_interactionArea))
+                            {
+                                float dist = rigidItem.GlobalPosition.DistanceSquaredTo(_interactionArea.GlobalPosition);
+                                if (dist < minDistRigid)
+                                {
+                                    minDistRigid = dist;
+                                    closestRigid = rigidItem;
+                                }
+                            }
+                        }
+                        else if (node is WorldItemEntity worldItem && worldItem.IsHighlightCandidate)
+                        {
+                            if (worldItem.TriggerArea.OverlapsArea(_interactionArea))
+                            {
+                                float dist = worldItem.GlobalPosition.DistanceSquaredTo(_interactionArea.GlobalPosition);
+                                if (dist < minDistWorld)
+                                {
+                                    minDistWorld = dist;
+                                    closestWorld = worldItem;
+                                }
+                            }
+                        }
+                    }
+
+                    // 跨类型比较：只高亮全局最近的那一件
+                    if (closestRigid != null && closestWorld != null)
+                    {
+                        if (minDistRigid <= minDistWorld)
+                            closestWorld = null;
+                        else
+                            closestRigid = null;
+                    }
+                }
+            }
+
+            RigidBodyWorldItemEntity.CurrentHighlightedEntity = closestRigid;
+            WorldItemEntity.CurrentHighlightedEntity = closestWorld;
         }
 
         public bool TryTriggerThrowAfterAnimation()
@@ -242,7 +304,7 @@ namespace Kuros.Actors.Heroes
             }
 
             // 從快捷欄提取物品
-            if (!InventoryComponent.TryExtractFromSelectedQuickBarSlot(selectedStack.Quantity, out var extracted) || extracted == null || extracted.IsEmpty)
+            if (!InventoryComponent.TryExtractFromSelectedQuickBarSlot(selectedStack.Quantity, out var extracted, _actor) || extracted == null || extracted.IsEmpty)
             {
                 // 提取失败：回滚预注册的飞行状态
                 if (preRegisteredBuild && buildController != null)

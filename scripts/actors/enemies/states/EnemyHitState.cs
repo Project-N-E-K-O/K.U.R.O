@@ -1,4 +1,5 @@
 using Godot;
+using Kuros.Core.Effects;
 
 namespace Kuros.Actors.Enemies.States
 {
@@ -22,6 +23,14 @@ namespace Kuros.Actors.Enemies.States
             Enemy.MoveAndSlide();
 
             if (_stunTimer > 0) return;
+
+            // 若仍有活跃的 FreezeEffect，Hit 结束后转到该效果配置的目标状态
+            var freezeEffect = Enemy.EffectController?.GetEffect<FreezeEffect>();
+            if (freezeEffect != null)
+            {
+                ChangeState(freezeEffect.FrozenStateName);
+                return;
+            }
 
             if (Enemy.IsPlayerWithinDetectionRange())
             {

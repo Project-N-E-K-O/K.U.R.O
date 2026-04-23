@@ -1,13 +1,27 @@
-[gd_resource type="Resource" script_class="ItemDefinition" load_steps=6 format=3 uid="uid://dknruw00xelvv"]
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=10 format=3 uid="uid://dknruw00xelvv"]
 
 [ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="1_0ac3k"]
 [ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="2_letw0"]
+[ext_resource type="PackedScene" uid="uid://ckvi05o7l1mv4" path="res://shaders/smoke.tscn" id="3_0ac3k"]
 [ext_resource type="Texture2D" uid="uid://n0ciynpx53jh" path="res://assets/weapons/镇暴烟雾弹.png" id="3_vod1j"]
+[ext_resource type="PackedScene" uid="uid://dm13v6vu200sa" path="res://resources/effects/WeaponStunEffect.tscn" id="4_letw0"]
 [ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="5_3rggb"]
 
 [sub_resource type="Resource" id="Attribute_AttackPower"]
 script = ExtResource("1_0ac3k")
 AttributeId = "attack_power"
+
+[sub_resource type="Resource" id="Resource_letw0"]
+script = ExtResource("2_letw0")
+Trigger = 4
+EffectScene = ExtResource("3_0ac3k")
+metadata/_custom_type_script = "uid://bv0es4osw3x0r"
+
+[sub_resource type="Resource" id="Resource_0ac3k"]
+script = ExtResource("2_letw0")
+Trigger = 4
+EffectScene = ExtResource("4_letw0")
+metadata/_custom_type_script = "uid://bv0es4osw3x0r"
 
 [resource]
 script = ExtResource("5_3rggb")
@@ -19,9 +33,12 @@ Category = "Weapon"
 Tags = Array[String](["tag_weapon", "build_guard", "tag_throw"])
 MaxStackSize = 1
 AttributeEntries = Array[ExtResource("1_0ac3k")]([SubResource("Attribute_AttackPower")])
+EffectEntries = Array[ExtResource("2_letw0")]([SubResource("Resource_letw0"), SubResource("Resource_0ac3k")])
 BuildClass = "guard"
 IsThrowable = true
 ThrowStartOffset = Vector2(0, -300)
 ThrowParabolicDuration = 0.4
+ThrowParabolicPeakHeight = 50.0
+ThrowHorizontalDistance = 700.0
 ThrowParabolicLandingYOffset = 200.0
 WorldScenePath = "uid://cipwjj7xx121y"

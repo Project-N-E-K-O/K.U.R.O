@@ -23,5 +23,5 @@ MaxStackSize = 1
 AttributeEntries = Array[ExtResource("1_q00hu")]([SubResource("Attribute_AttackPower")])
 EffectEntries = Array[ExtResource("2_iq0we")]([null])
 WeaponSkillResources = Array[Resource]([ExtResource("4_qwcde")])
-BuildClass = "Machine"
+BuildClass = "machine"
 WorldScenePath = "uid://6ghjqyjkk37w"
