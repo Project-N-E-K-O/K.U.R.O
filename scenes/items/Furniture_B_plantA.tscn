@@ -51,7 +51,7 @@ freeze_mode = 1
 
 [node name="Shadow" type="Sprite2D" parent="RigidBody2D"]
 material = SubResource("ShaderMaterial_aa7cv")
-position = Vector2(-4.0000005, 55)
+position = Vector2(-4, 103)
 scale = Vector2(5, 3)
 texture = ExtResource("4_ns7wp")
 

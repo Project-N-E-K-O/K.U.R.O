@@ -53,9 +53,8 @@ size = Vector2(900, 400)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_h8apo"]
 size = Vector2(650, 400)
 
-[sub_resource type="CapsuleShape2D" id="3"]
-radius = 100.0
-height = 400.0
+[sub_resource type="CircleShape2D" id="CircleShape2D_l3qmk"]
+radius = 180.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_l3qmk"]
 size = Vector2(320, 180)
@@ -190,9 +189,7 @@ scale = Vector2(0.9999999, 0.9999999)
 shape = SubResource("RectangleShape2D_h8apo")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, -100)
-rotation = 1.5707964
-shape = SubResource("3")
+shape = SubResource("CircleShape2D_l3qmk")
 
 [node name="StateMachine" type="Node" parent="." node_paths=PackedStringArray("InitialState")]
 script = ExtResource("2")
@@ -307,7 +304,6 @@ monitorable = false
 shape = SubResource("RectangleShape2D_l3qmk")
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
-path_desired_distance = 64.0
 target_desired_distance = 50.0
 path_max_distance = 500.0
 avoidance_enabled = true

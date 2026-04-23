@@ -1,0 +1,48 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=11 format=3 uid="uid://bk5qofm73s8f2"]
+
+[ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="1_5lf6o"]
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="2_tvgiw"]
+[ext_resource type="PackedScene" uid="uid://bi7guxtti6ocl" path="res://resources/effects/HeavyCarrySlowEffect.tscn" id="3_qp2rx"]
+[ext_resource type="PackedScene" uid="uid://ciwlpetibguab" path="res://shaders/destroy_somke.tscn" id="4_rriw5"]
+[ext_resource type="PackedScene" uid="uid://cmh3bnabinwi0" path="res://resources/effects/CameraShakeEffect.tscn" id="5_1rnen"]
+[ext_resource type="Texture2D" uid="uid://ch7oqqlpm2ubj" path="res://assets/furnitures/hotel_scene2/CautionTape_holding.png" id="6_jsn6v"]
+[ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="7_g5avp"]
+
+[sub_resource type="Resource" id="Resource_6f3qv"]
+script = ExtResource("2_tvgiw")
+Trigger = 1
+EffectScene = ExtResource("3_qp2rx")
+Notes = "小型家具：减速30%
+"
+metadata/_custom_type_script = "uid://bv0es4osw3x0r"
+
+[sub_resource type="Resource" id="Resource_mqy4i"]
+script = ExtResource("2_tvgiw")
+Trigger = 4
+EffectScene = ExtResource("4_rriw5")
+metadata/_custom_type_script = "uid://bv0es4osw3x0r"
+
+[sub_resource type="Resource" id="Resource_1qp51"]
+script = ExtResource("2_tvgiw")
+Trigger = 4
+EffectScene = ExtResource("5_1rnen")
+metadata/_custom_type_script = "uid://bv0es4osw3x0r"
+
+[resource]
+script = ExtResource("7_g5avp")
+ItemId = "Furniture_B_CautionTape_fwd"
+DisplayName = "警戒线(反)"
+Description = "一次性投掷道具：警戒线(反)"
+Icon = ExtResource("6_jsn6v")
+Category = "Furniture"
+Tags = Array[String](["tag_throw", "furniture"])
+MaxStackSize = 1
+EffectEntries = Array[ExtResource("2_tvgiw")]([SubResource("Resource_6f3qv"), SubResource("Resource_mqy4i"), SubResource("Resource_1qp51")])
+LevelCount = 0
+IsThrowable = true
+IsFurniture = true
+ThrowStartOffset = Vector2(0, -450)
+ThrowParabolicDuration = 0.30000000000000004
+ThrowHorizontalDistance = 700.0
+ThrowParabolicLandingYOffset = 325.0
+WorldScenePath = "uid://c0oyd0psq7fe1"

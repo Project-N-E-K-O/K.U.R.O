@@ -43,9 +43,8 @@ size = Vector2(1600, 700)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_otg7e"]
 size = Vector2(690.90894, 500)
 
-[sub_resource type="CapsuleShape2D" id="3"]
-radius = 200.0
-height = 900.0
+[sub_resource type="CircleShape2D" id="CircleShape2D_b5vhy"]
+radius = 380.0
 
 [node name="Enemy_B1_fat" type="CharacterBody2D" node_paths=PackedStringArray("DetectionArea", "AttackArea", "StateMachine", "EffectController")]
 z_index = 2
@@ -179,9 +178,7 @@ scale = Vector2(0.9999999, 0.9999999)
 shape = SubResource("RectangleShape2D_otg7e")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, -160)
-rotation = 1.5707964
-shape = SubResource("3")
+shape = SubResource("CircleShape2D_b5vhy")
 
 [node name="StateMachine" type="Node" parent="." node_paths=PackedStringArray("InitialState")]
 script = ExtResource("2")
@@ -261,7 +258,6 @@ AttackMixDuration = 0.2
 SkillMixDuration = 0.2
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
-path_desired_distance = 64.0
 target_desired_distance = 50.0
 path_max_distance = 500.0
 avoidance_enabled = true

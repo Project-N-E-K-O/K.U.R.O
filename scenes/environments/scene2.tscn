@@ -176,6 +176,7 @@ region_rect = Rect2(1, 0, 1689, 3059)
 script = ExtResource("11_ttjsf")
 TriggerAreaPath = NodePath("Area2D")
 TargetPath = NodePath(".")
+FadedAlpha = 0.2
 
 [node name="Area2D" type="Area2D" parent="FrontWall/GateFrontWall"]
 collision_mask = 4

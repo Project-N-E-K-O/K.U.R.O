@@ -18,6 +18,7 @@ namespace Kuros.Actors.Enemies.Attacks
 
         [ExportCategory("Dash")]
         [Export(PropertyHint.Range, "10,2000,10")] public float DashSpeed = 600f;
+        [Export(PropertyHint.Range, "0.01,2,0.01")] public float DashDuration = 0.3f; // 冲刺时长（限制最大冲刺距离）
         [Export] public bool LockFacingDuringDash = true;
 		[Export(PropertyHint.Range, "0,5,0.01")] public float MinDashTimeBeforeSmash = 0f;
 		[Export(PropertyHint.Range, "0,5,0.1")] public float SnapshotDelaySeconds = 0f;
@@ -160,6 +161,12 @@ namespace Kuros.Actors.Enemies.Attacks
 
         protected override void OnActivePhase()
         {
+			// 生成指定时機的特效（OnActive 阯段）
+			if (SpawnTiming == EffectSpawnTiming.OnActive)
+			{
+				SpawnEffectAtEnemy();
+			}
+			
 			if (Enemy == null) return;
 			_isDashing = true;
 			Enemy.Velocity = _dashDirection * DashSpeed;
@@ -172,6 +179,7 @@ namespace Kuros.Actors.Enemies.Attacks
 
         protected override void OnRecoveryStarted()
         {
+            // base.OnRecoveryStarted() 会处理 OnRecovery 时机的特效生成
             base.OnRecoveryStarted();
 			if (RequireAnimationHitTrigger)
 			{
@@ -261,16 +269,17 @@ namespace Kuros.Actors.Enemies.Attacks
             }
 
 			_dashDirection = direction.Normalized();
-			_dashTarget = dashStart + direction;
+            
+            // 根据 DashDuration 限制冲刺距离（参考 KickAttack 的设计）
+            float targetDistance = DashSpeed * Mathf.Max(DashDuration, 0.05f);
+            _dashTarget = dashStart + _dashDirection * targetDistance;
 
             if (LockFacingDuringDash && _dashDirection.X != 0)
             {
                 Enemy.FlipFacing(_dashDirection.X > 0);
             }
 
-			float distance = direction.Length();
-			float duration = distance / Mathf.Max(DashSpeed, 1f);
-            ActiveDuration = Mathf.Max(duration, 0.05f);
+			ActiveDuration = Mathf.Max(DashDuration, 0.05f);
 			RecoveryDuration = 1.0f;
         }
 
@@ -457,6 +466,12 @@ namespace Kuros.Actors.Enemies.Attacks
 
 		protected override void OnAnimationHit()
 		{
+			// 生成指定时機的特效（OnAnimationHit 阯段3）
+			if (SpawnTiming == EffectSpawnTiming.OnAnimationHit)
+			{
+				SpawnEffectAtEnemy();
+			}
+			
 			if (Enemy?.PlayerTarget == null) return;
 			if (!_canAttemptSmash) return;
 

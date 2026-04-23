@@ -24,7 +24,7 @@ shader_parameter/preserve_fill = true
 size = Vector2(1176, 458)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jyvv2"]
-size = Vector2(1200, 267.5)
+size = Vector2(1200, 241)
 
 [node name="FurnitureCounterA" type="Node2D"]
 z_index = 2
@@ -81,5 +81,5 @@ shape = SubResource("RectangleShape2D_gy46y")
 [node name="StaticBody2D" type="StaticBody2D" parent="RigidBody2D" groups=["navigation_polygon_source_geometry_group"]]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/StaticBody2D"]
-position = Vector2(0, 19.25)
+position = Vector2(0, 32.5)
 shape = SubResource("RectangleShape2D_jyvv2")

@@ -28,7 +28,7 @@ shader_parameter/softness = 0.5
 shader_parameter/alpha = 0.4
 
 [sub_resource type="RectangleShape2D" id="2"]
-size = Vector2(952, 597)
+size = Vector2(952, 481.81824)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_gvrrx"]
 radius = 1024.0
@@ -41,11 +41,10 @@ radius = 150.0
 height = 600.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_gkl6r"]
-radius = 650.0
+radius = 700.0
 
-[sub_resource type="CapsuleShape2D" id="3"]
-radius = 80.0
-height = 500.0
+[sub_resource type="CircleShape2D" id="CircleShape2D_d5sdg"]
+radius = 180.0
 
 [node name="Enemy_Normal_guard2" type="CharacterBody2D" node_paths=PackedStringArray("DetectionArea", "AttackArea", "StateMachine", "EffectController")]
 z_index = 2
@@ -127,7 +126,7 @@ skeleton_data_res = ExtResource("18_wixbd")
 preview_skin = "Default"
 preview_animation = "-- Empty --"
 preview_frame = true
-preview_time = 0.86
+preview_time = 0.0
 script = ExtResource("19_gkl6r")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
@@ -140,7 +139,8 @@ collision_layer = 0
 monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/AttackArea"]
-position = Vector2(565, -244.5)
+position = Vector2(565, 137.87881)
+scale = Vector2(0.9999999, 0.9999999)
 shape = SubResource("2")
 
 [node name="AttackDetectionArea" type="Area2D" parent="Sprite2D"]
@@ -171,17 +171,14 @@ position = Vector2(0, 130)
 shape = SubResource("CapsuleShape2D_gvrrx")
 
 [node name="MoveAttackArea" type="Area2D" parent="Sprite2D"]
-visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/MoveAttackArea"]
-position = Vector2(0, -60)
+position = Vector2(0, 100)
+scale = Vector2(1.1, 0.5)
 shape = SubResource("CircleShape2D_gkl6r")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-visible = false
-position = Vector2(0, -50)
-rotation = 1.5707964
-shape = SubResource("3")
+shape = SubResource("CircleShape2D_d5sdg")
 
 [node name="StateMachine" type="Node" parent="." node_paths=PackedStringArray("InitialState")]
 script = ExtResource("5_hayra")
@@ -261,7 +258,6 @@ script = ExtResource("19_d5sdg")
 AttackMixDuration = 0.2
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
-path_desired_distance = 64.0
 target_desired_distance = 50.0
 path_max_distance = 500.0
 avoidance_enabled = true
