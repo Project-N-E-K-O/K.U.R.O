@@ -17,6 +17,9 @@ namespace Kuros.Actors.Enemies.States
             _timer = DeathDuration;
             Enemy.AttackTimer = 0f;
 
+            // 禁用敌人碰撞体
+            Enemy.DisableCollisionShape();
+
             if (FreezeMotion)
             {
                 Enemy.Velocity = Vector2.Zero;

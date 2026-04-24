@@ -9,6 +9,7 @@ using Kuros.Core.Events;
 
 namespace Kuros.Core
 {
+	[GlobalClass]
 	public partial class GameActor : CharacterBody2D
 	{
 		public event Action<int, int>? HealthChanged;
@@ -564,6 +565,29 @@ namespace Kuros.Core
 		protected void NotifyHealthChanged()
 		{
 			HealthChanged?.Invoke(CurrentHealth, MaxHealth);
+		}
+
+		/// <summary>
+		/// 禁用自身及所有子节点的 CollisionShape2D。
+		/// </summary>
+		public void DisableCollisionShape()
+		{
+			DisableCollisionShapeInNode(this);
+		}
+
+		private void DisableCollisionShapeInNode(Node node)
+		{
+			foreach (Node child in node.GetChildren())
+			{
+				if (child is CollisionShape2D shape)
+				{	
+					//shape.Disabled = true;
+					shape.SetDeferred(CollisionShape2D.PropertyName.Disabled, true);
+				}
+
+				// 递归处理所有子节点
+				DisableCollisionShapeInNode(child);
+			}
 		}
 	}
 }

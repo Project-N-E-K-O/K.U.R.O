@@ -35,6 +35,11 @@ namespace Kuros.Core.Effects
             return _effects.Find(effect => effect.EffectId == effectId);
         }
 
+        public T? GetEffect<T>() where T : ActorEffect
+        {
+            return _effects.Find(e => e is T) as T;
+        }
+
         public void AddEffect(ActorEffect effect)
         {
             if (effect == null) return;

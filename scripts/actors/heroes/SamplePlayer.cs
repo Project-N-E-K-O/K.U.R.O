@@ -663,6 +663,12 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 		{
 			return;
 		}
+
+		// 家具槽有物品时禁止切换快捷栏槽位
+		if (InventoryComponent?.HasFurnitureItem == true)
+		{
+			return;
+		}
 		
 		// 如果 QuickBar 还未初始化，先记录选中的槽位索引，稍后在 QuickBar 设置后会同步
 		if (InventoryComponent?.QuickBar == null)
@@ -700,6 +706,13 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 	/// </summary>
 	public void SyncLeftHandItemFromSlot()
 	{
+		// 家具槽优先：当家具槽有物品时，始终使用家具槽的物品
+		if (InventoryComponent?.HasFurnitureItem == true)
+		{
+			LeftHandItem = InventoryComponent.FurnitureSlotStack!.Item;
+			return;
+		}
+
 		if (LeftHandSlotIndex < 0 || LeftHandSlotIndex > 4)
 		{
 			// 如果槽位索引无效，清除左手物品
@@ -752,6 +765,15 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 			SyncLeftHandItemFromSlot();
 			UpdateHandItemVisual();
 		}
+	}
+
+	/// <summary>
+	/// 家具槽变化时的回调：同步更新左手物品
+	/// </summary>
+	private void OnFurnitureSlotChanged()
+	{
+		SyncLeftHandItemFromSlot();
+		UpdateHandItemVisual();
 	}
 	
 	/// <summary>
@@ -923,6 +945,13 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 				UpdateHandItemVisual();
 				UpdateBattleHUDHandHighlight();
 			}
+		}
+
+		// 订阅家具槽变化事件
+		if (InventoryComponent != null)
+		{
+			InventoryComponent.FurnitureSlotChanged -= OnFurnitureSlotChanged;
+			InventoryComponent.FurnitureSlotChanged += OnFurnitureSlotChanged;
 		}
 	}
 	

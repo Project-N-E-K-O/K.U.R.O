@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="BuildLevelEffectEntry" load_steps=2 format=3 uid="uid://c42i4clr4tuwh"]
+
+[ext_resource type="Script" uid="uid://ba5xnpfo03sgb" path="res://scripts/actors/heroes/BuildLevelEffectEntry.cs" id="1_wthsy"]
+
+[resource]
+script = ExtResource("1_wthsy")
+BuildId = "Build_Guard_level2"
+BuildClass = "guard"
+BuildName = "二级安保"
+Level = 2
+RequiredPoints = 2
+EffectId = "Build_Guard_level2"
+EffectScript = "BuildGuardLevel2Effect"
+Description = "延长玩家受到伤害后的无敌时间"
+IconPath = "uid://cyjh04f738fg5"

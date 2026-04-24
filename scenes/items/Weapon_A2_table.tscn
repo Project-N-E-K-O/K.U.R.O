@@ -1,6 +1,6 @@
 [gd_scene load_steps=9 format=3 uid="uid://0g621ssvm2cp"]
 
-[ext_resource type="Script" uid="uid://rpt50t16vkk7" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_1rea5"]
+[ext_resource type="Script" uid="uid://dhfq2rrha0awm" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_1rea5"]
 [ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="2_k340y"]
 [ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="3_4pcy5"]
 [ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="5_sjlfq"]
@@ -12,6 +12,8 @@ ItemId = "Weapon_A2_table"
 DisplayName = "kitchen table"
 Icon = ExtResource("6_1rea5")
 MaxStackSize = 1
+IsThrowable = true
+IsFurniture = true
 metadata/_custom_type_script = "uid://dfgtff7mly02w"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jyvv2"]
@@ -26,7 +28,6 @@ ItemDefinition = SubResource("Resource_tdtid")
 GrabAreaPath = NodePath("Weapon_A2_table/GrabArea")
 ThrowDamage = 2.0
 StopOnHit = true
-MaxDurability = 1
 RigidBodyPath = NodePath("Weapon_A2_table")
 HitboxAreaPath = NodePath("Weapon_A2_table/Hitbox")
 
@@ -45,6 +46,7 @@ texture = ExtResource("6_1rea5")
 position = Vector2(0.49999595, 40)
 scale = Vector2(3.4, 3.4)
 shape = SubResource("RectangleShape2D_jyvv2")
+disabled = true
 
 [node name="Hitbox" type="Area2D" parent="Weapon_A2_table"]
 visible = false

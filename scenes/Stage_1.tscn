@@ -1,11 +1,9 @@
-[gd_scene load_steps=54 format=3 uid="uid://btqx0751t5bx4"]
+[gd_scene load_steps=52 format=3 uid="uid://btqx0751t5bx4"]
 
 [ext_resource type="Script" uid="uid://x1ic1ym4ykq8" path="res://scripts/scenes/BattleSceneManager.cs" id="1_givaq"]
 [ext_resource type="PackedScene" uid="uid://b1ljb2q212v3d" path="res://scenes/environments/floor.tscn" id="2_refik"]
 [ext_resource type="PackedScene" uid="uid://ufprfd4r8ijj" path="res://assets/spine/main_character/main_character.tscn" id="4_givaq"]
-[ext_resource type="Script" uid="uid://cn2bsvambjids" path="res://scripts/controllers/EnemySpawnController.cs" id="21_kt4h1"]
-[ext_resource type="PackedScene" uid="uid://cofm45kotvgto" path="res://scenes/actors/enemies/Enemy_B1_fat.tscn" id="22_uvtj7"]
-[ext_resource type="Texture2D" uid="uid://sinhag8w2ijl" path="res://textures/environments/wall/25.12.3 卧室下墙壁.png" id="26_yy663"]
+[ext_resource type="Texture2D" uid="uid://cggx01ms6yloy" path="res://textures/environments/wall/25.12.3 卧室下墙壁.png" id="26_yy663"]
 [ext_resource type="PackedScene" path="res://scenes/actors/npc/SimpleNPC.tscn" id="27_28u5u"]
 [ext_resource type="PackedScene" uid="uid://cwnslqteb78nc" path="res://scenes/objects/Static_A1_sink.tscn" id="28_61adh"]
 [ext_resource type="PackedScene" uid="uid://dh4uaik8ybpc" path="res://scenes/objects/Static_A1_stove.tscn" id="29_223i8"]
@@ -99,15 +97,6 @@ limit_right = 3854
 limit_bottom = 925
 drag_horizontal_enabled = true
 drag_vertical_enabled = true
-
-[node name="EnemySpawnController" type="Node2D" parent="World"]
-y_sort_enabled = true
-position = Vector2(-339, 127)
-script = ExtResource("21_kt4h1")
-
-[node name="EnemyInstance" parent="World/EnemySpawnController" instance=ExtResource("22_uvtj7")]
-position = Vector2(1369, 456)
-Speed = 50.0
 
 [node name="Sprite2D" type="Sprite2D" parent="World"]
 position = Vector2(1915, 487)
@@ -206,7 +195,7 @@ y_sort_enabled = true
 position = Vector2(3338.0002, 169)
 
 [node name="Kitchen_table" parent="World" instance=ExtResource("43_15qi6")]
-position = Vector2(2247, 489)
+position = Vector2(2251, 489)
 
 [node name="Static_A1_sink" parent="World" instance=ExtResource("28_61adh")]
 position = Vector2(2356, 230)

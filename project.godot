@@ -153,6 +153,13 @@ logging/enable_file_logging=true
 2d_physics/layer_3="Player"
 2d_physics/layer_4="ItemGhost"
 
+[navigation]
+
+2d/navigation/2d/geometry_face_color=Color(0.5, 1, 1, 0.4)
+2d/navigation/2d/geometry_edge_color=Color(0.5, 1, 1, 1)
+2d/navigation/3d/geometry_face_color=Color(0.5019608, 0.16862746, 1, 0.39215687)
+2d/navigation/3d/geometry_edge_color=Color(0.5019608, 0.16862746, 1, 1)
+
 [rendering]
 
 renderer/rendering_method="gl_compatibility"

@@ -1,9 +1,16 @@
-[gd_scene load_steps=8 format=3 uid="uid://bhjc0grsl76ep"]
+[gd_scene load_steps=11 format=3 uid="uid://bhjc0grsl76ep"]
 
 [ext_resource type="Script" uid="uid://dtgdjgrqgype7" path="res://scripts/items/world/WorldItemEntity.cs" id="1_82c6d"]
 [ext_resource type="Resource" uid="uid://c0h5f2yocbgcw" path="res://resources/items/Weapon_Brawl_RiotBracer.tres" id="2_82c6d"]
 [ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="3_2q28g"]
 [ext_resource type="Texture2D" uid="uid://crfbiiitqgkjb" path="res://assets/weapons/镇暴护腕.png" id="3_82c6d"]
+[ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="3_yqjh8"]
+[ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="4_blqw4"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_rrc52"]
+shader = ExtResource("3_yqjh8")
+shader_parameter/softness = 0.5
+shader_parameter/alpha = 0.4
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_2q28g"]
 shader = ExtResource("3_2q28g")
@@ -21,16 +28,21 @@ size = Vector2(500, 400)
 
 [node name="WeaponBrawlRiotBracer" type="CharacterBody2D"]
 z_index = 1
-scale = Vector2(0.5, 0.5)
+scale = Vector2(0.33, 0.33)
 collision_layer = 0
 collision_mask = 0
 script = ExtResource("1_82c6d")
 ItemDefinition = ExtResource("2_82c6d")
 DefaultOutlineColor = Color(0, 0, 0, 0)
 
+[node name="Shadow" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_rrc52")
+position = Vector2(-4, 120)
+scale = Vector2(10, 4)
+texture = ExtResource("4_blqw4")
+
 [node name="Outline" type="Sprite2D" parent="."]
 material = SubResource("ShaderMaterial_2q28g")
-scale = Vector2(0.75, 0.75)
 texture = ExtResource("3_82c6d")
 
 [node name="Sprite2D" type="Sprite2D" parent="Outline"]

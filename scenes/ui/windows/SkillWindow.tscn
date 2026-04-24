@@ -13,33 +13,16 @@ mouse_filter = 2
 script = ExtResource("1_skill_window_script")
 
 [node name="MainPanel" type="Panel" parent="."]
+self_modulate = Color(1, 1, 1, 0)
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -150.0
-offset_top = 178.0
-offset_right = -25.0
-offset_bottom = 668.0
+offset_left = -1920.0
+offset_top = 180.0
+offset_right = -1795.0
+offset_bottom = 880.0
 grow_horizontal = 0
-
-[node name="Header" type="HBoxContainer" parent="MainPanel"]
-layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -150.0
-offset_top = 8.0
-offset_right = 150.0
-offset_bottom = 40.0
-grow_horizontal = 2
-
-[node name="Title" type="Label" parent="MainPanel/Header"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 24
-text = "Effect"
-horizontal_alignment = 1
 
 [node name="Body" type="VBoxContainer" parent="MainPanel"]
 layout_mode = 1
@@ -69,7 +52,6 @@ tooltip_text = "
 theme_override_constants/separation = 12
 
 [node name="PassiveSkillsTitle" type="Label" parent="MainPanel/Body/SkillsVBox/PassiveSkillsSection"]
-visible = false
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
 

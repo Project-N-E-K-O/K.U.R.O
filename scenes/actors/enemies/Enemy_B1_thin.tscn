@@ -23,10 +23,10 @@
 [ext_resource type="Script" uid="uid://cj62qyo1gko88" path="res://scripts/actors/enemies/states/EnemySpawnState.cs" id="20_ie6to"]
 [ext_resource type="Script" uid="uid://bbybuyitd10jr" path="res://scripts/controllers/SpineController.gd" id="21_8xfgw"]
 [ext_resource type="Script" uid="uid://ltskqlwtnh6c" path="res://scripts/actors/enemies/animation/EnemyB1ThinSpineAnimationController.cs" id="22_8xfgw"]
-[ext_resource type="PackedScene" uid="uid://cofm45kotvgto" path="res://scenes/actors/enemies/Enemy_B1_fat.tscn" id="22_wdcme"]
 [ext_resource type="Script" uid="uid://cdjlv11ra7aby" path="res://scripts/actors/enemies/attacks/EnemyB1ThinAttackController.cs" id="23_1hw8y"]
-[ext_resource type="PackedScene" uid="uid://wrebd662va23" path="res://scenes/actors/enemies/Enemy_B2_fat02.tscn" id="23_ysbuf"]
 [ext_resource type="Script" uid="uid://dpokyaabbcwwl" path="res://scripts/controllers/EnemyThinSkillSpawnManager.cs" id="25_fkymf"]
+[ext_resource type="PackedScene" uid="uid://cofm45kotvgto" path="res://scenes/actors/enemies/Enemy_B1_fat.tscn" id="26_l3qmk"]
+[ext_resource type="PackedScene" uid="uid://wrebd662va23" path="res://scenes/actors/enemies/Enemy_B2_fat02.tscn" id="27_wdcme"]
 
 [sub_resource type="Resource" id="Resource_ie6to"]
 script = ExtResource("3_h8apo")
@@ -44,18 +44,18 @@ radius = 1024.0
 radius = 1024.0
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_8xfgw"]
-radius = 55.0
-height = 150.0
+radius = 150.0
+height = 600.0
 
 [sub_resource type="RectangleShape2D" id="2"]
-size = Vector2(320, 161.5)
+size = Vector2(900, 400)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_h8apo"]
-size = Vector2(303, 188)
+size = Vector2(650, 400)
 
 [sub_resource type="CapsuleShape2D" id="3"]
-radius = 28.0
-height = 134.0
+radius = 100.0
+height = 400.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_l3qmk"]
 size = Vector2(320, 180)
@@ -63,32 +63,29 @@ size = Vector2(320, 180)
 [node name="Enemy_B1_thin" type="CharacterBody2D" node_paths=PackedStringArray("DetectionArea", "AttackArea", "StateMachine", "EffectController")]
 z_index = 2
 y_sort_enabled = true
+scale = Vector2(0.33, 0.33)
 collision_layer = 2
 collision_mask = 7
 motion_mode = 1
 script = ExtResource("1_grl5w")
 EnableStateDebugOverlay = true
-DebugOverlayOffset = Vector2(-300, 50)
-DebugOverlayFontSize = 32
+DebugOverlayOffset = Vector2(-1200, 200)
+DebugOverlayFontSize = 128
 DetectionArea = NodePath("Sprite2D/ControllerDetectionArea")
 AttackArea = NodePath("Sprite2D/AttackArea")
-Speed = 200.0
+Speed = 400.0
 AttackDamage = 0.0
 AttackCooldown = 1.0
-MaxHealth = 40
+MaxHealth = 60
 StateMachine = NodePath("StateMachine")
 EffectController = NodePath("EffectController")
 StatProfile = SubResource("Resource_ie6to")
 DamageFlashColor = Color(18.892157, 18.751299, 18.892157, 1)
 
-[node name="EffectController" type="Node" parent="."]
-script = ExtResource("12")
-
 [node name="Shadow" type="Sprite2D" parent="."]
 show_behind_parent = true
 material = SubResource("ShaderMaterial_b5vhy")
-position = Vector2(0, 5)
-scale = Vector2(6, 1)
+scale = Vector2(12, 2.5)
 texture = ExtResource("5_8xfgw")
 
 [node name="OutlineLayer" type="Node2D" parent="."]
@@ -97,8 +94,7 @@ show_behind_parent = true
 [node name="OutlineSpineSprite_Left" type="SpineSprite" parent="OutlineLayer"]
 modulate = Color(0.02, 0.02, 0.02, 0.85)
 show_behind_parent = true
-position = Vector2(-7, 0)
-scale = Vector2(0.33, 0.33)
+position = Vector2(-20, 0)
 skeleton_data_res = ExtResource("20_5i0uy")
 preview_skin = "Default"
 preview_animation = "hit"
@@ -109,8 +105,7 @@ script = ExtResource("21_8xfgw")
 [node name="OutlineSpineSprite_Right" type="SpineSprite" parent="OutlineLayer"]
 modulate = Color(0.02, 0.02, 0.02, 0.85)
 show_behind_parent = true
-position = Vector2(7, 0)
-scale = Vector2(0.33, 0.33)
+position = Vector2(20, 0)
 skeleton_data_res = ExtResource("20_5i0uy")
 preview_skin = "Default"
 preview_animation = "hit"
@@ -121,8 +116,7 @@ script = ExtResource("21_8xfgw")
 [node name="OutlineSpineSprite_Up" type="SpineSprite" parent="OutlineLayer"]
 modulate = Color(0.02, 0.02, 0.02, 0.85)
 show_behind_parent = true
-position = Vector2(0, -7)
-scale = Vector2(0.33, 0.33)
+position = Vector2(0, -20)
 skeleton_data_res = ExtResource("20_5i0uy")
 preview_skin = "Default"
 preview_animation = "hit"
@@ -133,8 +127,7 @@ script = ExtResource("21_8xfgw")
 [node name="OutlineSpineSprite_Down" type="SpineSprite" parent="OutlineLayer"]
 modulate = Color(0.02, 0.02, 0.02, 0.85)
 show_behind_parent = true
-position = Vector2(0, 7)
-scale = Vector2(0.33, 0.33)
+position = Vector2(0, 20)
 skeleton_data_res = ExtResource("20_5i0uy")
 preview_skin = "Default"
 preview_animation = "hit"
@@ -142,31 +135,41 @@ preview_frame = true
 preview_time = 2.0
 script = ExtResource("21_8xfgw")
 
+[node name="SpineSprite" type="SpineSprite" parent="."]
+skeleton_data_res = ExtResource("20_5i0uy")
+preview_skin = "Default"
+preview_animation = "-- Empty --"
+preview_frame = true
+preview_time = 0.65
+script = ExtResource("21_8xfgw")
+
 [node name="Sprite2D" type="Sprite2D" parent="."]
-visible = false
 modulate = Color(0.8, 0.6, 0.5, 1)
-position = Vector2(0, -60)
+position = Vector2(0, -600)
 
 [node name="ControllerDetectionArea" type="Area2D" parent="Sprite2D"]
+visible = false
 collision_layer = 0
 collision_mask = 4
 
 [node name="ControllerDetectionShape" type="CollisionShape2D" parent="Sprite2D/ControllerDetectionArea"]
-scale = Vector2(3, 3)
+scale = Vector2(9, 9)
 shape = SubResource("CircleShape2D_8xfgw")
 
 [node name="AttackDetectionArea" type="Area2D" parent="Sprite2D"]
+visible = false
 collision_layer = 0
 collision_mask = 4
 
 [node name="AttackDetectionShape" type="CollisionShape2D" parent="Sprite2D/AttackDetectionArea"]
+scale = Vector2(3, 3)
 shape = SubResource("CircleShape2D_h8apo")
 
 [node name="HitArea" type="Area2D" parent="Sprite2D"]
+visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/HitArea"]
-position = Vector2(0, -87)
-scale = Vector2(1.2, 1.2)
+position = Vector2(0, 150)
 shape = SubResource("CapsuleShape2D_8xfgw")
 
 [node name="AttackArea" type="Area2D" parent="Sprite2D"]
@@ -174,19 +177,20 @@ collision_layer = 0
 monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/AttackArea"]
-position = Vector2(189, -34.25)
-scale = Vector2(1.0000001, 1.0000001)
+position = Vector2(550, 160)
+scale = Vector2(0.9999999, 0.9999999)
 shape = SubResource("2")
 
 [node name="KickArea" type="Area2D" parent="Sprite2D"]
+visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/KickArea"]
-position = Vector2(180, -70)
+position = Vector2(450, 200)
+scale = Vector2(0.9999999, 0.9999999)
 shape = SubResource("RectangleShape2D_h8apo")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-visible = false
-position = Vector2(0, -20)
+position = Vector2(0, -100)
 rotation = 1.5707964
 shape = SubResource("3")
 
@@ -252,6 +256,7 @@ script = ExtResource("14")
 
 [node name="Dying" type="Node" parent="StateMachine"]
 script = ExtResource("17")
+DeathDuration = 2.0
 
 [node name="Dead" type="Node" parent="StateMachine"]
 script = ExtResource("18")
@@ -266,18 +271,12 @@ AnimationName = "animations/Skill3"
 script = ExtResource("20_ie6to")
 LowHealthThresholds = PackedFloat32Array(1, 0.5)
 
+[node name="EffectController" type="Node" parent="."]
+script = ExtResource("12")
+
 [node name="FreezeOnTurnMovement" type="Node" parent="."]
 script = ExtResource("11")
 FreezeDuration = 1.0
-
-[node name="SpineSprite" type="SpineSprite" parent="."]
-scale = Vector2(0.33, 0.33)
-skeleton_data_res = ExtResource("20_5i0uy")
-preview_skin = "Default"
-preview_animation = "-- Empty --"
-preview_frame = true
-preview_time = 1.4
-script = ExtResource("21_8xfgw")
 
 [node name="AnimationController" type="Node" parent="."]
 script = ExtResource("22_8xfgw")
@@ -290,7 +289,7 @@ SkillMixDuration = 0.2
 visible = false
 script = ExtResource("25_fkymf")
 AutoTriggerDelay = 0.7
-EnemyScenes = Array[PackedScene]([ExtResource("22_wdcme"), ExtResource("23_ysbuf")])
+EnemyScenes = Array[PackedScene]([ExtResource("26_l3qmk"), ExtResource("27_wdcme")])
 SpawnCount = 2
 SpawnInterval = 0.0
 TriggerArea = NodePath("TriggerArea")
@@ -306,3 +305,14 @@ monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="EnemyThinSkillSpawneManager/TriggerArea"]
 shape = SubResource("RectangleShape2D_l3qmk")
+
+[node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
+path_desired_distance = 64.0
+target_desired_distance = 50.0
+path_max_distance = 500.0
+avoidance_enabled = true
+radius = 100.0
+max_speed = 400.0
+debug_enabled = true
+debug_use_custom = true
+debug_path_custom_line_width = 2.0

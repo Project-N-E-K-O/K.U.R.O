@@ -108,7 +108,7 @@ namespace Kuros.Builds
         {
             int nextBonus = _comboTimer > 0d
                 ? _currentBonusDamage + BonusDamagePerChainStep
-                : BonusDamagePerChainStep;
+                : 0;
 
             return Mathf.Clamp(nextBonus, 0, Math.Max(0, MaxBonusDamage));
         }

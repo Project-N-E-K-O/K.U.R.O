@@ -145,6 +145,11 @@ namespace Kuros.Systems.Inventory
             return broke;
         }
 
+        public void ApplyEquipEffects(GameActor owner)
+        {
+            Item.ApplyEffects(owner, ItemEffectTrigger.OnEquip);
+        }
+
         public void RepairDurability(int amount)
         {
             DurabilityState?.Repair(amount);

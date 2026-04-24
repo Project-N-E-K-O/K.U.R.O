@@ -191,7 +191,7 @@ namespace Kuros.Actors.Enemies.Attacks
 
 		public override void _PhysicsProcess(double delta)
 		{
-			if (Enemy == null || !GodotObject.IsInstanceValid(Enemy) || !Enemy.IsInsideTree())
+			if (Enemy == null || !GodotObject.IsInstanceValid(Enemy) || !Enemy.IsInsideTree() || Enemy.IsDeathSequenceActive || Enemy.IsDead)
 			{
 				return;
 			}
@@ -423,7 +423,7 @@ namespace Kuros.Actors.Enemies.Attacks
 
 		private void UpdateDashMovement(double delta)
 		{
-			if (!_isDashing || Enemy == null) return;
+			if (!_isDashing || Enemy == null || Enemy.IsDeathSequenceActive || Enemy.IsDead) return;
 
 			// 最短冲刺时间计时
 			if (!_canAttemptMoveAttack)

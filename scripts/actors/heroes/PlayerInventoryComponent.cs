@@ -28,7 +28,25 @@ namespace Kuros.Actors.Heroes
         private const string DefaultUnarmedWeaponPath = "res://resources/items/Weapon_Unarmed_Default.tres";
 
         // 跟踪已获得的物品ID（用于判断是否是第一次获得）
-        private HashSet<string> _obtainedItemIds = new HashSet<string>();
+private readonly HashSet<string> _obtainedItemIds = new HashSet<string>();
+
+		/// <summary>
+		/// 飞行中的投掷武器所占用的快捷栏槽位索引集合。
+		/// AddItemSmart 不将新物品放入这些槽位，防止占用投掷武器的归还位置。
+		/// </summary>
+		public HashSet<int> ReservedQuickBarSlots { get; } = new();
+
+		/// <summary>
+		/// 家具槽位（隐藏第6格）：只允许 IsFurniture=true 的物品放置，最多1个。
+		/// 当此槽有物品时，优先使用此槽的物品（禁止切换到快捷栏的其他槽位）。
+		/// </summary>
+		public InventoryItemStack? FurnitureSlotStack { get; private set; }
+
+		/// <summary>
+		/// 家具槽是否有物品
+		/// </summary>
+		public bool HasFurnitureItem => FurnitureSlotStack != null && !FurnitureSlotStack.IsEmpty
+			&& FurnitureSlotStack.Item.ItemId != "empty_item";
 
         [ExportGroup("Special Slots")]
         [Export] public Godot.Collections.Array<SpecialInventorySlotConfig> SpecialSlotConfigs
@@ -93,6 +111,10 @@ namespace Kuros.Actors.Heroes
         public event Action<int>? ActiveBackpackSlotChanged;
         public event Action? QuickBarAssigned;
         public event Action<int>? QuickBarSlotChanged;
+        /// <summary>
+        /// 家具槽变化事件（放入或清除时触发）
+        /// </summary>
+        public event Action? FurnitureSlotChanged;
 
         public override void _Ready()
         {
@@ -172,7 +194,7 @@ namespace Kuros.Actors.Heroes
         /// 3. 快捷欄1（索引0）是小木劍，永遠不會被更改
         /// 4. 快捷欄滿時，溢出的物品放置到物品欄中；總武器攜帶上限由 MaxCarriedWeaponCount 控制
         /// </summary>
-        public int AddItemSmart(ItemDefinition item, int amount, bool showPopupIfFirstTime = true)
+        public int AddItemSmart(ItemDefinition item, int amount, GameActor? owner = null, bool showPopupIfFirstTime = true)
         {
             // 参数验证：检查 item 是否为 null
             if (item == null)
@@ -186,6 +208,12 @@ namespace Kuros.Actors.Heroes
             {
                 GameLogger.Warn(nameof(PlayerInventoryComponent), $"AddItemSmart: amount ({amount}) is not positive for item '{item.DisplayName}' (ID: {item.ItemId}), nothing to add.");
                 return 0;
+            }
+
+            // 家具物品：路由到家具槽位（隐藏第6格）
+            if (item.IsFurniture)
+            {
+                return AddFurnitureItem(item, amount, owner, showPopupIfFirstTime);
             }
 
             int requestedAmount = amount;
@@ -216,10 +244,11 @@ namespace Kuros.Actors.Heroes
                 if (SelectedQuickBarSlot >= quickBarStart && SelectedQuickBarSlot < quickBarEndExclusive)
                 {
                     var selectedStack = QuickBar.GetStack(SelectedQuickBarSlot);
-                    // 檢查選中槽位是否為空、空白道具或可合併的相同物品
-                    if (selectedStack == null || selectedStack.IsEmpty || 
+                    // 檢查選中槽位是否為空、空白道具或可合併的相同物品，且未被投掷武器預占
+                    if (!ReservedQuickBarSlots.Contains(SelectedQuickBarSlot) &&
+                        (selectedStack == null || selectedStack.IsEmpty || 
                         selectedStack.Item.ItemId == "empty_item" ||
-                        (selectedStack.Item.ItemId == item.ItemId && !selectedStack.IsFull))
+                        (selectedStack.Item.ItemId == item.ItemId && !selectedStack.IsFull)))
                     {
                         int added = QuickBar.TryAddItemToSlot(item, remaining, SelectedQuickBarSlot);
                         if (added > 0)
@@ -252,6 +281,7 @@ namespace Kuros.Actors.Heroes
                     for (int i = quickBarStart; i < quickBarEndExclusive && remaining > 0; i++)
                     {
                         if (i == SelectedQuickBarSlot) continue; // 跳過已處理的選中槽位
+                        if (ReservedQuickBarSlots.Contains(i)) continue; // 跳過投掷武器預占槽位
                         
                         var existingStack = QuickBar.GetStack(i);
                         // 检查槽位是否为空或包含空白道具
@@ -294,8 +324,72 @@ namespace Kuros.Actors.Heroes
         }
 
         /// <summary>
-        /// 显示获得物品弹窗
+        /// 将家具物品放入家具槽位（隐藏第6格）。
+        /// 家具槽只能容纳1件 IsFurniture=true 的物品。
         /// </summary>
+        private int AddFurnitureItem(ItemDefinition item, int amount, GameActor? owner, bool showPopupIfFirstTime)
+        {
+            if (HasFurnitureItem)
+            {
+                GameLogger.Info(nameof(PlayerInventoryComponent), $"AddFurnitureItem: 家具槽已被占用（{FurnitureSlotStack!.Item.DisplayName}），无法拾取 '{item.DisplayName}'。");
+                return 0;
+            }
+
+            bool isFirstTime = IsFirstTimeObtaining(item);
+            FurnitureSlotStack = new InventoryItemStack(item, 1);
+            int totalAdded = 1;
+
+            if (owner != null)
+            {
+                item.ApplyEffects(owner, ItemEffectTrigger.OnEquip);
+            }
+
+            FurnitureSlotChanged?.Invoke();
+
+            if (totalAdded > 0 && isFirstTime)
+            {
+                MarkItemAsObtained(item);
+                if (showPopupIfFirstTime)
+                {
+                    ShowItemObtainedPopup(item);
+                }
+            }
+
+            return totalAdded;
+        }
+
+        /// <summary>
+        /// 从家具槽提取物品
+        /// </summary>
+        public bool TryExtractFromFurnitureSlot(int amount, out InventoryItemStack? extracted, GameActor? owner = null)
+        {
+            extracted = null;
+            if (!HasFurnitureItem)
+            {
+                return false;
+            }
+
+            extracted = new InventoryItemStack(FurnitureSlotStack!.Item, 1);
+            if (owner != null)
+            {
+                FurnitureSlotStack.Item.RemoveEffects(owner, ItemEffectTrigger.OnEquip);
+            }
+            FurnitureSlotStack = null;
+            FurnitureSlotChanged?.Invoke();
+            return true;
+        }
+
+        /// <summary>
+        /// 清除家具槽（用于丢弃/投掷后清除）
+        /// </summary>
+        public void ClearFurnitureSlot(GameActor? owner = null)
+        {
+            if (owner != null && FurnitureSlotStack != null)
+            {
+                FurnitureSlotStack.Item.RemoveEffects(owner, ItemEffectTrigger.OnEquip);
+            }
+            FurnitureSlotStack = null;
+        }
         private void ShowItemObtainedPopup(ItemDefinition item)
         {
             if (item == null)
@@ -682,10 +776,16 @@ namespace Kuros.Actors.Heroes
         }
 
         /// <summary>
-        /// 獲取當前選中的快捷欄槽位的物品堆疊
+        /// 獲取當前選中的快捷欄槽位的物品堆疊。
+        /// 如果家具槽有物品，优先返回家具槽的物品。
         /// </summary>
         public InventoryItemStack? GetSelectedQuickBarStack()
         {
+            // 家具槽优先
+            if (HasFurnitureItem)
+            {
+                return FurnitureSlotStack;
+            }
             if (QuickBar == null || SelectedQuickBarSlot < 0 || SelectedQuickBarSlot > 4)
             {
                 return null;
@@ -694,11 +794,19 @@ namespace Kuros.Actors.Heroes
         }
 
         /// <summary>
-        /// 嘗試從選中的快捷欄槽位提取物品
+        /// 嘗試從選中的快捷欄槽位提取物品。
+        /// 如果家具槽有物品，优先从家具槽提取。
         /// </summary>
-        public bool TryExtractFromSelectedQuickBarSlot(int amount, out InventoryItemStack? extracted)
+        public bool TryExtractFromSelectedQuickBarSlot(int amount, out InventoryItemStack? extracted, GameActor? owner = null)
         {
             extracted = null;
+
+            // 家具槽优先
+            if (HasFurnitureItem)
+            {
+                return TryExtractFromFurnitureSlot(amount, out extracted, owner);
+            }
+
             if (QuickBar == null || SelectedQuickBarSlot < 0 || SelectedQuickBarSlot > 4)
             {
                 return false;
@@ -741,6 +849,9 @@ namespace Kuros.Actors.Heroes
             int total = 0;
             total += CountWeaponStacksInContainer(Backpack);
             total += CountWeaponStacksInContainer(QuickBar);
+            // 飞行中的投掷武器已从快捷栏提取（槽位变为 empty_item），但它们仍属于玩家。
+            // 将 ReservedQuickBarSlots 数量视为虚拟武器数，防止在武器归还期间多拾取一件武器。
+            total += ReservedQuickBarSlots.Count;
 
             foreach (var slot in _specialSlots.Values)
             {

@@ -67,11 +67,23 @@ namespace Kuros.Items.World
 		public GameActor? LastDroppedBy { get; set; }
 		protected Vector2 PendingVelocity => _pendingVelocity;
 
+		/// <summary>
+		/// 当前被高亮的实体（由 PlayerItemInteractionComponent 每帧设置，避免 O(N²) 遍历）
+		/// </summary>
+		internal static WorldItemEntity? CurrentHighlightedEntity { get; set; }
+
+		/// <summary>
+		/// 判断此实例是否有资格参与高亮候选（供 PlayerItemInteractionComponent 调用）
+		/// </summary>
+		internal bool IsHighlightCandidate =>
+			EnableGrabAreaOutlineHighlight && !_isPicked
+			&& TriggerArea != null && GodotObject.IsInstanceValid(TriggerArea);
+
 		public override void _Ready()
 		{
 			base._Ready();
 			AddToGroup("world_items");  // 将物品添加到 "world_items" 组，用于场景中的物品管理
-    		AddToGroup("pickables");    // 统一使用 "pickables" 组来标识可拾取对象，方便 PlayerItemInteractionComponent 处理
+			AddToGroup("pickables");    // 统一使用 "pickables" 组来标识可拾取对象，方便 PlayerItemInteractionComponent 处理
 			InitializeStack();
 			ResolveTriggerArea();
 			ApplyCollisionSettings();
@@ -267,33 +279,9 @@ namespace Kuros.Items.World
 				return;
 			}
 
-			// 只高亮离玩家最近的那一件
-			bool shouldHighlight = false;
-			if (EnableGrabAreaOutlineHighlight && !_isPicked && TriggerArea != null && GodotObject.IsInstanceValid(TriggerArea))
-			{
-				var grabArea = ResolvePlayerGrabArea();
-				if (grabArea != null && GodotObject.IsInstanceValid(grabArea))
-				{
-					WorldItemEntity? closest = null;
-					float minDist = float.MaxValue;
-					foreach (var node in GetTree().GetNodesInGroup("world_items"))
-					{
-						if (node is WorldItemEntity item && item.EnableGrabAreaOutlineHighlight && !item._isPicked && item.TriggerArea != null && GodotObject.IsInstanceValid(item.TriggerArea))
-						{
-							if (item.TriggerArea.OverlapsArea(grabArea))
-							{
-								float dist = item.GlobalPosition.DistanceSquaredTo(grabArea.GlobalPosition);
-								if (dist < minDist)
-								{
-									minDist = dist;
-									closest = item;
-								}
-							}
-						}
-					}
-					shouldHighlight = ReferenceEquals(this, closest);
-				}
-			}
+			// 由 PlayerItemInteractionComponent 每帧设置 CurrentHighlightedEntity，
+			// 此处只需 O(1) 检查自身是否为当前高亮目标
+			bool shouldHighlight = ReferenceEquals(this, CurrentHighlightedEntity);
 
 			if (!force && _isOutlineHighlighted == shouldHighlight)
 			{
@@ -306,6 +294,14 @@ namespace Kuros.Items.World
 
 		public virtual void ApplyThrowImpulse(Vector2 velocity)
 		{
+			_pendingVelocity = velocity;
+			Velocity = velocity;
+		}
+
+		/// <inheritdoc/>
+		public virtual void ApplyScatterImpulse(Vector2 velocity)
+		{
+			// 仅做物理弹出，不进入投掷状态机
 			_pendingVelocity = velocity;
 			Velocity = velocity;
 		}
@@ -527,7 +523,7 @@ namespace Kuros.Items.World
 			}
 
 			// 使用 AddItemSmart 优先添加到快捷栏，溢出放入背包
-			int accepted = inventory.AddItemSmart(stack.Item, stack.Quantity, showPopupIfFirstTime: true);
+			int accepted = inventory.AddItemSmart(stack.Item, stack.Quantity, actor, showPopupIfFirstTime: true);
 			if (accepted <= 0)
 			{
 				GameLogger.Info(nameof(WorldItemEntity), $"Actor {actor.Name} 的物品栏已满，无法拾取 {ItemId}。");

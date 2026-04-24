@@ -8,7 +8,7 @@ namespace Kuros.Actors.Enemies.States
     public partial class EnemyCooldownFrozenState : EnemyState
     {
 		[Export(PropertyHint.Range, "0.1,10,0.1")]
-		public float Duration = 1.0f;
+		public float Duration = 0.5f;
 
 		[Export]
 		public string AnimationName = "animations/idle";

@@ -481,8 +481,8 @@ namespace Kuros.Actors.Enemies.Attacks
 			_dashFinalized = true;
 
 			if (!forceGrab)
-        {
-				Enemy.GlobalPosition = _dashTarget;
+        	{
+				//Enemy.GlobalPosition = _dashTarget;
 			}
 
 			Enemy.Velocity = Vector2.Zero;

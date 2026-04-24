@@ -19,6 +19,7 @@ namespace Kuros.Actors.Heroes
         [Export] public NodePath SpineSlotNodePath { get; set; } = new();
         [Export] public Godot.Collections.Array<NodePath> SpineBoneNodePaths { get; set; } = new();
         [Export] public Godot.Collections.Array<string> SpineBoneOrder { get; set; } = new() { "WQ1", "WQ2", "WP" };
+        [Export] public Godot.Collections.Array<string> ShowHoldingItemStates { get; set; } = new() { "Idle", "Walk", "Run", "Hit" };
         [Export] public bool FlipBoneAttachmentWithFacing { get; set; } = false;
         [Export(PropertyHint.Range, "-1024,1024,1")] public Vector2 BoneIconOffset { get; set; } = Vector2.Zero;
         [Export] public bool RotateBoneOffsetWithBone { get; set; } = false;
@@ -159,6 +160,7 @@ namespace Kuros.Actors.Heroes
             MaintainSlotAnchorBinding();
             UpdateBoneAttachmentTransform();
             UpdateEquippedAttackAreaTransform();
+            UpdateAttachmentIcon(); // 每帧检查状态，及时更新图标显示
         }
 
         private void ShowItemIcon(Texture2D? texture)
@@ -222,8 +224,23 @@ namespace Kuros.Actors.Heroes
             // Combat weapon source: special weapon slot > quick bar > backpack.
             ItemDefinition? activeItem = Inventory?.GetActiveCombatWeaponDefinition();
 
-            ShowItemIcon(activeItem?.Icon);
+            // Hitbox 始终根据当前持握物品更新（不受视觉状态影响）
+            // 这样武器的攻击区始终有效，不会被清空而回退到角色自身AttackArea
             UpdateEquippedAttackArea(activeItem);
+
+            // 获取当前状态名
+            string? currentState = _actor?.StateMachine?.CurrentState?.Name;
+
+            // 只控制视觉显示（是否显示图标），与Hitbox独立
+            // 对于可投掷物(投掷类)：在IdleHolding、RunHolding状态显示
+            // 对于不可投掷物(武器类)：在Idle、Run、Walk、Hit状态显示
+            if (!ShouldShowHoldingItem(currentState))
+            {
+                ShowItemIcon(null);  // 隐藏视觉，但Hitbox保留
+                return;
+            }
+
+            ShowItemIcon(activeItem?.Icon);  // 显示视觉
         }
 
         public Area2D? GetEquippedAttackArea()
@@ -518,8 +535,8 @@ namespace Kuros.Actors.Heroes
                 shapeInfo = $"circle(r={circle.Radius})";
             }
 
-            GameLogger.Info(nameof(PlayerItemAttachment),
-                $"EquipAttackArea item={item.ItemId}, scene={scenePath}, areaTransform={sourceArea.Transform}, shapeTransform={collisionShape?.Transform}, shape={shapeType} {shapeInfo}");
+            // GameLogger.Info(nameof(PlayerItemAttachment),
+            //     $"EquipAttackArea item={item.ItemId}, scene={scenePath}, areaTransform={sourceArea.Transform}, shapeTransform={collisionShape?.Transform}, shape={shapeType} {shapeInfo}");
         }
 
         private void CaptureEquippedAttackAreaTemplate(Area2D area)
@@ -790,7 +807,7 @@ namespace Kuros.Actors.Heroes
 
             if (_actor != null && FlipBoneAttachmentWithFacing)
             {
-                scale.X = absX * (_actor.FacingRight ? 1f : -1f);
+                scale.X = absX * (_actor.FacingRight ? 1f : -1f);  // 修复：应该是1f，不是2f
             }
             else
             {
@@ -907,6 +924,26 @@ namespace Kuros.Actors.Heroes
             }
 
             return GetNodeOrNull(SpineSlotNodePath) ?? _actor?.GetNodeOrNull(SpineSlotNodePath);
+        }
+
+        /// <summary>
+        /// 判断当前状态/动画名是否需要显示持握物品
+        /// </summary>
+        public bool ShouldShowHoldingItem(string? stateOrAnimationName)
+        {
+            if (string.IsNullOrWhiteSpace(stateOrAnimationName))
+            {
+                return false;
+            }
+
+            foreach (var state in ShowHoldingItemStates)
+            {
+                if (string.Equals(state, stateOrAnimationName, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

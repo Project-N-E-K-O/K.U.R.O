@@ -11,5 +11,5 @@ Level = 3
 RequiredPoints = 3
 EffectId = "Build_Machine_level3"
 EffectScript = "BuildMachineLevel3Effect"
-Description = "连续使用攻击时增加玩家攻击到敌人时的最终伤害，最多增加2点"
-IconPath = "uid://ui8m4evq41qj"
+Description = "连续使用攻击时增加玩家攻击到敌人时的最终伤害"
+IconPath = "uid://brcpa2kw0syy7"

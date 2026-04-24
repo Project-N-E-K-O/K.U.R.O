@@ -12,4 +12,4 @@ RequiredPoints = 2
 EffectId = "Build_Machine_level2"
 EffectScript = "BuildMachineLevel2Effect"
 Description = "玩家攻击和攻击结束后短时间内不会被非控制技能打断"
-IconPath = "uid://dp0a05mq36vr5"
+IconPath = "uid://xjyq8rkns3dh"

@@ -8,11 +8,12 @@ public partial class SampleEnemy : GameActor
 	[ExportCategory("Debug")]
 	[Export] public bool EnableStateDebugOverlay = false;
 	[Export] public Vector2 DebugOverlayOffset = new(-90f, -90f);
-	[Export(PropertyHint.Range, "8,48,1")] public int DebugOverlayFontSize = 14;
+	[Export(PropertyHint.Range, "8,128,1")] public int DebugOverlayFontSize = 14;
 	[Export] public Color DebugOverlayColor = new(1f, 0.95f, 0.2f, 1f);
 
 	[ExportCategory("Detection")]
 	[Export] public Area2D? DetectionArea { get; private set; }
+	[Export(PropertyHint.Range, "200,1000,10")] public float AttackRangeCheckDistance = 500f;
 	
 	[ExportCategory("Attack")]
 	[Export] public Area2D? AttackArea { get; private set; }
@@ -108,13 +109,15 @@ public partial class SampleEnemy : GameActor
 	}
 
 	/// <summary>
-	/// 检查本敌人是否在玩家的攻击范围内（玩家攻击区域覆盖到本敌人）。
+	/// 检查本敌人是否在玩家的攻击范围内（基于固定距离检测，不依赖玩家AttackArea碰撞体）。
 	/// </summary>
 	public bool IsEnemyInPlayerAttackRange()
 	{
 		RefreshPlayerReference();
 		if (_player == null) return false;
-		return IsHitByArea(_player.AttackArea);
+		
+		float distanceToPlayer = GlobalPosition.DistanceTo(_player.GlobalPosition);
+		return distanceToPlayer <= AttackRangeCheckDistance;
 	}
 
 	public Vector2 GetDirectionToPlayer()

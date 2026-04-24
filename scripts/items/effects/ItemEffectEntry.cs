@@ -9,7 +9,8 @@ namespace Kuros.Items.Effects
         OnPickup = 0,
         OnEquip = 1,
         OnConsume = 2,
-        OnBreak = 3
+        OnBreak = 3,
+        OnThrowDestroy = 4  // 投掷物品销毁时触发（击中敌人或落点销毁）
     }
 
     /// <summary>
@@ -20,8 +21,8 @@ namespace Kuros.Items.Effects
     {
         [Export] public ItemEffectTrigger Trigger { get; set; } = ItemEffectTrigger.OnPickup;
         [Export] public PackedScene? EffectScene { get; set; }
-        [Export(PropertyHint.MultilineText)] public string Notes { get; set; } = string.Empty;
-        [Export] public Godot.Collections.Dictionary<string, Variant> PropertyOverrides { get; set; } = new();
+        [Export(PropertyHint.MultilineText)] public string Notes { get; set; } = string.Empty; 
+        [Export] public Godot.Collections.Dictionary<string, Variant> PropertyOverrides { get; set; } = new();// 用于在实例化效果时覆盖默认属性值
 
         public ActorEffect? InstantiateEffect()
         {
@@ -35,7 +36,7 @@ namespace Kuros.Items.Effects
             return effect;
         }
 
-        private void ApplyOverrides(ActorEffect effect)
+        public void ApplyOverrides(ActorEffect effect)
         {
             if (effect == null || PropertyOverrides == null || PropertyOverrides.Count == 0)
             {

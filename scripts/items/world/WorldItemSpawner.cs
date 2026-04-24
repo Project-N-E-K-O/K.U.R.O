@@ -34,7 +34,17 @@ namespace Kuros.Items.World
                 return null;
             }
 
-            var worldNode = context.GetTree().CurrentScene ?? context;
+            var currentScene = context.GetTree().CurrentScene ?? context;
+
+            // 优先把物品加到带有 y_sort_enabled 的 "World" 容器节点下，
+            // 保证动态放置的物品与玩家/敌人参与同一层 Y-sort 排序。
+            // 若场景中找不到符合条件的容器，则退回到 CurrentScene 根节点。
+            Node worldNode = currentScene;
+            if (currentScene.FindChild("World", recursive: false, owned: false) is Node2D worldContainer
+                && worldContainer.YSortEnabled)
+            {
+                worldNode = worldContainer;
+            }
 
             GameLogger.Info(nameof(WorldItemSpawner), $"Instantiating scene: {scene.ResourcePath}");
             var rootNode = scene.Instantiate();

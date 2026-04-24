@@ -54,6 +54,15 @@ namespace Kuros.Actors.Heroes.States
 		{
 			if (HandleDialogueGating(delta)) return;
 			
+			// 检查是否转换到 IdleHolding（持握可投掷物品）
+			var selectedStack = Player.InventoryComponent?.GetSelectedQuickBarStack();
+			if (selectedStack != null && !selectedStack.IsEmpty && selectedStack.Item.IsThrowable)
+			{
+				GD.Print($"[PlayerIdleState] 检测到可投掷物品: {selectedStack.Item.ItemId}，转换到 IdleHolding");
+				ChangeState("IdleHolding");
+				return;
+			}
+			
 			// Check for transitions
 			if (IsActionJustPressed("attack") && Actor.AttackTimer <= 0)
 			{

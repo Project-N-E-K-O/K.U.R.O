@@ -1,0 +1,34 @@
+[gd_scene load_steps=6 format=3 uid="uid://blaa7le84meul"]
+
+[ext_resource type="Script" uid="uid://dj1eglv2letl3" path="res://scripts/effects/SpikeAttackEffect.cs" id="1_61h07"]
+[ext_resource type="Texture2D" uid="uid://b1awmq0je57lj" path="res://assets/weapons/金属地刺.png" id="2_dmpqe"]
+[ext_resource type="Shader" uid="uid://caxdo713k5kug" path="res://shaders/materials/sparkling.gdshader" id="3_x9m8k"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_sp1k1"]
+shader = ExtResource("3_x9m8k")
+shader_parameter/highlight_width = 0.08
+shader_parameter/highlight_speed = 2.0
+shader_parameter/highlight_intensity = 1.2
+shader_parameter/highlight_interval = 1.00000002375
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_8esxr"]
+size = Vector2(342, 198)
+
+[node name="SpikeAttackEffect" type="Node"]
+script = ExtResource("1_61h07")
+DamagePerTick = 1
+SpeedSlowPercent = 50.0
+EffectId = "f0f1b62e-cf75-4e12-b3ce-5758c772584f"
+Duration = 20.0
+
+[node name="Area2D" type="Area2D" parent="."]
+z_index = 1
+
+[node name="Sprite2D" type="Sprite2D" parent="Area2D"]
+material = SubResource("ShaderMaterial_sp1k1")
+scale = Vector2(0.33, 0.33)
+texture = ExtResource("2_dmpqe")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+position = Vector2(4, 25)
+shape = SubResource("RectangleShape2D_8esxr")
