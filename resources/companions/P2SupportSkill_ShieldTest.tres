@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="P2SupportSkillDefinition" load_steps=4 format=3 uid="uid://21rtv53ngnu7"]
+
+[ext_resource type="Script" uid="uid://dfiagl5v4ruqi" path="res://scripts/companions/P2SupportSkillDefinition.cs" id="1_skill_def"]
+[ext_resource type="Script" uid="uid://cea03dcql1ct5" path="res://scripts/companions/P2ShieldSkillHandler.cs" id="2_handler"]
+
+[sub_resource type="Resource" id="Handler_Shield"]
+script = ExtResource("2_handler")
+HandlerId = "p2_handler_shield"
+
+[resource]
+script = ExtResource("1_skill_def")
+SkillId = "p2_skill_shield_test"
+DisplayName = "测试护盾技能"
+Description = "为玩家施加短时护盾，吸收伤害。"
+CooldownSeconds = 20.0
+Handler = SubResource("Handler_Shield")

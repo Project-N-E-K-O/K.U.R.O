@@ -139,6 +139,21 @@ namespace Kuros.Companions
             if (_brain != null)
             {
                 sb.AppendLine($"rule: {Safe(_brain.LastTriggeredRuleKey)}");
+                sb.AppendLine($"ai_bridge: {(_brain.HasAiDecisionBridge ? "connected" : "missing")} | inflight={_brain.IsAiRequestInFlight}");
+                if (!string.IsNullOrWhiteSpace(_brain.LastAiDecisionIntent))
+                {
+                    sb.AppendLine($"ai_decision: {_brain.LastAiDecisionIntent} ({Safe(_brain.LastAiDecisionUrgency)})");
+                }
+                if (!string.IsNullOrWhiteSpace(_brain.LastAiRejectReason))
+                {
+                    sb.AppendLine($"ai_reject: {Safe(_brain.LastAiRejectReason)}");
+                }
+                if (!string.IsNullOrWhiteSpace(_brain.LastAiDecisionParseError))
+                {
+                    sb.AppendLine($"ai_parse: {Safe(_brain.LastAiDecisionParseError)}");
+                }
+                sb.AppendLine($"brain_stats: emit={_brain.TotalDecisionsEmitted} apply={_brain.TotalDecisionsApplied} reject={_brain.TotalDecisionsRejected}");
+                sb.AppendLine($"brain_stats2: fallback={_brain.TotalFallbackHints} ai_map={_brain.TotalAiMappedApplied} chatter={_brain.TotalPersonalityChatters}");
             }
             else
             {
@@ -149,6 +164,11 @@ namespace Kuros.Companions
             {
                 sb.AppendLine($"result: {Safe(_executor.LastResult)}");
                 sb.AppendLine($"action: {Safe(_executor.LastIntent)}");
+                sb.AppendLine($"loadout: skill={Safe(_executor.GetEquippedSupportSkillId())} | equip={Safe(_executor.GetEquippedEquipmentId())}");
+                sb.AppendLine($"cooldown: skill={_executor.GetSupportSkillCooldownRemainingSeconds():0.0}s | item={_executor.GetSupportItemCooldownRemainingSeconds():0.0}s");
+                sb.AppendLine($"shield: {_executor.GetActiveShieldPoints()} | remain={_executor.GetShieldRemainingSeconds():0.0}s");
+                sb.AppendLine($"exec_stats: req={_executor.TotalDecisionRequests} apply={_executor.TotalDecisionApplied} reject={_executor.TotalDecisionRejected}");
+                sb.AppendLine($"exec_stats2: absorbed={_executor.TotalShieldAbsorbedDamage} heal_skill={_executor.TotalHealFromSkills} heal_bonus={_executor.TotalHealFromEquipBonus}");
                 if (!string.IsNullOrWhiteSpace(_executor.LastActionDetail))
                 {
                     sb.AppendLine($"detail: {Safe(_executor.LastActionDetail)}");

@@ -32,6 +32,7 @@ DisplayName = "豪华蛋糕"
 Description = "大份蛋糕，可作为临时武器造成 3 点攻击力；食用后会立刻把生命值拉满，但只能享用一次。"
 Icon = ExtResource("4_icon")
 Category = "Supplies"
+Tags = Array[String](["tag_food"])
 MaxStackSize = 1
 AttributeEntries = Array[ExtResource("2_attribute_entry")]([SubResource("Attribute_AttackPower")])
 EffectEntries = Array[ExtResource("3_effect_entry")]([SubResource("Effect_OnConsume")])

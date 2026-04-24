@@ -1603,7 +1603,7 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 	private void UpdateDebugOverlayText()
 	{
 		string stateName = StateMachine?.CurrentState?.Name ?? "None";
-		_debugOverlayText = $"{Name} | State: {stateName} | HP: {CurrentHealth}/{MaxHealth}";
+		_debugOverlayText = $"{Name} | State: {stateName} | HP: {CurrentHealth}/{MaxHealth} | SH: {CurrentShield}";
 	}
 
 	private void UpdateStatsUI()
