@@ -5,7 +5,7 @@
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="3_1hnml"]
 [ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="4_dcbdm"]
 [ext_resource type="Texture2D" uid="uid://bed1scn5awxdv" path="res://assets/weapons/镇暴拳套.png" id="5_altab"]
-[ext_resource type="Shader" uid="uid://rvlvejer46bm" path="res://shaders/materials/sprite_outline.gdshader" id="5_d3aaw"]
+[ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="5_d3aaw"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_rrc52"]
 shader = ExtResource("3_1hnml")

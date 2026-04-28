@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://bioknm040r2lo"]
+
+[ext_resource type="Script" uid="uid://bkbovt0mfywy4" path="res://scripts/effects/KnockbackOnAttackEffect.cs" id="1"]
+
+[node name="KnockbackOnAttackEffect" type="Node"]
+script = ExtResource("1")
+EffectId = "5ab741bb-c504-41e3-b86b-261b72564cdf"
+Duration = 0.0

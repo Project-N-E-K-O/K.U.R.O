@@ -8,4 +8,6 @@ script = ExtResource("2_msw50")
 SkillId = "WeaponSkill_Slash_ExpandBaton"
 DisplayName = "甩棍攻击"
 AnimationName = "Weapon_Slash_ExpandBaton"
+ShowHitboxDebug = false
+Description = "手持该武器攻击敌人3次后，该武器的下一次dmg *2，切换武器时效果重置"
 ActivationAction = "weapon_skill_block"

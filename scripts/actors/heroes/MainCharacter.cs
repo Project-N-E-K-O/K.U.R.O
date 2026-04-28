@@ -439,7 +439,7 @@ namespace Kuros.Actors.Heroes
 			}
 		}
 
-	public override void TakeDamage(int damage, Vector2? attackOrigin = null, GameActor? attacker = null)
+	public override void TakeDamage(int damage, Vector2? attackOrigin = null, GameActor? attacker = null, Kuros.Core.Events.DamageSource damageSource = Kuros.Core.Events.DamageSource.DirectAttack)
 	{
 		if (damage > 0 && IsHitInvincible && !IsDeathSequenceActive && !IsDead)
 		{
@@ -451,7 +451,7 @@ namespace Kuros.Actors.Heroes
 		}
 
 		int previousHealth = CurrentHealth;
-		base.TakeDamage(damage, attackOrigin, attacker);
+		base.TakeDamage(damage, attackOrigin, attacker, damageSource);
 		_pendingHitKnockback = CurrentHealth < previousHealth;
 		// 状态机会处理受伤状态切换，不需要额外逻辑
 	}

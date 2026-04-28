@@ -21,7 +21,6 @@ ImpulseSpreadDegrees = 120.0
 
 [resource]
 script = ExtResource("1_table")
-GlobalDropChance = 0.5
 MaxDrops = 1
 ScatterRadius = 48.0
 DefaultImpulse = 400.0

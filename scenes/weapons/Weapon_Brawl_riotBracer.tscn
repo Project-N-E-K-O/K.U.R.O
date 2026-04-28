@@ -2,8 +2,8 @@
 
 [ext_resource type="Script" uid="uid://dtgdjgrqgype7" path="res://scripts/items/world/WorldItemEntity.cs" id="1_82c6d"]
 [ext_resource type="Resource" uid="uid://c0h5f2yocbgcw" path="res://resources/items/Weapon_Brawl_RiotBracer.tres" id="2_82c6d"]
-[ext_resource type="Shader" uid="uid://rvlvejer46bm" path="res://shaders/materials/sprite_outline.gdshader" id="3_2q28g"]
-[ext_resource type="Texture2D" uid="uid://c8id0wo6qo1k" path="res://assets/weapons/镇暴护腕.png" id="3_82c6d"]
+[ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="3_2q28g"]
+[ext_resource type="Texture2D" uid="uid://crfbiiitqgkjb" path="res://assets/weapons/镇暴护腕.png" id="3_82c6d"]
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="3_yqjh8"]
 [ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="4_blqw4"]
 

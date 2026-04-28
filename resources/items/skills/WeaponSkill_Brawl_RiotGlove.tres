@@ -8,4 +8,6 @@ script = ExtResource("2_egp4s")
 SkillId = "WeaponSkill_Brawl_RiotGlove"
 DisplayName = "镇暴拳套攻击"
 AnimationName = "Weapon_Brawl_RiotGlove"
+ShowHitboxDebug = false
+Description = "每次攻击到敌人时，都有20%概率使这一次的dmg *2"
 ActivationAction = "weapon_skill_block"

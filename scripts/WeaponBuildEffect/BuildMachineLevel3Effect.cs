@@ -42,7 +42,7 @@ namespace Kuros.Builds
                 return;
             }
 
-            DamageEventBus.Subscribe(OnDamageResolved);
+            DamageEventBus.SubscribeWithSource(OnDamageResolved);
             _subscribed = true;
         }
 
@@ -64,15 +64,16 @@ namespace Kuros.Builds
         {
             if (_subscribed)
             {
-                DamageEventBus.Unsubscribe(OnDamageResolved);
+                DamageEventBus.UnsubscribeWithSource(OnDamageResolved);
             }
 
             _subscribed = false;
             base.OnRemoved();
         }
 
-        private void OnDamageResolved(GameActor attacker, GameActor target, int damage)
+        private void OnDamageResolved(GameActor attacker, GameActor target, int damage, DamageSource source)
         {
+            if (source != DamageSource.DirectAttack) return;
             if (Actor == null || attacker != Actor || target == null)
             {
                 return;

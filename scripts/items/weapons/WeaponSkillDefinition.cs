@@ -11,7 +11,7 @@ namespace Kuros.Items.Weapons
     {
         [Export] public string SkillId { get; set; } = string.Empty;
         [Export] public string DisplayName { get; set; } = "Weapon Skill";
-        [Export] public WeaponSkillType SkillType { get; set; } = WeaponSkillType.Active;
+        [Export] public WeaponSkillType SkillType { get; set; } = WeaponSkillType.Passive;
         [Export] public string AnimationName { get; set; } = string.Empty;
         [Export(PropertyHint.Range, "0,5,0.1")] public float DamageMultiplier { get; set; } = 1f;
         [Export(PropertyHint.Range, "0,30,0.1")] public float CooldownSeconds { get; set; } = 0.5f;

@@ -6,11 +6,11 @@ namespace Kuros.Items.Effects
 {
     public enum ItemEffectTrigger
     {
-        OnPickup = 0,
-        OnEquip = 1,
-        OnConsume = 2,
-        OnBreak = 3,
-        OnThrowDestroy = 4  // 投掷物品销毁时触发（击中敌人或落点销毁）
+        OnPickup = 0,           // 捡起物品时
+        OnEquip = 1,            // 装备物品时
+        OnConsume = 2,          // 消耗物品时
+        OnBreak = 3,            // 物品破损时
+        OnThrowDestroy = 4,     // 投掷物品销毁时触发（击中敌人或落点销毁）
     }
 
     /// <summary>

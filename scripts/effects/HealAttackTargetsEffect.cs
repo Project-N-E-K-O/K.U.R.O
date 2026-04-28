@@ -17,17 +17,18 @@ namespace Kuros.Effects
         protected override void OnApply()
         {
             base.OnApply();
-            DamageEventBus.Subscribe(OnDamageResolved);
+            DamageEventBus.SubscribeWithSource(OnDamageResolved);
         }
 
         public override void OnRemoved()
         {
-            DamageEventBus.Unsubscribe(OnDamageResolved);
+            DamageEventBus.UnsubscribeWithSource(OnDamageResolved);
             base.OnRemoved();
         }
 
-        private void OnDamageResolved(GameActor attacker, GameActor target, int damage)
+        private void OnDamageResolved(GameActor attacker, GameActor target, int damage, DamageSource source)
         {
+            if (source != DamageSource.DirectAttack) return;
             if (Actor == null || attacker != Actor) return;
             if (target == null || HealAmount <= 0) return;
 

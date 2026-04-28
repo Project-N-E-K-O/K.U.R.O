@@ -213,6 +213,8 @@ namespace Kuros.Actors.Heroes
         {
             ClearSkills();
 
+            WeaponSkillDefinition? passiveAnimFallback = null;
+
             foreach (var skill in weapon.GetWeaponSkillDefinitions())
             {
                 _skills[skill.SkillId] = skill;
@@ -224,6 +226,11 @@ namespace Kuros.Actors.Heroes
                 if (skill.SkillType == WeaponSkillType.Passive)
                 {
                     ApplySkillEffects(skill, ItemEffectTrigger.OnEquip);
+                    // Passive 技能若配置了动画，作为攻击动画回退候选
+                    if (passiveAnimFallback == null && !string.IsNullOrWhiteSpace(skill.AnimationName))
+                    {
+                        passiveAnimFallback = skill;
+                    }
                     continue;
                 }
 
@@ -231,6 +238,12 @@ namespace Kuros.Actors.Heroes
                 {
                     _defaultActiveSkill = skill;
                 }
+            }
+
+            // 只有完全没有主动技能时，才使用 Passive 动画作为回退
+            if (_defaultActiveSkill == null && passiveAnimFallback != null)
+            {
+                _defaultActiveSkill = passiveAnimFallback;
             }
 
             if (_defaultActiveSkill == null)
@@ -263,6 +276,8 @@ namespace Kuros.Actors.Heroes
                 return;
             }
 
+            WeaponSkillDefinition? passiveAnimFallback = null;
+
             foreach (var skill in _fallbackWeaponDefinition.GetWeaponSkillDefinitions())
             {
                 _skills[skill.SkillId] = skill;
@@ -270,6 +285,10 @@ namespace Kuros.Actors.Heroes
                 if (skill.SkillType == WeaponSkillType.Passive)
                 {
                     ApplySkillEffects(skill, ItemEffectTrigger.OnEquip);
+                    if (passiveAnimFallback == null && !string.IsNullOrWhiteSpace(skill.AnimationName))
+                    {
+                        passiveAnimFallback = skill;
+                    }
                     continue;
                 }
 
@@ -277,6 +296,11 @@ namespace Kuros.Actors.Heroes
                 {
                     _defaultActiveSkill = skill;
                 }
+            }
+
+            if (_defaultActiveSkill == null && passiveAnimFallback != null)
+            {
+                _defaultActiveSkill = passiveAnimFallback;
             }
         }
 

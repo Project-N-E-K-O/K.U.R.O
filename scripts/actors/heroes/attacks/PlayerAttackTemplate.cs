@@ -1,9 +1,13 @@
 using System;
+using System.Collections.Generic;
 using Godot;
 using Godot.Collections;
 using Kuros.Actors.Heroes;
 using Kuros.Core;
+using Kuros.Core.Effects;
 using Kuros.Core.Events;
+using Kuros.Items;
+using Kuros.Items.Effects;
 using Kuros.Items.Weapons;
 
 namespace Kuros.Actors.Heroes.Attacks
@@ -105,6 +109,9 @@ namespace Kuros.Actors.Heroes.Attacks
         private AttackHitboxDebugDrawer? _hitboxDebugDrawer;
         private int _currentHitStep = 1;  // 记录当前 Spine 动画段数（1-based）
         private float _weaponBaseDamage = 0f;  // 记录武器基础伤害（不含玩家基础伤害）
+        private PlayerInventoryComponent? _inventoryComponent;
+        private List<ActorEffect> _appliedEquipEffects = new();  // 已应用的装备效果
+        private bool _equipEffectsSubscribed = false;  // 是否已订阅装备事件
 
         public bool IsRunning => _phase != AttackPhase.Idle;
         public bool IsOnCooldown => _cooldownTimer > 0f;
@@ -123,6 +130,22 @@ namespace Kuros.Actors.Heroes.Attacks
                 AttackArea = Player.AttackArea;
             }
 
+            // 获取背包组件用于监听装备事件
+            _inventoryComponent = Player.InventoryComponent ?? Player.GetNodeOrNull<PlayerInventoryComponent>("Inventory");
+            if (_inventoryComponent != null)
+            {
+                _inventoryComponent.WeaponEquipped += OnWeaponEquipped;
+                _inventoryComponent.WeaponUnequipped += OnWeaponUnequipped;
+                _equipEffectsSubscribed = true;
+                
+                // 如果已经装备了武器，立即应用效果
+                var currentWeapon = _inventoryComponent.GetCurrentWeaponDefinition();
+                if (currentWeapon != null)
+                {
+                    OnWeaponEquipped(currentWeapon);
+                }
+            }
+
             InitializeHitEffectSupport();
             InitializeSpineHitSupport();
 
@@ -132,9 +155,20 @@ namespace Kuros.Actors.Heroes.Attacks
         public override void _ExitTree()
         {
             base._ExitTree();
+            
+            // 移除已应用的装备效果
+            RemoveAllEquipEffects();
+            
+            if (_equipEffectsSubscribed && _inventoryComponent != null)
+            {
+                _inventoryComponent.WeaponEquipped -= OnWeaponEquipped;
+                _inventoryComponent.WeaponUnequipped -= OnWeaponUnequipped;
+                _equipEffectsSubscribed = false;
+            }
+            
             if (_hitEffectSubscribed)
             {
-                DamageEventBus.Unsubscribe(OnDamageResolved);
+                DamageEventBus.UnsubscribeWithSource(OnDamageResolved);
                 _hitEffectSubscribed = false;
             }
 
@@ -697,7 +731,7 @@ namespace Kuros.Actors.Heroes.Attacks
             {
                 if (_hitEffectSubscribed)
                 {
-                    DamageEventBus.Unsubscribe(OnDamageResolved);
+                    DamageEventBus.UnsubscribeWithSource(OnDamageResolved);
                     _hitEffectSubscribed = false;
                 }
                 _hitEffectParent = null;
@@ -709,7 +743,7 @@ namespace Kuros.Actors.Heroes.Attacks
 
             if (!_hitEffectSubscribed)
             {
-                DamageEventBus.Subscribe(OnDamageResolved);
+                DamageEventBus.SubscribeWithSource(OnDamageResolved);
                 _hitEffectSubscribed = true;
             }
         }
@@ -734,8 +768,14 @@ namespace Kuros.Actors.Heroes.Attacks
             return null;
         }
 
-        private void OnDamageResolved(GameActor attacker, GameActor target, int damage)
+        private void OnDamageResolved(GameActor attacker, GameActor target, int damage, DamageSource source)
         {
+            // 只响应直接攻击来源，过滤 spike 区域伤害等间接伤害，避免错误触发命中特效
+            if (source != DamageSource.DirectAttack)
+            {
+                return;
+            }
+
             if (!_hitWindowActive || HitEffectScene == null)
             {
                 return;
@@ -857,6 +897,76 @@ namespace Kuros.Actors.Heroes.Attacks
                     effectNode.Connect("finished", callable);
                 }
             }
+        }
+
+        /// <summary>
+        /// 装备武器时触发
+        /// </summary>
+        private void OnWeaponEquipped(ItemDefinition weapon)
+        {
+            // 只在装备了匹配的武器时才应用效果
+            if (HasWeaponRequirement && !string.Equals(weapon.ItemId, RequiredItemId, StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            // 从武器定义的 EffectEntries 中获取并应用 OnEquip 效果
+            ApplyEquipEffectsFromWeapon(weapon);
+        }
+
+        /// <summary>
+        /// 卸下武器时触发
+        /// </summary>
+        private void OnWeaponUnequipped()
+        {
+            RemoveAllEquipEffects();
+        }
+
+        /// <summary>
+        /// 应用所有装备时的效果
+        /// </summary>
+        private void ApplyEquipEffectsFromWeapon(ItemDefinition weapon)
+        {
+            if (weapon?.EffectEntries == null || Player?.EffectController == null)
+            {
+                return;
+            }
+
+            foreach (var effectEntry in weapon.EffectEntries)
+            {
+                if (effectEntry.Trigger != ItemEffectTrigger.OnEquip)
+                {
+                    continue;
+                }
+
+                var effect = effectEntry.InstantiateEffect();
+                if (effect != null)
+                {
+                    Player.EffectController.AddEffect(effect);
+                    _appliedEquipEffects.Add(effect);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 移除所有已应用的装备效果
+        /// </summary>
+        private void RemoveAllEquipEffects()
+        {
+            if (Player?.EffectController == null)
+            {
+                return;
+            }
+
+            foreach (var effect in _appliedEquipEffects)
+            {
+                if (GodotObject.IsInstanceValid(effect))
+                {
+                    Player.EffectController.RemoveEffect(effect);
+                }
+            }
+
+            _appliedEquipEffects.Clear();
         }
     }
 }

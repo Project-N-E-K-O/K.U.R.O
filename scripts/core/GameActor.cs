@@ -242,7 +242,7 @@ namespace Kuros.Core
 			return attackerArea.OverlapsBody(this);
 		}
 
-		public virtual void TakeDamage(int damage, Vector2? attackOrigin = null, GameActor? attacker = null)
+		public virtual void TakeDamage(int damage, Vector2? attackOrigin = null, GameActor? attacker = null, Events.DamageSource damageSource = Events.DamageSource.DirectAttack)
 		{
 			if (IsDeathSequenceActive || IsDead) return;
 			if (damage <= 0) return;
@@ -300,7 +300,7 @@ namespace Kuros.Core
 
 			if (attacker != null)
 			{
-				Events.DamageEventBus.Publish(attacker, this, damage);
+				Events.DamageEventBus.Publish(attacker, this, damage, damageSource);
 			}
 		}
 
