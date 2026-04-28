@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="P2SupportSkillDefinition" load_steps=4 format=3 uid="uid://bgqm2npag1dny"]
+
+[ext_resource type="Script" uid="uid://dfiagl5v4ruqi" path="res://scripts/companions/P2SupportSkillDefinition.cs" id="1_skill_def"]
+[ext_resource type="Script" uid="uid://ligfo5fnm6a1" path="res://scripts/companions/P2HealSkillHandler.cs" id="2_handler"]
+
+[sub_resource type="Resource" id="Handler_Heal"]
+script = ExtResource("2_handler")
+HandlerId = "p2_handler_heal"
+
+[resource]
+script = ExtResource("1_skill_def")
+SkillId = "p2_skill_heal_test"
+DisplayName = "测试恢复技能"
+Description = "为玩家恢复生命值。"
+CooldownSeconds = 15.0
+Handler = SubResource("Handler_Heal")

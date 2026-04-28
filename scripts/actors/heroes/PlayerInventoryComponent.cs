@@ -547,10 +547,71 @@ private readonly HashSet<string> _obtainedItemIds = new HashSet<string>();
         /// </summary>
         public bool TryConsumeSelectedItem(GameActor? consumer)
         {
-            if (Backpack == null) return false;
-            var stack = GetSelectedBackpackStack();
-            if (stack == null || stack.IsEmpty) return false;
-            if (!stack.HasTag(ItemTagIds.Food))
+            if (TryConsumeQuickBarSlot(SelectedQuickBarSlot, consumer, ItemTagIds.Food))
+            {
+                return true;
+            }
+
+            return TryConsumeBackpackSlot(SelectedBackpackSlot, consumer, ItemTagIds.Food);
+        }
+
+        public bool TryConsumeQuickBarSlot(int slotIndex, GameActor? consumer, string requiredTag = ItemTagIds.Food)
+        {
+            return TryConsumeContainerSlotInternal(QuickBar, slotIndex, consumer, requiredTag, out _);
+        }
+
+        public bool TryConsumeBackpackSlot(int slotIndex, GameActor? consumer, string requiredTag = ItemTagIds.Food)
+        {
+            return TryConsumeContainerSlotInternal(Backpack, slotIndex, consumer, requiredTag, out _);
+        }
+
+        public bool TryConsumeFirstTaggedItem(string tagId, GameActor? consumer)
+        {
+            if (string.IsNullOrWhiteSpace(tagId))
+            {
+                return false;
+            }
+
+            if (QuickBar != null)
+            {
+                for (int slotIndex = 0; slotIndex < QuickBar.Slots.Count; slotIndex++)
+                {
+                    if (TryConsumeContainerSlotInternal(QuickBar, slotIndex, consumer, tagId, out _))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            if (Backpack != null)
+            {
+                for (int slotIndex = 0; slotIndex < Backpack.Slots.Count; slotIndex++)
+                {
+                    if (TryConsumeContainerSlotInternal(Backpack, slotIndex, consumer, tagId, out _))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private bool TryConsumeContainerSlotInternal(InventoryContainer? container, int slotIndex, GameActor? consumer, string requiredTag, out string consumedItemId)
+        {
+            consumedItemId = string.Empty;
+            if (container == null || slotIndex < 0 || slotIndex >= container.Slots.Count)
+            {
+                return false;
+            }
+
+            var stack = container.GetStack(slotIndex);
+            if (stack == null || stack.IsEmpty)
+            {
+                return false;
+            }
+
+            if (!string.IsNullOrWhiteSpace(requiredTag) && !stack.HasTag(requiredTag))
             {
                 return false;
             }
@@ -580,13 +641,13 @@ private readonly HashSet<string> _obtainedItemIds = new HashSet<string>();
             }
             else
             {
-                int removed = Backpack.RemoveItemFromSlot(SelectedBackpackSlot, 1);
+                int removed = container.RemoveItemFromSlot(slotIndex, 1);
                 if (removed <= 0)
                 {
                     return false;
                 }
 
-                removedStack = Backpack.GetStack(SelectedBackpackSlot) == null;
+                removedStack = container.GetStack(slotIndex) == null;
             }
 
             if (consumer != null)
@@ -598,16 +659,18 @@ private readonly HashSet<string> _obtainedItemIds = new HashSet<string>();
             {
                 if (usesDurability)
                 {
-                    Backpack.SetStack(SelectedBackpackSlot, null);
+                    container.SetStack(slotIndex, null);
                 }
+
                 NotifyItemRemoved(item.ItemId);
             }
             else if (usesDurability)
             {
-                Backpack.EmitSignal(InventoryContainer.SignalName.SlotChanged, SelectedBackpackSlot, item.ItemId, stack.Quantity);
-                Backpack.EmitSignal(InventoryContainer.SignalName.InventoryChanged);
+                container.EmitSignal(InventoryContainer.SignalName.SlotChanged, slotIndex, item.ItemId, stack.Quantity);
+                container.EmitSignal(InventoryContainer.SignalName.InventoryChanged);
             }
 
+            consumedItemId = item.ItemId;
             return true;
         }
 

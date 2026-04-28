@@ -1,0 +1,47 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/companions/P2LoadoutPanel.cs" id="1_panel_script"]
+
+[node name="P2LoadoutPanel" type="CanvasLayer"]
+layer = 101
+script = ExtResource("1_panel_script")
+
+[node name="Panel" type="PanelContainer" parent="."]
+offset_left = 860.0
+offset_top = 430.0
+offset_right = 1240.0
+offset_bottom = 760.0
+
+[node name="VBox" type="VBoxContainer" parent="Panel"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Panel/VBox"]
+layout_mode = 2
+text = "P2 Skill Loadout"
+
+[node name="ToggleButton" type="Button" parent="Panel/VBox"]
+layout_mode = 2
+text = "Hide"
+
+[node name="Content" type="VBoxContainer" parent="Panel/VBox"]
+layout_mode = 2
+
+[node name="SkillLabel" type="Label" parent="Panel/VBox/Content"]
+layout_mode = 2
+text = "技能"
+
+[node name="SkillOption" type="OptionButton" parent="Panel/VBox/Content"]
+layout_mode = 2
+
+[node name="EquipmentLabel" type="Label" parent="Panel/VBox/Content"]
+layout_mode = 2
+text = "装备"
+
+[node name="EquipmentOption" type="OptionButton" parent="Panel/VBox/Content"]
+layout_mode = 2
+
+[node name="SummaryLabel" type="Label" parent="Panel/VBox/Content"]
+custom_minimum_size = Vector2(320, 120)
+layout_mode = 2
+text = "当前技能: -\n当前装备: -\n治疗倍率: x1.00"
+autowrap_mode = 2

@@ -50,6 +50,7 @@ namespace Kuros.Core
 
 		// Exposed state for States to use
 		public int CurrentHealth { get; protected set; }
+		public int CurrentShield { get; private set; }
 		public float AttackTimer { get; set; } = 0.0f;
 		public bool FacingRight { get; protected set; } = true;
 		public event Func<DamageEventArgs, bool>? DamageIntercepted;
@@ -95,6 +96,7 @@ namespace Kuros.Core
 		public override void _Ready()
 		{
 			CurrentHealth = MaxHealth;
+			CurrentShield = 0;
 			
 			
 			
@@ -179,6 +181,26 @@ namespace Kuros.Core
 
 			ApplyStatProfile();
 			NotifyHealthChanged();
+		}
+
+		public void SetShieldValue(int shield)
+		{
+			CurrentShield = Mathf.Max(0, shield);
+		}
+
+		public void AddShield(int shield)
+		{
+			if (shield <= 0)
+			{
+				return;
+			}
+
+			CurrentShield = Mathf.Max(0, CurrentShield + shield);
+		}
+
+		public void ClearShield()
+		{
+			CurrentShield = 0;
 		}
 
 		// ====================== 新增4：递归同步所有子渲染节点Z层级的工具方法 ======================

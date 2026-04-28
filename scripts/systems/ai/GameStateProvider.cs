@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Godot;
 using Kuros.Core;
 using Kuros.Actors.Heroes;
+using Kuros.Companions;
 
 namespace Kuros.Systems.AI
 {
@@ -107,6 +108,7 @@ namespace Kuros.Systems.AI
         private List<CompanionState> ResolveCompanions(SamplePlayer player)
         {
             var result = new List<CompanionState>();
+            var seenNodes = new HashSet<ulong>();
 
             if (CompanionPaths.Count > 0)
             {
@@ -114,14 +116,11 @@ namespace Kuros.Systems.AI
                 {
                     if (path == null || path.IsEmpty) continue;
                     var node = GetNodeOrNull<Node>(path) ?? GetNodeOrNull<Node>($"../{path}");
-                    if (node is GameActor actor && actor != player && !actor.IsDead && !actor.IsDeathSequenceActive)
+                    if (TryBuildCompanionState(node, player, out CompanionState? state) && state != null)
                     {
-                        result.Add(new CompanionState
-                        {
-                            Name = actor.Name,
-                            CurrentHp = actor.CurrentHealth,
-                            MaxHp = actor.MaxHealth
-                        });
+                        ulong id = node!.GetInstanceId();
+                        if (!seenNodes.Add(id)) continue;
+                        result.Add(state);
                     }
                 }
 
@@ -133,15 +132,14 @@ namespace Kuros.Systems.AI
             {
                 foreach (Node node in GetTree().GetNodesInGroup(group))
                 {
-                    if (node is not GameActor actor || actor == player) continue;
-                    if (actor.IsDead || actor.IsDeathSequenceActive) continue;
-
-                    result.Add(new CompanionState
+                    if (!TryBuildCompanionState(node, player, out CompanionState? state) || state == null)
                     {
-                        Name = actor.Name,
-                        CurrentHp = actor.CurrentHealth,
-                        MaxHp = actor.MaxHealth
-                    });
+                        continue;
+                    }
+
+                    ulong id = node.GetInstanceId();
+                    if (!seenNodes.Add(id)) continue;
+                    result.Add(state);
                 }
 
                 if (result.Count > 0)
@@ -151,6 +149,49 @@ namespace Kuros.Systems.AI
             }
 
             return result;
+        }
+
+        private static bool TryBuildCompanionState(Node? node, SamplePlayer player, out CompanionState? state)
+        {
+            state = null;
+            if (node == null)
+            {
+                return false;
+            }
+
+            if (node is GameActor actor)
+            {
+                if (actor == player || actor.IsDead || actor.IsDeathSequenceActive)
+                {
+                    return false;
+                }
+
+                state = new CompanionState
+                {
+                    Name = actor.Name,
+                    CurrentHp = actor.CurrentHealth,
+                    MaxHp = actor.MaxHealth
+                };
+                return true;
+            }
+
+            if (node is ICompanionStateSource source)
+            {
+                if (!source.IsCompanionAvailable)
+                {
+                    return false;
+                }
+
+                state = new CompanionState
+                {
+                    Name = string.IsNullOrWhiteSpace(source.CompanionName) ? node.Name : source.CompanionName,
+                    CurrentHp = Mathf.Max(0, source.CurrentHp),
+                    MaxHp = Mathf.Max(1, source.MaxHp)
+                };
+                return true;
+            }
+
+            return false;
         }
 
         private (int count, float nearestDistance, float averageDistance) ResolveEnemyMetrics(SamplePlayer player)

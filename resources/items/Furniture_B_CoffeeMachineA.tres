@@ -2,8 +2,8 @@
 
 [ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="1_0v566"]
 [ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="2_lb4p1"]
-[ext_resource type="Texture2D" uid="uid://b73hcxi424y4n" path="res://assets/furnitures/hotel_scene2/CoffeeMachineA.png" id="3_0v566"]
-[ext_resource type="PackedScene" uid="uid://bi7guxtti6ocl" path="res://resources/effects/HeavyCarrySlowEffect.tscn" id="3_lb4p1"]
+[ext_resource type="Texture2D" uid="uid://cs34tp7j7j5py" path="res://assets/furnitures/hotel_scene2/CoffeeMachineA.png" id="3_0v566"]
+[ext_resource type="PackedScene" path="res://resources/effects/HeavyCarrySlowEffect.tscn" id="3_lb4p1"]
 [ext_resource type="PackedScene" uid="uid://ciwlpetibguab" path="res://shaders/destroy_somke.tscn" id="4_1sllh"]
 [ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="4_71b4q"]
 [ext_resource type="PackedScene" uid="uid://cmh3bnabinwi0" path="res://resources/effects/CameraShakeEffect.tscn" id="5_71b4q"]

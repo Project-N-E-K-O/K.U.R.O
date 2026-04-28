@@ -32,6 +32,12 @@ namespace Kuros.UI
 		// 暂停键按钮样式（例如使用“暂停键底”资源）
 		[Export] public StyleBox? PauseButtonStyle { get; set; }
 
+		[ExportCategory("Status Message")]
+		// 提示锚点（归一化坐标），(0.5, 0.5) 为屏幕中心。
+		[Export] public Vector2 StatusMessageAnchorNormalized { get; set; } = new Vector2(0.5f, 0.28f);
+		// 在锚点基础上的像素偏移，便于微调最终显示位置。
+		[Export] public Vector2 StatusMessagePixelOffset { get; set; } = Vector2.Zero;
+
 		[ExportCategory("Default Items")]
 		[Export] public ItemDefinition? DefaultSwordItem { get; set; } // 默认小木剑物品定义
 		[Export] public bool SpawnDefaultSwordInQuickBar { get; set; } = false;
@@ -694,6 +700,65 @@ namespace Kuros.UI
 		public void SetFallbackStats()
 		{
 			UpdateStats(100, 100, 0);
+		}
+
+		/// <summary>
+		/// 在屏幕中央偏上位置动态弹出一条短暂状态消息，向上漂移后淡出消失。
+		/// 不依赖 InstructionsLabel 是否在场景中绑定。
+		/// </summary>
+		public void ShowStatusMessage(string message, float durationSeconds = 2.0f)
+		{
+			// 若 InstructionsLabel 已连接，同步写入（兼容旧行为）
+			if (InstructionsLabel != null)
+			{
+				InstructionsLabel.Text = message;
+				InstructionsLabel.Modulate = Colors.White;
+
+				var tweenLabel = CreateTween();
+				tweenLabel.TweenInterval(Mathf.Max(0.1f, durationSeconds - 0.4f));
+				tweenLabel.TweenProperty(InstructionsLabel, "modulate", new Color(1f, 1f, 1f, 0f), 0.4f);
+				tweenLabel.TweenCallback(Callable.From(() =>
+				{
+					if (IsInstanceValid(InstructionsLabel))
+						InstructionsLabel.Text = string.Empty;
+				}));
+			}
+
+			// 动态创建浮动提示标签
+			var popup = new Label
+			{
+				Text = message,
+				HorizontalAlignment = HorizontalAlignment.Center,
+				Modulate = new Color(1f, 0.95f, 0.3f, 1f),   // 醒目黄色
+				MouseFilter = Control.MouseFilterEnum.Ignore,
+				ZIndex = 9999,
+			};
+			popup.AddThemeColorOverride("font_color", new Color(1f, 0.95f, 0.3f, 1f));
+			popup.AddThemeColorOverride("font_outline_color", new Color(0f, 0f, 0f, 0.95f));
+			popup.AddThemeFontSizeOverride("font_size", 18);
+			popup.AddThemeConstantOverride("outline_size", 4);
+
+			AddChild(popup);
+
+			// 定位到可配置锚点位置
+			popup.ResetSize();
+			var vpSize = GetViewport().GetVisibleRect().Size;
+			var anchor = new Vector2(
+				Mathf.Clamp(StatusMessageAnchorNormalized.X, 0f, 1f),
+				Mathf.Clamp(StatusMessageAnchorNormalized.Y, 0f, 1f));
+			var anchorPos = new Vector2(vpSize.X * anchor.X, vpSize.Y * anchor.Y);
+			popup.Position = new Vector2(anchorPos.X - popup.Size.X * 0.5f, anchorPos.Y - popup.Size.Y * 0.5f) + StatusMessagePixelOffset;
+
+			var tween = CreateTween();
+			// 先停留，再向上漂移同时淡出
+			tween.TweenInterval(Mathf.Max(0.05f, durationSeconds - 0.6f));
+			tween.Parallel().TweenProperty(popup, "position", popup.Position + new Vector2(0f, -36f), 0.6f);
+			tween.Parallel().TweenProperty(popup, "modulate", new Color(1f, 0.95f, 0.3f, 0f), 0.6f);
+			tween.TweenCallback(Callable.From(() =>
+			{
+				if (IsInstanceValid(popup))
+					popup.QueueFree();
+			}));
 		}
 
 		private SamplePlayer? _player;

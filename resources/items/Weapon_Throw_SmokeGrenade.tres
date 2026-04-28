@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="1_0ac3k"]
 [ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="2_letw0"]
 [ext_resource type="PackedScene" uid="uid://ckvi05o7l1mv4" path="res://shaders/smoke.tscn" id="3_0ac3k"]
-[ext_resource type="Texture2D" uid="uid://n0ciynpx53jh" path="res://assets/weapons/镇暴烟雾弹.png" id="3_vod1j"]
+[ext_resource type="Texture2D" uid="uid://djqiu2bhspc0l" path="res://assets/weapons/镇暴烟雾弹.png" id="3_vod1j"]
 [ext_resource type="PackedScene" uid="uid://dm13v6vu200sa" path="res://resources/effects/WeaponStunEffect.tscn" id="4_letw0"]
 [ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="5_3rggb"]
 

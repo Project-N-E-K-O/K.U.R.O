@@ -21,6 +21,9 @@ build/
 # User save data
 saves/
 
+# Local training docs (keep out of git)
+teaching/
+
 # .NET ignores
 obj/
 *.user

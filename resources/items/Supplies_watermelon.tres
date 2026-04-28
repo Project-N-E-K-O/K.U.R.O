@@ -36,6 +36,7 @@ DisplayName = "多汁西瓜"
 Description = "既是食材也是武器：吃下可恢复 3 点生命，用手砸到敌人反而让对方回复 1 点生命。"
 Icon = ExtResource("4_icon")
 Category = "Supplies"
+Tags = Array[String](["tag_food"])
 MaxStackSize = 1
 AttributeEntries = Array[ExtResource("2_attribute_entry")]([SubResource("Attribute_AttackPower")])
 EffectEntries = Array[ExtResource("3_effect_entry")]([SubResource("Effect_OnConsume")])

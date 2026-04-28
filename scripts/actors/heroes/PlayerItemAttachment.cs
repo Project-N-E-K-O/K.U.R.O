@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Godot;
 using Kuros.Core;
 using Kuros.Items;
-using Kuros.Utils;
 
 namespace Kuros.Actors.Heroes
 {
@@ -12,19 +11,15 @@ namespace Kuros.Actors.Heroes
     /// </summary>
     public partial class PlayerItemAttachment : Node
     {
-        [Signal] public delegate void EquippedAttackAreaChangedEventHandler();
-
         [Export] public PlayerInventoryComponent? Inventory { get; set; }
         [Export] public NodePath AttachmentParentPath { get; set; } = new("SpineCharacter/Skeleton2D");
         [Export] public NodePath SpineSlotNodePath { get; set; } = new();
         [Export] public Godot.Collections.Array<NodePath> SpineBoneNodePaths { get; set; } = new();
         [Export] public Godot.Collections.Array<string> SpineBoneOrder { get; set; } = new() { "WQ1", "WQ2", "WP" };
-        [Export] public Godot.Collections.Array<string> ShowHoldingItemStates { get; set; } = new() { "Idle", "Walk", "Run", "Hit" };
         [Export] public bool FlipBoneAttachmentWithFacing { get; set; } = false;
         [Export(PropertyHint.Range, "-1024,1024,1")] public Vector2 BoneIconOffset { get; set; } = Vector2.Zero;
         [Export] public bool RotateBoneOffsetWithBone { get; set; } = false;
         [Export(PropertyHint.Range, "-512,512,1")] public Vector2 IconOffset { get; set; } = new Vector2(32, -32);
-        [Export(PropertyHint.Range, "-360,360,0.1")] public float IconRotationDegrees { get; set; } = 0f;
         [Export] public bool FlipWithFacing { get; set; } = true;
         [Export] public int ZIndex { get; set; } = 0;
         [Export] public string SpineSlotDefaultSelection { get; set; } = string.Empty;
@@ -40,10 +35,6 @@ namespace Kuros.Actors.Heroes
         private bool _iconUsesBoneTracking;
         private bool _useSlotAnchorBinding;
         private Area2D? _equippedAttackArea;
-        private Transform2D _equippedAttackAreaLocalTransform = Transform2D.Identity;
-        private Shape2D? _equippedAttackShapeTemplate;
-        private Transform2D _equippedAttackShapeTransform = Transform2D.Identity;
-        private uint _equippedAttackCollisionMask = 1u;
         private const string SlotSelectProperty = "切换名";
         private const string SlotIconName = "HeldItemSlotIcon";
 
@@ -63,10 +54,7 @@ namespace Kuros.Actors.Heroes
             Inventory.ItemPicked += OnItemPicked;
             Inventory.ItemRemoved += OnItemRemoved;
             Inventory.ActiveBackpackSlotChanged += OnActiveSlotChanged;
-            Inventory.QuickBarAssigned += OnQuickBarAssigned;
             Inventory.QuickBarSlotChanged += OnSelectedQuickBarSlotChanged;
-            Inventory.WeaponEquipped += OnWeaponEquipped;
-            Inventory.WeaponUnequipped += OnWeaponUnequipped;
             if (Inventory.Backpack != null)
             {
                 Inventory.Backpack.InventoryChanged += OnInventoryChanged;
@@ -104,17 +92,6 @@ namespace Kuros.Actors.Heroes
             UpdateAttachmentIcon();
         }
 
-        private void OnQuickBarAssigned()
-        {
-            SubscribeToQuickBar();
-            UpdateAttachmentIcon();
-        }
-
-        private void OnSelectedQuickBarSlotChanged(int _)
-        {
-            UpdateAttachmentIcon();
-        }
-
         private void OnQuickBarSlotChanged(int slotIndex, string itemId, int quantity)
         {
             // 如果变化的是当前选中的快捷栏槽位，更新图标
@@ -124,6 +101,12 @@ namespace Kuros.Actors.Heroes
             }
         }
 
+        private void OnSelectedQuickBarSlotChanged(int _slotIndex)
+        {
+            // 切换选中槽位时，槽位内容可能没变，但手持图标必须立刻刷新。
+            UpdateAttachmentIcon();
+        }
+
         public override void _ExitTree()
         {
             if (Inventory != null)
@@ -131,10 +114,7 @@ namespace Kuros.Actors.Heroes
                 Inventory.ItemPicked -= OnItemPicked;
                 Inventory.ItemRemoved -= OnItemRemoved;
                 Inventory.ActiveBackpackSlotChanged -= OnActiveSlotChanged;
-                Inventory.QuickBarAssigned -= OnQuickBarAssigned;
                 Inventory.QuickBarSlotChanged -= OnSelectedQuickBarSlotChanged;
-                Inventory.WeaponEquipped -= OnWeaponEquipped;
-                Inventory.WeaponUnequipped -= OnWeaponUnequipped;
                 if (Inventory.Backpack != null)
                 {
                     Inventory.Backpack.InventoryChanged -= OnInventoryChanged;
@@ -159,8 +139,6 @@ namespace Kuros.Actors.Heroes
             base._Process(delta);
             MaintainSlotAnchorBinding();
             UpdateBoneAttachmentTransform();
-            UpdateEquippedAttackAreaTransform();
-            UpdateAttachmentIcon(); // 每帧检查状态，及时更新图标显示
         }
 
         private void ShowItemIcon(Texture2D? texture)
@@ -209,38 +187,27 @@ namespace Kuros.Actors.Heroes
             UpdateAttachmentIcon();
         }
 
-        private void OnWeaponEquipped(ItemDefinition _)
-        {
-            UpdateAttachmentIcon();
-        }
-
-        private void OnWeaponUnequipped()
-        {
-            UpdateAttachmentIcon();
-        }
-
         private void UpdateAttachmentIcon()
         {
-            // Combat weapon source: special weapon slot > quick bar > backpack.
-            ItemDefinition? activeItem = Inventory?.GetActiveCombatWeaponDefinition();
+            ItemDefinition? activeItem = null;
 
-            // Hitbox 始终根据当前持握物品更新（不受视觉状态影响）
-            // 这样武器的攻击区始终有效，不会被清空而回退到角色自身AttackArea
-            UpdateEquippedAttackArea(activeItem);
-
-            // 获取当前状态名
-            string? currentState = _actor?.StateMachine?.CurrentState?.Name;
-
-            // 只控制视觉显示（是否显示图标），与Hitbox独立
-            // 对于可投掷物(投掷类)：在IdleHolding、RunHolding状态显示
-            // 对于不可投掷物(武器类)：在Idle、Run、Walk、Hit状态显示
-            if (!ShouldShowHoldingItem(currentState))
+            // 优先从 QuickBar 获取选中的物品（左手物品）
+            var stack = Inventory?.GetSelectedQuickBarStack();
+            
+            // 检查是否为空白道具
+            if (stack != null && !stack.IsEmpty && stack.Item.ItemId != "empty_item")
             {
-                ShowItemIcon(null);  // 隐藏视觉，但Hitbox保留
-                return;
+                activeItem = stack.Item;
+            }
+            else
+            {
+                // 如果 QuickBar 没有有效物品，尝试从 Backpack 获取
+                var backpackStack = Inventory?.GetSelectedBackpackStack();
+                activeItem = backpackStack?.Item;
             }
 
-            ShowItemIcon(activeItem?.Icon);  // 显示视觉
+            ShowItemIcon(activeItem?.Icon);
+            UpdateEquippedAttackArea(activeItem);
         }
 
         public Area2D? GetEquippedAttackArea()
@@ -251,38 +218,6 @@ namespace Kuros.Actors.Heroes
             }
 
             return _equippedAttackArea;
-        }
-
-        public bool TryGetEquippedAttackAreaTemplate(out Shape2D? shape, out Transform2D transform, out uint collisionMask)
-        {
-            if (_equippedAttackShapeTemplate == null)
-            {
-                shape = null;
-                transform = Transform2D.Identity;
-                collisionMask = 1u;
-                return false;
-            }
-
-            shape = _equippedAttackShapeTemplate.Duplicate() as Shape2D;
-            transform = _equippedAttackShapeTransform;
-            collisionMask = _equippedAttackCollisionMask;
-            return shape != null;
-        }
-
-        public bool TryGetAttackAnchorGlobalPosition(out Vector2 globalPosition)
-        {
-            var anchorNode = ResolveCurrentSlotAnchorNode() ?? ResolveActiveBoneNode();
-            if (anchorNode == null || !IsInstanceValid(anchorNode))
-            {
-                globalPosition = Vector2.Zero;
-                return false;
-            }
-
-            var anchorTransform = anchorNode.GetGlobalTransform();
-            globalPosition = RotateBoneOffsetWithBone
-                ? anchorTransform * BoneIconOffset
-                : anchorNode.GlobalPosition + BoneIconOffset;
-            return true;
         }
 
         private void ShowOnSpineSlot(Texture2D? texture)
@@ -455,13 +390,13 @@ namespace Kuros.Actors.Heroes
             }
 
             string scenePath = item.ResolveWorldScenePath();
-            if (string.IsNullOrWhiteSpace(scenePath))
+            if (string.IsNullOrWhiteSpace(scenePath) || !scenePath.StartsWith("res://", StringComparison.OrdinalIgnoreCase))
             {
                 ClearEquippedAttackArea();
                 return;
             }
 
-            var scene = ResourceLoader.Load<PackedScene>(scenePath, string.Empty, ResourceLoader.CacheMode.Ignore);
+            var scene = ResourceLoader.Load<PackedScene>(scenePath);
             if (scene == null)
             {
                 ClearEquippedAttackArea();
@@ -476,8 +411,7 @@ namespace Kuros.Actors.Heroes
                 return;
             }
 
-            var sourceArea = instance.GetNodeOrNull<Area2D>("AttackArea")
-                ?? instance.FindChild("AttackArea", recursive: true, owned: false) as Area2D;
+            var sourceArea = FindWeaponAttackArea(instance);
             if (sourceArea == null)
             {
                 instance.QueueFree();
@@ -493,93 +427,23 @@ namespace Kuros.Actors.Heroes
                 return;
             }
 
-            LogSourceAttackArea(item, scenePath, duplicatedArea);
-
             ClearEquippedAttackArea();
             _equippedAttackArea = duplicatedArea;
             _equippedAttackArea.Name = "AttackArea";
             ConfigureEquippedAttackArea(_equippedAttackArea);
-            _equippedAttackAreaLocalTransform = _equippedAttackArea.Transform;
-            CaptureEquippedAttackAreaTemplate(_equippedAttackArea);
             AttachEquippedAttackAreaToIcon();
-            EmitSignal(SignalName.EquippedAttackAreaChanged);
-        }
-
-        private void LogSourceAttackArea(ItemDefinition item, string scenePath, Area2D sourceArea)
-        {
-            CollisionShape2D? collisionShape = sourceArea.GetNodeOrNull<CollisionShape2D>("CollisionShape2D");
-            if (collisionShape == null)
-            {
-                foreach (Node child in sourceArea.GetChildren())
-                {
-                    if (child is CollisionShape2D shape)
-                    {
-                        collisionShape = shape;
-                        break;
-                    }
-                }
-            }
-
-            string shapeType = collisionShape?.Shape?.GetType().Name ?? "None";
-            string shapeInfo = string.Empty;
-            if (collisionShape?.Shape is RectangleShape2D rect)
-            {
-                shapeInfo = $"rectSize={rect.Size}";
-            }
-            else if (collisionShape?.Shape is CapsuleShape2D capsule)
-            {
-                shapeInfo = $"capsule(r={capsule.Radius}, h={capsule.Height})";
-            }
-            else if (collisionShape?.Shape is CircleShape2D circle)
-            {
-                shapeInfo = $"circle(r={circle.Radius})";
-            }
-
-            // GameLogger.Info(nameof(PlayerItemAttachment),
-            //     $"EquipAttackArea item={item.ItemId}, scene={scenePath}, areaTransform={sourceArea.Transform}, shapeTransform={collisionShape?.Transform}, shape={shapeType} {shapeInfo}");
-        }
-
-        private void CaptureEquippedAttackAreaTemplate(Area2D area)
-        {
-            _equippedAttackShapeTemplate = null;
-            _equippedAttackShapeTransform = Transform2D.Identity;
-            _equippedAttackCollisionMask = area.CollisionMask != 0 ? area.CollisionMask : 1u;
-
-            var collisionShape = area.GetNodeOrNull<CollisionShape2D>("CollisionShape2D");
-            if (collisionShape == null)
-            {
-                foreach (Node child in area.GetChildren())
-                {
-                    if (child is CollisionShape2D shape)
-                    {
-                        collisionShape = shape;
-                        break;
-                    }
-                }
-            }
-
-            if (collisionShape?.Shape == null)
-            {
-                return;
-            }
-
-            _equippedAttackShapeTemplate = collisionShape.Shape.Duplicate() as Shape2D;
-            _equippedAttackShapeTransform = area.Transform * collisionShape.Transform;
         }
 
         private void ConfigureEquippedAttackArea(Area2D area)
         {
-            NormalizeAttackAreaGeometry(area);
-
-            area.TopLevel = true;
+            area.TopLevel = false;
             area.Monitoring = true;
-            area.Monitorable = false;
+            // 武器攻击区域需要被敌人的 HitArea 与查询系统检测到。
+            area.Monitorable = true;
             area.CollisionLayer = 0;
-
-            if (_actor is SamplePlayer player && player.AttackArea != null)
-            {
-                area.CollisionMask = player.AttackArea.CollisionMask;
-            }
+            // 允许命中任意层，后续由 IsValidAttackTarget 过滤为敌人，
+            // 避免不同敌人 HitArea/Body 层级不一致导致的 0 hit。
+            area.CollisionMask = uint.MaxValue;
 
             foreach (Node child in area.GetChildren())
             {
@@ -590,98 +454,51 @@ namespace Kuros.Actors.Heroes
             }
         }
 
-        private static void NormalizeAttackAreaGeometry(Area2D area)
+        private static Area2D? FindWeaponAttackArea(Node root)
         {
-            var collisionShape = area.GetNodeOrNull<CollisionShape2D>("CollisionShape2D");
-            if (collisionShape == null)
+            // 优先使用命名规范 AttackArea，其次退化为首个可用 Area2D，降低每把武器的配置门槛。
+            var named = root.GetNodeOrNull<Area2D>("AttackArea")
+                ?? root.FindChild("AttackArea", recursive: true, owned: false) as Area2D;
+            if (named != null)
             {
+                return named;
+            }
+
+            foreach (Node node in root.FindChildren("*", "Area2D", recursive: true, owned: false))
+            {
+                if (node is not Area2D area)
+                {
+                    continue;
+                }
+
+                if (area.GetNodeOrNull<CollisionShape2D>("CollisionShape2D") != null)
+                {
+                    return area;
+                }
+
                 foreach (Node child in area.GetChildren())
                 {
-                    if (child is CollisionShape2D shape)
+                    if (child is CollisionShape2D shape && shape.Shape != null)
                     {
-                        collisionShape = shape;
-                        break;
+                        return area;
                     }
                 }
             }
 
-            if (collisionShape?.Shape == null)
-            {
-                area.Scale = Vector2.One;
-                return;
-            }
-
-            Vector2 areaScale = area.Scale;
-            Vector2 shapeScale = collisionShape.Scale;
-            Vector2 bakedScale = new Vector2(
-                Mathf.Abs(areaScale.X * shapeScale.X),
-                Mathf.Abs(areaScale.Y * shapeScale.Y));
-
-            collisionShape.Shape = DuplicateShapeWithScale(collisionShape.Shape, bakedScale);
-            collisionShape.Position = new Vector2(
-                collisionShape.Position.X * areaScale.X,
-                collisionShape.Position.Y * areaScale.Y);
-            collisionShape.Scale = Vector2.One;
-            area.Scale = Vector2.One;
-        }
-
-        private static Shape2D DuplicateShapeWithScale(Shape2D shape, Vector2 scale)
-        {
-            var duplicated = shape.Duplicate() as Shape2D;
-            if (duplicated == null)
-            {
-                return shape;
-            }
-
-            if (duplicated is RectangleShape2D rect)
-            {
-                rect.Size = new Vector2(rect.Size.X * scale.X, rect.Size.Y * scale.Y);
-                return rect;
-            }
-
-            if (duplicated is CircleShape2D circle)
-            {
-                circle.Radius *= Mathf.Max(scale.X, scale.Y);
-                return circle;
-            }
-
-            if (duplicated is CapsuleShape2D capsule)
-            {
-                capsule.Radius *= scale.X;
-                capsule.Height *= scale.Y;
-                return capsule;
-            }
-
-            return duplicated;
+            return null;
         }
 
         private void AttachEquippedAttackAreaToIcon()
         {
-            if (_equippedAttackArea == null)
+            if (_equippedAttackArea == null || _iconSprite == null)
             {
                 return;
             }
 
-            Node? targetParent = (Node?)_iconSprite ?? _attachmentParent ?? _actor;
-            if (targetParent == null)
+            if (_equippedAttackArea.GetParent() != _iconSprite)
             {
-                GD.PushWarning($"{Name}: 无法找到 AttackArea 的挂载父节点，武器攻击区域将无法生效。");
-                return;
+                _iconSprite.AddChild(_equippedAttackArea);
             }
-
-            if (_equippedAttackArea.GetParent() != targetParent)
-            {
-                if (_equippedAttackArea.GetParent() != null)
-                {
-                    _equippedAttackArea.Reparent(targetParent);
-                }
-                else
-                {
-                    targetParent.AddChild(_equippedAttackArea);
-                }
-            }
-
-            UpdateEquippedAttackAreaTransform();
         }
 
         private void ClearEquippedAttackArea()
@@ -692,53 +509,6 @@ namespace Kuros.Actors.Heroes
             }
 
             _equippedAttackArea = null;
-            _equippedAttackAreaLocalTransform = Transform2D.Identity;
-            _equippedAttackShapeTemplate = null;
-            _equippedAttackShapeTransform = Transform2D.Identity;
-            _equippedAttackCollisionMask = 1u;
-            EmitSignal(SignalName.EquippedAttackAreaChanged);
-        }
-
-        private void UpdateEquippedAttackAreaTransform()
-        {
-            if (_equippedAttackArea == null || !GodotObject.IsInstanceValid(_equippedAttackArea))
-            {
-                return;
-            }
-
-            if (_iconSprite != null && GodotObject.IsInstanceValid(_iconSprite))
-            {
-                Transform2D iconNoScale = RemoveScaleFromTransform(_iconSprite.GlobalTransform);
-                _equippedAttackArea.GlobalTransform = iconNoScale * _equippedAttackAreaLocalTransform;
-            }
-            else
-            {
-                // Fallback: follow attachment parent or actor position
-                var anchor = (_attachmentParent as Node2D) ?? (_actor as Node2D);
-                if (anchor != null)
-                {
-                    _equippedAttackArea.GlobalTransform = anchor.GlobalTransform * _equippedAttackAreaLocalTransform;
-                }
-            }
-        }
-
-        private static Transform2D RemoveScaleFromTransform(Transform2D transform)
-        {
-            Vector2 x = transform.X;
-            Vector2 y = transform.Y;
-
-            float xLen = x.Length();
-            float yLen = y.Length();
-
-            Vector2 xUnit = xLen > 0.0001f ? x / xLen : Vector2.Right;
-            Vector2 yUnit = yLen > 0.0001f ? y / yLen : Vector2.Down;
-
-            return new Transform2D(xUnit, yUnit, transform.Origin);
-        }
-
-        private float GetIconRotationRadians()
-        {
-            return Mathf.DegToRad(IconRotationDegrees);
         }
 
         private Sprite2D CreateIconSprite(string name)
@@ -778,7 +548,6 @@ namespace Kuros.Actors.Heroes
                 _iconUsesBoneTracking = false;
                 _activeBoneNode = null;
                 _iconSprite.Position = IconOffset;
-                _iconSprite.Rotation = GetIconRotationRadians();
                 ApplyFacingFlip(applyForBone: false);
             }
         }
@@ -799,7 +568,7 @@ namespace Kuros.Actors.Heroes
             _iconSprite.GlobalPosition = RotateBoneOffsetWithBone
                 ? boneTransform * BoneIconOffset
                 : _activeBoneNode.GlobalPosition + BoneIconOffset;
-            _iconSprite.GlobalRotation = _activeBoneNode.GlobalRotation + GetIconRotationRadians();
+            _iconSprite.GlobalRotation = _activeBoneNode.GlobalRotation;
 
             var scale = _iconSprite.Scale;
             float absX = MathF.Abs(scale.X);
@@ -807,7 +576,7 @@ namespace Kuros.Actors.Heroes
 
             if (_actor != null && FlipBoneAttachmentWithFacing)
             {
-                scale.X = absX * (_actor.FacingRight ? 1f : -1f);  // 修复：应该是1f，不是2f
+                scale.X = absX * (_actor.FacingRight ? 1f : -1f);
             }
             else
             {
@@ -867,7 +636,7 @@ namespace Kuros.Actors.Heroes
             }
 
             _iconSprite.Position = BoneIconOffset;
-            _iconSprite.Rotation = GetIconRotationRadians();
+            _iconSprite.Rotation = 0f;
 
             var scale = _iconSprite.Scale;
             float absX = MathF.Abs(scale.X);
@@ -924,26 +693,6 @@ namespace Kuros.Actors.Heroes
             }
 
             return GetNodeOrNull(SpineSlotNodePath) ?? _actor?.GetNodeOrNull(SpineSlotNodePath);
-        }
-
-        /// <summary>
-        /// 判断当前状态/动画名是否需要显示持握物品
-        /// </summary>
-        public bool ShouldShowHoldingItem(string? stateOrAnimationName)
-        {
-            if (string.IsNullOrWhiteSpace(stateOrAnimationName))
-            {
-                return false;
-            }
-
-            foreach (var state in ShowHoldingItemStates)
-            {
-                if (string.Equals(state, stateOrAnimationName, StringComparison.OrdinalIgnoreCase))
-                {
-                    return true;
-                }
-            }
-            return false;
         }
     }
 }

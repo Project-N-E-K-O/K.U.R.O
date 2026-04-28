@@ -62,6 +62,7 @@
 [ext_resource type="PackedScene" uid="uid://bbcqflgys8xp2" path="res://scenes/items/Weapon_A1_door2.tscn" id="60_r1vwt"]
 [ext_resource type="PackedScene" uid="uid://0k5p2tny0qe" path="res://scenes/objects/Static_A1_roadsign.tscn" id="61_gpv8d"]
 [ext_resource type="PackedScene" uid="uid://chway4etqkroy" path="res://scenes/objects/Moving_A1_taxi.tscn" id="62_a52n3"]
+[ext_resource type="PackedScene" uid="uid://cgjrdwkemgrcy" path="res://scenes/actors/heroes/P2.tscn" id="63_p2_companion"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_attack"]
 size = Vector2(64.75629, 180.66397)
@@ -117,6 +118,9 @@ motion_mode = 1
 script = ExtResource("1_player")
 AttackArea = NodePath("SpineCharacter/AttackArea")
 Speed = 150.0
+
+[node name="P2" parent="." instance=ExtResource("63_p2_companion")]
+position = Vector2(530, 360)
 
 [node name="Camera2D" type="Camera2D" parent="Player"]
 position = Vector2(-5, -88)

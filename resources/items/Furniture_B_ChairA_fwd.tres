@@ -2,10 +2,10 @@
 
 [ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="1_tmrwn"]
 [ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="2_lw0ym"]
-[ext_resource type="PackedScene" uid="uid://bi7guxtti6ocl" path="res://resources/effects/HeavyCarrySlowEffect.tscn" id="3_iiv30"]
+[ext_resource type="PackedScene" path="res://resources/effects/HeavyCarrySlowEffect.tscn" id="3_iiv30"]
 [ext_resource type="PackedScene" uid="uid://ciwlpetibguab" path="res://shaders/destroy_somke.tscn" id="4_mwwhu"]
 [ext_resource type="PackedScene" uid="uid://cmh3bnabinwi0" path="res://resources/effects/CameraShakeEffect.tscn" id="5_ij3oc"]
-[ext_resource type="Texture2D" uid="uid://ba11fgricl2ku" path="res://assets/furnitures/hotel_scene2/ChairA_fwd.png" id="6_tmrwn"]
+[ext_resource type="Texture2D" uid="uid://m3kt5lsy48ol" path="res://assets/furnitures/hotel_scene2/ChairA_fwd.png" id="6_tmrwn"]
 [ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="7_82umy"]
 
 [sub_resource type="Resource" id="Resource_6f3qv"]

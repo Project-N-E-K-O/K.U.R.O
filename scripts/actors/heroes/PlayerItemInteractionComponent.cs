@@ -1,8 +1,14 @@
 using System;
+using System.Linq;
 using Godot;
 using Kuros.Core;
+using Kuros.Items;
+using Kuros.Items.Effects;
+using Kuros.Items.Tags;
 using Kuros.Items.World;
+using Kuros.Managers;
 using Kuros.Systems.Inventory;
+using Kuros.UI;
 using Kuros.Utils;
 
 namespace Kuros.Actors.Heroes
@@ -416,10 +422,88 @@ namespace Kuros.Actors.Heroes
         {
             if (InventoryComponent == null)
             {
+                GD.PrintErr("[TryUseSelectedItem] InventoryComponent is null");
                 return false;
             }
 
+            // 满生命值时拦截纯治疗物品的使用
+            if (_actor != null && _actor.MaxHealth > 0 && _actor.CurrentHealth >= _actor.MaxHealth)
+            {
+                var candidate = GetSelectedFoodStack();
+                if (candidate != null)
+                {
+                    bool healOnly = IsHealOnlyOnConsume(candidate.Item);
+
+                    if (healOnly)
+                    {
+                        var hud = UIManager.Instance?.GetUI<BattleHUD>("BattleHUD");
+
+                        hud?.ShowStatusMessage("当前HP已满");
+                        return false;
+                    }
+                }
+            }
+
             return InventoryComponent.TryConsumeSelectedItem(_actor);
+        }
+
+        /// <summary>
+        /// 返回将被 TryConsumeSelectedItem 首先尝试消耗的 Food 物品栏（模拟其查找顺序）。
+        /// </summary>
+        private InventoryItemStack? GetSelectedFoodStack()
+        {
+            var qb = InventoryComponent?.QuickBar;
+            if (qb != null)
+            {
+                var slot = InventoryComponent!.SelectedQuickBarSlot;
+                if (slot >= 0 && slot < qb.Slots.Count)
+                {
+                    var stack = qb.GetStack(slot);
+                    if (stack != null && !stack.IsEmpty && stack.HasTag(ItemTagIds.Food))
+                        return stack;
+                }
+            }
+
+            var bp = InventoryComponent?.Backpack;
+            if (bp != null)
+            {
+                var slot = InventoryComponent!.SelectedBackpackSlot;
+                if (slot >= 0 && slot < bp.Slots.Count)
+                {
+                    var stack = bp.GetStack(slot);
+                    if (stack != null && !stack.IsEmpty && stack.HasTag(ItemTagIds.Food))
+                        return stack;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// 判断一个物品的所有 OnConsume 效果是否均为纯血量恢复（RestoreHealthEffect / RestoreFullHealthEffect）。
+        /// 含 IncreaseMaxHealthEffect 等永久增益效果的物品不视为纯治疗，不会被拦截。
+        /// </summary>
+        private static bool IsHealOnlyOnConsume(ItemDefinition? item)
+        {
+            if (item == null) return false;
+
+            bool foundHeal = false;
+            foreach (var entry in item.GetEffectEntries(ItemEffectTrigger.OnConsume))
+            {
+                if (entry.EffectScene == null) continue;
+                var path = entry.EffectScene.ResourcePath;
+                if (path.Contains("RestoreHealthEffect") || path.Contains("RestoreFullHealthEffect"))
+                {
+                    foundHeal = true;
+                }
+                else
+                {
+                    // 存在非治疗效果 → 物品不属于纯治疗，不拦截
+                    return false;
+                }
+            }
+
+            return foundHeal;
         }
 
         private Vector2 ComputeSpawnPosition(DropDisposition disposition)

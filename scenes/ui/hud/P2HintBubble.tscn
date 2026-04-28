@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/companions/P2HintBubble.cs" id="1_p2hint_script"]
+
+[node name="P2HintBubble" type="Node2D"]
+script = ExtResource("1_p2hint_script")

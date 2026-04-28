@@ -1,0 +1,20 @@
+[gd_scene load_steps=4 format=3 uid="uid://d85u4f9rgsva8"]
+
+[ext_resource type="PackedScene" uid="uid://cc2pf30u5p0j" path="res://scenes/items/world/RigidBodyWorldItem.tscn" id="1_r7f2v"]
+[ext_resource type="Script" uid="uid://dbf6zr6u7awg5" path="res://scripts/items/world/GravityGrenade.cs" id="2_i7t3v"]
+[ext_resource type="Texture2D" uid="uid://ccblah" path="res://assets/objects/grenade_gravity.png" id="3_dwp2c"]
+
+[node name="GravityGrenade" instance=ExtResource("1_r7f2v")]
+
+[node name="Rigidbody2D" parent="." index="0"]
+mass = 0.5
+
+[node name="Sprite2D" parent="." index="1"]
+texture = ExtResource("3_dwp2c")
+scale = Vector2(0.8, 0.8)
+
+[node name="GravityGrenade" type="Node2D" parent="." index="4"]
+script = ExtResource("2_i7t3v")
+
+[node name="GravityGrenade" parent="GravityGrenade" index="0"]
+black_hole_scene_path = "res://shaders/black_hole.tscn"

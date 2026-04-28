@@ -8,47 +8,17 @@ using Kuros.Actors.Heroes;
 using Kuros.Systems.Inventory;
 using Kuros.Items;
 using Kuros.Managers;
-using Kuros.Systems.AI;
 using Kuros.UI;
 using Kuros.Utils;
 
 public partial class SamplePlayer : GameActor, IPlayerStatsSource
-{	
-	[ExportCategory("Debug")]
-	[Export] public bool EnableStateDebugOverlay = false;
-	[Export] public Vector2 DebugOverlayOffset = new(-90f, -90f);
-	[Export(PropertyHint.Range, "8,128,1")] public int DebugOverlayFontSize = 14;
-	[Export] public Color DebugOverlayColor = new(1f, 0.95f, 0.2f, 1f);
-	
+{
 	[ExportCategory("Combat")]
 	[Export] public Area2D AttackArea { get; private set; } = null!;
 	[Export] public Area2D? HitArea { get; private set; }
-	[Export] public bool SyncMainAttackAreaWithEquippedWeaponArea { get; set; } = true;
-	[Export] public bool FollowSyncedAttackAreaWithAttackBoneMotion { get; set; } = true;
-	[Export] public NodePath AttackMotionBonePath { get; set; } = new("SpineSprite/SpineBoneNode");
 	private CollisionShape2D? _attackCollisionShape;
 	private Area2D? _cachedAttackAreaOwner;
-	private CollisionShape2D? _mainAttackCollisionShape;
-	private Vector2 _defaultAttackShapePosition;
-	private float _defaultAttackShapeRotation;
-	private Vector2 _defaultAttackShapeScale;
-	private Shape2D? _defaultAttackShape;
-	private Vector2 _currentAttackShapeBasePosition;
-	private float _currentAttackShapeBaseRotation;
-	private Vector2 _currentAttackAreaBaseScale = Vector2.One;
-	private Vector2 _attackAnchorRestLocalPosition;
-	private Vector2 _currentAttackAnchorMotionOffset = Vector2.Zero;
-	private Node2D? _attackMotionBoneNode;
-	private PlayerItemAttachment? _itemAttachment;
-	private AiDecisionBridge? _aiDecisionBridge;
-	private AiDecisionExecutor? _aiDecisionExecutor;
 	private readonly Godot.Collections.Array<Rid> _attackQueryExclude = new();
-	private Vector2 _aiMovementInput = Vector2.Zero;
-	private bool _aiRunPressed;
-	private bool _aiAttackQueued;
-	private bool _aiPickupQueued;
-	private bool _aiMoveLeftQueued;
-	private bool _aiMoveRightQueued;
 	public PlayerFrozenState? FrozenState { get; private set; }
 	public PlayerInventoryComponent? InventoryComponent { get; private set; }
 	public InventoryContainer? Backpack => InventoryComponent?.Backpack;
@@ -56,9 +26,7 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 	
 	[ExportCategory("UI")]
 	[Export] public Label StatsLabel { get; private set; } = null!; // Drag & Drop in Editor
-	[ExportCategory("AI")]
-	[Export] public Key AiAutopilotToggleKey { get; set; } = Key.F6;
-
+	
 	[ExportCategory("Equipment")]
 	/// <summary>
 	/// 左手附件點的節點路徑（可在編輯器中設置）
@@ -89,7 +57,7 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 	public ItemDefinition? LeftHandItem { get; private set; }
 	
 	/// <summary>
-	/// 当前左手物品对应的快捷栏槽位索引（0-4，对应数字键1-5）
+	/// 当前左手物品对应的快捷栏槽位索引（1-4，对应数字键2-5）
 	/// -1 表示未装备任何物品
 	/// </summary>
 	public int LeftHandSlotIndex { get; private set; } = -1;
@@ -97,8 +65,14 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 	private int _score = 0;
 	private int _gold = 0; // 金币数量
 	private string _pendingAttackSourceState = string.Empty;
-	private string _debugOverlayText = string.Empty;
+	private Vector2 _aiMovementInput = Vector2.Zero;
+	private bool _aiRunPressed;
+	private bool _aiAttackQueued;
+	private bool _aiPickupQueued;
+	private bool _aiMoveLeftQueued;
+	private bool _aiMoveRightQueued;
 	public string LastMovementStateName { get; private set; } = "Idle";
+	public bool AiInputOverrideEnabled { get; private set; }
 	
 	// IPlayerStatsSource interface implementation
 	public event Action<int, int, int>? StatsUpdated;
@@ -118,9 +92,6 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 	// Signal for UI updates (Alternative to direct reference)
 	[Signal] public delegate void StatsChangedEventHandler(int health, int score);
 	[Signal] public delegate void GoldChangedEventHandler(int gold);
-	[Signal] public delegate void AiInputOverrideChangedEventHandler(bool enabled);
-
-	public bool AiInputOverrideEnabled { get; private set; }
 
 	public override void _Ready()
 	{
@@ -134,22 +105,6 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 		if (StatsLabel == null) StatsLabel = GetNodeOrNull<Label>("../UI/PlayerStats");
 		if (InventoryComponent == null) InventoryComponent = GetNodeOrNull<PlayerInventoryComponent>("Inventory");
 		if (WeaponSkillController == null) WeaponSkillController = GetNodeOrNull<PlayerWeaponSkillController>("WeaponSkillController");
-		_itemAttachment = GetNodeOrNull<PlayerItemAttachment>("ItemAttachment");
-		_aiDecisionBridge = GetNodeOrNull<AiDecisionBridge>("AiDecisionBridge");
-		_aiDecisionExecutor = GetNodeOrNull<AiDecisionExecutor>("AiDecisionExecutor");
-		if (_itemAttachment != null)
-		{
-			var callable = new Callable(this, MethodName.OnEquippedAttackAreaChanged);
-			if (!_itemAttachment.IsConnected(PlayerItemAttachment.SignalName.EquippedAttackAreaChanged, callable))
-			{
-				_itemAttachment.EquippedAttackAreaChanged += OnEquippedAttackAreaChanged;
-			}
-		}
-
-		ResolveAttackMotionBoneNode();
-
-		CacheMainAttackAreaDefaults();
-		CallDeferred(MethodName.OnEquippedAttackAreaChanged);
 		
 		// 连接快捷栏变化信号，确保左手物品与选中槽位严格对应
 		ConnectQuickBarSignals();
@@ -160,277 +115,12 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 		CallDeferred(MethodName.ApplyUnarmedSkillIfEmpty);
 		
 		UpdateStatsUI();
-		UpdateDebugOverlayText();
-		QueueRedraw();
-	}
-
-	public override void _Process(double delta)
-	{
-		base._Process(delta);
-		UpdateSyncedAttackAreaAttackBoneMotion();
-		if (!EnableStateDebugOverlay) return;
-
-		UpdateDebugOverlayText();
-		QueueRedraw();
-	}
-
-	public override void _Draw()
-	{
-		base._Draw();
-		if (!EnableStateDebugOverlay) return;
-
-		var font = ThemeDB.FallbackFont;
-		if (font == null) return;
-
-		DrawString(font, DebugOverlayOffset, _debugOverlayText, HorizontalAlignment.Left, -1f, DebugOverlayFontSize, DebugOverlayColor);
-	}
-
-	public override void _ExitTree()
-	{
-		if (_itemAttachment != null)
-		{
-			var callable = new Callable(this, MethodName.OnEquippedAttackAreaChanged);
-			if (_itemAttachment.IsConnected(PlayerItemAttachment.SignalName.EquippedAttackAreaChanged, callable))
-			{
-				_itemAttachment.EquippedAttackAreaChanged -= OnEquippedAttackAreaChanged;
-			}
-		}
-
-		base._ExitTree();
-	}
-
-	private void CacheMainAttackAreaDefaults()
-	{
-		if (AttackArea == null)
-		{
-			return;
-		}
-
-		_mainAttackCollisionShape = AttackArea.GetNodeOrNull<CollisionShape2D>("CollisionShape2D");
-		if (_mainAttackCollisionShape == null)
-		{
-			foreach (Node child in AttackArea.GetChildren())
-			{
-				if (child is CollisionShape2D shape)
-				{
-					_mainAttackCollisionShape = shape;
-					break;
-				}
-			}
-		}
-
-		if (_mainAttackCollisionShape == null)
-		{
-			return;
-		}
-
-		_defaultAttackShapePosition = _mainAttackCollisionShape.Position;
-		_defaultAttackShapeRotation = _mainAttackCollisionShape.Rotation;
-		_defaultAttackShapeScale = _mainAttackCollisionShape.Scale;
-		_defaultAttackShape = _mainAttackCollisionShape.Shape?.Duplicate() as Shape2D;
-		_currentAttackShapeBasePosition = _defaultAttackShapePosition;
-		_currentAttackShapeBaseRotation = _defaultAttackShapeRotation;
-		_currentAttackAreaBaseScale = AttackArea.Scale;
-		_attackAnchorRestLocalPosition = Vector2.Zero;
-		_currentAttackAnchorMotionOffset = Vector2.Zero;
-	}
-
-	private void OnEquippedAttackAreaChanged()
-	{
-		if (!SyncMainAttackAreaWithEquippedWeaponArea || AttackArea == null)
-		{
-			return;
-		}
-
-		_mainAttackCollisionShape ??= AttackArea.GetNodeOrNull<CollisionShape2D>("CollisionShape2D");
-		if (_mainAttackCollisionShape == null)
-		{
-			return;
-		}
-
-		if (_itemAttachment == null)
-		{
-			RestoreDefaultMainAttackArea();
-			return;
-		}
-
-		if (!_itemAttachment.TryGetEquippedAttackAreaTemplate(out var templateShape, out var templateTransform, out var templateMask) || templateShape == null)
-		{
-			RestoreDefaultMainAttackArea();
-			return;
-		}
-
-		AttackArea.Monitoring = true;
-		AttackArea.Monitorable = false;
-		if (templateMask != 0)
-		{
-			AttackArea.CollisionMask = templateMask;
-		}
-		AttackArea.CollisionLayer = 0;
-
-		Vector2 parentScale = GetGlobalScaleFromTransform(AttackArea.GlobalTransform);
-		Vector2 templateScale = GetGlobalScaleFromTransform(templateTransform);
-		Vector2 bakedScale = new Vector2(
-			templateScale.X / Mathf.Max(0.0001f, parentScale.X),
-			templateScale.Y / Mathf.Max(0.0001f, parentScale.Y));
-		Shape2D syncedShape = DuplicateShapeWithBakedScale(templateShape, bakedScale);
-
-		// The weapon scene's local transform is relative to its own root/icon setup,
-		// not the player root. Only copy the shape size here and keep the player's
-		// default hitbox anchor so the attack area remains in front of the character.
-		_currentAttackShapeBasePosition = ComputeForwardAnchoredAttackShapePosition(syncedShape);
-		_currentAttackShapeBaseRotation = _defaultAttackShapeRotation;
-		_currentAttackAreaBaseScale = new Vector2(Mathf.Abs(AttackArea.Scale.X), Mathf.Abs(AttackArea.Scale.Y));
-		AttackArea.Scale = _currentAttackAreaBaseScale;
-		_mainAttackCollisionShape.Scale = Vector2.One;
-		_mainAttackCollisionShape.Shape = syncedShape;
-		RefreshAttackAnchorTracking(resetOffset: true);
-		ApplyAttackAreaFacingTransform(FacingRight);
-	}
-
-	private void RestoreDefaultMainAttackArea()
-	{
-		if (_mainAttackCollisionShape == null)
-		{
-			return;
-		}
-
-		_mainAttackCollisionShape.Position = _defaultAttackShapePosition;
-		_mainAttackCollisionShape.Rotation = _defaultAttackShapeRotation;
-		_mainAttackCollisionShape.Scale = _defaultAttackShapeScale;
-		if (_defaultAttackShape != null)
-		{
-			_mainAttackCollisionShape.Shape = _defaultAttackShape.Duplicate() as Shape2D;
-		}
-
-		_currentAttackShapeBasePosition = _defaultAttackShapePosition;
-		_currentAttackShapeBaseRotation = _defaultAttackShapeRotation;
-		_currentAttackAreaBaseScale = AttackArea != null
-			? new Vector2(Mathf.Abs(AttackArea.Scale.X), Mathf.Abs(AttackArea.Scale.Y))
-			: Vector2.One;
-		RefreshAttackAnchorTracking(resetOffset: true);
-		ApplyAttackAreaFacingTransform(FacingRight);
-	}
-
-	private void RefreshAttackAnchorTracking(bool resetOffset)
-	{
-		if (resetOffset)
-		{
-			_currentAttackAnchorMotionOffset = Vector2.Zero;
-		}
-
-		if (!TryGetCurrentAttackAnchorLocalPosition(out var localPosition))
-		{
-			_attackAnchorRestLocalPosition = Vector2.Zero;
-			return;
-		}
-
-		_attackAnchorRestLocalPosition = localPosition;
-	}
-
-	private void UpdateSyncedAttackAreaAttackBoneMotion()
-	{
-		if (!SyncMainAttackAreaWithEquippedWeaponArea || !FollowSyncedAttackAreaWithAttackBoneMotion)
-		{
-			return;
-		}
-
-		if (AttackArea == null || _mainAttackCollisionShape == null)
-		{
-			return;
-		}
-
-		if (!TryGetCurrentAttackAnchorLocalPosition(out var localPosition))
-		{
-			if (_currentAttackAnchorMotionOffset != Vector2.Zero)
-			{
-				_currentAttackAnchorMotionOffset = Vector2.Zero;
-				ApplyAttackAreaFacingTransform(FacingRight);
-			}
-			return;
-		}
-
-		Vector2 newOffset = localPosition - _attackAnchorRestLocalPosition;
-		if (newOffset.IsEqualApprox(_currentAttackAnchorMotionOffset))
-		{
-			return;
-		}
-
-		_currentAttackAnchorMotionOffset = newOffset;
-		ApplyAttackAreaFacingTransform(FacingRight);
-	}
-
-	private bool TryGetCurrentAttackAnchorLocalPosition(out Vector2 localPosition)
-	{
-		if (_itemAttachment != null && _itemAttachment.TryGetAttackAnchorGlobalPosition(out var globalPosition))
-		{
-			localPosition = ToLocal(globalPosition);
-			return true;
-		}
-
-		ResolveAttackMotionBoneNode();
-		if (_attackMotionBoneNode != null && IsInstanceValid(_attackMotionBoneNode))
-		{
-			localPosition = ToLocal(_attackMotionBoneNode.GlobalPosition);
-			return true;
-		}
-
-		localPosition = Vector2.Zero;
-		return false;
-	}
-
-	private void ResolveAttackMotionBoneNode()
-	{
-		if (_attackMotionBoneNode != null && IsInstanceValid(_attackMotionBoneNode))
-		{
-			return;
-		}
-
-		if (AttackMotionBonePath != null && !AttackMotionBonePath.IsEmpty)
-		{
-			_attackMotionBoneNode = GetNodeOrNull<Node2D>(AttackMotionBonePath);
-			if (_attackMotionBoneNode != null)
-			{
-				return;
-			}
-
-			_attackMotionBoneNode = GetNodeOrNull<Node2D>($"../{AttackMotionBonePath}");
-			if (_attackMotionBoneNode != null)
-			{
-				return;
-			}
-		}
-
-		_attackMotionBoneNode = GetNodeOrNull<Node2D>("SpineSprite/SpineBoneNode")
-			?? FindChild("SpineBoneNode", recursive: true, owned: false) as Node2D;
-	}
-
-	private void ApplyAttackAreaFacingTransform(bool faceRight)
-	{
-		if (AttackArea == null || _mainAttackCollisionShape == null)
-		{
-			return;
-		}
-
-		AttackArea.Scale = new Vector2(
-			Mathf.Abs(_currentAttackAreaBaseScale.X),
-			Mathf.Abs(_currentAttackAreaBaseScale.Y));
-
-		Vector2 basePosition = _currentAttackShapeBasePosition;
-		Vector2 facingPosition = new Vector2(
-			faceRight ? Mathf.Abs(basePosition.X) : -Mathf.Abs(basePosition.X),
-			basePosition.Y);
-		_mainAttackCollisionShape.Position = facingPosition + _currentAttackAnchorMotionOffset;
-
-		_mainAttackCollisionShape.Rotation = faceRight
-			? _currentAttackShapeBaseRotation
-			: -_currentAttackShapeBaseRotation;
 	}
 
 	private void ApplyUnarmedSkillIfEmpty()
 	{
 		if (InventoryComponent == null) return;
-		if (InventoryComponent.GetActiveCombatWeaponDefinition() == null)
+		if (InventoryComponent.GetSelectedBackpackStack() == null)
 		{
 			WeaponSkillController?.ApplyUnarmedFallback();
 		}
@@ -438,44 +128,19 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 	
 	public override void _UnhandledInput(InputEvent @event)
 	{
-		// 处理数字键 1-5 切换快捷栏物品（对应快捷栏槽位 0-4）
+		if (AiInputOverrideEnabled)
+		{
+			GetViewport().SetInputAsHandled();
+			return;
+		}
+
+		// 处理数字键 2、3、4、5 切换快捷栏物品（对应快捷栏槽位 1、2、3、4）
 		if (@event is InputEventKey keyEvent && keyEvent.Pressed)
 		{
-			if (keyEvent.Keycode == AiAutopilotToggleKey)
-			{
-				_aiDecisionExecutor ??= GetNodeOrNull<AiDecisionExecutor>("AiDecisionExecutor");
-				if (_aiDecisionExecutor != null)
-				{
-					_aiDecisionExecutor.SetAutopilotEnabled(!_aiDecisionExecutor.AutoPilotEnabled);
-					GameLogger.Info(nameof(SamplePlayer), $"AI autopilot toggled: {(_aiDecisionExecutor.AutoPilotEnabled ? "ON" : "OFF")}");
-				}
-
-				GetViewport().SetInputAsHandled();
-				return;
-			}
-
-			bool isPipeHotkey = keyEvent.Keycode == Key.Backslash || keyEvent.Unicode == '|';
-			if (isPipeHotkey)
-			{
-				_ = RequestAiDecisionTestAsync();
-				GetViewport().SetInputAsHandled();
-				return;
-			}
-
-			if (_aiDecisionExecutor?.AutoPilotEnabled == true)
-			{
-				GetViewport().SetInputAsHandled();
-				return;
-			}
-
 			int? slotIndex = null;
 			
-			// 数字键 1-5 对应快捷栏槽位 0-4
-			if (keyEvent.Keycode == Key.Key1)
-			{
-				slotIndex = 0; // 快捷栏槽位1
-			}
-			else if (keyEvent.Keycode == Key.Key2)
+			// 数字键 2-5 对应快捷栏槽位 1-4（索引从0开始，但槽位0是小木剑）
+			if (keyEvent.Keycode == Key.Key2)
 			{
 				slotIndex = 1; // 快捷栏槽位2
 			}
@@ -501,12 +166,6 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 
 		if (@event.IsActionPressed("weapon_skill_block"))
 		{
-			if (_aiDecisionExecutor?.AutoPilotEnabled == true)
-			{
-				GetViewport().SetInputAsHandled();
-				return;
-			}
-
 			if (WeaponSkillController?.TryTriggerActionSkill("weapon_skill_block") == true)
 			{
 				GetViewport().SetInputAsHandled();
@@ -529,8 +188,6 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 		{
 			ClearAiControlCommands();
 		}
-
-		EmitSignal(SignalName.AiInputOverrideChanged, enabled);
 	}
 
 	public void SetAiDesiredMovement(Vector2 movementInput, bool runPressed)
@@ -617,55 +274,17 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 		flag = false;
 		return true;
 	}
-
-	private async System.Threading.Tasks.Task RequestAiDecisionTestAsync()
-	{
-		_aiDecisionBridge ??= GetNodeOrNull<AiDecisionBridge>("AiDecisionBridge");
-		if (_aiDecisionBridge == null)
-		{
-			GameLogger.Warn(nameof(SamplePlayer), "AI test skipped: AiDecisionBridge node not found.");
-			return;
-		}
-
-		if (_aiDecisionBridge.RequestInFlight)
-		{
-			GameLogger.Info(nameof(SamplePlayer), "AI test skipped: request already in flight.");
-			return;
-		}
-
-		GameLogger.Info(nameof(SamplePlayer), "AI test request started (|). ");
-		var result = await _aiDecisionBridge.RequestDecisionAsync("根据当前游戏状态给出下一步行动建议，严格返回 JSON，字段为 intent, target, urgency, duration_seconds, reason。");
-		if (result.Success)
-		{
-			string text = result.ResponseText ?? string.Empty;
-			if (text.Length > 800)
-			{
-				text = text.Substring(0, 800) + "...<truncated>";
-			}
-			GameLogger.Info(nameof(SamplePlayer), $"AI test response(done_reason={result.DoneReason}, used_thinking_fallback={result.UsedThinkingFallback}): {text}");
-		}
-		else
-		{
-			GameLogger.Error(nameof(SamplePlayer), $"AI test failed: {result.ErrorMessage}");
-		}
-	}
 	
 	/// <summary>
 	/// 切换到指定快捷栏槽位的物品
 	/// 严格绑定：LeftHandSlotIndex 和 LeftHandItem 必须严格对应
 	/// 同時同步 PlayerInventoryComponent.SelectedQuickBarSlot
 	/// </summary>
-	/// <param name="slotIndex">快捷栏槽位索引（0-4，对应数字键1-5）</param>
+	/// <param name="slotIndex">快捷栏槽位索引（1-4，对应数字键2-5）</param>
 	private void SwitchToQuickBarSlot(int slotIndex)
 	{
-		// 验证槽位索引范围（0-4）
-		if (slotIndex < 0 || slotIndex > 4)
-		{
-			return;
-		}
-
-		// 家具槽有物品时禁止切换快捷栏槽位
-		if (InventoryComponent?.HasFurnitureItem == true)
+		// 验证槽位索引范围（1-4，跳过索引0的小木剑）
+		if (slotIndex < 1 || slotIndex > 4)
 		{
 			return;
 		}
@@ -706,14 +325,7 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 	/// </summary>
 	public void SyncLeftHandItemFromSlot()
 	{
-		// 家具槽优先：当家具槽有物品时，始终使用家具槽的物品
-		if (InventoryComponent?.HasFurnitureItem == true)
-		{
-			LeftHandItem = InventoryComponent.FurnitureSlotStack!.Item;
-			return;
-		}
-
-		if (LeftHandSlotIndex < 0 || LeftHandSlotIndex > 4)
+		if (LeftHandSlotIndex < 1 || LeftHandSlotIndex > 4)
 		{
 			// 如果槽位索引无效，清除左手物品
 			LeftHandItem = null;
@@ -760,20 +372,11 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 	private void OnQuickBarInventoryChanged()
 	{
 		// 如果当前有选中的槽位，同步更新左手物品
-		if (LeftHandSlotIndex >= 0 && LeftHandSlotIndex <= 4)
+		if (LeftHandSlotIndex >= 1 && LeftHandSlotIndex <= 4)
 		{
 			SyncLeftHandItemFromSlot();
 			UpdateHandItemVisual();
 		}
-	}
-
-	/// <summary>
-	/// 家具槽变化时的回调：同步更新左手物品
-	/// </summary>
-	private void OnFurnitureSlotChanged()
-	{
-		SyncLeftHandItemFromSlot();
-		UpdateHandItemVisual();
 	}
 	
 	/// <summary>
@@ -887,17 +490,23 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 		
 		if (battleHUD != null)
 		{
-			battleHUD.CallDeferred(BattleHUD.MethodName.UpdateHandSlotHighlight, LeftHandSlotIndex, -1);
+			battleHUD.CallDeferred(BattleHUD.MethodName.UpdateHandSlotHighlight, LeftHandSlotIndex, 0);
 		}
 	}
 	
 	/// <summary>
-	/// 初始化左手选择：不自动选中任何槽位，避免未按键时出现默认高亮
-	/// 仅当已有有效槽位时做同步
+	/// 初始化左手选择：默认选中快捷栏2（索引1）
+	/// 只在还没有选中任何槽位时才初始化，避免覆盖用户的选择
 	/// </summary>
 	public void InitializeLeftHandSelection()
 	{
-		if (LeftHandSlotIndex >= 0 && LeftHandSlotIndex <= 4)
+		// 如果还没有选中任何槽位，默认选中快捷栏2（索引1）
+		// 重要：只在 LeftHandSlotIndex 无效时才初始化，避免覆盖用户已选择的其他快捷栏
+		if (LeftHandSlotIndex < 1 || LeftHandSlotIndex > 4)
+		{
+			SwitchToQuickBarSlot(1);
+		}
+		else
 		{
 			// 即使已经选中，也要确保同步
 			if (InventoryComponent != null)
@@ -906,12 +515,6 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 			}
 			SyncLeftHandItemFromSlot();
 			UpdateHandItemVisual();
-			UpdateBattleHUDHandHighlight();
-		}
-		else
-		{
-			// 无有效选择时保持未选中状态，不触发默认高亮。
-			LeftHandItem = null;
 		}
 	}
 	
@@ -936,7 +539,7 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 			itemAttachment?.SubscribeToQuickBar();
 			
 			// 如果当前有选中的槽位，同步一次左手物品（可能是在 QuickBar 可用之前设置的）
-			if (LeftHandSlotIndex >= 0 && LeftHandSlotIndex <= 4)
+			if (LeftHandSlotIndex >= 1 && LeftHandSlotIndex <= 4)
 			{
 				// 同步 SelectedQuickBarSlot
 				InventoryComponent.SelectedQuickBarSlot = LeftHandSlotIndex;
@@ -945,13 +548,6 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 				UpdateHandItemVisual();
 				UpdateBattleHUDHandHighlight();
 			}
-		}
-
-		// 订阅家具槽变化事件
-		if (InventoryComponent != null)
-		{
-			InventoryComponent.FurnitureSlotChanged -= OnFurnitureSlotChanged;
-			InventoryComponent.FurnitureSlotChanged += OnFurnitureSlotChanged;
 		}
 	}
 	
@@ -997,8 +593,14 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 			 // Check if AttackArea parent is NOT the flipped visual (to avoid double flipping)
 			 if (AttackArea.GetParent() != _spineCharacter && AttackArea.GetParent() != _sprite)
 			 {
-				 RefreshAttackAnchorTracking(resetOffset: true);
-				 ApplyAttackAreaFacingTransform(faceRight);
+				 var areaPos = AttackArea.Position;
+				 float absX = Mathf.Abs(areaPos.X);
+				 AttackArea.Position = new Vector2(faceRight ? absX : -absX, areaPos.Y);
+				 
+				 // Optional: Flip scale too if the shape is asymmetric
+				 var areaScale = AttackArea.Scale;
+				 float absScaleX = Mathf.Abs(areaScale.X);
+				 AttackArea.Scale = new Vector2(faceRight ? absScaleX : -absScaleX, areaScale.Y);
 			 }
 		}
 	}
@@ -1016,7 +618,6 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 		}
 
 		GameLogger.Info(nameof(SamplePlayer), $"AttackArea Source: {areaSource}, Node: {activeAttackArea.GetPath()}");
-		GameLogger.Info(nameof(SamplePlayer), $"AttackArea Detail: {DescribeAttackArea(activeAttackArea)}");
 
 		int hitCount = ApplyDamageWithArea(AttackDamage, (target, isFallback) =>
 		{
@@ -1040,12 +641,6 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 
 		int hitCount = ApplyDamageWithSpecificArea(activeAttackArea, damageAmount, onHit);
 		GameLogger.Info(nameof(SamplePlayer), $"AttackArea hit test: {activeAttackArea.GetPath()} -> {hitCount} hit(s)");
-		if (hitCount == 0 && AttackArea != null && activeAttackArea != AttackArea)
-		{
-			GameLogger.Info(nameof(SamplePlayer), $"WeaponArea produced 0 hit(s), fallback to PlayerArea: {AttackArea.GetPath()}");
-			hitCount = ApplyDamageWithSpecificArea(AttackArea, damageAmount, onHit);
-			GameLogger.Info(nameof(SamplePlayer), $"PlayerArea fallback hit test: {AttackArea.GetPath()} -> {hitCount} hit(s)");
-		}
 
 		return hitCount;
 	}
@@ -1063,21 +658,11 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 			return null;
 		}
 
-		// When sync mode is enabled, the player's own AttackArea is the single
-		// authoritative hitbox. Do not fall back to the attached weapon Area2D,
-		// because that node follows icon/bone transforms and can inherit unwanted
-		// rotation even though the synced player hitbox should only react to facing.
-		if (SyncMainAttackAreaWithEquippedWeaponArea)
-		{
-			areaSource = "PlayerAreaSynced";
-			return AttackArea;
-		}
-
 		var itemAttachment = GetNodeOrNull<PlayerItemAttachment>("ItemAttachment");
 		var attachedWeaponArea = itemAttachment?.GetEquippedAttackArea();
 		if (IsAttackAreaUsable(attachedWeaponArea))
 		{
-			areaSource = "WeaponAreaAttached";
+			areaSource = "WeaponArea";
 			return attachedWeaponArea;
 		}
 
@@ -1102,30 +687,6 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 		return AttackArea;
 	}
 
-	private static string DescribeAttackArea(Area2D area)
-	{
-		var shapeNode = area.GetNodeOrNull<CollisionShape2D>("CollisionShape2D");
-		if (shapeNode == null)
-		{
-			foreach (Node child in area.GetChildren())
-			{
-				if (child is CollisionShape2D shape)
-				{
-					shapeNode = shape;
-					break;
-				}
-			}
-		}
-
-		string shapeName = shapeNode?.Shape?.GetType().Name ?? "None";
-		Vector2 pos = shapeNode?.GlobalPosition ?? area.GlobalPosition;
-		float rot = shapeNode?.GlobalRotationDegrees ?? area.GlobalRotationDegrees;
-		Vector2 scale = shapeNode?.GlobalScale ?? area.GlobalScale;
-		int overlapAreas = area.GetOverlappingAreas().Count;
-		int overlapBodies = area.GetOverlappingBodies().Count;
-		return $"shape={shapeName}, globalPos={pos}, rot={rot:F2}, scale={scale}, layer={area.CollisionLayer}, mask={area.CollisionMask}, overlaps(area={overlapAreas}, body={overlapBodies})";
-	}
-
 	private Area2D? FindUsableWeaponAttackArea(Node subtreeRoot)
 	{
 		if (subtreeRoot is Area2D rootArea && rootArea != AttackArea && IsAttackAreaUsable(rootArea))
@@ -1136,11 +697,6 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 		foreach (Node node in subtreeRoot.FindChildren("*", "Area2D", recursive: true, owned: false))
 		{
 			if (node is not Area2D area || area == AttackArea)
-			{
-				continue;
-			}
-
-			if (!string.Equals(area.Name.ToString(), "AttackArea", StringComparison.OrdinalIgnoreCase))
 			{
 				continue;
 			}
@@ -1165,11 +721,6 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 		if (hitCount == 0)
 		{
 			hitCount = DealDamageFromBodies(attackArea, damageAmount, onHit);
-		}
-
-		if (hitCount == 0)
-		{
-			LogNoHitDiagnostics(attackArea);
 		}
 
 		return hitCount;
@@ -1253,17 +804,12 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 				continue;
 			}
 
-			if (!IsValidAttackTarget(actor))
+			if (!IsValidAttackTarget(actor) || !uniqueTargets.Add(actor))
 			{
 				continue;
 			}
 
-			if (!IsConfirmedActorHit(attackArea, actor, hitArea))
-			{
-				continue;
-			}
-
-			if (!uniqueTargets.Add(actor))
+			if (!actor.IsHitByArea(attackArea))
 			{
 				continue;
 			}
@@ -1286,7 +832,7 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 			if (body is GameActor actor &&
 				IsValidAttackTarget(actor) &&
 				uniqueTargets.Add(actor) &&
-				IsConfirmedActorHit(attackArea, actor, null))
+				actor.IsHitByArea(attackArea))
 			{
 				DealDamageToTarget(actor, damageAmount);
 				hitCount++;
@@ -1319,7 +865,7 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 		{
 			Shape = _attackCollisionShape.Shape,
 			Transform = _attackCollisionShape.GlobalTransform,
-			CollisionMask = attackArea.CollisionMask == 0 ? uint.MaxValue : attackArea.CollisionMask,
+			CollisionMask = uint.MaxValue,
 			CollideWithAreas = true,
 			CollideWithBodies = true
 		};
@@ -1344,18 +890,26 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 			}
 
 			var colliderObject = colliderVariant.As<GodotObject>();
-			if (TryResolveActorFromCollider(colliderObject, out GameActor actor, out Area2D? hitArea) &&
-				IsValidAttackTarget(actor) &&
-				IsConfirmedActorHit(attackArea, actor, hitArea))
+			if (colliderObject is Area2D hitArea &&
+				TryResolveActorFromHitArea(hitArea, out GameActor actorFromArea) &&
+				IsValidAttackTarget(actorFromArea) &&
+				uniqueTargets.Add(actorFromArea) &&
+				actorFromArea.IsHitByArea(attackArea))
 			{
-				if (!uniqueTargets.Add(actor))
-				{
-					continue;
-				}
-
-				DealDamageToTarget(actor, damageAmount);
+				DealDamageToTarget(actorFromArea, damageAmount);
 				hitCount++;
-				onHit?.Invoke(actor, true);
+				onHit?.Invoke(actorFromArea, true);
+				continue;
+			}
+
+			if (colliderObject is GameActor actorFromBody &&
+				IsValidAttackTarget(actorFromBody) &&
+				uniqueTargets.Add(actorFromBody) &&
+				actorFromBody.IsHitByArea(attackArea))
+			{
+				DealDamageToTarget(actorFromBody, damageAmount);
+				hitCount++;
+				onHit?.Invoke(actorFromBody, true);
 			}
 		}
 
@@ -1378,148 +932,6 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 
 		actor = null!;
 		return false;
-	}
-
-	private static bool TryResolveActorFromCollider(GodotObject colliderObject, out GameActor actor, out Area2D? hitArea)
-	{
-		if (colliderObject is Area2D area)
-		{
-			hitArea = area;
-			return TryResolveActorFromHitArea(area, out actor);
-		}
-
-		hitArea = null;
-
-		if (colliderObject is GameActor gameActor)
-		{
-			actor = gameActor;
-			return true;
-		}
-
-		if (colliderObject is Node node)
-		{
-			Node? current = node;
-			while (current != null)
-			{
-				if (current is GameActor parentActor)
-				{
-					actor = parentActor;
-					return true;
-				}
-
-				current = current.GetParent();
-			}
-		}
-
-		actor = null!;
-		return false;
-	}
-
-	private static bool IsConfirmedActorHit(Area2D attackArea, GameActor actor, Area2D? overlappedArea)
-	{
-		if (overlappedArea != null && string.Equals(overlappedArea.Name.ToString(), "HitArea", StringComparison.OrdinalIgnoreCase))
-		{
-			return true;
-		}
-
-		if (actor.IsHitByArea(attackArea))
-		{
-			return true;
-		}
-
-		return attackArea.OverlapsBody(actor);
-	}
-
-	private static Vector2 GetGlobalScaleFromTransform(Transform2D transform)
-	{
-		return new Vector2(transform.X.Length(), transform.Y.Length());
-	}
-
-	private Vector2 ComputeForwardAnchoredAttackShapePosition(Shape2D shape)
-	{
-		float defaultRearEdge = _defaultAttackShapePosition.X - GetShapeHalfWidth(_defaultAttackShape);
-		float newHalfWidth = GetShapeHalfWidth(shape);
-		return new Vector2(defaultRearEdge + newHalfWidth, _defaultAttackShapePosition.Y);
-	}
-
-	private static float GetShapeHalfWidth(Shape2D? shape)
-	{
-		if (shape is RectangleShape2D rect)
-		{
-			return rect.Size.X * 0.5f;
-		}
-
-		if (shape is CircleShape2D circle)
-		{
-			return circle.Radius;
-		}
-
-		if (shape is CapsuleShape2D capsule)
-		{
-			return capsule.Radius;
-		}
-
-		return 0f;
-	}
-
-	private static Shape2D DuplicateShapeWithBakedScale(Shape2D originalShape, Vector2 scale)
-	{
-		Shape2D? duplicated = originalShape.Duplicate() as Shape2D;
-		if (duplicated == null)
-		{
-			return originalShape;
-		}
-
-		scale = new Vector2(Mathf.Abs(scale.X), Mathf.Abs(scale.Y));
-
-		if (duplicated is RectangleShape2D rect)
-		{
-			rect.Size = new Vector2(rect.Size.X * scale.X, rect.Size.Y * scale.Y);
-			return rect;
-		}
-
-		if (duplicated is CircleShape2D circle)
-		{
-			float uniform = Mathf.Max(scale.X, scale.Y);
-			circle.Radius *= uniform;
-			return circle;
-		}
-
-		if (duplicated is CapsuleShape2D capsule)
-		{
-			capsule.Radius *= scale.X;
-			capsule.Height *= scale.Y;
-			return capsule;
-		}
-
-		return duplicated;
-	}
-
-	private void LogNoHitDiagnostics(Area2D attackArea)
-	{
-		var overlapAreas = attackArea.GetOverlappingAreas();
-		foreach (Node node in overlapAreas)
-		{
-			if (node is not Area2D area)
-			{
-				continue;
-			}
-
-			bool actorResolved = TryResolveActorFromHitArea(area, out GameActor resolvedActor);
-			string actorName = actorResolved ? resolvedActor.Name : "None";
-			bool isEnemy = actorResolved && IsValidAttackTarget(resolvedActor);
-			bool areaHit = actorResolved && resolvedActor.IsHitByArea(attackArea);
-			GameLogger.Info(nameof(SamplePlayer), $"NoHit Diagnose Area: {area.GetPath()}, actor={actorName}, validEnemy={isEnemy}, actorHitCheck={areaHit}");
-		}
-
-		var overlapBodies = attackArea.GetOverlappingBodies();
-		foreach (Node body in overlapBodies)
-		{
-			string name = body.Name;
-			bool isActor = body is GameActor;
-			bool isEnemy = isActor && IsValidAttackTarget((GameActor)body);
-			GameLogger.Info(nameof(SamplePlayer), $"NoHit Diagnose Body: {name}, isGameActor={isActor}, validEnemy={isEnemy}");
-		}
 	}
 
 	protected virtual bool IsValidAttackTarget(GameActor candidate)
@@ -1629,12 +1041,6 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 		return false;
 	}
 	
-	private void UpdateDebugOverlayText()
-	{
-		string stateName = StateMachine?.CurrentState?.Name ?? "None";
-		_debugOverlayText = $"{Name} | State: {stateName} | HP: {CurrentHealth}/{MaxHealth}";
-	}
-
 	private void UpdateStatsUI()
 	{
 		NotifyStatsListeners();
