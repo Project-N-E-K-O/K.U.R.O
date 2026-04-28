@@ -24,7 +24,7 @@ shader_parameter/preserve_fill = true
 size = Vector2(220, 836)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jyvv2"]
-size = Vector2(64.117645, 51.47059)
+size = Vector2(48.2353, 30)
 
 [node name="FurniturePlantA" type="Node2D"]
 z_index = 2
@@ -34,7 +34,7 @@ ItemDefinition = ExtResource("2_cf8n5")
 GrabAreaPath = NodePath("RigidBody2D/CollisionArea")
 HighlightSpritePath = NodePath("RigidBody2D/Outline")
 DefaultOutlineColor = Color(0, 0, 0, 0)
-ThrowDamage = 5.0
+ThrowDamage = 2.0
 MinDamageVelocity = 0.0
 KnockbackForce = 0.0
 StopOnHit = true
@@ -51,8 +51,8 @@ freeze_mode = 1
 
 [node name="Shadow" type="Sprite2D" parent="RigidBody2D"]
 material = SubResource("ShaderMaterial_aa7cv")
-position = Vector2(-4.0000005, 55)
-scale = Vector2(5, 3)
+position = Vector2(0, 60.000008)
+scale = Vector2(4, 3)
 texture = ExtResource("4_ns7wp")
 
 [node name="Outline" type="Sprite2D" parent="RigidBody2D"]
@@ -80,6 +80,6 @@ shape = SubResource("RectangleShape2D_gy46y")
 [node name="StaticBody2D" type="StaticBody2D" parent="RigidBody2D" groups=["navigation_polygon_source_geometry_group"]]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/StaticBody2D"]
-position = Vector2(-1, 30.5)
+position = Vector2(3.999998, 31)
 scale = Vector2(3.4, 3.4)
 shape = SubResource("RectangleShape2D_jyvv2")

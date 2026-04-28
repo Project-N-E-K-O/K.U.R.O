@@ -1,0 +1,67 @@
+[gd_scene load_steps=11 format=3 uid="uid://blwgkboyojmcq"]
+
+[ext_resource type="Script" uid="uid://dtgdjgrqgype7" path="res://scripts/items/world/WorldItemEntity.cs" id="1_psgt0"]
+[ext_resource type="Resource" uid="uid://bgd8dah8wugey" path="res://resources/items/Weapon_Brawl_RiotGlove.tres" id="2_psgt0"]
+[ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="3_1hnml"]
+[ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="4_dcbdm"]
+[ext_resource type="Texture2D" uid="uid://bed1scn5awxdv" path="res://assets/weapons/镇暴拳套.png" id="5_altab"]
+[ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="5_d3aaw"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_rrc52"]
+shader = ExtResource("3_1hnml")
+shader_parameter/softness = 0.5
+shader_parameter/alpha = 0.4
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_2q28g"]
+shader = ExtResource("5_d3aaw")
+shader_parameter/outline_color = Color(0.02, 0.02, 0.02, 1)
+shader_parameter/outline_size = 32.0
+shader_parameter/alpha_threshold = 0.5
+shader_parameter/edge_softness = 0.12
+shader_parameter/preserve_fill = true
+
+[sub_resource type="RectangleShape2D" id="BodyShape_rr6vl"]
+size = Vector2(1145.4546, 709.09094)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_82c6d"]
+size = Vector2(600, 400)
+
+[node name="WeaponBrawlRiotGlove" type="CharacterBody2D"]
+z_index = 1
+scale = Vector2(0.33, 0.33)
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_psgt0")
+ItemDefinition = ExtResource("2_psgt0")
+DefaultOutlineColor = Color(0, 0, 0, 0)
+
+[node name="Shadow" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_rrc52")
+position = Vector2(-4, 120)
+scale = Vector2(10, 4)
+texture = ExtResource("4_dcbdm")
+
+[node name="Outline" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_2q28g")
+texture = ExtResource("5_altab")
+
+[node name="Sprite2D" type="Sprite2D" parent="Outline"]
+texture = ExtResource("5_altab")
+
+[node name="CollisionArea" type="Area2D" parent="."]
+visible = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CollisionArea"]
+z_index = 1
+position = Vector2(7.575757, 40.90909)
+scale = Vector2(0.49999994, 0.49999994)
+shape = SubResource("BodyShape_rr6vl")
+
+[node name="AttackArea" type="Area2D" parent="."]
+scale = Vector2(0.5, 0.5)
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AttackArea"]
+position = Vector2(1.9999998, 3.9999995)
+scale = Vector2(0.9999999, 0.9999999)
+shape = SubResource("RectangleShape2D_82c6d")

@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://dd8xmpgwy0t2o"]
+[gd_scene load_steps=23 format=3 uid="uid://dd8xmpgwy0t2o"]
 
 [ext_resource type="Texture2D" uid="uid://rpleid8er0tq" path="res://assets/environments/scene_2_hotel/去掉遮挡墙面的大门底图.png" id="1_qqgfp"]
 [ext_resource type="Texture2D" uid="uid://bldctlu6nwf6g" path="res://assets/environments/scene_2_hotel/地板.png" id="2_fsr21"]
@@ -9,11 +9,12 @@
 [ext_resource type="Texture2D" uid="uid://c2cdvsj12ngr1" path="res://assets/environments/scene_2_hotel/电梯墙后.png" id="6_hsu0y"]
 [ext_resource type="Texture2D" uid="uid://dkpv0dxfg1rx7" path="res://assets/environments/scene_2_hotel/酒店大门口墙后.png" id="8_qqgfp"]
 [ext_resource type="Texture2D" uid="uid://pl67o3rwu44h" path="res://assets/environments/scene_2_hotel/酒店大门口墙前.png" id="10_hsu0y"]
-[ext_resource type="Script" uid="uid://ch3pldopfd7tr" path="res://scripts/effects/AreaSpriteFadeTrigger.cs" id="11_ttjsf"]
+[ext_resource type="Texture2D" uid="uid://gxc75o5wrtfl" path="res://assets/environments/scene_2_hotel/酒店大门口.png" id="11_hsu0y"]
+[ext_resource type="Script" uid="uid://d3gc8jf51u7gn" path="res://scripts/effects/AreaSpriteFadeTrigger.cs" id="11_ttjsf"]
 [ext_resource type="Texture2D" uid="uid://pan0auvatm1f" path="res://assets/environments/scene_2_hotel/电梯墙前.png" id="12_qbr0m"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_eyc65"]
-size = Vector2(877.5, 3200)
+size = Vector2(6132, 3200)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_hsu0y"]
 size = Vector2(16974, 774)
@@ -156,14 +157,6 @@ texture = ExtResource("6_hsu0y")
 region_enabled = true
 region_rect = Rect2(0, 0, 1047, 3059)
 
-[node name="GateWall" type="Node2D" parent="."]
-
-[node name="gatewall" type="Sprite2D" parent="GateWall"]
-position = Vector2(-4760, -879)
-texture = ExtResource("8_qqgfp")
-region_enabled = true
-region_rect = Rect2(0, 0, 437, 1307)
-
 [node name="FrontWall" type="Node2D" parent="."]
 z_index = 3
 
@@ -177,11 +170,23 @@ script = ExtResource("11_ttjsf")
 TriggerAreaPath = NodePath("Area2D")
 TargetPath = NodePath(".")
 
+[node name="gate" type="Sprite2D" parent="FrontWall/GateFrontWall"]
+z_as_relative = false
+position = Vector2(-416, -114)
+texture = ExtResource("11_hsu0y")
+
+[node name="gatewall" type="Sprite2D" parent="FrontWall/GateFrontWall"]
+z_as_relative = false
+position = Vector2(-567, -876)
+texture = ExtResource("8_qqgfp")
+region_enabled = true
+region_rect = Rect2(0, 0, 437, 1307)
+
 [node name="Area2D" type="Area2D" parent="FrontWall/GateFrontWall"]
 collision_mask = 4
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="FrontWall/GateFrontWall/Area2D"]
-position = Vector2(227.25, 0)
+position = Vector2(2676, 0)
 shape = SubResource("RectangleShape2D_eyc65")
 
 [node name="ElevatorFrontWall" type="Sprite2D" parent="FrontWall"]

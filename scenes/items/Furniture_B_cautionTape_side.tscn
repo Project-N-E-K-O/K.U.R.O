@@ -1,0 +1,85 @@
+[gd_scene load_steps=11 format=3 uid="uid://ddi1sshkssyq"]
+
+[ext_resource type="Script" uid="uid://dhfq2rrha0awm" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_h7sm0"]
+[ext_resource type="Resource" uid="uid://b2i1slt2vqjop" path="res://resources/items/Furniture_B_CautionTape_side.tres" id="2_h7sm0"]
+[ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="3_jor71"]
+[ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="4_it7bh"]
+[ext_resource type="Texture2D" uid="uid://caq0ihkhft35v" path="res://assets/furnitures/hotel_scene2/CautionTape_side.png" id="5_ssvvj"]
+[ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="5_v1is5"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_aa7cv"]
+shader = ExtResource("3_jor71")
+shader_parameter/softness = 0.5
+shader_parameter/alpha = 0.4
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_5sin4"]
+shader = ExtResource("5_v1is5")
+shader_parameter/outline_color = Color(0.02, 0.02, 0.02, 1)
+shader_parameter/outline_size = 32.0
+shader_parameter/alpha_threshold = 0.5
+shader_parameter/edge_softness = 0.12
+shader_parameter/preserve_fill = true
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_gy46y"]
+size = Vector2(709, 436)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_jyvv2"]
+size = Vector2(214.11766, 22.647058)
+
+[node name="FurnitureCautionTape_side" type="Node2D"]
+z_index = 2
+y_sort_enabled = true
+script = ExtResource("1_h7sm0")
+ItemDefinition = ExtResource("2_h7sm0")
+GrabAreaPath = NodePath("RigidBody2D/CollisionArea")
+HighlightSpritePath = NodePath("RigidBody2D/Outline")
+DefaultOutlineColor = Color(0, 0, 0, 0)
+ThrowDamage = 2.0
+MinDamageVelocity = 0.0
+KnockbackForce = 0.0
+StopOnHit = true
+DestructionAnimationDuration = 0.0
+LandingHideDelay = 0.01
+RigidBodyPath = NodePath("RigidBody2D")
+HitboxAreaPath = NodePath("RigidBody2D/AttackArea")
+
+[node name="RigidBody2D" type="RigidBody2D" parent="."]
+gravity_scale = 0.0
+can_sleep = false
+freeze = true
+freeze_mode = 1
+
+[node name="Shadow" type="Sprite2D" parent="RigidBody2D"]
+material = SubResource("ShaderMaterial_aa7cv")
+position = Vector2(0, 50)
+scale = Vector2(14, 1.5)
+texture = ExtResource("4_it7bh")
+
+[node name="Outline" type="Sprite2D" parent="RigidBody2D"]
+material = SubResource("ShaderMaterial_5sin4")
+scale = Vector2(0.33, 0.33)
+texture = ExtResource("5_ssvvj")
+
+[node name="Sprite2D" type="Sprite2D" parent="RigidBody2D/Outline"]
+texture = ExtResource("5_ssvvj")
+
+[node name="CollisionArea" type="Area2D" parent="RigidBody2D"]
+visible = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/CollisionArea"]
+position = Vector2(2, -126)
+shape = SubResource("RectangleShape2D_gy46y")
+
+[node name="AttackArea" type="Area2D" parent="RigidBody2D"]
+visible = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/AttackArea"]
+position = Vector2(13.5, 63)
+shape = SubResource("RectangleShape2D_gy46y")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="RigidBody2D" groups=["navigation_polygon_source_geometry_group"]]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/StaticBody2D"]
+position = Vector2(-9.99999, 36.5)
+scale = Vector2(3.4, 3.4)
+shape = SubResource("RectangleShape2D_jyvv2")

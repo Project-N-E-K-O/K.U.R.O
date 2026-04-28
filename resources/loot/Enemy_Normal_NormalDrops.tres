@@ -1,14 +1,16 @@
-[gd_resource type="Resource" script_class="LootDropTable" load_steps=7 format=3 uid="uid://xsa2wlasoj6i"]
+[gd_resource type="Resource" script_class="LootDropTable" load_steps=11 format=3 uid="uid://xsa2wlasoj6i"]
 
 [ext_resource type="Resource" uid="uid://c0h5f2yocbgcw" path="res://resources/items/Weapon_Brawl_RiotBracer.tres" id="1_f534h"]
 [ext_resource type="Script" uid="uid://nd1f744icb05" path="res://scripts/systems/loot/LootDropEntry.cs" id="2_3hqkn"]
 [ext_resource type="Resource" uid="uid://dknruw00xelvv" path="res://resources/items/Weapon_Throw_SmokeGrenade.tres" id="3_3hqkn"]
+[ext_resource type="Resource" uid="uid://bgd8dah8wugey" path="res://resources/items/Weapon_Brawl_RiotGlove.tres" id="4_bbq0j"]
 [ext_resource type="Script" uid="uid://dpdpwmf4dwu8k" path="res://scripts/systems/loot/LootDropTable.cs" id="4_dlggc"]
+[ext_resource type="Resource" uid="uid://bfijfbb5m32i6" path="res://resources/items/Weapon_Slash_ExpandBaton.tres" id="5_dlggc"]
 
 [sub_resource type="Resource" id="Drop_Common"]
 script = ExtResource("2_3hqkn")
 Item = ExtResource("1_f534h")
-DropChance = 0.75
+DropChance = 0.25
 MaxStacks = 2
 ImpulseStrength = 260.0
 ImpulseSpreadDegrees = 120.0
@@ -20,9 +22,21 @@ DropChance = 0.25
 ImpulseStrength = 220.0
 ImpulseSpreadDegrees = 90.0
 
+[sub_resource type="Resource" id="Resource_4af4i"]
+script = ExtResource("2_3hqkn")
+Item = ExtResource("4_bbq0j")
+DropChance = 0.25
+metadata/_custom_type_script = "uid://nd1f744icb05"
+
+[sub_resource type="Resource" id="Resource_m34i8"]
+script = ExtResource("2_3hqkn")
+Item = ExtResource("5_dlggc")
+DropChance = 0.25
+metadata/_custom_type_script = "uid://nd1f744icb05"
+
 [resource]
 script = ExtResource("4_dlggc")
-GlobalDropChance = 0.2
-ScatterRadius = 32.0
-DefaultImpulse = 180.0
-Entries = [SubResource("Drop_Common"), SubResource("Drop_Rare")]
+MaxDrops = 1
+ScatterRadius = 48.0
+DefaultImpulse = 400.0
+Entries = [SubResource("Drop_Common"), SubResource("Drop_Rare"), SubResource("Resource_4af4i"), SubResource("Resource_m34i8")]

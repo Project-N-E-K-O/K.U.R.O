@@ -1,0 +1,77 @@
+[gd_scene load_steps=17 format=3 uid="uid://dew4wgl7w576m"]
+
+[ext_resource type="Texture2D" uid="uid://gnfeliqctpc2" path="res://assets/effect/AttackEffect/brawl/时间轴 1_0000.png" id="1_u4a5g"]
+[ext_resource type="Texture2D" uid="uid://dvn03bid47ide" path="res://assets/effect/AttackEffect/brawl/时间轴 1_0001.png" id="2_vn0kj"]
+[ext_resource type="Texture2D" uid="uid://dy4nwdyx2evmj" path="res://assets/effect/AttackEffect/brawl/时间轴 1_0002.png" id="3_q7crh"]
+[ext_resource type="Texture2D" uid="uid://t4yacolimbui" path="res://assets/effect/AttackEffect/brawl/时间轴 1_0003.png" id="4_2ll1w"]
+[ext_resource type="Texture2D" uid="uid://ducsfecw4t47b" path="res://assets/effect/AttackEffect/brawl/时间轴 1_0004.png" id="5_sqjup"]
+[ext_resource type="Texture2D" uid="uid://i8kx001746k8" path="res://assets/effect/AttackEffect/brawl/时间轴 1_0005.png" id="6_7mh3h"]
+[ext_resource type="Texture2D" uid="uid://ccrcuvspcosk7" path="res://assets/effect/AttackEffect/brawl/时间轴 1_0006.png" id="7_l2iiy"]
+[ext_resource type="Texture2D" uid="uid://5rxpybjfy2i0" path="res://assets/effect/AttackEffect/brawl/时间轴 1_0007.png" id="8_q8pwb"]
+[ext_resource type="Texture2D" uid="uid://bq8bq6xdrvlam" path="res://assets/effect/AttackEffect/brawl/时间轴 1_0008.png" id="9_4xlge"]
+[ext_resource type="Texture2D" uid="uid://r00y1gp27e6e" path="res://assets/effect/AttackEffect/brawl/时间轴 1_0009.png" id="10_52f4c"]
+[ext_resource type="Texture2D" uid="uid://br1i1ha215mfe" path="res://assets/effect/AttackEffect/brawl/时间轴 1_0010.png" id="11_a0eox"]
+[ext_resource type="Texture2D" uid="uid://dpyy4g5erbc03" path="res://assets/effect/AttackEffect/brawl/时间轴 1_0011.png" id="12_aweok"]
+[ext_resource type="Texture2D" uid="uid://b585su5xb0dc6" path="res://assets/effect/AttackEffect/brawl/时间轴 1_0012.png" id="13_kkwuk"]
+[ext_resource type="Texture2D" uid="uid://cbsittatak0po" path="res://assets/effect/AttackEffect/brawl/时间轴 1_0013.png" id="14_rmqkw"]
+[ext_resource type="Texture2D" uid="uid://6kee7ddwi0jd" path="res://assets/effect/AttackEffect/brawl/时间轴 1_0014.png" id="15_f01d4"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_s8kh4"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_u4a5g")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_vn0kj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_q7crh")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_2ll1w")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_sqjup")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_7mh3h")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_l2iiy")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_q8pwb")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_4xlge")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_52f4c")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_a0eox")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_aweok")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_kkwuk")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_rmqkw")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_f01d4")
+}],
+"loop": false,
+"name": &"BrawlAttackEffect",
+"speed": 25.0
+}]
+
+[node name="BrawlAttackEffect" type="AnimatedSprite2D"]
+z_index = 2
+sprite_frames = SubResource("SpriteFrames_s8kh4")
+animation = &"BrawlAttackEffect"
+playing = true
+speed_scale = 1.5

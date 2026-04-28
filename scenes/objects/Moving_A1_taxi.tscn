@@ -109,7 +109,6 @@ animations = [{
 size = Vector2(408.8235, 650.0001)
 
 [node name="Moving_A1_taxi" type="AnimatableBody2D"]
-scale = Vector2(0.34, 0.34)
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_c03wn")
@@ -117,6 +116,7 @@ autoplay = "default"
 frame_progress = 0.5354809
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+visible = false
 position = Vector2(4.4117284, -119.1176)
 scale = Vector2(0.99999964, 0.99999964)
 shape = SubResource("RectangleShape2D_c8qn3")

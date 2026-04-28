@@ -1,0 +1,77 @@
+[gd_scene load_steps=17 format=3 uid="uid://qhytc6rh50pe"]
+
+[ext_resource type="Texture2D" uid="uid://ceb68j6pyt74r" path="res://assets/effect/AttackEffect/slash/时间轴 1_0000.png" id="1_uxvwd"]
+[ext_resource type="Texture2D" uid="uid://7lsqw8i10m6u" path="res://assets/effect/AttackEffect/slash/时间轴 1_0001.png" id="2_xpq4i"]
+[ext_resource type="Texture2D" uid="uid://cee2jaivc71q6" path="res://assets/effect/AttackEffect/slash/时间轴 1_0002.png" id="3_8whd2"]
+[ext_resource type="Texture2D" uid="uid://cwn2m6e6h562n" path="res://assets/effect/AttackEffect/slash/时间轴 1_0003.png" id="4_1t4pi"]
+[ext_resource type="Texture2D" uid="uid://doqq38s607l8x" path="res://assets/effect/AttackEffect/slash/时间轴 1_0004.png" id="5_p7tdi"]
+[ext_resource type="Texture2D" uid="uid://c8jk5oj6tn76g" path="res://assets/effect/AttackEffect/slash/时间轴 1_0005.png" id="6_laqxm"]
+[ext_resource type="Texture2D" uid="uid://b17wjow6hogs3" path="res://assets/effect/AttackEffect/slash/时间轴 1_0006.png" id="7_mpu82"]
+[ext_resource type="Texture2D" uid="uid://vakakurgxduq" path="res://assets/effect/AttackEffect/slash/时间轴 1_0007.png" id="8_bwrrk"]
+[ext_resource type="Texture2D" uid="uid://jyd7pi4ryi70" path="res://assets/effect/AttackEffect/slash/时间轴 1_0008.png" id="9_7ftkv"]
+[ext_resource type="Texture2D" uid="uid://cqhok5gcpfhwo" path="res://assets/effect/AttackEffect/slash/时间轴 1_0009.png" id="10_43xcb"]
+[ext_resource type="Texture2D" uid="uid://bjvepleask503" path="res://assets/effect/AttackEffect/slash/时间轴 1_0010.png" id="11_0om6g"]
+[ext_resource type="Texture2D" uid="uid://dvifr3g58tus3" path="res://assets/effect/AttackEffect/slash/时间轴 1_0011.png" id="12_0rp1p"]
+[ext_resource type="Texture2D" uid="uid://q4yj31q5pqgo" path="res://assets/effect/AttackEffect/slash/时间轴 1_0012.png" id="13_rlusp"]
+[ext_resource type="Texture2D" uid="uid://qpxtw31jdkau" path="res://assets/effect/AttackEffect/slash/时间轴 1_0013.png" id="14_15uy5"]
+[ext_resource type="Texture2D" uid="uid://by5gtuouykdwd" path="res://assets/effect/AttackEffect/slash/时间轴 1_0014.png" id="15_0uydv"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_ml7nv"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_uxvwd")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_xpq4i")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_8whd2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_1t4pi")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_p7tdi")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_laqxm")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_mpu82")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_bwrrk")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_7ftkv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_43xcb")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_0om6g")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_0rp1p")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_rlusp")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_15uy5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_0uydv")
+}],
+"loop": false,
+"name": &"SlashAttackEffect",
+"speed": 25.0
+}]
+
+[node name="SlashAttackEffect" type="AnimatedSprite2D"]
+z_index = 2
+sprite_frames = SubResource("SpriteFrames_ml7nv")
+animation = &"SlashAttackEffect"
+playing = true
+speed_scale = 1.5

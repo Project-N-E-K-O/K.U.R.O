@@ -2,6 +2,7 @@ using Godot;
 using System;
 using Kuros.Core;
 using Kuros.Utils;
+using Kuros.Actors.Enemies.States;
 
 public partial class SampleEnemy : GameActor
 {
@@ -141,9 +142,9 @@ public partial class SampleEnemy : GameActor
 		}
 	}
 	
-	public override void TakeDamage(int damage, Vector2? attackOrigin = null, GameActor? attacker = null)
+	public override void TakeDamage(int damage, Vector2? attackOrigin = null, GameActor? attacker = null, Kuros.Core.Events.DamageSource damageSource = Kuros.Core.Events.DamageSource.DirectAttack)
 	{
-		base.TakeDamage(damage, attackOrigin, attacker);
+		base.TakeDamage(damage, attackOrigin, attacker, damageSource);
 		// If we want to play hit animation manually since base FSM logic might not cover enemy without state machine
 		if (_animationPlayer != null)
 		{
@@ -181,6 +182,15 @@ public partial class SampleEnemy : GameActor
 	private void UpdateDebugOverlayText()
 	{
 		string stateName = StateMachine?.CurrentState?.Name ?? "None";
-		_debugOverlayText = $"{Name} | State: {stateName} | HP: {CurrentHealth}/{MaxHealth}";
+		string frozenInfo = "";
+		
+		// 如果在Frozen状态，显示倒计时
+		if (stateName == "Frozen" && StateMachine?.CurrentState is EnemyFrozenState frozenState)
+		{
+			float remainingTime = frozenState.GetRemainingTime();
+			frozenInfo = $" | Frozen: {remainingTime:F2}s";
+		}
+		
+		_debugOverlayText = $"{Name} | State: {stateName} | HP: {CurrentHealth}/{MaxHealth}{frozenInfo}";
 	}
 }

@@ -1,0 +1,67 @@
+[gd_scene load_steps=11 format=3 uid="uid://csjvahh6hev8k"]
+
+[ext_resource type="Script" uid="uid://dtgdjgrqgype7" path="res://scripts/items/world/WorldItemEntity.cs" id="1_hnhuv"]
+[ext_resource type="Resource" uid="uid://bfijfbb5m32i6" path="res://resources/items/Weapon_Slash_ExpandBaton.tres" id="2_hnhuv"]
+[ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="3_o1fls"]
+[ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="4_djioy"]
+[ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="5_6dn8i"]
+[ext_resource type="Texture2D" uid="uid://cedvgcxm5d1ef" path="res://assets/weapons/甩棍.png" id="6_hnhuv"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_nqlfu"]
+shader = ExtResource("3_o1fls")
+shader_parameter/softness = 0.5
+shader_parameter/alpha = 0.4
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_waoek"]
+shader = ExtResource("5_6dn8i")
+shader_parameter/outline_color = Color(0.02, 0.02, 0.02, 1)
+shader_parameter/outline_size = 32.0
+shader_parameter/alpha_threshold = 0.5
+shader_parameter/edge_softness = 0.12
+shader_parameter/preserve_fill = true
+
+[sub_resource type="RectangleShape2D" id="BodyShape_rr6vl"]
+size = Vector2(1303.0304, 309.09094)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_64hvb"]
+radius = 400.0
+
+[node name="WeaponSlashExpandBaton" type="CharacterBody2D"]
+z_index = 1
+scale = Vector2(0.33, 0.33)
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_hnhuv")
+ItemDefinition = ExtResource("2_hnhuv")
+DefaultOutlineColor = Color(0, 0, 0, 0)
+
+[node name="Shadow" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_nqlfu")
+position = Vector2(0, 28)
+scale = Vector2(12, 1.2)
+texture = ExtResource("4_djioy")
+
+[node name="Outline" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_waoek")
+texture = ExtResource("6_hnhuv")
+
+[node name="Sprite2D" type="Sprite2D" parent="Outline"]
+texture = ExtResource("6_hnhuv")
+
+[node name="CollisionArea" type="Area2D" parent="."]
+visible = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CollisionArea"]
+position = Vector2(4.545434, -1.5151541)
+scale = Vector2(0.49999994, 0.49999994)
+shape = SubResource("BodyShape_rr6vl")
+
+[node name="AttackArea" type="Area2D" parent="."]
+visible = false
+scale = Vector2(0.5, 0.5)
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AttackArea"]
+position = Vector2(484.84848, 24.242424)
+scale = Vector2(0.99999994, 0.99999994)
+shape = SubResource("CircleShape2D_64hvb")

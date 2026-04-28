@@ -1,13 +1,25 @@
-[gd_resource type="Resource" script_class="WeaponSkillDefinition" load_steps=3 format=3 uid="uid://d4ku81cbnqgui"]
+[gd_resource type="Resource" script_class="WeaponSkillDefinition" load_steps=5 format=3 uid="uid://d4ku81cbnqgui"]
 
 [ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="1_vwwsf"]
 [ext_resource type="Script" uid="uid://bp6pwgoj44cuq" path="res://scripts/items/weapons/WeaponSkillDefinition.cs" id="2_2o5f0"]
+[ext_resource type="PackedScene" uid="uid://bioknm040r2lo" path="res://resources/effects/KnockbackOnAttackEffect.tscn" id="2_i83jg"]
+
+[sub_resource type="Resource" id="Resource_2o5f0"]
+script = ExtResource("1_vwwsf")
+Trigger = 1
+EffectScene = ExtResource("2_i83jg")
+PropertyOverrides = Dictionary[String, Variant]({
+"KnockbackDistance": 25.0
+})
+metadata/_custom_type_script = "uid://bv0es4osw3x0r"
 
 [resource]
 script = ExtResource("2_2o5f0")
 SkillId = "Weapon_Brawl_RiotBracer"
 DisplayName = "镇暴护腕攻击"
+SkillType = 0
 AnimationName = "Weapon_Brawl_RiotBracer"
-CooldownSeconds = 0.8
-Description = "攻击到敌人时击退该敌人0.5m"
+ShowHitboxDebug = false
+Description = "每次攻击到敌人时击退该敌人0.25m"
+Effects = Array[ExtResource("1_vwwsf")]([SubResource("Resource_2o5f0")])
 ActivationAction = "Weapon_Brawl_RiotBracer"

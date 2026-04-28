@@ -1,13 +1,15 @@
-[gd_resource type="Resource" script_class="WeaponSkillDefinition" load_steps=4 format=3 uid="uid://dc7u7akvpcjtn"]
+[gd_resource type="Resource" script_class="WeaponSkillDefinition" load_steps=5 format=3 uid="uid://dc7u7akvpcjtn"]
 
 [ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="1_w8ttm"]
+[ext_resource type="PackedScene" uid="uid://bioknm040r2lo" path="res://resources/effects/KnockbackOnAttackEffect.tscn" id="2_bt0ev"]
 [ext_resource type="Script" uid="uid://bp6pwgoj44cuq" path="res://scripts/items/weapons/WeaponSkillDefinition.cs" id="2_hduh6"]
 
 [sub_resource type="Resource" id="Resource_a5flt"]
 script = ExtResource("1_w8ttm")
 Trigger = 1
+EffectScene = ExtResource("2_bt0ev")
 PropertyOverrides = Dictionary[String, Variant]({
-"attack_power": 6
+"KnockbackDistance": 30.0
 })
 metadata/_custom_type_script = "uid://bv0es4osw3x0r"
 
@@ -15,8 +17,10 @@ metadata/_custom_type_script = "uid://bv0es4osw3x0r"
 script = ExtResource("2_hduh6")
 SkillId = "WeaponSkill_Stab_Umbrella"
 DisplayName = "雨伞攻击"
+SkillType = 0
 AnimationName = "attack_thrust"
 CooldownSeconds = 2.5
-Description = "展开雨伞形成临时护盾，短时间内格挡正面攻击。"
+ShowHitboxDebug = false
+Description = "攻击到敌人时击退该敌人0.3m"
 Effects = Array[ExtResource("1_w8ttm")]([SubResource("Resource_a5flt")])
 ActivationAction = "weapon_skill_block"

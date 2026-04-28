@@ -1,7 +1,7 @@
 [gd_resource type="SpineSkeletonDataResource" load_steps=3 format=3 uid="uid://bvd366fnel6yq"]
 
-[ext_resource type="SpineAtlasResource" uid="uid://f8o1rgpeovyk" path="res://assets/spine/main_character/Enemy_A1_zhuA.atlas" id="1_xmi8y"]
-[ext_resource type="SpineSkeletonFileResource" uid="uid://b6r8ktmmttem6" path="res://assets/spine/main_character/Enemy_A1_zhuA.spine-json" id="2_45rm8"]
+[ext_resource type="SpineAtlasResource" uid="uid://c4cx1o154rxba" path="res://assets/spine/main_character/Enemy_A1_zhuA.atlas" id="1_xmi8y"]
+[ext_resource type="SpineSkeletonFileResource" uid="uid://ctc7l75asjli1" path="res://assets/spine/main_character/Enemy_A1_zhuA.spine-json" id="2_45rm8"]
 
 [resource]
 atlas_res = ExtResource("1_xmi8y")

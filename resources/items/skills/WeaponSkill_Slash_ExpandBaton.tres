@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="WeaponSkillDefinition" load_steps=3 format=3 uid="uid://vdq16nvnnvsv"]
+
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="1_8mx5c"]
+[ext_resource type="Script" uid="uid://bp6pwgoj44cuq" path="res://scripts/items/weapons/WeaponSkillDefinition.cs" id="2_msw50"]
+
+[resource]
+script = ExtResource("2_msw50")
+SkillId = "WeaponSkill_Slash_ExpandBaton"
+DisplayName = "甩棍攻击"
+AnimationName = "Weapon_Slash_ExpandBaton"
+ShowHitboxDebug = false
+Description = "手持该武器攻击敌人3次后，该武器的下一次dmg *2，切换武器时效果重置"
+ActivationAction = "weapon_skill_block"

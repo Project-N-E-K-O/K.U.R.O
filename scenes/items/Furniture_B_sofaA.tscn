@@ -21,10 +21,10 @@ shader_parameter/edge_softness = 0.12
 shader_parameter/preserve_fill = true
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_gy46y"]
-size = Vector2(1115, 681)
+size = Vector2(1152, 524)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jyvv2"]
-size = Vector2(372.64706, 88.82353)
+size = Vector2(362.05884, 74.70589)
 
 [node name="FurnitureSofaA" type="Node2D"]
 z_index = 2
@@ -34,7 +34,7 @@ ItemDefinition = ExtResource("2_6f5qb")
 GrabAreaPath = NodePath("RigidBody2D/CollisionArea")
 HighlightSpritePath = NodePath("RigidBody2D/Outline")
 DefaultOutlineColor = Color(0, 0, 0, 0)
-ThrowDamage = 15.0
+ThrowDamage = 10.0
 MinDamageVelocity = 0.0
 KnockbackForce = 0.0
 StopOnHit = true
@@ -67,7 +67,7 @@ texture = ExtResource("3_3a25w")
 visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/CollisionArea"]
-position = Vector2(28.5, 5.5)
+position = Vector2(10, -73)
 shape = SubResource("RectangleShape2D_gy46y")
 
 [node name="AttackArea" type="Area2D" parent="RigidBody2D"]
@@ -80,6 +80,6 @@ shape = SubResource("RectangleShape2D_gy46y")
 [node name="StaticBody2D" type="StaticBody2D" parent="RigidBody2D" groups=["navigation_polygon_source_geometry_group"]]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/StaticBody2D"]
-position = Vector2(22.499996, 41)
+position = Vector2(4.5000114, 65)
 scale = Vector2(3.4, 3.4)
 shape = SubResource("RectangleShape2D_jyvv2")

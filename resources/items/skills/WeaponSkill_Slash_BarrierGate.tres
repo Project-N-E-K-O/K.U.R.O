@@ -6,8 +6,9 @@
 [resource]
 script = ExtResource("2_hxcpv")
 SkillId = "Weapon_Slash_BarrierGate"
-DisplayName = "开刃升降杆技能"
+DisplayName = "开刃升降杆攻击"
 AnimationName = "Weapon_Slash_BarrierGate"
 CooldownSeconds = 0.6
+ShowHitboxDebug = false
 Description = "攻击到敌人时使该敌人移动速度减少100%，持续1秒"
 ActivationAction = "weapon_skill_block"

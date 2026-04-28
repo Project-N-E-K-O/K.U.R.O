@@ -1,9 +1,13 @@
 using System;
+using System.Collections.Generic;
 using Godot;
 using Godot.Collections;
 using Kuros.Actors.Heroes;
 using Kuros.Core;
+using Kuros.Core.Effects;
 using Kuros.Core.Events;
+using Kuros.Items;
+using Kuros.Items.Effects;
 using Kuros.Items.Weapons;
 
 namespace Kuros.Actors.Heroes.Attacks
@@ -66,7 +70,7 @@ namespace Kuros.Actors.Heroes.Attacks
         [Export(PropertyHint.Enum, "Target,Player,AttackArea,CustomNode")] public HitEffectAnchor HitEffectAnchorMode = HitEffectAnchor.Target;
         [Export] public NodePath HitEffectAnchorPath = new();
         [Export(PropertyHint.Range, "-1024,1024,1")] public int HitEffectZIndex = 100;
-        [Export] public bool HitEffectForceTopLevel = false;
+        [Export] public bool HitEffectForceTopLevel = false; 
         [Export] public Vector2 HitEffectLocalOffset = Vector2.Zero;
         [Export] public bool HitEffectMirrorFacing = true;
 
@@ -81,6 +85,11 @@ namespace Kuros.Actors.Heroes.Attacks
         protected SamplePlayer Player { get; private set; } = null!;
         protected string TriggerSourceState { get; private set; } = string.Empty;
         protected Area2D? AttackArea { get; private set; }
+        
+        /// <summary>
+        /// 当前攻击的 Spine 动画段数（1-based），用于让其他系统（如效果）判断是否为第一段伤害
+        /// </summary>
+        public static int CurrentAttackHitStep { get; private set; } = 1;
 
         private AttackPhase _phase = AttackPhase.Idle;
         private float _phaseTimer = 0f;
@@ -98,6 +107,11 @@ namespace Kuros.Actors.Heroes.Attacks
         private string _resolvedAnimationName = string.Empty;
         private WeaponSkillDefinition? _activeWeaponSkill;
         private AttackHitboxDebugDrawer? _hitboxDebugDrawer;
+        private int _currentHitStep = 1;  // 记录当前 Spine 动画段数（1-based）
+        private float _weaponBaseDamage = 0f;  // 记录武器基础伤害（不含玩家基础伤害）
+        private PlayerInventoryComponent? _inventoryComponent;
+        private List<ActorEffect> _appliedEquipEffects = new();  // 已应用的装备效果
+        private bool _equipEffectsSubscribed = false;  // 是否已订阅装备事件
 
         public bool IsRunning => _phase != AttackPhase.Idle;
         public bool IsOnCooldown => _cooldownTimer > 0f;
@@ -116,6 +130,22 @@ namespace Kuros.Actors.Heroes.Attacks
                 AttackArea = Player.AttackArea;
             }
 
+            // 获取背包组件用于监听装备事件
+            _inventoryComponent = Player.InventoryComponent ?? Player.GetNodeOrNull<PlayerInventoryComponent>("Inventory");
+            if (_inventoryComponent != null)
+            {
+                _inventoryComponent.WeaponEquipped += OnWeaponEquipped;
+                _inventoryComponent.WeaponUnequipped += OnWeaponUnequipped;
+                _equipEffectsSubscribed = true;
+                
+                // 如果已经装备了武器，立即应用效果
+                var currentWeapon = _inventoryComponent.GetCurrentWeaponDefinition();
+                if (currentWeapon != null)
+                {
+                    OnWeaponEquipped(currentWeapon);
+                }
+            }
+
             InitializeHitEffectSupport();
             InitializeSpineHitSupport();
 
@@ -125,9 +155,20 @@ namespace Kuros.Actors.Heroes.Attacks
         public override void _ExitTree()
         {
             base._ExitTree();
+            
+            // 移除已应用的装备效果
+            RemoveAllEquipEffects();
+            
+            if (_equipEffectsSubscribed && _inventoryComponent != null)
+            {
+                _inventoryComponent.WeaponEquipped -= OnWeaponEquipped;
+                _inventoryComponent.WeaponUnequipped -= OnWeaponUnequipped;
+                _equipEffectsSubscribed = false;
+            }
+            
             if (_hitEffectSubscribed)
             {
-                DamageEventBus.Unsubscribe(OnDamageResolved);
+                DamageEventBus.UnsubscribeWithSource(OnDamageResolved);
                 _hitEffectSubscribed = false;
             }
 
@@ -188,8 +229,10 @@ namespace Kuros.Actors.Heroes.Attacks
             _cooldownTimer = CooldownDuration;
             Player.AttackTimer = Mathf.Max(Player.AttackTimer, CooldownDuration);
 
-            OnAttackStarted();
+            // 先进入 Warmup 阶段，再启动攻击
+            // 这样可以确保当动画 hit 事件触发时，IsRunning 已经是 true
             SetPhase(AttackPhase.Warmup);
+            OnAttackStarted();
 
             if (ConsumeResourceOnStart)
             {
@@ -332,19 +375,22 @@ namespace Kuros.Actors.Heroes.Attacks
             _resolvedAnimationName = ResolveAnimationName(_activeWeaponSkill);
             EnsureSpineHitSupport();
             _spineAttackAnimationName = _resolvedAnimationName;
+            // 在播放动画前就启用 Spine 事件窗口，防止动画的第一个 hit 事件被错过
             _spineHitWindowActive = ShouldUseSpineHitEvents();
+            _currentHitStep = 1;  // 重置段数计数器
+            CurrentAttackHitStep = 1;  // 重置静态段数
+            
+            // 计算武器基础伤害：DamageOverride - Player.AttackDamage
+            // 只有在第一段才应用玩家基础伤害和增伤效果
+            _weaponBaseDamage = DamageOverride - Player.AttackDamage;
+            if (_weaponBaseDamage < 0) _weaponBaseDamage = 0;
 
             // 如果是 MainCharacter，使用 Spine 动画
             if (Player is MainCharacter mainChar)
             {
                 if (!string.IsNullOrEmpty(_resolvedAnimationName))
                 {
-                    GD.Print($"[{GetType().Name}] 播放攻击动画 (Spine): {_resolvedAnimationName}");
                     mainChar.PlaySpineAnimation(_resolvedAnimationName, false);
-                }
-                else
-                {
-                    GD.PushWarning($"[{GetType().Name}] AnimationName 为空，无法播放攻击动画");
                 }
             }
             // 否则使用 AnimationPlayer
@@ -354,10 +400,6 @@ namespace Kuros.Actors.Heroes.Attacks
                 {
                     Player.AnimPlayer.Play(_resolvedAnimationName);
                 }
-            }
-            else
-            {
-                GD.PushWarning($"[{GetType().Name}] 无法播放攻击动画: AnimationName={_resolvedAnimationName}, AnimPlayer={Player.AnimPlayer}");
             }
         }
 
@@ -450,10 +492,7 @@ namespace Kuros.Actors.Heroes.Attacks
                 skill.HitboxDebugDuration
             );
 
-            if (logOnce)
-            {
-                GD.Print($"[{GetType().Name}] Hitbox Debug => Shape={collisionShape.Shape.GetType().Name}, Position={collisionShape.GlobalPosition}, Rotation={collisionShape.GlobalRotationDegrees}");
-            }
+            
         }
 
         private void EnsureHitboxDebugDrawer()
@@ -535,31 +574,29 @@ namespace Kuros.Actors.Heroes.Attacks
                     break;
                 case AttackPhase.Warmup:
                     _phaseTimer = WarmupDuration;
-                    _hitWindowActive = false;
+                    // 在 Warmup 阶段也启用 _hitWindowActive，因为第一段 hit 可能在 Warmup 期间触发
+                    _hitWindowActive = HitEffectScene != null;
+                    _spineHitWindowActive = ShouldUseSpineHitEvents();
                     OnWarmupStarted();
                     break;
                 case AttackPhase.Active:
                     _phaseTimer = ActiveDuration;
+                    // 只要有特效场景，就保持 _hitWindowActive=true（不管是否使用 Spine 事件）
                     _hitWindowActive = HitEffectScene != null;
+                    _spineHitWindowActive = ShouldUseSpineHitEvents();
                     if (ShouldUseSpineHitEvents())
                     {
                         OnActivePhase();
                     }
                     else
                     {
-                        try
-                        {
-                            OnActivePhase();
-                        }
-                        finally
-                        {
-                            _hitWindowActive = false;
-                        }
+                        OnActivePhase();
                     }
                     break;
                 case AttackPhase.Recovery:
                     _phaseTimer = RecoveryDuration;
                     _hitWindowActive = false;
+                    _spineHitWindowActive = false;
                     OnRecoveryStarted();
                     break;
             }
@@ -591,7 +628,25 @@ namespace Kuros.Actors.Heroes.Attacks
             if (Player == null) return;
 
             float originalDamage = Player.AttackDamage;
-            Player.AttackDamage = DamageOverride;
+            
+            // 区分有武器和徒手的情况：
+            // - 徒手（_weaponBaseDamage == 0）：所有段都应用完整伤害 DamageOverride
+            // - 有武器（_weaponBaseDamage > 0）：第一段应用 DamageOverride，后续段仅应用武器伤害
+            if (_weaponBaseDamage <= 0)
+            {
+                // 徒手攻击：所有段都应用完整伤害
+                Player.AttackDamage = DamageOverride;
+            }
+            else if (_currentHitStep == 1)
+            {
+                // 有武器的第一段：应用完整伤害（基础伤害 + 武器伤害 + 增伤效果）
+                Player.AttackDamage = DamageOverride;
+            }
+            else
+            {
+                // 有武器的后续段：仅应用武器伤害，避免基础伤害和增伤效果被多段武器放大
+                Player.AttackDamage = _weaponBaseDamage;
+            }
 
             Player.PerformAttackCheck();
 
@@ -627,7 +682,6 @@ namespace Kuros.Actors.Heroes.Attacks
             _spineHitCallable = Callable.From<int, string>(OnSpineHitReceived);
             _spineControllerNode.Connect("hit_received", _spineHitCallable);
             _spineHitSubscribed = true;
-            GD.Print($"[{GetType().Name}] 已连接 Spine hit_received 信号");
         }
 
         private void UnsubscribeSpineHitSignal()
@@ -666,7 +720,8 @@ namespace Kuros.Actors.Heroes.Attacks
                 return;
             }
 
-            GD.Print($"[{GetType().Name}] Spine hit_received 触发伤害判定: 动画={animationName}, 段数={hitStep}");
+            _currentHitStep = hitStep;  // 记录当前段数
+            CurrentAttackHitStep = hitStep;  // 更新静态属性供其他系统访问
             PerformDefaultHitDetection();
         }
 
@@ -676,7 +731,7 @@ namespace Kuros.Actors.Heroes.Attacks
             {
                 if (_hitEffectSubscribed)
                 {
-                    DamageEventBus.Unsubscribe(OnDamageResolved);
+                    DamageEventBus.UnsubscribeWithSource(OnDamageResolved);
                     _hitEffectSubscribed = false;
                 }
                 _hitEffectParent = null;
@@ -688,7 +743,7 @@ namespace Kuros.Actors.Heroes.Attacks
 
             if (!_hitEffectSubscribed)
             {
-                DamageEventBus.Subscribe(OnDamageResolved);
+                DamageEventBus.SubscribeWithSource(OnDamageResolved);
                 _hitEffectSubscribed = true;
             }
         }
@@ -713,8 +768,14 @@ namespace Kuros.Actors.Heroes.Attacks
             return null;
         }
 
-        private void OnDamageResolved(GameActor attacker, GameActor target, int damage)
+        private void OnDamageResolved(GameActor attacker, GameActor target, int damage, DamageSource source)
         {
+            // 只响应直接攻击来源，过滤 spike 区域伤害等间接伤害，避免错误触发命中特效
+            if (source != DamageSource.DirectAttack)
+            {
+                return;
+            }
+
             if (!_hitWindowActive || HitEffectScene == null)
             {
                 return;
@@ -728,7 +789,6 @@ namespace Kuros.Actors.Heroes.Attacks
             var parent = GetValidHitEffectParent();
             if (parent == null)
             {
-                GD.PushWarning($"[{GetType().Name}] 无法生成击打特效，未找到父节点。");
                 return;
             }
 
@@ -748,7 +808,6 @@ namespace Kuros.Actors.Heroes.Attacks
             }
             else
             {
-                GD.PushWarning($"[{GetType().Name}] HitEffectScene 需要是 Node2D 场景。");
                 instance.QueueFree();
             }
         }
@@ -788,7 +847,7 @@ namespace Kuros.Actors.Heroes.Attacks
             Vector2 offset = HitEffectLocalOffset;
             if (HitEffectMirrorFacing && Player != null)
             {
-                float sign = Player.FacingRight ? 1f : -1f;
+                float sign = Player.FacingRight ? -1f : 1f;
                 offset.X *= sign;
             }
 
@@ -802,7 +861,7 @@ namespace Kuros.Actors.Heroes.Attacks
                 return;
             }
 
-            float sign = Player.FacingRight ? 1f : -1f;
+            float sign = Player.FacingRight ? -1f : 1f;
             Vector2 scale = effectNode.Scale;
             scale.X = Mathf.Abs(scale.X) * sign;
             effectNode.Scale = scale;
@@ -810,6 +869,12 @@ namespace Kuros.Actors.Heroes.Attacks
 
         private void TriggerHitEffect(Node2D effectNode)
         {
+            // 处理 AnimatedSprite2D
+            if (effectNode is AnimatedSprite2D animSprite)
+            {
+                animSprite.Play();
+            }
+            
             if (effectNode.HasMethod("restart"))
             {
                 effectNode.Call("restart");
@@ -832,6 +897,76 @@ namespace Kuros.Actors.Heroes.Attacks
                     effectNode.Connect("finished", callable);
                 }
             }
+        }
+
+        /// <summary>
+        /// 装备武器时触发
+        /// </summary>
+        private void OnWeaponEquipped(ItemDefinition weapon)
+        {
+            // 只在装备了匹配的武器时才应用效果
+            if (HasWeaponRequirement && !string.Equals(weapon.ItemId, RequiredItemId, StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            // 从武器定义的 EffectEntries 中获取并应用 OnEquip 效果
+            ApplyEquipEffectsFromWeapon(weapon);
+        }
+
+        /// <summary>
+        /// 卸下武器时触发
+        /// </summary>
+        private void OnWeaponUnequipped()
+        {
+            RemoveAllEquipEffects();
+        }
+
+        /// <summary>
+        /// 应用所有装备时的效果
+        /// </summary>
+        private void ApplyEquipEffectsFromWeapon(ItemDefinition weapon)
+        {
+            if (weapon?.EffectEntries == null || Player?.EffectController == null)
+            {
+                return;
+            }
+
+            foreach (var effectEntry in weapon.EffectEntries)
+            {
+                if (effectEntry.Trigger != ItemEffectTrigger.OnEquip)
+                {
+                    continue;
+                }
+
+                var effect = effectEntry.InstantiateEffect();
+                if (effect != null)
+                {
+                    Player.EffectController.AddEffect(effect);
+                    _appliedEquipEffects.Add(effect);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 移除所有已应用的装备效果
+        /// </summary>
+        private void RemoveAllEquipEffects()
+        {
+            if (Player?.EffectController == null)
+            {
+                return;
+            }
+
+            foreach (var effect in _appliedEquipEffects)
+            {
+                if (GodotObject.IsInstanceValid(effect))
+                {
+                    Player.EffectController.RemoveEffect(effect);
+                }
+            }
+
+            _appliedEquipEffects.Clear();
         }
     }
 }

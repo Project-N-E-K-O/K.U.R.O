@@ -33,12 +33,12 @@ namespace Kuros.Effects
                 return;
             }
 
-            DamageEventBus.Subscribe(OnDamageResolved);
+            DamageEventBus.SubscribeWithSource(OnDamageResolved);
         }
 
         public override void OnRemoved()
         {
-            DamageEventBus.Unsubscribe(OnDamageResolved);
+            DamageEventBus.UnsubscribeWithSource(OnDamageResolved);
             base.OnRemoved();
         }
 
@@ -52,8 +52,9 @@ namespace Kuros.Effects
             return Actor.GetNodeOrNull<PlayerInventoryComponent>("Inventory");
         }
 
-        private void OnDamageResolved(GameActor attacker, GameActor target, int damage)
+        private void OnDamageResolved(GameActor attacker, GameActor target, int damage, DamageSource source)
         {
+            if (source != DamageSource.DirectAttack) return;
             if (AttackPowerPerAttack <= 0f) return;
             if (attacker != Actor) return;
             if (!IsTargetWeaponSelected()) return;

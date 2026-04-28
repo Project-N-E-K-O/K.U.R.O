@@ -1065,8 +1065,8 @@ namespace Kuros.Items.World
 				return false;
 			}
 
-			// 造成伤害
-			target.TakeDamage(damage, GlobalPosition, LastDroppedBy);
+			// 造成伤害（投掷物命中，使用 ThrowImpact 来源，避免触发玩家装备的近战武器效果）
+			target.TakeDamage(damage, GlobalPosition, LastDroppedBy, Kuros.Core.Events.DamageSource.ThrowImpact);
 			_hitActors.Add(target);
 
 			// 应用击退效果

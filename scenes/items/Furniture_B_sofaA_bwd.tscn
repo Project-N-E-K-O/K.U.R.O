@@ -1,0 +1,88 @@
+[gd_scene load_steps=10 format=3 uid="uid://bkswj210r68h2"]
+
+[ext_resource type="Script" uid="uid://dhfq2rrha0awm" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_gdh3r"]
+[ext_resource type="Resource" uid="uid://bxj7pa1lqo3vi" path="res://resources/items/Furniture_B_SofaA_bwd.tres" id="2_gdh3r"]
+[ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="3_xnuv3"]
+[ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="5_fpj4w"]
+[ext_resource type="Texture2D" uid="uid://bnn5wuesgmvi8" path="res://assets/furnitures/hotel_scene2/SofaA_bwd.png" id="6_gdh3r"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_aa7cv"]
+shader = ExtResource("3_xnuv3")
+shader_parameter/softness = 0.5
+shader_parameter/alpha = 0.4
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_5sin4"]
+shader = ExtResource("5_fpj4w")
+shader_parameter/outline_color = Color(0.02, 0.02, 0.02, 1)
+shader_parameter/outline_size = 32.0
+shader_parameter/alpha_threshold = 0.5
+shader_parameter/edge_softness = 0.12
+shader_parameter/preserve_fill = true
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_gy46y"]
+size = Vector2(1113, 578.5)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_jyvv2"]
+size = Vector2(348.2353, 78.82353)
+
+[node name="FurnitureSofaA_bwd" type="Node2D"]
+z_index = 2
+y_sort_enabled = true
+script = ExtResource("1_gdh3r")
+ItemDefinition = ExtResource("2_gdh3r")
+GrabAreaPath = NodePath("RigidBody2D/CollisionArea")
+HighlightSpritePath = NodePath("RigidBody2D/Outline")
+DefaultOutlineColor = Color(0, 0, 0, 0)
+ThrowDamage = 10.0
+MinDamageVelocity = 0.0
+KnockbackForce = 0.0
+StopOnHit = true
+DestructionAnimationDuration = 0.0
+LandingHideDelay = 0.01
+RigidBodyPath = NodePath("RigidBody2D")
+HitboxAreaPath = NodePath("RigidBody2D/AttackArea")
+
+[node name="RigidBody2D" type="RigidBody2D" parent="."]
+gravity_scale = 0.0
+can_sleep = false
+freeze = true
+freeze_mode = 1
+
+[node name="Shadow" type="Sprite2D" parent="RigidBody2D"]
+material = SubResource("ShaderMaterial_aa7cv")
+position = Vector2(0, 118.99999)
+scale = Vector2(0.3, 0.3)
+texture = ExtResource("6_gdh3r")
+
+[node name="Outline" type="Sprite2D" parent="RigidBody2D"]
+material = SubResource("ShaderMaterial_5sin4")
+scale = Vector2(0.33, 0.33)
+texture = ExtResource("6_gdh3r")
+offset = Vector2(0, 200)
+
+[node name="Sprite2D" type="Sprite2D" parent="RigidBody2D/Outline"]
+texture = ExtResource("6_gdh3r")
+offset = Vector2(0, 200)
+
+[node name="CollisionArea" type="Area2D" parent="RigidBody2D"]
+visible = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/CollisionArea"]
+position = Vector2(-2, 53)
+shape = SubResource("RectangleShape2D_gy46y")
+
+[node name="AttackArea" type="Area2D" parent="RigidBody2D"]
+visible = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/AttackArea"]
+position = Vector2(-14.5, 119.25)
+shape = SubResource("RectangleShape2D_gy46y")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="RigidBody2D" groups=["navigation_polygon_source_geometry_group"]]
+visible = false
+position = Vector2(0, 49)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/StaticBody2D"]
+position = Vector2(-18.999996, 58)
+scale = Vector2(3.4, 3.4)
+shape = SubResource("RectangleShape2D_jyvv2")

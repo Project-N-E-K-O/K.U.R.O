@@ -3,6 +3,16 @@ using Godot;
 namespace Kuros.Actors.Enemies.Attacks
 {
     /// <summary>
+    /// 攻击特效生成时机
+    /// </summary>
+    public enum EffectSpawnTiming
+    {
+        OnActive,
+        OnAnimationHit,
+        OnRecovery
+    }
+
+    /// <summary>
     /// 基础敌人攻击模板。封装预热-生效-恢复的攻击流程，并提供可重写的钩子。
     /// 继承此类即可快速实现不同的攻击类型（近战、投射、范围等）。
     /// </summary>
@@ -45,6 +55,11 @@ namespace Kuros.Actors.Enemies.Attacks
         [ExportCategory("Collision Override")]
         [Export] public bool IgnoreEnemyCollisionDuringAttack = false;
         [Export(PropertyHint.Range, "1,32,1")] public int EnemyCollisionLayerIndex = 2;
+
+        [ExportCategory("Effect")]
+        [Export] public PackedScene? EffectScene = null;
+        [Export] public Vector2 EffectOffset = Vector2.Zero;
+        [Export] public EffectSpawnTiming SpawnTiming = EffectSpawnTiming.OnActive;
 
         protected SampleEnemy Enemy { get; private set; } = null!;
         protected SamplePlayer? Player => Enemy.PlayerTarget;
@@ -173,6 +188,11 @@ namespace Kuros.Actors.Enemies.Attacks
 
         protected virtual void OnActivePhase()
         {
+            if (SpawnTiming == EffectSpawnTiming.OnActive)
+            {
+                SpawnEffectAtEnemy();
+            }
+
             if (RequireAnimationHitTrigger)
             {
                 _animationHitReady = true;
@@ -184,6 +204,11 @@ namespace Kuros.Actors.Enemies.Attacks
 
         protected virtual void OnRecoveryStarted()
         {
+            if (SpawnTiming == EffectSpawnTiming.OnRecovery)
+            {
+                SpawnEffectAtEnemy();
+            }
+
             Enemy.Velocity = Enemy.Velocity.MoveToward(Vector2.Zero, Enemy.Speed);
             _animationHitReady = false;
         }
@@ -304,6 +329,11 @@ namespace Kuros.Actors.Enemies.Attacks
         /// </summary>
         protected virtual void OnAnimationHit()
         {
+            if (SpawnTiming == EffectSpawnTiming.OnAnimationHit)
+            {
+                SpawnEffectAtEnemy();
+            }
+
             PerformAttackNow();
         }
 
@@ -424,6 +454,58 @@ namespace Kuros.Actors.Enemies.Attacks
             }
 
             frozenState.ApplyExternalDisplacement(velocity, duration);
+        }
+
+        /// <summary>
+        /// 在敌人位置生成特效（支持 Node2D 和 ActorEffect）。
+        /// </summary>
+        protected virtual void SpawnEffectAtEnemy()
+        {
+            if (EffectScene == null || Enemy == null)
+            {
+                return;
+            }
+
+            try
+            {
+                var effect = EffectScene.Instantiate();
+                
+                // 根据敌人朝向调整偏移（X 轴翻转）
+                Vector2 adjustedOffset = EffectOffset;
+                if (!Enemy.FacingRight && EffectOffset.X != 0)
+                {
+                    adjustedOffset.X = -EffectOffset.X;
+                }
+                
+                Vector2 spawnPos = Enemy.GlobalPosition + adjustedOffset;
+
+                if (effect is Node2D node2D)
+                {
+                    // 世界坐标生成（如烟雾、粒子等视觉效果）
+                    Enemy.GetParent()?.AddChild(node2D);
+                    node2D.GlobalPosition = spawnPos;
+                }
+                else if (effect is Kuros.Core.Effects.ActorEffect actorEffect)
+                {
+                    // ActorEffect 应用到敌人身上
+                    if (Enemy.EffectController != null)
+                    {
+                        Enemy.ApplyEffect(actorEffect);
+                    }
+                    else
+                    {
+                        actorEffect.QueueFree();
+                    }
+                }
+                else
+                {
+                    effect?.QueueFree();
+                }
+            }
+            catch (System.Exception ex)
+            {
+                GD.PushWarning($"[{AttackName}] 无法生成攻击特效: {ex.Message}");
+            }
         }
     }
 }

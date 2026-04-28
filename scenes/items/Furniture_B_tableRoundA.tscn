@@ -24,7 +24,7 @@ shader_parameter/preserve_fill = true
 size = Vector2(452, 637)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jyvv2"]
-size = Vector2(145.58826, 94.70589)
+size = Vector2(140, 94.70589)
 
 [node name="FurnitureTableRoundA" type="Node2D"]
 z_index = 2
@@ -34,7 +34,7 @@ ItemDefinition = ExtResource("2_ovrx3")
 GrabAreaPath = NodePath("RigidBody2D/CollisionArea")
 HighlightSpritePath = NodePath("RigidBody2D/Outline")
 DefaultOutlineColor = Color(0, 0, 0, 0)
-ThrowDamage = 10.0
+ThrowDamage = 6.0
 MinDamageVelocity = 0.0
 KnockbackForce = 0.0
 StopOnHit = true
@@ -80,6 +80,6 @@ shape = SubResource("RectangleShape2D_gy46y")
 [node name="StaticBody2D" type="StaticBody2D" parent="RigidBody2D" groups=["navigation_polygon_source_geometry_group"]]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/StaticBody2D"]
-position = Vector2(-0.5000038, -43)
+position = Vector2(-10.000028, -43)
 scale = Vector2(3.4, 3.4)
 shape = SubResource("RectangleShape2D_jyvv2")

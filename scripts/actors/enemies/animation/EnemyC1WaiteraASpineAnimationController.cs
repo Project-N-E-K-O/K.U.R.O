@@ -15,6 +15,7 @@ namespace Kuros.Actors.Enemies.Animation
         [Export] public string AttackAnimation = "attack";
         [Export] public string SkillAnimation = "skill";
         [Export] public string HitAnimation = "hit";
+        [Export] public string StunAnimation = "stun";
         [Export] public string DieAnimation = "death";
         [Export(PropertyHint.Range, "0,1,0.01")] public float MixDuration = 0.15f;
 
@@ -66,6 +67,9 @@ namespace Kuros.Actors.Enemies.Animation
                     break;
                 case "Hit":
                     PlayOnceIfNeeded("Hit", HitAnimation);
+                    break;
+                case "Frozen":
+                    PlayLoopIfNeeded("Frozen", StunAnimation);
                     break;
                 case "Dying":
                     PlayOnceIfNeeded("Die", DieAnimation, enqueueIdle: false);

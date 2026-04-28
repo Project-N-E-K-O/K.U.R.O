@@ -89,7 +89,7 @@ namespace Kuros.Effects
                 if (_enemyTimers[enemy] >= DamageInterval)
                 {
                     _enemyTimers[enemy] = 0f;
-                    enemy.TakeDamage(DamagePerTick, Actor?.GlobalPosition, Actor);
+                    enemy.TakeDamage(DamagePerTick, Actor?.GlobalPosition, Actor, Kuros.Core.Events.DamageSource.AreaEffect);
                 }
             }
 
@@ -118,7 +118,7 @@ namespace Kuros.Effects
 
             // 立刻造成首次伤害
             if (!enemy.IsDead)
-                enemy.TakeDamage(DamagePerTick, Actor?.GlobalPosition, Actor);
+                enemy.TakeDamage(DamagePerTick, Actor?.GlobalPosition, Actor, Kuros.Core.Events.DamageSource.AreaEffect);
 
             // 使用倍数乘积管理减速
             ApplySpeedMultiplier(enemy, _speedMultiplier);

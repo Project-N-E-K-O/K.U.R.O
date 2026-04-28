@@ -1,0 +1,77 @@
+[gd_scene load_steps=17 format=3 uid="uid://1dmiw35p7g47"]
+
+[ext_resource type="Texture2D" uid="uid://i7fbmetcqnn3" path="res://assets/effect/AttackEffect/stab1/时间轴 1_0000.png" id="1_1wl5l"]
+[ext_resource type="Texture2D" uid="uid://brkfl14ap0qer" path="res://assets/effect/AttackEffect/stab1/时间轴 1_0001.png" id="2_m4yri"]
+[ext_resource type="Texture2D" uid="uid://dr8qbm5euynvt" path="res://assets/effect/AttackEffect/stab1/时间轴 1_0002.png" id="3_0ks2j"]
+[ext_resource type="Texture2D" uid="uid://lpiyfbpqufrv" path="res://assets/effect/AttackEffect/stab1/时间轴 1_0003.png" id="4_7ux1e"]
+[ext_resource type="Texture2D" uid="uid://bd8phk7ri2byq" path="res://assets/effect/AttackEffect/stab1/时间轴 1_0004.png" id="5_ushvy"]
+[ext_resource type="Texture2D" uid="uid://1wulxgcm3yl3" path="res://assets/effect/AttackEffect/stab1/时间轴 1_0005.png" id="6_jv0ig"]
+[ext_resource type="Texture2D" uid="uid://cr7fny6tdief2" path="res://assets/effect/AttackEffect/stab1/时间轴 1_0006.png" id="7_3mvt7"]
+[ext_resource type="Texture2D" uid="uid://b4aaymeoljwtc" path="res://assets/effect/AttackEffect/stab1/时间轴 1_0007.png" id="8_oo72d"]
+[ext_resource type="Texture2D" uid="uid://bf0def1oe1nsu" path="res://assets/effect/AttackEffect/stab1/时间轴 1_0008.png" id="9_n4usr"]
+[ext_resource type="Texture2D" uid="uid://cxwggsj58htdi" path="res://assets/effect/AttackEffect/stab1/时间轴 1_0009.png" id="10_myvvp"]
+[ext_resource type="Texture2D" uid="uid://dxsruf1qxvs1y" path="res://assets/effect/AttackEffect/stab1/时间轴 1_0010.png" id="11_5fy7o"]
+[ext_resource type="Texture2D" uid="uid://cjb5q62nclvgf" path="res://assets/effect/AttackEffect/stab1/时间轴 1_0011.png" id="12_vv3m7"]
+[ext_resource type="Texture2D" uid="uid://b45f8rmiranwl" path="res://assets/effect/AttackEffect/stab1/时间轴 1_0012.png" id="13_v3lgr"]
+[ext_resource type="Texture2D" uid="uid://dhyaxj66gg0y6" path="res://assets/effect/AttackEffect/stab1/时间轴 1_0013.png" id="14_02lc3"]
+[ext_resource type="Texture2D" uid="uid://cpmv5xfxctfo2" path="res://assets/effect/AttackEffect/stab1/时间轴 1_0014.png" id="15_p5pyd"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_77bso"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_1wl5l")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_m4yri")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_0ks2j")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_7ux1e")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_ushvy")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_jv0ig")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_3mvt7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_oo72d")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_n4usr")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_myvvp")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_5fy7o")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_vv3m7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_v3lgr")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_02lc3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_p5pyd")
+}],
+"loop": false,
+"name": &"StabAttackEffect",
+"speed": 25.0
+}]
+
+[node name="StabAttackEffectA" type="AnimatedSprite2D"]
+z_index = 2
+sprite_frames = SubResource("SpriteFrames_77bso")
+animation = &"StabAttackEffect"
+playing = true
+speed_scale = 1.5

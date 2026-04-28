@@ -3,18 +3,20 @@ using Godot;
 using Kuros.Core;
 using Kuros.Core.Effects;
 using Kuros.Core.Events;
+using Kuros.Actors.Heroes.Attacks;
 
 namespace Kuros.Builds
 {
     /// <summary>
     /// 机械构筑 3 级效果：连续攻击命中时逐步提升额外最终伤害。
+    /// 仅在玩家第一段攻击命中时触发，后续段伤害不计入连续计数。
     /// </summary>
     [GlobalClass]
     public partial class BuildMachineLevel3Effect : ActorEffect
     {
         [Export(PropertyHint.Range, "0,10,1")] public int MaxBonusDamage { get; set; } = 2;
         [Export(PropertyHint.Range, "0,10,1")] public int BonusDamagePerChainStep { get; set; } = 1;
-        [Export(PropertyHint.Range, "0.05,10,0.05")] public float ComboWindowSeconds { get; set; } = 1.5f;
+        [Export(PropertyHint.Range, "0.05,10,0.05")] public float ComboWindowSeconds { get; set; } = 2.5f;
         [Export] public bool RequirePositiveDamage { get; set; } = true;
 
         private double _comboTimer;
@@ -40,7 +42,7 @@ namespace Kuros.Builds
                 return;
             }
 
-            DamageEventBus.Subscribe(OnDamageResolved);
+            DamageEventBus.SubscribeWithSource(OnDamageResolved);
             _subscribed = true;
         }
 
@@ -62,16 +64,24 @@ namespace Kuros.Builds
         {
             if (_subscribed)
             {
-                DamageEventBus.Unsubscribe(OnDamageResolved);
+                DamageEventBus.UnsubscribeWithSource(OnDamageResolved);
             }
 
             _subscribed = false;
             base.OnRemoved();
         }
 
-        private void OnDamageResolved(GameActor attacker, GameActor target, int damage)
+        private void OnDamageResolved(GameActor attacker, GameActor target, int damage, DamageSource source)
         {
+            if (source != DamageSource.DirectAttack) return;
             if (Actor == null || attacker != Actor || target == null)
+            {
+                return;
+            }
+
+            // 只在第一段伤害时触发效果
+            // 后续段伤害不应用加成，以避免多段攻击时加成被放大
+            if (PlayerAttackTemplate.CurrentAttackHitStep != 1)
             {
                 return;
             }

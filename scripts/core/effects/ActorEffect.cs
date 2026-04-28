@@ -27,6 +27,15 @@ namespace Kuros.Core.Effects
 
         public bool IsExpired => Duration > 0 && _elapsed >= Duration;
         public int CurrentStacks => _currentStacks;
+        
+        /// <summary>
+        /// 获取效果的剩余时长（秒）。若Duration为0或负数表示永久效果，返回0。
+        /// </summary>
+        public float GetRemainingDuration()
+        {
+            if (Duration <= 0) return 0f;
+            return Mathf.Max(Duration - _elapsed, 0f);
+        }
 
         public void Initialize(GameActor actor, EffectController controller)
         {

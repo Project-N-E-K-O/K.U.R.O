@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="WeaponSkillDefinition" load_steps=3 format=3 uid="uid://d1b3b7rg8p75c"]
+
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="1_bdrdo"]
+[ext_resource type="Script" uid="uid://bp6pwgoj44cuq" path="res://scripts/items/weapons/WeaponSkillDefinition.cs" id="2_egp4s"]
+
+[resource]
+script = ExtResource("2_egp4s")
+SkillId = "WeaponSkill_Brawl_RiotGlove"
+DisplayName = "镇暴拳套攻击"
+AnimationName = "Weapon_Brawl_RiotGlove"
+ShowHitboxDebug = false
+Description = "每次攻击到敌人时，都有20%概率使这一次的dmg *2"
+ActivationAction = "weapon_skill_block"

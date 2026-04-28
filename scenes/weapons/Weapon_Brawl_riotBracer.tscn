@@ -21,7 +21,7 @@ shader_parameter/edge_softness = 0.12
 shader_parameter/preserve_fill = true
 
 [sub_resource type="RectangleShape2D" id="BodyShape_rr6vl"]
-size = Vector2(1200, 500)
+size = Vector2(1078.788, 654.5454)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_82c6d"]
 size = Vector2(500, 400)
@@ -47,16 +47,14 @@ texture = ExtResource("3_82c6d")
 
 [node name="Sprite2D" type="Sprite2D" parent="Outline"]
 texture = ExtResource("3_82c6d")
-region_enabled = true
 region_rect = Rect2(0, 64, 776, 344)
 
 [node name="CollisionArea" type="Area2D" parent="."]
-visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CollisionArea"]
 z_index = 1
-position = Vector2(-2, 0)
-scale = Vector2(0.5, 0.5)
+position = Vector2(-7.224805e-06, 24.242407)
+scale = Vector2(0.49999994, 0.49999994)
 shape = SubResource("BodyShape_rr6vl")
 
 [node name="AttackArea" type="Area2D" parent="."]

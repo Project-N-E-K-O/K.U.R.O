@@ -13,6 +13,7 @@ shader_parameter/softness = 0.5
 shader_parameter/alpha = 0.4
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_5sin4"]
+resource_local_to_scene = true
 shader = ExtResource("5_bd20n")
 shader_parameter/outline_color = Color(0.02, 0.02, 0.02, 1)
 shader_parameter/outline_size = 32.0
@@ -34,7 +35,7 @@ ItemDefinition = ExtResource("2_2omr6")
 GrabAreaPath = NodePath("RigidBody2D/CollisionArea")
 HighlightSpritePath = NodePath("RigidBody2D/Outline")
 DefaultOutlineColor = Color(0, 0, 0, 0)
-ThrowDamage = 5.0
+ThrowDamage = 2.0
 MinDamageVelocity = 0.0
 KnockbackForce = 0.0
 StopOnHit = true

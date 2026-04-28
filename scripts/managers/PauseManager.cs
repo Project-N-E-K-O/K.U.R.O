@@ -14,7 +14,7 @@ namespace Kuros.Managers
 
 		private int _pauseCount = 0;
 		private SceneTree? _tree;
-
+		private float _gameTimeScale = 1.0f;
 		public override void _Ready()
 		{
 			if (Instance != null && Instance != this)

@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://b3nhftj45ban3" path="res://scripts/effects/StunEnemiesEffect.cs" id="1_stun_script"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_27qv0"]
-radius = 400.0
+radius = 300.0
 
 [node name="StunEnemiesEffect" type="Node"]
 script = ExtResource("1_stun_script")

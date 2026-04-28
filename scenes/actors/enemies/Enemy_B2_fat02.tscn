@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=3 uid="uid://wrebd662va23"]
+[gd_scene load_steps=30 format=3 uid="uid://wrebd662va23"]
 
 [ext_resource type="Script" uid="uid://dklt5k3rq7qjb" path="res://scripts/actors/enemies/EnemyB2Fat02.cs" id="1_gvrrx"]
 [ext_resource type="Resource" uid="uid://d2yxetxicyb1b" path="res://resources/loot/Enemy_B_NormalDrops.tres" id="2_ooggc"]
@@ -13,6 +13,7 @@
 [ext_resource type="Script" uid="uid://cmnxe0hpulqnx" path="res://scripts/actors/enemies/attacks/EnemySmashAttack.cs" id="10_6yc1u"]
 [ext_resource type="Script" uid="uid://cu6enbmbcicac" path="res://scripts/actors/enemies/attacks/EnemySimpleMeleeAttack.cs" id="12_daw10"]
 [ext_resource type="Script" uid="uid://cwnxfhj8ysc2f" path="res://scripts/actors/enemies/states/EnemyHitState.cs" id="13_ey01n"]
+[ext_resource type="PackedScene" uid="uid://3o6u0oms7vm6" path="res://shaders/smash_effect.tscn" id="14_6yc1u"]
 [ext_resource type="Script" uid="uid://cihawgv4js52w" path="res://scripts/actors/enemies/states/EnemyFrozenState.cs" id="14_rru7p"]
 [ext_resource type="Script" uid="uid://fpfidsmcwy6w" path="res://scripts/actors/enemies/states/EnemyCooldownFrozenState.cs" id="15_3ftbl"]
 [ext_resource type="Script" uid="uid://cbmvuppulotha" path="res://scripts/actors/enemies/states/EnemyDyingState.cs" id="16_23m8e"]
@@ -38,14 +39,13 @@ radius = 350.0
 height = 800.0
 
 [sub_resource type="RectangleShape2D" id="2"]
-size = Vector2(1600, 700)
+size = Vector2(1350, 880)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_6yc1u"]
 radius = 600.0
 
-[sub_resource type="CapsuleShape2D" id="3"]
-radius = 200.0
-height = 900.0
+[sub_resource type="CircleShape2D" id="CircleShape2D_xrpf5"]
+radius = 380.0
 
 [node name="Enemy_B2_fat02" type="CharacterBody2D" node_paths=PackedStringArray("DetectionArea", "AttackArea", "StateMachine", "EffectController")]
 z_index = 2
@@ -71,7 +71,7 @@ DamageFlashColor = Color(18.892157, 18.892157, 18.892157, 1)
 [node name="Shadow" type="Sprite2D" parent="."]
 show_behind_parent = true
 material = SubResource("ShaderMaterial_b5vhy")
-scale = Vector2(24, 4.5)
+scale = Vector2(20, 10)
 texture = ExtResource("5_bb8mk")
 
 [node name="OutlineLayer" type="Node2D" parent="."]
@@ -126,7 +126,7 @@ skeleton_data_res = ExtResource("19_gvrrx")
 preview_skin = "Default"
 preview_animation = "-- Empty --"
 preview_frame = true
-preview_time = 1.04
+preview_time = 2.0
 script = ExtResource("20_ooggc")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
@@ -162,16 +162,16 @@ rotation = 1.5707964
 shape = SubResource("CapsuleShape2D_gvrrx")
 
 [node name="AttackArea" type="Area2D" parent="Sprite2D"]
+visible = false
 collision_layer = 0
 monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/AttackArea"]
-position = Vector2(900, 80)
+position = Vector2(780, 170)
 scale = Vector2(0.9999999, 0.9999999)
 shape = SubResource("2")
 
 [node name="SmashArea" type="Area2D" parent="Sprite2D"]
-visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/SmashArea"]
 position = Vector2(900, 900)
@@ -179,10 +179,7 @@ scale = Vector2(1.4, 1.2)
 shape = SubResource("CircleShape2D_6yc1u")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-visible = false
-position = Vector2(0, -160)
-rotation = 1.5707964
-shape = SubResource("3")
+shape = SubResource("CircleShape2D_xrpf5")
 
 [node name="StateMachine" type="Node" parent="." node_paths=PackedStringArray("InitialState")]
 script = ExtResource("6_5fjrf")
@@ -206,13 +203,15 @@ PlayerDetectionAreaPath = NodePath("../../../Sprite2D/ControllerDetectionArea")
 script = ExtResource("10_6yc1u")
 DetectionAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
 SmashAreaPath = NodePath("../../../../Sprite2D/SmashArea")
-DashSpeed = 800.0
+DashSpeed = 900.0
+DashDuration = 1.05
 SnapshotDelaySeconds = 0.5
 SmashDmg = 5
 AppliedStunDuration = 2.0
 WarmupDuration = 0.6
-ActiveDuration = 0.43
-RecoveryDuration = 0.97
+ActiveDuration = 0.45
+RecoveryDuration = 0.95
+CooldownDuration = 0.0
 AttackAreaPath = NodePath("../../../../Sprite2D/SmashArea")
 KnockbackDistance = 500.0
 KnockbackDuration = 0.1
@@ -220,6 +219,9 @@ KnockbackSpeed = 2500.0
 RequireAnimationHitTrigger = true
 EnableSuperArmor = true
 IgnoreEnemyCollisionDuringAttack = true
+EffectScene = ExtResource("14_6yc1u")
+EffectOffset = Vector2(250, 0)
+SpawnTiming = 1
 metadata/attack_weight = 60.0
 
 [node name="SimpleMeleeAttack" type="Node" parent="StateMachine/Attack/AttackController"]
@@ -261,7 +263,6 @@ FreezeDuration = 1.0
 script = ExtResource("20_xrpf5")
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
-path_desired_distance = 64.0
 target_desired_distance = 50.0
 path_max_distance = 500.0
 avoidance_enabled = true

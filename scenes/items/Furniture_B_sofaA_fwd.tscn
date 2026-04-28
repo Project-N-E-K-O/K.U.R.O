@@ -1,0 +1,86 @@
+[gd_scene load_steps=10 format=3 uid="uid://bkxqiwlgdq03s"]
+
+[ext_resource type="Script" uid="uid://dhfq2rrha0awm" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_pynux"]
+[ext_resource type="Resource" uid="uid://cw8r0qohfelka" path="res://resources/items/Furniture_B_SofaA_fwd.tres" id="2_pynux"]
+[ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="3_b5et6"]
+[ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="5_mn3ns"]
+[ext_resource type="Texture2D" uid="uid://c3ef1oinnbpsf" path="res://assets/furnitures/hotel_scene2/SofaA_fwd.png" id="6_pynux"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_aa7cv"]
+shader = ExtResource("3_b5et6")
+shader_parameter/softness = 0.5
+shader_parameter/alpha = 0.4
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_5sin4"]
+shader = ExtResource("5_mn3ns")
+shader_parameter/outline_color = Color(0.02, 0.02, 0.02, 1)
+shader_parameter/outline_size = 32.0
+shader_parameter/alpha_threshold = 0.5
+shader_parameter/edge_softness = 0.12
+shader_parameter/preserve_fill = true
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_gy46y"]
+size = Vector2(488, 806)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_jyvv2"]
+size = Vector2(156.76471, 229.7059)
+
+[node name="FurnitureSofaA_fwd" type="Node2D"]
+z_index = 2
+y_sort_enabled = true
+script = ExtResource("1_pynux")
+ItemDefinition = ExtResource("2_pynux")
+GrabAreaPath = NodePath("RigidBody2D/CollisionArea")
+HighlightSpritePath = NodePath("RigidBody2D/Outline")
+DefaultOutlineColor = Color(0, 0, 0, 0)
+ThrowDamage = 10.0
+MinDamageVelocity = 0.0
+KnockbackForce = 0.0
+StopOnHit = true
+DestructionAnimationDuration = 0.0
+LandingHideDelay = 0.01
+RigidBodyPath = NodePath("RigidBody2D")
+HitboxAreaPath = NodePath("RigidBody2D/AttackArea")
+
+[node name="RigidBody2D" type="RigidBody2D" parent="."]
+gravity_scale = 0.0
+can_sleep = false
+freeze = true
+freeze_mode = 1
+
+[node name="Shadow" type="Sprite2D" parent="RigidBody2D"]
+material = SubResource("ShaderMaterial_aa7cv")
+position = Vector2(16, 314)
+scale = Vector2(0.28, 0.28)
+texture = ExtResource("6_pynux")
+
+[node name="Outline" type="Sprite2D" parent="RigidBody2D"]
+material = SubResource("ShaderMaterial_5sin4")
+scale = Vector2(0.33, 0.33)
+texture = ExtResource("6_pynux")
+offset = Vector2(0, 800)
+
+[node name="Sprite2D" type="Sprite2D" parent="RigidBody2D/Outline"]
+texture = ExtResource("6_pynux")
+offset = Vector2(0, 800)
+
+[node name="CollisionArea" type="Area2D" parent="RigidBody2D"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/CollisionArea"]
+visible = false
+position = Vector2(28, 314)
+shape = SubResource("RectangleShape2D_gy46y")
+
+[node name="AttackArea" type="Area2D" parent="RigidBody2D"]
+visible = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/AttackArea"]
+position = Vector2(15.5, 45)
+shape = SubResource("RectangleShape2D_gy46y")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="RigidBody2D" groups=["navigation_polygon_source_geometry_group"]]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/StaticBody2D"]
+position = Vector2(-3.8146973e-06, 371.5)
+scale = Vector2(3.4, 3.4)
+shape = SubResource("RectangleShape2D_jyvv2")

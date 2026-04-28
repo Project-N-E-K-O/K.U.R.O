@@ -55,6 +55,11 @@ namespace Kuros.Core
 		public event Func<DamageEventArgs, bool>? DamageIntercepted;
 		public AnimationPlayer? AnimPlayer => _animationPlayer;
 		
+		/// <summary>
+		/// 保存Frozen状态被打断时的剩余时长，用于在Hit后恢复
+		/// </summary>
+		public float FrozenStateRemainingTime { get; set; } = 0f;
+		
 		protected Node2D _spineCharacter = null!;
 		protected Sprite2D _sprite = null!;
 		protected AnimationPlayer _animationPlayer = null!;
@@ -237,7 +242,7 @@ namespace Kuros.Core
 			return attackerArea.OverlapsBody(this);
 		}
 
-		public virtual void TakeDamage(int damage, Vector2? attackOrigin = null, GameActor? attacker = null)
+		public virtual void TakeDamage(int damage, Vector2? attackOrigin = null, GameActor? attacker = null, Events.DamageSource damageSource = Events.DamageSource.DirectAttack)
 		{
 			if (IsDeathSequenceActive || IsDead) return;
 			if (damage <= 0) return;
@@ -295,7 +300,7 @@ namespace Kuros.Core
 
 			if (attacker != null)
 			{
-				Events.DamageEventBus.Publish(attacker, this, damage);
+				Events.DamageEventBus.Publish(attacker, this, damage, damageSource);
 			}
 		}
 

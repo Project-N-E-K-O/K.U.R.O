@@ -94,7 +94,7 @@ namespace Kuros.Effects
             _stunnedEnemies.Add(enemy);
             var freeze = new FreezeEffect
             {
-                Duration = 99999f,   // 由本效果统一管理生命周期，不自行到期
+                Duration = this.Duration,   // 与区域眩晕效果同步倒计时
                 EffectId = $"{_idPrefix}_{enemy.GetInstanceId()}"
             };
             enemy.ApplyEffect(freeze);
@@ -123,7 +123,12 @@ namespace Kuros.Effects
             foreach (var enemy in _stunnedEnemies)
             {
                 if (!IsInstanceValid(enemy)) continue;
+                
+                // 移除应用的 FreezeEffect
                 enemy.RemoveEffect($"{_idPrefix}_{enemy.GetInstanceId()}");
+                
+                // 清空残留的 Frozen 状态恢复时长，防止后续 Hit 状态错误恢复 Frozen
+                enemy.FrozenStateRemainingTime = 0f;
             }
             _stunnedEnemies.Clear();
         }

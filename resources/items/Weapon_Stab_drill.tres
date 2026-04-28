@@ -9,7 +9,7 @@
 [sub_resource type="Resource" id="Attribute_AttackPower"]
 script = ExtResource("1_kq0dh")
 AttributeId = "attack_power"
-Value = 5.0
+Value = 4.0
 
 [resource]
 script = ExtResource("5_i15sv")
@@ -18,7 +18,7 @@ DisplayName = "钻头"
 Description = "机械武器：钻头"
 Icon = ExtResource("3_xvvcl")
 Category = "Weapon"
-Tags = Array[String](["tag_weapon", "build_machine", "tag_stab"])
+Tags = Array[String](["tag_weapon", "build_machine", "tag_stab", "hit_1"])
 MaxStackSize = 1
 AttributeEntries = Array[ExtResource("1_kq0dh")]([SubResource("Attribute_AttackPower")])
 WeaponSkillResources = Array[Resource]([ExtResource("4_kq0dh")])

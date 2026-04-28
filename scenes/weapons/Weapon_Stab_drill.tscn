@@ -1,7 +1,7 @@
 [gd_scene load_steps=11 format=3 uid="uid://cdnitqquebaw6"]
 
 [ext_resource type="Script" uid="uid://dtgdjgrqgype7" path="res://scripts/items/world/WorldItemEntity.cs" id="1_0qove"]
-[ext_resource type="Resource" uid="uid://ba0kuifke6v7o" path="res://resources/items/Weapon_Stab_Drill.tres" id="2_0qove"]
+[ext_resource type="Resource" uid="uid://ba0kuifke6v7o" path="res://resources/items/Weapon_Stab_drill.tres" id="2_0qove"]
 [ext_resource type="Texture2D" uid="uid://dkgk5xhiddujd" path="res://assets/weapons/钻头.png" id="3_0qove"]
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="3_1l2vw"]
 [ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="3_emqd7"]

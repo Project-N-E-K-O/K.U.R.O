@@ -22,6 +22,7 @@ GameSettingsManager="*res://scripts/managers/GameSettingsManager.cs"
 DialogueManager="*res://scripts/managers/DialogueManager.cs"
 SaveManager="*res://scripts/managers/SaveManager.cs"
 PauseManager="*res://scripts/managers/PauseManager.cs"
+FloatingDamageTextManager="*res://scripts/managers/FloatingDamageTextManager.cs"
 
 [display]
 

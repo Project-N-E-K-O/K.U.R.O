@@ -1,0 +1,8 @@
+[gd_resource type="SpineSkeletonDataResource" load_steps=3 format=3 uid="uid://d2mipn3j22njv"]
+
+[ext_resource type="SpineAtlasResource" uid="uid://x0fbqdxjtiqh" path="res://assets/spine/main_character/NPJQR.atlas" id="1_fypna"]
+[ext_resource type="SpineSkeletonFileResource" uid="uid://caqhx8rl8dnfg" path="res://assets/spine/main_character/NPJQR.spine-json" id="2_froab"]
+
+[resource]
+atlas_res = ExtResource("1_fypna")
+skeleton_file_res = ExtResource("2_froab")

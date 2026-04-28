@@ -1,13 +1,15 @@
-[gd_resource type="Resource" script_class="WeaponSkillDefinition" load_steps=4 format=3 uid="uid://bf0i6jxqjqnb5"]
+[gd_resource type="Resource" script_class="WeaponSkillDefinition" load_steps=5 format=3 uid="uid://bf0i6jxqjqnb5"]
 
 [ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="1_7jkjn"]
+[ext_resource type="PackedScene" uid="uid://bioknm040r2lo" path="res://resources/effects/KnockbackOnAttackEffect.tscn" id="2_uybkd"]
 [ext_resource type="Script" uid="uid://bp6pwgoj44cuq" path="res://scripts/items/weapons/WeaponSkillDefinition.cs" id="2_wr56q"]
 
 [sub_resource type="Resource" id="Resource_a5flt"]
 script = ExtResource("1_7jkjn")
 Trigger = 1
+EffectScene = ExtResource("2_uybkd")
 PropertyOverrides = Dictionary[String, Variant]({
-"attack_power": 6
+"KnockbackDistance": 100.0
 })
 metadata/_custom_type_script = "uid://bv0es4osw3x0r"
 
@@ -15,8 +17,10 @@ metadata/_custom_type_script = "uid://bv0es4osw3x0r"
 script = ExtResource("2_wr56q")
 SkillId = "Weapon_Stab_Drill"
 DisplayName = "钻头攻击"
+SkillType = 0
 AnimationName = "Weapon_Stab_Drill"
 CooldownSeconds = 3.0
-Description = "攻击到敌人时击退该敌人0.5m并使其速度减少30%持续1秒，该效果有3秒冷却"
+ShowHitboxDebug = false
+Description = "攻击到敌人时击退该敌人1m并使其速度减少30%持续1秒"
 Effects = Array[ExtResource("1_7jkjn")]([SubResource("Resource_a5flt")])
 ActivationAction = "weapon_skill_block"

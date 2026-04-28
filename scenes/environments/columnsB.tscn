@@ -1,6 +1,13 @@
-[gd_scene load_steps=3 format=3 uid="uid://bo6r21cbk3ftm"]
+[gd_scene load_steps=6 format=3 uid="uid://bo6r21cbk3ftm"]
 
+[ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="1_87lfk"]
 [ext_resource type="Texture2D" uid="uid://c72hb4tqgnj5f" path="res://assets/furnitures/hotel_scene2/ColumnsB.png" id="1_mbnq6"]
+[ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="2_873p6"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_4do5r"]
+shader = ExtResource("1_87lfk")
+shader_parameter/softness = 0.5
+shader_parameter/alpha = 0.4
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_3yw8j"]
 size = Vector2(304.00006, 254.00003)
@@ -13,6 +20,12 @@ gravity_scale = 0.0
 can_sleep = false
 freeze = true
 freeze_mode = 1
+
+[node name="Shadow" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_4do5r")
+position = Vector2(0, -4)
+scale = Vector2(6.4412036, 5.087142)
+texture = ExtResource("2_873p6")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 scale = Vector2(0.33, 0.33)

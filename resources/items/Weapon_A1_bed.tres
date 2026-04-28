@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="2_attribute_entry"]
 [ext_resource type="Texture2D" uid="uid://dccrl4lpl0t2h" path="res://icon.svg" id="3_bed_icon"]
 [ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="4_effect_entry"]
-[ext_resource type="PackedScene" path="res://resources/effects/HeavyCarrySlowEffect.tscn" id="6_slow_effect"]
+[ext_resource type="PackedScene" uid="uid://bi7guxtti6ocl" path="res://resources/effects/HeavyCarrySlowEffect.tscn" id="6_slow_effect"]
 [ext_resource type="Script" uid="uid://bkm4r2swk5lyl" path="res://scripts/items/durability/ItemDurabilityConfig.cs" id="durability_script"]
 
 [sub_resource type="Resource" id="Attribute_AttackPower"]

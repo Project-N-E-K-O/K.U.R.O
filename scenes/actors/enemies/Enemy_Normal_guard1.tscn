@@ -1,16 +1,16 @@
 [gd_scene load_steps=29 format=3 uid="uid://byi2utn347fwu"]
 
-[ext_resource type="Script" uid="uid://dk2iwmam78oa5" path="res://scripts/actors/enemies/EnemyNormalGuard1.cs" id="1_75dbm"]
-[ext_resource type="Resource" uid="uid://d2yxetxicyb1b" path="res://resources/loot/Enemy_B_NormalDrops.tres" id="2_lxpom"]
+[ext_resource type="Script" uid="uid://0oyesoklbkac" path="res://scripts/actors/enemies/EnemyNormalGuard1.cs" id="1_75dbm"]
+[ext_resource type="Resource" uid="uid://xsa2wlasoj6i" path="res://resources/loot/Enemy_Normal_NormalDrops.tres" id="2_0ugu3"]
 [ext_resource type="Script" uid="uid://d6ppl6a6djpr" path="res://scripts/core/effects/EffectController.cs" id="3_it0yr"]
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="4_f6qhq"]
 [ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="5_fp57c"]
 [ext_resource type="Script" uid="uid://cenpuhlcgesin" path="res://scripts/systems/fsm/StateMachine.cs" id="6_a0ggd"]
 [ext_resource type="Script" uid="uid://7sdhlullren0" path="res://scripts/actors/enemies/states/EnemyIdleState.cs" id="7_dc001"]
 [ext_resource type="Script" uid="uid://c6mvoo4sy0r7g" path="res://scripts/actors/enemies/states/EnemyWalkState.cs" id="8_rh8pq"]
-[ext_resource type="Script" uid="uid://cgsoggd2e4ljs" path="res://scripts/actors/enemies/attacks/EnemyNormalGuard1AttackController.cs" id="9_75dbm"]
+[ext_resource type="Script" uid="uid://cidaqa31665ta" path="res://scripts/actors/enemies/attacks/EnemyNormalGuard1AttackController.cs" id="9_75dbm"]
 [ext_resource type="Script" uid="uid://bo6uhkbqyxe6o" path="res://scripts/actors/enemies/states/EnemyAttackState.cs" id="9_h8efu"]
-[ext_resource type="Script" uid="uid://codttxa65jj5t" path="res://scripts/actors/enemies/attacks/EnemyOnePunchAttack.cs" id="10_75dbm"]
+[ext_resource type="Script" uid="uid://xg265nrl48s8" path="res://scripts/actors/enemies/attacks/EnemyOnePunchAttack.cs" id="10_75dbm"]
 [ext_resource type="Script" uid="uid://cu6enbmbcicac" path="res://scripts/actors/enemies/attacks/EnemySimpleMeleeAttack.cs" id="12_yoq8a"]
 [ext_resource type="Script" uid="uid://cwnxfhj8ysc2f" path="res://scripts/actors/enemies/states/EnemyHitState.cs" id="13_vr7xr"]
 [ext_resource type="Script" uid="uid://cihawgv4js52w" path="res://scripts/actors/enemies/states/EnemyFrozenState.cs" id="14_e7577"]
@@ -19,8 +19,8 @@
 [ext_resource type="Script" uid="uid://bta6sixb7kee4" path="res://scripts/actors/enemies/states/EnemyDeadState.cs" id="17_lt3oi"]
 [ext_resource type="SpineSkeletonDataResource" uid="uid://bkpmrpkt4puta" path="res://animations/spine/Enemy_Normal_guard1.tres" id="17_s72su"]
 [ext_resource type="Script" uid="uid://dasv6eyuks8yq" path="res://scripts/actors/enemies/movement/EnemyFreezeOnTurnMovement.cs" id="18_u8fiq"]
-[ext_resource type="Script" uid="uid://266uyrs4q4pa" path="res://scripts/actors/enemies/animation/EnemyNormalGuard1SpineAnimationController.cs" id="19_lxpom"]
-[ext_resource type="Script" uid="uid://bbybuyitd10jr" path="res://scripts/controllers/SpineController.gd" id="20_0ugu3"]
+[ext_resource type="Script" uid="uid://3eddvmlbom6u" path="res://scripts/actors/enemies/animation/EnemyNormalGuard1SpineAnimationController.cs" id="19_lxpom"]
+[ext_resource type="Script" uid="uid://c1otj8df5nwyr" path="res://scripts/controllers/SpineController.gd" id="20_0ugu3"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_b5vhy"]
 shader = ExtResource("4_f6qhq")
@@ -43,9 +43,8 @@ height = 600.0
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_gvrrx"]
 size = Vector2(709, 313)
 
-[sub_resource type="CapsuleShape2D" id="3"]
-radius = 80.0
-height = 500.0
+[sub_resource type="CircleShape2D" id="CircleShape2D_0ugu3"]
+radius = 180.0
 
 [node name="Enemy_Normal_guard1" type="CharacterBody2D" node_paths=PackedStringArray("DetectionArea", "AttackArea", "StateMachine", "EffectController")]
 z_index = 2
@@ -66,13 +65,13 @@ AttackCooldown = 1.0
 MaxHealth = 15
 StateMachine = NodePath("StateMachine")
 EffectController = NodePath("EffectController")
-LootTable = ExtResource("2_lxpom")
+LootTable = ExtResource("2_0ugu3")
 DamageFlashColor = Color(18.892157, 18.892157, 18.892157, 1)
 
 [node name="Shadow" type="Sprite2D" parent="."]
 show_behind_parent = true
 material = SubResource("ShaderMaterial_b5vhy")
-scale = Vector2(10, 3)
+scale = Vector2(10, 5)
 texture = ExtResource("5_fp57c")
 
 [node name="OutlineLayer" type="Node2D" parent="."]
@@ -177,10 +176,7 @@ position = Vector2(399.5, 65.5)
 shape = SubResource("RectangleShape2D_gvrrx")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-visible = false
-position = Vector2(0, -50)
-rotation = 1.5707964
-shape = SubResource("3")
+shape = SubResource("CircleShape2D_0ugu3")
 
 [node name="StateMachine" type="Node" parent="." node_paths=PackedStringArray("InitialState")]
 script = ExtResource("6_a0ggd")
@@ -265,7 +261,6 @@ AttackMixDuration = 0.0
 SkillMixDuration = 0.0
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
-path_desired_distance = 64.0
 target_desired_distance = 50.0
 path_max_distance = 500.0
 avoidance_enabled = true
