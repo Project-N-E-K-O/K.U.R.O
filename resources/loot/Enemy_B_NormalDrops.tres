@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="LootDropTable" load_steps=11 format=3 uid="uid://d2yxetxicyb1b"]
 
 [ext_resource type="Script" uid="uid://nd1f744icb05" path="res://scripts/systems/loot/LootDropEntry.cs" id="2_1ee31"]
-[ext_resource type="Resource" uid="uid://ba0kuifke6v7o" path="res://resources/items/Weapon_Stab_Drill.tres" id="3_e2vn0"]
+[ext_resource type="Resource" uid="uid://ba0kuifke6v7o" path="res://resources/items/Weapon_Stab_drill.tres" id="3_e2vn0"]
 [ext_resource type="Resource" uid="uid://b1jpt8qriaub8" path="res://resources/items/Weapon_Slash_BarrierGate.tres" id="4_syeeu"]
 [ext_resource type="Resource" uid="uid://dsmyr3iwkk7n5" path="res://resources/items/Weapon_Brawl_MechGlove.tres" id="5_1ee31"]
 [ext_resource type="Resource" uid="uid://j6kveph5wqjm" path="res://resources/items/Weapon_Throw_MetalSpike.tres" id="5_geg3s"]

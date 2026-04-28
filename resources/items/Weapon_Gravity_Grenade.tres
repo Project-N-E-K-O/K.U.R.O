@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=6 format=3 uid="uid://dm7l4jq8c8hdt"]
+
+[ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="1_attr"]
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="2_effect"]
+[ext_resource type="Texture2D" uid="uid://dccrl4lpl0t2h" path="res://icon.svg" id="3_icon"]
+[ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="4_def"]
+
+[sub_resource type="Resource" id="Attribute_AttackPower"]
+script = ExtResource("1_attr")
+AttributeId = "attack_power"
+Value = 3.0
+
+[resource]
+script = ExtResource("4_def")
+ItemId = "Weapon_Gravity_Grenade"
+DisplayName = "重力手雷"
+Description = "投掷生成黑洞，吸引并持续伤害周围敌人"
+Icon = ExtResource("3_icon")
+Category = "Weapon"
+Tags = Array[String](["tag_weapon", "throwable", "tag_ranged", "gravity"])
+MaxStackSize = 5
+AttributeEntries = Array[ExtResource("1_attr")]([SubResource("Attribute_AttackPower")])
+WeaponSkillResources = Array[Resource]([])
+BuildClass = ""
+WorldScenePath = "res://scenes/items/weapons/GravityGrenade.tscn"

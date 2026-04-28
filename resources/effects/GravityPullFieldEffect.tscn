@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://udregeg33142"]
+
+[ext_resource type="Script" path="res://scripts/effects/GravityPullFieldEffect.cs" id="1_gravity"]
+
+[node name="GravityPullFieldEffect" type="Node2D"]
+script = ExtResource("1_gravity")
+Duration = null
+FadeOutDuration = null
+PullRadius = null
+DamagePerSecond = null
+PullForce = null

@@ -1,4 +1,4 @@
-[gd_scene load_steps=34 format=3 uid="uid://qd5abd4opeob"]
+[gd_scene load_steps=36 format=3 uid="uid://qd5abd4opeob"]
 
 [ext_resource type="PackedScene" uid="uid://dd8xmpgwy0t2o" path="res://scenes/environments/scene2.tscn" id="1_7jsho"]
 [ext_resource type="Script" uid="uid://x1ic1ym4ykq8" path="res://scripts/scenes/BattleSceneManager.cs" id="1_ctuyy"]
@@ -10,7 +10,7 @@
 [ext_resource type="PackedScene" uid="uid://cofm45kotvgto" path="res://scenes/actors/enemies/Enemy_B1_fat.tscn" id="6_ctuyy"]
 [ext_resource type="PackedScene" uid="uid://cqpk38oxthrr1" path="res://scenes/items/Furniture_B_tableRoundA.tscn" id="6_sxiib"]
 [ext_resource type="Script" uid="uid://b7afb3wjghskq" path="res://scripts/items/world/DropItemDebugger.cs" id="7_k0qph"]
-[ext_resource type="Script" uid="uid://b3iq6dm2pc5y0" path="res://scripts/controllers/EnemySpawnManager.cs" id="8_5klp8"]
+[ext_resource type="Script" uid="uid://carsh4dnv63qg" path="res://scripts/controllers/EnemySpawnManager.cs" id="8_5klp8"]
 [ext_resource type="PackedScene" uid="uid://6ghjqyjkk37w" path="res://scenes/weapons/Weapon_Stab_umbrella.tscn" id="8_pvxkr"]
 [ext_resource type="PackedScene" uid="uid://dmg1hgmpmsc05" path="res://scenes/items/Furniture_B_coffeeMachineA.tscn" id="9_4r5ho"]
 [ext_resource type="PackedScene" uid="uid://2pny8f8vuu3j" path="res://scenes/weapons/Weapon_Slash_barrierGate.tscn" id="10_f0l3g"]
@@ -23,13 +23,15 @@
 [ext_resource type="PackedScene" uid="uid://byi2utn347fwu" path="res://scenes/actors/enemies/Enemy_Normal_guard1.tscn" id="13_x3vg8"]
 [ext_resource type="PackedScene" uid="uid://djio6ojcqw8yf" path="res://scenes/actors/enemies/Enemy_Normal_guard2.tscn" id="14_cwau0"]
 [ext_resource type="PackedScene" uid="uid://bvvyo3wubh12j" path="res://scenes/weapons/Weapon_Throw_gravityGrenade.tscn" id="14_t6vgq"]
-[ext_resource type="PackedScene" uid="uid://bkbhucnxqiys2" path="res://scenes/items/Furniture_B_counterB.tscn" id="15_22xbq"]
+[ext_resource type="PackedScene" uid="uid://bkbhucnxqiys2" path="res://scenes/items/Furniture_B_CounterB.tscn" id="15_22xbq"]
 [ext_resource type="PackedScene" uid="uid://3c5l27vhvwni" path="res://scenes/items/Furniture_B_sofaA.tscn" id="16_ly1ch"]
 [ext_resource type="PackedScene" uid="uid://ctpw5uqly3yu5" path="res://scenes/weapons/Weapon_Brawl_mechGlove.tscn" id="19_t6vgq"]
 [ext_resource type="PackedScene" uid="uid://0anrcfm2pnsd" path="res://scenes/items/Furniture_B_luggageCartA.tscn" id="22_22xbq"]
 [ext_resource type="PackedScene" uid="uid://1mc4twnj45va" path="res://scenes/items/Furniture_B_tableRoundB.tscn" id="24_nosxg"]
+[ext_resource type="PackedScene" uid="uid://ds87c8d0i4h8a" path="res://shaders/black_hole.tscn" id="25_i6en5"]
 [ext_resource type="PackedScene" uid="uid://kwbg3wy7rik" path="res://scenes/items/Furniture_B_chairA.tscn" id="26_cd8hr"]
 [ext_resource type="PackedScene" uid="uid://dsfadn8x6iwkh" path="res://scenes/items/Furniture_B_plantA.tscn" id="29_edhkl"]
+[ext_resource type="PackedScene" uid="uid://cgjrdwkemgrcy" path="res://scenes/actors/heroes/P2.tscn" id="30_p2_companion"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2l4aj"]
 size = Vector2(1112.5, 1843)
@@ -116,6 +118,9 @@ HitStopOnPlayerAttackHit = true
 PlayerAttackHitHitStopDuration = 0.1
 PlayerAttackKillHitStopDuration = 0.3
 HitStopDelay = 0.1
+
+[node name="P2" parent="World" instance=ExtResource("30_p2_companion")]
+position = Vector2(-5710, 210)
 
 [node name="DroopTest" type="Node2D" parent="World"]
 
@@ -233,3 +238,6 @@ MaxHealth = 1000
 [node name="NavigationRegion2D" type="NavigationRegion2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
 position = Vector2(12, 49)
 navigation_polygon = SubResource("NavigationPolygon_bjupw")
+
+[node name="BlackHole" parent="." instance=ExtResource("25_i6en5")]
+position = Vector2(-6866, 263)

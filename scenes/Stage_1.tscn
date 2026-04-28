@@ -41,6 +41,7 @@
 [ext_resource type="PackedScene" uid="uid://r6k0tyrf5n84" path="res://scenes/items/Weapon_A1_door.tscn" id="60_nnnrk"]
 [ext_resource type="PackedScene" uid="uid://bbcqflgys8xp2" path="res://scenes/items/Weapon_A1_door2.tscn" id="61_qpe52"]
 [ext_resource type="PackedScene" uid="uid://chway4etqkroy" path="res://scenes/objects/Moving_A1_taxi.tscn" id="62_7gwax"]
+[ext_resource type="PackedScene" uid="uid://cgjrdwkemgrcy" path="res://scenes/actors/heroes/P2.tscn" id="63_p2_companion"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_sb658"]
 size = Vector2(17, 1106)
@@ -87,6 +88,9 @@ metadata/_edit_lock_ = true
 
 [node name="MainCharacter" parent="World" instance=ExtResource("4_givaq")]
 position = Vector2(317, 454)
+
+[node name="P2" parent="World" instance=ExtResource("63_p2_companion")]
+position = Vector2(530, 390)
 
 [node name="Camera2D" type="Camera2D" parent="World/MainCharacter"]
 position = Vector2(-18.75, -781.25)

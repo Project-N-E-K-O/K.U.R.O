@@ -676,6 +676,7 @@ namespace Kuros.Items.World
 					
 					// 确保最终位置精确在落点
 					_rigidBody.GlobalPosition = new Vector2(newX, landingY);
+					GD.Print($"[PhysicsProcess] Projectile landed at GlobalPosition={_rigidBody.GlobalPosition}, this.GlobalPosition={GlobalPosition}");
 					
 					// 停止伤害检测并恢复原始碰撞设置
 					_impactArmed = false;
@@ -1405,6 +1406,10 @@ namespace Kuros.Items.World
 		/// </summary>
 		private void HideItemAtLanding()
 		{
+			// 调试：输出落地时的位置信息
+			Vector2 debugPos = _rigidBody?.GlobalPosition ?? GlobalPosition;
+			GD.Print($"[HideItemAtLanding] Called at position: _rigidBody.GlobalPosition={(_rigidBody?.GlobalPosition)}, GlobalPosition={GlobalPosition}, debugPos={debugPos}, IsThrowWeapon={IsThrowWeapon}");
+			
 			// 隐藏视觉表现
 			if (_rigidBody != null)
 			{
@@ -1746,7 +1751,26 @@ namespace Kuros.Items.World
 		{
 			if (ItemDefinition == null) return;
 
-			Vector2 spawnPos = _rigidBody?.GlobalPosition ?? GlobalPosition;
+			// 改进位置获取逻辑：优先使用 RigidBody2D，然后是当前位置
+			Vector2 spawnPos = Vector2.Zero;
+			
+			if (_rigidBody != null)
+			{
+				spawnPos = _rigidBody.GlobalPosition;
+				GD.Print($"[SpawnThrowDestroyEffects] Using _rigidBody.GlobalPosition: {spawnPos}");
+			}
+			else
+			{
+				spawnPos = GlobalPosition;
+				GD.Print($"[SpawnThrowDestroyEffects] Using GlobalPosition (no RigidBody): {spawnPos}");
+			}
+
+			// 如果位置为 (0,0)，使用 Node2D 的全局位置作为备方案
+			if (spawnPos == Vector2.Zero && GetParent() != null)
+			{
+				spawnPos = GlobalPosition;
+				GD.PushWarning($"[SpawnThrowDestroyEffects] Position was (0,0), using fallback GlobalPosition: {spawnPos}");
+			}
 
 			foreach (var entry in ItemDefinition.GetEffectEntries(ItemEffectTrigger.OnThrowDestroy))
 			{
@@ -1760,8 +1784,22 @@ namespace Kuros.Items.World
 					if (node is Node2D node2D)
 					{
 						// 视觉效果：在世界坐标生成，使用 RigidBody 的实际落点位置
-						GetParent()?.AddChild(node2D);
+						var targetParent = GetParent();
+						if (targetParent == null)
+						{
+							targetParent = GetTree().CurrentScene;
+							GD.PushWarning("[SpawnThrowDestroyEffects] GetParent() is null, using CurrentScene");
+						}
+						targetParent?.AddChild(node2D);
 						node2D.GlobalPosition = spawnPos;
+
+						if (node2D is GravityGrenadeBlackHole gravityBlackHole)
+						{
+							gravityBlackHole.SetSourceActor(LastDroppedBy);
+							gravityBlackHole.AttractRadius = ResolveGravityRadiusFromHitbox();
+						}
+
+						GD.Print($"[SpawnThrowDestroyEffects] Node2D effect spawned at {spawnPos}, parent: {targetParent?.Name}, node type: {node.GetType().Name}");
 					}
 					else if (node is Kuros.Core.Effects.ActorEffect actorEffect)
 					{
@@ -1797,6 +1835,52 @@ namespace Kuros.Items.World
 					GD.PushWarning($"[{Name}] 无法生成 OnThrowDestroy 效果: {ex.Message}");
 				}
 			}
+		}
+
+		private float ResolveGravityRadiusFromHitbox()
+		{
+			const float fallbackRadius = 200f;
+
+			if (_hitboxArea == null)
+			{
+				return fallbackRadius;
+			}
+
+			CollisionShape2D? shapeNode = _hitboxArea.GetNodeOrNull<CollisionShape2D>("CollisionShape2D");
+			if (shapeNode == null)
+			{
+				foreach (Node child in _hitboxArea.GetChildren())
+				{
+					if (child is CollisionShape2D candidate && candidate.Shape != null)
+					{
+						shapeNode = candidate;
+						break;
+					}
+				}
+			}
+
+			if (shapeNode?.Shape == null)
+			{
+				return fallbackRadius;
+			}
+
+			float radius = fallbackRadius;
+			switch (shapeNode.Shape)
+			{
+				case CircleShape2D circle:
+					radius = circle.Radius;
+					break;
+				case RectangleShape2D rect:
+					radius = Mathf.Max(rect.Size.X, rect.Size.Y) * 0.5f;
+					break;
+				case CapsuleShape2D capsule:
+					radius = Mathf.Max(capsule.Height, capsule.Radius * 2f) * 0.5f;
+					break;
+			}
+
+			Vector2 areaScale = _hitboxArea.GlobalScale;
+			float scale = Mathf.Max(Mathf.Abs(areaScale.X), Mathf.Abs(areaScale.Y));
+			return Mathf.Max(1f, radius * Mathf.Max(scale, 0.0001f));
 		}
 
 		private static T? FindChildComponent<T>(Node root) where T : Node
