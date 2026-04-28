@@ -17,7 +17,6 @@ metadata/_custom_type_script = "uid://bv0es4osw3x0r"
 script = ExtResource("2_hduh6")
 SkillId = "WeaponSkill_Stab_Umbrella"
 DisplayName = "雨伞攻击"
-SkillType = 0
 AnimationName = "attack_thrust"
 CooldownSeconds = 2.5
 ShowHitboxDebug = false

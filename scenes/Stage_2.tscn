@@ -60,6 +60,20 @@ outlines = Array[PackedVector2Array]([PackedVector2Array(-9573, -1692, -9566, 18
 source_geometry_mode = 2
 agent_radius = 50.0
 
+[sub_resource type="Animation" id="Animation_jurhs"]
+length = 0.001
+tracks/0/type = "bezier"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Node2D/Moving_A1_taxi:position:y")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"handle_modes": PackedInt32Array(0),
+"points": PackedFloat32Array(2155, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0)
+}
+
 [sub_resource type="Animation" id="Animation_mdjvw"]
 resource_name = "taxi_moving"
 length = 1.5
@@ -73,20 +87,6 @@ tracks/0/keys = {
 "handle_modes": PackedInt32Array(2, 2),
 "points": PackedFloat32Array(2155, -0.25, 0, 0.25, 0, 300, -0.25, 309.16666, 0, 0),
 "times": PackedFloat32Array(0, 1.5)
-}
-
-[sub_resource type="Animation" id="Animation_jurhs"]
-length = 0.001
-tracks/0/type = "bezier"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Node2D/Moving_A1_taxi:position:y")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"handle_modes": PackedInt32Array(0),
-"points": PackedFloat32Array(2155, -0.25, 0, 0.25, 0),
-"times": PackedFloat32Array(0)
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_edhkl"]
@@ -375,15 +375,14 @@ script = ExtResource("8_5klp8")
 EnemyScenes = Array[PackedScene]([ExtResource("13_x3vg8"), ExtResource("14_cwau0")])
 MultiEnemySelectionMode = 1
 SpawnCount = 3
-SpawnInterval = 1.35
+SpawnInterval = 1.5
 SpawnParentPath = NodePath("..")
 TriggerArea = NodePath("TriggerArea")
 TriggerCollisionLayer = 1
 TriggerCollisionMask = 1
 SpawnAreaExtents = Vector2(1800, 800)
 EnemySpawnOffset = Vector2(0, 100)
-SpawnBackEffectOffset = Vector2(0, -300)
-SpawnFrontEffectOffset = Vector2(0, -300)
+ObstacleCheckMask = 7
 EnemyAppearDelay = 1.0
 AutoLowerFrontEffectAfterEnemySpawn = true
 DebugLineWidth = 2.5
@@ -407,6 +406,7 @@ SpawnParentPath = NodePath("..")
 TriggerArea = NodePath("TriggerArea")
 SpawnAreaExtents = Vector2(1800, 800)
 EnemySpawnOffset = Vector2(0, 100)
+ObstacleCheckMask = 7
 EnemyAppearDelay = 1.0
 AutoLowerFrontEffectAfterEnemySpawn = true
 
@@ -429,6 +429,7 @@ SpawnParentPath = NodePath("..")
 TriggerArea = NodePath("Area2D")
 SpawnAreaExtents = Vector2(1800, 800)
 EnemySpawnOffset = Vector2(0, 100)
+ObstacleCheckMask = 7
 EnemyAppearDelay = 1.0
 AutoLowerFrontEffectAfterEnemySpawn = true
 
@@ -449,6 +450,7 @@ SpawnParentPath = NodePath("..")
 TriggerArea = NodePath("Area2D")
 SpawnAreaExtents = Vector2(200, 200)
 EnemySpawnOffset = Vector2(0, 100)
+ObstacleCheckMask = 7
 EnemyAppearDelay = 1.0
 AutoLowerFrontEffectAfterEnemySpawn = true
 
