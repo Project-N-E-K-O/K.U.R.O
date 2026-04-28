@@ -889,12 +889,12 @@ namespace Kuros.Actors.Heroes.Attacks
                 effectNode.Call("set_emission_enabled", true);
             }
 
-            if (effectNode.HasSignal("finished"))
+            if (effectNode.HasSignal("animation_finished"))
             {
                 var callable = Callable.From(() => effectNode.QueueFree());
-                if (!effectNode.IsConnected("finished", callable))
+                if (!effectNode.IsConnected("animation_finished", callable))
                 {
-                    effectNode.Connect("finished", callable);
+                    effectNode.Connect("animation_finished", callable);
                 }
             }
         }

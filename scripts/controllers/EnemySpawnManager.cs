@@ -59,6 +59,12 @@ namespace Kuros.Controllers
         [Export] public bool AlignEnemyFacingToManager { get; set; } = true;
         [Export] public bool FaceRightOnSpawn { get; set; } = false;
 
+        // 智能落点检测：优先生成在无障碍物的位置（默认检测 Layer 1，即家具/环境静态体）
+        [Export] public bool EnableSmartSpawnPlacement { get; set; } = true;
+        [Export(PropertyHint.Layers2DPhysics)] public uint ObstacleCheckMask { get; set; } = 1u; //检测障碍物的层，默认Layer 1
+        [Export(PropertyHint.Range, "1,30,1")] public int MaxSpawnAttempts { get; set; } = 10;
+        [Export(PropertyHint.Range, "4,500,2")] public float SpawnCheckRadius { get; set; } = 60f; // 生成点周围这个半径范围内如果有障碍物则视为不合适的落点
+
         [ExportCategory("Spawn FX")]
         [Export] public PackedScene? SpawnBackEffectScene { get; set; } = GD.Load<PackedScene>("res://scenes/actors/etc/enemy_spaw_back.tscn");
         [Export] public PackedScene? SpawnFrontEffectScene { get; set; } = GD.Load<PackedScene>("res://scenes/actors/etc/enemy_spawn_front.tscn");
@@ -99,6 +105,7 @@ namespace Kuros.Controllers
         private bool _hasTriggered;
         private bool _isSpawning;
         private bool _triggerAreaAutoCreated;
+        private CircleShape2D? _spawnCheckShape;
 
         public override void _Ready()
         {
@@ -484,9 +491,65 @@ namespace Kuros.Controllers
                 return GlobalPosition + SpawnOffsets[index % SpawnOffsets.Count];
             }
 
+            if (EnableSmartSpawnPlacement && !Engine.IsEditorHint() && IsInsideTree())
+            {
+                return FindClearSpawnPosition();
+            }
+
             float x = _rng.RandfRange(-SpawnAreaExtents.X, SpawnAreaExtents.X);
             float y = _rng.RandfRange(-SpawnAreaExtents.Y, SpawnAreaExtents.Y);
             return GlobalPosition + new Vector2(x, y);
+        }
+
+        private Vector2 FindClearSpawnPosition()
+        {
+            var spaceState = GetWorld2D().DirectSpaceState;
+            Vector2 fallback = GlobalPosition;
+
+            for (int attempt = 0; attempt < MaxSpawnAttempts; attempt++)
+            {
+                float x = _rng.RandfRange(-SpawnAreaExtents.X, SpawnAreaExtents.X);
+                float y = _rng.RandfRange(-SpawnAreaExtents.Y, SpawnAreaExtents.Y);
+                Vector2 candidate = GlobalPosition + new Vector2(x, y);
+
+                if (attempt == 0)
+                {
+                    fallback = candidate;
+                }
+
+                if (IsPositionClear(spaceState, candidate))
+                {
+                    if (LogSpawnEffectPositions && attempt > 0)
+                    {
+                        GD.Print($"[{Name}] 智能落点：第 {attempt + 1} 次尝试找到空闲位置 {candidate}");
+                    }
+                    return candidate;
+                }
+            }
+
+            if (LogSpawnEffectPositions)
+            {
+                GD.PushWarning($"[{Name}] 智能落点：{MaxSpawnAttempts} 次尝试均有障碍物，使用第一次候选点 {fallback}");
+            }
+            return fallback;
+        }
+
+        private bool IsPositionClear(PhysicsDirectSpaceState2D spaceState, Vector2 position)
+        {
+            _spawnCheckShape ??= new CircleShape2D();
+            _spawnCheckShape.Radius = SpawnCheckRadius;
+
+            var query = new PhysicsShapeQueryParameters2D
+            {
+                Shape = _spawnCheckShape,
+                Transform = new Transform2D(0f, position),
+                CollisionMask = ObstacleCheckMask,
+                CollideWithBodies = true,
+                CollideWithAreas = false,
+            };
+
+            var results = spaceState.IntersectShape(query, 1);
+            return results.Count == 0;
         }
 
         private void OnTriggerBodyEntered(Node2D body)
