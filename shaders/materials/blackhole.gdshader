@@ -6,7 +6,7 @@ uniform float strength = 0.16;         // 吸引强度（减弱）
 uniform float radius = 0.45;           // 影响范围（UV 空间 0~1）
 uniform float swirl = 0.0;             // 旋转强度（保留参数，但默认关闭）
 uniform float time_scale = 1.0;
-
+ 
 // 波动效果参数
 uniform float wave_amplitude = 0.06;       // 波动振幅
 uniform float wave_frequency = 4.5;        // 波动频率

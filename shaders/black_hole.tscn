@@ -28,7 +28,7 @@ shader_parameter/distortion_falloff = 0.415
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_attract"]
 radius = 390.0
-
+ 
 [node name="BlackHole" type="Node2D"]
 z_index = 3
 script = ExtResource("3_bpn0")

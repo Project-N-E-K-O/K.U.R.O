@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="2_effect"]
 [ext_resource type="Texture2D" uid="uid://dccrl4lpl0t2h" path="res://icon.svg" id="3_icon"]
 [ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="4_def"]
-
+ 
 [sub_resource type="Resource" id="Attribute_AttackPower"]
 script = ExtResource("1_attr")
 AttributeId = "attack_power"

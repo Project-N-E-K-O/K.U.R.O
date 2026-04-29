@@ -4,7 +4,7 @@ using Kuros.Actors;
 using Kuros.Core;
 using Kuros.Items.Effects;
 using Kuros.Utils;
-
+ 
 namespace Kuros.Items.World
 {
 	/// <summary>
