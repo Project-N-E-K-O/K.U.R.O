@@ -106,7 +106,8 @@ namespace Kuros.Builds
             _applyingBonusDamage = true;
             try
             {
-                target.TakeDamage(_currentBonusDamage, Actor.GlobalPosition, Actor);
+                // 使用 EffectBonus 源，避免触发 CriticalStrikeEffect 等监听 DirectAttack 的武器词条
+                target.TakeDamage(_currentBonusDamage, Actor.GlobalPosition, Actor, DamageSource.EffectBonus);
             }
             finally
             {

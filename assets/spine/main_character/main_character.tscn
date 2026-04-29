@@ -1,4 +1,4 @@
-[gd_scene load_steps=50 format=3 uid="uid://ufprfd4r8ijj"]
+[gd_scene load_steps=52 format=3 uid="uid://ufprfd4r8ijj"]
 
 [ext_resource type="Script" uid="uid://befx3l05f0eph" path="res://scripts/actors/heroes/MainCharacter.cs" id="1_om6pm"]
 [ext_resource type="Shader" uid="uid://bdu6bfs07ahhw" path="res://shaders/materials/shadow.gdshader" id="2_4ht1x"]
@@ -13,8 +13,9 @@
 [ext_resource type="Script" uid="uid://l40es7irdvdw" path="res://scripts/actors/heroes/states/PlayerHitState.cs" id="10_utqjm"]
 [ext_resource type="PackedScene" uid="uid://dew4wgl7w576m" path="res://scenes/actors/etc/BrawlAttackEffect.tscn" id="11_6hy0m"]
 [ext_resource type="Script" uid="uid://d1g4amacs13a3" path="res://scripts/actors/heroes/states/PlayerFrozenState.cs" id="11_t3prk"]
-[ext_resource type="PackedScene" uid="uid://bxgdthwh67px6" path="res://shaders/attack_star.tscn" id="12_0y2r2"]
 [ext_resource type="Script" uid="uid://ba1kd5qgh17ag" path="res://scripts/actors/heroes/states/PlayerRunState.cs" id="12_4ht1x"]
+[ext_resource type="PackedScene" uid="uid://qhytc6rh50pe" path="res://scenes/actors/etc/SlashAttackEffect.tscn" id="12_f18x1"]
+[ext_resource type="PackedScene" uid="uid://1dmiw35p7g47" path="res://scenes/actors/etc/StabAttackEffectA.tscn" id="13_7xilr"]
 [ext_resource type="Script" uid="uid://bsa4kolrnan6p" path="res://scripts/actors/heroes/states/PlayerDyingState.cs" id="13_tdm7a"]
 [ext_resource type="Script" uid="uid://cp40kowtn1ho3" path="res://scripts/actors/heroes/states/PlayerDeadState.cs" id="14_0y2r2"]
 [ext_resource type="Script" uid="uid://ch33kuwv8bhip" path="res://scripts/actors/heroes/states/PlayerPickUpState.cs" id="15_0y6jy"]
@@ -79,7 +80,7 @@ AttackArea = NodePath("AttackArea")
 LeftHandAttachmentPath = NodePath("SpineSprite/SpineBoneNode")
 Speed = 500.0
 AttackDamage = 1.0
-MaxHealth = 12
+MaxHealth = 10000
 StateMachine = NodePath("StateMachine")
 EffectController = NodePath("EffectController")
 DamageFlashColor = Color(18.892157, 18.892157, 18.892157, 1)
@@ -140,7 +141,7 @@ script = ExtResource("4_ixg0x")
 skeleton_data_res = ExtResource("4_o4xwm")
 bones_thickness = 10.09
 preview_skin = "Default"
-preview_animation = "attack"
+preview_animation = "-- Empty --"
 preview_frame = true
 preview_time = 0.0
 script = ExtResource("4_ixg0x")
@@ -161,7 +162,6 @@ scale = Vector2(0.99999994, 0.99999994)
 bone_name = "Upper Body"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-visible = false
 position = Vector2(0, -108.995995)
 rotation = 1.5707964
 scale = Vector2(0.9999999, 0.9999999)
@@ -184,7 +184,6 @@ scale = Vector2(0.9999999, 0.9999999)
 shape = SubResource("RectangleShape2D_kqj82")
 
 [node name="GrabArea" type="Area2D" parent="."]
-visible = false
 collision_layer = 7
 collision_mask = 7
 

@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://cjfcykygrpf6o"]
+
+[ext_resource type="Script" uid="uid://b4katcvp64qky" path="res://scripts/effects/MechGloveEffect.cs" id="1_qflls"]
+
+[node name="MechGloveEffect" type="Node"]
+script = ExtResource("1_qflls")
+EffectId = "9d586fdb-407b-4531-b03f-6fa5bbddcadb"

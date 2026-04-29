@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://cbcmkogcqffmo"]
+
+[ext_resource type="Script" uid="uid://bo4656hhx2mc6" path="res://scripts/effects/CriticalStrikeEffect.cs" id="1_0td6q"]
+
+[node name="CriticalStrikeEffect" type="Node"]
+script = ExtResource("1_0td6q")
+EffectId = "d2bb4a0c-5c4b-4d0f-8518-7e749b29846e"
+Duration = 0.0

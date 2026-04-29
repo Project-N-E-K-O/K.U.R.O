@@ -43,6 +43,8 @@ namespace Kuros.Managers
 
 			// 订阅全局伤害事件
 			GameActor.AnyDamageTaken += OnAnyDamageTaken;
+			// 订阅带来源的伤害总线，用于识别暴击追加伤害
+			DamageEventBus.SubscribeWithSource(OnDamageResolvedWithSource);
 		}
 
 		public override void _ExitTree()
@@ -52,6 +54,7 @@ namespace Kuros.Managers
 				_instance = null;
 			}
 			GameActor.AnyDamageTaken -= OnAnyDamageTaken;
+			DamageEventBus.UnsubscribeWithSource(OnDamageResolvedWithSource);
 		}
 
 		/// <summary>
@@ -72,8 +75,9 @@ namespace Kuros.Managers
 				damageDirection = (victim.GlobalPosition - attacker.GlobalPosition).Normalized();
 			}
 
-			// 判断是否暴击
-			bool isCritical = damage > victim.MaxHealth * 0.2f;
+			// 红色暴击飘字只由 DamageSource.CritBonus 触发（见 OnDamageResolvedWithSource），
+			// 此处不做阈值判断，避免大伤害/投掷物误判为暴击
+			bool isCritical = false;
 
 			// 检查是否有最近的飘字可以合并伤害
 			if (_recentDamageTexts.TryGetValue(victim, out var recentText))
@@ -98,6 +102,20 @@ namespace Kuros.Managers
 				_recentDamageTexts[victim] = newText;
 			}
 		}
+		/// <summary>
+		/// 监听带来源的伤害总线：当 source == CritBonus 时，将对应飘字升级为暴击显示（红色）。
+		/// 此回调在 AnyDamageTaken（生成飘字）之后触发，因此可直接修改刚创建的飘字。
+		/// </summary>
+		private void OnDamageResolvedWithSource(GameActor attacker, GameActor target, int damage, DamageSource source)
+		{
+			if (source != DamageSource.CritBonus) return;
+			if (!_recentDamageTexts.TryGetValue(target, out var text)) return;
+			if (IsInstanceValid(text))
+			{
+				text.SetCritical();
+			}
+		}
+
 		/// <summary>
 		/// 创建飘字实例
 		/// </summary>

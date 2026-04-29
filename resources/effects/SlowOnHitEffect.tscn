@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://cphslrrtuko1d"]
+
+[ext_resource type="Script" uid="uid://d1gpthqer5ts5" path="res://scripts/effects/SlowOnHitEffect.cs" id="1_btpv2"]
+
+[node name="SlowOnHitEffect" type="Node"]
+script = ExtResource("1_btpv2")
+EffectId = "07ed55a9-67f6-406d-8f3b-8b8f55ab0087"

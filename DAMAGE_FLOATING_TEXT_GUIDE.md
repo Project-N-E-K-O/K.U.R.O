@@ -66,16 +66,16 @@ using Kuros.Managers;
 
 // 显示伤害飘字
 FloatingDamageTextManager.Instance.ShowFloatingDamage(
-    damage: 50,
-    position: enemy.GlobalPosition + Vector2.Up * 50,
-    isCritical: false
+	damage: 50,
+	position: enemy.GlobalPosition + Vector2.Up * 50,
+	isCritical: false
 );
 
 // 显示暴击飘字
 FloatingDamageTextManager.Instance.ShowFloatingDamage(
-    damage: 100,
-    position: enemy.GlobalPosition + Vector2.Up * 50,
-    isCritical: true
+	damage: 100,
+	position: enemy.GlobalPosition + Vector2.Up * 50,
+	isCritical: true
 );
 ```
 
@@ -85,8 +85,8 @@ FloatingDamageTextManager.Instance.ShowFloatingDamage(
 using Kuros.Managers;
 
 FloatingDamageTextManager.Instance.ShowFloatingHealing(
-    amount: 30,
-    position: player.GlobalPosition + Vector2.Up * 50
+	amount: 30,
+	position: player.GlobalPosition + Vector2.Up * 50
 );
 ```
 
@@ -101,15 +101,15 @@ using Godot;
 
 public partial class MyCustomEffect : ActorEffect
 {
-    public override void Apply(GameActor actor)
-    {
-        int damageAmount = 50;
-        actor.TakeDamage(damageAmount, actor.GlobalPosition, this.Actor);
-        
-        // TakeDamage 会自动触发飘字显示
-        // 如果需要自定义位置也可以手动调用：
-        // FloatingDamageTextManager.Instance.ShowFloatingDamage(damageAmount, actor.GlobalPosition);
-    }
+	public override void Apply(GameActor actor)
+	{
+		int damageAmount = 50;
+		actor.TakeDamage(damageAmount, actor.GlobalPosition, this.Actor);
+		
+		// TakeDamage 会自动触发飘字显示
+		// 如果需要自定义位置也可以手动调用：
+		// FloatingDamageTextManager.Instance.ShowFloatingDamage(damageAmount, actor.GlobalPosition);
+	}
 }
 ```
 
@@ -143,17 +143,17 @@ float alpha = Mathf.Lerp(1f, 0f, easeProgress);
 ```csharp
 private void OnAnyDamageTaken(GameActor victim, GameActor? attacker, int damage)
 {
-    if (!EnableFloatingText) return;
-    if (victim == null || damage <= 0) return;
-    if (_floatingTextScene == null) return;
+	if (!EnableFloatingText) return;
+	if (victim == null || damage <= 0) return;
+	if (_floatingTextScene == null) return;
 
-    // 自定义位置逻辑
-    Vector2 textPosition = victim.GlobalPosition + new Vector2(
-        GD.Randf() * 40 - 20,  // 随机X偏移
-        -60                      // Y偏移
-    );
+	// 自定义位置逻辑
+	Vector2 textPosition = victim.GlobalPosition + new Vector2(
+		GD.Randf() * 40 - 20,  // 随机X偏移
+		-60                      // Y偏移
+	);
 
-    ShowFloatingDamage(damage, textPosition, isCritical: false);
+	ShowFloatingDamage(damage, textPosition, isCritical: false);
 }
 ```
 
