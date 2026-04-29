@@ -439,7 +439,7 @@ namespace Kuros.Actors.Heroes
 			}
 		}
 
-	public override void TakeDamage(int damage, Vector2? attackOrigin = null, GameActor? attacker = null, Kuros.Core.Events.DamageSource damageSource = Kuros.Core.Events.DamageSource.DirectAttack)
+	public override void TakeDamage(int damage, Vector2? attackOrigin, GameActor? attacker, Kuros.Core.Events.DamageSource damageSource)
 	{
 		if (damage > 0 && IsHitInvincible && !IsDeathSequenceActive && !IsDead)
 		{

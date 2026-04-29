@@ -16,12 +16,14 @@ namespace Kuros.Items.World
 		[ExportGroup("BlackHole")]
 		[Export] public string black_hole_scene_path { get; set; } = "res://shaders/black_hole.tscn";
 		[Export] public NodePath RigidBodyEntityPath { get; set; } = new NodePath("..");
+		[Export] public NodePath RigidBodyPath { get; set; } = new NodePath("Rigidbody2D");
 		
 		[ExportGroup("Audio")]
 		[Export] public string landing_sound_path { get; set; } = ""; // 着陆音效路径（可选）
 		[Export(PropertyHint.Range, "0,1,0.1")] public float landing_sound_volume { get; set; } = 0.8f;
 		
 		private RigidBodyWorldItemEntity? _rigidBodyEntity;
+		private RigidBody2D? _rigidBody;
 		private double _flightCheckTimer = 0.0;
 		private bool _hasLanded = false;
 		private bool _throwArmed = false;
@@ -37,6 +39,12 @@ namespace Kuros.Items.World
 			if (_rigidBodyEntity == null)
 			{
 				GameLogger.Warn(nameof(GravityGrenade), $"未找到 RigidBodyWorldItemEntity: {RigidBodyEntityPath}");
+			}
+
+			_rigidBody = ResolveRigidBody();
+			if (_rigidBody == null)
+			{
+				GameLogger.Warn(nameof(GravityGrenade), "未找到手雷的 RigidBody2D 节点，黑洞落地判定将无法触发。");
 			}
 			
 			GameLogger.Info(nameof(GravityGrenade), $"重力手雷已准备就绪: {Name}");
@@ -54,7 +62,7 @@ namespace Kuros.Items.World
 				{
 					_flightCheckTimer = 0.0;
 					
-					RigidBody2D? rigidBody = _rigidBodyEntity.GetNodeOrNull<RigidBody2D>("RigidBody2D");
+					RigidBody2D? rigidBody = _rigidBody ??= ResolveRigidBody();
 					if (rigidBody != null)
 					{
 						float speed = rigidBody.LinearVelocity.Length();
@@ -123,7 +131,7 @@ namespace Kuros.Items.World
 				
 				// 实例化黑洞
 				var blackHole = blackHoleScene.Instantiate();
-				var rigidBody = _rigidBodyEntity?.GetNodeOrNull<RigidBody2D>("RigidBody2D");
+				var rigidBody = _rigidBody ??= ResolveRigidBody();
 				Vector2 spawnPos = rigidBody?.GlobalPosition ?? GlobalPosition;
 				Node? spawnParent = GetTree().CurrentScene ?? GetParent();
 				
@@ -205,6 +213,28 @@ namespace Kuros.Items.World
 			}
 
 			SetMeta("SourceActor", actor);
+		}
+
+		private RigidBody2D? ResolveRigidBody()
+		{
+			if (_rigidBodyEntity == null)
+			{
+				return null;
+			}
+
+			if (!RigidBodyPath.IsEmpty)
+			{
+				var rigidBody = _rigidBodyEntity.GetNodeOrNull<RigidBody2D>(RigidBodyPath);
+				if (rigidBody != null)
+				{
+					return rigidBody;
+				}
+			}
+
+			return _rigidBodyEntity.GetNodeOrNull<RigidBody2D>("Rigidbody2D")
+				?? _rigidBodyEntity.GetNodeOrNull<RigidBody2D>("RigidBody2D")
+				?? _rigidBodyEntity.FindChild("Rigidbody2D", recursive: true) as RigidBody2D
+				?? _rigidBodyEntity.FindChild("RigidBody2D", recursive: true) as RigidBody2D;
 		}
 	}
 }

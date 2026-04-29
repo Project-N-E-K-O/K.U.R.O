@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="1_8xicf"]
 [ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="2_he3c1"]
-[ext_resource type="Texture2D" uid="uid://cedvgcxm5d1ef" path="res://assets/weapons/甩棍.png" id="3_8xicf"]
+[ext_resource type="Texture2D" uid="uid://ccs0qsdrstg7h" path="res://assets/weapons/甩棍.png" id="3_8xicf"]
 [ext_resource type="Resource" uid="uid://vdq16nvnnvsv" path="res://resources/items/skills/WeaponSkill_Slash_ExpandBaton.tres" id="4_8xicf"]
 [ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="5_ltl53"]
 

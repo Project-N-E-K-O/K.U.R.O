@@ -50,15 +50,12 @@ namespace Kuros.Core
 
 		// Exposed state for States to use
 		public int CurrentHealth { get; protected set; }
+		public int CurrentShield { get; private set; }
+		public float FrozenStateRemainingTime { get; set; } = 0.0f;
 		public float AttackTimer { get; set; } = 0.0f;
 		public bool FacingRight { get; protected set; } = true;
 		public event Func<DamageEventArgs, bool>? DamageIntercepted;
 		public AnimationPlayer? AnimPlayer => _animationPlayer;
-		
-		/// <summary>
-		/// 保存Frozen状态被打断时的剩余时长，用于在Hit后恢复
-		/// </summary>
-		public float FrozenStateRemainingTime { get; set; } = 0f;
 		
 		protected Node2D _spineCharacter = null!;
 		protected Sprite2D _sprite = null!;
@@ -95,6 +92,7 @@ namespace Kuros.Core
 		public override void _Ready()
 		{
 			CurrentHealth = MaxHealth;
+			CurrentShield = 0;
 			
 			
 			
@@ -181,6 +179,26 @@ namespace Kuros.Core
 			NotifyHealthChanged();
 		}
 
+		public void SetShieldValue(int shield)
+		{
+			CurrentShield = Mathf.Max(0, shield);
+		}
+
+		public void AddShield(int shield)
+		{
+			if (shield <= 0)
+			{
+				return;
+			}
+
+			CurrentShield = Mathf.Max(0, CurrentShield + shield);
+		}
+
+		public void ClearShield()
+		{
+			CurrentShield = 0;
+		}
+
 		// ====================== 新增4：递归同步所有子渲染节点Z层级的工具方法 ======================
 		private void ForceChildRenderNodesZIndex(Node parentNode, int targetZIndex)
 		{
@@ -242,7 +260,12 @@ namespace Kuros.Core
 			return attackerArea.OverlapsBody(this);
 		}
 
-		public virtual void TakeDamage(int damage, Vector2? attackOrigin = null, GameActor? attacker = null, Events.DamageSource damageSource = Events.DamageSource.DirectAttack)
+		public virtual void TakeDamage(int damage, Vector2? attackOrigin = null, GameActor? attacker = null)
+		{
+			TakeDamage(damage, attackOrigin, attacker, DamageSource.DirectAttack);
+		}
+
+		public virtual void TakeDamage(int damage, Vector2? attackOrigin, GameActor? attacker, DamageSource damageSource)
 		{
 			if (IsDeathSequenceActive || IsDead) return;
 			if (damage <= 0) return;

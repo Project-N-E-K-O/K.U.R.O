@@ -1,0 +1,40 @@
+[gd_scene load_steps=4 format=3 uid="uid://jwljcdrqjlph"]
+
+[ext_resource type="Script" uid="uid://rpt50t16vkk7" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_world_item"]
+[ext_resource type="Texture2D" uid="uid://cyltfomsjhw82" path="res://assets/furnitures/房间卧室家具导出_0001_布丁.png" id="2_texture"]
+
+[sub_resource type="RectangleShape2D" id="1_pick_shape"]
+size = Vector2(74, 41)
+
+[node name="Supplies_P2_support_test" type="Node2D"]
+z_index = 2
+script = ExtResource("1_world_item")
+ItemDefinitionResourcePath = "res://resources/items/Supplies_p2_support_test.tres"
+GrabAreaPath = NodePath("Rigidbody2D/GrabArea")
+StopOnHit = true
+
+[node name="Rigidbody2D" type="RigidBody2D" parent="."]
+gravity_scale = 0.0
+
+[node name="Sprite2D" type="Sprite2D" parent="Rigidbody2D"]
+position = Vector2(-0.29999927, -28)
+scale = Vector2(0.36, 0.36)
+texture = ExtResource("2_texture")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Rigidbody2D"]
+position = Vector2(-0.29999924, -28.499996)
+shape = SubResource("1_pick_shape")
+
+[node name="Hitbox" type="Area2D" parent="Rigidbody2D"]
+position = Vector2(-0.29999924, -27.999996)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Rigidbody2D/Hitbox"]
+position = Vector2(0, -0.5)
+shape = SubResource("1_pick_shape")
+
+[node name="GrabArea" type="Area2D" parent="Rigidbody2D"]
+position = Vector2(-0.29999924, -27.999996)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Rigidbody2D/GrabArea"]
+position = Vector2(0, -0.5)
+shape = SubResource("1_pick_shape")

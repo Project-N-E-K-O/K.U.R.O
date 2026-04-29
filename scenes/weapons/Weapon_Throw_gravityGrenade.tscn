@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dhfq2rrha0awm" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_eecfu"]
 [ext_resource type="Resource" uid="uid://b8vf1obgnfb2y" path="res://resources/items/Weapon_Throw_GravityGrenade.tres" id="2_v5ky2"]
+[ext_resource type="Script" uid="uid://dbf6zr6u7awg5" path="res://scripts/items/world/GravityGrenade.cs" id="2_gravity"]
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="3_eecfu"]
 [ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="4_630y6"]
 [ext_resource type="Texture2D" uid="uid://cbs8s6snkb78b" path="res://assets/weapons/引力手雷.png" id="4_q0htg"]
@@ -78,3 +79,9 @@ visible = false
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/AttackArea"]
 position = Vector2(-1.5, 99)
 shape = SubResource("RectangleShape2D_eecfu")
+
+[node name="GravityGrenade" type="Node2D" parent="." index="2"]
+script = ExtResource("2_gravity")
+black_hole_scene_path = "res://shaders/black_hole.tscn"
+RigidBodyEntityPath = NodePath("..")
+RigidBodyPath = NodePath("Rigidbody2D")

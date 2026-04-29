@@ -31,6 +31,7 @@ offset_bottom = -18.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_battle_hud")
+StatusMessageAnchorNormalized = Vector2(0.5, 0.5)
 
 [node name="MinimapPanel" type="Panel" parent="."]
 layout_mode = 1

@@ -611,6 +611,81 @@ private readonly HashSet<string> _obtainedItemIds = new HashSet<string>();
             return true;
         }
 
+        public bool TryConsumeFirstTaggedItem(string requiredTag, GameActor? consumer)
+        {
+            if (Backpack == null || string.IsNullOrWhiteSpace(requiredTag))
+            {
+                return false;
+            }
+
+            for (int slotIndex = 0; slotIndex < Backpack.Slots.Count; slotIndex++)
+            {
+                var stack = Backpack.GetStack(slotIndex);
+                if (stack == null || stack.IsEmpty || !stack.HasTag(requiredTag))
+                {
+                    continue;
+                }
+
+                if (stack.DurabilityState != null && stack.DurabilityState.IsBroken)
+                {
+                    continue;
+                }
+
+                var item = stack.Item;
+                bool usesDurability = item.DurabilityConfig != null && stack.HasDurability;
+                bool removedStack = false;
+
+                if (usesDurability && item.DurabilityConfig != null)
+                {
+                    int damage = item.DurabilityConfig.DamagePerUse;
+                    if (damage <= 0)
+                    {
+                        damage = 1;
+                    }
+
+                    bool broke = stack.ApplyDurabilityDamage(damage, consumer, triggerEffects: true);
+                    if (broke && item.DurabilityConfig.BreakBehavior == DurabilityBreakBehavior.Disappear)
+                    {
+                        removedStack = true;
+                    }
+                }
+                else
+                {
+                    int removed = Backpack.RemoveItemFromSlot(slotIndex, 1);
+                    if (removed <= 0)
+                    {
+                        continue;
+                    }
+
+                    removedStack = Backpack.GetStack(slotIndex) == null;
+                }
+
+                if (consumer != null)
+                {
+                    item.ApplyEffects(consumer, ItemEffectTrigger.OnConsume);
+                }
+
+                if (removedStack)
+                {
+                    if (usesDurability)
+                    {
+                        Backpack.SetStack(slotIndex, null);
+                    }
+
+                    NotifyItemRemoved(item.ItemId);
+                }
+                else if (usesDurability)
+                {
+                    Backpack.EmitSignal(InventoryContainer.SignalName.SlotChanged, slotIndex, item.ItemId, stack.Quantity);
+                    Backpack.EmitSignal(InventoryContainer.SignalName.InventoryChanged);
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
         public int TryAddItemToSelectedSlot(ItemDefinition item, int quantity)
         {
             if (Backpack == null || item == null || quantity <= 0) return 0;
