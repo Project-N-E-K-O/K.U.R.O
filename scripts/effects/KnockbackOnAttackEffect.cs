@@ -1,5 +1,4 @@
 using Godot;
-using System.Collections.Generic;
 using Kuros.Core;
 using Kuros.Core.Effects;
 using Kuros.Core.Events;
@@ -9,7 +8,7 @@ namespace Kuros.Effects
 {
     /// <summary>
     /// 攻击时击退敌人的效果。
-    /// 当携带此效果的角色攻击敌人时，敌人会在指定时间内被击退指定距离。
+    /// 当携带此效果的角色攻击敌人时，敌人会被物理击退，自动与场景碰撞停止。
     /// 搭配 ItemDefinition 的 OnEquip 触发器使用。
     /// </summary>
     [GlobalClass]
@@ -28,137 +27,122 @@ namespace Kuros.Effects
         public float KnockbackDistance { get; set; } = 150f;
 
         /// <summary>
-        /// 击退缓动类型
-        /// </summary>
-        [Export]
-        public Tween.EaseType KnockbackEaseType { get; set; } = Tween.EaseType.InOut;
-
-        /// <summary>
-        /// 击退缓动曲线
-        /// </summary>
-        [Export]
-        public Tween.TransitionType KnockbackTransitionType { get; set; } = Tween.TransitionType.Quart;
-
-        /// <summary>
         /// 触发击退的攻击段数（1-based）。0 表示所有段都触发
         /// </summary>
         [Export(PropertyHint.Range, "0,10,1")]
         public int TriggerHitStep { get; set; } = 1;
 
         private GameActor? _actor;
-        private Dictionary<GameActor, Tween> _knockbackTweens = new();
 
         protected override void OnApply()
         {
             base.OnApply();
-            _actor = Actor;  // 使用 Actor 属性而不是 Owner
-
-            // 订阅伤害事件，只响应直接攻击（不响应区域效果等间接伤害）
+            _actor = Actor;
             DamageEventBus.SubscribeWithSource(OnDamageResolved);
         }
 
         public override void OnRemoved()
         {
             base.OnRemoved();
-            
-            // 移除所有正在进行的击退 Tween
-            foreach (var tween in _knockbackTweens.Values)
-            {
-                if (tween != null)
-                {
-                    tween.Kill();
-                }
-            }
-            _knockbackTweens.Clear();
-
-            // 取消订阅伤害事件
             DamageEventBus.UnsubscribeWithSource(OnDamageResolved);
         }
 
         private void OnDamageResolved(GameActor attacker, GameActor target, int damage, DamageSource source)
         {
-            // 只响应直接攻击，过滤掌刺/持续区域伤害等间接伤害
-            if (source != DamageSource.DirectAttack)
-            {
-                return;
-            }
-            if (attacker != _actor || target == null)
-            {
-                return;
-            }
+            if (source != DamageSource.DirectAttack) return;
+            if (attacker != _actor || target == null) return;
 
-            // 检查击退是否应该在此段触发
-            // TriggerHitStep == 0 表示所有段都触发，否则只在匹配段触发
             if (TriggerHitStep > 0 && PlayerAttackTemplate.CurrentAttackHitStep != TriggerHitStep)
             {
-                GD.Print($"击退: 击退触发段 {PlayerAttackTemplate.CurrentAttackHitStep} 所有触发段 {TriggerHitStep}");
                 return;
             }
 
-            // 目标必须是 CharacterBody2D（敌人）
-            if (target is not CharacterBody2D targetBody)
+            if (target is not CharacterBody2D targetBody) return;
+
+            Vector2 direction = (target.GlobalPosition - attacker.GlobalPosition);
+            if (direction == Vector2.Zero)
             {
-                return;
+                direction = attacker.FacingRight ? Vector2.Right : Vector2.Left;
             }
 
-            ApplyKnockback(targetBody, attacker);
+            // 线性减速的总位移 = v0 * T / 2，故初速度需乘以 2 才能达到目标距离
+            float speed = 2f * KnockbackDistance / Mathf.Max(KnockbackDuration, 0.01f);
+            KnockbackDriver.Attach(targetBody, direction.Normalized(), speed, KnockbackDuration);
         }
 
-        private void ApplyKnockback(CharacterBody2D target, GameActor? attacker)
+        // ─── 内部驱动节点：每物理帧用 MoveAndCollide 推动目标，保证碰撞检测 ───
+
+        /// <summary>
+        /// 临时挂载到被击退目标上的物理驱动节点。
+        /// 每物理帧通过 MoveAndCollide 施加位移，自动与静态体（墙壁/家具）碰撞停止。
+        /// 在 StateMachine._PhysicsProcess 之后执行，避免与 HitState.MoveAndSlide 叠加。
+        /// </summary>
+        private sealed partial class KnockbackDriver : Node
         {
-            if (target == null || attacker == null)
-            {
-                return;
-            }
+            private const string NodeName = "__KnockbackDriver__";
 
-            // 计算从攻击者指向目标的方向
-            Vector2 direction = (target.GlobalPosition - attacker.GlobalPosition).Normalized();
+            private CharacterBody2D? _target;
+            private Vector2 _direction;
+            private float _initialSpeed;
+            private float _duration;
+            private float _elapsed;
 
-            // 杀死已存在的击退 Tween（避免重复）
-            GameActor? targetActor = target as GameActor;
-            if (targetActor != null && _knockbackTweens.TryGetValue(targetActor, out var existingTween))
+            /// <summary>
+            /// 将击退驱动节点附加到目标身上。若目标已有驱动节点则先移除。
+            /// </summary>
+            public static void Attach(CharacterBody2D target, Vector2 direction,
+                float initialSpeed, float duration)
             {
-                if (existingTween != null)
+                var existing = target.GetNodeOrNull<KnockbackDriver>(NodeName);
+                if (existing != null && GodotObject.IsInstanceValid(existing))
                 {
-                    existingTween.Kill();
-                }
-            }
-
-            // 保存初始速度以便恢复
-            Vector2 originalVelocity = Vector2.Zero;
-            if (target != null)
-            {
-                originalVelocity = target.Velocity;
-            }
-
-            // 计算目标位置
-            Vector2 startPos = target!.GlobalPosition;
-            Vector2 endPos = startPos + direction * KnockbackDistance;
-
-            // 创建击退 Tween
-            var tween = target.CreateTween();
-            tween.TweenProperty(target, "global_position", endPos, KnockbackDuration)
-                .SetEase(KnockbackEaseType)
-                .SetTrans(KnockbackTransitionType);
-
-            // 在 Tween 完成时恢复原始速度
-            tween.TweenCallback(Callable.From(() =>
-            {
-                if (GodotObject.IsInstanceValid(target))
-                {
-                    target.Velocity = originalVelocity;
+                    existing.QueueFree();
                 }
 
-                if (targetActor != null)
+                var driver = new KnockbackDriver
                 {
-                    _knockbackTweens.Remove(targetActor);
-                }
-            }));
+                    Name = NodeName,
+                    _target = target,
+                    _direction = direction,
+                    _initialSpeed = initialSpeed,
+                    _duration = Mathf.Max(duration, 0.01f),
+                    _elapsed = 0f,
+                    // 使其在父节点 StateMachine 之后执行，避免 MoveAndSlide 叠加
+                    ProcessPhysicsPriority = 10
+                };
+                target.AddChild(driver);
+            }
 
-            // 存储 Tween 引用
-            if (targetActor != null)
+            public override void _PhysicsProcess(double delta)
             {
-                _knockbackTweens[targetActor] = tween;
+                if (_target == null || !GodotObject.IsInstanceValid(_target)
+                    || !_target.IsInsideTree())
+                {
+                    QueueFree();
+                    return;
+                }
+
+                _elapsed += (float)delta;
+
+                if (_elapsed >= _duration)
+                {
+                    // 确保 HitState 下一帧从零速度开始
+                    _target.Velocity = Vector2.Zero;
+                    QueueFree();
+                    return;
+                }
+
+                // 线性减速：速度从 _initialSpeed 线性降到 0
+                float t = _elapsed / _duration;
+                float currentSpeed = _initialSpeed * (1f - t);
+
+                Vector2 displacement = _direction * currentSpeed * (float)delta;
+
+                // 用 MoveAndCollide 施加位移，自动与碰撞体停止
+                _target.MoveAndCollide(displacement);
+
+                // 将 Velocity 清零，防止 HitState 的 MoveAndSlide 再次叠加位移
+                _target.Velocity = Vector2.Zero;
             }
         }
     }

@@ -1,4 +1,4 @@
-[gd_scene load_steps=47 format=3 uid="uid://qd5abd4opeob"]
+[gd_scene load_steps=44 format=3 uid="uid://qd5abd4opeob"]
 
 [ext_resource type="PackedScene" uid="uid://dd8xmpgwy0t2o" path="res://scenes/environments/scene2.tscn" id="1_7jsho"]
 [ext_resource type="Script" uid="uid://x1ic1ym4ykq8" path="res://scripts/scenes/BattleSceneManager.cs" id="1_ctuyy"]
@@ -59,41 +59,6 @@ polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3), PackedInt32Arr
 outlines = Array[PackedVector2Array]([PackedVector2Array(-9573, -1692, -9566, 1812, 12144, 1825, 12171, -1675)])
 source_geometry_mode = 2
 agent_radius = 50.0
-
-[sub_resource type="Animation" id="Animation_jurhs"]
-length = 0.001
-tracks/0/type = "bezier"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Node2D/Moving_A1_taxi:position:y")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"handle_modes": PackedInt32Array(0),
-"points": PackedFloat32Array(2155, -0.25, 0, 0.25, 0),
-"times": PackedFloat32Array(0)
-}
-
-[sub_resource type="Animation" id="Animation_mdjvw"]
-resource_name = "taxi_moving"
-length = 1.5
-tracks/0/type = "bezier"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Node2D/Moving_A1_taxi:position:y")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"handle_modes": PackedInt32Array(2, 2),
-"points": PackedFloat32Array(2155, -0.25, 0, 0.25, 0, 300, -0.25, 309.16666, 0, 0),
-"times": PackedFloat32Array(0, 1.5)
-}
-
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_edhkl"]
-_data = {
-&"RESET": SubResource("Animation_jurhs"),
-&"taxi_moving": SubResource("Animation_mdjvw")
-}
 
 [node name="BattleScene" type="Node2D" node_paths=PackedStringArray("Player")]
 script = ExtResource("1_ctuyy")
@@ -217,6 +182,9 @@ position = Vector2(-3674, 148)
 
 [node name="FurnitureCautionTape_fwd2" parent="World" instance=ExtResource("26_4r5ho")]
 position = Vector2(2663, 184)
+
+[node name="FurnitureCautionTape_fwd3" parent="World" instance=ExtResource("26_4r5ho")]
+position = Vector2(11146, -187)
 
 [node name="FurnitureCounterA" parent="World" instance=ExtResource("8_hlhvb")]
 position = Vector2(10039, -552)
@@ -344,7 +312,7 @@ position = Vector2(5571, 1102)
 position = Vector2(-6924, -316.00003)
 
 [node name="MainCharacter" parent="World" instance=ExtResource("2_s0pgc")]
-position = Vector2(-5388, 131.00002)
+position = Vector2(-5346, 184)
 
 [node name="Camera2D" type="Camera2D" parent="World/MainCharacter"]
 position = Vector2(0, -15.15156)
@@ -462,9 +430,6 @@ collision_mask = 4
 shape = SubResource("RectangleShape2D_f0l3g")
 debug_color = Color(1, 0, 0, 0.19607843)
 
-[node name="FurnitureCautionTape_fwd3" parent="World" instance=ExtResource("26_4r5ho")]
-position = Vector2(11146, -187)
-
 [node name="NavigationRegion2D" type="NavigationRegion2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
 visible = false
 position = Vector2(12, 49)
@@ -472,17 +437,6 @@ navigation_polygon = SubResource("NavigationPolygon_bjupw")
 
 [node name="DropDebug" type="Node2D" parent="."]
 script = ExtResource("7_k0qph")
-
-[node name="Node2D" type="Node2D" parent="."]
-
-[node name="AnimationPlayer" type="AnimationPlayer" parent="Node2D"]
-root_node = NodePath("../..")
-libraries = {
-&"": SubResource("AnimationLibrary_edhkl")
-}
-
-[node name="Moving_A1_taxi" parent="Node2D" instance=ExtResource("27_4r5ho")]
-position = Vector2(-7729, 2155)
 
 [node name="Weapons" type="Node2D" parent="."]
 
@@ -512,3 +466,6 @@ position = Vector2(-6743, 217)
 
 [node name="WeaponThrowMetalSpike" parent="Weapons" instance=ExtResource("37_jurhs")]
 position = Vector2(-6060, 183)
+
+[node name="Taxi" parent="." instance=ExtResource("27_4r5ho")]
+position = Vector2(-7750, -1500)

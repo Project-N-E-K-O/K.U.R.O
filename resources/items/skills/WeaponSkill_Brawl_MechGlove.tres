@@ -10,7 +10,8 @@ script = ExtResource("1_rpm6u")
 Trigger = 1
 EffectScene = ExtResource("2_7vkc4")
 PropertyOverrides = Dictionary[String, Variant]({
-"KnockbackDistance": 500.0,
+"KnockbackDistance": 1000.0,
+"KnockbackDuration": 0.5,
 "TriggerHitStep": 3
 })
 metadata/_custom_type_script = "uid://bv0es4osw3x0r"
@@ -27,6 +28,6 @@ SkillId = "Weapon_Brawl_MechGlove"
 DisplayName = "机械冲撞臂攻击"
 AnimationName = "Weapon_Brawl_MechGlove"
 ShowHitboxDebug = false
-Description = "第三次攻击到敌人后击退敌人5 m且dmg增加+3"
+Description = "第三次攻击到敌人后击退敌人5 m，如果三次攻击都击中敌人则最后一击发生暴击"
 Effects = Array[ExtResource("1_rpm6u")]([SubResource("Resource_bk1ns"), SubResource("Resource_ni6ga")])
 ActivationAction = "weapon_skill_block"

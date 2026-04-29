@@ -1,7 +1,19 @@
-[gd_resource type="Resource" script_class="WeaponSkillDefinition" load_steps=3 format=3 uid="uid://d1b3b7rg8p75c"]
+[gd_resource type="Resource" script_class="WeaponSkillDefinition" load_steps=5 format=3 uid="uid://d1b3b7rg8p75c"]
 
 [ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="1_bdrdo"]
+[ext_resource type="PackedScene" uid="uid://cbcmkogcqffmo" path="res://resources/effects/CriticalStrikeEffect.tscn" id="2_42yta"]
 [ext_resource type="Script" uid="uid://bp6pwgoj44cuq" path="res://scripts/items/weapons/WeaponSkillDefinition.cs" id="2_egp4s"]
+
+[sub_resource type="Resource" id="Resource_rr1ju"]
+script = ExtResource("1_bdrdo")
+Trigger = 1
+EffectScene = ExtResource("2_42yta")
+PropertyOverrides = Dictionary[String, Variant]({
+"CritBonusMultiplier": 1.0,
+"CritChance": 100.0,
+"WeaponAttackValue": 1.0
+})
+metadata/_custom_type_script = "uid://bv0es4osw3x0r"
 
 [resource]
 script = ExtResource("2_egp4s")
@@ -9,5 +21,6 @@ SkillId = "WeaponSkill_Brawl_RiotGlove"
 DisplayName = "镇暴拳套攻击"
 AnimationName = "Weapon_Brawl_RiotGlove"
 ShowHitboxDebug = false
-Description = "每次攻击到敌人时，都有20%概率使这一次的dmg *2"
+Description = "每次攻击到敌人时，都有20%概率使这一次的伤害发生暴击"
+Effects = Array[ExtResource("1_bdrdo")]([SubResource("Resource_rr1ju")])
 ActivationAction = "weapon_skill_block"

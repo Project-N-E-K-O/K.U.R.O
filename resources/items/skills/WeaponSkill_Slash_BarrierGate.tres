@@ -1,7 +1,18 @@
-[gd_resource type="Resource" script_class="WeaponSkillDefinition" load_steps=3 format=3 uid="uid://0rwr32wy7yud"]
+[gd_resource type="Resource" script_class="WeaponSkillDefinition" load_steps=5 format=3 uid="uid://0rwr32wy7yud"]
 
 [ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="1_joilt"]
+[ext_resource type="PackedScene" uid="uid://cphslrrtuko1d" path="res://resources/effects/SlowOnHitEffect.tscn" id="2_hrrjb"]
 [ext_resource type="Script" uid="uid://bp6pwgoj44cuq" path="res://scripts/items/weapons/WeaponSkillDefinition.cs" id="2_hxcpv"]
+
+[sub_resource type="Resource" id="Resource_nfyj5"]
+script = ExtResource("1_joilt")
+Trigger = 1
+EffectScene = ExtResource("2_hrrjb")
+PropertyOverrides = Dictionary[String, Variant]({
+"SlowDuration": 1.0,
+"SlowPercent": 50.0
+})
+metadata/_custom_type_script = "uid://bv0es4osw3x0r"
 
 [resource]
 script = ExtResource("2_hxcpv")
@@ -10,5 +21,6 @@ DisplayName = "开刃升降杆攻击"
 AnimationName = "Weapon_Slash_BarrierGate"
 CooldownSeconds = 0.6
 ShowHitboxDebug = false
-Description = "攻击到敌人时使该敌人移动速度减少100%，持续1秒"
+Description = "攻击到敌人时使该敌人移动速度减少50%，持续1秒"
+Effects = Array[ExtResource("1_joilt")]([SubResource("Resource_nfyj5")])
 ActivationAction = "weapon_skill_block"

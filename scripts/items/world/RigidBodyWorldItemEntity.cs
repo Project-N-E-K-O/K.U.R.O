@@ -200,6 +200,11 @@ namespace Kuros.Items.World
 			{
 				ScheduleNavigationRebake();
 			}
+
+			// 预热 OnThrowDestroy 效果场景的 Shader：
+			// Godot 4 首次实例化含 ParticleProcessMaterial 的场景时会同步编译 Shader（卡帧）。
+			// 在 _Ready 阶段提前实例化一次（invisible，立刻销毁），使 Shader 在此时完成编译。
+			WarmUpThrowDestroyEffectShaders();
 		}
 
 		public override void _ExitTree()
@@ -1735,6 +1740,43 @@ namespace Kuros.Items.World
 		private void ApplyItemEffects(GameActor actor, ItemEffectTrigger trigger)
 		{
 			ItemDefinition?.ApplyEffects(actor, trigger);
+		}
+
+		/// <summary>
+		/// <summary>
+		/// 预热 OnThrowDestroy 效果场景的 Shader。
+		/// 将每个 Node2D 效果场景实例化一次并立刻销毁，触发 Godot 在 _Ready 阶段编译所有相关 Shader，
+		/// 避免投掷落地时因首次 Shader 编译导致的主线程卡顿。
+		/// ActorEffect 类型不含渲染资源，跳过处理。
+		/// </summary>
+		private void WarmUpThrowDestroyEffectShaders()
+		{
+			if (ItemDefinition == null) return;
+
+			foreach (var entry in ItemDefinition.GetEffectEntries(ItemEffectTrigger.OnThrowDestroy))
+			{
+				if (entry?.EffectScene == null) continue;
+
+				try
+				{
+					var node = entry.EffectScene.Instantiate();
+					if (node is Node2D node2D)
+					{
+						// 隐藏后加入场景树，触发 Shader 编译，然后立刻销毁
+						node2D.Visible = false;
+						AddChild(node2D);
+						node2D.QueueFree();
+					}
+					else
+					{
+						node?.QueueFree();
+					}
+				}
+				catch
+				{
+					// 预热失败不影响正常流程，静默忽略
+				}
+			}
 		}
 
 		/// <summary>

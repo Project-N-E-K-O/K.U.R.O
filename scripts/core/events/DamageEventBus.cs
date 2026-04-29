@@ -15,6 +15,10 @@ namespace Kuros.Core.Events
         AreaEffect,
         /// <summary>投掷物命中</summary>
         ThrowImpact,
+        /// <summary>暴击追加伤害（如 MechGloveEffect 全中暴击）</summary>
+        CritBonus,
+        /// <summary>效果/构筑追加伤害（如 BuildMachineLevel3），不触发武器主动词条如暴击</summary>
+        EffectBonus,
     }
 
     /// <summary>

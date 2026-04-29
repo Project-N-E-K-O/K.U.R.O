@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://dtgdjgrqgype7" path="res://scripts/items/world/WorldItemEntity.cs" id="1_64hvb"]
 [ext_resource type="Resource" uid="uid://b1jpt8qriaub8" path="res://resources/items/Weapon_Slash_BarrierGate.tres" id="2_64hvb"]
 [ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="3_07ll6"]
-[ext_resource type="Texture2D" uid="uid://uosakgaqe1yp" path="res://assets/weapons/闸门刀.png" id="3_64hvb"]
+[ext_resource type="Texture2D" uid="uid://dgvv4023kntq7" path="res://assets/weapons/闸门刀.png" id="3_64hvb"]
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="3_aybeu"]
 [ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="4_ofv0e"]
 

@@ -1,4 +1,4 @@
-[gd_scene load_steps=50 format=3 uid="uid://ufprfd4r8ijj"]
+[gd_scene load_steps=52 format=3 uid="uid://ufprfd4r8ijj"]
 
 [ext_resource type="Script" uid="uid://12wblt72y8xt" path="res://scripts/actors/heroes/MainCharacter.cs" id="1_om6pm"]
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="2_4ht1x"]
@@ -13,10 +13,12 @@
 [ext_resource type="Script" uid="uid://l40es7irdvdw" path="res://scripts/actors/heroes/states/PlayerHitState.cs" id="10_utqjm"]
 [ext_resource type="PackedScene" uid="uid://dew4wgl7w576m" path="res://scenes/actors/etc/BrawlAttackEffect.tscn" id="11_6hy0m"]
 [ext_resource type="Script" uid="uid://d1g4amacs13a3" path="res://scripts/actors/heroes/states/PlayerFrozenState.cs" id="11_t3prk"]
-[ext_resource type="PackedScene" uid="uid://bxgdthwh67px6" path="res://shaders/attack_star.tscn" id="12_0y2r2"]
 [ext_resource type="Script" uid="uid://ba1kd5qgh17ag" path="res://scripts/actors/heroes/states/PlayerRunState.cs" id="12_4ht1x"]
+[ext_resource type="PackedScene" uid="uid://qhytc6rh50pe" path="res://scenes/actors/etc/SlashAttackEffect.tscn" id="12_f18x1"]
+[ext_resource type="PackedScene" uid="uid://1dmiw35p7g47" path="res://scenes/actors/etc/StabAttackEffectA.tscn" id="13_7xilr"]
 [ext_resource type="Script" uid="uid://bsa4kolrnan6p" path="res://scripts/actors/heroes/states/PlayerDyingState.cs" id="13_tdm7a"]
 [ext_resource type="Script" uid="uid://cp40kowtn1ho3" path="res://scripts/actors/heroes/states/PlayerDeadState.cs" id="14_0y2r2"]
+[ext_resource type="PackedScene" uid="uid://bmseps5gh7qi3" path="res://scenes/actors/etc/StabAttackEffectB.tscn" id="14_van21"]
 [ext_resource type="Script" uid="uid://vr51ymsfyxws" path="res://scripts/actors/heroes/states/PlayerPickUpState.cs" id="15_0y6jy"]
 [ext_resource type="Script" uid="uid://dijk8ngvrs5g0" path="res://scripts/actors/heroes/states/PlayerThrowState.cs" id="16_oc5yk"]
 [ext_resource type="Script" uid="uid://b6vgqpdrtg1lh" path="res://scripts/actors/heroes/PlayerInventoryComponent.cs" id="17_13pt2"]
@@ -82,7 +84,7 @@ AttackArea = NodePath("AttackArea")
 LeftHandAttachmentPath = NodePath("SpineSprite/SpineBoneNode")
 Speed = 500.0
 AttackDamage = 1.0
-MaxHealth = 12
+MaxHealth = 10000
 StateMachine = NodePath("StateMachine")
 EffectController = NodePath("EffectController")
 DamageFlashColor = Color(18.892157, 18.892157, 18.892157, 1)
@@ -143,7 +145,7 @@ script = ExtResource("4_ixg0x")
 skeleton_data_res = ExtResource("4_o4xwm")
 bones_thickness = 10.09
 preview_skin = "Default"
-preview_animation = "attack"
+preview_animation = "-- Empty --"
 preview_frame = true
 preview_time = 0.0
 script = ExtResource("4_ixg0x")
@@ -164,7 +166,6 @@ scale = Vector2(0.99999994, 0.99999994)
 bone_name = "Upper Body"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-visible = false
 position = Vector2(0, -108.995995)
 rotation = 1.5707964
 scale = Vector2(0.9999999, 0.9999999)
@@ -187,7 +188,6 @@ scale = Vector2(0.9999999, 0.9999999)
 shape = SubResource("RectangleShape2D_kqj82")
 
 [node name="GrabArea" type="Area2D" parent="."]
-visible = false
 collision_layer = 7
 collision_mask = 7
 
@@ -216,9 +216,8 @@ ActiveDuration = 0.3
 RecoveryDuration = 0.18
 CooldownDuration = 0.5
 HitEffectScene = ExtResource("11_6hy0m")
-HitEffectAnchorMode = 0
 HitEffectForceTopLevel = true
-HitEffectLocalOffset = Vector2(0, 0)
+HitEffectLocalOffset = Vector2(0, -350)
 
 [node name="BrawlRiotGlove" type="Node" parent="StateMachine/Attack"]
 script = ExtResource("9_13pt2")
@@ -231,9 +230,8 @@ RecoveryDuration = 0.18
 CooldownDuration = 0.5
 AnimationName = "animations/Weapon_Brawl_RiotGlove"
 HitEffectScene = ExtResource("11_6hy0m")
-HitEffectAnchorMode = 0
 HitEffectForceTopLevel = true
-HitEffectLocalOffset = Vector2(0, 0)
+HitEffectLocalOffset = Vector2(0, -350)
 RequiredItemId = "Weapon_Brawl_riotGlove"
 
 [node name="BrawlRiotBracer" type="Node" parent="StateMachine/Attack"]
@@ -247,9 +245,8 @@ RecoveryDuration = 0.17
 CooldownDuration = 0.5
 AnimationName = "animations/Weapon_Brawl_RiotBracer"
 HitEffectScene = ExtResource("11_6hy0m")
-HitEffectAnchorMode = 0
 HitEffectForceTopLevel = true
-HitEffectLocalOffset = Vector2(0, 0)
+HitEffectLocalOffset = Vector2(0, -350)
 RequiredItemId = "Weapon_Brawl_riotBracer"
 
 [node name="BrawlMechGlove" type="Node" parent="StateMachine/Attack"]
@@ -263,9 +260,8 @@ RecoveryDuration = 0.4
 CooldownDuration = 0.5
 AnimationName = "animations/Weapon_Brawl_MechGlove"
 HitEffectScene = ExtResource("11_6hy0m")
-HitEffectAnchorMode = 0
 HitEffectForceTopLevel = true
-HitEffectLocalOffset = Vector2(0, 0)
+HitEffectLocalOffset = Vector2(0, -350)
 RequiredItemId = "Weapon_Brawl_mechGlove"
 
 [node name="SlashExpandBaton" type="Node" parent="StateMachine/Attack"]
@@ -278,10 +274,9 @@ ActiveDuration = 0.17
 RecoveryDuration = 0.19
 CooldownDuration = 0.3
 AnimationName = "animations/Weapon_Slash_ExpandBaton"
-HitEffectScene = ExtResource("12_0y2r2")
-HitEffectAnchorMode = 0
+HitEffectScene = ExtResource("11_6hy0m")
 HitEffectForceTopLevel = true
-HitEffectLocalOffset = Vector2(0, 0)
+HitEffectLocalOffset = Vector2(0, -350)
 RequiredItemId = "Weapon_Slash_expandBaton"
 
 [node name="SlashBarrierGate" type="Node" parent="StateMachine/Attack"]
@@ -294,10 +289,9 @@ ActiveDuration = 0.31
 RecoveryDuration = 0.16
 CooldownDuration = 0.5
 AnimationName = "animations/Weapon_Slash_BarrierGate"
-HitEffectScene = ExtResource("12_0y2r2")
-HitEffectAnchorMode = 0
+HitEffectScene = ExtResource("12_f18x1")
 HitEffectForceTopLevel = true
-HitEffectLocalOffset = Vector2(0, 0)
+HitEffectLocalOffset = Vector2(0, -350)
 RequiredItemId = "Weapon_Slash_barrierGate"
 
 [node name="StabUmbrella" type="Node" parent="StateMachine/Attack"]
@@ -309,10 +303,9 @@ WarmupDuration = 0.17
 ActiveDuration = 0.63
 RecoveryDuration = 0.2
 AnimationName = "animations/attack_thrust"
-HitEffectScene = ExtResource("12_0y2r2")
-HitEffectAnchorMode = 0
+HitEffectScene = ExtResource("13_7xilr")
 HitEffectForceTopLevel = true
-HitEffectLocalOffset = Vector2(0, 0)
+HitEffectLocalOffset = Vector2(0, -350)
 RequiredItemId = "Weapon_Stab_umbrella"
 
 [node name="StabDrill" type="Node" parent="StateMachine/Attack"]
@@ -325,10 +318,9 @@ ActiveDuration = 0.2
 RecoveryDuration = 0.34
 CooldownDuration = 0.5
 AnimationName = "animations/Weapon_Stab_Drill"
-HitEffectScene = ExtResource("12_0y2r2")
-HitEffectAnchorMode = 0
+HitEffectScene = ExtResource("14_van21")
 HitEffectForceTopLevel = true
-HitEffectLocalOffset = Vector2(0, 0)
+HitEffectLocalOffset = Vector2(0, -350)
 RequiredItemId = "Weapon_Stab_drill"
 
 [node name="Hit" type="Node" parent="StateMachine"]
@@ -464,6 +456,7 @@ size_flags_vertical = 3
 scroll_following = true
 
 [node name="HitboxEditorPreview" type="Node2D" parent="."]
+visible = false
 z_as_relative = false
 position = Vector2(464.24234, -569.99994)
 scale = Vector2(0.9999999, 0.9999999)

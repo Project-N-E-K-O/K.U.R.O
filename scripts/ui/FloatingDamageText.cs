@@ -11,10 +11,9 @@ namespace Kuros.UI
 		[Export] public float DurationSeconds = 1.5f;
 		[Export] public float FloatHeight = 80f;
 		[Export] public float HorizontalDrift = 40f; // 水平漂移距离
-		[Export] public Color DamageColor = Colors.Yellow;
+		[Export] public Color DamageColor = Colors.White;
 		[Export] public Color CriticalColor = Colors.Red;
 		[Export] public Color HealColor = Colors.Green;
-		[Export] public int BaseFontSize = 32;
 		[Export] public float DamageMergeWindowSeconds = 0.3f; // 伤害合并时间窗口（秒内的伤害会合并）
 		
 		[ExportCategory("显示位置")]
@@ -25,24 +24,33 @@ namespace Kuros.UI
 		[Export] public float RandomOffsetXRange = 60f;  // X轴随机偏移范围（总范围）
 		[Export] public float RandomOffsetYRange = 20f;  // Y轴随机偏移范围（总范围）
 
+		[ExportCategory("伤害缩放与弹出速度")]
+		[Export] public float ReferenceDamage = 5f;     // 基准
+		[Export] public float MinDamageScale = 0.75f;     
+		[Export] public float MaxDamageScale = 2.5f;     
+
 		private Label? _label;
 		private Vector2 _startPosition;
 		private Vector2 _pushDirection = Vector2.Right; // 推开方向（根据受击方向反向）
 		private float _elapsedTime = 0f;
 		private int _totalDamage = 0; // 累积伤害值
 		private bool _isCritical = false;
-		private int _baseFontSize;
 		private float _lastDamageTime = 0f; // 记录上次伤害的时间，用于判断是否应该重置合并窗口
+
+		// 伤害缩放后的运行时参数
+		private float _effectiveFloatHeight;
+		private float _effectiveDrift;
+		// 由伤害量决定的基础缩放比，_Process 中的动画曲线在此基础上乘算
+		private float _damageScale = 1f;
+		// 当前目标颜色（纯色，不含 alpha；_Process 每帧写入 _label.Modulate = color * alpha）
+		private Color _currentLabelColor;
 
 		public override void _Ready()
 		{
 			_label = GetNode<Label>("Label");
-			_baseFontSize = _label?.GetThemeFontSize("font_size") ?? BaseFontSize;
-			
-			if (_label != null)
-			{
-				_label.AddThemeColorOverride("font_color", DamageColor);
-			}
+			_currentLabelColor = DamageColor;
+			_effectiveFloatHeight = FloatHeight;
+			_effectiveDrift = HorizontalDrift;
 		}
 
 		public override void _Process(double delta)
@@ -58,23 +66,16 @@ namespace Kuros.UI
 				return;
 			}
 
-			// 计算位置：向上浮动 + 根据推开方向的水平漂移
-			float currentY = _startPosition.Y - (FloatHeight * progress);
-			float horizontalOffset = HorizontalDrift * progress * _pushDirection.X*-1;
+			// 计算位置：向上浮动 + 根据推开方向的水平漂移（均使用伤害缩放后的值）
+			float currentY = _startPosition.Y - (_effectiveFloatHeight * progress);
+			float horizontalOffset = _effectiveDrift * progress * _pushDirection.X * -1;
 			GlobalPosition = new Vector2(_startPosition.X + horizontalOffset, currentY);
 
-			// 计算透明度（逐渐消退）
-			if (_label != null)
-			{
-				float alpha = Mathf.Lerp(1f, 0f, progress);
-				var color = _label.GetThemeColor("font_color");
-				color.A = alpha;
-				_label.AddThemeColorOverride("font_color", color);
-
-				// 微妙的缩放效果：前期稍微放大，后期缩小
-				float scaleValue = Mathf.Lerp(1.1f, 0.8f, progress);
-				Scale = new Vector2(scaleValue, scaleValue);
-			}
+			// 缩放动画
+			float animScale = Mathf.Lerp(1.1f, 0.5f, progress);
+			float baseScale = _isCritical ? _damageScale * 1.5f : _damageScale;
+			float s = baseScale * animScale;
+			Scale = new Vector2(s, s);
 		}
 
 		/// <summary>
@@ -103,6 +104,7 @@ namespace Kuros.UI
 			_isCritical = isCritical;
 			_elapsedTime = 0f;
 			_lastDamageTime = 0f;
+			ApplyDamageScale(_totalDamage);
 
 			// 设置推开方向（与伤害来源方向相反）
 			if (damageDirection.LengthSquared() > 0.01f)
@@ -132,6 +134,7 @@ namespace Kuros.UI
 				_pushDirection = -damageDirection.Normalized();
 			}
 
+			ApplyDamageScale(_totalDamage);
 			UpdateDisplay();
 		}
 
@@ -144,6 +147,31 @@ namespace Kuros.UI
 		}
 
 		/// <summary>
+		/// 将此飘字标记为暴击（由外部管理器调用）
+		/// </summary>
+		public void SetCritical()
+		{
+			_isCritical = true;
+			UpdateDisplay();
+		}
+
+		/// <summary>
+		/// 根据伤害量计算并更新运行时缩放参数（上浮高度、漂移距离、整体 Scale）
+		/// LabelSettings 会覆盖 AddThemeFontSizeOverride，所以字号大小改用 Scale 控制。
+		/// </summary>
+		private void ApplyDamageScale(int damage)
+		{
+			float scale = ReferenceDamage > 0f
+				? Mathf.Clamp(damage / ReferenceDamage, MinDamageScale, MaxDamageScale)
+				: 1f;
+			_damageScale = scale;
+			_effectiveFloatHeight = FloatHeight * scale;
+			_effectiveDrift = HorizontalDrift * scale;
+			// 立即应用初始缩放，让飘字一出现就是正确大小
+			Scale = new Vector2(scale, scale);
+		}
+
+		/// <summary>
 		/// 更新显示内容
 		/// </summary>
 		private void UpdateDisplay()
@@ -152,22 +180,25 @@ namespace Kuros.UI
 
 			_label.Text = _totalDamage.ToString();
 
-			// 根据是否暴击选择颜色和大小
+			// 根据是否暴击选择颜色，暴击时 Scale 额外 ×1.5
 			if (_isCritical)
 			{
-				_label.AddThemeColorOverride("font_color", CriticalColor);
-				_label.AddThemeFontSizeOverride("font_size", (int)(_baseFontSize * 1.5f));
+				_currentLabelColor = CriticalColor;
+				Scale = new Vector2(_damageScale * 1.5f, _damageScale * 1.5f);
 			}
 			else
 			{
-				_label.AddThemeColorOverride("font_color", DamageColor);
-				_label.AddThemeFontSizeOverride("font_size", _baseFontSize);
+				_currentLabelColor = DamageColor;
+				Scale = new Vector2(_damageScale, _damageScale);
 			}
 
-			// 重置alpha
-			var currentColor = _label.GetThemeColor("font_color");
-			currentColor.A = 1f;
-			_label.AddThemeColorOverride("font_color", currentColor);
+			// 重置 Scale
+			if (_label != null)
+			{
+				var c = _currentLabelColor;
+				c.A = 1f;
+				_label.Modulate = c;
+			}
 		}
 
 		/// <summary>
@@ -194,12 +225,9 @@ namespace Kuros.UI
 			if (_label != null)
 			{
 				_label.Text = $"+{amount}";
-				_label.AddThemeColorOverride("font_color", HealColor);
-				_label.AddThemeFontSizeOverride("font_size", _baseFontSize);
-
-				var currentColor = _label.GetThemeColor("font_color");
-				currentColor.A = 1f;
-				_label.AddThemeColorOverride("font_color", currentColor);
+				var c = HealColor;
+				c.A = 1f;
+				_label.Modulate = c;
 			}
 
 			Scale = Vector2.One;
