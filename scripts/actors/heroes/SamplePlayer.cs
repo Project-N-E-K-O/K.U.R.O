@@ -33,6 +33,11 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 	private float _defaultAttackShapeRotation;
 	private Vector2 _defaultAttackShapeScale;
 	private Shape2D? _defaultAttackShape;
+	// 缓存 AttackArea 的初始碰撞配置
+	private uint _defaultAttackAreaCollisionMask;
+	private uint _defaultAttackAreaCollisionLayer;
+	private bool _defaultAttackAreaMonitoring;
+	private bool _defaultAttackAreaMonitorable;
 	private Vector2 _currentAttackShapeBasePosition;
 	private float _currentAttackShapeBaseRotation;
 	private Vector2 _currentAttackAreaBaseScale = Vector2.One;
@@ -240,6 +245,9 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 		_currentAttackAreaBaseScale = AttackArea.Scale;
 		_attackAnchorRestLocalPosition = Vector2.Zero;
 		_currentAttackAnchorMotionOffset = Vector2.Zero;
+
+		// 缓存 AttackArea 的初始碰撞配置
+		CacheInitialAttackAreaDefaults();
 	}
 
 	private void OnEquippedAttackAreaChanged()
@@ -310,6 +318,15 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 			_mainAttackCollisionShape.Shape = _defaultAttackShape.Duplicate() as Shape2D;
 		}
 
+		// 恢复 AttackArea 的碰撞配置
+		if (AttackArea != null)
+		{
+			AttackArea.CollisionMask = _defaultAttackAreaCollisionMask;
+			AttackArea.CollisionLayer = _defaultAttackAreaCollisionLayer;
+			AttackArea.Monitoring = _defaultAttackAreaMonitoring;
+			AttackArea.Monitorable = _defaultAttackAreaMonitorable;
+		}
+
 		_currentAttackShapeBasePosition = _defaultAttackShapePosition;
 		_currentAttackShapeBaseRotation = _defaultAttackShapeRotation;
 		_currentAttackAreaBaseScale = AttackArea != null
@@ -317,6 +334,19 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 			: Vector2.One;
 		RefreshAttackAnchorTracking(resetOffset: true);
 		ApplyAttackAreaFacingTransform(FacingRight);
+	}
+
+	private void CacheInitialAttackAreaDefaults()
+	{
+		if (AttackArea == null)
+		{
+			return;
+		}
+
+		_defaultAttackAreaCollisionMask = AttackArea.CollisionMask;
+		_defaultAttackAreaCollisionLayer = AttackArea.CollisionLayer;
+		_defaultAttackAreaMonitoring = AttackArea.Monitoring;
+		_defaultAttackAreaMonitorable = AttackArea.Monitorable;
 	}
 
 	private void RefreshAttackAnchorTracking(bool resetOffset)
