@@ -211,9 +211,10 @@ private readonly HashSet<string> _obtainedItemIds = new HashSet<string>();
             }
 
             // 家具物品：路由到家具槽位（隐藏第6格）
+            // 家具类型不显示新获取介绍弹窗
             if (item.IsFurniture)
             {
-                return AddFurnitureItem(item, amount, owner, showPopupIfFirstTime);
+                return AddFurnitureItem(item, amount, owner, showPopupIfFirstTime: false);
             }
 
             int requestedAmount = amount;

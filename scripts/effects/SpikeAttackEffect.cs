@@ -14,7 +14,7 @@ namespace Kuros.Effects
     /// 支持多个尖刺效果重叠（使用倍数乘积管理减速）。
     /// </summary>
     [GlobalClass]
-    public partial class SpikeAttackEffect : ActorEffect
+    public partial class SpikeAttackEffect : ActorEffect, Kuros.Core.Effects.IWorldSpawnable
     {
         private const uint EnemiesLayerMask = 2u;
         // 全局字典：敌人 → 减速倍数列表（来自所有活跃的 SpikeAttackEffect）
@@ -25,7 +25,7 @@ namespace Kuros.Effects
         /// <summary>
         /// 由 SpawnThrowDestroyEffects 在应用前设置，将 Area2D 定位到抛物落点。
         /// </summary>
-        public Vector2 WorldSpawnPosition { get; set; } = Vector2.Zero;
+        public Vector2? WorldSpawnPosition { get; set; }
 
         /// <summary>每次造成的伤害量。</summary>
         [Export(PropertyHint.Range, "1,999,1")]
@@ -60,8 +60,8 @@ namespace Kuros.Effects
             _area = GetNodeOrNull<Area2D>("Area2D");
             if (_area == null) return;
 
-            if (WorldSpawnPosition != Vector2.Zero)
-                _area.GlobalPosition = WorldSpawnPosition;
+            if (WorldSpawnPosition.HasValue)
+                _area.GlobalPosition = WorldSpawnPosition.Value;
 
             _area.CollisionMask = EnemiesLayerMask;
             _area.Monitoring = true;

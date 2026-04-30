@@ -1,8 +1,8 @@
 [gd_scene load_steps=6 format=3 uid="uid://ds87c8d0i4h8a"]
 
-[ext_resource type="Shader" uid="uid://byenhbkp3wqqj" path="res://shaders/materials/blackhole.gdshader" id="1_a0is8"]
+[ext_resource type="Shader" uid="uid://ivc0uarjx68f" path="res://shaders/materials/blackhole.gdshader" id="1_a0is8"]
 [ext_resource type="Texture2D" uid="uid://ci4fm1v108nw6" path="res://resources/ui/武器栏框（选中）.png" id="3_1lrwd"]
-[ext_resource type="Script" uid="uid://cv8bvwy4qs0w7" path="res://scripts/items/world/GravityGrenadeBlackHole.cs" id="3_bpn0"]
+[ext_resource type="Script" uid="uid://8gk3tach1kg7" path="res://scripts/items/world/GravityGrenadeBlackHole.cs" id="3_bpn0"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_1lrwd"]
 shader = ExtResource("1_a0is8")
@@ -28,9 +28,10 @@ shader_parameter/distortion_falloff = 0.415
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_attract"]
 radius = 390.0
- 
+
 [node name="BlackHole" type="Node2D"]
-z_index = 3
+z_index = 2
+y_sort_enabled = true
 script = ExtResource("3_bpn0")
 AttractRadius = 390.0
 AttractForce = 1400.0

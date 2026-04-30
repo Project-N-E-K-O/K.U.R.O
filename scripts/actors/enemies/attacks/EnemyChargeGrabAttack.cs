@@ -515,15 +515,9 @@ namespace Kuros.Actors.Enemies.Attacks
 				return;
 			}
 
-			var sourcePosition = Enemy?.GlobalPosition;
-			if (Enemy != null)
-			{
-				_grabbedPlayer.TakeDamage(GrabHitDamage, sourcePosition, Enemy);
-			}
-			else
-			{
-				_grabbedPlayer.TakeDamage(GrabHitDamage, sourcePosition);
-			}
+			// 伤害来源为敌人当前坐标，若敌人在攻击过程中被击退或位移，伤害仍以当前坐标为准。
+			// IsEnemyAlive() 已确保 Enemy 不为 null，因此此时 Enemy 必定有效
+			_grabbedPlayer.TakeDamage(GrabHitDamage, Enemy.GlobalPosition, Enemy);
 		}
 
 		private void StartPostCooldown()

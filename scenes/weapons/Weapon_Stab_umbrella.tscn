@@ -1,9 +1,9 @@
 [gd_scene load_steps=11 format=3 uid="uid://6ghjqyjkk37w"]
 
 [ext_resource type="Script" uid="uid://dtgdjgrqgype7" path="res://scripts/items/world/WorldItemEntity.cs" id="1_inoct"]
-[ext_resource type="Texture2D" uid="uid://cuysvmaku41f8" path="res://assets/weapons/伞.png" id="1_kyvej"]
-[ext_resource type="Resource" uid="uid://c01sltuo7404y" path="res://resources/items/Weapon_Stab_Umbrella.tres" id="2_inoct"]
-[ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="3_o27ch"]
+[ext_resource type="Texture2D" uid="uid://cp3tj4mexoi30" path="res://assets/weapons/伞.png" id="1_kyvej"]
+[ext_resource type="Resource" uid="uid://c01sltuo7404y" path="res://resources/items/Weapon_Stab_umbrella.tres" id="2_inoct"]
+[ext_resource type="Shader" uid="uid://rvlvejer46bm" path="res://shaders/materials/sprite_outline.gdshader" id="3_o27ch"]
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="3_u83q7"]
 [ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="4_0qmq6"]
 

@@ -1,2 +1,8 @@
 # Normalize EOL for all files that Git considers text files.
 * text=auto eol=lf
+
+# Godot resource files: treat as binary to avoid line-level UID merge conflicts.
+# Git will mark the whole file as conflicted instead of auto-merging mismatched UIDs.
+*.tres merge=binary
+*.tscn merge=binary
+*.import merge=binary

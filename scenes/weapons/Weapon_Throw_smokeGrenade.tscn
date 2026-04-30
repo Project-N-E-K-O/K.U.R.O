@@ -36,6 +36,7 @@ DefaultOutlineColor = Color(0, 0, 0, 0)
 ThrowDamage = 0.0
 MinDamageVelocity = 0.0
 KnockbackForce = 0.0
+StopOnHit = true
 IsThrowWeapon = true
 ThrowWeaponCooldown = 10.0
 LandingHideDelay = 0.5
