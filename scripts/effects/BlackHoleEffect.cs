@@ -20,7 +20,7 @@ namespace Kuros.Effects
         /// <summary>
         /// 由 SpawnThrowDestroyEffects 在应用前设置，将 Area2D 定位到抛物落点。
         /// </summary>
-        public Vector2 WorldSpawnPosition { get; set; } = Vector2.Zero;
+        public Vector2? WorldSpawnPosition { get; set; }
 
         [ExportGroup("Damage")]
         /// <summary>每次造成的伤害量。</summary>
@@ -80,8 +80,8 @@ namespace Kuros.Effects
 
             EffectId = $"black_hole_{Guid.NewGuid()}";
 
-            _isWorldSpawned = WorldSpawnPosition != Vector2.Zero;
-            _blackHoleCenter = _isWorldSpawned ? WorldSpawnPosition : Actor?.GlobalPosition ?? Vector2.Zero;
+            _isWorldSpawned = WorldSpawnPosition.HasValue;
+            _blackHoleCenter = WorldSpawnPosition ?? Actor?.GlobalPosition ?? Vector2.Zero;
 
             _damageArea = GetNodeOrNull<Area2D>("Area2D");
             if (_damageArea == null) return;

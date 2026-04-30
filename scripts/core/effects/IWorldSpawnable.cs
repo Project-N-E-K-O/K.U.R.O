@@ -13,6 +13,6 @@ namespace Kuros.Core.Effects
         /// 世界坐标落点。由 SpawnThrowDestroyEffects 在 ApplyEffect 之前赋值。
         /// 若为 Vector2.Zero 则表示未设置，效果应回退到施法者位置。
         /// </summary>
-        Vector2 WorldSpawnPosition { get; set; }
+        Vector2? WorldSpawnPosition { get; set; }
     }
 }

@@ -18,7 +18,7 @@ namespace Kuros.Effects
         /// <summary>
         /// 由 SpawnThrowDestroyEffects 在应用前设置，将 Area2D 定位到抛物落点。
         /// </summary>
-        public Vector2 WorldSpawnPosition { get; set; } = Vector2.Zero;
+        public Vector2? WorldSpawnPosition { get; set; }
 
         private Area2D? _area;
         private readonly HashSet<GameActor> _stunnedEnemies = new();
@@ -50,8 +50,8 @@ namespace Kuros.Effects
             if (_area == null || !IsInstanceValid(_area)) return;
 
             // 修正 Area2D 到世界坐标落点（ActorEffect 挂在玩家树下，默认跟随玩家）
-            if (WorldSpawnPosition != Vector2.Zero)
-                _area.GlobalPosition = WorldSpawnPosition;
+            if (WorldSpawnPosition.HasValue)
+                _area.GlobalPosition = WorldSpawnPosition.Value;
 
             // GetOverlappingBodies() 依赖物理帧，移动 Area2D 后立刻调用结果为空。
             // 改用直接空间查询，立即得到落点处的所有敌人。
@@ -61,7 +61,7 @@ namespace Kuros.Effects
             var spaceState = _area.GetWorld2D().DirectSpaceState;
             if (spaceState == null) return;
 
-            Vector2 center = WorldSpawnPosition != Vector2.Zero ? WorldSpawnPosition : _area.GlobalPosition;
+            Vector2 center = WorldSpawnPosition ?? _area.GlobalPosition;
             var queryParams = new PhysicsShapeQueryParameters2D
             {
                 Shape = shapeNode.Shape,

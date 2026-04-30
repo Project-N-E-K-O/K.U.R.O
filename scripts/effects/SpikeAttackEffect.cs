@@ -25,7 +25,7 @@ namespace Kuros.Effects
         /// <summary>
         /// 由 SpawnThrowDestroyEffects 在应用前设置，将 Area2D 定位到抛物落点。
         /// </summary>
-        public Vector2 WorldSpawnPosition { get; set; } = Vector2.Zero;
+        public Vector2? WorldSpawnPosition { get; set; }
 
         /// <summary>每次造成的伤害量。</summary>
         [Export(PropertyHint.Range, "1,999,1")]
@@ -60,8 +60,8 @@ namespace Kuros.Effects
             _area = GetNodeOrNull<Area2D>("Area2D");
             if (_area == null) return;
 
-            if (WorldSpawnPosition != Vector2.Zero)
-                _area.GlobalPosition = WorldSpawnPosition;
+            if (WorldSpawnPosition.HasValue)
+                _area.GlobalPosition = WorldSpawnPosition.Value;
 
             _area.CollisionMask = EnemiesLayerMask;
             _area.Monitoring = true;

@@ -335,37 +335,37 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 		_attackAnchorRestLocalPosition = localPosition;
 	}
 
-	private void UpdateSyncedAttackAreaAttackBoneMotion()
-	{
-		if (!SyncMainAttackAreaWithEquippedWeaponArea || !FollowSyncedAttackAreaWithAttackBoneMotion)
-		{
-			return;
-		}
+	// private void UpdateSyncedAttackAreaAttackBoneMotion()
+	// {
+	// 	if (!SyncMainAttackAreaWithEquippedWeaponArea || !FollowSyncedAttackAreaWithAttackBoneMotion)
+	// 	{
+	// 		return;
+	// 	}
 
-		if (AttackArea == null || _mainAttackCollisionShape == null)
-		{
-			return;
-		}
+	// 	if (AttackArea == null || _mainAttackCollisionShape == null)
+	// 	{
+	// 		return;
+	// 	}
 
-		if (!TryGetCurrentAttackAnchorLocalPosition(out var localPosition))
-		{
-			if (_currentAttackAnchorMotionOffset != Vector2.Zero)
-			{
-				_currentAttackAnchorMotionOffset = Vector2.Zero;
-				ApplyAttackAreaFacingTransform(FacingRight);
-			}
-			return;
-		}
+	// 	if (!TryGetCurrentAttackAnchorLocalPosition(out var localPosition))
+	// 	{
+	// 		if (_currentAttackAnchorMotionOffset != Vector2.Zero)
+	// 		{
+	// 			_currentAttackAnchorMotionOffset = Vector2.Zero;
+	// 			ApplyAttackAreaFacingTransform(FacingRight);
+	// 		}
+	// 		return;
+	// 	}
 
-		Vector2 newOffset = localPosition - _attackAnchorRestLocalPosition;
-		if (newOffset.IsEqualApprox(_currentAttackAnchorMotionOffset))
-		{
-			return;
-		}
+	// 	Vector2 newOffset = localPosition - _attackAnchorRestLocalPosition;
+	// 	if (newOffset.IsEqualApprox(_currentAttackAnchorMotionOffset))
+	// 	{
+	// 		return;
+	// 	}
 
-		_currentAttackAnchorMotionOffset = newOffset;
-		ApplyAttackAreaFacingTransform(FacingRight);
-	}
+	// 	_currentAttackAnchorMotionOffset = newOffset;
+	// 	ApplyAttackAreaFacingTransform(FacingRight);
+	// }
 
 	private bool TryGetCurrentAttackAnchorLocalPosition(out Vector2 localPosition)
 	{
