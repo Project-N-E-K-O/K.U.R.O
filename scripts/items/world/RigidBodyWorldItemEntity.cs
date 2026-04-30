@@ -1811,13 +1811,9 @@ namespace Kuros.Items.World
 						entry.ApplyOverrides(actorEffect);
 
 						// 若效果支持落点定位，传入世界坐标
-						if (actorEffect is StunEnemiesEffect stunEffect)
+						if (actorEffect is Kuros.Core.Effects.IWorldSpawnable worldSpawnable)
 						{
-							stunEffect.WorldSpawnPosition = spawnPos;
-						}
-						else if (actorEffect is Kuros.Effects.SpikeAttackEffect spikeEffect)
-						{
-							spikeEffect.WorldSpawnPosition = spawnPos;
+							worldSpawnable.WorldSpawnPosition = spawnPos;
 						}
 
 						if (LastDroppedBy?.EffectController != null)

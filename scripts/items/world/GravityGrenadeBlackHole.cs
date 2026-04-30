@@ -9,6 +9,7 @@ using Kuros.Utils;
 namespace Kuros.Items.World
 {
 	/// <summary>
+	/// 目前重力手雷特效由BlackHoleEffect.cs接管，该脚本暂不使用
 	/// 重力手雷生成的黑洞实体
 	/// 负责：吸引周围敌人，持续造成伤害，管理黑洞的生命周期
 	/// </summary>

@@ -51,7 +51,7 @@ namespace Kuros.Core
 		// Exposed state for States to use
 		public int CurrentHealth { get; protected set; }
 		public int CurrentShield { get; private set; }
-		public float FrozenStateRemainingTime { get; set; } = 0.0f;
+		//public float FrozenStateRemainingTime { get; set; } = 0.0f;
 		public float AttackTimer { get; set; } = 0.0f;
 		public bool FacingRight { get; protected set; } = true;
 		public event Func<DamageEventArgs, bool>? DamageIntercepted;
@@ -60,7 +60,7 @@ namespace Kuros.Core
 		/// <summary>
 		/// 保存Frozen状态被打断时的剩余时长，用于在Hit后恢复
 		/// </summary>
-		//public float FrozenStateRemainingTime { get; set; } = 0f;
+		public float FrozenStateRemainingTime { get; set; } = 0f;
 		
 		protected Node2D _spineCharacter = null!;
 		protected Sprite2D _sprite = null!;

@@ -14,7 +14,7 @@ namespace Kuros.Effects
     /// 支持多个尖刺效果重叠（使用倍数乘积管理减速）。
     /// </summary>
     [GlobalClass]
-    public partial class SpikeAttackEffect : ActorEffect
+    public partial class SpikeAttackEffect : ActorEffect, Kuros.Core.Effects.IWorldSpawnable
     {
         private const uint EnemiesLayerMask = 2u;
         // 全局字典：敌人 → 减速倍数列表（来自所有活跃的 SpikeAttackEffect）

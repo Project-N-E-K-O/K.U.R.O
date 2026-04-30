@@ -1,0 +1,50 @@
+[gd_scene load_steps=6 format=3 uid="uid://yl5nej7amceb"]
+
+[ext_resource type="Script" uid="uid://dngolc07wtr11" path="res://scripts/effects/BlackHoleEffect.cs" id="1_7j3d2"]
+[ext_resource type="Shader" uid="uid://ivc0uarjx68f" path="res://shaders/materials/blackhole.gdshader" id="1_xjlwi"]
+[ext_resource type="Texture2D" uid="uid://ci4fm1v108nw6" path="res://resources/ui/武器栏框（选中）.png" id="2_7j3d2"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_2afgt"]
+shader = ExtResource("1_xjlwi")
+shader_parameter/strength = 0.16
+shader_parameter/radius = 0.38
+shader_parameter/swirl = 0.565
+shader_parameter/time_scale = 0.665
+shader_parameter/wave_amplitude = 0.0
+shader_parameter/wave_frequency = 2.73
+shader_parameter/wave_speed = 5.455
+shader_parameter/chromatic_intensity = 0.48
+shader_parameter/distortion_intensity = 1.415
+shader_parameter/horizon_radius = 0.195
+shader_parameter/horizon_thickness = 0.022
+shader_parameter/horizon_brightness = 1.08
+shader_parameter/ring_intensity = 2.84
+shader_parameter/ring_density = 23.77
+shader_parameter/ring_speed = 1.535
+shader_parameter/edge_softness = 0.105
+shader_parameter/horizon_softness = 0.033
+shader_parameter/edge_fog_strength = 0.24
+shader_parameter/distortion_falloff = 0.415
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_04aku"]
+radius = 270.0
+
+[node name="GravityGrenadeEffect" type="Node"]
+script = ExtResource("1_7j3d2")
+DamagePerTick = 1
+AdsorbRadius = 600.0
+AdsorbForce = 200.0
+EffectId = "423beca3-dc85-457c-82c2-1cc7947fe5de"
+Duration = 8.0
+
+[node name="Area2D" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="Sprite2D" type="Sprite2D" parent="Area2D"]
+z_index = 3
+material = SubResource("ShaderMaterial_2afgt")
+texture = ExtResource("2_7j3d2")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("CircleShape2D_04aku")

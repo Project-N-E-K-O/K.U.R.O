@@ -11,7 +11,7 @@ namespace Kuros.Effects
     /// 效果到期时自动解除全部眩晕。
     /// </summary>
     [GlobalClass]
-    public partial class StunEnemiesEffect : ActorEffect
+    public partial class StunEnemiesEffect : ActorEffect, Kuros.Core.Effects.IWorldSpawnable
     {
         private const uint EnemiesLayerMask = 2u;
 
