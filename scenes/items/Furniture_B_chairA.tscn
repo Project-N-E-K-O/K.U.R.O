@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://kwbg3wy7rik"]
+[gd_scene load_steps=12 format=3 uid="uid://kwbg3wy7rik"]
 
 [ext_resource type="Script" uid="uid://dhfq2rrha0awm" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_2omr6"]
 [ext_resource type="Resource" uid="uid://dl5ouycvwcoeh" path="res://resources/items/Furniture_B_ChairA.tres" id="2_2omr6"]
@@ -21,8 +21,11 @@ shader_parameter/alpha_threshold = 0.5
 shader_parameter/edge_softness = 0.12
 shader_parameter/preserve_fill = true
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_2omr6"]
+size = Vector2(353, 282)
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_gy46y"]
-size = Vector2(336, 242)
+size = Vector2(320.5, 493)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jyvv2"]
 size = Vector2(96.4706, 43.823532)
@@ -67,14 +70,13 @@ texture = ExtResource("6_2omr6")
 [node name="CollisionArea" type="Area2D" parent="RigidBody2D"]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/CollisionArea"]
-position = Vector2(2, -22)
-shape = SubResource("RectangleShape2D_gy46y")
+position = Vector2(-8.5, -28)
+shape = SubResource("RectangleShape2D_2omr6")
 
 [node name="AttackArea" type="Area2D" parent="RigidBody2D"]
-visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/AttackArea"]
-position = Vector2(-2.5, 21)
+position = Vector2(-10.25, 168.5)
 shape = SubResource("RectangleShape2D_gy46y")
 
 [node name="StaticBody2D" type="StaticBody2D" parent="RigidBody2D" groups=["navigation_polygon_source_geometry_group"]]

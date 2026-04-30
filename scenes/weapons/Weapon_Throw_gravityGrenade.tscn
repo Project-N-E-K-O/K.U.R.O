@@ -66,13 +66,11 @@ texture = ExtResource("4_q0htg")
 region_rect = Rect2(-100, -100, 700, 700)
 
 [node name="CollisionArea" type="Area2D" parent="RigidBody2D"]
-visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/CollisionArea"]
 shape = SubResource("CircleShape2D_w5uvq")
 
 [node name="AttackArea" type="Area2D" parent="RigidBody2D"]
-visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/AttackArea"]
 position = Vector2(-1.5, 99)

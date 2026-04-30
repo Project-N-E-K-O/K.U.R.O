@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://bkbhucnxqiys2"]
+[gd_scene load_steps=12 format=3 uid="uid://bkbhucnxqiys2"]
 
 [ext_resource type="Script" uid="uid://dhfq2rrha0awm" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_bqitj"]
 [ext_resource type="Resource" uid="uid://cbb56n2xt45k6" path="res://resources/items/Furniture_B_CounterB.tres" id="2_k7rl8"]
@@ -22,6 +22,9 @@ shader_parameter/preserve_fill = true
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_gy46y"]
 size = Vector2(1429, 310.25)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_k7rl8"]
+size = Vector2(1435, 596)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jyvv2"]
 size = Vector2(1575, 226)
@@ -71,11 +74,10 @@ position = Vector2(-8, -47.875)
 shape = SubResource("RectangleShape2D_gy46y")
 
 [node name="AttackArea" type="Area2D" parent="RigidBody2D"]
-visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/AttackArea"]
-position = Vector2(-6.5, 76)
-shape = SubResource("RectangleShape2D_gy46y")
+position = Vector2(-5.5, 98)
+shape = SubResource("RectangleShape2D_k7rl8")
 
 [node name="StaticBody2D" type="StaticBody2D" parent="RigidBody2D" groups=["navigation_polygon_source_geometry_group"]]
 
