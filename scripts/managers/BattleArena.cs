@@ -1,0 +1,339 @@
+using Godot;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Kuros.Core;
+using Kuros.Utils;
+
+namespace Kuros.Managers
+{
+    /// <summary>
+    /// 独立的战斗区域管理器：
+    /// 实时检测指定范围内是否有敌人。
+    /// 有敌人时自动创建空气墙边界并锁定相机；
+    /// 无敌人时自动移除空气墙并解除相机锁定。
+    /// </summary>
+    [GlobalClass]
+    public partial class BattleArena : Area2D
+    {
+        /// <summary>战斗区域的大小。</summary>
+        [Export]
+        public Vector2 ArenaSize { get; set; } = new Vector2(800, 600);
+
+        /// <summary>空气墙使用的碰撞层。</summary>
+        [Export(PropertyHint.Layers2DPhysics)]
+        public uint BoundaryCollisionLayer { get; set; } = 0;
+
+        /// <summary>空气墙的碰撞掩码（应包含玩家层0和敌人层2）。</summary>
+        [Export(PropertyHint.Layers2DPhysics)]
+        public uint BoundaryCollisionMask { get; set; } = 0; // Layer 0 + Layer 2
+
+        /// <summary>空气墙的厚度。</summary>
+        [Export(PropertyHint.Range, "1,50,1")]
+        public float BoundaryThickness { get; set; } = 2f;
+
+        /// <summary>检测敌人的碰撞掩码。</summary>
+        [Export(PropertyHint.Layers2DPhysics)]
+        public uint EnemyDetectionMask { get; set; } = 0; // Layer 2 - 敌人
+
+        /// <summary>检查间隔（秒），多久检查一次敌人。</summary>
+        [Export(PropertyHint.Range, "0.1,2,0.1")]
+        public float CheckInterval { get; set; } = 0.3f;
+
+        [ExportCategory("Debug")]
+        [Export]
+        public bool ShowDebugOverlay { get; set; } = true;
+
+        [Export]
+        public bool ShowDebugOverlayInGame { get; set; } = true;
+
+        [Export]
+        public Color DebugArenaColor { get; set; } = new Color(0.2f, 1f, 0.2f, 0.5f);
+
+        [Export(PropertyHint.Range, "1,8,0.5")]
+        public float DebugLineWidth { get; set; } = 2f;
+
+        [Export(PropertyHint.Range, "2,16,0.5")]
+        public float DebugPointRadius { get; set; } = 5f;
+
+        [Signal]
+        public delegate void BattleStartedEventHandler();
+
+        [Signal]
+        public delegate void BattleEndedEventHandler();
+
+        private BattleArenaBoundary? _boundaryWalls;
+        private CameraZoneManager? _cameraZoneManager;
+        private float _checkTimer = 0f;
+        private bool _isBattleActive = false;
+        private List<GameActor> _trackedEnemies = new();
+        private string? _originalCameraZoneName;
+
+        public override void _Ready()
+        {
+            // 配置 Area2D 的碰撞层
+            CollisionLayer = 0;
+            CollisionMask = EnemyDetectionMask;
+
+            // 确保有碰撞形状
+            var collisionShape = GetNodeOrNull<CollisionShape2D>("CollisionShape2D");
+            if (collisionShape == null)
+            {
+                collisionShape = new CollisionShape2D
+                {
+                    Name = "CollisionShape2D",
+                    Shape = new RectangleShape2D { Size = ArenaSize }
+                };
+                AddChild(collisionShape);
+            }
+            else
+            {
+                // 更新现有碰撞形状大小
+                if (collisionShape.Shape is RectangleShape2D rectShape)
+                {
+                    rectShape.Size = ArenaSize;
+                }
+            }
+        }
+
+        public override void _Process(double delta)
+        {
+            if (Engine.IsEditorHint())
+            {
+                QueueRedraw();
+                return;
+            }
+
+            _checkTimer -= (float)delta;
+            if (_checkTimer <= 0f)
+            {
+                _checkTimer = CheckInterval;
+                CheckEnemyStatus();
+            }
+
+            if (ShouldDrawDebugOverlay())
+            {
+                QueueRedraw();
+            }
+        }
+
+        public override void _Draw()
+        {
+            if (!ShouldDrawDebugOverlay())
+            {
+                return;
+            }
+
+            DrawDebugArenaShape();
+        }
+
+        /// <summary>
+        /// 检查范围内敌人状态（使用物理查询）。
+        /// </summary>
+        private void CheckEnemyStatus()
+        {
+            // 更新现有敌人列表
+            _trackedEnemies.RemoveAll(enemy => !IsInstanceValid(enemy) || enemy.IsDead);
+
+            // 通过物理查询找到范围内的所有敌人
+            var overlappingBodies = GetOverlappingBodies();
+            var detectedEnemies = new List<GameActor>();
+
+            foreach (var body in overlappingBodies)
+            {
+                if (body is GameActor actor && !detectedEnemies.Contains(actor))
+                {
+                    detectedEnemies.Add(actor);
+                    
+                    // 新进入的敌人
+                    if (!_trackedEnemies.Contains(actor))
+                    {
+                        GameLogger.Debug(nameof(BattleArena), $"敌人进入检测范围：{actor.Name}");
+                    }
+                }
+            }
+
+            // 检查离开的敌人
+            foreach (var enemy in _trackedEnemies.ToList())
+            {
+                if (!detectedEnemies.Contains(enemy))
+                {
+                    GameLogger.Debug(nameof(BattleArena), $"敌人离开检测范围：{enemy.Name}");
+                }
+            }
+
+            _trackedEnemies = detectedEnemies;
+
+            bool hasEnemies = _trackedEnemies.Count > 0;
+
+            // 状态转移：无敌人 -> 有敌人
+            if (hasEnemies && !_isBattleActive)
+            {
+                ActivateBattle();
+            }
+            // 状态转移：有敌人 -> 无敌人
+            else if (!hasEnemies && _isBattleActive)
+            {
+                DeactivateBattle();
+            }
+        }
+
+        /// <summary>
+        /// 激活战斗：创建空气墙并锁定相机。
+        /// </summary>
+        private void ActivateBattle()
+        {
+            _isBattleActive = true;
+
+            GameLogger.Info(nameof(BattleArena), $"战斗激活：检测到 {_trackedEnemies.Count} 个敌人，创建空气墙");
+
+            // 找到相机管理器
+            var cameraZoneManager = GetTree().Root.GetNodeOrNull<CameraZoneManager>("BattleScene/CameraZoneManager");
+            if (cameraZoneManager == null)
+            {
+                cameraZoneManager = GetTree().Root.GetNodeOrNull<CameraZoneManager>("/root/BattleScene/CameraZoneManager");
+            }
+
+            if (cameraZoneManager != null)
+            {
+                _cameraZoneManager = cameraZoneManager;
+                _originalCameraZoneName = cameraZoneManager.CurrentZoneName;
+
+                // 创建临时相机区域
+                var arenaRect = new Rect2(GlobalPosition - ArenaSize / 2f, ArenaSize);
+                cameraZoneManager.CreateAndSwitchTemporaryCameraZone(arenaRect, $"arena_{GetInstanceId()}");
+
+                GameLogger.Info(nameof(BattleArena), "相机已切换到战斗区域");
+            }
+            else
+            {
+                GameLogger.Warn(nameof(BattleArena), "未找到 CameraZoneManager，相机不会被锁定");
+            }
+
+            // 创建空气墙
+            CreateBoundaryWalls();
+
+            EmitSignal(SignalName.BattleStarted);
+        }
+
+        /// <summary>
+        /// 停用战斗：移除空气墙并解除相机锁定。
+        /// </summary>
+        private void DeactivateBattle()
+        {
+            _isBattleActive = false;
+
+            GameLogger.Info(nameof(BattleArena), "战斗完成：所有敌人已击杀，移除空气墙");
+
+            // 移除空气墙
+            RemoveBoundaryWalls();
+
+            // 恢复相机
+            if (_cameraZoneManager != null)
+            {
+                if (!string.IsNullOrEmpty(_originalCameraZoneName))
+                {
+                    _cameraZoneManager.SwitchToZone(_originalCameraZoneName);
+                }
+                else
+                {
+                    _cameraZoneManager.RemoveTemporaryCameraZone($"arena_{GetInstanceId()}");
+                }
+
+                _cameraZoneManager = null;
+                GameLogger.Info(nameof(BattleArena), "相机已恢复");
+            }
+
+            _trackedEnemies.Clear();
+            EmitSignal(SignalName.BattleEnded);
+        }
+
+        /// <summary>
+        /// 创建空气墙边界。
+        /// </summary>
+        private void CreateBoundaryWalls()
+        {
+            if (_boundaryWalls != null && IsInstanceValid(_boundaryWalls))
+            {
+                return; // 已经存在
+            }
+
+            var arenaRect = new Rect2(GlobalPosition - ArenaSize / 2f, ArenaSize);
+
+            _boundaryWalls = new BattleArenaBoundary
+            {
+                Name = $"BattleArenaBoundary_{GetInstanceId()}",
+                ArenaRect = arenaRect,
+                WallThickness = BoundaryThickness,
+                CollisionLayer = BoundaryCollisionLayer,
+                CollisionMask = BoundaryCollisionMask
+            };
+
+            GetParent()?.AddChild(_boundaryWalls);
+            GameLogger.Info(nameof(BattleArena), "空气墙已创建");
+        }
+
+        /// <summary>
+        /// 移除空气墙。
+        /// </summary>
+        private void RemoveBoundaryWalls()
+        {
+            if (_boundaryWalls != null && IsInstanceValid(_boundaryWalls))
+            {
+                _boundaryWalls.QueueFree();
+                _boundaryWalls = null;
+                GameLogger.Info(nameof(BattleArena), "空气墙已移除");
+            }
+        }
+
+
+        private void DrawDebugArenaShape()
+        {
+            var halfSize = ArenaSize / 2f;
+            var topLeft = new Vector2(-halfSize.X, -halfSize.Y);
+            var topRight = new Vector2(halfSize.X, -halfSize.Y);
+            var bottomRight = new Vector2(halfSize.X, halfSize.Y);
+            var bottomLeft = new Vector2(-halfSize.X, halfSize.Y);
+
+            var color = _isBattleActive 
+                ? new Color(1f, 0.2f, 0.2f, 0.7f)  // 红色表示战斗激活
+                : DebugArenaColor;                  // 绿色表示待命
+
+            DrawLine(topLeft, topRight, color, DebugLineWidth);
+            DrawLine(topRight, bottomRight, color, DebugLineWidth);
+            DrawLine(bottomRight, bottomLeft, color, DebugLineWidth);
+            DrawLine(bottomLeft, topLeft, color, DebugLineWidth);
+
+            // 中心圆点
+            DrawCircle(Vector2.Zero, DebugPointRadius, color);
+
+            // 敌人计数标签（编辑器中显示）
+            if (Engine.IsEditorHint())
+            {
+                DrawCircle(new Vector2(0, -halfSize.Y - 20), 3, color);
+            }
+        }
+
+        private bool ShouldDrawDebugOverlay()
+        {
+            if (!ShowDebugOverlay)
+            {
+                return false;
+            }
+
+            if (Engine.IsEditorHint())
+            {
+                return true;
+            }
+
+            return ShowDebugOverlayInGame;
+        }
+
+        public override void _ExitTree()
+        {
+            RemoveBoundaryWalls();
+            DeactivateBattle();
+            _trackedEnemies.Clear();
+        }
+    }
+}

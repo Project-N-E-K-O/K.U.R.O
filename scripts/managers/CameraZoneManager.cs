@@ -53,6 +53,9 @@ namespace Kuros.Managers
         private CameraZone[] CameraZones = new CameraZone[0];
         private Area2D? _zone1Area;
         private Area2D? _zone2Area;
+        // 临时相机区域存储（用于战斗区域等动态场景）
+        private Dictionary<string, CameraZone> _temporaryCameraZones = new();
+        private string? _temporaryCameraZoneNameBeforeSwitch; // 记录切换到临时区域前的区域名
         #endregion
 
         #region Lifecycle
@@ -256,15 +259,11 @@ namespace Kuros.Managers
                 return;
 
             CameraZone zone = CameraZones[zoneIndex];
-
-            // 更新相机限制
-            TargetCamera.LimitLeft = zone.LimitLeft;
-            TargetCamera.LimitTop = zone.LimitTop;
-            TargetCamera.LimitRight = zone.LimitRight;
-            TargetCamera.LimitBottom = zone.LimitBottom;
+            ApplyZoneToCamera(zone);
 
             _currentZoneIndex = zoneIndex;
             _currentZone = zone;
+            _temporaryCameraZoneNameBeforeSwitch = null;
 
             GameLogger.Info(nameof(CameraZoneManager), $"✓ 切换到相机区域: {zone.Name} " +
                 $"(Left:{zone.LimitLeft}, Top:{zone.LimitTop}, Right:{zone.LimitRight}, Bottom:{zone.LimitBottom})");
@@ -279,6 +278,11 @@ namespace Kuros.Managers
         }
 
         /// <summary>
+        /// 获取当前相机区域的名称
+        /// </summary>
+        public string? CurrentZoneName => _currentZone?.Name;
+
+        /// <summary>
         /// 获取指定名称的区域
         /// </summary>
         public CameraZone? GetZoneByName(string name)
@@ -288,7 +292,100 @@ namespace Kuros.Managers
                 if (zone.Name == name)
                     return zone;
             }
+
+            // 检查临时区域
+            if (_temporaryCameraZones.TryGetValue(name, out var tempZone))
+            {
+                return tempZone;
+            }
+
             return null;
+        }
+
+        /// <summary>
+        /// 按名称切换到相机区域
+        /// </summary>
+        public void SwitchToZone(string zoneName)
+        {
+            for (int i = 0; i < CameraZones.Length; i++)
+            {
+                if (CameraZones[i].Name == zoneName)
+                {
+                    SwitchToZone(i);
+                    return;
+                }
+            }
+
+            // 检查临时区域
+            if (_temporaryCameraZones.TryGetValue(zoneName, out var tempZone))
+            {
+                _currentZone = tempZone;
+                _currentZoneIndex = -1; // 标记为非固定区域
+                ApplyZoneToCamera(tempZone);
+                GameLogger.Info(nameof(CameraZoneManager), $"✓ 切换到临时相机区域: {zoneName}");
+                return;
+            }
+
+            GameLogger.Warn(nameof(CameraZoneManager), $"区域 '{zoneName}' 不存在");
+        }
+
+        /// <summary>
+        /// 创建并切换到临时相机区域（用于战斗场景等）
+        /// </summary>
+        public void CreateAndSwitchTemporaryCameraZone(Rect2 arenaRect, string zoneName)
+        {
+            Vector2 arenaEnd = arenaRect.Position + arenaRect.Size;
+            var tempZone = new CameraZone
+            {
+                Name = zoneName,
+                LimitLeft = (int)arenaRect.Position.X,
+                LimitTop = (int)arenaRect.Position.Y,
+                LimitRight = (int)arenaEnd.X,
+                LimitBottom = (int)arenaEnd.Y
+            };
+
+            _temporaryCameraZones[zoneName] = tempZone;
+            _temporaryCameraZoneNameBeforeSwitch = _currentZone?.Name;
+
+            SwitchToZone(zoneName);
+            GameLogger.Info(nameof(CameraZoneManager), $"✓ 创建并切换到临时相机区域: {zoneName}");
+        }
+
+        /// <summary>
+        /// 移除临时相机区域
+        /// </summary>
+        public void RemoveTemporaryCameraZone(string zoneName)
+        {
+            if (_temporaryCameraZones.Remove(zoneName))
+            {
+                // 如果当前激活的是此临时区域，切换回之前的区域
+                if (_currentZone?.Name == zoneName)
+                {
+                    if (!string.IsNullOrEmpty(_temporaryCameraZoneNameBeforeSwitch))
+                    {
+                        SwitchToZone(_temporaryCameraZoneNameBeforeSwitch);
+                    }
+                    else if (CameraZones.Length > 0)
+                    {
+                        SwitchToZone(0);
+                    }
+                }
+
+                GameLogger.Info(nameof(CameraZoneManager), $"✓ 移除临时相机区域: {zoneName}");
+            }
+        }
+
+        /// <summary>
+        /// 应用相机区域到目标相机
+        /// </summary>
+        private void ApplyZoneToCamera(CameraZone zone)
+        {
+            if (TargetCamera == null) return;
+
+            TargetCamera.LimitLeft = zone.LimitLeft;
+            TargetCamera.LimitTop = zone.LimitTop;
+            TargetCamera.LimitRight = zone.LimitRight;
+            TargetCamera.LimitBottom = zone.LimitBottom;
         }
         #endregion
 

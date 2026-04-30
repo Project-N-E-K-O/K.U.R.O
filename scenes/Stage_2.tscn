@@ -1,4 +1,4 @@
-[gd_scene load_steps=46 format=3 uid="uid://qd5abd4opeob"]
+[gd_scene load_steps=51 format=3 uid="uid://qd5abd4opeob"]
 
 [ext_resource type="PackedScene" uid="uid://dd8xmpgwy0t2o" path="res://scenes/environments/scene2.tscn" id="1_7jsho"]
 [ext_resource type="Script" uid="uid://x1ic1ym4ykq8" path="res://scripts/scenes/BattleSceneManager.cs" id="1_ctuyy"]
@@ -39,6 +39,7 @@
 [ext_resource type="PackedScene" uid="uid://ddi1sshkssyq" path="res://scenes/items/Furniture_B_cautionTape_side.tscn" id="33_g8q38"]
 [ext_resource type="PackedScene" uid="uid://dfmke56wtqt2x" path="res://scenes/weapons/Weapon_Throw_metalSpike.tscn" id="37_jurhs"]
 [ext_resource type="PackedScene" uid="uid://chway4etqkroy" path="res://scenes/objects/Moving_A1_taxi.tscn" id="39_qe0y4"]
+[ext_resource type="Script" uid="uid://dmqu7phxi8gbi" path="res://scripts/managers/BattleArena.cs" id="40_battle_arena"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_zone1"]
 size = Vector2(4430, 3106.5)
@@ -53,7 +54,7 @@ size = Vector2(400, 2500)
 size = Vector2(300, 2500)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_f0l3g"]
-size = Vector2(300, 2500)
+size = Vector2(300, 411)
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_bjupw"]
 vertices = PackedVector2Array(-9516.094, 1762.0234, -9516.203, 1710.1328, -9378, 1710.1328, -9378, 1713.5, 12094.383, 1774.9688, 12042, 1713.5, 12113, -790, 12113, -1625.0391, 12120.609, -1625.0313, 12042, 1440.5, 12031, -790, 12031, 555, 12028, 1440.5, 12028, 838.8125, 11981.75, 555, 11981.75, 838.8125, -4961, -1470, -4961, -894.1328, -5037.0313, -894.1328, -9257.25, -1470, -5037.0313, -819, -5240, -819, -9257.25, 1440.5, -5240, -617, -5037.0313, -617, -5037.0313, -221, -5240, 1081, -4570, -221, -4570, -100, -5024, 598, -3822, -100, -3822, 553, -4556, 553, -4556, 598, -5024, 1081, -5240, 1283, -5024, 1283, -5024, 1440.5, -9443.5, -1641.8906, -9443.5, -1622.1328, -9522.859, -1622.1328, -9522.891, -1641.9609, 5837, 1221, 6137, 1219, 8910, 1207, 9174, 1207, 11073, 1440.5, -4516, 1440.5, 3839, 1263, 851, 616, 851, 755, 798, 755, -24.5, 712, -24.5, -169, 10456, 1071.5, 11031, 1071.5, 174, 1207, 528, 1241, -3746, 1226.5, -90, 1207, 11031, 690, 11073, 838.8125, 8318.5, -172, 8318.5, 709, 8183, 494, 8183, 7, -657.5, -169, -657.5, 712, -792, 508, -792, 21, 7690, -95.5, 7690, -477, 7456, 7, 7341.5, -95.5, 7341.5, 718, 7456, 494, -1798, 1068, -1645.5, 709, -1519, 508, -1645.5, -172, -1519, 21, 2903, 934, 2903, 1183, 2702, 1068, 2702, 714, 4410, 1005, 4410, 1207, 4181, 1133, 4181, 884, 10651, -373, 10651, -661, 10998, -460.5, 10998, 209, 10958, 209, -2803, -293, -2803, -619, -2423, -367, -2423, -163, -2754, 584, 2160, 1005, 2160, 1207, 1654, 1128, 1654, 879, 2065, 976, 9174, 1005, 10456, 690, 528, 992, 174, 1005, 10180, -183, 8951.5, 709, 8951.5, -172, 9752, -183, 8910, 1005, 2298, -486, 2298, -132, 1247, -176, 1247, -425, 1328, -439, -458, -374.5, 752, -439, 819, -425, 819, -176, 5261, 1147, 5261, 1221, 4674, 1207, 4951, 1147, 4674, 1005, 4951, 898, 5709, -198, 6708.5, -163, 6708.5, 718, 5757, 626, 2702, -132, 5281, -198, 2733, 632, 2733, -89.5, 5329, 626, 3745, 658, 3317, 658, 194, -617, 194, -790, 458, -790, 458, -554, 752, -554, 1328, -523, 1614, -523, 1614, -772, 1328, -772, 1328, -790, 2160, -790, 2160, -617, 2424, -790, 3227, -790, 3227, -763, 2948, -763, 2424, -617, 2948, -514, 2702, -486, 3227, -514, 3227, -435, 3344, -435, 3344, -228, 3772, -228, 3772, -435, 3803, -435, 3803, -563, 4082, -563, 4082, -790, 4410, -790, 4410, -617, 4674, -790, 5230, -790, 5230, -745, 4936, -745, 4674, -617, 4936, -496, 5230, -496, 5230, -409, 5281, -409, 5709, -409, 5806, -409, 6558, -247, 6798, -163, 5806, -520, 6114, -520, 6558, -451, 6114, -769, 5806, -769, 5806, -790, 6660, -790, 6660, -617, 6924, -617, 6924, -790, 8910, -790, 8910, -617, 7202, -486, 11164, -790, 11164, -460.5, 9174, -790, 9377, -661, 9174, -617, 9377, -373, 9405, -373, 9405, -192, 9752, -192, 10180, -373, 10187, -373, 10187, -192, 10615, -192, 10615, -373, 10958, 413, 11164, 413, 11164, 555, 11709.25, 555, 11709.25, 838.8125, 7202, -477, 6798, -486, 6798, -451, 6798, -247, 6798, 718, 6798, 1005, 6660, 1005, 6137, 970, 6924, 1207, 6924, 1068, 7202, 1068, 7202, 718, 5837, 970, 5837, 799, 5757, 799, 5329, 799, 5261, 799, 5261, 898, 3839, 884, 3839, 841, 3745, 841, 3317, 841, 3263, 841, 2515, 632, 3263, 934, 1279, 616, 2298, 714, 2298, 772, 2065, 772, 1374, 755, 2298, 976, 2298, 1005, 1374, 879, 1279, 755, -1798, -172, -1798, -486, -2202, -486, -2202, -367, -2340, -617, -2278.5, -163, -2278.5, 584, -2754, 965.5, -2202, 965.5, -2202, 1005, -2340, 1005, -2076, 1207, -2076, 1068, -1798, 714, -2179, 714, -2179, 709, 798, 992, -90, 1005, 956, 1241, 956, 1177, 1374, 1177, 3263, 1263, 1374, 1128, 2424, 1207, 2424, 1068, 3263, 1183, 3839, 1133, 5837, 1219, -3728, 730, -3728, 596, -3604, 596, -3604, -125.5, -3742, -125.5, -3742, -277, -4570, -790, -2340, -790, -2340, 1207, -1033, -374.5, 6660, 1207, 2515, -89.5, -3746, 845, -2076, -790, -1033, -756, -2076, -617, -70, -617, -458, -756, -70, -790, -4478, -619, -4570, -277, -4478, -293, -4516, 730, -4321, 845, -4321, 1226.5)
@@ -61,6 +62,18 @@ polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3), PackedInt32Arr
 outlines = Array[PackedVector2Array]([PackedVector2Array(-9573, -1692, -9566, 1812, 12144, 1825, 12171, -1675)])
 source_geometry_mode = 2
 agent_radius = 50.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_battle_arena"]
+size = Vector2(5000, 3050)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_j25i8"]
+size = Vector2(5000, 3050)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_mixre"]
+size = Vector2(5000, 3050)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_n3l86"]
+size = Vector2(7000, 3050)
 
 [node name="BattleScene" type="Node2D" node_paths=PackedStringArray("Player")]
 script = ExtResource("1_ctuyy")
@@ -319,12 +332,13 @@ position = Vector2(-5346, 184)
 [node name="Camera2D" type="Camera2D" parent="World/MainCharacter"]
 position = Vector2(0, -15.15156)
 ignore_rotation = false
-zoom = Vector2(0.4, 0.4)
+zoom = Vector2(0.43, 0.43)
 limit_left = -9300
 limit_top = -1500
 limit_right = -3650
 limit_bottom = 1500
 position_smoothing_enabled = true
+rotation_smoothing_enabled = true
 drag_horizontal_enabled = true
 drag_vertical_enabled = true
 script = ExtResource("4_vvtmr")
@@ -344,7 +358,7 @@ scale = Vector2(0.274, 0.274)
 
 [node name="EnemySpawneManager" type="Node2D" parent="World" node_paths=PackedStringArray("TriggerArea")]
 top_level = true
-position = Vector2(-1050, 243)
+position = Vector2(-1580, 200)
 script = ExtResource("8_5klp8")
 EnemyScenes = Array[PackedScene]([ExtResource("13_x3vg8"), ExtResource("14_cwau0")])
 MultiEnemySelectionMode = 1
@@ -354,12 +368,12 @@ SpawnParentPath = NodePath("..")
 TriggerArea = NodePath("TriggerArea")
 TriggerCollisionLayer = 1
 TriggerCollisionMask = 1
-SpawnAreaExtents = Vector2(1800, 800)
+SpawnAreaExtents = Vector2(1800, 1000)
 EnemySpawnOffset = Vector2(0, 100)
 ObstacleCheckMask = 7
 EnemyAppearDelay = 1.0
 AutoLowerFrontEffectAfterEnemySpawn = true
-DebugLineWidth = 2.5
+DebugLineWidth = 8.0
 
 [node name="TriggerArea" type="Area2D" parent="World/EnemySpawneManager"]
 position = Vector2(-2350, 0)
@@ -370,7 +384,7 @@ shape = SubResource("RectangleShape2D_2l4aj")
 debug_color = Color(1, 0, 0, 0.19607843)
 
 [node name="EnemySpawneManager2" type="Node2D" parent="World" node_paths=PackedStringArray("TriggerArea")]
-position = Vector2(2608, 322)
+position = Vector2(2400, 300)
 script = ExtResource("8_5klp8")
 EnemyScenes = Array[PackedScene]([ExtResource("14_cwau0"), ExtResource("13_x3vg8"), ExtResource("6_ctuyy"), ExtResource("13_f0l3g")])
 MultiEnemySelectionMode = 1
@@ -383,6 +397,7 @@ EnemySpawnOffset = Vector2(0, 100)
 ObstacleCheckMask = 7
 EnemyAppearDelay = 1.0
 AutoLowerFrontEffectAfterEnemySpawn = true
+DebugLineWidth = 8.0
 
 [node name="TriggerArea" type="Area2D" parent="World/EnemySpawneManager2"]
 position = Vector2(-533, 0)
@@ -406,6 +421,7 @@ EnemySpawnOffset = Vector2(0, 100)
 ObstacleCheckMask = 7
 EnemyAppearDelay = 1.0
 AutoLowerFrontEffectAfterEnemySpawn = true
+DebugLineWidth = 8.0
 
 [node name="Area2D" type="Area2D" parent="World/EnemySpawneManager3"]
 position = Vector2(-612, 0)
@@ -427,9 +443,10 @@ EnemySpawnOffset = Vector2(0, 100)
 ObstacleCheckMask = 7
 EnemyAppearDelay = 1.0
 AutoLowerFrontEffectAfterEnemySpawn = true
+DebugLineWidth = 8.0
 
 [node name="Area2D" type="Area2D" parent="World/EnemySpawneManager4"]
-position = Vector2(-1106, 1)
+position = Vector2(-750, 0)
 collision_mask = 4
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="World/EnemySpawneManager4/Area2D"]
@@ -478,3 +495,61 @@ position = Vector2(-6508, -465)
 
 [node name="Taxi" parent="." instance=ExtResource("39_qe0y4")]
 position = Vector2(-7750, -1500)
+
+[node name="BattleArena1" type="Area2D" parent="."]
+z_index = 10
+position = Vector2(-2090, 0)
+script = ExtResource("40_battle_arena")
+ArenaSize = Vector2(5000, 3050)
+BoundaryCollisionLayer = 6
+BoundaryCollisionMask = 6
+BoundaryThickness = 50.0
+EnemyDetectionMask = 2
+DebugLineWidth = 8.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="BattleArena1"]
+shape = SubResource("RectangleShape2D_battle_arena")
+
+[node name="BattleArena2" type="Area2D" parent="."]
+z_index = 10
+position = Vector2(3050, 0)
+script = ExtResource("40_battle_arena")
+ArenaSize = Vector2(5000, 3050)
+BoundaryCollisionLayer = 6
+BoundaryCollisionMask = 6
+BoundaryThickness = 50.0
+EnemyDetectionMask = 2
+DebugLineWidth = 8.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="BattleArena2"]
+position = Vector2(-117, 0)
+shape = SubResource("RectangleShape2D_j25i8")
+
+[node name="BattleArena3" type="Area2D" parent="."]
+z_index = 10
+position = Vector2(8012, -10)
+script = ExtResource("40_battle_arena")
+ArenaSize = Vector2(5000, 3050)
+BoundaryCollisionLayer = 6
+BoundaryCollisionMask = 6
+BoundaryThickness = 50.0
+EnemyDetectionMask = 2
+DebugLineWidth = 8.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="BattleArena3"]
+shape = SubResource("RectangleShape2D_mixre")
+
+[node name="BattleArena4" type="Area2D" parent="."]
+z_index = 10
+position = Vector2(13169, -10)
+script = ExtResource("40_battle_arena")
+ArenaSize = Vector2(5000, 3050)
+BoundaryCollisionLayer = 6
+BoundaryCollisionMask = 6
+BoundaryThickness = 50.0
+EnemyDetectionMask = 2
+DebugLineWidth = 8.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="BattleArena4"]
+position = Vector2(910, 0)
+shape = SubResource("RectangleShape2D_n3l86")

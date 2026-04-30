@@ -10,7 +10,7 @@
 [ext_resource type="Texture2D" uid="uid://dkpv0dxfg1rx7" path="res://assets/environments/scene_2_hotel/酒店大门口墙后.png" id="8_qqgfp"]
 [ext_resource type="Texture2D" uid="uid://pl67o3rwu44h" path="res://assets/environments/scene_2_hotel/酒店大门口墙前.png" id="10_hsu0y"]
 [ext_resource type="Texture2D" uid="uid://gxc75o5wrtfl" path="res://assets/environments/scene_2_hotel/酒店大门口.png" id="11_hsu0y"]
-[ext_resource type="Script" uid="uid://d3gc8jf51u7gn" path="res://scripts/effects/AreaSpriteFadeTrigger.cs" id="11_ttjsf"]
+[ext_resource type="Script" uid="uid://ch3pldopfd7tr" path="res://scripts/effects/AreaSpriteFadeTrigger.cs" id="11_ttjsf"]
 [ext_resource type="Texture2D" uid="uid://pan0auvatm1f" path="res://assets/environments/scene_2_hotel/电梯墙前.png" id="12_qbr0m"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_eyc65"]
@@ -91,6 +91,12 @@ texture = ExtResource("3_qqgfp")
 region_enabled = true
 region_rect = Rect2(0, 0, 5858, 688)
 
+[node name="wall4" type="Sprite2D" parent="Wall"]
+position = Vector2(14972, -1188)
+texture = ExtResource("3_qqgfp")
+region_enabled = true
+region_rect = Rect2(0, 0, 5858, 688)
+
 [node name="window1" type="Sprite2D" parent="Wall"]
 position = Vector2(-737, -1150)
 texture = ExtResource("4_7qe3t")
@@ -115,8 +121,20 @@ texture = ExtResource("4_7qe3t")
 region_enabled = true
 region_rect = Rect2(1, 0, 2737, 766)
 
+[node name="window5" type="Sprite2D" parent="Wall"]
+position = Vector2(9546, -1150)
+texture = ExtResource("4_7qe3t")
+region_enabled = true
+region_rect = Rect2(1, 0, 2737, 766)
+
+[node name="window6" type="Sprite2D" parent="Wall"]
+position = Vector2(12119, -1150)
+texture = ExtResource("4_7qe3t")
+region_enabled = true
+region_rect = Rect2(1, 0, 2737, 766)
+
 [node name="bar" type="Sprite2D" parent="Wall"]
-position = Vector2(10053, -1174)
+position = Vector2(16063, -1178)
 texture = ExtResource("5_fsr21")
 region_enabled = true
 region_rect = Rect2(90, 0, 1811, 727)
@@ -149,6 +167,12 @@ texture = ExtResource("5_7oy14")
 region_enabled = true
 region_rect = Rect2(0, 1, 4250, 854)
 
+[node name="carpet5" type="Sprite2D" parent="items/carpets"]
+position = Vector2(14213, 282)
+texture = ExtResource("5_7oy14")
+region_enabled = true
+region_rect = Rect2(0, 1, 4250, 854)
+
 [node name="ElevatorWall" type="Node2D" parent="."]
 
 [node name="elevatorwall" type="Sprite2D" parent="ElevatorWall"]
@@ -158,6 +182,7 @@ region_enabled = true
 region_rect = Rect2(0, 0, 1047, 3059)
 
 [node name="FrontWall" type="Node2D" parent="."]
+visible = false
 z_index = 3
 
 [node name="GateFrontWall" type="Sprite2D" parent="FrontWall"]
