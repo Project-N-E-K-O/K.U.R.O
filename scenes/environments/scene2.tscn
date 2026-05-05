@@ -10,7 +10,7 @@
 [ext_resource type="Texture2D" uid="uid://dkpv0dxfg1rx7" path="res://assets/environments/scene_2_hotel/酒店大门口墙后.png" id="8_qqgfp"]
 [ext_resource type="Texture2D" uid="uid://pl67o3rwu44h" path="res://assets/environments/scene_2_hotel/酒店大门口墙前.png" id="10_hsu0y"]
 [ext_resource type="Texture2D" uid="uid://gxc75o5wrtfl" path="res://assets/environments/scene_2_hotel/酒店大门口.png" id="11_hsu0y"]
-[ext_resource type="Script" uid="uid://ch3pldopfd7tr" path="res://scripts/effects/AreaSpriteFadeTrigger.cs" id="11_ttjsf"]
+[ext_resource type="Script" uid="uid://d3gc8jf51u7gn" path="res://scripts/effects/AreaSpriteFadeTrigger.cs" id="11_ttjsf"]
 [ext_resource type="Texture2D" uid="uid://pan0auvatm1f" path="res://assets/environments/scene_2_hotel/电梯墙前.png" id="12_qbr0m"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_eyc65"]

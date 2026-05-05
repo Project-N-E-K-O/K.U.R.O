@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="BuildLevelEffectEntry" load_steps=2 format=3 uid="uid://cg1ohbn3itor0"]
 
-[ext_resource type="Script" uid="uid://ba5xnpfo03sgb" path="res://scripts/actors/heroes/BuildLevelEffectEntry.cs" id="1_build_entry_script"]
+[ext_resource type="Script" uid="uid://bn5bwn56rqmd3" path="res://scripts/actors/heroes/BuildLevelEffectEntry.cs" id="1_build_entry_script"]
 
 [resource]
 script = ExtResource("1_build_entry_script")
@@ -12,4 +12,4 @@ RequiredPoints = 3
 EffectId = "Build_Machine_level3"
 EffectScript = "BuildMachineLevel3Effect"
 Description = "连续使用攻击时增加玩家攻击到敌人时的最终伤害"
-IconPath = "uid://brcpa2kw0syy7"
+IconPath = "uid://t5tjuew6wirf"

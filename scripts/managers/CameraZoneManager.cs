@@ -376,6 +376,40 @@ namespace Kuros.Managers
         }
 
         /// <summary>
+        /// 设置全局相机边界，由 StageGeneratorManager 在关卡生成完毕后调用。
+        /// 覆盖 Zone 0（默认区域）的范围，并立即应用到相机。
+        /// </summary>
+        public void SetGlobalBounds(int limitLeft, int limitTop, int limitRight, int limitBottom)
+        {
+            if (TargetCamera == null) return;
+
+            if (CameraZones.Length > 0)
+            {
+                var zone = CameraZones[0];
+                zone.LimitLeft   = limitLeft;
+                zone.LimitTop    = limitTop;
+                zone.LimitRight  = limitRight;
+                zone.LimitBottom = limitBottom;
+                zone.Name        = "Stage_Global";
+                ApplyZoneToCamera(zone);
+                _currentZone      = zone;
+                _currentZoneIndex = 0;
+                _temporaryCameraZoneNameBeforeSwitch = null;
+            }
+            else
+            {
+                // 没有预设区域时直接设置相机限制
+                TargetCamera.LimitLeft   = limitLeft;
+                TargetCamera.LimitTop    = limitTop;
+                TargetCamera.LimitRight  = limitRight;
+                TargetCamera.LimitBottom = limitBottom;
+            }
+
+            GameLogger.Info(nameof(CameraZoneManager),
+                $"全局相机边界已设置：X[{limitLeft}, {limitRight}] Y[{limitTop}, {limitBottom}]");
+        }
+
+        /// <summary>
         /// 应用相机区域到目标相机
         /// </summary>
         private void ApplyZoneToCamera(CameraZone zone)

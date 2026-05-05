@@ -4,7 +4,7 @@
 [ext_resource type="Resource" uid="uid://3otbbdidxw0h" path="res://resources/items/Furniture_B_CoffeeMachineA.tres" id="2_paiqs"]
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="3_kf2mp"]
 [ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="4_hlil7"]
-[ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="5_gm4l1"]
+[ext_resource type="Shader" uid="uid://rvlvejer46bm" path="res://shaders/materials/sprite_outline.gdshader" id="5_gm4l1"]
 [ext_resource type="Texture2D" uid="uid://b73hcxi424y4n" path="res://assets/furnitures/hotel_scene2/CoffeeMachineA.png" id="6_paiqs"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ukya5"]
@@ -24,10 +24,10 @@ shader_parameter/preserve_fill = true
 size = Vector2(414, 324)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_paiqs"]
-size = Vector2(385, 761)
+size = Vector2(385, 674)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jyvv2"]
-size = Vector2(120, 49.558647)
+size = Vector2(120, 46.323357)
 
 [node name="FurnitureCoffeeMachineA" type="Node2D"]
 z_index = 2
@@ -75,12 +75,12 @@ shape = SubResource("RectangleShape2D_gy46y")
 [node name="AttackArea" type="Area2D" parent="RigidBody2D"]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/AttackArea"]
-position = Vector2(-7.5, 200.5)
+position = Vector2(-7.5, 157)
 shape = SubResource("RectangleShape2D_paiqs")
 
 [node name="StaticBody2D" type="StaticBody2D" parent="RigidBody2D" groups=["navigation_polygon_source_geometry_group"]]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/StaticBody2D"]
-position = Vector2(0, 53.249706)
+position = Vector2(0, 58.749702)
 scale = Vector2(3.4, 3.4)
 shape = SubResource("RectangleShape2D_jyvv2")

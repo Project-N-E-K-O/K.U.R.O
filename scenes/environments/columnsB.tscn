@@ -12,7 +12,7 @@ shader_parameter/alpha = 0.4
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_3yw8j"]
 size = Vector2(304.00006, 254.00003)
 
-[node name="columnsB1" type="RigidBody2D"]
+[node name="columnsB" type="RigidBody2D"]
 z_index = 2
 y_sort_enabled = true
 collision_mask = 7
@@ -23,8 +23,7 @@ freeze_mode = 1
 
 [node name="Shadow" type="Sprite2D" parent="."]
 material = SubResource("ShaderMaterial_4do5r")
-position = Vector2(0, -4)
-scale = Vector2(6.4412036, 5.087142)
+scale = Vector2(7, 7.5)
 texture = ExtResource("2_873p6")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
@@ -33,6 +32,7 @@ texture = ExtResource("1_mbnq6")
 offset = Vector2(0, -1200)
 
 [node name="StaticBody2D" type="StaticBody2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
+visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
 position = Vector2(12, 40)

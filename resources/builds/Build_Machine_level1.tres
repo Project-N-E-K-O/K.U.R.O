@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="BuildLevelEffectEntry" load_steps=2 format=3 uid="uid://dlngh4ui567ss"]
 
-[ext_resource type="Script" uid="uid://ba5xnpfo03sgb" path="res://scripts/actors/heroes/BuildLevelEffectEntry.cs" id="1_build_entry_script"]
+[ext_resource type="Script" uid="uid://bn5bwn56rqmd3" path="res://scripts/actors/heroes/BuildLevelEffectEntry.cs" id="1_build_entry_script"]
 
 [resource]
 script = ExtResource("1_build_entry_script")
@@ -10,4 +10,4 @@ BuildName = "一级机械"
 EffectId = "Build_Machine_level1"
 EffectScript = "BuildMachineLevel1Effect"
 Description = "减少玩家受到攻击时的击退力度"
-IconPath = "uid://lt17133enlt2"
+IconPath = "uid://7mw7hqgi8un4"
