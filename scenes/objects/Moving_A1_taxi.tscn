@@ -1,36 +1,48 @@
-[gd_scene load_steps=33 format=3 uid="uid://chway4etqkroy"]
+[gd_scene load_steps=35 format=3 uid="uid://chway4etqkroy"]
 
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="1_d7g0g"]
-[ext_resource type="Texture2D" uid="uid://038kjb47rgc5" path="res://assets/objects/taxi/时间轴1_0000.png" id="1_l4djn"]
-[ext_resource type="Script" uid="uid://dryx2p6xtxsn" path="res://scripts/objects/TaxiController.cs" id="1_taxictrl"]
-[ext_resource type="Texture2D" uid="uid://cfmqwo6h7h3sj" path="res://assets/objects/taxi/时间轴1_0001.png" id="2_rqshq"]
-[ext_resource type="Texture2D" uid="uid://og2gq2qj138m" path="res://assets/objects/taxi/时间轴1_0002.png" id="3_d7g0g"]
-[ext_resource type="Texture2D" uid="uid://rurwkln2flnh" path="res://assets/objects/taxi/时间轴1_0003.png" id="4_3td21"]
-[ext_resource type="Texture2D" uid="uid://6x2atph4ejri" path="res://assets/objects/taxi/时间轴1_0004.png" id="5_lkpan"]
-[ext_resource type="Texture2D" uid="uid://cwammw7bvbcky" path="res://assets/objects/taxi/时间轴1_0005.png" id="6_faxbq"]
-[ext_resource type="Texture2D" uid="uid://cywsxkgjddg4q" path="res://assets/objects/taxi/时间轴1_0006.png" id="7_lp1pl"]
-[ext_resource type="Texture2D" uid="uid://e2gujcpebdkk" path="res://assets/objects/taxi/时间轴1_0007.png" id="8_njg5h"]
-[ext_resource type="Texture2D" uid="uid://cux6hxc8oyc6a" path="res://assets/objects/taxi/时间轴1_0008.png" id="9_bdxcw"]
-[ext_resource type="Texture2D" uid="uid://cj2u2rke1nxxu" path="res://assets/objects/taxi/时间轴1_0009.png" id="10_aaotp"]
-[ext_resource type="Texture2D" uid="uid://c4bxdme7o8kqp" path="res://assets/objects/taxi/时间轴1_0010.png" id="11_85d1n"]
-[ext_resource type="Texture2D" uid="uid://dn6s0eeh2by0w" path="res://assets/objects/taxi/时间轴1_0011.png" id="12_sbbju"]
-[ext_resource type="Texture2D" uid="uid://bmyre4i1w0qfl" path="res://assets/objects/taxi/时间轴1_0012.png" id="13_8g5jn"]
-[ext_resource type="Texture2D" uid="uid://djnxnfrrykdco" path="res://assets/objects/taxi/时间轴1_0013.png" id="14_trv2a"]
-[ext_resource type="Texture2D" uid="uid://b2p23aa4nt0sw" path="res://assets/objects/taxi/时间轴1_0014.png" id="15_almle"]
-[ext_resource type="Texture2D" uid="uid://br1p1t331ubn1" path="res://assets/objects/taxi/时间轴1_0015.png" id="16_j7ojp"]
-[ext_resource type="Texture2D" uid="uid://b3mw31vf1tqmn" path="res://assets/objects/taxi/时间轴1_0016.png" id="17_d6nrb"]
-[ext_resource type="Texture2D" uid="uid://ctnl1nrq3mkp5" path="res://assets/objects/taxi/时间轴1_0017.png" id="18_b08jy"]
-[ext_resource type="Texture2D" uid="uid://bp1lsx17um7e1" path="res://assets/objects/taxi/时间轴1_0018.png" id="19_rv2ht"]
-[ext_resource type="Texture2D" uid="uid://btxwey75m68e1" path="res://assets/objects/taxi/时间轴1_0019.png" id="20_052nk"]
-[ext_resource type="Texture2D" uid="uid://olud751lkisy" path="res://assets/objects/taxi/时间轴1_0020.png" id="21_llloc"]
-[ext_resource type="Texture2D" uid="uid://dhfgrvmfsyq5a" path="res://assets/objects/taxi/时间轴1_0021.png" id="22_4rj1d"]
-[ext_resource type="Texture2D" uid="uid://h8xedqaqtjb4" path="res://assets/objects/taxi/时间轴1_0022.png" id="23_em2oj"]
-[ext_resource type="Texture2D" uid="uid://maehyxtkrdks" path="res://assets/objects/taxi/时间轴1_0023.png" id="24_kfupp"]
+[ext_resource type="Texture2D" uid="uid://c34jnai6l2qir" path="res://assets/objects/taxi/时间轴1_0000.png" id="1_l4djn"]
+[ext_resource type="Script" uid="uid://bxuk25oxfayh6" path="res://scripts/objects/TaxiController.cs" id="1_taxictrl"]
+[ext_resource type="Texture2D" uid="uid://dttdf8786fpkd" path="res://assets/objects/taxi/时间轴1_0001.png" id="2_rqshq"]
+[ext_resource type="Texture2D" uid="uid://cvbj831wvyfl5" path="res://assets/objects/taxi/时间轴1_0002.png" id="3_d7g0g"]
+[ext_resource type="Texture2D" uid="uid://c58onqltftdi3" path="res://assets/objects/taxi/时间轴1_0003.png" id="4_3td21"]
+[ext_resource type="Shader" uid="uid://dkf74bfnhfomi" path="res://shaders/fx/ground_wash_ripple.gdshader" id="4_lkpan"]
+[ext_resource type="Texture2D" uid="uid://dmb1qaobgsj02" path="res://assets/objects/taxi/时间轴1_0004.png" id="5_lkpan"]
+[ext_resource type="Texture2D" uid="uid://xtj7xwt72188" path="res://assets/objects/taxi/时间轴1_0005.png" id="6_faxbq"]
+[ext_resource type="Texture2D" uid="uid://dj7wklmp3p5uw" path="res://assets/objects/taxi/时间轴1_0006.png" id="7_lp1pl"]
+[ext_resource type="Texture2D" uid="uid://b71rac57ml3x2" path="res://assets/objects/taxi/时间轴1_0007.png" id="8_njg5h"]
+[ext_resource type="Texture2D" uid="uid://cjythww25lul8" path="res://assets/objects/taxi/时间轴1_0008.png" id="9_bdxcw"]
+[ext_resource type="Texture2D" uid="uid://c27tfjmrhipej" path="res://assets/objects/taxi/时间轴1_0009.png" id="10_aaotp"]
+[ext_resource type="Texture2D" uid="uid://co0bjw2n3qe7d" path="res://assets/objects/taxi/时间轴1_0010.png" id="11_85d1n"]
+[ext_resource type="Texture2D" uid="uid://ctsgfubkoxc4k" path="res://assets/objects/taxi/时间轴1_0011.png" id="12_sbbju"]
+[ext_resource type="Texture2D" uid="uid://c1ir8gsjktvd7" path="res://assets/objects/taxi/时间轴1_0012.png" id="13_8g5jn"]
+[ext_resource type="Texture2D" uid="uid://cgbf1ptlk4mkc" path="res://assets/objects/taxi/时间轴1_0013.png" id="14_trv2a"]
+[ext_resource type="Texture2D" uid="uid://lr3nmu0aq5ff" path="res://assets/objects/taxi/时间轴1_0014.png" id="15_almle"]
+[ext_resource type="Texture2D" uid="uid://darqqr01uf048" path="res://assets/objects/taxi/时间轴1_0015.png" id="16_j7ojp"]
+[ext_resource type="Texture2D" uid="uid://w1pmeegmfhx6" path="res://assets/objects/taxi/时间轴1_0016.png" id="17_d6nrb"]
+[ext_resource type="Texture2D" uid="uid://chaovavvghm18" path="res://assets/objects/taxi/时间轴1_0017.png" id="18_b08jy"]
+[ext_resource type="Texture2D" uid="uid://b05expe0ioumv" path="res://assets/objects/taxi/时间轴1_0018.png" id="19_rv2ht"]
+[ext_resource type="Texture2D" uid="uid://txus3qvunrp2" path="res://assets/objects/taxi/时间轴1_0019.png" id="20_052nk"]
+[ext_resource type="Texture2D" uid="uid://cqvli8wckd1fy" path="res://assets/objects/taxi/时间轴1_0020.png" id="21_llloc"]
+[ext_resource type="Texture2D" uid="uid://0stcpfv4f570" path="res://assets/objects/taxi/时间轴1_0021.png" id="22_4rj1d"]
+[ext_resource type="Texture2D" uid="uid://b5loogtg6btjq" path="res://assets/objects/taxi/时间轴1_0022.png" id="23_em2oj"]
+[ext_resource type="Texture2D" uid="uid://cn8xoplv6fmxq" path="res://assets/objects/taxi/时间轴1_0023.png" id="24_kfupp"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_3td21"]
 shader = ExtResource("1_d7g0g")
 shader_parameter/softness = 0.5
 shader_parameter/alpha = 0.4
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_lkpan"]
+shader = ExtResource("4_lkpan")
+shader_parameter/speed = 0.80000003474012
+shader_parameter/ring_count = 2
+shader_parameter/ring_width = 0.07500000321324
+shader_parameter/max_radius = 0.46
+shader_parameter/inner_dead = 0.06
+shader_parameter/ring_color = Color(0, 0, 0, 0.19607843)
+shader_parameter/intensity = 1.0
+shader_parameter/aspect_y = 0.75000003236512
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_l4djn"]
 animations = [{
@@ -165,19 +177,43 @@ tracks/3/keys = {
 tracks/4/type = "value"
 tracks/4/imported = false
 tracks/4/enabled = true
-tracks/4/path = NodePath("AnimatedSprite2D:skew")
+tracks/4/path = NodePath("GroundWash:visible")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("GroundWash:position")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [0.0]
+"values": [Vector2(0, 0)]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("GroundWash:scale")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
 }
 
 [sub_resource type="Animation" id="Animation_3td21"]
 resource_name = "taxi_idle"
-length = 3.0
+length = 2.0
 loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -186,10 +222,10 @@ tracks/0/path = NodePath("AnimatedSprite2D:scale")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 1.5, 3),
-"transitions": PackedFloat32Array(1, 1, 1),
+"times": PackedFloat32Array(0, 0.5, 1, 1.5, 2),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
 "update": 0,
-"values": [Vector2(0.45, 0.45), Vector2(0.4, 0.4), Vector2(0.45, 0.45)]
+"values": [Vector2(0.45, 0.45), Vector2(0.445, 0.445), Vector2(0.45, 0.45), Vector2(0.445, 0.445), Vector2(0.45, 0.45)]
 }
 
 [sub_resource type="Animation" id="Animation_rqshq"]
@@ -202,10 +238,10 @@ tracks/0/path = NodePath("AnimatedSprite2D:scale")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 2, 3, 6),
-"transitions": PackedFloat32Array(1, 1, 1, 1),
+"times": PackedFloat32Array(0, 2, 2.3, 2.6, 2.8333333, 3, 6),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
 "update": 0,
-"values": [Vector2(1, 1), Vector2(0.66, 0.66), Vector2(0.66, 0.66), Vector2(0.45, 0.45)]
+"values": [Vector2(1, 1), Vector2(0.66, 0.66), Vector2(0.65, 0.65), Vector2(0.664, 0.664), Vector2(0.658, 0.658), Vector2(0.66, 0.66), Vector2(0.45, 0.45)]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -214,10 +250,10 @@ tracks/1/path = NodePath("AnimatedSprite2D:position")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0, 2),
-"transitions": PackedFloat32Array(1, 1),
+"times": PackedFloat32Array(0, 2, 2.3, 2.6, 2.8333333, 3),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
 "update": 0,
-"values": [Vector2(0, 0), Vector2(0, 1500)]
+"values": [Vector2(0, 0), Vector2(0, 1520), Vector2(0, 1490), Vector2(0, 1505), Vector2(0, 1497.5), Vector2(0, 1500)]
 }
 tracks/2/type = "value"
 tracks/2/imported = false
@@ -246,14 +282,38 @@ tracks/3/keys = {
 tracks/4/type = "value"
 tracks/4/imported = false
 tracks/4/enabled = true
-tracks/4/path = NodePath("AnimatedSprite2D:skew")
+tracks/4/path = NodePath("GroundWash:visible")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
-"times": PackedFloat32Array(0, 1.95, 2, 2.05, 2.1),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"times": PackedFloat32Array(0, 2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [false, true]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("GroundWash:position")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0, 2),
+"transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [0.0, 0.0, 0.01745329251994329, -0.01745329251994329, 0.0]
+"values": [Vector2(0, 0), Vector2(0, 1500)]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("GroundWash:scale")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0, 2, 6),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(0.1, 0.1), Vector2(0.1, 0.1), Vector2(1.3, 1.3)]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_3td21"]
@@ -272,6 +332,16 @@ material = SubResource("ShaderMaterial_3td21")
 position = Vector2(0, 1000)
 scale = Vector2(0.5, 0.5)
 texture = ExtResource("1_l4djn")
+
+[node name="GroundWash" type="Node2D" parent="."]
+
+[node name="WashRect" type="ColorRect" parent="GroundWash"]
+material = SubResource("ShaderMaterial_lkpan")
+custom_minimum_size = Vector2(2000, 2000)
+offset_left = -1000.0
+offset_top = -1000.0
+offset_right = 1000.0
+offset_bottom = 1000.0
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_l4djn")
