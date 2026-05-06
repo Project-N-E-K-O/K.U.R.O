@@ -1,19 +1,20 @@
 [gd_scene load_steps=9 format=3 uid="uid://cgjrdwkemgrcy"]
 
 [ext_resource type="Texture2D" uid="uid://casaexun5c8dv" path="res://assets/p2/P2.png" id="1_fj31g"]
-[ext_resource type="Script" uid="uid://lkpmpxvgsh47" path="res://scripts/companions/P2CompanionController.cs" id="2_p2follow"]
+[ext_resource type="Script" uid="uid://csll5ffp7awd5" path="res://scripts/companions/P2CompanionController.cs" id="2_p2follow"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hud/P2HintBubble.tscn" id="3_p2hint_scene"]
-[ext_resource type="Script" uid="uid://u2r4ehj525hk" path="res://scripts/companions/P2SupportBrain.cs" id="4_p2brain"]
-[ext_resource type="Script" uid="uid://dst4b1bg6wi2h" path="res://scripts/companions/P2SupportExecutor.cs" id="5_p2executor"]
-[ext_resource type="Script" uid="uid://chb7glefdnb1k" path="res://scripts/companions/P2SupportDecisionBridge.cs" id="6_p2bridge"]
+[ext_resource type="Script" uid="uid://d0pebgaq6o2wu" path="res://scripts/companions/P2SupportBrain.cs" id="4_p2brain"]
+[ext_resource type="Script" uid="uid://djnyhimlasmm7" path="res://scripts/companions/P2SupportExecutor.cs" id="5_p2executor"]
+[ext_resource type="Script" uid="uid://blw2gqa3746s4" path="res://scripts/companions/P2SupportDecisionBridge.cs" id="6_p2bridge"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hud/P2DebugPanel.tscn" id="7_p2debug_scene"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hud/P2LoadoutPanel.tscn" id="8_p2loadout_scene"]
 
 [node name="CharacterBody2D" type="CharacterBody2D"]
-position = Vector2(0, -356)
+scale = Vector2(0.33, 0.33)
 script = ExtResource("2_p2follow")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(0, -350)
 texture = ExtResource("1_fj31g")
 
 [node name="HintBubble" parent="." instance=ExtResource("3_p2hint_scene")]

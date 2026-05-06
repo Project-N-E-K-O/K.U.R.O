@@ -1,12 +1,13 @@
-[gd_scene load_steps=12 format=3 uid="uid://qd5abd4opeob"]
+[gd_scene load_steps=13 format=3 uid="uid://qd5abd4opeob"]
 
 [ext_resource type="Script" uid="uid://x1ic1ym4ykq8" path="res://scripts/scenes/BattleSceneManager.cs" id="1_ctuyy"]
 [ext_resource type="PackedScene" uid="uid://ufprfd4r8ijj" path="res://assets/spine/main_character/main_character.tscn" id="2_s0pgc"]
 [ext_resource type="Script" uid="uid://del8hgcg3sr4i" path="res://scripts/managers/CameraFollow.cs" id="3_vvtmr"]
-[ext_resource type="Script" uid="uid://cp0n2tvk02njp" path="res://scripts/managers/CameraZoneManager.cs" id="4_camera"]
+[ext_resource type="Script" uid="uid://b6qifqg0v8c6o" path="res://scripts/managers/CameraZoneManager.cs" id="4_camera"]
 [ext_resource type="PackedScene" uid="uid://cgjrdwkemgrcy" path="res://scenes/actors/heroes/P2.tscn" id="5_p2"]
-[ext_resource type="Script" uid="uid://bhuuwadid30ns" path="res://scripts/managers/StageGeneratorManager.cs" id="6_gen"]
+[ext_resource type="Script" uid="uid://l1558pct4220" path="res://scripts/managers/StageGeneratorManager.cs" id="6_gen"]
 [ext_resource type="Script" uid="uid://b7afb3wjghskq" path="res://scripts/items/world/DropItemDebugger.cs" id="7_drop"]
+[ext_resource type="PackedScene" uid="uid://cnrdifmso2jps" path="res://scenes/levels/B3.tscn" id="8_2l4aj"]
 [ext_resource type="PackedScene" uid="uid://cnc8qhgt2qlco" path="res://scenes/levels/B_begin.tscn" id="8_begin"]
 [ext_resource type="PackedScene" uid="uid://duv46pbl7d7l6" path="res://scenes/levels/B1.tscn" id="9_b1"]
 [ext_resource type="PackedScene" uid="uid://b8ky5f2goteu0" path="res://scenes/levels/B2.tscn" id="10_b2"]
@@ -21,15 +22,14 @@ LevelName = "关卡 2"
 script = ExtResource("4_camera")
 TargetCamera = NodePath("../World/MainCharacter/Camera2D")
 Player = NodePath("../World/MainCharacter")
-Zone1_LimitLeft = -10000
-Zone1_LimitRight = 35000
 
 [node name="StageGeneratorManager" type="Node" parent="."]
 script = ExtResource("6_gen")
 BeginScene = ExtResource("8_begin")
 EndScene = ExtResource("11_end")
-MiddleScenePool = Array[PackedScene]([ExtResource("9_b1"), ExtResource("10_b2")])
-RandomSeed = 1
+MiddleScenePool = Array[PackedScene]([ExtResource("9_b1"), ExtResource("10_b2"), ExtResource("8_2l4aj")])
+MinMiddleRooms = 0
+MaxMiddleRooms = 0
 
 [node name="World" type="Node2D" parent="."]
 y_sort_enabled = true
@@ -41,10 +41,6 @@ position = Vector2(-5346, 184)
 position = Vector2(0, -15.15156)
 ignore_rotation = false
 zoom = Vector2(0.43, 0.43)
-limit_left = -10000
-limit_top = -1500
-limit_right = 35000
-limit_bottom = 1500
 position_smoothing_enabled = true
 rotation_smoothing_enabled = true
 drag_horizontal_enabled = true
@@ -62,7 +58,6 @@ HitStopDelay = 0.1
 
 [node name="P2" parent="World" instance=ExtResource("5_p2")]
 position = Vector2(-5151.0005, -183.99998)
-scale = Vector2(0.274, 0.274)
 
 [node name="DropDebug" type="Node2D" parent="."]
 script = ExtResource("7_drop")

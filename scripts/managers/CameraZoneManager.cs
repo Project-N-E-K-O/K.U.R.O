@@ -1,87 +1,47 @@
 using Godot;
-using System;   
 using System.Collections.Generic;
 using Kuros.Utils;
 
 namespace Kuros.Managers
 {
     /// <summary>
-    /// 相机区域管理器 - 使用 Area2D 检测玩家进入/离开区域，动态切换相机限制
+    /// 相机区域管理器 - 动态区域注册模式。
+    ///
+    /// 工作流程：
+    ///   1. StageGeneratorManager 生成关卡后调用 SetGlobalBounds() 设置全局初始相机范围。
+    ///   2. 每个房间场景内的 CameraZoneArea 节点在玩家进入时调用 RegisterZoneAndSwitch()，
+    ///      相机限制切换到该房间的边界。
+    ///   3. 房间内的 BattleArena 检测到敌人时调用 CreateAndSwitchTemporaryCameraZone()，
+    ///      相机锁定到战斗区域。
+    ///   4. 战斗结束后调用 RemoveTemporaryCameraZone()，相机恢复到当前房间区域。
     /// </summary>
     public partial class CameraZoneManager : Node
     {
-        #region Camera Zone Class
-        /// <summary>
-        /// 相机区域定义
-        /// </summary>
-        [System.Serializable]
+        /// <summary>相机区域定义。</summary>
         public class CameraZone
         {
-            [Export] public string Name { get; set; } = "Zone";
-            
-            [ExportCategory("相机限制")]
-            [Export] public int LimitLeft { get; set; } = 0;
-            [Export] public int LimitTop { get; set; } = 0;
-            [Export] public int LimitRight { get; set; } = 0;
-            [Export] public int LimitBottom { get; set; } = 0;
+            public string Name { get; set; } = "Zone";
+            public int LimitLeft { get; set; } = 0;
+            public int LimitTop { get; set; } = 0;
+            public int LimitRight { get; set; } = 0;
+            public int LimitBottom { get; set; } = 0;
         }
-        #endregion
 
-        #region Exported Properties
         [Export] public Camera2D? TargetCamera { get; set; }
         [Export] public Node2D? Player { get; set; }
-        
-        [ExportCategory("相机区域配置")]
-        [Export] public int Zone1_LimitLeft { get; set; } = -9300;
-        [Export] public int Zone1_LimitTop { get; set; } = -1500;
-        [Export] public int Zone1_LimitRight { get; set; } = -9300 + 5650;
-        [Export] public int Zone1_LimitBottom { get; set; } = 1500;
 
-        [Export] public int Zone2_LimitLeft { get; set; } = -3650;
-        [Export] public int Zone2_LimitTop { get; set; } = -1500;
-        [Export] public int Zone2_LimitRight { get; set; } = 5000;
-        [Export] public int Zone2_LimitBottom { get; set; } = 1500;
-
-        [ExportCategory("Area2D 节点路径")]
-        [Export] public NodePath? Zone1AreaPath { get; set; }
-        [Export] public NodePath? Zone2AreaPath { get; set; }
-        #endregion
-
-        #region Private Fields
-        private int _currentZoneIndex = -1;
         private CameraZone? _currentZone;
-        private CameraZone[] CameraZones = new CameraZone[0];
-        private Area2D? _zone1Area;
-        private Area2D? _zone2Area;
-        // 临时相机区域存储（用于战斗区域等动态场景）
-        private Dictionary<string, CameraZone> _temporaryCameraZones = new();
-        private string? _temporaryCameraZoneNameBeforeSwitch; // 记录切换到临时区域前的区域名
-        #endregion
+        private readonly Dictionary<string, CameraZone> _registeredZones = new();
+        private readonly Dictionary<string, CameraZone> _temporaryCameraZones = new();
+        private string? _temporaryCameraZoneNameBeforeSwitch;
+        // 玩家当前身处的区域有序列表（进入时追加，退出时移除）
+        private readonly List<string> _activeZoneStack = new();
 
-        #region Lifecycle
+        /// <summary>当前激活的相机区域名称。</summary>
+        public string? CurrentZoneName => _currentZone?.Name;
+
         public override void _Ready()
         {
-            // 初始化相机区域数据
-            CameraZones = new CameraZone[]
-            {
-                new CameraZone 
-                { 
-                    Name = "Zone_1_左侧房间",
-                    LimitLeft = Zone1_LimitLeft,
-                    LimitTop = Zone1_LimitTop,
-                    LimitRight = Zone1_LimitRight,
-                    LimitBottom = Zone1_LimitBottom
-                },
-                new CameraZone 
-                { 
-                    Name = "Zone_2_右侧房间",
-                    LimitLeft = Zone2_LimitLeft,
-                    LimitTop = Zone2_LimitTop,
-                    LimitRight = Zone2_LimitRight,
-                    LimitBottom = Zone2_LimitBottom
-                }
-            };
-
             if (TargetCamera == null)
             {
                 GameLogger.Error(nameof(CameraZoneManager), "未设置目标相机！");
@@ -90,361 +50,179 @@ namespace Kuros.Managers
 
             if (Player == null)
             {
-                // 尝试自动查找玩家
                 Player = GetTree().GetFirstNodeInGroup("player") as Node2D;
                 if (Player == null)
-                {
-                    GameLogger.Error(nameof(CameraZoneManager), "未找到玩家节点！");
-                    return;
-                }
+                    GameLogger.Warn(nameof(CameraZoneManager), "未找到玩家节点，将在首次区域进入时自动查找。");
             }
 
-            // 查找 Area2D 节点
-            InitializeAreas();
-
-            // 初始化相机到第一个区域
-            if (CameraZones.Length > 0)
-            {
-                SwitchToZone(0);
-            }
-
-            GameLogger.Info(nameof(CameraZoneManager), $"相机区域管理器已初始化，共有 {CameraZones.Length} 个区域");
+            GameLogger.Info(nameof(CameraZoneManager), "相机区域管理器已初始化（动态区域注册模式）");
         }
 
-        public override void _ExitTree()
-        {
-            UnsubscribeAreaSignals();
-            base._ExitTree();
-        }
-        #endregion
+        // ─── 区域注册 ──────────────────────────────────────────────────────────
 
-        #region Initialization
         /// <summary>
-        /// 初始化 Area2D 节点
+        /// 注册一个命名相机区域（不切换）。
         /// </summary>
-        private void InitializeAreas()
+        public void RegisterZone(string name, Rect2 bounds)
         {
-            // 尝试从指定路径获取 Area2D
-            if (Zone1AreaPath != null)
-            {
-                _zone1Area = GetNode<Area2D>(Zone1AreaPath);
-            }
-
-            if (Zone2AreaPath != null)
-            {
-                _zone2Area = GetNode<Area2D>(Zone2AreaPath);
-            }
-
-            // 如果没有找到，尝试自动查找
-            if (_zone1Area == null)
-            {
-                _zone1Area = GetNodeOrNull<Area2D>("CameraZones/Zone1_Area2D");
-            }
-
-            if (_zone2Area == null)
-            {
-                _zone2Area = GetNodeOrNull<Area2D>("CameraZones/Zone2_Area2D");
-            }
-
-            // 订阅 Area2D 信号
-            SubscribeAreaSignals();
+            _registeredZones[name] = BoundsToZone(name, bounds);
+            GameLogger.Debug(nameof(CameraZoneManager), $"注册区域: {name}  X[{(int)bounds.Position.X}, {(int)(bounds.Position.X + bounds.Size.X)}]");
         }
 
         /// <summary>
-        /// 订阅 Area2D 进入/离开信号
+        /// 玩家进入某区域时调用：将该区域推入活跃栈并切换相机。
         /// </summary>
-        private void SubscribeAreaSignals()
+        public void EnterZone(string name, Rect2 bounds)
         {
-            if (_zone1Area != null)
-            {
-                _zone1Area.AreaEntered -= OnZone1AreaEntered;
-                _zone1Area.AreaEntered += OnZone1AreaEntered;
-                GameLogger.Info(nameof(CameraZoneManager), "已订阅 Zone1 Area2D 信号");
-            }
-            else
-            {
-                GameLogger.Warn(nameof(CameraZoneManager), "未找到 Zone1 Area2D 节点");
-            }
+            RegisterZone(name, bounds);
+            if (!_activeZoneStack.Contains(name))
+                _activeZoneStack.Add(name);
+            SwitchToZone(name);
+            GameLogger.Debug(nameof(CameraZoneManager), $"进入区域: {name}，栈: [{string.Join(", ", _activeZoneStack)}]");
+        }
 
-            if (_zone2Area != null)
+        /// <summary>
+        /// 玩家离开某区域时调用：从活跃栈移除，并切换到栈顶的上一个区域。
+        /// </summary>
+        public void ExitZone(string name)
+        {
+            _activeZoneStack.Remove(name);
+            GameLogger.Debug(nameof(CameraZoneManager), $"离开区域: {name}，栈: [{string.Join(", ", _activeZoneStack)}]");
+
+            // 当前相机正是该区域才需要切换
+            if (_currentZone?.Name == name)
             {
-                _zone2Area.AreaEntered -= OnZone2AreaEntered;
-                _zone2Area.AreaEntered += OnZone2AreaEntered;
-                GameLogger.Info(nameof(CameraZoneManager), "已订阅 Zone2 Area2D 信号");
-            }
-            else
-            {
-                GameLogger.Warn(nameof(CameraZoneManager), "未找到 Zone2 Area2D 节点");
+                if (_activeZoneStack.Count > 0)
+                    SwitchToZone(_activeZoneStack[^1]); // 切回栈顶（最近进入的区域）
+                else
+                    SwitchToZone("Stage_Global");       // 已无房间区域，回到全局
             }
         }
 
         /// <summary>
-        /// 取消订阅 Area2D 信号
+        /// 注销一个区域（房间离开场景树时调用）。
         /// </summary>
-        private void UnsubscribeAreaSignals()
+        public void UnregisterZone(string name)
         {
-            if (_zone1Area != null)
-            {
-                _zone1Area.AreaEntered -= OnZone1AreaEntered;
-            }
-
-            if (_zone2Area != null)
-            {
-                _zone2Area.AreaEntered -= OnZone2AreaEntered;
-            }
-        }
-        #endregion
-
-        #region Area Signals
-        /// <summary>
-        /// 当玩家进入 Zone1 时
-        /// </summary>
-        private void OnZone1AreaEntered(Area2D area)
-        {
-            if (IsPlayerHitArea(area))
-            {
-                SwitchToZone(0);
-            }
+            _registeredZones.Remove(name);
+            _activeZoneStack.Remove(name);
         }
 
         /// <summary>
-        /// 当玩家进入 Zone2 时
+        /// 注册并立即切换（向后兼容，内部调用 EnterZone）。
         /// </summary>
-        private void OnZone2AreaEntered(Area2D area)
-        {
-            if (IsPlayerHitArea(area))
-            {
-                SwitchToZone(1);
-            }
-        }
+        public void RegisterZoneAndSwitch(string name, Rect2 bounds) => EnterZone(name, bounds);
+
+        // ─── 区域切换 ──────────────────────────────────────────────────────────
 
         /// <summary>
-        /// 判断是否是玩家的 HitArea（玩家的碰撞检测区域）
-        /// </summary>
-        private bool IsPlayerHitArea(Area2D area)
-        {
-            if (Player == null || area == null)
-                return false;
-
-            // 检查是否是玩家的 HitArea 节点
-            // HitArea 是 MainCharacter 下的 Area2D，用于伤害检测和区域检测
-            var hitArea = Player.GetNodeOrNull<Area2D>("HitArea");
-            if (hitArea != null && area == hitArea)
-            {
-                return true;
-            }
-
-            // 备选方案：检查是否是玩家本身或其子节点
-            if (area == Player || Player.IsAncestorOf(area))
-            {
-                return true;
-            }
-
-            return false;
-        }
-        #endregion
-
-        #region Zone Management
-        /// <summary>
-        /// 切换到指定的相机区域
-        /// </summary>
-        /// <param name="zoneIndex">区域索引</param>
-        public void SwitchToZone(int zoneIndex)
-        {
-            if (zoneIndex < 0 || zoneIndex >= CameraZones.Length || TargetCamera == null)
-                return;
-
-            // 避免重复切换
-            if (zoneIndex == _currentZoneIndex)
-                return;
-
-            CameraZone zone = CameraZones[zoneIndex];
-            ApplyZoneToCamera(zone);
-
-            _currentZoneIndex = zoneIndex;
-            _currentZone = zone;
-            _temporaryCameraZoneNameBeforeSwitch = null;
-
-            GameLogger.Info(nameof(CameraZoneManager), $"✓ 切换到相机区域: {zone.Name} " +
-                $"(Left:{zone.LimitLeft}, Top:{zone.LimitTop}, Right:{zone.LimitRight}, Bottom:{zone.LimitBottom})");
-        }
-
-        /// <summary>
-        /// 获取当前相机区域
-        /// </summary>
-        public CameraZone? GetCurrentZone()
-        {
-            return _currentZone;
-        }
-
-        /// <summary>
-        /// 获取当前相机区域的名称
-        /// </summary>
-        public string? CurrentZoneName => _currentZone?.Name;
-
-        /// <summary>
-        /// 获取指定名称的区域
-        /// </summary>
-        public CameraZone? GetZoneByName(string name)
-        {
-            foreach (var zone in CameraZones)
-            {
-                if (zone.Name == name)
-                    return zone;
-            }
-
-            // 检查临时区域
-            if (_temporaryCameraZones.TryGetValue(name, out var tempZone))
-            {
-                return tempZone;
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// 按名称切换到相机区域
+        /// 切换到已注册的区域（含临时区域）。
         /// </summary>
         public void SwitchToZone(string zoneName)
         {
-            for (int i = 0; i < CameraZones.Length; i++)
-            {
-                if (CameraZones[i].Name == zoneName)
-                {
-                    SwitchToZone(i);
-                    return;
-                }
-            }
+            if (_currentZone?.Name == zoneName) return;
 
-            // 检查临时区域
-            if (_temporaryCameraZones.TryGetValue(zoneName, out var tempZone))
+            CameraZone? zone = null;
+            if (!_registeredZones.TryGetValue(zoneName, out zone))
+                _temporaryCameraZones.TryGetValue(zoneName, out zone);
+
+            if (zone == null)
             {
-                _currentZone = tempZone;
-                _currentZoneIndex = -1; // 标记为非固定区域
-                ApplyZoneToCamera(tempZone);
-                GameLogger.Info(nameof(CameraZoneManager), $"✓ 切换到临时相机区域: {zoneName}");
+                GameLogger.Warn(nameof(CameraZoneManager), $"区域 '{zoneName}' 未注册，切换失败。");
                 return;
             }
 
-            GameLogger.Warn(nameof(CameraZoneManager), $"区域 '{zoneName}' 不存在");
+            _currentZone = zone;
+            ApplyZoneToCamera(zone);
+            GameLogger.Info(nameof(CameraZoneManager),
+                $"✓ 切换到区域: {zoneName}  L:{zone.LimitLeft} R:{zone.LimitRight}  T:{zone.LimitTop} B:{zone.LimitBottom}");
         }
 
+        // ─── 临时区域（战斗锁定）──────────────────────────────────────────────
+
         /// <summary>
-        /// 创建并切换到临时相机区域（用于战斗场景等）
+        /// 创建临时战斗相机区域并立即切换。同时记录当前区域以便战斗结束后恢复。
+        /// 由 BattleArena 在激活战斗时调用。
         /// </summary>
         public void CreateAndSwitchTemporaryCameraZone(Rect2 arenaRect, string zoneName)
         {
-            Vector2 arenaEnd = arenaRect.Position + arenaRect.Size;
-            var tempZone = new CameraZone
-            {
-                Name = zoneName,
-                LimitLeft = (int)arenaRect.Position.X,
-                LimitTop = (int)arenaRect.Position.Y,
-                LimitRight = (int)arenaEnd.X,
-                LimitBottom = (int)arenaEnd.Y
-            };
-
-            _temporaryCameraZones[zoneName] = tempZone;
+            _temporaryCameraZones[zoneName] = BoundsToZone(zoneName, arenaRect);
             _temporaryCameraZoneNameBeforeSwitch = _currentZone?.Name;
-
             SwitchToZone(zoneName);
-            GameLogger.Info(nameof(CameraZoneManager), $"✓ 创建并切换到临时相机区域: {zoneName}");
+            GameLogger.Info(nameof(CameraZoneManager), $"✓ 创建临时战斗区域: {zoneName}，战斗结束后恢复至: {_temporaryCameraZoneNameBeforeSwitch ?? "无"}");
         }
 
         /// <summary>
-        /// 移除临时相机区域
+        /// 移除临时战斗区域并恢复至战斗前的区域。
+        /// 由 BattleArena 在战斗结束时调用。
         /// </summary>
         public void RemoveTemporaryCameraZone(string zoneName)
         {
-            if (_temporaryCameraZones.Remove(zoneName))
-            {
-                // 如果当前激活的是此临时区域，切换回之前的区域
-                if (_currentZone?.Name == zoneName)
-                {
-                    if (!string.IsNullOrEmpty(_temporaryCameraZoneNameBeforeSwitch))
-                    {
-                        SwitchToZone(_temporaryCameraZoneNameBeforeSwitch);
-                    }
-                    else if (CameraZones.Length > 0)
-                    {
-                        SwitchToZone(0);
-                    }
-                }
+            if (!_temporaryCameraZones.Remove(zoneName)) return;
 
-                GameLogger.Info(nameof(CameraZoneManager), $"✓ 移除临时相机区域: {zoneName}");
+            if (_currentZone?.Name == zoneName)
+            {
+                if (!string.IsNullOrEmpty(_temporaryCameraZoneNameBeforeSwitch))
+                    SwitchToZone(_temporaryCameraZoneNameBeforeSwitch);
+
+                _temporaryCameraZoneNameBeforeSwitch = null;
             }
+
+            GameLogger.Info(nameof(CameraZoneManager), $"✓ 移除临时战斗区域: {zoneName}");
         }
 
+        // ─── 全局边界（由 StageGeneratorManager 调用）──────────────────────────
+
         /// <summary>
-        /// 设置全局相机边界，由 StageGeneratorManager 在关卡生成完毕后调用。
-        /// 覆盖 Zone 0（默认区域）的范围，并立即应用到相机。
+        /// 设置关卡全局相机边界，关卡生成完毕后立即生效。
+        /// 此区域作为默认基础区域，CameraZoneArea 进入房间后会覆盖为房间边界。
         /// </summary>
         public void SetGlobalBounds(int limitLeft, int limitTop, int limitRight, int limitBottom)
         {
             if (TargetCamera == null) return;
-
-            if (CameraZones.Length > 0)
-            {
-                var zone = CameraZones[0];
-                zone.LimitLeft   = limitLeft;
-                zone.LimitTop    = limitTop;
-                zone.LimitRight  = limitRight;
-                zone.LimitBottom = limitBottom;
-                zone.Name        = "Stage_Global";
-                ApplyZoneToCamera(zone);
-                _currentZone      = zone;
-                _currentZoneIndex = 0;
-                _temporaryCameraZoneNameBeforeSwitch = null;
-            }
-            else
-            {
-                // 没有预设区域时直接设置相机限制
-                TargetCamera.LimitLeft   = limitLeft;
-                TargetCamera.LimitTop    = limitTop;
-                TargetCamera.LimitRight  = limitRight;
-                TargetCamera.LimitBottom = limitBottom;
-            }
-
+            var bounds = new Rect2(limitLeft, limitTop, limitRight - limitLeft, limitBottom - limitTop);
+            RegisterZoneAndSwitch("Stage_Global", bounds);
             GameLogger.Info(nameof(CameraZoneManager),
-                $"全局相机边界已设置：X[{limitLeft}, {limitRight}] Y[{limitTop}, {limitBottom}]");
+                $"全局相机边界已设置：X[{limitLeft}, {limitRight}]  Y[{limitTop}, {limitBottom}]");
         }
 
-        /// <summary>
-        /// 应用相机区域到目标相机
-        /// </summary>
+        // ─── 内部工具 ──────────────────────────────────────────────────────────
+
+        private static CameraZone BoundsToZone(string name, Rect2 bounds) => new CameraZone
+        {
+            Name = name,
+            LimitLeft   = (int)bounds.Position.X,
+            LimitTop    = (int)bounds.Position.Y,
+            LimitRight  = (int)(bounds.Position.X + bounds.Size.X),
+            LimitBottom = (int)(bounds.Position.Y + bounds.Size.Y),
+        };
+
         private void ApplyZoneToCamera(CameraZone zone)
         {
             if (TargetCamera == null) return;
-
-            TargetCamera.LimitLeft = zone.LimitLeft;
-            TargetCamera.LimitTop = zone.LimitTop;
-            TargetCamera.LimitRight = zone.LimitRight;
+            TargetCamera.LimitLeft   = zone.LimitLeft;
+            TargetCamera.LimitTop    = zone.LimitTop;
+            TargetCamera.LimitRight  = zone.LimitRight;
             TargetCamera.LimitBottom = zone.LimitBottom;
         }
-        #endregion
 
-        #region Debug Helper
-        /// <summary>
-        /// 获取所有区域信息用于调试
-        /// </summary>
+        // ─── 调试 ──────────────────────────────────────────────────────────────
+
         public string GetDebugInfo()
         {
             var sb = new System.Text.StringBuilder();
-            sb.AppendLine($"=== 相机区域管理器调试信息 ===");
-            sb.AppendLine($"当前激活区域: {(_currentZone?.Name ?? "无")}");
-            sb.AppendLine($"总区域数: {CameraZones.Length}");
-            sb.AppendLine($"Zone1 Area2D: {(_zone1Area != null ? "已连接" : "未找到")}");
-            sb.AppendLine($"Zone2 Area2D: {(_zone2Area != null ? "已连接" : "未找到")}");
-            
-            for (int i = 0; i < CameraZones.Length; i++)
+            sb.AppendLine("=== CameraZoneManager ===");
+            sb.AppendLine($"当前区域: {(_currentZone?.Name ?? "无")}");
+            sb.AppendLine($"已注册区域 ({_registeredZones.Count}):");
+            foreach (var kv in _registeredZones)
+                sb.AppendLine($"  {kv.Key}: L={kv.Value.LimitLeft} R={kv.Value.LimitRight}");
+            if (_temporaryCameraZones.Count > 0)
             {
-                var zone = CameraZones[i];
-                sb.AppendLine($"\n区域 {i}: {zone.Name}");
-                sb.AppendLine($"  相机限制: L:{zone.LimitLeft} T:{zone.LimitTop} R:{zone.LimitRight} B:{zone.LimitBottom}");
+                sb.AppendLine($"临时区域 ({_temporaryCameraZones.Count}):");
+                foreach (var kv in _temporaryCameraZones)
+                    sb.AppendLine($"  {kv.Key}: L={kv.Value.LimitLeft} R={kv.Value.LimitRight}");
             }
-            
             return sb.ToString();
         }
-        #endregion
     }
 }

@@ -41,6 +41,12 @@ namespace Kuros.Controllers
         [Export] public NodePath SpawnParentPath { get; set; } = new NodePath();
         [Export] public bool SpawnOnReady { get; set; } = false;
         [Export] public bool TriggerOnce { get; set; } = true;
+        [Export] public bool SimultaneousSpawn { get; set; } = false;
+        /// <summary>
+        /// 是否启用自动触发器（TriggerArea）。
+        /// 作为 WaveSpawnManager 的子波次时应设为 false，由 WaveSpawnManager 统一驱动。
+        /// </summary>
+        [Export] public bool EnableTrigger { get; set; } = true;
 
         [ExportCategory("Trigger")]
         [Export] public Area2D? TriggerArea { get; set; }
@@ -110,15 +116,19 @@ namespace Kuros.Controllers
         public override void _Ready()
         {
             _rng.Randomize();
-            EnsureTriggerArea();
-            UpdateTriggerAreaShape();
+
+            if (EnableTrigger)
+            {
+                EnsureTriggerArea();
+                UpdateTriggerAreaShape();
+            }
 
             if (Engine.IsEditorHint())
             {
                 return;
             }
 
-            if (TriggerArea != null)
+            if (EnableTrigger && TriggerArea != null)
             {
                 TriggerArea.BodyEntered += OnTriggerBodyEntered;
             }
@@ -131,7 +141,7 @@ namespace Kuros.Controllers
 
         public override void _ExitTree()
         {
-            if (TriggerArea != null)
+            if (EnableTrigger && TriggerArea != null)
             {
                 TriggerArea.BodyEntered -= OnTriggerBodyEntered;
             }
@@ -141,7 +151,7 @@ namespace Kuros.Controllers
 
         public override void _Process(double delta)
         {
-            if (Engine.IsEditorHint())
+            if (Engine.IsEditorHint() && EnableTrigger)
             {
                 EnsureTriggerArea();
                 if (ShouldAutoConfigureTriggerArea())
@@ -215,49 +225,67 @@ namespace Kuros.Controllers
             }
 
             int spawnTotal = spawnQueue.Count;
-            for (int i = 0; i < spawnTotal; i++)
+
+            if (SimultaneousSpawn)
             {
-                PackedScene enemyScene = spawnQueue[i];
-                Vector2 spawnAnchorPosition = ResolveSpawnPosition(i);
-                Vector2 enemySpawnPosition = spawnAnchorPosition + EnemySpawnOffset;
-                SpawnEffectRefs effectRefs = PlaySpawnEffects(spawnAnchorPosition);
-
-                await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
-
-                ulong waitStart = Time.GetTicksMsec();
-                await WaitForEnemyAppearGateAsync(effectRefs.BackEffectInstance);
-                ulong waitedMs = Time.GetTicksMsec() - waitStart;
-
-                if (LogSpawnEffectPositions)
+                // 同时启动所有敌人的生成流程，互不等待
+                var tasks = new System.Threading.Tasks.Task[spawnTotal];
+                for (int i = 0; i < spawnTotal; i++)
                 {
-                    GD.Print($"[{Name}] Spawn index={i + 1}/{spawnTotal}, gateMode={EnemyAppearGateMode}, actualWait={waitedMs}ms");
+                    tasks[i] = SpawnSingleEnemyAsync(spawnQueue[i], i, spawnTotal);
                 }
-
-                var enemy = SpawnEnemy(enemyScene, enemySpawnPosition, i);
-                if (enemy != null)
+                await System.Threading.Tasks.Task.WhenAll(tasks);
+            }
+            else
+            {
+                for (int i = 0; i < spawnTotal; i++)
                 {
-                    if (LogSpawnEffectPositions)
+                    await SpawnSingleEnemyAsync(spawnQueue[i], i, spawnTotal);
+
+                    if (i < spawnTotal - 1 && SpawnInterval > 0f)
                     {
-                        GD.Print($"[{Name}] Enemy spawned index={i + 1}/{spawnTotal}, anchor={spawnAnchorPosition}, enemyPos={enemySpawnPosition}, enemyOffset={EnemySpawnOffset}, root={DescribeCanvasItem(enemy as CanvasItem)}");
+                        var intervalTimer = GetTree().CreateTimer(SpawnInterval);
+                        await ToSignal(intervalTimer, SceneTreeTimer.SignalName.Timeout);
                     }
-
-                    if (AutoLowerFrontEffectAfterEnemySpawn)
-                    {
-                        LowerFrontEffectAfterEnemySpawn(effectRefs.FrontEffect, enemy);
-                    }
-
-                    EmitSignal(SignalName.EnemySpawned, enemy, i);
-                }
-
-                if (i < spawnTotal - 1 && SpawnInterval > 0f)
-                {
-                    var intervalTimer = GetTree().CreateTimer(SpawnInterval);
-                    await ToSignal(intervalTimer, SceneTreeTimer.SignalName.Timeout);
                 }
             }
 
             _isSpawning = false;
             EmitSignal(SignalName.SpawnCompleted);
+        }
+
+        private async System.Threading.Tasks.Task SpawnSingleEnemyAsync(PackedScene enemyScene, int index, int spawnTotal)
+        {
+            Vector2 spawnAnchorPosition = ResolveSpawnPosition(index);
+            Vector2 enemySpawnPosition = spawnAnchorPosition + EnemySpawnOffset;
+            SpawnEffectRefs effectRefs = PlaySpawnEffects(spawnAnchorPosition);
+
+            await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+
+            ulong waitStart = Time.GetTicksMsec();
+            await WaitForEnemyAppearGateAsync(effectRefs.BackEffectInstance);
+            ulong waitedMs = Time.GetTicksMsec() - waitStart;
+
+            if (LogSpawnEffectPositions)
+            {
+                GD.Print($"[{Name}] Spawn index={index + 1}/{spawnTotal}, gateMode={EnemyAppearGateMode}, actualWait={waitedMs}ms");
+            }
+
+            var enemy = SpawnEnemy(enemyScene, enemySpawnPosition, index);
+            if (enemy != null)
+            {
+                if (LogSpawnEffectPositions)
+                {
+                    GD.Print($"[{Name}] Enemy spawned index={index + 1}/{spawnTotal}, anchor={spawnAnchorPosition}, enemyPos={enemySpawnPosition}, enemyOffset={EnemySpawnOffset}, root={DescribeCanvasItem(enemy as CanvasItem)}");
+                }
+
+                if (AutoLowerFrontEffectAfterEnemySpawn)
+                {
+                    LowerFrontEffectAfterEnemySpawn(effectRefs.FrontEffect, enemy);
+                }
+
+                EmitSignal(SignalName.EnemySpawned, enemy, index);
+            }
         }
 
         private Node? SpawnEnemy(PackedScene enemyScene, Vector2 spawnPosition, int spawnIndex)

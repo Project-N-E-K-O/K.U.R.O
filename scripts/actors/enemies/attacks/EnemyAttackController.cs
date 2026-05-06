@@ -352,7 +352,7 @@ namespace Kuros.Actors.Enemies.Attacks
 
         private bool ShouldForceAttackState()
         {
-            if (!IsEnemyAlive() || Enemy?.StateMachine == null) return false;
+            if (!IsEnemyActionable() || Enemy?.StateMachine == null) return false;
             if (_queuedAttack == null) return false;
             if (_queuedAttack.CanStart())
             {
@@ -366,6 +366,21 @@ namespace Kuros.Actors.Enemies.Attacks
         private bool IsEnemyAlive()
         {
             return Enemy != null && !Enemy.IsDeathSequenceActive && !Enemy.IsDead;
+        }
+
+        /// <summary>
+        /// 敌人是否处于可行动状态（未死亡、未冻结、未处于受击状态）。
+        /// 用于判断是否允许发起/强制触发攻击。
+        /// </summary>
+        private bool IsEnemyActionable()
+        {
+            if (!IsEnemyAlive()) return false;
+            var stateName = Enemy?.StateMachine?.CurrentState?.Name;
+            return stateName != "Frozen"
+                && stateName != "CooldownFrozen"
+                && stateName != "Hit"
+                && stateName != "Dying"
+                && stateName != "Dead";
         }
 
         private void DebugLog(string message)

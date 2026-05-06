@@ -68,6 +68,26 @@ namespace Kuros.Managers
         private bool _isBattleActive = false;
         private List<GameActor> _trackedEnemies = new();
         private string? _originalCameraZoneName;
+        /// <summary>
+        /// 外部持锁标志。当为 true 时，即使检测到无敌人也不会撤销空气墙/相机锁定。
+        /// 由 WaveSpawnManager 在整个波次期间持锁，全部波次结束后释放。
+        /// </summary>
+        private bool _forceLocked = false;
+
+        /// <summary>
+        /// 设置强制锁定状态。
+        /// locked=true：波次进行中，禁止自动 DeactivateBattle。
+        /// locked=false：所有波次结束，恢复正常自动停用逻辑。
+        /// </summary>
+        public void SetForceLock(bool locked)
+        {
+            _forceLocked = locked;
+            GameLogger.Debug(nameof(BattleArena), $"SetForceLock({locked})");
+
+            // 解锁时若当前无敌人则立即停用
+            if (!locked && _isBattleActive && _trackedEnemies.Count == 0)
+                DeactivateBattle();
+        }
 
         public override void _Ready()
         {
@@ -171,8 +191,8 @@ namespace Kuros.Managers
             {
                 ActivateBattle();
             }
-            // 状态转移：有敌人 -> 无敌人
-            else if (!hasEnemies && _isBattleActive)
+            // 状态转移：有敌人 -> 无敌人（锁定期间禁止停用）
+            else if (!hasEnemies && _isBattleActive && !_forceLocked)
             {
                 DeactivateBattle();
             }

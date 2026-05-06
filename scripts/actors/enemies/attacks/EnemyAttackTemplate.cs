@@ -99,6 +99,7 @@ namespace Kuros.Actors.Enemies.Attacks
         public virtual bool CanStart()
         {
             if (Enemy == null || Player == null) return false;
+            if (Enemy.IsDeathSequenceActive || Enemy.IsDead) return false;
             if (IsRunning || IsOnCooldown) return false;
             if (Enemy.AttackTimer > 0) return false;
 

@@ -174,19 +174,29 @@ namespace Kuros.Managers
         }
 
         /// <summary>
-        /// 对直接子节点中 TopLevel=true 的节点手动追加世界偏移。
+        /// 递归查找所有 TopLevel=true 的节点并手动追加世界偏移。
         /// TopLevel 节点不随父节点移动，父节点 Position 改变后需手动补偿。
+        /// 注意：需要递归处理，因为 TopLevel 节点可能嵌套在普通子节点内（如 WaveSpawnManager/TriggerArea）。
         /// </summary>
-        private static void OffsetTopLevelChildren(Node2D room, float offsetX)
+        private static void OffsetTopLevelChildren(Node room, float offsetX)
         {
             if (Mathf.IsZeroApprox(offsetX)) return;
 
-            foreach (var child in room.GetChildren())
+            OffsetTopLevelRecursive(room, offsetX);
+        }
+
+        private static void OffsetTopLevelRecursive(Node parent, float offsetX)
+        {
+            foreach (var child in parent.GetChildren())
             {
-                if (child is Node2D node && node.TopLevel)
+                if (child is Node2D node2D && node2D.TopLevel)
                 {
-                    node.GlobalPosition += new Vector2(offsetX, 0f);
+                    // TopLevel 节点使用世界坐标，直接补偿偏移
+                    node2D.GlobalPosition += new Vector2(offsetX, 0f);
+                    // TopLevel 节点的子树跟随自身移动（除非子节点也是 TopLevel），继续向下递归
                 }
+                // 不管当前节点是否 TopLevel，都继续向下找嵌套的 TopLevel 节点
+                OffsetTopLevelRecursive(child, offsetX);
             }
         }
 

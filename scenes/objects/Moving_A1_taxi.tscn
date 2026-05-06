@@ -1,7 +1,8 @@
-[gd_scene load_steps=31 format=3 uid="uid://chway4etqkroy"]
+[gd_scene load_steps=33 format=3 uid="uid://chway4etqkroy"]
 
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="1_d7g0g"]
 [ext_resource type="Texture2D" uid="uid://038kjb47rgc5" path="res://assets/objects/taxi/时间轴1_0000.png" id="1_l4djn"]
+[ext_resource type="Script" uid="uid://dryx2p6xtxsn" path="res://scripts/objects/TaxiController.cs" id="1_taxictrl"]
 [ext_resource type="Texture2D" uid="uid://cfmqwo6h7h3sj" path="res://assets/objects/taxi/时间轴1_0001.png" id="2_rqshq"]
 [ext_resource type="Texture2D" uid="uid://og2gq2qj138m" path="res://assets/objects/taxi/时间轴1_0002.png" id="3_d7g0g"]
 [ext_resource type="Texture2D" uid="uid://rurwkln2flnh" path="res://assets/objects/taxi/时间轴1_0003.png" id="4_3td21"]
@@ -174,9 +175,10 @@ tracks/4/keys = {
 "values": [0.0]
 }
 
-[sub_resource type="Animation" id="Animation_rqshq"]
-resource_name = "taxi_intro"
-length = 5.0
+[sub_resource type="Animation" id="Animation_3td21"]
+resource_name = "taxi_idle"
+length = 3.0
+loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -184,10 +186,26 @@ tracks/0/path = NodePath("AnimatedSprite2D:scale")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 2, 3.5, 5),
+"times": PackedFloat32Array(0, 1.5, 3),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(0.45, 0.45), Vector2(0.4, 0.4), Vector2(0.45, 0.45)]
+}
+
+[sub_resource type="Animation" id="Animation_rqshq"]
+resource_name = "taxi_intro"
+length = 6.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite2D:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 2, 3, 6),
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 0,
-"values": [Vector2(1, 1), Vector2(0.66, 0.66), Vector2(0.66, 0.66), Vector2(0.33, 0.33)]
+"values": [Vector2(1, 1), Vector2(0.66, 0.66), Vector2(0.66, 0.66), Vector2(0.45, 0.45)]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -208,7 +226,7 @@ tracks/2/path = NodePath("Shadow:position")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
-"times": PackedFloat32Array(0, 2, 3.5, 5),
+"times": PackedFloat32Array(0, 2, 3, 6),
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 0,
 "values": [Vector2(0, 800), Vector2(0, 1600), Vector2(0, 1600), Vector2(0, 1500)]
@@ -220,7 +238,7 @@ tracks/3/path = NodePath("Shadow:scale")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
-"times": PackedFloat32Array(0, 2, 5),
+"times": PackedFloat32Array(0, 2, 6),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
 "values": [Vector2(0.2, 0.2), Vector2(0.22, 0.22), Vector2(0.22, 0.22)]
@@ -241,11 +259,13 @@ tracks/4/keys = {
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_3td21"]
 _data = {
 &"RESET": SubResource("Animation_d7g0g"),
+&"taxi_idle": SubResource("Animation_3td21"),
 &"taxi_intro": SubResource("Animation_rqshq")
 }
 
 [node name="Taxi" type="CharacterBody2D"]
-z_index = 2
+z_index = 10
+script = ExtResource("1_taxictrl")
 
 [node name="Shadow" type="Sprite2D" parent="."]
 material = SubResource("ShaderMaterial_3td21")
