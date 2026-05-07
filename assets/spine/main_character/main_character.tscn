@@ -80,6 +80,7 @@ AttackArea = NodePath("AttackArea")
 AttackArea = NodePath("AttackArea")
 LeftHandAttachmentPath = NodePath("SpineSprite/SpineBoneNode")
 Speed = 500.0
+AttackDamage = 1.0
 MaxHealth = 12
 StateMachine = NodePath("StateMachine")
 EffectController = NodePath("EffectController")
@@ -142,7 +143,7 @@ skeleton_data_res = ExtResource("4_o4xwm")
 bones_thickness = 10.09
 preview_skin = "Default"
 preview_animation = "-- Empty --"
-preview_frame = true
+preview_frame = false
 preview_time = 0.0
 script = ExtResource("4_ixg0x")
 

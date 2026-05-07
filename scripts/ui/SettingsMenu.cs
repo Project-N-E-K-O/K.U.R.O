@@ -15,6 +15,7 @@ namespace Kuros.UI
         [Export] public HSlider SFXVolumeSlider { get; private set; } = null!;
 		[Export] public OptionButton WindowModeOption { get; private set; } = null!;
         [Export] public OptionButton LanguageOption { get; private set; } = null!;
+        [Export] public CheckButton? CrtToggle { get; private set; }
 
         // 信号
         [Signal] public delegate void BackRequestedEventHandler();
@@ -119,6 +120,17 @@ namespace Kuros.UI
 
             // 使用 Godot 原生 Connect 方法连接信号，在导出版本中更可靠
             ConnectButtonSignal(BackButton, nameof(OnBackPressed));
+
+            // CRT 开关
+            if (CrtToggle == null)
+                CrtToggle = GetNodeOrNull<CheckButton>("MenuPanel/VBoxContainer/CrtToggle");
+            if (CrtToggle != null)
+            {
+                CrtToggle.ButtonPressed = GameSettingsManager.Instance?.CrtEnabled ?? false;
+                var callable = new Callable(this, nameof(OnCrtToggled));
+                if (!CrtToggle.IsConnected(CheckButton.SignalName.Toggled, callable))
+                    CrtToggle.Connect(CheckButton.SignalName.Toggled, callable);
+            }
         }
 
         private void OnMasterVolumeChanged(double value)
@@ -195,6 +207,12 @@ namespace Kuros.UI
         private void OnBackPressed()
         {
             EmitSignal(SignalName.BackRequested);
+        }
+
+        private void OnCrtToggled(bool enabled)
+        {
+            GameSettingsManager.Instance?.SetCrtEnabled(enabled);
+            EmitSignal(SignalName.SettingsChanged);
         }
 
         public override void _Input(InputEvent @event)

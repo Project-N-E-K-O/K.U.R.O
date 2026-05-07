@@ -1,4 +1,4 @@
-[gd_scene load_steps=41 format=3 uid="uid://cnc8qhgt2qlco"]
+[gd_scene load_steps=44 format=3 uid="uid://cnc8qhgt2qlco"]
 
 [ext_resource type="Script" uid="uid://dmqu7phxi8gbi" path="res://scripts/managers/BattleArena.cs" id="1_kesvg"]
 [ext_resource type="Script" uid="uid://b3iq6dm2pc5y0" path="res://scripts/controllers/EnemySpawnManager.cs" id="2_py885"]
@@ -17,8 +17,10 @@
 [ext_resource type="PackedScene" uid="uid://dqrmlh3reek3f" path="res://scenes/items/Furniture_B_garbageCanA.tscn" id="14_n0h0p"]
 [ext_resource type="PackedScene" uid="uid://cgy13s0ewifos" path="res://scenes/environments/taxiSign.tscn" id="15_2etho"]
 [ext_resource type="PackedScene" uid="uid://ddi1sshkssyq" path="res://scenes/items/Furniture_B_cautionTape_side.tscn" id="15_d0c6g"]
+[ext_resource type="Script" uid="uid://cbui22isww64v" path="res://scripts/systems/cutscene/CutsceneTrigger.cs" id="15_o7u55"]
 [ext_resource type="Texture2D" uid="uid://dkpv0dxfg1rx7" path="res://assets/environments/scene_2_hotel/酒店大门口墙后.png" id="15_xf8xq"]
 [ext_resource type="PackedScene" uid="uid://c0oyd0psq7fe1" path="res://scenes/items/Furniture_B_cautionTape_fwd.tscn" id="16_2etho"]
+[ext_resource type="Resource" uid="uid://dpxai5bvaoeto" path="res://resources/cutscene/B_begin_intro.tres" id="16_xf8xq"]
 [ext_resource type="PackedScene" uid="uid://bkbhucnxqiys2" path="res://scenes/items/Furniture_B_counterB.tscn" id="17_xi57c"]
 [ext_resource type="PackedScene" uid="uid://0anrcfm2pnsd" path="res://scenes/items/Furniture_B_luggageCartA.tscn" id="18_hjjd7"]
 [ext_resource type="PackedScene" uid="uid://1mc4twnj45va" path="res://scenes/items/Furniture_B_tableRoundB.tscn" id="19_o7u55"]
@@ -48,14 +50,17 @@ size = Vector2(400, 2500)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_7fi66"]
 size = Vector2(6132, 3200)
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_av3q5"]
+size = Vector2(2000, 2000)
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_py885"]
 size = Vector2(6000, 700)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_gvdxe"]
-size = Vector2(10500, 700)
+size = Vector2(12000, 700)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2mcrk"]
-size = Vector2(10500, 700)
+size = Vector2(12000, 700)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_058wa"]
 size = Vector2(700, 4000)
@@ -75,6 +80,9 @@ agent_radius = 50.0
 
 [node name="BBegin" type="Node2D"]
 y_sort_enabled = true
+
+[node name="PlayerSpawnPoint" type="Node2D" parent="."]
+position = Vector2(-5300, 200)
 
 [node name="AreaSize" type="Area2D" parent="."]
 visible = false
@@ -155,6 +163,9 @@ EnemySpawnOffset = Vector2(0, 100)
 ObstacleCheckMask = 7
 EnemyAppearDelay = 1.0
 AutoLowerFrontEffectAfterEnemySpawn = true
+ShowDebugOverlay = false
+ShowDebugOverlayInGame = false
+LogSpawnEffectPositions = false
 DebugLineWidth = 8.0
 
 [node name="TriggerArea" type="Area2D" parent="EnemySpawneManager"]
@@ -209,7 +220,7 @@ TargetPath = NodePath(".")
 FadedAlpha = 0.6
 
 [node name="gate" parent="Environments/FrontWall/GateFrontWall" instance=ExtResource("13_d0c6g")]
-position = Vector2(-416, -166)
+position = Vector2(0, -166)
 
 [node name="gatewall" type="Sprite2D" parent="Environments/FrontWall/GateFrontWall"]
 z_as_relative = false
@@ -226,6 +237,18 @@ collision_mask = 4
 position = Vector2(2676, 0)
 shape = SubResource("RectangleShape2D_7fi66")
 
+[node name="CutsceneTrigger" type="Area2D" parent="."]
+z_index = 10
+position = Vector2(-5552, 105)
+collision_layer = 0
+collision_mask = 4
+script = ExtResource("15_o7u55")
+Sequence = ExtResource("16_xf8xq")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CutsceneTrigger"]
+shape = SubResource("RectangleShape2D_av3q5")
+debug_color = Color(1, 0, 1, 0.41960785)
+
 [node name="AirWall" type="StaticBody2D" parent="."]
 z_index = 1
 
@@ -235,12 +258,12 @@ shape = SubResource("RectangleShape2D_py885")
 debug_color = Color(0, 0, 0, 0.21568628)
 
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="AirWall"]
-position = Vector2(-2300, 1800)
+position = Vector2(-1700, 1800)
 shape = SubResource("RectangleShape2D_gvdxe")
 debug_color = Color(0, 0, 0, 0.21568628)
 
 [node name="CollisionShape2D3" type="CollisionShape2D" parent="AirWall"]
-position = Vector2(-2300, -1800)
+position = Vector2(-1700, -1800)
 shape = SubResource("RectangleShape2D_2mcrk")
 debug_color = Color(0, 0, 0, 0.21568628)
 
@@ -307,6 +330,7 @@ position = Vector2(-503, 148)
 
 [node name="FurnitureCounterB" parent="." instance=ExtResource("17_xi57c")]
 position = Vector2(-417, -362)
+KnockbackForce = 0.0
 
 [node name="FurnitureLuggageCartA" parent="." instance=ExtResource("18_hjjd7")]
 position = Vector2(-813, 1065)

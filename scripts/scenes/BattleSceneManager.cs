@@ -771,6 +771,32 @@ namespace Kuros.Scenes
 			}
 		}
 
+		/// <summary>
+		/// 过场动画开始时隐藏 HUD 和技能窗口（菜单类 UI 本身就是隐藏的，无需处理）。
+		/// 由 CutsceneManager 调用。
+		/// </summary>
+		public void HideAllUI()
+		{
+			if (_battleHUD != null && IsInstanceValid(_battleHUD))
+				_battleHUD.Hide();
+			if (_skillWindow != null && IsInstanceValid(_skillWindow))
+				_skillWindow.Hide();
+			GameLogger.Info(nameof(BattleSceneManager), "[Cutscene] UI 已隐藏");
+		}
+
+		/// <summary>
+		/// 过场动画结束时恢复 HUD 和技能窗口。
+		/// 由 CutsceneManager 调用。
+		/// </summary>
+		public void ShowAllUI()
+		{
+			if (_battleHUD != null && IsInstanceValid(_battleHUD))
+				_battleHUD.Show();
+			if (_skillWindow != null && IsInstanceValid(_skillWindow))
+				_skillWindow.Show();
+			GameLogger.Info(nameof(BattleSceneManager), "[Cutscene] UI 已恢复");
+		}
+
 		public override void _ExitTree()
 		{
 			// 场景退出时清理UI

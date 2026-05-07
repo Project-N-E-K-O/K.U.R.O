@@ -1,5 +1,6 @@
-[gd_scene load_steps=13 format=3 uid="uid://qd5abd4opeob"]
+[gd_scene load_steps=14 format=3 uid="uid://qd5abd4opeob"]
 
+[ext_resource type="Script" uid="uid://b0qiaumw3ige7" path="res://scripts/systems/cutscene/CutsceneManager.cs" id="1_csmgr"]
 [ext_resource type="Script" uid="uid://x1ic1ym4ykq8" path="res://scripts/scenes/BattleSceneManager.cs" id="1_ctuyy"]
 [ext_resource type="PackedScene" uid="uid://ufprfd4r8ijj" path="res://assets/spine/main_character/main_character.tscn" id="2_s0pgc"]
 [ext_resource type="Script" uid="uid://del8hgcg3sr4i" path="res://scripts/managers/CameraFollow.cs" id="3_vvtmr"]
@@ -23,22 +24,24 @@ script = ExtResource("4_camera")
 TargetCamera = NodePath("../World/MainCharacter/Camera2D")
 Player = NodePath("../World/MainCharacter")
 
+[node name="CutsceneManager" type="Node" parent="."]
+script = ExtResource("1_csmgr")
+SkipActionName = "run"
+HideNodePaths = Array[NodePath]([NodePath("../World/P2")])
+BattleSceneManagerPath = NodePath("..")
+
 [node name="StageGeneratorManager" type="Node" parent="."]
 script = ExtResource("6_gen")
 BeginScene = ExtResource("8_begin")
 EndScene = ExtResource("11_end")
 MiddleScenePool = Array[PackedScene]([ExtResource("9_b1"), ExtResource("10_b2"), ExtResource("8_2l4aj")])
-MinMiddleRooms = 0
-MaxMiddleRooms = 0
 
 [node name="World" type="Node2D" parent="."]
 y_sort_enabled = true
 
 [node name="MainCharacter" parent="World" instance=ExtResource("2_s0pgc")]
-position = Vector2(-5346, 184)
 
 [node name="Camera2D" type="Camera2D" parent="World/MainCharacter"]
-position = Vector2(0, -15.15156)
 ignore_rotation = false
 zoom = Vector2(0.43, 0.43)
 position_smoothing_enabled = true
@@ -57,7 +60,7 @@ PlayerAttackKillHitStopDuration = 0.3
 HitStopDelay = 0.1
 
 [node name="P2" parent="World" instance=ExtResource("5_p2")]
-position = Vector2(-5151.0005, -183.99998)
+position = Vector2(300, 0)
 
 [node name="DropDebug" type="Node2D" parent="."]
 script = ExtResource("7_drop")

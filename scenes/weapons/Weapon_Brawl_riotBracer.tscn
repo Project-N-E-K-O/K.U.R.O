@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://bhjc0grsl76ep"]
+[gd_scene load_steps=13 format=3 uid="uid://bhjc0grsl76ep"]
 
 [ext_resource type="Script" uid="uid://dtgdjgrqgype7" path="res://scripts/items/world/WorldItemEntity.cs" id="1_82c6d"]
 [ext_resource type="Resource" uid="uid://c0h5f2yocbgcw" path="res://resources/items/Weapon_Brawl_RiotBracer.tres" id="2_82c6d"]
@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://crfbiiitqgkjb" path="res://assets/weapons/镇暴护腕.png" id="3_82c6d"]
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="3_yqjh8"]
 [ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="4_blqw4"]
+[ext_resource type="Shader" uid="uid://caxdo713k5kug" path="res://shaders/materials/sparkling.gdshader" id="7_blqw4"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_rrc52"]
 shader = ExtResource("3_yqjh8")
@@ -19,6 +20,13 @@ shader_parameter/outline_size = 32.0
 shader_parameter/alpha_threshold = 0.5
 shader_parameter/edge_softness = 0.12
 shader_parameter/preserve_fill = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_jlsbm"]
+shader = ExtResource("7_blqw4")
+shader_parameter/highlight_width = 0.08
+shader_parameter/highlight_speed = 2.0
+shader_parameter/highlight_intensity = 1.2
+shader_parameter/highlight_interval = 1.00000002375
 
 [sub_resource type="RectangleShape2D" id="BodyShape_rr6vl"]
 size = Vector2(1078.788, 654.5454)
@@ -46,6 +54,7 @@ material = SubResource("ShaderMaterial_2q28g")
 texture = ExtResource("3_82c6d")
 
 [node name="Sprite2D" type="Sprite2D" parent="Outline"]
+material = SubResource("ShaderMaterial_jlsbm")
 texture = ExtResource("3_82c6d")
 region_rect = Rect2(0, 64, 776, 344)
 

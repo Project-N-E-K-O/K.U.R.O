@@ -1,0 +1,20 @@
+[gd_scene load_steps=2 format=3 uid="uid://svq4i003d6rg"]
+
+[ext_resource type="Script" uid="uid://cusp5185wmj2x" path="res://scripts/ui/CrtOverlay.cs" id="1_crtovl"]
+
+[node name="CrtOverlay" type="CanvasLayer"]
+layer = 127
+script = ExtResource("1_crtovl")
+Pixelate = true
+Roll = true
+DistortIntensity = 0.005
+NoiseOpacity = 0.005
+Aberration = 0.0009999999999998899
+
+[node name="ColorRect" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2

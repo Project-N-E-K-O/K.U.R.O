@@ -1,6 +1,6 @@
-[gd_scene load_steps=2 format=3 uid="uid://settings_menu"]
+[gd_scene load_steps=2 format=3 uid="uid://dlneh4fvslb5q"]
 
-[ext_resource type="Script" path="res://scripts/ui/SettingsMenu.cs" id="1_settings"]
+[ext_resource type="Script" uid="uid://c068arqlmstak" path="res://scripts/ui/SettingsMenu.cs" id="1_settings"]
 
 [node name="SettingsMenu" type="Control"]
 layout_mode = 3
@@ -58,52 +58,43 @@ grow_vertical = 2
 
 [node name="Title" type="Label" parent="MenuPanel/VBoxContainer"]
 layout_mode = 2
+theme_override_font_sizes/font_size = 32
 text = "设置"
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 32
 
 [node name="HSeparator" type="HSeparator" parent="MenuPanel/VBoxContainer"]
 layout_mode = 2
 
 [node name="VolumeLabel" type="Label" parent="MenuPanel/VBoxContainer"]
 layout_mode = 2
-text = "音量设置"
 theme_override_font_sizes/font_size = 20
+text = "音量设置"
 
 [node name="MasterVolumeLabel" type="Label" parent="MenuPanel/VBoxContainer"]
 layout_mode = 2
-text = "主音量:"
 theme_override_font_sizes/font_size = 16
+text = "主音量:"
 
 [node name="MasterVolumeSlider" type="HSlider" parent="MenuPanel/VBoxContainer"]
 layout_mode = 2
-min_value = 0.0
-max_value = 100.0
-step = 1.0
 value = 100.0
 
 [node name="MusicVolumeLabel" type="Label" parent="MenuPanel/VBoxContainer"]
 layout_mode = 2
-text = "音乐音量:"
 theme_override_font_sizes/font_size = 16
+text = "音乐音量:"
 
 [node name="MusicVolumeSlider" type="HSlider" parent="MenuPanel/VBoxContainer"]
 layout_mode = 2
-min_value = 0.0
-max_value = 100.0
-step = 1.0
 value = 100.0
 
 [node name="SFXVolumeLabel" type="Label" parent="MenuPanel/VBoxContainer"]
 layout_mode = 2
-text = "音效音量:"
 theme_override_font_sizes/font_size = 16
+text = "音效音量:"
 
 [node name="SFXVolumeSlider" type="HSlider" parent="MenuPanel/VBoxContainer"]
 layout_mode = 2
-min_value = 0.0
-max_value = 100.0
-step = 1.0
 value = 100.0
 
 [node name="HSeparator2" type="HSeparator" parent="MenuPanel/VBoxContainer"]
@@ -111,13 +102,13 @@ layout_mode = 2
 
 [node name="VideoLabel" type="Label" parent="MenuPanel/VBoxContainer"]
 layout_mode = 2
-text = "视频设置"
 theme_override_font_sizes/font_size = 20
+text = "视频设置"
 
 [node name="WindowModeLabel" type="Label" parent="MenuPanel/VBoxContainer"]
 layout_mode = 2
-text = "窗口模式:"
 theme_override_font_sizes/font_size = 16
+text = "窗口模式:"
 
 [node name="WindowModeOption" type="OptionButton" parent="MenuPanel/VBoxContainer"]
 layout_mode = 2
@@ -127,8 +118,8 @@ layout_mode = 2
 
 [node name="LanguageLabel" type="Label" parent="MenuPanel/VBoxContainer"]
 layout_mode = 2
-text = "语言:"
 theme_override_font_sizes/font_size = 16
+text = "语言:"
 
 [node name="LanguageOption" type="OptionButton" parent="MenuPanel/VBoxContainer"]
 layout_mode = 2
@@ -136,12 +127,18 @@ layout_mode = 2
 [node name="HSeparator4" type="HSeparator" parent="MenuPanel/VBoxContainer"]
 layout_mode = 2
 
+[node name="CrtToggle" type="CheckButton" parent="MenuPanel/VBoxContainer"]
+layout_mode = 2
+text = "CRT滤镜:"
+
+[node name="HSeparator5" type="HSeparator" parent="MenuPanel/VBoxContainer"]
+layout_mode = 2
+
 [node name="BackButton" type="Button" parent="MenuPanel/VBoxContainer"]
 layout_mode = 2
-text = "返回"
 theme_override_font_sizes/font_size = 20
+text = "返回"
 
 [node name="RestartDialog" type="ConfirmationDialog" parent="MenuPanel"]
-layout_mode = 1
 title = "重新启动游戏"
 dialog_text = "修改分辨率需要重新启动游戏，是否立即重启？"

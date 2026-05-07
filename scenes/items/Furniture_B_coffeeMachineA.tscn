@@ -4,7 +4,7 @@
 [ext_resource type="Resource" uid="uid://3otbbdidxw0h" path="res://resources/items/Furniture_B_CoffeeMachineA.tres" id="2_paiqs"]
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="3_kf2mp"]
 [ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="4_hlil7"]
-[ext_resource type="Shader" uid="uid://rvlvejer46bm" path="res://shaders/materials/sprite_outline.gdshader" id="5_gm4l1"]
+[ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="5_gm4l1"]
 [ext_resource type="Texture2D" uid="uid://b73hcxi424y4n" path="res://assets/furnitures/hotel_scene2/CoffeeMachineA.png" id="6_paiqs"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ukya5"]
@@ -39,7 +39,7 @@ HighlightSpritePath = NodePath("RigidBody2D/Outline")
 DefaultOutlineColor = Color(0, 0, 0, 0)
 ThrowDamage = 6.0
 MinDamageVelocity = 0.0
-KnockbackForce = 0.0
+KnockbackForce = 600.0
 StopOnHit = true
 DestructionAnimationDuration = 0.0
 LandingHideDelay = 0.01

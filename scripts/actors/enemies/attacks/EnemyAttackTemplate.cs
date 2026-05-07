@@ -400,7 +400,9 @@ namespace Kuros.Actors.Enemies.Attacks
                 return false;
             }
 
-            if (player is Kuros.Actors.Heroes.MainCharacter mainCharacter && mainCharacter.IsHitInvincible)
+            // 无论是无敌帧还是护盾完全格挡（此时血量未减少，_pendingHitKnockback=false），
+            // 只要没有待处理的击退标记，就跳过击退，避免护盾格挡后仍被大力弹飞。
+            if (player is Kuros.Actors.Heroes.MainCharacter mainCharacter)
             {
                 if (!mainCharacter.ConsumePendingHitKnockback())
                 {

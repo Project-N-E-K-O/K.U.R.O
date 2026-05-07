@@ -23,6 +23,7 @@ DialogueManager="*res://scripts/managers/DialogueManager.cs"
 SaveManager="*res://scripts/managers/SaveManager.cs"
 PauseManager="*res://scripts/managers/PauseManager.cs"
 FloatingDamageTextManager="*res://scripts/managers/FloatingDamageTextManager.cs"
+CrtOverlay="res://scenes/ui/CrtOverlay.tscn"
 
 [display]
 

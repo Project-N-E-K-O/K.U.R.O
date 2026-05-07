@@ -22,6 +22,7 @@ metadata/_custom_type_script = "uid://bv0es4osw3x0r"
 script = ExtResource("2_jk2vw")
 Trigger = 4
 EffectScene = ExtResource("4_jk2vw")
+Notes = "破坏效果"
 metadata/_custom_type_script = "uid://bv0es4osw3x0r"
 
 [sub_resource type="Resource" id="Resource_shake"]
