@@ -1,9 +1,9 @@
 [gd_scene load_steps=24 format=3 uid="uid://b8ky5f2goteu0"]
 
-[ext_resource type="Script" uid="uid://dmqu7phxi8gbi" path="res://scripts/managers/BattleArena.cs" id="1_2oxwq"]
+[ext_resource type="Script" uid="uid://bo4c1bqdtxwd7" path="res://scripts/managers/BattleArena.cs" id="1_2oxwq"]
 [ext_resource type="Script" uid="uid://b3iq6dm2pc5y0" path="res://scripts/controllers/EnemySpawnManager.cs" id="2_4aqtp"]
-[ext_resource type="Script" uid="uid://orymlwdqv2xq" path="res://scripts/controllers/WaveSpawnManager.cs" id="2_7fatj"]
-[ext_resource type="Texture2D" uid="uid://behye8vdgemoq" path="res://assets/environments/scene_2_hotel/地板.png" id="2_eperr"]
+[ext_resource type="Script" uid="uid://ccecrbc2x0efo" path="res://scripts/controllers/WaveSpawnManager.cs" id="2_7fatj"]
+[ext_resource type="Texture2D" uid="uid://bldctlu6nwf6g" path="res://assets/environments/scene_2_hotel/地板.png" id="2_eperr"]
 [ext_resource type="Texture2D" uid="uid://k45cthgn2dgq" path="res://assets/environments/scene_2_hotel/墙面.png" id="3_ln7e0"]
 [ext_resource type="Texture2D" uid="uid://dw2alagwosewh" path="res://assets/environments/scene_2_hotel/地毯.png" id="3_rjiuo"]
 [ext_resource type="PackedScene" uid="uid://djio6ojcqw8yf" path="res://scenes/actors/enemies/Enemy_Normal_guard2.tscn" id="3_u445e"]
@@ -60,6 +60,8 @@ BoundaryCollisionLayer = 6
 BoundaryCollisionMask = 6
 BoundaryThickness = 50.0
 EnemyDetectionMask = 2
+ShowDebugOverlay = false
+ShowDebugOverlayInGame = false
 DebugLineWidth = 8.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="BattleArena"]
@@ -98,6 +100,9 @@ EnemySpawnOffset = Vector2(0, 100)
 ObstacleCheckMask = 7
 EnemyAppearDelay = 1.0
 AutoLowerFrontEffectAfterEnemySpawn = true
+ShowDebugOverlay = false
+ShowDebugOverlayInGame = false
+LogSpawnEffectPositions = false
 DebugLineWidth = 8.0
 
 [node name="EnemySpawneManager2" type="Node2D" parent="."]
@@ -116,6 +121,9 @@ EnemySpawnOffset = Vector2(0, 100)
 ObstacleCheckMask = 7
 EnemyAppearDelay = 1.0
 AutoLowerFrontEffectAfterEnemySpawn = true
+ShowDebugOverlay = false
+ShowDebugOverlayInGame = false
+LogSpawnEffectPositions = false
 DebugLineWidth = 8.0
 
 [node name="Environments" type="Node2D" parent="."]

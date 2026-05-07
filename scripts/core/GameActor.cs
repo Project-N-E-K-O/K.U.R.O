@@ -370,6 +370,17 @@ namespace Kuros.Core
 			GameLogger.Info(nameof(GameActor), $"{Name} health restored to {CurrentHealth}/{MaxHealth}");
 		}
 
+		/// <summary>
+		/// 广播伤害事件到全局监听者。用于非 GameActor 对象（如 Gate）被击中时触发相机抖动、特效等。
+		/// </summary>
+		/// <param name="victim">受击者（可为 null）</param>
+		/// <param name="attacker">攻击者（通常是玩家）</param>
+		/// <param name="damage">伤害值</param>
+		public static void BroadcastDamage(GameActor? victim, GameActor? attacker, int damage)
+		{
+			AnyDamageTaken?.Invoke(victim, attacker, damage);
+		}
+
 		protected virtual void Die()
 		{
 			if (_deathStarted) return;

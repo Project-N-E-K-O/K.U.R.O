@@ -781,7 +781,20 @@ namespace Kuros.Actors.Heroes.Attacks
                 return;
             }
 
-            if (attacker != Player || target is not Node2D targetNode)
+            if (attacker != Player)
+            {
+                return;
+            }
+
+            // target 可能为 null（击中非 GameActor 对象如 Gate），此时在 Player 或 AttackArea 位置创建特效
+            Node2D? targetNode = target as Node2D;
+            if (targetNode == null)
+            {
+                // target 为 null 或不是 Node2D，使用备用位置
+                targetNode = Player;
+            }
+
+            if (targetNode == null)
             {
                 return;
             }

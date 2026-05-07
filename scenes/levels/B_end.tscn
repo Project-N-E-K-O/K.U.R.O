@@ -1,9 +1,9 @@
 [gd_scene load_steps=32 format=3 uid="uid://bco3niswcahcc"]
 
-[ext_resource type="Texture2D" uid="uid://behye8vdgemoq" path="res://assets/environments/scene_2_hotel/地板.png" id="1_fjfxm"]
+[ext_resource type="Texture2D" uid="uid://bldctlu6nwf6g" path="res://assets/environments/scene_2_hotel/地板.png" id="1_fjfxm"]
 [ext_resource type="Texture2D" uid="uid://dw2alagwosewh" path="res://assets/environments/scene_2_hotel/地毯.png" id="2_qtmhi"]
 [ext_resource type="Texture2D" uid="uid://k45cthgn2dgq" path="res://assets/environments/scene_2_hotel/墙面.png" id="3_le30p"]
-[ext_resource type="Script" uid="uid://dmqu7phxi8gbi" path="res://scripts/managers/BattleArena.cs" id="3_rvxy7"]
+[ext_resource type="Script" uid="uid://bo4c1bqdtxwd7" path="res://scripts/managers/BattleArena.cs" id="3_rvxy7"]
 [ext_resource type="Script" uid="uid://b3iq6dm2pc5y0" path="res://scripts/controllers/EnemySpawnManager.cs" id="5_le30p"]
 [ext_resource type="Texture2D" uid="uid://dtmefhuw7vvci" path="res://assets/environments/scene_2_hotel/酒吧吧台.png" id="6_le30p"]
 [ext_resource type="PackedScene" uid="uid://wqcdwpyo1nji" path="res://scenes/actors/enemies/Enemy_B1_thin.tscn" id="6_qcu5f"]
@@ -86,6 +86,8 @@ BoundaryCollisionLayer = 6
 BoundaryCollisionMask = 6
 BoundaryThickness = 50.0
 EnemyDetectionMask = 2
+ShowDebugOverlay = false
+ShowDebugOverlayInGame = false
 DebugLineWidth = 8.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="BattleArena"]
@@ -104,6 +106,9 @@ EnemySpawnOffset = Vector2(0, 100)
 ObstacleCheckMask = 7
 EnemyAppearDelay = 1.0
 AutoLowerFrontEffectAfterEnemySpawn = true
+ShowDebugOverlay = false
+ShowDebugOverlayInGame = false
+LogSpawnEffectPositions = false
 DebugLineWidth = 8.0
 
 [node name="Area2D" type="Area2D" parent="EnemySpawneManager"]

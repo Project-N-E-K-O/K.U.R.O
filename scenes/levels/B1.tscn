@@ -1,12 +1,12 @@
 [gd_scene load_steps=28 format=3 uid="uid://duv46pbl7d7l6"]
 
-[ext_resource type="Script" uid="uid://dmqu7phxi8gbi" path="res://scripts/managers/BattleArena.cs" id="1_7rk8h"]
+[ext_resource type="Script" uid="uid://bo4c1bqdtxwd7" path="res://scripts/managers/BattleArena.cs" id="1_7rk8h"]
 [ext_resource type="Script" uid="uid://b3iq6dm2pc5y0" path="res://scripts/controllers/EnemySpawnManager.cs" id="2_foxgp"]
-[ext_resource type="Script" uid="uid://orymlwdqv2xq" path="res://scripts/controllers/WaveSpawnManager.cs" id="2_gho62"]
+[ext_resource type="Script" uid="uid://ccecrbc2x0efo" path="res://scripts/controllers/WaveSpawnManager.cs" id="2_gho62"]
 [ext_resource type="PackedScene" uid="uid://byi2utn347fwu" path="res://scenes/actors/enemies/Enemy_Normal_guard1.tscn" id="3_moveh"]
 [ext_resource type="PackedScene" uid="uid://cofm45kotvgto" path="res://scenes/actors/enemies/Enemy_B1_fat.tscn" id="4_8wmdx"]
 [ext_resource type="PackedScene" uid="uid://wrebd662va23" path="res://scenes/actors/enemies/Enemy_B2_fat02.tscn" id="5_c4tua"]
-[ext_resource type="Texture2D" uid="uid://behye8vdgemoq" path="res://assets/environments/scene_2_hotel/地板.png" id="5_moveh"]
+[ext_resource type="Texture2D" uid="uid://bldctlu6nwf6g" path="res://assets/environments/scene_2_hotel/地板.png" id="5_moveh"]
 [ext_resource type="PackedScene" uid="uid://djio6ojcqw8yf" path="res://scenes/actors/enemies/Enemy_Normal_guard2.tscn" id="6_c8qwy"]
 [ext_resource type="Texture2D" uid="uid://dw2alagwosewh" path="res://assets/environments/scene_2_hotel/地毯.png" id="6_ilowa"]
 [ext_resource type="Texture2D" uid="uid://k45cthgn2dgq" path="res://assets/environments/scene_2_hotel/墙面.png" id="6_ncd57"]
@@ -64,6 +64,8 @@ BoundaryCollisionLayer = 6
 BoundaryCollisionMask = 6
 BoundaryThickness = 50.0
 EnemyDetectionMask = 2
+ShowDebugOverlay = false
+ShowDebugOverlayInGame = false
 DebugLineWidth = 8.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="BattleArena"]
@@ -105,6 +107,9 @@ EnemySpawnOffset = Vector2(0, 100)
 ObstacleCheckMask = 7
 EnemyAppearDelay = 1.0
 AutoLowerFrontEffectAfterEnemySpawn = true
+ShowDebugOverlay = false
+ShowDebugOverlayInGame = false
+LogSpawnEffectPositions = false
 DebugLineWidth = 8.0
 
 [node name="EnemySpawneManager2" type="Node2D" parent="."]
@@ -123,6 +128,9 @@ EnemySpawnOffset = Vector2(0, 100)
 ObstacleCheckMask = 7
 EnemyAppearDelay = 1.0
 AutoLowerFrontEffectAfterEnemySpawn = true
+ShowDebugOverlay = false
+ShowDebugOverlayInGame = false
+LogSpawnEffectPositions = false
 DebugLineWidth = 8.0
 
 [node name="Environments" type="Node2D" parent="."]

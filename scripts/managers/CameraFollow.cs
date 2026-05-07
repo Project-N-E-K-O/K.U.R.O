@@ -473,13 +473,20 @@ namespace Kuros.Managers
 
         private void OnAnyDamageTaken(GameActor victim, GameActor? attacker, int damage)
         {
-            // 仅当 attacker 是被跟随的目标（玩家），且 victim 属于敌人组时触发
-            if (attacker == null || attacker != _trackedActor || !IsEnemyVictim(victim))
+            // 仅当 attacker 是被跟随的目标（玩家）时触发
+            if (attacker == null || attacker != _trackedActor)
             {
                 return;
             }
 
-            bool killedEnemy = victim.CurrentHealth <= 0 || victim.IsDeathSequenceActive || victim.IsDead;
+            // victim 为 null 表示击中非 GameActor 对象（如 Gate），也应该触发特效
+            // 只需要检查 victim 属于敌人组或 victim 为 null
+            if (victim != null && !IsEnemyVictim(victim))
+            {
+                return;
+            }
+
+            bool killedEnemy = victim != null && (victim.CurrentHealth <= 0 || victim.IsDeathSequenceActive || victim.IsDead);
 
             if (ShakeOnPlayerAttackHit)
             {
