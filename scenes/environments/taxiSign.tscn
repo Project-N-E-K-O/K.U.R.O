@@ -10,7 +10,7 @@ shader_parameter/softness = 0.5
 shader_parameter/alpha = 0.4
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ns468"]
-size = Vector2(191, 58)
+size = Vector2(170, 128)
 
 [node name="TaxiSign" type="RigidBody2D"]
 z_index = 2
@@ -23,17 +23,18 @@ freeze_mode = 1
 [node name="Shadow" type="Sprite2D" parent="."]
 material = SubResource("ShaderMaterial_4unrl")
 position = Vector2(-3, 0)
-scale = Vector2(4, 1.5)
+scale = Vector2(3.5, 3.5)
 texture = ExtResource("2_qg1cb")
 offset = Vector2(0, 5)
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.33, 0.33)
 texture = ExtResource("1_58ifs")
-offset = Vector2(0, -300)
+offset = Vector2(0, -1000)
 
 [node name="StaticBody2D" type="StaticBody2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
 visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
-position = Vector2(-4.5, 10)
+position = Vector2(1, 2)
 shape = SubResource("RectangleShape2D_ns468")

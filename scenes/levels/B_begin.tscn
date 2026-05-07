@@ -194,6 +194,9 @@ region_rect = Rect2(0, 1, 4250, 854)
 position = Vector2(1309, -1530)
 texture = ExtResource("9_uv8cu")
 
+[node name="gate" parent="Environments" instance=ExtResource("13_d0c6g")]
+position = Vector2(-2788, -458)
+
 [node name="Window" type="Sprite2D" parent="Environments"]
 position = Vector2(29, -1530)
 texture = ExtResource("10_1tmm1")
@@ -218,9 +221,6 @@ script = ExtResource("13_hjjd7")
 TriggerAreaPath = NodePath("Area2D")
 TargetPath = NodePath(".")
 FadedAlpha = 0.6
-
-[node name="gate" parent="Environments/FrontWall/GateFrontWall" instance=ExtResource("13_d0c6g")]
-position = Vector2(0, -166)
 
 [node name="gatewall" type="Sprite2D" parent="Environments/FrontWall/GateFrontWall"]
 z_as_relative = false
