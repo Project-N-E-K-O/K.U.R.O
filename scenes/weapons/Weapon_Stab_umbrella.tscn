@@ -1,11 +1,12 @@
-[gd_scene load_steps=11 format=3 uid="uid://6ghjqyjkk37w"]
+[gd_scene load_steps=13 format=3 uid="uid://6ghjqyjkk37w"]
 
 [ext_resource type="Script" uid="uid://dtgdjgrqgype7" path="res://scripts/items/world/WorldItemEntity.cs" id="1_inoct"]
-[ext_resource type="Texture2D" uid="uid://cp3tj4mexoi30" path="res://assets/weapons/伞.png" id="1_kyvej"]
+[ext_resource type="Texture2D" uid="uid://cuysvmaku41f8" path="res://assets/weapons/伞.png" id="1_kyvej"]
 [ext_resource type="Resource" uid="uid://c01sltuo7404y" path="res://resources/items/Weapon_Stab_umbrella.tres" id="2_inoct"]
-[ext_resource type="Shader" uid="uid://rvlvejer46bm" path="res://shaders/materials/sprite_outline.gdshader" id="3_o27ch"]
+[ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="3_o27ch"]
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="3_u83q7"]
 [ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="4_0qmq6"]
+[ext_resource type="Shader" uid="uid://caxdo713k5kug" path="res://shaders/materials/sparkling.gdshader" id="7_0qmq6"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_m4rsl"]
 shader = ExtResource("3_u83q7")
@@ -19,6 +20,13 @@ shader_parameter/outline_size = 32.0
 shader_parameter/alpha_threshold = 0.56999998725936
 shader_parameter/edge_softness = 0.12
 shader_parameter/preserve_fill = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ap2ar"]
+shader = ExtResource("7_0qmq6")
+shader_parameter/highlight_width = 0.08
+shader_parameter/highlight_speed = 2.0
+shader_parameter/highlight_intensity = 1.2
+shader_parameter/highlight_interval = 1.00000002375
 
 [sub_resource type="RectangleShape2D" id="BodyShape_rr6vl"]
 size = Vector2(972, 208)
@@ -46,6 +54,7 @@ material = SubResource("ShaderMaterial_4lmql")
 texture = ExtResource("1_kyvej")
 
 [node name="Sprite2D" type="Sprite2D" parent="Outline"]
+material = SubResource("ShaderMaterial_ap2ar")
 texture = ExtResource("1_kyvej")
 
 [node name="CollisionArea" type="Area2D" parent="."]

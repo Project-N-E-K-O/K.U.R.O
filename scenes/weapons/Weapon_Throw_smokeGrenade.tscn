@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://cipwjj7xx121y"]
+[gd_scene load_steps=13 format=3 uid="uid://cipwjj7xx121y"]
 
 [ext_resource type="Script" uid="uid://dhfq2rrha0awm" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_26ux8"]
 [ext_resource type="Texture2D" uid="uid://n0ciynpx53jh" path="res://assets/weapons/镇暴烟雾弹.png" id="1_rp6mi"]
@@ -6,6 +6,7 @@
 [ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="2_7shqp"]
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="3_ai6mm"]
 [ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="4_26ux8"]
+[ext_resource type="Shader" uid="uid://caxdo713k5kug" path="res://shaders/materials/sparkling.gdshader" id="7_26ux8"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_idk0v"]
 shader = ExtResource("3_ai6mm")
@@ -19,6 +20,13 @@ shader_parameter/outline_size = 32.0
 shader_parameter/alpha_threshold = 0.5
 shader_parameter/edge_softness = 0.12
 shader_parameter/preserve_fill = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_w57jh"]
+shader = ExtResource("7_26ux8")
+shader_parameter/highlight_width = 0.08
+shader_parameter/highlight_speed = 2.0
+shader_parameter/highlight_intensity = 1.2
+shader_parameter/highlight_interval = 1.00000002375
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_rp6mi"]
 size = Vector2(181.00002, 106.000015)
@@ -64,6 +72,7 @@ texture = ExtResource("1_rp6mi")
 region_rect = Rect2(-50, -50, 750, 450)
 
 [node name="Sprite2D" type="Sprite2D" parent="RigidBody2D/Outline"]
+material = SubResource("ShaderMaterial_w57jh")
 texture = ExtResource("1_rp6mi")
 region_rect = Rect2(-50, -50, 750, 450)
 

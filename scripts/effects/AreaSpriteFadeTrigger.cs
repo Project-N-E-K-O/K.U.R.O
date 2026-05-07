@@ -12,7 +12,7 @@ namespace Kuros.Effects
     {
         [Export] public NodePath TriggerAreaPath { get; set; } = new("");
         [Export] public NodePath TargetPath { get; set; } = new("");
-        [Export] public string ActorGroupName { get; set; } = "player";
+        [Export] public string[] ActorGroupNames { get; set; } = { "player" };
         [Export(PropertyHint.Range, "0,1,0.01")] public float FadedAlpha { get; set; } = 0.35f;
         [Export(PropertyHint.Range, "0,2,0.01")] public float FadeDuration { get; set; } = 0.15f;
 
@@ -104,7 +104,19 @@ namespace Kuros.Effects
 
         private bool IsTargetBody(Node2D body)
         {
-            return body != null && (string.IsNullOrWhiteSpace(ActorGroupName) || body.IsInGroup(ActorGroupName));
+            if (body == null) return false;
+
+            // 没有配置任何group，所有body都触发
+            if (ActorGroupNames == null || ActorGroupNames.Length == 0) return true;
+
+            // 任意一个group匹配即触发
+            foreach (var group in ActorGroupNames)
+            {
+                if (!string.IsNullOrWhiteSpace(group) && body.IsInGroup(group))
+                    return true;
+            }
+
+            return false;
         }
 
         private void UpdateFadeState()

@@ -595,6 +595,10 @@ namespace Kuros.Actors.Enemies.Attacks
 		{
 			if (Enemy == null) return;
 			if (Enemy.IsDeathSequenceActive || Enemy.IsDead) return;
+			// Frozen / Hit / Dying 状态下不允许发起新攻击
+			var stateName = Enemy.StateMachine?.CurrentState?.Name;
+			if (stateName == "Frozen" || stateName == "CooldownFrozen"
+				|| stateName == "Hit" || stateName == "Dying" || stateName == "Dead") return;
             if (IsRunning || IsOnCooldown) return;
 			if (Enemy.AttackTimer > 0) return;
 			if (HasActiveGrab) return;
@@ -717,6 +721,21 @@ namespace Kuros.Actors.Enemies.Attacks
 		private bool IsEnemyAlive()
 		{
 			return Enemy != null && !Enemy.IsDeathSequenceActive && !Enemy.IsDead;
+		}
+
+		/// <summary>
+		/// 敌人是否处于可行动状态（未死亡、未冻结、未受击）。
+		/// 用于冲刺/抓取物理更新阶段的守卫判断。
+		/// </summary>
+		private bool IsEnemyActionable()
+		{
+			if (!IsEnemyAlive()) return false;
+			var stateName = Enemy?.StateMachine?.CurrentState?.Name;
+			return stateName != "Frozen"
+				&& stateName != "CooldownFrozen"
+				&& stateName != "Hit"
+				&& stateName != "Dying"
+				&& stateName != "Dead";
 		}
 
 		private void AbortActiveGrabDueToEnemyDeath()

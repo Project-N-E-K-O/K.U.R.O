@@ -10,9 +10,12 @@ namespace Kuros.Managers
 	{
 		public static GameSettingsManager Instance { get; private set; } = null!;
 
+		[Signal] public delegate void CrtEnabledChangedEventHandler(bool enabled);
+
 		private const string ConfigPath = "user://config/window_settings.cfg";
 		private const string WindowSection = "Window";
 		private const string PresetKey = "Preset";
+		private const string CrtKey = "CrtEnabled";
 
 		private readonly WindowPreset[] _presets =
 		{
@@ -23,9 +26,11 @@ namespace Kuros.Managers
 		};
 
 		private string _currentPresetId = "window_1080p";
+		private bool _crtEnabled = false;
 
 		public WindowPreset CurrentPreset => GetPresetById(_currentPresetId);
 		public WindowPreset[] Presets => _presets;
+		public bool CrtEnabled => _crtEnabled;
 
 		public override void _Ready()
 		{
@@ -95,6 +100,14 @@ namespace Kuros.Managers
 			}
 		}
 
+		public void SetCrtEnabled(bool value)
+		{
+			if (_crtEnabled == value) return;
+			_crtEnabled = value;
+			SaveSettings();
+			EmitSignal(SignalName.CrtEnabledChanged, _crtEnabled);
+		}
+
 		private WindowPreset GetDefaultPreset()
 		{
 			return _presets[0];
@@ -141,6 +154,7 @@ namespace Kuros.Managers
 			if (result == Error.Ok)
 			{
 				_currentPresetId = (string)config.GetValue(WindowSection, PresetKey, _currentPresetId);
+				_crtEnabled = (bool)config.GetValue(WindowSection, CrtKey, false);
 			}
 			else
 			{
@@ -153,6 +167,7 @@ namespace Kuros.Managers
 		{
 			var config = new ConfigFile();
 			config.SetValue(WindowSection, PresetKey, _currentPresetId);
+			config.SetValue(WindowSection, CrtKey, _crtEnabled);
 
 			var err = config.Save(ConfigPath);
 			if (err != Error.Ok)

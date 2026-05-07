@@ -68,6 +68,7 @@ namespace Kuros.Effects
             // 线性减速的总位移 = v0 * T / 2，故初速度需乘以 2 才能达到目标距离
             float speed = 2f * KnockbackDistance / Mathf.Max(KnockbackDuration, 0.01f);
             KnockbackDriver.Attach(targetBody, direction.Normalized(), speed, KnockbackDuration);
+            GD.PrintS("击退效果生效：", target.Name, " was knocked back with speed ", speed);
         }
 
         // ─── 内部驱动节点：每物理帧用 MoveAndCollide 推动目标，保证碰撞检测 ───

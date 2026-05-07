@@ -263,6 +263,4 @@ path_max_distance = 500.0
 avoidance_enabled = true
 radius = 100.0
 max_speed = 300.0
-debug_enabled = true
-debug_use_custom = true
 debug_path_custom_line_width = 2.0

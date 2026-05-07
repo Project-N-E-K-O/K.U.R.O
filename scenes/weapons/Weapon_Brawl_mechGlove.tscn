@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://ctpw5uqly3yu5"]
+[gd_scene load_steps=13 format=3 uid="uid://ctpw5uqly3yu5"]
 
 [ext_resource type="Script" uid="uid://dtgdjgrqgype7" path="res://scripts/items/world/WorldItemEntity.cs" id="1_f06cv"]
 [ext_resource type="Resource" uid="uid://dsmyr3iwkk7n5" path="res://resources/items/Weapon_Brawl_MechGlove.tres" id="2_f06cv"]
@@ -6,6 +6,7 @@
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="3_f1ntn"]
 [ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="4_5you7"]
 [ext_resource type="Texture2D" uid="uid://cvlce2kc8uucx" path="res://assets/weapons/机械冲撞臂.png" id="4_f06cv"]
+[ext_resource type="Shader" uid="uid://caxdo713k5kug" path="res://shaders/materials/sparkling.gdshader" id="7_f1ntn"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_wh64k"]
 shader = ExtResource("3_f1ntn")
@@ -19,6 +20,13 @@ shader_parameter/outline_size = 32.0
 shader_parameter/alpha_threshold = 0.5
 shader_parameter/edge_softness = 0.12
 shader_parameter/preserve_fill = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_5you7"]
+shader = ExtResource("7_f1ntn")
+shader_parameter/highlight_width = 0.08
+shader_parameter/highlight_speed = 2.0
+shader_parameter/highlight_intensity = 1.2
+shader_parameter/highlight_interval = 1.00000002375
 
 [sub_resource type="RectangleShape2D" id="BodyShape_rr6vl"]
 size = Vector2(1127.2727, 806.06067)
@@ -47,6 +55,7 @@ texture = ExtResource("4_f06cv")
 region_rect = Rect2(-13, -11, 156, 151)
 
 [node name="Sprite2D" type="Sprite2D" parent="Outline"]
+material = SubResource("ShaderMaterial_5you7")
 texture = ExtResource("4_f06cv")
 region_rect = Rect2(0, 64, 776, 344)
 

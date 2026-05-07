@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://csjvahh6hev8k"]
+[gd_scene load_steps=13 format=3 uid="uid://csjvahh6hev8k"]
 
 [ext_resource type="Script" uid="uid://dtgdjgrqgype7" path="res://scripts/items/world/WorldItemEntity.cs" id="1_hnhuv"]
 [ext_resource type="Resource" uid="uid://bfijfbb5m32i6" path="res://resources/items/Weapon_Slash_ExpandBaton.tres" id="2_hnhuv"]
@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="4_djioy"]
 [ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="5_6dn8i"]
 [ext_resource type="Texture2D" uid="uid://cedvgcxm5d1ef" path="res://assets/weapons/甩棍.png" id="6_hnhuv"]
+[ext_resource type="Shader" uid="uid://caxdo713k5kug" path="res://shaders/materials/sparkling.gdshader" id="7_32rtd"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_nqlfu"]
 shader = ExtResource("3_o1fls")
@@ -19,6 +20,13 @@ shader_parameter/outline_size = 32.0
 shader_parameter/alpha_threshold = 0.5
 shader_parameter/edge_softness = 0.12
 shader_parameter/preserve_fill = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_o1fls"]
+shader = ExtResource("7_32rtd")
+shader_parameter/highlight_width = 0.08
+shader_parameter/highlight_speed = 2.0
+shader_parameter/highlight_intensity = 1.2
+shader_parameter/highlight_interval = 1.00000002375
 
 [sub_resource type="RectangleShape2D" id="BodyShape_rr6vl"]
 size = Vector2(1303.0304, 309.09094)
@@ -46,6 +54,7 @@ material = SubResource("ShaderMaterial_waoek")
 texture = ExtResource("6_hnhuv")
 
 [node name="Sprite2D" type="Sprite2D" parent="Outline"]
+material = SubResource("ShaderMaterial_o1fls")
 texture = ExtResource("6_hnhuv")
 
 [node name="CollisionArea" type="Area2D" parent="."]

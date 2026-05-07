@@ -1,0 +1,39 @@
+[gd_scene load_steps=6 format=3 uid="uid://cgy13s0ewifos"]
+
+[ext_resource type="Texture2D" uid="uid://pmhcu661yxfl" path="res://assets/furnitures/hotel_scene2/TaxiSign.png" id="1_58ifs"]
+[ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="1_ns468"]
+[ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="2_qg1cb"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_4unrl"]
+shader = ExtResource("1_ns468")
+shader_parameter/softness = 0.5
+shader_parameter/alpha = 0.4
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ns468"]
+size = Vector2(191, 58)
+
+[node name="TaxiSign" type="RigidBody2D"]
+z_index = 2
+y_sort_enabled = true
+gravity_scale = 0.0
+can_sleep = false
+freeze = true
+freeze_mode = 1
+
+[node name="Shadow" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_4unrl")
+position = Vector2(-3, 0)
+scale = Vector2(4, 1.5)
+texture = ExtResource("2_qg1cb")
+offset = Vector2(0, 5)
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_58ifs")
+offset = Vector2(0, -300)
+
+[node name="StaticBody2D" type="StaticBody2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
+visible = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(-4.5, 10)
+shape = SubResource("RectangleShape2D_ns468")

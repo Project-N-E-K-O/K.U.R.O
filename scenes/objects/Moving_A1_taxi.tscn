@@ -1,10 +1,12 @@
-[gd_scene load_steps=31 format=3 uid="uid://chway4etqkroy"]
+[gd_scene load_steps=35 format=3 uid="uid://chway4etqkroy"]
 
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="1_d7g0g"]
 [ext_resource type="Texture2D" uid="uid://038kjb47rgc5" path="res://assets/objects/taxi/时间轴1_0000.png" id="1_l4djn"]
+[ext_resource type="Script" uid="uid://dryx2p6xtxsn" path="res://scripts/objects/TaxiController.cs" id="1_taxictrl"]
 [ext_resource type="Texture2D" uid="uid://cfmqwo6h7h3sj" path="res://assets/objects/taxi/时间轴1_0001.png" id="2_rqshq"]
 [ext_resource type="Texture2D" uid="uid://og2gq2qj138m" path="res://assets/objects/taxi/时间轴1_0002.png" id="3_d7g0g"]
 [ext_resource type="Texture2D" uid="uid://rurwkln2flnh" path="res://assets/objects/taxi/时间轴1_0003.png" id="4_3td21"]
+[ext_resource type="Shader" uid="uid://vc0qhwc6jx88" path="res://shaders/fx/ground_wash_ripple.gdshader" id="4_lkpan"]
 [ext_resource type="Texture2D" uid="uid://6x2atph4ejri" path="res://assets/objects/taxi/时间轴1_0004.png" id="5_lkpan"]
 [ext_resource type="Texture2D" uid="uid://cwammw7bvbcky" path="res://assets/objects/taxi/时间轴1_0005.png" id="6_faxbq"]
 [ext_resource type="Texture2D" uid="uid://cywsxkgjddg4q" path="res://assets/objects/taxi/时间轴1_0006.png" id="7_lp1pl"]
@@ -30,6 +32,17 @@
 shader = ExtResource("1_d7g0g")
 shader_parameter/softness = 0.5
 shader_parameter/alpha = 0.4
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_lkpan"]
+shader = ExtResource("4_lkpan")
+shader_parameter/speed = 0.80000003474012
+shader_parameter/ring_count = 2
+shader_parameter/ring_width = 0.07500000321324
+shader_parameter/max_radius = 0.46
+shader_parameter/inner_dead = 0.06
+shader_parameter/ring_color = Color(0.57996243, 0.57996243, 0.57996243, 0.60784316)
+shader_parameter/intensity = 1.0
+shader_parameter/aspect_y = 0.75000003236512
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_l4djn"]
 animations = [{
@@ -164,19 +177,44 @@ tracks/3/keys = {
 tracks/4/type = "value"
 tracks/4/imported = false
 tracks/4/enabled = true
-tracks/4/path = NodePath("AnimatedSprite2D:skew")
+tracks/4/path = NodePath("GroundWash:visible")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("GroundWash:position")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [0.0]
+"values": [Vector2(0, 0)]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("GroundWash:scale")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
 }
 
-[sub_resource type="Animation" id="Animation_rqshq"]
-resource_name = "taxi_intro"
-length = 5.0
+[sub_resource type="Animation" id="Animation_3td21"]
+resource_name = "taxi_idle"
+length = 2.0
+loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -184,10 +222,26 @@ tracks/0/path = NodePath("AnimatedSprite2D:scale")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 2, 3.5, 5),
-"transitions": PackedFloat32Array(1, 1, 1, 1),
+"times": PackedFloat32Array(0, 0.5, 1, 1.5, 2),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
 "update": 0,
-"values": [Vector2(1, 1), Vector2(0.66, 0.66), Vector2(0.66, 0.66), Vector2(0.33, 0.33)]
+"values": [Vector2(0.45, 0.45), Vector2(0.445, 0.445), Vector2(0.45, 0.45), Vector2(0.445, 0.445), Vector2(0.45, 0.45)]
+}
+
+[sub_resource type="Animation" id="Animation_rqshq"]
+resource_name = "taxi_intro"
+length = 6.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite2D:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 2, 2.3, 2.6, 2.8333333, 3, 6),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(1, 1), Vector2(0.66, 0.66), Vector2(0.65, 0.65), Vector2(0.664, 0.664), Vector2(0.658, 0.658), Vector2(0.66, 0.66), Vector2(0.45, 0.45)]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -196,10 +250,10 @@ tracks/1/path = NodePath("AnimatedSprite2D:position")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0, 2),
-"transitions": PackedFloat32Array(1, 1),
+"times": PackedFloat32Array(0, 2, 2.3, 2.6, 2.8333333, 3),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
 "update": 0,
-"values": [Vector2(0, 0), Vector2(0, 1500)]
+"values": [Vector2(0, 0), Vector2(0, 1500), Vector2(0, 1520), Vector2(0, 1490), Vector2(0, 1505), Vector2(0, 1500)]
 }
 tracks/2/type = "value"
 tracks/2/imported = false
@@ -208,7 +262,7 @@ tracks/2/path = NodePath("Shadow:position")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
-"times": PackedFloat32Array(0, 2, 3.5, 5),
+"times": PackedFloat32Array(0, 2, 3, 6),
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 0,
 "values": [Vector2(0, 800), Vector2(0, 1600), Vector2(0, 1600), Vector2(0, 1500)]
@@ -220,7 +274,7 @@ tracks/3/path = NodePath("Shadow:scale")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
-"times": PackedFloat32Array(0, 2, 5),
+"times": PackedFloat32Array(0, 2, 6),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
 "values": [Vector2(0.2, 0.2), Vector2(0.22, 0.22), Vector2(0.22, 0.22)]
@@ -228,30 +282,66 @@ tracks/3/keys = {
 tracks/4/type = "value"
 tracks/4/imported = false
 tracks/4/enabled = true
-tracks/4/path = NodePath("AnimatedSprite2D:skew")
+tracks/4/path = NodePath("GroundWash:visible")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
-"times": PackedFloat32Array(0, 1.95, 2, 2.05, 2.1),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"times": PackedFloat32Array(0, 2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [false, true]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("GroundWash:position")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0, 2),
+"transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [0.0, 0.0, 0.01745329251994329, -0.01745329251994329, 0.0]
+"values": [Vector2(0, 0), Vector2(0, 1500)]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("GroundWash:scale")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0, 2, 6),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(0.1, 0.1), Vector2(0.1, 0.1), Vector2(1.3, 1.3)]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_3td21"]
 _data = {
 &"RESET": SubResource("Animation_d7g0g"),
+&"taxi_idle": SubResource("Animation_3td21"),
 &"taxi_intro": SubResource("Animation_rqshq")
 }
 
 [node name="Taxi" type="CharacterBody2D"]
-z_index = 2
+z_index = 10
+script = ExtResource("1_taxictrl")
 
 [node name="Shadow" type="Sprite2D" parent="."]
 material = SubResource("ShaderMaterial_3td21")
 position = Vector2(0, 1000)
 scale = Vector2(0.5, 0.5)
 texture = ExtResource("1_l4djn")
+
+[node name="GroundWash" type="Node2D" parent="."]
+
+[node name="WashRect" type="ColorRect" parent="GroundWash"]
+material = SubResource("ShaderMaterial_lkpan")
+custom_minimum_size = Vector2(2000, 2000)
+offset_left = -1000.0
+offset_top = -1000.0
+offset_right = 1000.0
+offset_bottom = 1000.0
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_l4djn")

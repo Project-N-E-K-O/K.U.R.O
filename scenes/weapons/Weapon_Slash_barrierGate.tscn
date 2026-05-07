@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://2pny8f8vuu3j"]
+[gd_scene load_steps=13 format=3 uid="uid://2pny8f8vuu3j"]
 
 [ext_resource type="Script" uid="uid://dtgdjgrqgype7" path="res://scripts/items/world/WorldItemEntity.cs" id="1_64hvb"]
 [ext_resource type="Resource" uid="uid://b1jpt8qriaub8" path="res://resources/items/Weapon_Slash_BarrierGate.tres" id="2_64hvb"]
@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://dgvv4023kntq7" path="res://assets/weapons/闸门刀.png" id="3_64hvb"]
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="3_aybeu"]
 [ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="4_ofv0e"]
+[ext_resource type="Shader" uid="uid://caxdo713k5kug" path="res://shaders/materials/sparkling.gdshader" id="7_ofv0e"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_nqlfu"]
 shader = ExtResource("3_aybeu")
@@ -19,6 +20,13 @@ shader_parameter/outline_size = 32.0
 shader_parameter/alpha_threshold = 0.5
 shader_parameter/edge_softness = 0.12
 shader_parameter/preserve_fill = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_lo6ct"]
+shader = ExtResource("7_ofv0e")
+shader_parameter/highlight_width = 0.08
+shader_parameter/highlight_speed = 2.0
+shader_parameter/highlight_intensity = 1.2
+shader_parameter/highlight_interval = 1.00000002375
 
 [sub_resource type="RectangleShape2D" id="BodyShape_rr6vl"]
 size = Vector2(3606.0605, 388.96973)
@@ -48,6 +56,7 @@ texture = ExtResource("3_64hvb")
 region_rect = Rect2(0, 424, 1832, 177)
 
 [node name="Sprite2D" type="Sprite2D" parent="Outline"]
+material = SubResource("ShaderMaterial_lo6ct")
 texture = ExtResource("3_64hvb")
 
 [node name="CollisionArea" type="Area2D" parent="."]
