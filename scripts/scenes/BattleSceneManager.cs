@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using Kuros.Actors.Heroes;
 using Kuros.Core;
 using Kuros.Items;
 using Kuros.Managers;
@@ -96,11 +97,14 @@ namespace Kuros.Scenes
 				}
 			}
 
-			// 应用加载的游戏数据（如果有）
+			// 应用加载的游戏数据（HP 等基础属性）
 			ApplyLoadedGameData();
 
-			// 加载UI
+			// 加载UI（LoadHUD 内部会调用 SetQuickBar，QuickBar 此后才可用）
 			LoadUIs();
+
+			// 背包还原推迟到下一帧执行，确保 HUD._Ready 已完成，不会错过 NotifyHealthChanged 信号
+			CallDeferred(MethodName.RestoreInventoryTransit);
 
 			// 显示关卡名称弹窗
 			if (AutoShowLevelName)
@@ -126,6 +130,28 @@ namespace Kuros.Scenes
 			{
 				LoadSkillWindow();
 			}
+		}
+
+		/// <summary>
+		/// 还原场景切换时的背包过渡快照（必须在 LoadUIs 之后调用，QuickBar 此时才已设置）
+		/// </summary>
+		private void RestoreInventoryTransit()
+		{
+			if (SaveManager.Instance?.PendingInventoryTransit == null) return;
+			if (Player is not SamplePlayer sp) return;
+
+			var inv = sp.InventoryComponent ?? sp.GetNodeOrNull<PlayerInventoryComponent>("Inventory");
+			if (inv == null) return;
+
+			var transit = SaveManager.Instance.PendingInventoryTransit;
+			transit.RestoreTo(inv);
+
+			// 如果过渡数据中保存了 HP，也一并恢复
+			if (transit.CurrentHealth > 0)
+				sp.RestoreHealth(transit.CurrentHealth, transit.MaxHealth > 0 ? transit.MaxHealth : sp.MaxHealth);
+
+			SaveManager.Instance.PendingInventoryTransit = null;
+			GameLogger.Info(nameof(BattleSceneManager), "已从过渡快照还原背包与血量。");
 		}
 
 		/// <summary>

@@ -206,6 +206,34 @@ namespace Kuros.Managers
             TargetCamera.LimitBottom = zone.LimitBottom;
         }
 
+        // ─── 缩放 ──────────────────────────────────────────────────────────────
+
+        private Tween? _zoomTween;
+
+        /// <summary>
+        /// 平滑过渡相机 Zoom。<br/>
+        /// <paramref name="zoom"/> 为目标缩放值（X/Y 相同）。<br/>
+        /// <paramref name="duration"/> 为过渡时长（秒），0 表示立即生效。
+        /// </summary>
+        public void SetZoom(float zoom, float duration = 0.25f)
+        {
+            if (TargetCamera == null) return;
+
+            _zoomTween?.Kill();
+
+            var target = new Vector2(zoom, zoom);
+            if (duration <= 0f)
+            {
+                TargetCamera.Zoom = target;
+                return;
+            }
+
+            _zoomTween = TargetCamera.CreateTween();
+            _zoomTween.TweenProperty(TargetCamera, "zoom", target, duration)
+                      .SetTrans(Tween.TransitionType.Sine)
+                      .SetEase(Tween.EaseType.InOut);
+        }
+
         // ─── 调试 ──────────────────────────────────────────────────────────────
 
         public string GetDebugInfo()

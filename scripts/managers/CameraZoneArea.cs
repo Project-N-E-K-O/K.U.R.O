@@ -29,6 +29,12 @@ namespace Kuros.Managers
         /// <summary>相机下限（世界 Y 坐标）。</summary>
         [Export] public int CameraLimitBottom { get; set; } = 1500;
 
+        /// <summary>进入此区域时相机的目标 Zoom（X/Y 相同）。</summary>
+        [Export(PropertyHint.Range, "0.1,2.0,0.01")] public float ZoomLevel { get; set; } = 0.43f;
+
+        /// <summary>离开此区域时恢复的默认 Zoom。</summary>
+        [Export(PropertyHint.Range, "0.1,2.0,0.01")] public float DefaultZoom { get; set; } = 0.43f;
+
         private CameraZoneManager? _cameraZoneManager;
         private bool _playerInside = false;
 
@@ -58,6 +64,7 @@ namespace Kuros.Managers
 
             var bounds = ComputeWorldBounds();
             mgr.EnterZone(ZoneName, bounds);
+            mgr.SetZoom(ZoomLevel);
         }
 
         private void OnAreaExited(Area2D area)
@@ -83,7 +90,9 @@ namespace Kuros.Managers
             if (!_playerInside) return;
             _playerInside = false;
             var mgr = GetOrFindManager();
-            mgr?.ExitZone(ZoneName);
+            if (mgr == null) return;
+            mgr.ExitZone(ZoneName);
+            mgr.SetZoom(DefaultZoom);
         }
 
         // ─── 内部工具 ──────────────────────────────────────────────────────

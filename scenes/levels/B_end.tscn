@@ -1,9 +1,11 @@
-[gd_scene load_steps=32 format=3 uid="uid://bco3niswcahcc"]
+[gd_scene load_steps=34 format=3 uid="uid://bco3niswcahcc"]
 
-[ext_resource type="Texture2D" uid="uid://bldctlu6nwf6g" path="res://assets/environments/scene_2_hotel/地板.png" id="1_fjfxm"]
+[ext_resource type="Script" uid="uid://cra7y7mt0x1j8" path="res://scripts/managers/CameraZoneArea.cs" id="1_b2kum"]
+[ext_resource type="Texture2D" uid="uid://behye8vdgemoq" path="res://assets/environments/scene_2_hotel/地板.png" id="1_fjfxm"]
 [ext_resource type="Texture2D" uid="uid://dw2alagwosewh" path="res://assets/environments/scene_2_hotel/地毯.png" id="2_qtmhi"]
 [ext_resource type="Texture2D" uid="uid://k45cthgn2dgq" path="res://assets/environments/scene_2_hotel/墙面.png" id="3_le30p"]
-[ext_resource type="Script" uid="uid://bo4c1bqdtxwd7" path="res://scripts/managers/BattleArena.cs" id="3_rvxy7"]
+[ext_resource type="Script" uid="uid://dmqu7phxi8gbi" path="res://scripts/managers/BattleArena.cs" id="3_rvxy7"]
+[ext_resource type="PackedScene" uid="uid://v3n56xk6n8ca" path="res://scenes/loading/Loading_elevator.tscn" id="5_6oh11"]
 [ext_resource type="Script" uid="uid://b3iq6dm2pc5y0" path="res://scripts/controllers/EnemySpawnManager.cs" id="5_le30p"]
 [ext_resource type="Texture2D" uid="uid://dtmefhuw7vvci" path="res://assets/environments/scene_2_hotel/酒吧吧台.png" id="6_le30p"]
 [ext_resource type="PackedScene" uid="uid://wqcdwpyo1nji" path="res://scenes/actors/enemies/Enemy_B1_thin.tscn" id="6_qcu5f"]
@@ -25,8 +27,8 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_oqqdb"]
 size = Vector2(5610, 3050)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_cam_bend"]
-size = Vector2(5610, 3050)
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_oh5lj"]
+size = Vector2(1950, 1200)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jopov"]
 size = Vector2(5500, 3050)
@@ -46,8 +48,8 @@ size = Vector2(700, 1500)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_rvxy7"]
 size = Vector2(700, 700)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_qjxmc"]
-size = Vector2(700, 2000)
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_b2kum"]
+size = Vector2(300, 200)
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_rvxy7"]
 vertices = PackedVector2Array(127, 1105, -1441.5, 818, -464.5, 809, 168.5, 809, 391, 1105, 391, 1307, 1673, 1171.5, 2248, 1171.5, 2724.039, 1520.0078, 2726.9531, -1501.0313, 2476, 513, 2476, 309, -464.5, -72, -600, 594, -600, 107, 2248, 790, 2175, 513, 1673, 790, -1327, 594, -1441.5, -63, -1327, 107, 1868, -273, 1868, -561, 2215, -360.5, 2215, 309, 2175, 309, 391, -517, 391, -719, 594, -561, 594, -273, 1397, -83, 168.5, -72, 969, -83, 2433, 309, 2433, -360.5, -1859, -517, -1859, -719, 127, -719, 127, -517, -1581, -386, 622, -273, 622, -92, 969, -92, 1397, -273, 1404, -273, 1404, -92, 1832, -92, 1832, -273, -1581, -63, -1985, -386, -1985, -351, -2225, -351, -2123, -517, -2225, -147, -1985, -147, -1985, -63, -2074.5, -63, -2074.5, 818, -1985, 818, -1985, 1105, -2123, 1105, -1859, 1307, -1859, 1168, -1581, 1168, 127, 1307, -1581, 818, -2801.039, -1504.9609, -2803.9531, 1521.9766, -2123, -719, -2123, 1307)
@@ -69,12 +71,18 @@ shape = SubResource("RectangleShape2D_oqqdb")
 debug_color = Color(0.6428762, 0.52304673, 0.06685588, 0.41960785)
 
 [node name="CameraZone" type="Area2D" parent="."]
+z_index = 10
+position = Vector2(3939, 362)
 collision_layer = 0
 collision_mask = 4
+script = ExtResource("1_b2kum")
+ZoneName = "Room_Zone_B_end"
+CameraLimitTop = -500
+CameraLimitBottom = 900
+ZoomLevel = 0.95
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CameraZone"]
-position = Vector2(9.5, 0)
-shape = SubResource("RectangleShape2D_cam_bend")
+shape = SubResource("RectangleShape2D_oh5lj")
 
 [node name="BattleArena" type="Area2D" parent="."]
 visible = false
@@ -119,6 +127,11 @@ collision_mask = 4
 shape = SubResource("RectangleShape2D_oox7u")
 debug_color = Color(1, 0, 0, 0.19607843)
 
+[node name="LoadingElevator" parent="." instance=ExtResource("5_6oh11")]
+position = Vector2(3939, 340)
+MinRideDuration = 10.0
+NextStagePath = "uid://qd5abd4opeob"
+
 [node name="Environments" type="Node2D" parent="."]
 position = Vector2(0, 340)
 
@@ -136,7 +149,7 @@ position = Vector2(0, -1530)
 texture = ExtResource("3_le30p")
 
 [node name="ElevatorGate" parent="Environments" instance=ExtResource("9_6oh11")]
-position = Vector2(2632, 197)
+position = Vector2(2609, 197)
 BattleArenaPath = NodePath("../../BattleArena")
 
 [node name="Bar" type="Sprite2D" parent="Environments"]
@@ -144,7 +157,6 @@ position = Vector2(1100, -1510)
 texture = ExtResource("6_le30p")
 
 [node name="AirWall" type="StaticBody2D" parent="."]
-visible = false
 z_index = 1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AirWall"]
@@ -168,8 +180,9 @@ shape = SubResource("RectangleShape2D_rvxy7")
 debug_color = Color(0, 0, 0, 0.19607843)
 
 [node name="CollisionShape2D5" type="CollisionShape2D" parent="AirWall"]
-position = Vector2(3300, 500)
-shape = SubResource("RectangleShape2D_qjxmc")
+position = Vector2(2965, 602.00006)
+rotation = 0.56548667
+shape = SubResource("RectangleShape2D_b2kum")
 debug_color = Color(0, 0, 0, 0.19607843)
 
 [node name="NavigationRegion2D" type="NavigationRegion2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
@@ -198,10 +211,10 @@ position = Vector2(255, 1175)
 position = Vector2(-1481, -272)
 
 [node name="FurnitureGarbageCanA2" parent="." instance=ExtResource("12_vrh0j")]
-position = Vector2(2402, 356)
+position = Vector2(2393, 356)
 
 [node name="FurnitureCautionTape_fwd" parent="." instance=ExtResource("13_6oh11")]
-position = Vector2(2429, -136)
+position = Vector2(2420, -136)
 
 [node name="FurnitureCounterA" parent="." instance=ExtResource("14_b2kum")]
 position = Vector2(1244, -501)

@@ -641,6 +641,10 @@ namespace Kuros.UI
 				// 使用 C# 事件驱动血量/分数更新，避免仅依赖未触发的 Godot 信号。
 				samplePlayer.StatsUpdated -= OnPlayerStatsUpdated;
 				samplePlayer.StatsUpdated += OnPlayerStatsUpdated;
+
+				// 订阅底层 HealthChanged（RestoreHealth 只触发此事件，不触发 StatsUpdated）
+				samplePlayer.HealthChanged -= OnHealthChanged;
+				samplePlayer.HealthChanged += OnHealthChanged;
 				
 				// 连接玩家状态变化信号
 				if (!samplePlayer.IsConnected(SamplePlayer.SignalName.StatsChanged, new Callable(this, MethodName.OnPlayerStatsChanged)))
@@ -673,6 +677,7 @@ namespace Kuros.UI
 			if (player is SamplePlayer samplePlayer)
 			{
 				samplePlayer.StatsUpdated -= OnPlayerStatsUpdated;
+				samplePlayer.HealthChanged -= OnHealthChanged;
 
 				if (samplePlayer.IsConnected(SamplePlayer.SignalName.StatsChanged, new Callable(this, MethodName.OnPlayerStatsChanged)))
 				{
@@ -790,6 +795,14 @@ namespace Kuros.UI
 		private void OnPlayerStatsUpdated(int health, int maxHealth, int score)
 		{
 			UpdateStats(health, maxHealth, score);
+		}
+
+		/// <summary>
+		/// 处理 GameActor.HealthChanged（RestoreHealth 只触发此事件）
+		/// </summary>
+		private void OnHealthChanged(int health, int maxHealth)
+		{
+			UpdateStats(health, maxHealth, _score);
 		}
 		
 		private void OnPlayerGoldChanged(int gold)
