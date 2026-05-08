@@ -5,6 +5,8 @@
 [node name="CrtOverlay" type="CanvasLayer"]
 layer = 127
 script = ExtResource("1_crtovl")
+ScanlinesOpacity = 0.0
+ScanlinesWidth = 0.0
 GrilleOpacity = 0.1
 Pixelate = true
 Roll = true

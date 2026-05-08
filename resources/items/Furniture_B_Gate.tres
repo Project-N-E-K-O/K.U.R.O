@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://bi7guxtti6ocl" path="res://resources/effects/HeavyCarrySlowEffect.tscn" id="3_8obib"]
 [ext_resource type="PackedScene" uid="uid://ciwlpetibguab" path="res://shaders/destroy_somke.tscn" id="4_q3w86"]
 [ext_resource type="PackedScene" uid="uid://cmh3bnabinwi0" path="res://resources/effects/CameraShakeEffect.tscn" id="5_8rmnk"]
-[ext_resource type="Texture2D" uid="uid://csr8w1j7uq8x0" path="res://assets/environments/scene_2_hotel/破损的酒店大门口.png" id="6_2wk6w"]
+[ext_resource type="Texture2D" uid="uid://cmkskjonm6883" path="res://assets/environments/scene_2_hotel/破损的酒店大门口_侧.png" id="6_2wk6w"]
 [ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="7_m18ws"]
 
 [sub_resource type="Resource" id="Resource_48rr8"]

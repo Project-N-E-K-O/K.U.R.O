@@ -1,0 +1,138 @@
+[gd_scene load_steps=9 format=3 uid="uid://v3n56xk6n8ca"]
+
+[ext_resource type="Texture2D" uid="uid://tm160ewu2yyj" path="res://assets/environments/scene_loading_elevator/ElevatorBackground.png" id="1_1e411"]
+[ext_resource type="Texture2D" uid="uid://bd81ty7uf16q3" path="res://assets/environments/scene_loading_elevator/Elevator.png" id="2_1rckx"]
+
+[sub_resource type="Animation" id="Animation_1e411"]
+resource_name = "loading"
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Environments/ElevatorBackground:position:y")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 260.0]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Environments/ElevatorBackground2:position:y")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 260.0]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Environments/ElevatorBackground3:position:y")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 260.0]
+}
+
+[sub_resource type="Animation" id="Animation_1rckx"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Environments/ElevatorBackground2:position:y")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0.0]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Environments/ElevatorBackground:position:y")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0.0]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Environments/ElevatorBackground3:position:y")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0.0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_5rppg"]
+_data = {
+&"RESET": SubResource("Animation_1rckx"),
+&"loading": SubResource("Animation_1e411")
+}
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1e411"]
+size = Vector2(1500, 200)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1rckx"]
+size = Vector2(200, 1000)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_5rppg"]
+size = Vector2(200, 1000)
+
+[node name="LoadingElevator" type="Node2D"]
+
+[node name="Environments" type="Node2D" parent="."]
+
+[node name="ElevatorBackground" type="Sprite2D" parent="Environments"]
+position = Vector2(999, 0)
+texture = ExtResource("1_1e411")
+
+[node name="ElevatorBackground2" type="Sprite2D" parent="Environments"]
+texture = ExtResource("1_1e411")
+
+[node name="ElevatorBackground3" type="Sprite2D" parent="Environments"]
+position = Vector2(-999, 0)
+texture = ExtResource("1_1e411")
+
+[node name="Elevator" type="Sprite2D" parent="Environments"]
+position = Vector2(-20, 0)
+texture = ExtResource("2_1rckx")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_5rppg")
+}
+autoplay = "loading"
+
+[node name="AirWall" type="StaticBody2D" parent="."]
+visible = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AirWall"]
+position = Vector2(0, 465)
+shape = SubResource("RectangleShape2D_1e411")
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="AirWall"]
+position = Vector2(-650, 0)
+shape = SubResource("RectangleShape2D_1rckx")
+
+[node name="CollisionShape2D3" type="CollisionShape2D" parent="AirWall"]
+position = Vector2(650, 0)
+shape = SubResource("RectangleShape2D_5rppg")
