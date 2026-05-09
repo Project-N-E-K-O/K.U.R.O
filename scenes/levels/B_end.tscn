@@ -130,7 +130,7 @@ debug_color = Color(1, 0, 0, 0.19607843)
 [node name="LoadingElevator" parent="." instance=ExtResource("5_6oh11")]
 position = Vector2(3939, 340)
 MinRideDuration = 10.0
-NextStagePath = "uid://qd5abd4opeob"
+NextStagePath = "uid://dwk6x3qcbsmul"
 
 [node name="Environments" type="Node2D" parent="."]
 position = Vector2(0, 340)

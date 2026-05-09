@@ -1,0 +1,49 @@
+[gd_scene load_steps=7 format=3 uid="uid://df51wgv346jhn"]
+
+[ext_resource type="Texture2D" uid="uid://c35fnrp1a4jbf" path="res://assets/environments/scene_2_hotel/电梯内饰.png" id="2_deymr"]
+[ext_resource type="Texture2D" uid="uid://fjtsintqy2q3" path="res://assets/environments/scene_2_hotel/电梯墙后2.png" id="3_mhhvk"]
+[ext_resource type="Texture2D" uid="uid://pan0auvatm1f" path="res://assets/environments/scene_2_hotel/电梯墙前.png" id="4_eel3d"]
+[ext_resource type="Texture2D" uid="uid://de4c2xajty0y2" path="res://assets/environments/scene_2_hotel/电梯门右.png" id="5_e5gk6"]
+[ext_resource type="Texture2D" uid="uid://bdmohs76ihvrd" path="res://assets/environments/scene_2_hotel/电梯门左.png" id="6_v42t1"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_4jbtd"]
+size = Vector2(200, 700)
+
+[node name="ElevatorGate" type="RigidBody2D"]
+gravity_scale = 0.0
+can_sleep = false
+freeze = true
+freeze_mode = 1
+
+[node name="Elevatorwall" type="Sprite2D" parent="."]
+position = Vector2(126, 47)
+texture = ExtResource("2_deymr")
+flip_h = true
+
+[node name="Elevatorwall2" type="Sprite2D" parent="."]
+z_index = 1
+position = Vector2(0, -405)
+texture = ExtResource("3_mhhvk")
+flip_h = true
+
+[node name="ElevatorFrontWall" type="Sprite2D" parent="."]
+z_index = 3
+position = Vector2(0, -411)
+texture = ExtResource("4_eel3d")
+flip_h = true
+region_rect = Rect2(0, 0, 352, 1612)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(201, 0)
+shape = SubResource("RectangleShape2D_4jbtd")
+disabled = true
+
+[node name="right" type="Sprite2D" parent="."]
+position = Vector2(193.5, 19.5)
+texture = ExtResource("5_e5gk6")
+flip_h = true
+
+[node name="left" type="Sprite2D" parent="."]
+position = Vector2(193.5, 19.5)
+texture = ExtResource("6_v42t1")
+flip_h = true

@@ -463,8 +463,7 @@ position = Vector2(0, 327)
 shape = SubResource("RectangleShape2D_h28jp")
 
 [node name="ExitArea" type="Area2D" parent="."]
-visible = false
-position = Vector2(-999, 382)
+position = Vector2(-1267, 382)
 collision_mask = 4
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="ExitArea"]
