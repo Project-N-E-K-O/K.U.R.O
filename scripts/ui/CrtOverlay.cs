@@ -40,8 +40,8 @@ namespace Kuros.UI
 
         // ── 变形 / 晕影 ───────────────────────────────────────────────────
         [ExportCategory("Warp & Vignette")]
-        [Export(PropertyHint.Range, "0,5")] public float WarpAmount        { get; set; } = 0.3f;        // 边框宽度
-        [Export] public bool ClipWarp      { get; set; } = false;                                       // 是否添加边框
+        [Export(PropertyHint.Range, "0,5")] public float WarpAmount        { get; set; } = 0.3f;        // 桶形畸变效果
+        [Export] public bool ClipWarp      { get; set; } = false;                                       // 是否启用边框裁剪
         [Export] public float VignetteIntensity { get; set; } = 0.3f;                                   // 暗角强度，过大会导致画面过暗，过小则不明显
         [Export(PropertyHint.Range, "0,1")] public float VignetteOpacity   { get; set; } = 0.25f;       // 暗角透明度，过大会导致画面过暗，过小则不明显
 

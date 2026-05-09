@@ -812,6 +812,19 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 	/// </summary>
 	private void OnFurnitureSlotChanged()
 	{
+		// 家具槽清空后（投掷/放下），恢复快捷栏选中状态。
+		// 持家具期间 SwitchToQuickBarSlot 被阻断，LeftHandSlotIndex 可能已冻结或为 -1。
+		// 主动重新切换到最后记忆的槽位，确保 LeftHandItem、LeftHandSlotIndex、
+		// SelectedQuickBarSlot 三者重新严格对应，避免空手攻击视觉异常。
+		if (InventoryComponent?.HasFurnitureItem == false)
+		{
+			int targetSlot = (LeftHandSlotIndex >= 0 && LeftHandSlotIndex <= 4)
+				? LeftHandSlotIndex
+				: (InventoryComponent?.SelectedQuickBarSlot ?? 0);
+			// SwitchToQuickBarSlot 内部会调用 SyncLeftHandItemFromSlot + UpdateHandItemVisual
+			SwitchToQuickBarSlot(targetSlot);
+			return;
+		}
 		SyncLeftHandItemFromSlot();
 		UpdateHandItemVisual();
 	}

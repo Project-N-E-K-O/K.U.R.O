@@ -380,7 +380,7 @@ _data = {
 [node name="Gate" type="CharacterBody2D"]
 z_index = 1
 collision_layer = 2
-collision_mask = 2
+collision_mask = 7
 
 [node name="Broken" type="Sprite2D" parent="."]
 visible = false

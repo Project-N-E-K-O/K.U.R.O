@@ -533,12 +533,15 @@ namespace Kuros.Managers
             }
 
             // 背包
-            foreach (var stack in inv.Backpack.Slots)
+            if (inv.Backpack != null)
             {
-                if (stack == null || stack.IsEmpty || string.IsNullOrEmpty(stack.Item.ResourcePath))
-                    data.BackpackSlots.Add(null);
-                else
-                    data.BackpackSlots.Add(new SlotEntry(stack.Item.ResourcePath, stack.Quantity));
+                foreach (var stack in inv.Backpack.Slots)
+                {
+                    if (stack == null || stack.IsEmpty || string.IsNullOrEmpty(stack.Item.ResourcePath))
+                        data.BackpackSlots.Add(null);
+                    else
+                        data.BackpackSlots.Add(new SlotEntry(stack.Item.ResourcePath, stack.Quantity));
+                }
             }
 
             // 家具槽
@@ -558,29 +561,52 @@ namespace Kuros.Managers
                 for (int i = 0; i < QuickBarSlots.Count && i < inv.QuickBar.Slots.Count; i++)
                 {
                     var entry = QuickBarSlots[i];
+                    // 先清空槽位，避免已有默认物品导致 TryAddItemToSlot 覆盖失败
+                    inv.QuickBar.SetStack(i, null);
                     if (entry == null) continue;
                     var item = ResourceLoader.Load<ItemDefinition>(entry.ItemPath);
-                    if (item == null) continue;
+                    if (item == null)
+                    {
+                        GD.PushWarning($"[InventoryTransitData] 快捷栏槽位 {i} 资源加载失败：{entry.ItemPath}");
+                        continue;
+                    }
                     inv.QuickBar.TryAddItemToSlot(item, entry.Quantity, i);
                 }
             }
 
             // ── 背包 ────────────────────────────────────────────
-            for (int i = 0; i < BackpackSlots.Count && i < inv.Backpack.Slots.Count; i++)
+            if (inv.Backpack != null && BackpackSlots.Count > 0)
             {
-                var entry = BackpackSlots[i];
-                if (entry == null) continue;
-                var item = ResourceLoader.Load<ItemDefinition>(entry.ItemPath);
-                if (item == null) continue;
-                inv.Backpack.TryAddItemToSlot(item, entry.Quantity, i);
+                for (int i = 0; i < BackpackSlots.Count && i < inv.Backpack.Slots.Count; i++)
+                {
+                    var entry = BackpackSlots[i];
+                    // 先清空槽位，避免已有物品导致合并或失败
+                    inv.Backpack.SetStack(i, null);
+                    if (entry == null) continue;
+                    var item = ResourceLoader.Load<ItemDefinition>(entry.ItemPath);
+                    if (item == null)
+                    {
+                        GD.PushWarning($"[InventoryTransitData] 背包槽位 {i} 资源加载失败：{entry.ItemPath}");
+                        continue;
+                    }
+                    inv.Backpack.TryAddItemToSlot(item, entry.Quantity, i);
+                }
             }
 
             // ── 家具槽 ──────────────────────────────────────────
             if (FurnitureSlot != null)
             {
                 var item = ResourceLoader.Load<ItemDefinition>(FurnitureSlot.ItemPath);
-                if (item != null)
+                if (item == null)
+                {
+                    GD.PushWarning($"[InventoryTransitData] 家具槽资源加载失败：{FurnitureSlot.ItemPath}");
+                }
+                else
+                {
+                    // 先清空家具槽，确保 AddFurnitureItem 不会因槽已占用而失败
+                    inv.ClearFurnitureSlot();
                     inv.AddItemSmart(item, FurnitureSlot.Quantity);
+                }
             }
 
             // ── 恢复选中槽位 ────────────────────────────────────
