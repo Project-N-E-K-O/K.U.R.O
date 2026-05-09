@@ -3,7 +3,7 @@
 [ext_resource type="Texture2D" uid="uid://de4c2xajty0y2" path="res://assets/environments/scene_2_hotel/电梯门右.png" id="1_4jbtd"]
 [ext_resource type="Script" uid="uid://k8jjrnqgrkqj" path="res://scripts/environments/ElevatorGate.cs" id="1_egscript"]
 [ext_resource type="Texture2D" uid="uid://bdmohs76ihvrd" path="res://assets/environments/scene_2_hotel/电梯门左.png" id="2_ldo24"]
-[ext_resource type="Texture2D" uid="uid://c2cdvsj12ngr1" path="res://assets/environments/scene_2_hotel/电梯墙后.png" id="2_vcby0"]
+[ext_resource type="Texture2D" uid="uid://c35fnrp1a4jbf" path="res://assets/environments/scene_2_hotel/电梯内饰.png" id="2_vcby0"]
 [ext_resource type="Texture2D" uid="uid://fjtsintqy2q3" path="res://assets/environments/scene_2_hotel/电梯墙后2.png" id="3_v7b0u"]
 [ext_resource type="Texture2D" uid="uid://pan0auvatm1f" path="res://assets/environments/scene_2_hotel/电梯墙前.png" id="4_y3mbp"]
 
@@ -103,7 +103,7 @@ script = ExtResource("1_egscript")
 OpenDelay = 2.0
 
 [node name="Elevatorwall" type="Sprite2D" parent="."]
-position = Vector2(329.5, -546.5)
+position = Vector2(66, 47)
 texture = ExtResource("2_vcby0")
 
 [node name="Elevatorwall2" type="Sprite2D" parent="."]

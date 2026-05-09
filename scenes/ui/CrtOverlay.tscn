@@ -5,11 +5,14 @@
 [node name="CrtOverlay" type="CanvasLayer"]
 layer = 127
 script = ExtResource("1_crtovl")
+ScanlinesOpacity = 0.0
+ScanlinesWidth = 0.0
+GrilleOpacity = 0.1
 Pixelate = true
 Roll = true
 DistortIntensity = 0.005
 NoiseOpacity = 0.005
-Aberration = 0.0009999999999998899
+Aberration = 0.00099999999999988
 
 [node name="ColorRect" type="ColorRect" parent="."]
 anchors_preset = 15

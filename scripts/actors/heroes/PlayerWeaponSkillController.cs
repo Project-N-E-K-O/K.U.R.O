@@ -45,6 +45,7 @@ namespace Kuros.Actors.Heroes
             Inventory.ActiveBackpackSlotChanged += OnActiveSlotChanged;
             Inventory.QuickBarAssigned += OnQuickBarAssigned;
             Inventory.QuickBarSlotChanged += OnQuickBarSelectedSlotChanged;
+            Inventory.FurnitureSlotChanged += OnFurnitureSlotChanged;
             if (Inventory.Backpack != null)
             {
                 Inventory.Backpack.InventoryChanged += OnBackpackInventoryChanged;
@@ -63,6 +64,7 @@ namespace Kuros.Actors.Heroes
                 Inventory.ActiveBackpackSlotChanged -= OnActiveSlotChanged;
                 Inventory.QuickBarAssigned -= OnQuickBarAssigned;
                 Inventory.QuickBarSlotChanged -= OnQuickBarSelectedSlotChanged;
+                Inventory.FurnitureSlotChanged -= OnFurnitureSlotChanged;
                 if (Inventory.Backpack != null)
                 {
                     Inventory.Backpack.InventoryChanged -= OnBackpackInventoryChanged;
@@ -154,6 +156,13 @@ namespace Kuros.Actors.Heroes
 
         private void OnActiveSlotChanged(int slotIndex)
         {
+            ApplyFallbackIfNoWeapon();
+        }
+
+        private void OnFurnitureSlotChanged()
+        {
+            // 家具槽变化时重新评估武器技能：
+            // 投掷家具后 GetSelectedQuickBarStack() 不再返回家具，可以正确读取快捷栏武器
             ApplyFallbackIfNoWeapon();
         }
 
