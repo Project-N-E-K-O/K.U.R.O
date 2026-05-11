@@ -196,6 +196,14 @@ namespace Kuros.Actors.Enemies.Attacks
 				return;
 			}
 
+			// frozen/受击状态下停止所有追踪与冲刺逻辑
+			var stateName = Enemy.StateMachine?.CurrentState?.Name;
+			if (stateName == "Frozen" || stateName == "CooldownFrozen"
+				|| stateName == "Hit" || stateName == "Dying" || stateName == "Dead")
+			{
+				return;
+			}
+
 			// 快照延迟计时
 			if (_waitingForSnapshot)
 			{
@@ -406,9 +414,17 @@ namespace Kuros.Actors.Enemies.Attacks
 		{
 			if (Enemy == null) return;
 			if (Enemy.IsDeathSequenceActive || Enemy.IsDead) return;
-            if (IsRunning || IsOnCooldown) return;
+			if (IsRunning || IsOnCooldown) return;
 			if (Enemy.AttackTimer > 0) return;
 			if (_postAttackCooldown > 0f) return;
+
+			// 冻结/受击状态下不触发攻击
+			var currentStateName = Enemy.StateMachine?.CurrentState?.Name;
+			if (currentStateName == "Frozen" || currentStateName == "CooldownFrozen"
+				|| currentStateName == "Hit" || currentStateName == "Dying" || currentStateName == "Dead")
+			{
+				return;
+			}
 
 			if (_controller != null && _controller.PeekQueuedAttack() != this)
 			{

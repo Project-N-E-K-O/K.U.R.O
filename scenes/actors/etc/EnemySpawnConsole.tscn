@@ -1,0 +1,79 @@
+[gd_scene load_steps=15 format=3 uid="uid://mwpdlx1yup0k"]
+
+[ext_resource type="Script" uid="uid://dlbrxuciurl4o" path="res://scripts/environments/EnemySpawnConsole.cs" id="1_2lj3c"]
+[ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="1_bllfa"]
+[ext_resource type="Texture2D" uid="uid://bn101t3c88poy" path="res://assets/environments/scene_loading_elevator/Elevator2.png" id="2_2lj3c"]
+[ext_resource type="Script" uid="uid://dq0vqwi52hgyp" path="res://scripts/utils/ProximityOutlineHighlight.cs" id="2_2vmbw"]
+[ext_resource type="PackedScene" uid="uid://cofm45kotvgto" path="res://scenes/actors/enemies/Enemy_B1_fat.tscn" id="2_bqlf7"]
+[ext_resource type="PackedScene" uid="uid://wrebd662va23" path="res://scenes/actors/enemies/Enemy_B2_fat02.tscn" id="3_b7qyu"]
+[ext_resource type="PackedScene" uid="uid://byi2utn347fwu" path="res://scenes/actors/enemies/Enemy_Normal_guard1.tscn" id="4_bt2sr"]
+[ext_resource type="PackedScene" uid="uid://djio6ojcqw8yf" path="res://scenes/actors/enemies/Enemy_Normal_guard2.tscn" id="5_njsr5"]
+[ext_resource type="PackedScene" uid="uid://wqcdwpyo1nji" path="res://scenes/actors/enemies/Enemy_B1_thin.tscn" id="6_w5fa5"]
+[ext_resource type="PackedScene" uid="uid://ct7yf5l4li46d" path="res://scenes/actors/etc/enemy_spaw_back.tscn" id="7_bt2sr"]
+[ext_resource type="PackedScene" uid="uid://dsofgohgx0eoo" path="res://scenes/actors/etc/enemy_spawn_front.tscn" id="8_njsr5"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_nmbao"]
+shader = ExtResource("1_bllfa")
+shader_parameter/outline_color = Color(0.02, 0.02, 0.02, 1)
+shader_parameter/outline_size = 16.0
+shader_parameter/alpha_threshold = 0.5
+shader_parameter/edge_softness = 0.12
+shader_parameter/preserve_fill = true
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_nmbao"]
+size = Vector2(2000, 2000)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_2lj3c"]
+size = Vector2(200, 432)
+
+[node name="EnemySpawnConsole" type="Node2D"]
+script = ExtResource("1_2lj3c")
+EnemyScenes = Array[PackedScene]([ExtResource("2_bqlf7"), ExtResource("3_b7qyu"), ExtResource("4_bt2sr"), ExtResource("5_njsr5"), ExtResource("6_w5fa5")])
+BackEffectScene = ExtResource("7_bt2sr")
+FrontEffectScene = ExtResource("8_njsr5")
+EnemySpawnOffset = Vector2(0, 200)
+EnemyAppearDelay = 1.0
+AutoLowerFrontEffectAfterEnemySpawn = true
+SimultaneousSpawn = true
+BoundaryThickness = 50.0
+BoundaryCollisionLayer = 8
+BoundaryCollisionMask = 2
+
+[node name="OutlineEffect" type="Node" parent="."]
+script = ExtResource("2_2vmbw")
+OutlineSpritePath = NodePath("../Outline")
+
+[node name="Outline" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_nmbao")
+texture = ExtResource("2_2lj3c")
+
+[node name="Sprite2D" type="Sprite2D" parent="Outline"]
+texture = ExtResource("2_2lj3c")
+
+[node name="SpawnArea" type="Area2D" parent="."]
+position = Vector2(1200, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="SpawnArea"]
+shape = SubResource("RectangleShape2D_nmbao")
+
+[node name="InteractArea" type="Area2D" parent="."]
+position = Vector2(0, 184)
+collision_layer = 0
+collision_mask = 4
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InteractArea"]
+position = Vector2(0, -84)
+shape = SubResource("RectangleShape2D_2lj3c")
+
+[node name="HintLabel" type="Label" parent="."]
+z_index = 10
+offset_top = -195.0
+offset_right = 56.0
+offset_bottom = -156.0
+theme_override_colors/font_color = Color(1, 1, 0.6, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 28
+horizontal_alignment = 1

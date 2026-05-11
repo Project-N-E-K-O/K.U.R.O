@@ -38,6 +38,7 @@ namespace Kuros.UI
         private InventoryWindow? _cachedInventoryWindow;
         private CompendiumWindow? _cachedCompendiumWindow;
         private SkillDetailWindow? _cachedSkillDetailWindow;
+        private EnemySpawnConsoleWindow? _cachedEnemySpawnConsoleWindow;
 
         public bool IsOpen => _isOpen;
 
@@ -167,6 +168,16 @@ namespace Kuros.UI
                     // 技能详情窗口打开时，ESC键会被技能详情窗口处理，这里不处理
                     GD.Print("BattleMenu._Input: 技能详情窗口打开，ESC键由技能详情窗口处理，不拦截");
                     return; // 不处理，也不调用SetInputAsHandled，让技能详情窗口处理
+                }
+                
+                // 检查敌人生成控制台窗口是否打开
+                bool enemySpawnConsoleOpen = IsEnemySpawnConsoleWindowOpen();
+                
+                if (enemySpawnConsoleOpen)
+                {
+                    // 敌人生成控制台窗口打开时，ESC键由该窗口处理，这里不处理
+                    GD.Print("BattleMenu._Input: 敌人生成控制台窗口打开，ESC键由该窗口处理，不拦截");
+                    return;
                 }
             }
             
@@ -327,6 +338,19 @@ namespace Kuros.UI
             
             GD.Print("BattleMenu.IsSkillDetailWindowOpen: 未找到打开的技能详情窗口");
             return false;
+        }
+
+        /// <summary>
+        /// 检查敌人生成控制台窗口是否打开（使用缓存）
+        /// </summary>
+        private bool IsEnemySpawnConsoleWindowOpen()
+        {
+            if (_cachedEnemySpawnConsoleWindow == null || !IsInstanceValid(_cachedEnemySpawnConsoleWindow))
+            {
+                _cachedEnemySpawnConsoleWindow = UIManager.Instance?.GetUI<EnemySpawnConsoleWindow>("EnemySpawnConsoleWindow");
+            }
+
+            return _cachedEnemySpawnConsoleWindow != null && _cachedEnemySpawnConsoleWindow.Visible;
         }
 
         private void LoadCompendiumWindow()

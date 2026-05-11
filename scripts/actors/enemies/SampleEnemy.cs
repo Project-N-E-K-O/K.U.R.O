@@ -50,8 +50,8 @@ public partial class SampleEnemy : GameActor
 		}
 		if (DetectionArea == null) 
 		{
-			DetectionArea = GetNodeOrNull<Area2D>("Sprite2D/DetectionArea");
-			if (DetectionArea == null) GD.PrintErr("DetectionArea not found at Sprite2D/DetectionArea");
+			DetectionArea = GetNodeOrNull<Area2D>("Sprite2D/ControllerDetectionArea");
+			if (DetectionArea == null) GD.PrintErr("DetectionArea not found at Sprite2D/ControllerDetectionArea");
 		}
 		RefreshPlayerReference();
 		UpdateDebugOverlayText();

@@ -41,7 +41,7 @@ namespace Kuros.Controllers
         [Export] public NodePath SpawnParentPath { get; set; } = new NodePath();
         [Export] public bool SpawnOnReady { get; set; } = false;
         [Export] public bool TriggerOnce { get; set; } = true;
-        [Export] public bool SimultaneousSpawn { get; set; } = false;
+        [Export] public bool SimultaneousSpawn { get; set; } = false;   // 是否同时生成所有敌人
         /// <summary>
         /// 是否启用自动触发器（TriggerArea）。
         /// 作为 WaveSpawnManager 的子波次时应设为 false，由 WaveSpawnManager 统一驱动。
@@ -288,7 +288,7 @@ namespace Kuros.Controllers
             }
         }
 
-        private Node? SpawnEnemy(PackedScene enemyScene, Vector2 spawnPosition, int spawnIndex)
+        public Node? SpawnEnemy(PackedScene enemyScene, Vector2 spawnPosition, int spawnIndex)
         {
             if (enemyScene == null)
             {
@@ -380,7 +380,7 @@ namespace Kuros.Controllers
             return queue;
         }
 
-        private List<PackedScene> GetConfiguredEnemyScenes()
+        public List<PackedScene> GetConfiguredEnemyScenes()
         {
             List<PackedScene> scenes = new();
 

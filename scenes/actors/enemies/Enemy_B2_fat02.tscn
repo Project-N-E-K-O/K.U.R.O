@@ -10,7 +10,7 @@
 [ext_resource type="Script" uid="uid://c6mvoo4sy0r7g" path="res://scripts/actors/enemies/states/EnemyWalkState.cs" id="8_aqxxu"]
 [ext_resource type="Script" uid="uid://bs353w318s113" path="res://scripts/actors/enemies/attacks/EnemyB2Fat02AttackController.cs" id="9_ooggc"]
 [ext_resource type="Script" uid="uid://bo6uhkbqyxe6o" path="res://scripts/actors/enemies/states/EnemyAttackState.cs" id="9_rbnx7"]
-[ext_resource type="Script" uid="uid://c5ht3p5nyuptw" path="res://scripts/actors/enemies/attacks/EnemySmashAttack.cs" id="10_6yc1u"]
+[ext_resource type="Script" uid="uid://cmnxe0hpulqnx" path="res://scripts/actors/enemies/attacks/EnemySmashAttack.cs" id="10_6yc1u"]
 [ext_resource type="Script" uid="uid://cu6enbmbcicac" path="res://scripts/actors/enemies/attacks/EnemySimpleMeleeAttack.cs" id="12_daw10"]
 [ext_resource type="Script" uid="uid://cwnxfhj8ysc2f" path="res://scripts/actors/enemies/states/EnemyHitState.cs" id="13_ey01n"]
 [ext_resource type="PackedScene" uid="uid://3o6u0oms7vm6" path="res://shaders/smash_effect.tscn" id="14_6yc1u"]
@@ -20,8 +20,8 @@
 [ext_resource type="Script" uid="uid://bta6sixb7kee4" path="res://scripts/actors/enemies/states/EnemyDeadState.cs" id="17_oq0qc"]
 [ext_resource type="Script" uid="uid://dasv6eyuks8yq" path="res://scripts/actors/enemies/movement/EnemyFreezeOnTurnMovement.cs" id="18_qelwu"]
 [ext_resource type="SpineSkeletonDataResource" uid="uid://dekq4qj6eyk0j" path="res://animations/spine/Enemy_B2_fat02.tres" id="19_gvrrx"]
-[ext_resource type="Script" uid="uid://c1otj8df5nwyr" path="res://scripts/controllers/SpineController.gd" id="20_ooggc"]
-[ext_resource type="Script" uid="uid://cr13s5w56si02" path="res://scripts/actors/enemies/animation/EnemyB2Fat02SpineAnimationController.cs" id="20_xrpf5"]
+[ext_resource type="Script" uid="uid://bbybuyitd10jr" path="res://scripts/controllers/SpineController.gd" id="20_ooggc"]
+[ext_resource type="Script" uid="uid://dpw2jqa8mdgvb" path="res://scripts/actors/enemies/animation/EnemyB2Fat02SpineAnimationController.cs" id="20_xrpf5"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_b5vhy"]
 shader = ExtResource("4_xrpf5")
@@ -52,7 +52,7 @@ z_index = 2
 y_sort_enabled = true
 scale = Vector2(0.33, 0.33)
 collision_layer = 2
-collision_mask = 7
+collision_mask = 15
 motion_mode = 1
 script = ExtResource("1_gvrrx")
 DebugOverlayOffset = Vector2(-1200, 200)

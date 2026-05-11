@@ -19,7 +19,7 @@
 [ext_resource type="Script" uid="uid://bsa4kolrnan6p" path="res://scripts/actors/heroes/states/PlayerDyingState.cs" id="23_player_dying"]
 [ext_resource type="Script" uid="uid://cp40kowtn1ho3" path="res://scripts/actors/heroes/states/PlayerDeadState.cs" id="24_player_dead"]
 [ext_resource type="PackedScene" path="res://scenes/actors/npc/SimpleNPC.tscn" id="25_simple_npc"]
-[ext_resource type="Script" uid="uid://6uws0lovsucd" path="res://scripts/actors/heroes/PlayerItemAttachment.cs" id="27_item_attachment"]
+[ext_resource type="Script" uid="uid://h02ofhsj1qa4" path="res://scripts/actors/heroes/PlayerItemAttachment.cs" id="27_item_attachment"]
 [ext_resource type="Resource" path="res://data/TestItem2.tres" id="27_test_item_2"]
 [ext_resource type="Texture2D" uid="uid://cggx01ms6yloy" path="res://textures/environments/wall/25.12.3 卧室下墙壁.png" id="28_pfjrb"]
 [ext_resource type="Resource" path="res://data/TestItem3.tres" id="28_test_item_3"]
@@ -28,7 +28,7 @@
 [ext_resource type="Script" uid="uid://b0t8cfl3khjix" path="res://scripts/actors/heroes/PlayerItemInteractionComponent.cs" id="29_item_interaction"]
 [ext_resource type="PackedScene" uid="uid://dnwhjf0qt2753" path="res://scenes/items/Supplies_A0_cake.tscn" id="29_pfjrb"]
 [ext_resource type="PackedScene" uid="uid://cl861foq2wo6m" path="res://scenes/items/Supplies_A0_pudding.tscn" id="30_34xhk"]
-[ext_resource type="Script" uid="uid://v8exb3wpvh6d" path="res://scripts/actors/heroes/PlayerWeaponSkillController.cs" id="30_weapon_skill_controller"]
+[ext_resource type="Script" uid="uid://c002yrog1v7ag" path="res://scripts/actors/heroes/PlayerWeaponSkillController.cs" id="30_weapon_skill_controller"]
 [ext_resource type="Script" uid="uid://vr51ymsfyxws" path="res://scripts/actors/heroes/states/PlayerPickUpState.cs" id="31_player_pickup"]
 [ext_resource type="PackedScene" uid="uid://bl14myq60jv3t" path="res://scenes/items/Weapon_A0_chest2.tscn" id="32_1hj54"]
 [ext_resource type="Script" uid="uid://dijk8ngvrs5g0" path="res://scripts/actors/heroes/states/PlayerThrowState.cs" id="32_player_throw"]
@@ -237,8 +237,6 @@ texture = ExtResource("28_pfjrb")
 y_sort_enabled = true
 position = Vector2(611, 711)
 
-; 旧版示例 UI 节点已移除，UI 由 BattleHUD 统一负责
-
 [node name="StaticOBJ" type="Node2D" parent="."]
 
 [node name="Static_A1_sink" parent="StaticOBJ" instance=ExtResource("29_bh7yi")]
@@ -261,112 +259,60 @@ y_sort_enabled = true
 
 [node name="Weapon_A0_bowl" parent="PickupItems" instance=ExtResource("29_feb7u")]
 position = Vector2(2301, 482)
-collision_layer = 8
-collision_mask = 0
-gravity_scale = 0.0
-freeze = true
 
 [node name="Weapon_A0_bowl2" parent="PickupItems" instance=ExtResource("29_feb7u")]
 position = Vector2(2409, 485)
-collision_layer = 8
-collision_mask = 0
-gravity_scale = 0.0
-freeze = true
 
 [node name="Supplies_A0_cake" parent="PickupItems" instance=ExtResource("29_pfjrb")]
 position = Vector2(2115, 456)
-collision_layer = 8
-collision_mask = 0
-gravity_scale = 0.0
-freeze = true
 
 [node name="Supplies_A0_pudding" parent="PickupItems" instance=ExtResource("30_34xhk")]
 position = Vector2(2299, 475)
-collision_layer = 8
-collision_mask = 0
-gravity_scale = 0.0
-freeze = true
 
 [node name="Supplies_A0_pudding2" parent="PickupItems" instance=ExtResource("30_34xhk")]
 position = Vector2(2409, 475)
-collision_layer = 8
-collision_mask = 0
-gravity_scale = 0.0
-freeze = true
 
 [node name="Weapon_A2_chair" parent="PickupItems" instance=ExtResource("32_xn6vi")]
 position = Vector2(2298, 605)
-gravity_scale = 0.0
-freeze = true
 
 [node name="Weapon_A2_chair2" parent="PickupItems" instance=ExtResource("32_xn6vi")]
 position = Vector2(2408, 605)
-gravity_scale = 0.0
-freeze = true
 
 [node name="Weapon_A0_chest2" parent="PickupItems" instance=ExtResource("32_1hj54")]
 position = Vector2(534, 939)
-gravity_scale = 0.0
-freeze = true
 
 [node name="Weapon_A0_chest3" parent="PickupItems" instance=ExtResource("32_1hj54")]
 position = Vector2(1971, 935)
-gravity_scale = 0.0
-freeze = true
 
 [node name="Weapon_A0_chest" parent="PickupItems" instance=ExtResource("33_76ea4")]
 position = Vector2(453, 912)
-gravity_scale = 0.0
-freeze = true
 
 [node name="Weapon_A0_chest4" parent="PickupItems" instance=ExtResource("33_76ea4")]
 position = Vector2(1889, 907)
-gravity_scale = 0.0
-freeze = true
 
 [node name="Weapon_A0_chest5" parent="PickupItems" instance=ExtResource("33_76ea4")]
 position = Vector2(2673, 901)
-gravity_scale = 0.0
-freeze = true
 
 [node name="Weapon_A1_ball" parent="PickupItems" instance=ExtResource("34_hfn0d")]
 position = Vector2(427, 637)
-collision_layer = 8
-collision_mask = 0
-gravity_scale = 0.0
-freeze = true
 
 [node name="Weapon_A1_bed" parent="PickupItems" instance=ExtResource("35_w4oyo")]
 position = Vector2(1008, 312)
-gravity_scale = 0.0
-freeze = true
 
 [node name="Weapon_A1_bed2" parent="PickupItems" instance=ExtResource("36_pautr")]
 position = Vector2(792, 310)
-gravity_scale = 0.0
-freeze = true
 
 [node name="Weapon_A1_toying" parent="PickupItems" instance=ExtResource("37_pautr")]
 position = Vector2(1501, 547)
-collision_layer = 8
-collision_mask = 0
-gravity_scale = 0.0
-freeze = true
 
 [node name="Weapon_A1_table_lamp" parent="PickupItems" instance=ExtResource("39_ksxye")]
 position = Vector2(585, 207)
-gravity_scale = 0.0
-freeze = true
 
 [node name="Weapon_A1_table_lamp2" parent="PickupItems" instance=ExtResource("39_ksxye")]
 position = Vector2(1203, 207)
-gravity_scale = 0.0
-freeze = true
 
 [node name="Weapon_A1_cabinet" parent="PickupItems" instance=ExtResource("40_ksxye")]
 position = Vector2(239, 855)
-gravity_scale = 0.0
-freeze = true
 
 [node name="Weapon_A1_cat" parent="PickupItems" instance=ExtResource("41_6kiix")]
 position = Vector2(303, 635)
@@ -377,62 +323,36 @@ freeze = true
 
 [node name="Weapon_A1_dock" parent="PickupItems" instance=ExtResource("42_drc5q")]
 position = Vector2(1353, 253)
-gravity_scale = 0.0
-freeze = true
 
 [node name="Weapon_A1_chair2" parent="PickupItems" instance=ExtResource("43_7c55y")]
 position = Vector2(565, 339)
-gravity_scale = 0.0
-freeze = true
 
 [node name="Weapon_A1_garbage_can" parent="PickupItems" instance=ExtResource("44_mrqws")]
 position = Vector2(279, 532)
-collision_layer = 8
-collision_mask = 0
-gravity_scale = 0.0
-freeze = true
 
 [node name="Weapon_A1_nightstand" parent="PickupItems" instance=ExtResource("45_drc5q")]
 position = Vector2(686, 263)
-gravity_scale = 0.0
-freeze = true
 
 [node name="Weapon_A1_nightstand2" parent="PickupItems" instance=ExtResource("45_drc5q")]
 position = Vector2(1114, 269)
-gravity_scale = 0.0
-freeze = true
 
 [node name="Weapon_A1_fridge" parent="PickupItems" instance=ExtResource("46_7c55y")]
 position = Vector2(2604, 176)
-gravity_scale = 0.0
-freeze = true
 
 [node name="Weapon_A1_robot" parent="PickupItems" instance=ExtResource("47_mrqws")]
 position = Vector2(545, 638)
-collision_layer = 8
-collision_mask = 0
-gravity_scale = 0.0
-freeze = true
 
 [node name="Weapon_A1_sofa" parent="PickupItems" instance=ExtResource("48_ulh2d")]
 position = Vector2(1428, 476)
-gravity_scale = 0.0
-freeze = true
 
 [node name="Weapon_A1_perch" parent="PickupItems" instance=ExtResource("49_k2ygy")]
 position = Vector2(1528, 238)
-gravity_scale = 0.0
-freeze = true
 
 [node name="Weapon_A1_table" parent="PickupItems" instance=ExtResource("50_w3elf")]
 position = Vector2(97, 441)
-gravity_scale = 0.0
-freeze = true
 
 [node name="Weapon_A1_chair" parent="PickupItems" instance=ExtResource("51_a2yqm")]
 position = Vector2(173, 371)
-gravity_scale = 0.0
-freeze = true
 
 [node name="ArillWall" type="StaticBody2D" parent="."]
 
@@ -504,13 +424,9 @@ texture = ExtResource("58_wccef")
 
 [node name="Weapon_A1_door" parent="Door" instance=ExtResource("59_6yduf")]
 position = Vector2(1704, 850)
-gravity_scale = 0.0
-freeze = true
 
 [node name="Weapon_A1_door2" parent="Door" instance=ExtResource("60_r1vwt")]
 position = Vector2(2874, 788)
-gravity_scale = 0.0
-freeze = true
 
 [node name="AnimatedOBJ" type="Node2D" parent="."]
 
