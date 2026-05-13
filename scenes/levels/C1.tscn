@@ -1,0 +1,117 @@
+[gd_scene load_steps=12 format=3 uid="uid://cqdtru26cvd8g"]
+
+[ext_resource type="Script" uid="uid://dmqu7phxi8gbi" path="res://scripts/managers/BattleArena.cs" id="1_65ofg"]
+[ext_resource type="Script" uid="uid://orymlwdqv2xq" path="res://scripts/controllers/WaveSpawnManager.cs" id="2_0xlrd"]
+[ext_resource type="Script" uid="uid://b3iq6dm2pc5y0" path="res://scripts/controllers/EnemySpawnManager.cs" id="3_5qtsb"]
+[ext_resource type="PackedScene" uid="uid://djio6ojcqw8yf" path="res://scenes/actors/enemies/Enemy_Normal_guard2.tscn" id="4_0yg2g"]
+[ext_resource type="PackedScene" uid="uid://byi2utn347fwu" path="res://scenes/actors/enemies/Enemy_Normal_guard1.tscn" id="5_csfgp"]
+[ext_resource type="PackedScene" uid="uid://wrebd662va23" path="res://scenes/actors/enemies/Enemy_B2_fat02.tscn" id="6_x6qfe"]
+[ext_resource type="PackedScene" uid="uid://cofm45kotvgto" path="res://scenes/actors/enemies/Enemy_B1_fat.tscn" id="7_y8smn"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_jukqj"]
+size = Vector2(11500, 3050)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bh8mo"]
+size = Vector2(5400, 3050)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_oniqv"]
+size = Vector2(400, 2500)
+
+[sub_resource type="NavigationPolygon" id="NavigationPolygon_uc4a6"]
+vertices = PackedVector2Array(2509, -600, 2509, -802, 2750.5, -1517.1094, 2781.4766, 1540.7266, 192, 1117, 344.5, 758, 613, 557, 1340, 557, 1605.5, 761, 2225, 1302, 2489, 1302, -3151.789, 1510.25, 2489, 1100, 2238.5, 761, 2225, 1100, 2238.5, -120, 2245, -600, 1605.5, -120, 1340, 70, 344.5, -123, 613, 70, -3139.2031, -1530.8828, 2245, -802, -813, -244, -813, -570, -433, -318, -433, -114, -764, 633, -1756, 1275.5, -350, 1100, -350, 1302, -1756, 894, -764, 1014.5, -86, -600, -86, -802, 192, -437, -350, -802, 192, -123, -212, -437, -212, -318, -350, -600, -288.5, -114, -288.5, 633, -212, 1014.5, -212, 1100, -2488, -244, -86, 1302, -86, 1117, 192, 763, -189, 763, -189, 758, -2331, 894, -2488, -570, -2331, 1275.5)
+polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3), PackedInt32Array(4, 5, 6, 7, 8, 9), PackedInt32Array(10, 3, 11, 9), PackedInt32Array(0, 3, 10, 12), PackedInt32Array(13, 0, 12, 14), PackedInt32Array(0, 13, 15, 16), PackedInt32Array(17, 8, 7, 18), PackedInt32Array(6, 5, 19, 20), PackedInt32Array(21, 2, 1, 22), PackedInt32Array(23, 24, 25, 26, 27), PackedInt32Array(8, 13, 14), PackedInt32Array(28, 29, 30, 11), PackedInt32Array(29, 28, 31, 32), PackedInt32Array(22, 16, 15, 17, 33, 34), PackedInt32Array(33, 17, 18, 35), PackedInt32Array(21, 22, 34), PackedInt32Array(21, 34, 36), PackedInt32Array(19, 37, 35), PackedInt32Array(38, 39, 25, 24, 40), PackedInt32Array(26, 41, 42, 27), PackedInt32Array(32, 43, 44, 29), PackedInt32Array(27, 32, 31, 45, 23), PackedInt32Array(46, 47, 4, 9), PackedInt32Array(48, 49, 50, 5), PackedInt32Array(4, 48, 5), PackedInt32Array(45, 31, 51), PackedInt32Array(52, 21, 36, 40, 24), PackedInt32Array(8, 14, 9), PackedInt32Array(46, 9, 11), PackedInt32Array(30, 46, 11), PackedInt32Array(53, 28, 11), PackedInt32Array(51, 53, 11, 21, 45), PackedInt32Array(52, 45, 21), PackedInt32Array(38, 40, 33, 35), PackedInt32Array(35, 18, 20, 19)])
+outlines = Array[PackedVector2Array]([PackedVector2Array(-3189, -1581, 2800, -1567, 2832, 1591, -3202, 1560)])
+source_geometry_mode = 2
+agent_radius = 50.0
+
+[node name="C1" type="Node2D"]
+
+[node name="AreaSize" type="Area2D" parent="."]
+visible = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AreaSize"]
+z_index = 10
+position = Vector2(-1645, 0)
+shape = SubResource("RectangleShape2D_jukqj")
+debug_color = Color(0.6428762, 0.52304673, 0.06685588, 0.41960785)
+
+[node name="BattleArena" type="Area2D" parent="."]
+visible = false
+z_index = 10
+script = ExtResource("1_65ofg")
+ArenaSize = Vector2(5400, 3050)
+BoundaryCollisionLayer = 6
+BoundaryCollisionMask = 6
+BoundaryThickness = 50.0
+EnemyDetectionMask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="BattleArena"]
+shape = SubResource("RectangleShape2D_bh8mo")
+
+[node name="WaveSpawnManager" type="Node2D" parent="." node_paths=PackedStringArray("TriggerArea")]
+script = ExtResource("2_0xlrd")
+WavePaths = Array[NodePath]([NodePath("../EnemySpawneManager"), NodePath("../EnemySpawneManager2")])
+WaveClearDelay = 0.0
+PollInterval = 0.30000000000000004
+TriggerArea = NodePath("TriggerArea")
+BattleArenaPath = NodePath("../BattleArena")
+
+[node name="TriggerArea" type="Area2D" parent="WaveSpawnManager"]
+top_level = true
+position = Vector2(-1316, 350)
+collision_mask = 4
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WaveSpawnManager/TriggerArea"]
+shape = SubResource("RectangleShape2D_oniqv")
+debug_color = Color(1, 0, 0, 0.19607843)
+
+[node name="EnemySpawneManager" type="Node2D" parent="."]
+top_level = true
+position = Vector2(0, 350)
+script = ExtResource("3_5qtsb")
+EnemyScenes = Array[PackedScene]([ExtResource("4_0yg2g"), ExtResource("5_csfgp")])
+MultiEnemySelectionMode = 1
+SpawnCount = 3
+SpawnInterval = 0.0
+SpawnParentPath = NodePath("..")
+SimultaneousSpawn = true
+EnableTrigger = false
+SpawnAreaExtents = Vector2(2500, 1000)
+EnemySpawnOffset = Vector2(0, 100)
+ObstacleCheckMask = 7
+EnemyAppearDelay = 1.0
+AutoLowerFrontEffectAfterEnemySpawn = true
+ShowDebugOverlay = false
+ShowDebugOverlayInGame = false
+LogSpawnEffectPositions = false
+DebugLineWidth = 8.0
+
+[node name="EnemySpawneManager2" type="Node2D" parent="."]
+top_level = true
+position = Vector2(0, 350)
+script = ExtResource("3_5qtsb")
+EnemyScenes = Array[PackedScene]([ExtResource("6_x6qfe"), ExtResource("7_y8smn")])
+MultiEnemySelectionMode = 1
+SpawnCount = 4
+SpawnInterval = 0.0
+SpawnParentPath = NodePath("..")
+SimultaneousSpawn = true
+EnableTrigger = false
+SpawnAreaExtents = Vector2(2500, 1000)
+EnemySpawnOffset = Vector2(0, 100)
+ObstacleCheckMask = 7
+EnemyAppearDelay = 1.0
+AutoLowerFrontEffectAfterEnemySpawn = true
+ShowDebugOverlay = false
+ShowDebugOverlayInGame = false
+LogSpawnEffectPositions = false
+DebugLineWidth = 8.0
+
+[node name="Environments" type="Node2D" parent="."]
+position = Vector2(0, 340)
+
+[node name="AirWall" type="StaticBody2D" parent="."]
+
+[node name="NavigationRegion2D" type="NavigationRegion2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
+visible = false
+navigation_polygon = SubResource("NavigationPolygon_uc4a6")

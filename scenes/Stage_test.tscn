@@ -1,16 +1,22 @@
-[gd_scene load_steps=17 format=3 uid="uid://wluyqt2wxlvb"]
+[gd_scene load_steps=23 format=3 uid="uid://wluyqt2wxlvb"]
 
 [ext_resource type="Script" uid="uid://x1ic1ym4ykq8" path="res://scripts/scenes/BattleSceneManager.cs" id="1_s6mo5"]
 [ext_resource type="PackedScene" uid="uid://ufprfd4r8ijj" path="res://assets/spine/main_character/main_character.tscn" id="1_tv6fd"]
 [ext_resource type="PackedScene" uid="uid://mwpdlx1yup0k" path="res://scenes/actors/etc/EnemySpawnConsole.tscn" id="2_s6mo5"]
 [ext_resource type="Script" uid="uid://del8hgcg3sr4i" path="res://scripts/managers/CameraFollow.cs" id="2_ybuta"]
-[ext_resource type="PackedScene" uid="uid://cgjrdwkemgrcy" path="res://scenes/actors/heroes/P2.tscn" id="3_g3q4a"]
+[ext_resource type="PackedScene" uid="uid://cofm45kotvgto" path="res://scenes/actors/enemies/Enemy_B1_fat.tscn" id="3_mkebo"]
 [ext_resource type="PackedScene" uid="uid://ctpw5uqly3yu5" path="res://scenes/weapons/Weapon_Brawl_mechGlove.tscn" id="4_7yh4q"]
+[ext_resource type="PackedScene" uid="uid://wrebd662va23" path="res://scenes/actors/enemies/Enemy_B2_fat02.tscn" id="4_pxy7y"]
 [ext_resource type="PackedScene" uid="uid://bhjc0grsl76ep" path="res://scenes/weapons/Weapon_Brawl_riotBracer.tscn" id="5_s6mo5"]
+[ext_resource type="PackedScene" uid="uid://byi2utn347fwu" path="res://scenes/actors/enemies/Enemy_Normal_guard1.tscn" id="5_y4lq6"]
 [ext_resource type="PackedScene" uid="uid://blwgkboyojmcq" path="res://scenes/weapons/Weapon_Brawl_riotGlove.tscn" id="6_28ted"]
+[ext_resource type="PackedScene" uid="uid://djio6ojcqw8yf" path="res://scenes/actors/enemies/Enemy_Normal_guard2.tscn" id="6_jqh86"]
+[ext_resource type="PackedScene" uid="uid://wqcdwpyo1nji" path="res://scenes/actors/enemies/Enemy_B1_thin.tscn" id="7_5lslu"]
 [ext_resource type="PackedScene" uid="uid://2pny8f8vuu3j" path="res://scenes/weapons/Weapon_Slash_barrierGate.tscn" id="7_pja2j"]
+[ext_resource type="PackedScene" uid="uid://bvps5t0s8owhw" path="res://scenes/actors/enemies/Enemy_C1_waiterA.tscn" id="8_gr5eg"]
 [ext_resource type="PackedScene" uid="uid://csjvahh6hev8k" path="res://scenes/weapons/Weapon_Slash_expandBaton.tscn" id="8_w0p8f"]
 [ext_resource type="PackedScene" uid="uid://cdnitqquebaw6" path="res://scenes/weapons/Weapon_Stab_drill.tscn" id="9_ngl7c"]
+[ext_resource type="PackedScene" uid="uid://8ce54l6083nt" path="res://scenes/actors/enemies/Enemy_C1_waiterB.tscn" id="9_pxy7y"]
 [ext_resource type="PackedScene" uid="uid://6ghjqyjkk37w" path="res://scenes/weapons/Weapon_Stab_umbrella.tscn" id="10_dxexl"]
 [ext_resource type="PackedScene" uid="uid://bvvyo3wubh12j" path="res://scenes/weapons/Weapon_Throw_gravityGrenade.tscn" id="11_5dr7i"]
 [ext_resource type="PackedScene" uid="uid://dfmke56wtqt2x" path="res://scenes/weapons/Weapon_Throw_metalSpike.tscn" id="12_mkebo"]
@@ -28,6 +34,7 @@ y_sort_enabled = true
 [node name="EnemySpawnConsole" parent="World" instance=ExtResource("2_s6mo5")]
 position = Vector2(714, -170)
 SpawnParentPath = NodePath("..")
+EnemyScenes = Array[PackedScene]([ExtResource("5_y4lq6"), ExtResource("6_jqh86"), ExtResource("3_mkebo"), ExtResource("4_pxy7y"), ExtResource("7_5lslu"), ExtResource("8_gr5eg"), ExtResource("9_pxy7y")])
 
 [node name="MainCharacter" parent="World" instance=ExtResource("1_tv6fd")]
 
@@ -48,9 +55,6 @@ PlayerDamagedHitStopDuration = 0.18
 PlayerAttackHitHitStopDuration = 0.1
 PlayerAttackKillHitStopDuration = 0.3
 HitStopDelay = 0.1
-
-[node name="P2" parent="World" instance=ExtResource("3_g3q4a")]
-position = Vector2(300, 0)
 
 [node name="WeaponMechGlove" parent="World" instance=ExtResource("4_7yh4q")]
 position = Vector2(-1470, -1153)

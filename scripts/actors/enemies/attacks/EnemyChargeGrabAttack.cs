@@ -44,7 +44,7 @@ namespace Kuros.Actors.Enemies.Attacks
         private Vector2 _dashDirection = Vector2.Right;
 		private Vector2 _dashTarget;
 		private SamplePlayer? _grabbedPlayer;
-		private bool _isEvaluatingEscape;
+		private bool _isEvaluatingEscape;	// 正在进行逃脱判定（玩家被抓住后或逃脱过程中）
 		private float _escapeTimer;
 		private bool _isDashing;
 		private bool _dashFinalized;

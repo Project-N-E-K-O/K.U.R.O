@@ -787,7 +787,8 @@
 	}
 ],
 "events": {
-	"hit": {}
+	"hit": {},
+	"effect": {}
 },
 "animations": {
 	"attack": {
@@ -11989,7 +11990,11 @@
 				{ "bendPositive": false, "curve": "stepped" },
 				{ "time": 0.5333, "bendPositive": false }
 			]
-		}
+		},
+		"events": [
+			{ "time": 0.01, "name": "effect" },
+			{ "time": 0.28, "name": "effect" }
+		]
 	},
 	"run_holding_item": {
 		"slots": {

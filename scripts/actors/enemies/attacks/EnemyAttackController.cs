@@ -84,8 +84,12 @@ namespace Kuros.Actors.Enemies.Attacks
 
             if (_playerDetectionArea != null)
             {
-                return _playerDetectionArea.OverlapsBody(player);
+                if (!_playerDetectionArea.OverlapsBody(player)) return false;
             }
+
+            // 若排队的攻击已确定但其自身 CanStart() 不满足（如玩家不在攻击范围），
+            // 则控制器也视为不可开始，让 EnemyAttackState 正确退出到 Walk 状态。
+            if (_queuedAttack != null && !_queuedAttack.CanStart()) return false;
 
             return true;
         }
@@ -158,7 +162,16 @@ namespace Kuros.Actors.Enemies.Attacks
         public override void _PhysicsProcess(double delta)
         {
             base._PhysicsProcess(delta);
-            if (_currentAttack == null) return;
+            if (_currentAttack == null)
+            {
+                // OnAttackStarted 内子攻击 CanStart() 失败时，TryStart 仍会调用 SetPhase(Warmup)
+                // 导致控制器处于 Running 但无当前攻击的卡死状态，此处主动结束。
+                if (IsRunning)
+                {
+                    FinishControllerAttack("NullCurrentAttack");
+                }
+                return;
+            }
             if (!GodotObject.IsInstanceValid(_currentAttack))
             {
                 _currentAttack = null;

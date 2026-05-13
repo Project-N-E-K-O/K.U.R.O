@@ -11,7 +11,7 @@ namespace Kuros.Actors.Enemies.Attacks
     public partial class EnemySimpleMeleeAttack : EnemyAttackTemplate
     {
         [ExportCategory("Basic Attack Settings")]
-        [Export(PropertyHint.Range, "1,200,1")] public int Damage = 10;
+        [Export(PropertyHint.Range, "0,200,1")] public int Damage = 10;
 
         private SamplePlayer? _activeKnockbackTarget;
         private float _activeKnockbackTimer;

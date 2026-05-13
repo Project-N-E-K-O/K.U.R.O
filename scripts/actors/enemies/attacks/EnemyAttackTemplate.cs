@@ -1,4 +1,5 @@
 using Godot;
+using Kuros.Fx;
 
 namespace Kuros.Actors.Enemies.Attacks
 {
@@ -251,6 +252,16 @@ namespace Kuros.Actors.Enemies.Attacks
             _hasCollisionMaskOverride = false;
         }
 
+        protected virtual bool ShouldHoldWarmupPhase()
+        {
+            return false;
+        }
+
+        protected virtual bool ShouldHoldActivePhase()
+        {
+            return false;
+        }
+
         protected virtual bool ShouldHoldRecoveryPhase()
         {
             return false;
@@ -299,9 +310,19 @@ namespace Kuros.Actors.Enemies.Attacks
             switch (_phase)
             {
                 case AttackPhase.Warmup:
+                    if (ShouldHoldWarmupPhase())
+                    {
+                        _phaseTimer = 0.05f;
+                        return;
+                    }
                     SetPhase(AttackPhase.Active);
                     break;
                 case AttackPhase.Active:
+                    if (ShouldHoldActivePhase())
+                    {
+                        _phaseTimer = 0.05f;
+                        return;
+                    }
                     _animationHitReady = false;
                     _pendingAnimationHitFromWarmup = false;
                     SetPhase(AttackPhase.Recovery);
@@ -487,6 +508,11 @@ namespace Kuros.Actors.Enemies.Attacks
                     // 世界坐标生成（如烟雾、粒子等视觉效果）
                     Enemy.GetParent()?.AddChild(node2D);
                     node2D.GlobalPosition = spawnPos;
+                    // 将敌人朝向传递给方向性特效（如激光束）
+                    if (node2D is LaserBeam laserBeam)
+                    {
+                        laserBeam.FacingRight = Enemy.FacingRight;
+                    }
                 }
                 else if (effect is Kuros.Core.Effects.ActorEffect actorEffect)
                 {
