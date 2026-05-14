@@ -183,6 +183,7 @@ namespace Kuros.Effects
             foreach (var actor in actors)
             {
                 if (!IsInstanceValid(actor) || actor.IsDead) continue;
+                if (actor.ActiveImmunities.HasFlag(Kuros.Core.ImmunityFlags.ForcedMovement)) continue;
 
                 Vector2 direction = (_blackHoleCenter - actor.GlobalPosition).Normalized();
                 float distance = _blackHoleCenter.DistanceTo(actor.GlobalPosition);

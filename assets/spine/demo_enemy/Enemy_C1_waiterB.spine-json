@@ -4631,7 +4631,10 @@
 					{ "time": 3.3333 }
 				]
 			}
-		}
+		},
+		"events": [
+			{ "time": 1.6, "name": "hit" }
+		]
 	},
 	"skill_dash": {
 		"slots": {

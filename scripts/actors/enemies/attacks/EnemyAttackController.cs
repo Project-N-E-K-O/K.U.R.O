@@ -355,13 +355,20 @@ namespace Kuros.Actors.Enemies.Attacks
 
             if (_currentAttack != null)
             {
-                FinishControllerAttack("PlayerExit", clearControllerCooldown: true);
+                if (ShouldInterruptOnPlayerExit())
+                    FinishControllerAttack("PlayerExit", clearControllerCooldown: true);
             }
             else
             {
                 QueueNextAttack("PlayerExit");
             }
         }
+
+        /// <summary>
+        /// 玩家离开检测区域时，是否中断当前子攻击。
+        /// 子类可重写此方法，对需要持续到底的攻击（如终极技）返回 false。
+        /// </summary>
+        protected virtual bool ShouldInterruptOnPlayerExit() => true;
 
         private bool ShouldForceAttackState()
         {

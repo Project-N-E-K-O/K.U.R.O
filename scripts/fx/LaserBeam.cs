@@ -1,4 +1,5 @@
 using Godot;
+using Kuros.Core;
 
 namespace Kuros.Fx
 {
@@ -40,16 +41,28 @@ namespace Kuros.Fx
         /// <summary>淡出时长（秒），从 Lifetime 末尾开始淡出。</summary>
         [Export] public float FadeDuration = 0.15f;
 
+        [ExportCategory("Damage")]
+        /// <summary>激光命中玩家造成的伤害（0 = 不造成伤害）。</summary>
+        [Export(PropertyHint.Range, "0,500,1")] public int Damage = 0;
+
+        [ExportCategory("Knockback")]
+        [Export(PropertyHint.Range, "0,2000,1")] public float KnockbackDistance = 0f;
+
+        /// <summary>击退持续时间（秒）。</summary>
+        [Export(PropertyHint.Range, "0.01,2,0.01")] public float KnockbackDuration = 0.18f;
+
+        /// <summary>命中时施加的击退速度（像素/秒，0 = 不击退）。</summary>
+        [Export(PropertyHint.Range, "0,3000,1")] public float KnockbackSpeed = 0f;
         /// <summary>
         /// 若为 true，首帧自动查找玩家并计算朝向：
         /// 水平方向由玩家相对位置决定（左/右），
         /// 垂直方向仅在 ±<see cref="MaxVerticalTiltDegrees"/> 范围内微调。
         /// </summary>
         [ExportCategory("Targeting")]
-        [Export] public bool AutoAimAtPlayer = true;
+        [Export] public bool AutoAimAtPlayer = true;   
 
         /// <summary>垂直倾斜最大角度（度）。激光基础方向水平，此值限制上下偏转幅度。</summary>
-        [Export(PropertyHint.Range, "0,45,0.5")] public float MaxVerticalTiltDegrees = 5f;
+        [Export(PropertyHint.Range, "0,180,0.5")] public float MaxVerticalTiltDegrees = 5f;
 
         /// <summary>
         /// 激光水平朝向：true = 向右，false = 向左。<br/>
@@ -71,6 +84,10 @@ namespace Kuros.Fx
         private Color _initGlowColor;
         /// <summary>是否还没执行过首帧自动对准。</summary>
         private bool _pendingAutoAim;
+        /// <summary>是否已经在本次激活中造成过伤害（每次实例化只触发一次）。</summary>
+        private bool _hasDamaged;
+        /// <summary>autoAim 时缓存的玩家节点，供 TryDamagePlayer 直接使用，避免射线被敌人自身 Area2D 阻挡。</summary>
+        private Node2D? _cachedPlayer;
 
         // ── 生命周期 ──────────────────────────────────────────────
 
@@ -82,7 +99,7 @@ namespace Kuros.Fx
 
             if (_ray == null || _glowLine == null || _beamLine == null)
             {
-                GD.PushWarning("[LaserBeam] 缺少子节点（RayCast2D / GlowLine / BeamLine），请检查场景结构。");
+                GD.PushWarning("[LaserBeam] 缺少子节点，请检查场景结构。");
                 QueueFree();
                 return;
             }
@@ -107,7 +124,8 @@ namespace Kuros.Fx
             // 需等到下一帧位置就位后再计算朝向。
             _pendingAutoAim = AutoAimAtPlayer;
 
-            UpdateBeam();
+            // 去掉这行，等_Process第一帧位置和朝向都就位后再画
+            //UpdateBeam();
         }
 
         public override void _Process(double delta)
@@ -118,8 +136,20 @@ namespace Kuros.Fx
                 _pendingAutoAim = false;
                 var player = GetTree().GetFirstNodeInGroup("player") as Node2D;
                 if (player != null)
-                    AimHorizontalWithVerticalTilt(player.GlobalPosition);
+                {
+                    _cachedPlayer = player;
+                    // 瞄准 HitArea 的 CollisionShape2D 中心（即受击体积的实际中心）
+                    // HitArea 节点本身无位置偏移，偏移在其子节点 CollisionShape2D 上
+                    var hitArea = player.GetNodeOrNull<Area2D>("HitArea")
+                        ?? player.FindChild("HitArea", recursive: true, owned: false) as Area2D;
+                    var hitShape = hitArea?.GetNodeOrNull<CollisionShape2D>("CollisionShape2D");
+                    Vector2 aimTarget = hitShape?.GlobalPosition
+                        ?? hitArea?.GlobalPosition
+                        ?? player.GlobalPosition;
+                    AimHorizontalWithVerticalTilt(aimTarget);
+                }
                 UpdateBeam();
+                TryDamagePlayer();
             }
 
             _timer -= (float)delta;
@@ -189,6 +219,70 @@ namespace Kuros.Fx
         }
 
         // ── 私有方法 ──────────────────────────────────────────────
+
+        /// <summary>
+        /// 对缓存的玩家节点做几何距离检测，命中 HitArea 后触发一次伤害和击退。
+        /// 不使用射线查询，避免被激光起点附近的敌人自身 Area2D 阻挡。
+        /// </summary>
+        private void TryDamagePlayer()
+        {
+            if (_hasDamaged) return;
+            if (Damage <= 0 && KnockbackSpeed <= 0f && KnockbackDistance <= 0f) return;
+            if (_cachedPlayer == null) return;
+
+            // 取 HitArea 的 CollisionShape2D 世界坐标作为检测中心
+            var hitArea = _cachedPlayer.GetNodeOrNull<Area2D>("HitArea")
+                ?? _cachedPlayer.FindChild("HitArea", recursive: true, owned: false) as Area2D;
+            var hitShape = hitArea?.GetNodeOrNull<CollisionShape2D>("CollisionShape2D");
+            Vector2 targetCenter = hitShape?.GlobalPosition
+                ?? hitArea?.GlobalPosition
+                ?? _cachedPlayer.GlobalPosition;
+
+            // 求 targetCenter 到激光线段的距离
+            Vector2 beamDir = new Vector2(Mathf.Cos(Rotation), Mathf.Sin(Rotation));
+            Vector2 toTarget = targetCenter - GlobalPosition;
+
+            // 沿激光方向的投影（必须在 [0, MaxLength] 范围内才算命中）
+            float along = toTarget.Dot(beamDir);
+            if (along < 0f || along > MaxLength) return;
+
+            // 垂直激光方向的距离
+            float perp = Mathf.Abs(toTarget.X * beamDir.Y - toTarget.Y * beamDir.X);
+
+            // 用 HitArea 胶囊的世界半径作为判定宽度（含父节点缩放）
+            float detectionRadius = 150f; // 默认回退值
+            if (hitShape?.Shape is CapsuleShape2D cap)
+            {
+                // GlobalTransform.Scale 已包含所有父节点累乘缩放
+                float worldScale = Mathf.Abs(hitShape.GlobalTransform.Scale.X);
+                detectionRadius = cap.Radius * worldScale;
+            }
+
+            if (perp > detectionRadius) return;
+
+            // 命中
+            if (_cachedPlayer is not GameActor actor) return;
+
+            // 在伤害判定前记录玩家当前无敌状态：
+            // TakeDamage 调用后第一击会触发无敌帧，后续同帧命中不应再覆写速度。
+            bool alreadyInvincible = actor is Kuros.Actors.Heroes.MainCharacter mc && mc.IsHitInvincible;
+
+            _hasDamaged = true;
+
+            if (Damage > 0)
+                actor.TakeDamage(Damage, GlobalPosition);
+
+            // 仅在命中前玩家尚未处于无敌帧时才施加击退，避免覆盖已有的击退速度。
+            // 速度优先：KnockbackSpeed > 0 直接使用；否则由 KnockbackDistance / KnockbackDuration 推算（与 EnemyAttackTemplate 一致）。
+            if (!alreadyInvincible)
+            {
+                float knockSpeed = KnockbackSpeed > 0f
+                    ? KnockbackSpeed
+                    : (KnockbackDistance > 0f ? KnockbackDistance / Mathf.Max(KnockbackDuration, 0.01f) : 0f);
+                if (knockSpeed > 0f)
+                    actor.Velocity = beamDir * knockSpeed;
+            }
+        }
 
         private void UpdateBeam()
         {

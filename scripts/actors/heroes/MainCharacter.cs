@@ -444,8 +444,8 @@ namespace Kuros.Actors.Heroes
 		if (damage > 0 && IsHitInvincible && !IsDeathSequenceActive && !IsDead)
 		{
 			// 无敌帧期间完全忽略受击：不掉血、不击退、不进入受击反应。
+			// 注意：不清零 Velocity，避免抹掉触发无敌的那次击退所赋予的速度。
 			_pendingHitKnockback = false;
-			Velocity = Vector2.Zero;
 			GameLogger.Info(nameof(MainCharacter), $"{Name} is invincible and ignored incoming damage/knockback.");
 			return;
 		}

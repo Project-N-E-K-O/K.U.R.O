@@ -15,11 +15,17 @@ namespace Kuros.Actors.Enemies.Animation
         [Export] public string AttackAnimation = "attack";
         [Export] public string SkillAnimation = "skill_dash";
         [Export] public string Skill2Animation = "slash";
-        [Export] public string Skill3Animation = "slash";
+        [Export] public string Skill3Animation = "skill_beam";
         [Export] public string HitAnimation = "hit";
         [Export] public string StunAnimation = "stun";
         [Export] public string DieAnimation = "death";
+        [Export(PropertyHint.Range, "0,5,0.01")] public float Skill3LoopStart = 1.63f;
+        [Export(PropertyHint.Range, "0,5,0.01")] public float Skill3LoopEnd = 2.13f;
+        [Export(PropertyHint.Range, "0,5,0.01")] public float Skill3PartStart = 2.14f;
+        [Export(PropertyHint.Range, "0,5,0.01")] public float Skill3PartEnd = 3.33f;
+
         private EnemyC1WaiterBAttackController? _attackController;
+        private EnemyUltimateBeamAttack? _ultimateBeamAttack;
         private string _currentKey = string.Empty;
         private SpineAnimationPlaybackMode _currentMode = SpineAnimationPlaybackMode.Loop;
         private StringComparison _comparison = StringComparison.OrdinalIgnoreCase;
@@ -139,6 +145,24 @@ namespace Kuros.Actors.Enemies.Animation
                     return;
                 }
 
+                if (attackName.Equals(controller.UltimateAttackName, _comparison))
+                {
+                    var ultimateAttack =  ResolveUltimateBeamAttack(controller);
+
+                    if (ultimateAttack != null && !ultimateAttack.IsBeamFinished)
+                    {
+                        // 光束攻击期间循环播放 skill_beam 动画
+                        PlayPartLoopIfNeeded("skill_beam", Skill3Animation, Skill3LoopStart, Skill3LoopEnd, SkillMixDuration);
+                        return;
+                    }
+                    if (ultimateAttack != null && ultimateAttack.IsBeamFinished)
+                    {   
+                        // 光束攻击结束收尾播放 skill_beam 动画
+                        PlayPartOnceIfNeeded("skill_beam_PartOnce", Skill3Animation, Skill3PartStart, Skill3PartEnd, SkillMixDuration);
+                        return;
+                    }
+                }
+
             }
 
             PlayIdle();
@@ -224,6 +248,43 @@ namespace Kuros.Actors.Enemies.Animation
             }
         }
 
+        private void PlayPartOnceIfNeeded(string key, string animationName, float partStart, float partEnd, float mixDuration)
+        {
+            if (string.IsNullOrEmpty(animationName))
+            {
+                return;
+            }
+
+            if (partEnd <= partStart)
+            {
+                PlayOnceIfNeeded(key, animationName, mixDuration);
+                return;
+            }
+
+            bool samePartialOnce = _currentKey == key
+                && _currentMode == SpineAnimationPlaybackMode.PartialOnce
+                && Mathf.IsEqualApprox(_activeLoopStart, partStart)
+                && Mathf.IsEqualApprox(_activeLoopEnd, partEnd);
+
+            if (samePartialOnce)
+            {
+                return;
+            }
+
+            if (PlayPartialOnce(animationName, partStart, partEnd, mixDuration))
+            {
+                _currentKey = key;
+                _currentMode = SpineAnimationPlaybackMode.PartialOnce;
+                _activeLoopStart = partStart;
+                _activeLoopEnd = partEnd;
+
+                // if (!string.IsNullOrEmpty(IdleAnimation))
+                // {
+                //     QueueAnimation(IdleAnimation, SpineAnimationPlaybackMode.Loop, 0f, mixDuration);
+                // }
+            }
+        }
+
         private void TickPartialLoop()
         {
             if (_currentMode != SpineAnimationPlaybackMode.PartialLoop)
@@ -268,7 +329,16 @@ namespace Kuros.Actors.Enemies.Animation
 
             return _attackController;
         }
+        private EnemyUltimateBeamAttack? ResolveUltimateBeamAttack(EnemyC1WaiterBAttackController controller)
+        {
+            if (_ultimateBeamAttack != null && IsInstanceValid(_ultimateBeamAttack))
+            {
+                return _ultimateBeamAttack;
+            }
 
+            _ultimateBeamAttack = controller.GetNodeOrNull<EnemyUltimateBeamAttack>(controller.UltimateAttackName);
+            return _ultimateBeamAttack;
+        }
 
         private void EnsureSpineHitSupport()
         {
@@ -358,8 +428,13 @@ namespace Kuros.Actors.Enemies.Animation
             if (controller.CurrentAttackName.Equals(controller.Skill1AttackName, _comparison))
             {
                 // 只有 slash 收招动画的 hit 帧才触发伤害；skill_dash 冲刺动画不触发，防止距离外命中
-                return MatchesAnimationName(animationName, Skill2Animation)
-                    || MatchesAnimationName(animationName, Skill3Animation);
+                return MatchesAnimationName(animationName, Skill2Animation);
+            }
+
+            if (controller.CurrentAttackName.Equals(controller.UltimateAttackName, _comparison))
+            {
+                // UltimateBeamAttack 不使用动画 hit 帧触发，始终放行
+                return true;
             }
 
             return true;

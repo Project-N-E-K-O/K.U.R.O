@@ -4,12 +4,16 @@
 
 [node name="LaserBeam" type="Node2D"]
 z_index = 3
+y_sort_enabled = true
 script = ExtResource("1_laser")
-MaxLength = 1420.0
+MaxLength = 1500.0
 BeamColor = Color(1, 0, 0, 1)
 GlowColor = Color(1, 0, 0, 0.34901962)
 BeamWidth = 32.0
 GlowWidth = 92.0
+Damage = 2
+KnockbackDistance = 50.0
+KnockbackSpeed = 1000.0
 
 [node name="RayCast2D" type="RayCast2D" parent="."]
 target_position = Vector2(3000, 0)

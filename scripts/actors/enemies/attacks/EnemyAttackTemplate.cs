@@ -1,4 +1,5 @@
 using Godot;
+using Kuros.Core;
 using Kuros.Fx;
 
 namespace Kuros.Actors.Enemies.Attacks
@@ -50,8 +51,13 @@ namespace Kuros.Actors.Enemies.Attacks
         [Export] public bool RequireAnimationHitTrigger = false;
         [Export] public bool AllowMultipleAnimationHits = false;
 
-        [ExportCategory("Interrupt")]
-        [Export] public bool EnableSuperArmor = false;
+        [ExportCategory("Super Armor")]
+        /// <summary>
+        /// 攻击期间赋予敌人的免疫集合。<br/>
+        /// 新增免疫类型只需在 <see cref="ImmunityFlags"/> 枚举追加值，无需修改此模板。
+        /// </summary>
+        [Export(PropertyHint.Flags, "Stun,ForcedMovement,SpeedSlow,SuperArmor,Damage")]
+        public ImmunityFlags GrantedImmunities = ImmunityFlags.None;
 
         [ExportCategory("Collision Override")]
         [Export] public bool IgnoreEnemyCollisionDuringAttack = false;
@@ -72,6 +78,7 @@ namespace Kuros.Actors.Enemies.Attacks
         protected bool _animationHitReady = false;
         private bool _pendingAnimationHitFromWarmup;
         private bool? _previousIgnoreHitStateOnDamage;
+        private ImmunityFlags? _previousImmunities;
         private uint _cachedCollisionMask;
         private bool _hasCollisionMaskOverride;
 
@@ -171,10 +178,16 @@ namespace Kuros.Actors.Enemies.Attacks
         {
             ApplyEnemyCollisionMaskOverride();
 
-            if (EnableSuperArmor && Enemy != null)
+            if (GrantedImmunities.HasFlag(ImmunityFlags.SuperArmor) && Enemy != null)
             {
                 _previousIgnoreHitStateOnDamage = Enemy.IgnoreHitStateOnDamage;
                 Enemy.IgnoreHitStateOnDamage = true;
+            }
+
+            if (GrantedImmunities != ImmunityFlags.None && Enemy != null)
+            {
+                _previousImmunities = Enemy.ActiveImmunities;
+                Enemy.ActiveImmunities |= GrantedImmunities;
             }
 
             if (Enemy != null && !string.IsNullOrEmpty(AnimationName))
@@ -224,7 +237,13 @@ namespace Kuros.Actors.Enemies.Attacks
                 Enemy.IgnoreHitStateOnDamage = _previousIgnoreHitStateOnDamage.Value;
             }
 
+            if (Enemy != null && _previousImmunities.HasValue)
+            {
+                Enemy.ActiveImmunities = _previousImmunities.Value;
+            }
+
             _previousIgnoreHitStateOnDamage = null;
+            _previousImmunities = null;
         }
 
         private void ApplyEnemyCollisionMaskOverride()
@@ -504,16 +523,18 @@ namespace Kuros.Actors.Enemies.Attacks
                 Vector2 spawnPos = Enemy.GlobalPosition + adjustedOffset;
 
                 if (effect is Node2D node2D)
-                {
-                    // 世界坐标生成（如烟雾、粒子等视觉效果）
-                    Enemy.GetParent()?.AddChild(node2D);
-                    node2D.GlobalPosition = spawnPos;
+                {		    
+		            // 先设朝向，再AddChild，确保_Ready执行时值已正确
                     // 将敌人朝向传递给方向性特效（如激光束）
                     if (node2D is LaserBeam laserBeam)
                     {
                         laserBeam.FacingRight = Enemy.FacingRight;
                     }
+                    // 世界坐标生成（如烟雾、粒子等视觉效果）
+                    Enemy.GetParent()?.AddChild(node2D);
+                    node2D.GlobalPosition = spawnPos;
                 }
+                
                 else if (effect is Kuros.Core.Effects.ActorEffect actorEffect)
                 {
                     // ActorEffect 应用到敌人身上
