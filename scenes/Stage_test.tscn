@@ -22,7 +22,7 @@
 [ext_resource type="PackedScene" uid="uid://dfmke56wtqt2x" path="res://scenes/weapons/Weapon_Throw_metalSpike.tscn" id="12_mkebo"]
 [ext_resource type="PackedScene" uid="uid://cipwjj7xx121y" path="res://scenes/weapons/Weapon_Throw_smokeGrenade.tscn" id="13_pxy7y"]
 [ext_resource type="PackedScene" uid="uid://v3n56xk6n8ca" path="res://scenes/loading/Loading_elevator.tscn" id="16_28ted"]
-[ext_resource type="PackedScene" path="res://scenes/actors/npc/SimpleNPC.tscn" id="23_pxy7y"]
+[ext_resource type="PackedScene" uid="uid://beohs6gufqc3i" path="res://scenes/actors/npc/SimpleNPC.tscn" id="23_pxy7y"]
 
 [node name="BattleScene" type="Node2D" node_paths=PackedStringArray("Player")]
 script = ExtResource("1_s6mo5")

@@ -14,7 +14,7 @@ namespace Kuros.Actors.NPC
 		[ExportCategory("Interaction")]
 		[Export] public DialogueData? DialogueData { get; set; }
 		[Export] public NodePath? InteractionAreaPath { get; set; } = null; // 若设置则使用该Area，否则自动创建
-		[Export] public float InteractionRange { get; set; } = 100.0f;
+		[Export] public float InteractionRange { get; set; } = 50.0f;
 		[Export] public bool ShowInteractionPrompt { get; set; } = true;	
 		
 		[ExportCategory("Visual")]
@@ -22,10 +22,10 @@ namespace Kuros.Actors.NPC
 		[Export] public string InteractionPromptText { get; set; } = "[E] 交互";
 		
 		// 提示框样式
-		[Export(PropertyHint.Range, "8,160,1")] public int PromptFontSize { get; set; } = 16;
+		[Export(PropertyHint.Range, "8,160,1")] public int PromptFontSize { get; set; } = 48;
 		[Export] public Vector2 PromptMinSize { get; set; } = new Vector2(150, 30);
 		[Export] public Vector2 PromptOffset { get; set; } = new Vector2(0, -80);
-		[Export] public Color PromptBgColor { get; set; } = new Color(0, 0, 0, 0.7f);
+		[Export] public Color PromptBgColor { get; set; } = new Color(0, 0, 0, 0);
 		[Export(PropertyHint.Range, "0,20,1")] public int PromptCornerRadius { get; set; } = 5;
 		[Export] public Vector2 PromptPadding { get; set; } = new Vector2(10, 5);
 		[Export(PropertyHint.Range, "-100,100,1")] public int PromptZIndex { get; set; } = 10;

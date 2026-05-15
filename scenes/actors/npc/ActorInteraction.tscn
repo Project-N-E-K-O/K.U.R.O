@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://bbi71g20oa7q7"]
+
+[ext_resource type="Script" uid="uid://c0ymmgnnpig1d" path="res://scripts/actors/npc/NPCInteraction.cs" id="1_wht7s"]
+
+[node name="NPCInteraction" type="Node2D"]
+script = ExtResource("1_wht7s")
