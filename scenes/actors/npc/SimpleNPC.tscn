@@ -1,8 +1,8 @@
-[gd_scene load_steps=4 format=3 uid="uid://simple_npc_scene"]
+[gd_scene load_steps=7 format=3 uid="uid://beohs6gufqc3i"]
 
-[ext_resource type="Script" path="res://scripts/core/GameActor.cs" id="1_game_actor"]
-[ext_resource type="Script" path="res://scripts/actors/npc/NPCInteraction.cs" id="2_npc_interaction"]
-[ext_resource type="Script" path="res://scripts/core/effects/EffectController.cs" id="3_effect_controller"]
+[ext_resource type="Script" uid="uid://qw88ikfetulp" path="res://scripts/core/GameActor.cs" id="1_game_actor"]
+[ext_resource type="Script" uid="uid://c0ymmgnnpig1d" path="res://scripts/actors/npc/NPCInteraction.cs" id="2_npc_interaction"]
+[ext_resource type="Script" uid="uid://d6ppl6a6djpr" path="res://scripts/core/effects/EffectController.cs" id="3_effect_controller"]
 
 [sub_resource type="PlaceholderTexture2D" id="1_npc_sprite"]
 size = Vector2(32, 64)
@@ -10,6 +10,9 @@ size = Vector2(32, 64)
 [sub_resource type="CapsuleShape2D" id="2_npc_collision"]
 radius = 16.0
 height = 50.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_xhfkc"]
+radius = 78.7
 
 [node name="SimpleNPC" type="CharacterBody2D"]
 collision_layer = 4
@@ -33,6 +36,14 @@ shape = SubResource("2_npc_collision")
 
 [node name="NPCInteraction" type="Node2D" parent="."]
 script = ExtResource("2_npc_interaction")
+InteractionAreaPath = NodePath("../Area2D")
 InteractionRange = 120.0
-InteractionPromptText = "按 [E] 对话"
+PromptFontSize = 48
+PromptBgColor = Color(0, 0, 0, 0)
 
+[node name="Area2D" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 4
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("CircleShape2D_xhfkc")

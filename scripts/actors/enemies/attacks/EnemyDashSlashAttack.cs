@@ -203,6 +203,17 @@ namespace Kuros.Actors.Enemies.Attacks
 
             if (_postAttackCooldown > 0f)
             {
+                // 若其他攻击已接管（本攻击未运行但状态为 Attack），
+                // 立即放弃冷却追踪，避免 FinishCooldownState 误打断无关攻击。
+                // 场景：DashSlash 结束后 FreezeOnTurn 冻结，冻结结束时下一次攻击已开始。
+                var currentStateName = Enemy?.StateMachine?.CurrentState?.Name;
+                if (currentStateName == "Attack" && !IsRunning)
+                {
+                    _postAttackCooldown = 0f;
+                    _pendingCooldownExit = false;
+                    return;
+                }
+
                 _postAttackCooldown -= (float)delta;
                 if (_postAttackCooldown <= 0f)
                 {
@@ -211,16 +222,6 @@ namespace Kuros.Actors.Enemies.Attacks
                     {
                         FinishCooldownState();
                         _pendingCooldownExit = false;
-                    }
-                }
-                // 只有当敌人处于冷却相关状态时，才由此处控制移动
-                var currentStateName = Enemy?.StateMachine?.CurrentState?.Name;
-                if (currentStateName == "Attack")
-                {
-                    if (Enemy != null)
-                    {
-                        Enemy.Velocity = Vector2.Zero;
-                        Enemy.MoveAndSlide();
                     }
                 }
                 return;

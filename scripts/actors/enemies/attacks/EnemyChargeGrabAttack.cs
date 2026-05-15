@@ -284,6 +284,16 @@ namespace Kuros.Actors.Enemies.Attacks
 
 			if (_postAttackCooldown > 0f)
 			{
+				// 若其他攻击已接管（本攻击未运行但状态为 Attack），
+				// 立即放弃冷却追踪，避免 FinishCooldownState 误打断无关攻击。
+				var currentStateName = Enemy?.StateMachine?.CurrentState?.Name;
+				if (currentStateName == "Attack" && !IsRunning)
+				{
+					_postAttackCooldown = 0f;
+					_pendingCooldownExit = false;
+					return;
+				}
+
 				_postAttackCooldown -= (float)delta;
 				if (_postAttackCooldown <= 0f)
 				{
@@ -292,17 +302,6 @@ namespace Kuros.Actors.Enemies.Attacks
 					{
 						FinishCooldownState();
 						_pendingCooldownExit = false;
-					}
-				}
-				// 只有当敌人处于冷却相关状态时，才由此处控制移动
-				// 否则让状态机自己处理，避免覆盖其他状态的速度设置
-				var currentStateName = Enemy?.StateMachine?.CurrentState?.Name;
-				if (currentStateName == CooldownStateName || currentStateName == "Attack")
-				{
-					if (Enemy != null)
-					{
-						Enemy.Velocity = Vector2.Zero;
-						Enemy.MoveAndSlide();
 					}
 				}
 				return;
@@ -544,11 +543,9 @@ namespace Kuros.Actors.Enemies.Attacks
 		{
 			if (Enemy?.StateMachine == null) return;
 
+			// 只有仍处于冷却状态时才负责退出；若外部效果已把状态切走则不干预。
+			// 特别地，若已进入新的 Attack，绝不强制切回 Walk（会打断无关攻击）。
 			if (Enemy.StateMachine.CurrentState?.Name == CooldownStateName)
-			{
-				Enemy.StateMachine.ChangeState("Walk");
-			}
-			else if (Enemy.StateMachine.CurrentState?.Name == "Attack")
 			{
 				Enemy.StateMachine.ChangeState("Walk");
 			}

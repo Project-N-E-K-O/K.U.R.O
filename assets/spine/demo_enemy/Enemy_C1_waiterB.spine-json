@@ -4633,7 +4633,8 @@
 			}
 		},
 		"events": [
-			{ "time": 1.6, "name": "hit" }
+			{ "time": 1.6, "name": "hit" },
+			{ "time": 1.865, "name": "hit" }
 		]
 	},
 	"skill_dash": {
