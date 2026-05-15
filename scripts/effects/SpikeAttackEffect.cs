@@ -120,8 +120,9 @@ namespace Kuros.Effects
             if (!enemy.IsDead)
                 enemy.TakeDamage(DamagePerTick, Actor?.GlobalPosition, Actor, Kuros.Core.Events.DamageSource.AreaEffect);
 
-            // 使用倍数乘积管理减速
-            ApplySpeedMultiplier(enemy, _speedMultiplier);
+            // 免疫减速的敌人不施加速度倍数
+            if (!enemy.ActiveImmunities.HasFlag(Kuros.Core.ImmunityFlags.SpeedSlow))
+                ApplySpeedMultiplier(enemy, _speedMultiplier);
         }
 
         private void OnBodyExited(Node2D body)

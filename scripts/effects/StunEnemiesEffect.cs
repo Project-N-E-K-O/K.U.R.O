@@ -90,6 +90,7 @@ namespace Kuros.Effects
             if (_cleaned) return;
             if (!IsInstanceValid(enemy)) return;
             if (_stunnedEnemies.Contains(enemy)) return;
+            if (enemy.ActiveImmunities.HasFlag(Kuros.Core.ImmunityFlags.Stun)) return;
 
             _stunnedEnemies.Add(enemy);
             var freeze = new FreezeEffect

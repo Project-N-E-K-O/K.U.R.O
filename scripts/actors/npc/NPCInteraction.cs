@@ -13,19 +13,30 @@ namespace Kuros.Actors.NPC
 	{
 		[ExportCategory("Interaction")]
 		[Export] public DialogueData? DialogueData { get; set; }
-		[Export] public float InteractionRange { get; set; } = 100.0f;
-		[Export] public bool ShowInteractionPrompt { get; set; } = true;
+		[Export] public NodePath? InteractionAreaPath { get; set; } = null; // 若设置则使用该Area，否则自动创建
+		[Export] public float InteractionRange { get; set; } = 50.0f;
+		[Export] public bool ShowInteractionPrompt { get; set; } = true;	
 		
 		[ExportCategory("Visual")]
-		[Export] public NodePath? PromptLabelPath { get; set; }
-		[Export] public string InteractionPromptText { get; set; } = "按 [E] 交互";
+		[Export] public NodePath? PromptLabelPath { get; set; }	
+		[Export] public string InteractionPromptText { get; set; } = "[E] 交互";
 		
+		// 提示框样式
+		[Export(PropertyHint.Range, "8,160,1")] public int PromptFontSize { get; set; } = 48;
+		[Export] public Vector2 PromptMinSize { get; set; } = new Vector2(150, 30);
+		[Export] public Vector2 PromptOffset { get; set; } = new Vector2(0, -80);
+		[Export] public Color PromptBgColor { get; set; } = new Color(0, 0, 0, 0);
+		[Export(PropertyHint.Range, "0,20,1")] public int PromptCornerRadius { get; set; } = 5;
+		[Export] public Vector2 PromptPadding { get; set; } = new Vector2(10, 5);
+		[Export(PropertyHint.Range, "-100,100,1")] public int PromptZIndex { get; set; } = 10;
+
 		private Area2D? _interactionArea;
 		private Label? _promptLabel;
 		private GameActor? _owner;
 		private GameActor? _playerInRange;
 		private bool _isInteracting = false;
 		private bool _hasTriedLoadDialogue = false; // 避免重复尝试加载
+		private bool _isUsingExternalArea = false; // 是否使用外部交互区域
 		
 		public override void _Ready()
 		{
@@ -56,8 +67,8 @@ namespace Kuros.Actors.NPC
 				GD.PrintErr("NPCInteraction: 请在Godot编辑器中为NPCInteraction组件设置DialogueData资源。");
 			}
 			
-			// 创建交互区域
-			CreateInteractionArea();
+			// 初始化交互区域（使用外部或创建内置）
+			InitializeInteractionArea();
 			
 			// 创建提示标签
 			CreatePromptLabel();
@@ -73,16 +84,57 @@ namespace Kuros.Actors.NPC
 		}
 		
 		/// <summary>
-		/// 创建交互区域
+		/// 初始化交互区域（优先使用外部指定的区域，否则创建内置区域）
+		/// </summary>
+		private void InitializeInteractionArea()
+		{
+			// 尝试使用外部指定的交互区域
+			if (InteractionAreaPath != null && InteractionAreaPath.GetNameCount() > 0)
+			{
+				var externalArea = GetNodeOrNull<Area2D>(InteractionAreaPath);
+				if (externalArea != null)
+				{
+					_interactionArea = externalArea;
+					_isUsingExternalArea = true;
+					GD.Print($"NPCInteraction: 使用外部交互区域 {InteractionAreaPath}");
+				}
+				else
+				{
+					GD.PrintErr($"NPCInteraction: 无法找到指定的交互区域 {InteractionAreaPath}，创建内置交互区域");
+					CreateInteractionArea();
+				}
+			}
+			else
+			{
+				// 创建内置交互区域
+				CreateInteractionArea();
+			}
+			
+			// 无论使用哪种区域，都要连接信号（改为检测Area2D即玩家的GrabArea）
+			if (_interactionArea != null)
+			{
+				_interactionArea.AreaEntered += OnAreaEntered;
+				_interactionArea.AreaExited += OnAreaExited;
+			}
+		}
+		
+		/// <summary>
+		/// 创建内置交互区域（仅当未使用外部区域时调用）
 		/// </summary>
 		private void CreateInteractionArea()
 		{
+			if (_isUsingExternalArea)
+			{
+				GD.PrintErr("NPCInteraction: 已在使用外部交互区域，不应重新创建内置区域");
+				return;
+			}
+			
 			_interactionArea = new Area2D();
 			_interactionArea.Name = "InteractionArea";
 			_interactionArea.Monitoring = true;
 			_interactionArea.Monitorable = false;
 			_interactionArea.CollisionLayer = 0;
-			_interactionArea.CollisionMask = 1; // 检测第1层（玩家层）
+			_interactionArea.CollisionMask = (1 << 3) | (1 << 2) | (1 << 1) | (1 << 0); // 检测第1-4层（包含玩家第4层）
 			
 			// 创建碰撞形状
 			var collisionShape = new CollisionShape2D();
@@ -92,10 +144,6 @@ namespace Kuros.Actors.NPC
 			
 			_interactionArea.AddChild(collisionShape);
 			AddChild(_interactionArea);
-			
-			// 连接信号
-			_interactionArea.BodyEntered += OnBodyEntered;
-			_interactionArea.BodyExited += OnBodyExited;
 		}
 		
 		/// <summary>
@@ -103,63 +151,61 @@ namespace Kuros.Actors.NPC
 		/// </summary>
 		private void CreatePromptLabel()
 		{
-			if (!ShowInteractionPrompt)
-				return;
-			
-			// 创建Control节点作为容器，用于在世界坐标中显示UI
+			if (!ShowInteractionPrompt) return;
+
 			var control = new Control();
 			control.Name = "PromptContainer";
 			control.MouseFilter = Control.MouseFilterEnum.Ignore;
 			control.ProcessMode = ProcessModeEnum.Always;
-			
+			control.ZIndex = PromptZIndex;          
+    		control.ZAsRelative = false;
+
 			_promptLabel = new Label();
 			_promptLabel.Name = "InteractionPrompt";
 			_promptLabel.Text = InteractionPromptText;
 			_promptLabel.HorizontalAlignment = HorizontalAlignment.Center;
 			_promptLabel.VerticalAlignment = VerticalAlignment.Center;
 			_promptLabel.Visible = false;
-			
-			// 设置样式
+
 			var styleBox = new StyleBoxFlat();
-			styleBox.BgColor = new Color(0, 0, 0, 0.7f);
-			styleBox.CornerRadiusTopLeft = 5;
-			styleBox.CornerRadiusTopRight = 5;
-			styleBox.CornerRadiusBottomLeft = 5;
-			styleBox.CornerRadiusBottomRight = 5;
-			styleBox.ContentMarginLeft = 10;
-			styleBox.ContentMarginTop = 5;
-			styleBox.ContentMarginRight = 10;
-			styleBox.ContentMarginBottom = 5;
+			styleBox.BgColor = PromptBgColor;
+			styleBox.CornerRadiusTopLeft     = PromptCornerRadius;
+			styleBox.CornerRadiusTopRight    = PromptCornerRadius;
+			styleBox.CornerRadiusBottomLeft  = PromptCornerRadius;
+			styleBox.CornerRadiusBottomRight = PromptCornerRadius;
+			styleBox.ContentMarginLeft   = PromptPadding.X;
+			styleBox.ContentMarginRight  = PromptPadding.X;
+			styleBox.ContentMarginTop    = PromptPadding.Y;
+			styleBox.ContentMarginBottom = PromptPadding.Y;
 			_promptLabel.AddThemeStyleboxOverride("normal", styleBox);
-			
-			// 设置字体大小
-			var fontSize = 16;
-			_promptLabel.AddThemeFontSizeOverride("font_size", fontSize);
-			
-			// 设置标签大小和位置
-			_promptLabel.CustomMinimumSize = new Vector2(150, 30);
-			_promptLabel.Position = new Vector2(-75, 0); // 居中
-			
+
+			_promptLabel.AddThemeFontSizeOverride("font_size", PromptFontSize);
+			_promptLabel.CustomMinimumSize = PromptMinSize;
+
+			// 水平居中：X偏移 = -宽度的一半
+			_promptLabel.Position = new Vector2(-PromptMinSize.X / 2f, 0);
+
 			control.AddChild(_promptLabel);
 			AddChild(control);
-			
-			// 设置容器位置（在NPC上方）
-			control.Position = new Vector2(0, -80);
+
+			control.Position = PromptOffset;
 		}
 		
 		/// <summary>
-		/// 有物体进入交互区域
+		/// 有Area2D进入交互区域（检测玩家的GrabArea）
 		/// </summary>
-		private void OnBodyEntered(Node2D body)
+		private void OnAreaEntered(Area2D area)
 		{
-			if (body is GameActor actor)
+			// 检查进入的区域是否是玩家的GrabArea
+			if (area.Name == "GrabArea")
 			{
-				if (actor.IsInGroup("player"))
+				var parentActor = area.GetParent<GameActor>();
+				if (parentActor != null && parentActor.IsInGroup("player"))
 				{
 					// 只有在没有聚焦玩家时才设置新的，避免多人模式下焦点被抢夺
 					if (_playerInRange == null)
 					{
-						_playerInRange = actor;
+						_playerInRange = parentActor;
 						UpdatePromptVisibility();
 					}
 				}
@@ -167,14 +213,19 @@ namespace Kuros.Actors.NPC
 		}
 		
 		/// <summary>
-		/// 有物体离开交互区域
+		/// 有Area2D离开交互区域（玩家的GrabArea离开）
 		/// </summary>
-		private void OnBodyExited(Node2D body)
+		private void OnAreaExited(Area2D area)
 		{
-			if (body == _playerInRange)
+			// 检查离开的区域是否是我们跟踪的玩家的GrabArea
+			if (area.Name == "GrabArea")
 			{
-				_playerInRange = null;
-				UpdatePromptVisibility();
+				var parentActor = area.GetParent<GameActor>();
+				if (parentActor == _playerInRange)
+				{
+					_playerInRange = null;
+					UpdatePromptVisibility();
+				}
 			}
 		}
 		
@@ -288,6 +339,9 @@ namespace Kuros.Actors.NPC
 			
 			_isInteracting = true;
 			UpdatePromptVisibility();
+
+			// 冻结全局时间
+    		Engine.TimeScale = 0f;
 			
 			// 注意：不需要手动禁用玩家输入
 			// 玩家状态机会自动检查 DialogueManager.IsDialogueActive
@@ -311,6 +365,9 @@ namespace Kuros.Actors.NPC
 			_isInteracting = false;
 			UpdatePromptVisibility();
 			
+			// 恢复全局时间
+			Engine.TimeScale = 1f;
+
 			// 注意：不需要手动恢复玩家输入
 			// 玩家状态机会自动检查 DialogueManager.IsDialogueActive
 			// 当对话结束时，状态机会自动恢复正常的输入处理

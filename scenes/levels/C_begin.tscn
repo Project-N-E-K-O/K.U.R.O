@@ -52,6 +52,7 @@ y_sort_enabled = true
 position = Vector2(-2564, 767)
 
 [node name="AreaSize" type="Area2D" parent="."]
+visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AreaSize"]
 z_index = 10

@@ -82,6 +82,11 @@ namespace Kuros.Core
 		public bool IsDeathSequenceActive => _deathStarted && !_deathFinalized;
 		public bool IsDead => _deathFinalized;
 		public bool IgnoreHitStateOnDamage { get; set; } = false;
+		/// <summary>
+		/// 当前角色持有的免疫标志集合，由 EnemyAttackTemplate 的 GrantedImmunities 字段在攻击期间写入/还原。
+		/// 新增免疫类型只需在 <see cref="ImmunityFlags"/> 枚举中追加值，无需修改此类。
+		/// </summary>
+		public ImmunityFlags ActiveImmunities { get; set; } = ImmunityFlags.None;
 
 		public float GetSecondsSinceLastDamageTaken()
 		{
@@ -268,6 +273,7 @@ namespace Kuros.Core
 		public virtual void TakeDamage(int damage, Vector2? attackOrigin = null, GameActor? attacker = null, Events.DamageSource damageSource = Events.DamageSource.DirectAttack)
 		{
 			if (IsDeathSequenceActive || IsDead) return;
+			if (ActiveImmunities.HasFlag(ImmunityFlags.Damage)) return;
 			if (damage <= 0) return;
 
 			if (DamageIntercepted != null)

@@ -3,6 +3,7 @@ using System;
 using Kuros.Core;
 using Kuros.Utils;
 using Kuros.Actors.Enemies.States;
+using Kuros.Actors.Enemies.Attacks;
 
 public partial class SampleEnemy : GameActor
 {
@@ -25,6 +26,7 @@ public partial class SampleEnemy : GameActor
 	private SamplePlayer? _player;
 	private bool _scoreGranted;
 	private string _debugOverlayText = string.Empty;
+	private EnemyAttackController? _cachedAttackController;
 	
 	// public SampleEnemy()
 	// {
@@ -50,8 +52,8 @@ public partial class SampleEnemy : GameActor
 		}
 		if (DetectionArea == null) 
 		{
-			DetectionArea = GetNodeOrNull<Area2D>("Sprite2D/DetectionArea");
-			if (DetectionArea == null) GD.PrintErr("DetectionArea not found at Sprite2D/DetectionArea");
+			DetectionArea = GetNodeOrNull<Area2D>("Sprite2D/ControllerDetectionArea");
+			if (DetectionArea == null) GD.PrintErr("DetectionArea not found at Sprite2D/ControllerDetectionArea");
 		}
 		RefreshPlayerReference();
 		UpdateDebugOverlayText();
@@ -183,6 +185,7 @@ public partial class SampleEnemy : GameActor
 	{
 		string stateName = StateMachine?.CurrentState?.Name ?? "None";
 		string frozenInfo = "";
+		string attackInfo = "";
 		
 		// 如果在Frozen状态，显示倒计时
 		if (stateName == "Frozen" && StateMachine?.CurrentState is EnemyFrozenState frozenState)
@@ -190,7 +193,52 @@ public partial class SampleEnemy : GameActor
 			float remainingTime = frozenState.GetRemainingTime();
 			frozenInfo = $" | Frozen: {remainingTime:F2}s";
 		}
+
+		// 如果在Attack状态，显示当前攻击模式
+		if (stateName == "Attack")
+		{
+			string currentAttackName = GetCurrentAttackName();
+			if (!string.IsNullOrEmpty(currentAttackName))
+			{
+				attackInfo = $" | Attack: {currentAttackName}";
+			}
+		}
 		
-		_debugOverlayText = $"{Name} | State: {stateName} | HP: {CurrentHealth}/{MaxHealth}{frozenInfo}";
+		_debugOverlayText = $"{Name} | State: {stateName}{attackInfo} | HP: {CurrentHealth}/{MaxHealth}{frozenInfo}";
+	}
+
+	private string GetCurrentAttackName()
+	{
+		// 尝试从缓存获取 AttackController
+		if (_cachedAttackController != null && IsInstanceValid(_cachedAttackController))
+		{
+			// 通过反射获取 CurrentAttackName 属性
+			var property = _cachedAttackController.GetType().GetProperty("CurrentAttackName");
+			if (property != null)
+			{
+				var value = property.GetValue(_cachedAttackController);
+				return value?.ToString() ?? string.Empty;
+			}
+		}
+
+		// 尝试从 StateMachine/Attack/AttackController 获取
+		if (StateMachine == null) return string.Empty;
+
+		var attackState = StateMachine.GetNodeOrNull("Attack");
+		if (attackState == null) return string.Empty;
+
+		_cachedAttackController = attackState.GetNodeOrNull<EnemyAttackController>("AttackController");
+		if (_cachedAttackController != null)
+		{
+			// 通过反射获取 CurrentAttackName 属性
+			var property = _cachedAttackController.GetType().GetProperty("CurrentAttackName");
+			if (property != null)
+			{
+				var value = property.GetValue(_cachedAttackController);
+				return value?.ToString() ?? string.Empty;
+			}
+		}
+
+		return string.Empty;
 	}
 }

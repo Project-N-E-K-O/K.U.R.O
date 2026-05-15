@@ -196,6 +196,14 @@ namespace Kuros.Actors.Enemies.Attacks
 				return;
 			}
 
+			// frozen/受击状态下停止所有追踪与冲刺逻辑
+			var stateName = Enemy.StateMachine?.CurrentState?.Name;
+			if (stateName == "Frozen" || stateName == "CooldownFrozen"
+				|| stateName == "Hit" || stateName == "Dying" || stateName == "Dead")
+			{
+				return;
+			}
+
 			// 快照延迟计时
 			if (_waitingForSnapshot)
 			{
@@ -210,6 +218,16 @@ namespace Kuros.Actors.Enemies.Attacks
 
 			if (_postAttackCooldown > 0f)
 			{
+				// 若其他攻击已接管（本攻击未运行但状态为 Attack），
+				// 立即放弃冷却追踪，避免 FinishCooldownState 误打断无关攻击。
+				var currentStateName = Enemy?.StateMachine?.CurrentState?.Name;
+				if (currentStateName == "Attack" && !IsRunning)
+				{
+					_postAttackCooldown = 0f;
+					_pendingCooldownExit = false;
+					return;
+				}
+
 				_postAttackCooldown -= (float)delta;
 				if (_postAttackCooldown <= 0f)
 				{
@@ -218,17 +236,6 @@ namespace Kuros.Actors.Enemies.Attacks
 					{
 						FinishCooldownState();
 						_pendingCooldownExit = false;
-					}
-				}
-				// 只有当敌人处于冷却相关状态时，才由此处控制移动
-				// 否则让状态机自己处理，避免覆盖其他状态的速度设置
-				var currentStateName = Enemy?.StateMachine?.CurrentState?.Name;
-				if (currentStateName == CooldownStateName || currentStateName == "Attack")
-				{
-					if (Enemy != null)
-					{
-						Enemy.Velocity = Vector2.Zero;
-						Enemy.MoveAndSlide();
 					}
 				}
 				return;
@@ -356,11 +363,8 @@ namespace Kuros.Actors.Enemies.Attacks
 		{
 			if (Enemy?.StateMachine == null) return;
 
+			// 只有仍处于冷却状态时才负责退出；外部状态已被接管则不干预。
 			if (Enemy.StateMachine.CurrentState?.Name == CooldownStateName)
-			{
-				Enemy.StateMachine.ChangeState("Walk");
-			}
-			else if (Enemy.StateMachine.CurrentState?.Name == "Attack")
 			{
 				Enemy.StateMachine.ChangeState("Walk");
 			}
@@ -406,9 +410,17 @@ namespace Kuros.Actors.Enemies.Attacks
 		{
 			if (Enemy == null) return;
 			if (Enemy.IsDeathSequenceActive || Enemy.IsDead) return;
-            if (IsRunning || IsOnCooldown) return;
+			if (IsRunning || IsOnCooldown) return;
 			if (Enemy.AttackTimer > 0) return;
 			if (_postAttackCooldown > 0f) return;
+
+			// 冻结/受击状态下不触发攻击
+			var currentStateName = Enemy.StateMachine?.CurrentState?.Name;
+			if (currentStateName == "Frozen" || currentStateName == "CooldownFrozen"
+				|| currentStateName == "Hit" || currentStateName == "Dying" || currentStateName == "Dead")
+			{
+				return;
+			}
 
 			if (_controller != null && _controller.PeekQueuedAttack() != this)
 			{

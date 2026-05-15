@@ -1,79 +1,204 @@
-[gd_scene load_steps=20 format=3 uid="uid://enemy_c1_waiter_b"]
+[gd_scene load_steps=35 format=3 uid="uid://8ce54l6083nt"]
 
-[ext_resource type="Script" path="res://scripts/actors/enemies/EnemyC1WaiterB.cs" id="1_enemy_script"]
-[ext_resource type="Texture2D" path="res://icon.svg" id="2_icon"]
-[ext_resource type="Script" path="res://scripts/core/effects/EffectController.cs" id="3_effect_controller"]
-[ext_resource type="Script" path="res://scripts/systems/fsm/StateMachine.cs" id="4_state_machine"]
-[ext_resource type="Script" path="res://scripts/actors/enemies/states/EnemyIdleState.cs" id="5_idle_state"]
-[ext_resource type="Script" path="res://scripts/actors/enemies/states/EnemyWalkState.cs" id="6_walk_state"]
-[ext_resource type="Script" path="res://scripts/actors/enemies/states/EnemyAttackState.cs" id="7_attack_state"]
-[ext_resource type="Script" path="res://scripts/actors/enemies/states/EnemyHitState.cs" id="8_hit_state"]
-[ext_resource type="Script" path="res://scripts/actors/enemies/states/EnemyFrozenState.cs" id="9_frozen_state"]
-[ext_resource type="Script" path="res://scripts/actors/enemies/states/EnemyCooldownFrozenState.cs" id="10_cooldown_state"]
-[ext_resource type="Script" path="res://scripts/actors/enemies/states/EnemyDyingState.cs" id="11_dying_state"]
-[ext_resource type="Script" path="res://scripts/actors/enemies/states/EnemyDeadState.cs" id="12_dead_state"]
-[ext_resource type="Script" path="res://scripts/actors/enemies/attacks/EnemyAttackController.cs" id="13_attack_controller"]
-[ext_resource type="Script" path="res://scripts/actors/enemies/attacks/EnemyLaserSweepAttack.cs" id="14_laser_attack"]
-[ext_resource type="Script" path="res://scripts/actors/enemies/attacks/EnemyVolleyRangedAttack.cs" id="15_volley_attack"]
-[ext_resource type="Script" path="res://scripts/actors/enemies/attacks/EnemyThrustStrikeAttack.cs" id="16_thrust_attack"]
-[ext_resource type="Resource" path="res://resources/items/Weapon_A0_plate.tres" id="17_plate_item"]
+[ext_resource type="Script" uid="uid://d3gkoo7f3rxiq" path="res://scripts/actors/enemies/EnemyC1WaiterB.cs" id="1_enemy_script"]
+[ext_resource type="Script" uid="uid://crdjpji0qtc4q" path="res://scripts/core/stats/StatModifier.cs" id="2_eqcia"]
+[ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="2_st2e3"]
+[ext_resource type="Script" uid="uid://d6ppl6a6djpr" path="res://scripts/core/effects/EffectController.cs" id="3_effect_controller"]
+[ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="3_evlou"]
+[ext_resource type="Script" uid="uid://d4mh83kyh88kd" path="res://scripts/core/stats/CharacterStatProfile.cs" id="3_qgdql"]
+[ext_resource type="Script" uid="uid://cenpuhlcgesin" path="res://scripts/systems/fsm/StateMachine.cs" id="4_state_machine"]
+[ext_resource type="Script" uid="uid://7sdhlullren0" path="res://scripts/actors/enemies/states/EnemyIdleState.cs" id="5_idle_state"]
+[ext_resource type="Script" uid="uid://bbybuyitd10jr" path="res://scripts/controllers/SpineController.gd" id="5_muxhp"]
+[ext_resource type="Script" uid="uid://c6mvoo4sy0r7g" path="res://scripts/actors/enemies/states/EnemyWalkState.cs" id="6_walk_state"]
+[ext_resource type="Script" uid="uid://bo6uhkbqyxe6o" path="res://scripts/actors/enemies/states/EnemyAttackState.cs" id="7_attack_state"]
+[ext_resource type="Script" uid="uid://cwnxfhj8ysc2f" path="res://scripts/actors/enemies/states/EnemyHitState.cs" id="8_hit_state"]
+[ext_resource type="Script" uid="uid://cihawgv4js52w" path="res://scripts/actors/enemies/states/EnemyFrozenState.cs" id="9_frozen_state"]
+[ext_resource type="Script" uid="uid://fpfidsmcwy6w" path="res://scripts/actors/enemies/states/EnemyCooldownFrozenState.cs" id="10_cooldown_state"]
+[ext_resource type="Script" uid="uid://gmfkjmmrq05b" path="res://scripts/actors/enemies/attacks/EnemyC1WaiterBAttackController.cs" id="10_st2e3"]
+[ext_resource type="Script" uid="uid://c8dl2dxj817c1" path="res://scripts/actors/enemies/attacks/EnemyDashSlashAttack.cs" id="11_5drfe"]
+[ext_resource type="Script" uid="uid://cbmvuppulotha" path="res://scripts/actors/enemies/states/EnemyDyingState.cs" id="11_dying_state"]
+[ext_resource type="Script" uid="uid://bta6sixb7kee4" path="res://scripts/actors/enemies/states/EnemyDeadState.cs" id="12_dead_state"]
+[ext_resource type="Script" uid="uid://c427wppd4y7w7" path="res://scripts/actors/enemies/attacks/EnemyC1WaiterBMeleeAttack.cs" id="13_st2e3"]
+[ext_resource type="PackedScene" uid="uid://bbh4qpwwrrpna" path="res://shaders/laser_beam.tscn" id="14_evlou"]
+[ext_resource type="PackedScene" uid="uid://bso7mhhjbapey" path="res://shaders/laser_beam_ultimate.tscn" id="15_evlou"]
+[ext_resource type="Script" uid="uid://pq441lqdfxhh" path="res://scripts/actors/enemies/attacks/EnemyUltimateBeamAttack.cs" id="15_ultbeam"]
+[ext_resource type="SpineSkeletonDataResource" uid="uid://c8ikhh4fs46ba" path="res://animations/spine/Enemy_C1_waiterB.tres" id="18_t4d47"]
+[ext_resource type="Script" uid="uid://dasv6eyuks8yq" path="res://scripts/actors/enemies/movement/EnemyFreezeOnTurnMovement.cs" id="18_uohhx"]
+[ext_resource type="Script" uid="uid://dvu6xk56lp65v" path="res://scripts/actors/enemies/animation/EnemyC1WaiterBSpineAnimationController.cs" id="19_uohhx"]
 
-[sub_resource type="CapsuleShape2D" id="BodyShape"]
-radius = 10.0
-height = 48.0
+[sub_resource type="Resource" id="Resource_f4qnp"]
+script = ExtResource("3_qgdql")
+metadata/_custom_type_script = "uid://d4mh83kyh88kd"
 
-[sub_resource type="RectangleShape2D" id="AttackShape"]
-size = Vector2(90, 50)
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_eqcia"]
+shader = ExtResource("2_st2e3")
+shader_parameter/softness = 0.5
+shader_parameter/alpha = 0.4
 
-[sub_resource type="RectangleShape2D" id="DetectionShape"]
-size = Vector2(220, 140)
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ek8bd"]
+size = Vector2(4000, 500)
 
-[sub_resource type="RectangleShape2D" id="ControllerDetectionShape"]
-size = Vector2(320, 200)
+[sub_resource type="CircleShape2D" id="CircleShape2D_t4d47"]
+radius = 1033.9792
 
-[node name="Enemy_C1_waiterB" type="CharacterBody2D" node_paths=PackedStringArray("DetectionArea", "AttackArea")]
+[sub_resource type="CircleShape2D" id="CircleShape2D_uohhx"]
+radius = 1024.0
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_5drfe"]
+radius = 150.0
+height = 600.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_st2e3"]
+size = Vector2(400, 400)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_evlou"]
+radius = 1024.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_st2e3"]
+radius = 180.0
+
+[node name="Enemy_C1_waiterB" type="CharacterBody2D" node_paths=PackedStringArray("DetectionArea", "AttackArea", "StateMachine", "EffectController")]
+z_index = 2
+y_sort_enabled = true
+scale = Vector2(0.33, 0.33)
 collision_layer = 2
-collision_mask = 3
+collision_mask = 15
+motion_mode = 1
 script = ExtResource("1_enemy_script")
-DetectionArea = NodePath("Sprite2D/DetectionArea")
+EnableStateDebugOverlay = true
+DebugOverlayOffset = Vector2(-1200, 200)
+DebugOverlayFontSize = 128
+DetectionArea = NodePath("Sprite2D/ControllerDetectionArea")
 AttackArea = NodePath("Sprite2D/AttackArea")
+ScoreValue = 50
+Speed = 400.0
+AttackDamage = 0.0
+AttackCooldown = 0.4
+StateMachine = NodePath("StateMachine")
+EffectController = NodePath("EffectController")
+StatProfile = SubResource("Resource_f4qnp")
+DamageFlashColor = Color(1, 1, 1, 1)
 
-[node name="EffectController" type="Node" parent="."]
-script = ExtResource("3_effect_controller")
+[node name="Shadow" type="Sprite2D" parent="."]
+show_behind_parent = true
+material = SubResource("ShaderMaterial_eqcia")
+scale = Vector2(10, 5)
+texture = ExtResource("3_evlou")
+
+[node name="OutlineLayer" type="Node2D" parent="."]
+show_behind_parent = true
+scale = Vector2(0.99999994, 0.99999994)
+
+[node name="OutlineSpineSprite_Left" type="SpineSprite" parent="OutlineLayer"]
+modulate = Color(0.02, 0.02, 0.02, 0.85)
+show_behind_parent = true
+position = Vector2(-20, 0)
+skeleton_data_res = ExtResource("18_t4d47")
+preview_skin = "Default"
+preview_animation = "-- Empty --"
+preview_frame = true
+preview_time = 3.23
+script = ExtResource("5_muxhp")
+
+[node name="OutlineSpineSprite_Right" type="SpineSprite" parent="OutlineLayer"]
+modulate = Color(0.02, 0.02, 0.02, 0.85)
+show_behind_parent = true
+position = Vector2(20, 0)
+skeleton_data_res = ExtResource("18_t4d47")
+preview_skin = "Default"
+preview_animation = "-- Empty --"
+preview_frame = true
+preview_time = 3.23
+script = ExtResource("5_muxhp")
+
+[node name="OutlineSpineSprite_Up" type="SpineSprite" parent="OutlineLayer"]
+modulate = Color(0.02, 0.02, 0.02, 0.85)
+show_behind_parent = true
+position = Vector2(0, -20)
+skeleton_data_res = ExtResource("18_t4d47")
+preview_skin = "Default"
+preview_animation = "-- Empty --"
+preview_frame = true
+preview_time = 3.23
+script = ExtResource("5_muxhp")
+
+[node name="OutlineSpineSprite_Down" type="SpineSprite" parent="OutlineLayer"]
+modulate = Color(0.02, 0.02, 0.02, 0.85)
+show_behind_parent = true
+position = Vector2(0, 20)
+skeleton_data_res = ExtResource("18_t4d47")
+preview_skin = "Default"
+preview_animation = "-- Empty --"
+preview_frame = true
+preview_time = 3.23
+script = ExtResource("5_muxhp")
+
+[node name="SpineSprite" type="SpineSprite" parent="."]
+skeleton_data_res = ExtResource("18_t4d47")
+preview_skin = "Default"
+preview_animation = "-- Empty --"
+preview_frame = true
+preview_time = 0.0
+script = ExtResource("5_muxhp")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-texture = ExtResource("2_icon")
-offset = Vector2(0, -8)
-scale = Vector2(1.2, 1.2)
+position = Vector2(0, -600)
 
 [node name="AttackArea" type="Area2D" parent="Sprite2D"]
-position = Vector2(28, -6)
 collision_layer = 0
-monitoring = true
+monitorable = false
 
-[node name="AttackShape" type="CollisionShape2D" parent="Sprite2D/AttackArea"]
-shape = SubResource("AttackShape")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/AttackArea"]
+position = Vector2(2000, 0)
+shape = SubResource("RectangleShape2D_ek8bd")
 
-[node name="DetectionArea" type="Area2D" parent="Sprite2D"]
-position = Vector2(12, -8)
-collision_layer = 0
-monitoring = true
-
-[node name="DetectionShape" type="CollisionShape2D" parent="Sprite2D/DetectionArea"]
-shape = SubResource("DetectionShape")
-
-[node name="ControllerDetectionArea" type="Area2D" parent="Sprite2D"]
-position = Vector2(12, -8)
+[node name="AttackDetectionArea" type="Area2D" parent="Sprite2D"]
+visible = false
 collision_layer = 0
 collision_mask = 4
-monitoring = true
+monitorable = false
+
+[node name="AttackDetectionShape" type="CollisionShape2D" parent="Sprite2D/AttackDetectionArea"]
+scale = Vector2(5, 5)
+shape = SubResource("CircleShape2D_t4d47")
+
+[node name="ControllerDetectionArea" type="Area2D" parent="Sprite2D"]
+visible = false
+collision_layer = 0
+collision_mask = 4
+monitorable = false
 
 [node name="ControllerDetectionShape" type="CollisionShape2D" parent="Sprite2D/ControllerDetectionArea"]
-shape = SubResource("ControllerDetectionShape")
+scale = Vector2(9, 9)
+shape = SubResource("CircleShape2D_uohhx")
+
+[node name="HitArea" type="Area2D" parent="Sprite2D"]
+visible = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/HitArea"]
+position = Vector2(0, 130)
+shape = SubResource("CapsuleShape2D_5drfe")
+
+[node name="DashStopArea" type="Area2D" parent="Sprite2D"]
+scale = Vector2(0.99999994, 0.99999994)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/DashStopArea"]
+position = Vector2(500, 100)
+shape = SubResource("RectangleShape2D_st2e3")
+
+[node name="DashSlashArea" type="Area2D" parent="Sprite2D"]
+collision_layer = 0
+collision_mask = 7
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/DashSlashArea"]
+position = Vector2(800, 0)
+scale = Vector2(1.2, 0.8)
+shape = SubResource("CircleShape2D_evlou")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, -8)
-shape = SubResource("BodyShape")
+visible = false
+shape = SubResource("CircleShape2D_st2e3")
 
 [node name="StateMachine" type="Node" parent="." node_paths=PackedStringArray("InitialState")]
 script = ExtResource("4_state_machine")
@@ -89,67 +214,65 @@ script = ExtResource("6_walk_state")
 script = ExtResource("7_attack_state")
 
 [node name="AttackController" type="Node" parent="StateMachine/Attack"]
-script = ExtResource("13_attack_controller")
+script = ExtResource("10_st2e3")
+MeleeCountBeforeCharge = 5
+UltimateHealthThresholds = PackedFloat32Array(0.9, 0.5, 0.1)
 PlayerDetectionAreaPath = NodePath("../../../Sprite2D/ControllerDetectionArea")
 
-[node name="LaserAttack" type="Node" parent="StateMachine/Attack/AttackController"]
-script = ExtResource("14_laser_attack")
-AttackName = "Attack1_Laser"
-BurstCount = 3
-TelegraphDuration = 1.5
-LaserDuration = 1.0
-InterBurstDelay = 0.25
-PostRecoveryDuration = 1.0
-LaserDamage = 2
-LaserWidth = 1200.0
-LaserThickness = 80.0
-HoverOffset = Vector2(0, -100)
-LaserAnchorPaths = Array[NodePath]([NodePath("Anchors/AnchorLeft"), NodePath("Anchors/AnchorCenter"), NodePath("Anchors/AnchorRight")])
-metadata/attack_weight = 20.0
-metadata/guarantee_interval = 4
-metadata/guarantee_priority = 0
+[node name="DashSlashAttack" type="Node" parent="StateMachine/Attack/AttackController"]
+script = ExtResource("11_5drfe")
+DetectionAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
+DashStopAreaPath = NodePath("../../../../Sprite2D/DashStopArea")
+DashSlashAreaPath = NodePath("../../../../Sprite2D/DashSlashArea")
+SlashDamage = 5
+WarmupDuration = 1.0
+ActiveDuration = 0.5
+RecoveryDuration = 0.87
+CooldownDuration = 0.5
+AttackAreaPath = NodePath("../../../../Sprite2D/DashSlashArea")
+KnockbackDistance = 500.0
+KnockbackSpeed = 1000.0
+RequireAnimationHitTrigger = true
+GrantedImmunities = 8
+IgnoreEnemyCollisionDuringAttack = true
+metadata/attack_weight = 60.0
 
-[node name="Anchors" type="Node2D" parent="StateMachine/Attack/AttackController/LaserAttack"]
-
-[node name="AnchorLeft" type="Marker2D" parent="StateMachine/Attack/AttackController/LaserAttack/Anchors"]
-position = Vector2(-450, -60)
-
-[node name="AnchorCenter" type="Marker2D" parent="StateMachine/Attack/AttackController/LaserAttack/Anchors"]
-position = Vector2(0, -80)
-
-[node name="AnchorRight" type="Marker2D" parent="StateMachine/Attack/AttackController/LaserAttack/Anchors"]
-position = Vector2(450, -60)
-
-[node name="VolleyAttack" type="Node" parent="StateMachine/Attack/AttackController"]
-script = ExtResource("15_volley_attack")
-AttackName = "Attack2_Volley"
-VolleyCount = 2
-ShotsPerVolley = 4
-ShotIntervalSeconds = 0.18
-VolleyIntervalSeconds = 0.65
-AimMode = 1
-DamagePerShot = 1
-ProjectileImpulse = 900.0
-SpawnOffset = Vector2(18, -6)
-ProjectileItem = ExtResource("17_plate_item")
-metadata/attack_weight = 50.0
-metadata/guarantee_interval = 3
-metadata/guarantee_priority = 1
-
-[node name="ThrustAttack" type="Node" parent="StateMachine/Attack/AttackController"]
-script = ExtResource("16_thrust_attack")
-AttackName = "Attack3_Thrust"
-WarmupDuration = 0.15
-RecoveryDuration = 0.5
-CooldownDuration = 1.6
-DashSpeed = 850.0
-MaxDashDistance = 680.0
-MinDashDistance = 140.0
-StrikeDelaySeconds = 0.2
-StrikeDamage = 6
+[node name="SimpleMeleeAttack" type="Node" parent="StateMachine/Attack/AttackController"]
+script = ExtResource("13_st2e3")
+SecondEffectScene = ExtResource("14_evlou")
+SecondEffectOffset = Vector2(280, -330)
+Damage = 2
+WarmupDuration = 0.4
+ActiveDuration = 1.4
+RecoveryDuration = 0.3
+CooldownDuration = 0.4
 AttackAreaPath = NodePath("../../../../Sprite2D/AttackArea")
-metadata/attack_weight = 30.0
-metadata/guarantee_priority = 2
+KnockbackDistance = 50.0
+KnockbackSpeed = 1000.0
+RequireAnimationHitTrigger = true
+AllowMultipleAnimationHits = true
+EffectScene = ExtResource("14_evlou")
+EffectOffset = Vector2(0, -200)
+metadata/attack_weight = 40.0
+
+[node name="UltimateBeamAttack" type="Node" parent="StateMachine/Attack/AttackController"]
+script = ExtResource("15_ultbeam")
+BeamDuration = 5.0
+WarmupDuration = 1.5
+ActiveDuration = 1.1
+RecoveryDuration = 0.73
+CooldownDuration = 0.5
+AttackAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
+KnockbackDistance = 50.0
+KnockbackSpeed = 1000.0
+RequireAnimationHitTrigger = true
+AllowMultipleAnimationHits = true
+GrantedImmunities = 31
+IgnoreEnemyCollisionDuringAttack = true
+EffectScene = ExtResource("15_evlou")
+EffectOffset = Vector2(-100, -750)
+SpawnTiming = 1
+metadata/attack_weight = 0.0
 
 [node name="Hit" type="Node" parent="StateMachine"]
 script = ExtResource("8_hit_state")
@@ -162,7 +285,27 @@ script = ExtResource("10_cooldown_state")
 
 [node name="Dying" type="Node" parent="StateMachine"]
 script = ExtResource("11_dying_state")
+DeathDuration = 1.6
 
 [node name="Dead" type="Node" parent="StateMachine"]
 script = ExtResource("12_dead_state")
 
+[node name="EffectController" type="Node" parent="."]
+script = ExtResource("3_effect_controller")
+
+[node name="FreezeOnTurnMovement" type="Node" parent="."]
+script = ExtResource("18_uohhx")
+
+[node name="AnimationController" type="Node" parent="."]
+script = ExtResource("19_uohhx")
+Skill3LoopStart = 1.6
+AttackMixDuration = 0.1
+SkillMixDuration = 0.2
+
+[node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
+target_desired_distance = 50.0
+path_max_distance = 500.0
+avoidance_enabled = true
+radius = 100.0
+max_speed = 350.0
+debug_path_custom_line_width = 2.0

@@ -1,0 +1,136 @@
+[gd_scene load_steps=2 format=3 uid="uid://dy0pchsyvmjhy"]
+
+[ext_resource type="Script" uid="uid://bm4x4gek0h6nb" path="res://scripts/ui/EnemySpawnConsoleWindow.cs" id="1_esp_window_script"]
+
+[node name="EnemySpawnConsoleWindow" type="Control"]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_esp_window_script")
+MaxEnemyCount = 12
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.85)
+
+[node name="MainPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -360.0
+offset_top = -280.0
+offset_right = 360.0
+offset_bottom = 280.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Header" type="HBoxContainer" parent="MainPanel"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 12.0
+offset_top = 8.0
+offset_right = -12.0
+offset_bottom = 50.0
+grow_horizontal = 2
+theme_override_constants/separation = 8
+
+[node name="Title" type="Label" parent="MainPanel/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "敌人生成控制台"
+vertical_alignment = 1
+
+[node name="CloseButton" type="Button" parent="MainPanel/Header"]
+custom_minimum_size = Vector2(36, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "×"
+
+[node name="HSeparator" type="HSeparator" parent="MainPanel"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 8.0
+offset_top = 50.0
+offset_right = -8.0
+offset_bottom = 58.0
+grow_horizontal = 2
+
+[node name="Body" type="MarginContainer" parent="MainPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 58.0
+offset_bottom = -62.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+
+[node name="EnemyListScroll" type="ScrollContainer" parent="MainPanel/Body"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="EnemyListContainer" type="VBoxContainer" parent="MainPanel/Body/EnemyListScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 14
+
+[node name="Footer" type="HBoxContainer" parent="MainPanel"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = -54.0
+offset_right = -12.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 8
+
+[node name="DisableAICheckBox" type="CheckBox" parent="MainPanel/Footer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "暂停敌人AI"
+
+[node name="KillAllEnemiesButton" type="Button" parent="MainPanel/Footer"]
+custom_minimum_size = Vector2(120, 38)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "消灭所有敌人"
+
+[node name="Spacer" type="Control" parent="MainPanel/Footer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CancelButton" type="Button" parent="MainPanel/Footer"]
+custom_minimum_size = Vector2(80, 38)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "取消"
+
+[node name="ConfirmButton" type="Button" parent="MainPanel/Footer"]
+custom_minimum_size = Vector2(110, 38)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "确认生成"

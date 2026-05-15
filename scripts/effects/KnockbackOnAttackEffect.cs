@@ -59,6 +59,8 @@ namespace Kuros.Effects
 
             if (target is not CharacterBody2D targetBody) return;
 
+            if (target.ActiveImmunities.HasFlag(ImmunityFlags.ForcedMovement)) return;
+
             Vector2 direction = (target.GlobalPosition - attacker.GlobalPosition);
             if (direction == Vector2.Zero)
             {
