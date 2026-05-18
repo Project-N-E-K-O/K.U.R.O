@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=3 uid="uid://wluyqt2wxlvb"]
+[gd_scene load_steps=26 format=3 uid="uid://wluyqt2wxlvb"]
 
 [ext_resource type="Script" uid="uid://x1ic1ym4ykq8" path="res://scripts/scenes/BattleSceneManager.cs" id="1_s6mo5"]
 [ext_resource type="PackedScene" uid="uid://ufprfd4r8ijj" path="res://assets/spine/main_character/main_character.tscn" id="1_tv6fd"]
@@ -23,6 +23,8 @@
 [ext_resource type="PackedScene" uid="uid://cipwjj7xx121y" path="res://scenes/weapons/Weapon_Throw_smokeGrenade.tscn" id="13_pxy7y"]
 [ext_resource type="PackedScene" uid="uid://v3n56xk6n8ca" path="res://scenes/loading/Loading_elevator.tscn" id="16_28ted"]
 [ext_resource type="PackedScene" uid="uid://beohs6gufqc3i" path="res://scenes/actors/npc/SimpleNPC.tscn" id="23_pxy7y"]
+[ext_resource type="PackedScene" uid="uid://bya6to34ex05t" path="res://scenes/actors/npc/Dialogic_Interaction.tscn" id="24_y4lq6"]
+[ext_resource type="Script" uid="uid://b7afb3wjghskq" path="res://scripts/items/world/DropItemDebugger.cs" id="25_jqh86"]
 
 [node name="BattleScene" type="Node2D" node_paths=PackedStringArray("Player")]
 script = ExtResource("1_s6mo5")
@@ -94,3 +96,11 @@ NextStagePath = "uid://dwk6x3qcbsmul"
 [node name="NPC" parent="World" instance=ExtResource("23_pxy7y")]
 y_sort_enabled = true
 position = Vector2(-729, 536)
+
+[node name="DialogicInteraction" parent="World/NPC" instance=ExtResource("24_y4lq6")]
+TimelinePath = "B_begin_timeline"
+CharacterPath = "Enemy_Normal_guard2_B_begin_gate"
+PromptText = ""
+
+[node name="DropDebug" type="Node2D" parent="."]
+script = ExtResource("25_jqh86")

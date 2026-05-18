@@ -26,6 +26,8 @@ script = ExtResource("3_fohb2")
 BeginScene = ExtResource("4_ehms5")
 EndScene = ExtResource("5_fhce4")
 MiddleScenePool = Array[PackedScene]([ExtResource("6_k7md6"), ExtResource("7_gcbwp"), ExtResource("8_iafd3")])
+MinMiddleRooms = 0
+MaxMiddleRooms = 0
 
 [node name="World" type="Node2D" parent="."]
 y_sort_enabled = true

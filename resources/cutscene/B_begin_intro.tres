@@ -7,6 +7,10 @@
 
 [sub_resource type="Resource" id="Resource_bcybp"]
 script = ExtResource("3_7qph7")
+Duration = 5.0
+TransitionDuration = 1.0
+UseMovieBlackBars = true
+WaitForCompletion = false
 metadata/_custom_type_script = "uid://cjl1hjmndwvcg"
 
 [sub_resource type="Resource" id="Resource_mork0"]

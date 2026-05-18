@@ -9,6 +9,13 @@ namespace Kuros.Systems.Loot
     [GlobalClass]
     public partial class LootDropTable : Resource
     {
+        /// <summary>
+        /// Sequential: 按顺序逐条独立掷骰（默认）
+        /// PickOne: 按 DropChance 权重从池中随机选一条，保证 GlobalDropChance 通过后必出一件
+        /// </summary>
+        public enum LootSelectionMode { Sequential, PickOne }
+
+        [Export] public LootSelectionMode SelectionMode { get; set; } = LootSelectionMode.Sequential;
         [Export(PropertyHint.Range, "0,1,0.01")]
         public float GlobalDropChance { get; set; } = 1f;
 

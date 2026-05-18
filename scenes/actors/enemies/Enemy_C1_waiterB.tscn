@@ -193,7 +193,7 @@ monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/DashSlashArea"]
 position = Vector2(800, 0)
-scale = Vector2(1.2, 0.8)
+scale = Vector2(1.2, 0.9)
 shape = SubResource("CircleShape2D_evlou")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
@@ -215,7 +215,6 @@ script = ExtResource("7_attack_state")
 
 [node name="AttackController" type="Node" parent="StateMachine/Attack"]
 script = ExtResource("10_st2e3")
-MeleeCountBeforeCharge = 5
 UltimateHealthThresholds = PackedFloat32Array(0.9, 0.5, 0.1)
 PlayerDetectionAreaPath = NodePath("../../../Sprite2D/ControllerDetectionArea")
 
@@ -224,6 +223,7 @@ script = ExtResource("11_5drfe")
 DetectionAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
 DashStopAreaPath = NodePath("../../../../Sprite2D/DashStopArea")
 DashSlashAreaPath = NodePath("../../../../Sprite2D/DashSlashArea")
+DashSpeed = 800.0
 SlashDamage = 5
 WarmupDuration = 1.0
 ActiveDuration = 0.5

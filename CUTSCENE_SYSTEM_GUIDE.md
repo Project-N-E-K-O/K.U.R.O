@@ -26,12 +26,12 @@ scripts/systems/cutscene/
 ├── CutsceneDialoguePanel.cs        ← 对话框抽象基类（Control）
 ├── DefaultCutsceneDialoguePanel.cs ← 默认对话框实现
 └── steps/
-    ├── WaitStep.cs                 ← 等待 N 秒
-    ├── DialogueLine.cs             ← 单条台词 Resource
-    ├── DialogueStep.cs             ← 显示一组台词
-    ├── CameraMoveStep.cs           ← 镜头移动
-    ├── PlayAnimationStep.cs        ← 播放动画
-    └── FadeStep.cs                 ← 黑幕淡变
+	├── WaitStep.cs                 ← 等待 N 秒
+	├── DialogueLine.cs             ← 单条台词 Resource
+	├── DialogueStep.cs             ← 显示一组台词
+	├── CameraMoveStep.cs           ← 镜头移动
+	├── PlayAnimationStep.cs        ← 播放动画
+	└── FadeStep.cs                 ← 黑幕淡变
 ```
 
 ---
@@ -93,12 +93,12 @@ Duration: 0.5      ← 过渡时长（秒）
 类型: DialogueStep
 Lines:
   [0] DialogueLine
-        Speaker: "主角"
-        Text:    "这里是对话内容……"
-        RevealSpeed: 40   ← 每秒显示字符数（0 = 立即全显）
+		Speaker: "主角"
+		Text:    "这里是对话内容……"
+		RevealSpeed: 40   ← 每秒显示字符数（0 = 立即全显）
   [1] DialogueLine
-        Speaker: "NPC"
-        Text:    "另一条台词"
+		Speaker: "NPC"
+		Text:    "另一条台词"
 ```
 
 #### CameraMoveStep — 镜头移动
@@ -210,9 +210,9 @@ cutsceneManager.CutsceneFinished += (id) => GD.Print($"过场结束: {id}");
 2. 子节点结构（参考）：
    ```
    Control (DefaultCutsceneDialoguePanel)
-     └─ Panel
-          ├─ SpeakerLabel  (Label)
-          └─ TextLabel     (RichTextLabel)
+	 └─ Panel
+		  ├─ SpeakerLabel  (Label)
+		  └─ TextLabel     (RichTextLabel)
    ```
 3. 在 Inspector 中修改 `SpeakerLabelPath` / `TextLabelPath` 对应实际节点路径
 4. 将此场景实例放到 `Stage_2.tscn` 的 `CanvasLayer` 下
@@ -236,19 +236,19 @@ cutsceneManager.CutsceneFinished += (id) => GD.Print($"过场结束: {id}");
 [GlobalClass]
 public partial class MyCustomStep : CutsceneStep
 {
-    [Export] public string SomeConfig { get; set; } = "";
+	[Export] public string SomeConfig { get; set; } = "";
 
-    public override async Task Execute(CutsceneContext ctx)
-    {
-        if (ctx.IsSkipping) return;
+	public override async Task Execute(CutsceneContext ctx)
+	{
+		if (ctx.IsSkipping) return;
 
-        // 做一些事情……
-        await ctx.NextFrame();  // 等一帧
+		// 做一些事情……
+		await ctx.NextFrame();  // 等一帧
 
-        // 检查跳过
-        while (!ctx.IsSkipping && /* 条件 */)
-            await ctx.NextFrame();
-    }
+		// 检查跳过
+		while (!ctx.IsSkipping && /* 条件 */)
+			await ctx.NextFrame();
+	}
 }
 ```
 

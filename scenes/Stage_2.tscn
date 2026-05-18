@@ -27,6 +27,8 @@ Player = NodePath("../World/MainCharacter")
 [node name="CutsceneManager" type="Node" parent="."]
 script = ExtResource("1_csmgr")
 SkipActionName = "run"
+TopBlackBarPath = NodePath("../CanvasLayer/ColorRectTop")
+BottomBlackBarPath = NodePath("../CanvasLayer/ColorRectBottom")
 HideNodePaths = Array[NodePath]([NodePath("../World/P2")])
 BattleSceneManagerPath = NodePath("..")
 
@@ -64,3 +66,18 @@ position = Vector2(300, 0)
 
 [node name="DropDebug" type="Node2D" parent="."]
 script = ExtResource("7_drop")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+layer = 128
+
+[node name="ColorRectTop" type="ColorRect" parent="CanvasLayer"]
+offset_right = 1920.0
+offset_bottom = 150.0
+color = Color(0, 0, 0, 1)
+metadata/_edit_use_anchors_ = true
+
+[node name="ColorRectBottom" type="ColorRect" parent="CanvasLayer"]
+offset_top = 930.0
+offset_right = 1920.0
+offset_bottom = 1080.0
+color = Color(0, 0, 0, 1)

@@ -456,7 +456,7 @@ namespace Kuros.Environments
                     }
                     if (_currentSpawnConfig.DisableLoot)
                     {
-                        DisableEnemyLoot(enemy);
+                        //DisableEnemyLoot(enemy);
                     }
                 }
 

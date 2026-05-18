@@ -82,7 +82,7 @@ AttackArea = NodePath("AttackArea")
 LeftHandAttachmentPath = NodePath("SpineSprite/SpineBoneNode")
 Speed = 500.0
 AttackDamage = 1.0
-MaxHealth = 1000
+MaxHealth = 12
 StateMachine = NodePath("StateMachine")
 EffectController = NodePath("EffectController")
 DamageFlashColor = Color(18.892157, 18.892157, 18.892157, 1)
@@ -144,8 +144,8 @@ skeleton_data_res = ExtResource("4_o4xwm")
 bones_thickness = 10.09
 preview_skin = "Default"
 preview_animation = "-- Empty --"
-preview_frame = false
-preview_time = 0.0
+preview_frame = true
+preview_time = 0.6667
 script = ExtResource("4_ixg0x")
 
 [node name="SpineBoneNode" type="SpineBoneNode" parent="SpineSprite"]

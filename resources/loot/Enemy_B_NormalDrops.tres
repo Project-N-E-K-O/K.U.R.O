@@ -33,6 +33,7 @@ metadata/_custom_type_script = "uid://nd1f744icb05"
 
 [resource]
 script = ExtResource("6_p7jmf")
+SelectionMode = 1
 MaxDrops = 1
 ScatterRadius = 48.0
 DefaultImpulse = 400.0

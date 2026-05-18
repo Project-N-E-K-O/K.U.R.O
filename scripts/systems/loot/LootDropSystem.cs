@@ -32,6 +32,13 @@ namespace Kuros.Systems.Loot
                 return;
             }
 
+            // PickOne 模式：按权重从池中选一条，跳过 Sequential 逻辑
+            if (table.SelectionMode == LootDropTable.LootSelectionMode.PickOne)
+            {
+                SpawnLootPickOne(actor, table, rng);
+                return;
+            }
+
             int spawned = 0;
             foreach (var entry in entries)
             {
@@ -67,6 +74,52 @@ namespace Kuros.Systems.Loot
                     {
                         return;
                     }
+                }
+            }
+        }
+
+        /// <summary>
+        /// PickOne 模式：按 DropChance 权重加权随机选一条条目生成掉落物。
+        /// 所有 DropChance 之和为总权重，各条目被选中的概率 = 自身 DropChance / 总权重。
+        /// 若总权重为 0 则不掉落。
+        /// </summary>
+        private static void SpawnLootPickOne(GameActor actor, LootDropTable table, RandomNumberGenerator rng)
+        {
+            var entries = table.Entries;
+
+            // 计算所有有效条目的总权重
+            float totalWeight = 0f;
+            foreach (var entry in entries)
+            {
+                if (entry != null && entry.IsValid)
+                    totalWeight += entry.DropChance;
+            }
+
+            if (totalWeight <= 0f)
+                return;
+
+            // 在 [0, totalWeight] 内随机取一点，落在哪个区间就掉哪个
+            float roll = rng.RandfRange(0f, totalWeight);
+            float cumulative = 0f;
+
+            foreach (var entry in entries)
+            {
+                if (entry == null || !entry.IsValid || entry.Item == null)
+                    continue;
+
+                cumulative += entry.DropChance;
+                if (roll <= cumulative)
+                {
+                    int quantity = entry.RollQuantity(rng);
+                    if (quantity <= 0)
+                        return;
+
+                    var stack = new InventoryItemStack(entry.Item, quantity);
+                    Vector2 spawnPos = actor.GlobalPosition + table.SpawnOffset + entry.PositionOffset + GetScatterOffset(table, rng);
+                    var entity = WorldItemSpawner.SpawnFromStack(actor, stack, spawnPos);
+                    if (entity != null)
+                        ApplyImpulse(entity, entry, table, rng);
+                    return;
                 }
             }
         }
