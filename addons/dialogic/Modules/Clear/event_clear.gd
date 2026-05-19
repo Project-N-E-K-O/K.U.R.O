@@ -19,6 +19,10 @@ var clear_background := true
 ################################################################################
 
 func _execute() -> void:
+	# 防止游戏关闭时访问已释放的 dialogic 对象
+	if not is_instance_valid(dialogic):
+		return
+
 	var final_time := time
 
 	if dialogic.Inputs.auto_skip.enabled:

@@ -169,7 +169,12 @@ func get_base_content_size() -> Vector2:
 
 	# Let text use content's width, and let text auto shrink height to its content.
 	text.size = Vector2(text_width, 0)
+	# Guard: node may have been removed from tree (e.g. end_timeline called during dialogue)
+	if not is_inside_tree():
+		return text.size
 	await get_tree().process_frame
+	if not is_inside_tree():
+		return text.size
 
 	# Don't know why text.size.y != content's height,
 	# so we re-set text.size.y to 0 to let text shrink to its content again.

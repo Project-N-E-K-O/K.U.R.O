@@ -81,6 +81,7 @@ AttackArea = NodePath("AttackArea")
 AttackArea = NodePath("AttackArea")
 LeftHandAttachmentPath = NodePath("SpineSprite/SpineBoneNode")
 Speed = 500.0
+AttackDamage = 5.0
 StateMachine = NodePath("StateMachine")
 EffectController = NodePath("EffectController")
 DamageFlashColor = Color(18.892157, 18.892157, 18.892157, 1)

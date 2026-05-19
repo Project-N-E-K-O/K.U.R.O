@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://bm5ryerrw6s32"]
+
+[ext_resource type="Script" uid="uid://cxhls5fphixy5" path="res://scripts/actors/enemies/EnemyDetectAttackEffect.cs" id="1_effect"]
+
+[node name="EnemyDetectAttackEffect" type="Node2D"]
+script = ExtResource("1_effect")

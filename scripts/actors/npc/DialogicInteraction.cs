@@ -31,12 +31,6 @@ namespace Kuros.Actors.Npc
 		[Export] public NodePath BubbleAnchorPath { get; set; } = "Marker2D";
 
 		/// <summary>
-		/// 气泡对话框的偏移量（相对于 BubbleAnchorPath 指定的节点）
-		/// 例如：Vector2(0, -50) 会让气泡向上偏移 50 像素
-		/// </summary>
-		[Export] public Vector2 BubbleAnchorOffset { get; set; } = Vector2.Zero;
-
-		/// <summary>
 		/// 交互提示文字
 		/// </summary>
 		[Export] public string PromptText { get; set; } = "[E] 交互";   //留空时进入area2d范围自动触发对话
@@ -50,6 +44,54 @@ namespace Kuros.Actors.Npc
 		private bool _playerInRange = false;
 		private bool _hasTriggered = false;
 		private Label? _promptLabel;
+		private Kuros.Core.GameActor? _parentActor;
+		private bool _dialogueActive = false;
+
+		public override void _ExitTree()
+		{
+			// 立即结束正在进行的对话
+			if (_dialogueActive)
+			{
+				try
+				{
+					ForceEndDialogueImmediate();
+				}
+				catch (System.Exception ex)
+				{
+					GD.PrintErr($"DialogicInteraction: _ExitTree 结束对话时出错：{ex.Message}");
+				}
+			}
+
+			// 清理信号连接
+			try
+			{
+				var dialogic = GetNodeOrNull("/root/Dialogic");
+				if (dialogic != null && dialogic.IsConnected("timeline_ended", new Callable(this, MethodName.OnTimelineEnded)))
+				{
+					dialogic.Disconnect("timeline_ended", new Callable(this, MethodName.OnTimelineEnded));
+				}
+			}
+			catch (System.Exception ex)
+			{
+				GD.PrintErr($"DialogicInteraction: _ExitTree 清理时出错：{ex.Message}");
+			}
+
+			// 清理 Area2D 信号
+			if (_area != null)
+			{
+				try
+				{
+					_area.AreaEntered -= OnAreaEntered;
+					_area.AreaExited -= OnAreaExited;
+					_area.BodyEntered -= OnBodyEntered;
+					_area.BodyExited -= OnBodyExited;
+				}
+				catch (System.Exception ex)
+				{
+					GD.PrintErr($"DialogicInteraction: 清理 Area2D 信号时出错：{ex.Message}");
+				}
+			}
+		}
 
 		public override void _Ready()
 		{
@@ -59,6 +101,9 @@ namespace Kuros.Actors.Npc
 				GD.PrintErr("DialogicInteraction: 找不到 Area2D 子节点！");
 				return;
 			}
+
+			// 缓存父 GameActor（通常是敌人）
+			_parentActor = GetParent() as Kuros.Core.GameActor;
 
 			_area.AreaEntered += OnAreaEntered;
 			_area.AreaExited += OnAreaExited;
@@ -71,6 +116,15 @@ namespace Kuros.Actors.Npc
 
 		public override void _Process(double delta)
 		{
+			// 监测敌人死亡，立即结束对话并销毁自身
+			// text_bubble.gd 中已有 is_inside_tree() 守卫，end_timeline 可安全同步调用
+			if (_dialogueActive && _parentActor != null && _parentActor.IsDead)
+			{
+				ForceEndDialogueImmediate();
+				QueueFree();
+				return;
+			}
+
 			if (!string.IsNullOrEmpty(PromptText) && _playerInRange && Input.IsActionJustPressed("interact"))
 			{
 				StartDialogue();
@@ -131,49 +185,49 @@ namespace Kuros.Actors.Npc
 				return;
 
 			_hasTriggered = true;
+			_dialogueActive = true;
 			UpdatePrompt();
 
-			var dialogic = GetNode("/root/Dialogic");
-			if (dialogic == null)
+			try
 			{
-				GD.PrintErr("DialogicInteraction: 找不到 Dialogic autoload！请确认 project.godot 中已启用 Dialogic。");
-				return;
-			}
-
-			// 连接 timeline_ended 信号
-			if (!dialogic.IsConnected("timeline_ended", new Callable(this, MethodName.OnTimelineEnded)))
-			{
-				dialogic.Connect("timeline_ended", new Callable(this, MethodName.OnTimelineEnded));
-			}
-
-			// 启动对话，start() 返回布局节点（Style 的根场景）
-			var layoutVariant = dialogic.Call("start", TimelinePath);
-
-			// 将 Marker2D 注册到布局节点，让气泡对话框定位到 Marker2D
-			// 必须在 start() 之后，且用 CallDeferred 等布局节点就绪后再注册
-			if (!string.IsNullOrEmpty(CharacterPath) && layoutVariant.AsGodotObject() is Node layoutNode)
-			{
-				var anchor = GetNodeOrNull(BubbleAnchorPath);
-				if (anchor != null)
+				var dialogic = GetNodeOrNull("/root/Dialogic");
+				if (dialogic == null)
 				{
-					// 如果有偏移，创建一个虚拟的偏移容器节点
-					Node anchorWithOffset = anchor;
-					if (BubbleAnchorOffset != Vector2.Zero && anchor is Node2D anchor2D)
+					GD.PrintErr("DialogicInteraction: 找不到 Dialogic autoload！请确认 project.godot 中已启用 Dialogic。");
+					_dialogueActive = false;
+					return;
+				}
+
+				// 连接 timeline_ended 信号
+				if (!dialogic.IsConnected("timeline_ended", new Callable(this, MethodName.OnTimelineEnded)))
+				{
+					dialogic.Connect("timeline_ended", new Callable(this, MethodName.OnTimelineEnded));
+				}
+
+				// 启动对话，start() 返回布局节点（Style 的根场景）
+				var layoutVariant = dialogic.Call("start", TimelinePath);
+
+				// 将 Marker2D 注册到布局节点，让气泡对话框定位到 Marker2D
+				// 必须在 start() 之后，且用 CallDeferred 等布局节点就绪后再注册
+				if (!string.IsNullOrEmpty(CharacterPath) && layoutVariant.AsGodotObject() is Node layoutNode)
+				{
+					var anchor = GetNodeOrNull(BubbleAnchorPath);
+					if (anchor != null && IsInstanceValid(anchor))
 					{
-						var offsetContainer = new Node2D();
-						offsetContainer.Name = "BubbleAnchorOffsetContainer";
-						offsetContainer.GlobalPosition = anchor2D.GlobalPosition + BubbleAnchorOffset;
-						AddChild(offsetContainer);
-						anchorWithOffset = offsetContainer;
+						// register_character(角色资源路径, 锚点节点) 告诉 Dialogic 气泡在哪显示
+						layoutNode.CallDeferred("register_character", CharacterPath, anchor);
 					}
-
-					// register_character(角色资源路径, 锚点节点) 告诉 Dialogic 气泡在哪显示
-					layoutNode.CallDeferred("register_character", CharacterPath, anchorWithOffset);
+					else
+					{
+						GD.PrintErr($"DialogicInteraction: 找不到或锚点节点无效 '{BubbleAnchorPath}'，气泡将显示在默认位置。");
+					}
 				}
-				else
-				{
-					GD.PrintErr($"DialogicInteraction: 找不到锚点节点 '{BubbleAnchorPath}'，气泡将显示在默认位置。");
-				}
+			}
+			catch (System.Exception ex)
+			{
+				GD.PrintErr($"DialogicInteraction: StartDialogue 时出错：{ex.Message}");
+				_hasTriggered = false; // 恢复状态，允许重试
+				_dialogueActive = false;
 			}
 		}
 
@@ -182,37 +236,71 @@ namespace Kuros.Actors.Npc
 		/// </summary>
 		private void ForceEndDialogue()
 		{
-			var dialogic = GetNode("/root/Dialogic");
-			if (dialogic == null) return;
+			if (!IsInstanceValid(this) || GetTree() == null)
+				return;
 
-			// 只有对话正在进行时才调用 end_timeline
-			var currentTimeline = dialogic.Get("current_timeline");
-			if (currentTimeline.AsGodotObject() != null)
+			ForceEndDialogueImmediate();
+		}
+
+		/// <summary>
+		/// 立即结束对话的核心逻辑（可被 _ExitTree 直接调用）
+		/// </summary>
+		private void ForceEndDialogueImmediate()
+		{
+			_dialogueActive = false;
+
+			// 防止节点销毁过程中的访问错误
+			if (!IsInstanceValid(this))
+				return;
+
+			var dialogic = GetNodeOrNull("/root/Dialogic");
+			if (dialogic == null)
+				return;
+
+			try
 			{
-				dialogic.Call("end_timeline");
+				// 检查是否有正在运行的对话
+				var currentTimeline = dialogic.Get("current_timeline");
+				if (currentTimeline.AsGodotObject() == null)
+					return; // 没有正在运行的对话
+
+				// 清理信号连接
+				if (dialogic.IsConnected("timeline_ended", new Callable(this, MethodName.OnTimelineEnded)))
+				{
+					dialogic.Disconnect("timeline_ended", new Callable(this, MethodName.OnTimelineEnded));
+				}
+
+				// 安全地调用 end_timeline
+				if (dialogic.HasMethod("end_timeline"))
+				{
+					dialogic.Call("end_timeline");
+					GD.Print("DialogicInteraction: 对话已通过 end_timeline 结束");
+				}
 			}
-
-			// 清理虚拟偏移容器
-			var offsetContainer = GetNodeOrNull("BubbleAnchorOffsetContainer");
-			if (offsetContainer != null)
+			catch (System.Exception ex)
 			{
-				offsetContainer.QueueFree();
+				GD.PrintErr($"DialogicInteraction: ForceEndDialogueImmediate 时出错：{ex.Message}");
 			}
 		}
 
 		private void OnTimelineEnded()
 		{
-			var dialogic = GetNode("/root/Dialogic");
-			if (dialogic != null && dialogic.IsConnected("timeline_ended", new Callable(this, MethodName.OnTimelineEnded)))
-			{
-				dialogic.Disconnect("timeline_ended", new Callable(this, MethodName.OnTimelineEnded));
-			}
+			_dialogueActive = false;
 
-			// 清理虚拟偏移容器
-			var offsetContainer = GetNodeOrNull("BubbleAnchorOffsetContainer");
-			if (offsetContainer != null)
+			if (!IsInstanceValid(this))
+				return;
+
+			try
 			{
-				offsetContainer.QueueFree();
+				var dialogic = GetNodeOrNull("/root/Dialogic");
+				if (dialogic != null && dialogic.IsConnected("timeline_ended", new Callable(this, MethodName.OnTimelineEnded)))
+				{
+					dialogic.Disconnect("timeline_ended", new Callable(this, MethodName.OnTimelineEnded));
+				}
+			}
+			catch (System.Exception ex)
+			{
+				GD.PrintErr($"DialogicInteraction: OnTimelineEnded 清理连接时出错：{ex.Message}");
 			}
 
 			if (TriggerOnce)

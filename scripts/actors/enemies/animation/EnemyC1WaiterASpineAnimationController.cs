@@ -13,7 +13,7 @@ namespace Kuros.Actors.Enemies.Animation
         [Export] public string IdleAnimation = "idle";
         [Export] public string WalkAnimation = "walk";
         [Export] public string AttackAnimation = "attack";
-        [Export] public string SkillAnimation = "skill";
+        [Export] public string SkillAnimation = "stun";
         [Export] public string HitAnimation = "hit";
         [Export] public string StunAnimation = "stun";
         [Export] public string DieAnimation = "death";
@@ -116,23 +116,12 @@ namespace Kuros.Actors.Enemies.Animation
                     return;
                 }
 
-                if (attackName.Equals(controller.SkillAttackName, _comparison))
+                if (attackName.Equals(controller.ThrowAttackName, _comparison))
                 {
-                    var skillAttack = ResolveSkillMoveAttack(controller);
-
-                    if (skillAttack != null && !skillAttack.IsDashFinished)
-                    {
-                        PlayLoopIfNeeded("Skill", SkillAnimation, SkillMixDuration);
-                        return;
-                    }
-
-					// Dash 结束后若会立即进入 Frozen，先保持 stun 动画，避免出现一帧 idle 闪烁。
-					if (skillAttack != null && skillAttack.IsDashFinished && skillAttack.DashEndSelfFrozenDuration > 0f)
-					{
-						PlayLoopIfNeeded("Stun", StunAnimation, HitMixDuration);
-						return;
-					}
+                    PlayOnceIfNeeded("Stun", SkillAnimation, AttackMixDuration);
+                    return;
                 }
+
             }
 
             PlayIdle();
@@ -306,7 +295,7 @@ namespace Kuros.Actors.Enemies.Animation
                 return _skillChargeMoveAttack;
             }
 
-            _skillChargeMoveAttack = controller.GetNodeOrNull<EnemyMoveAttack>(controller.SkillAttackName);
+            //_skillChargeMoveAttack = controller.GetNodeOrNull<EnemyMoveAttack>(controller.SkillAttackName);
             return _skillChargeMoveAttack;
         }
 
@@ -395,10 +384,10 @@ namespace Kuros.Actors.Enemies.Animation
             {
                 expectedAnimation = AttackAnimation;
             }
-            else if (controller.CurrentAttackName.Equals(controller.SkillAttackName, _comparison))
-            {
-                expectedAnimation = SkillAnimation;
-            }
+            // else if (controller.CurrentAttackName.Equals(controller.SkillAttackName, _comparison))
+            // {
+            //     expectedAnimation = SkillAnimation;
+            // }
 
             if (string.IsNullOrEmpty(expectedAnimation))
             {

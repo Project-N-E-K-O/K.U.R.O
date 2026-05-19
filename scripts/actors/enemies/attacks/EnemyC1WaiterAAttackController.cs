@@ -3,60 +3,40 @@ using System;
 
 namespace Kuros.Actors.Enemies.Attacks
 {
+    /// <summary>
+    /// C1 服务员 A 的攻击控制器。
+    /// 
+    /// 工作原理：
+    ///   - 管理多个攻击模板（SimpleMeleeAttack、ThrowAttack）的权重和选择
+    ///   - 范围检测由各个攻击模板通过 CanStart() 自身实现
+    ///   - SimpleMeleeAttack 检查近战范围（Sprite2D/MeleeAttackArea）
+    ///   - ThrowAttack 检查远程范围（Sprite2D/ThrowAttackArea）
+    /// </summary>
     public partial class EnemyC1WaiterAAttackController : EnemyAttackController
     {
-        [Export] public string SkillAttackName { get; set; } = "MoveAttack";
+        /// <summary>近战攻击名字。</summary>
         [Export] public string MeleeAttackName { get; set; } = "SimpleMeleeAttack";
-        [Export(PropertyHint.Range, "1,10,1")] public int MeleeCountBeforeCharge { get; set; } = 2;
+
+        /// <summary>远程攻击名字。</summary>
+        [Export] public string ThrowAttackName { get; set; } = "ThrowAttack";
 
         public string CurrentAttackName { get; private set; } = string.Empty;
-
-        private int _meleeCountSinceCharge;
 
         public override void Initialize(SampleEnemy enemy)
         {
             base.Initialize(enemy);
-            _meleeCountSinceCharge = 0;
-            ConfigureNextAttack(forceCharge: false);
         }
 
         protected override void OnChildAttackStarted(EnemyAttackTemplate attack)
         {
             base.OnChildAttackStarted(attack);
             CurrentAttackName = attack.Name;
-
-            if (IsAttack(attack.Name, MeleeAttackName))
-            {
-                _meleeCountSinceCharge++;
-                int threshold = Mathf.Max(1, MeleeCountBeforeCharge);
-                ConfigureNextAttack(forceCharge: _meleeCountSinceCharge >= threshold);
-                return;
-            }
-
-            if (IsAttack(attack.Name, SkillAttackName))
-            {
-                _meleeCountSinceCharge = 0;
-                ConfigureNextAttack(forceCharge: false);
-            }
         }
 
         protected override void OnAttackFinished()
         {
             base.OnAttackFinished();
             CurrentAttackName = string.Empty;
-        }
-
-        private void ConfigureNextAttack(bool forceCharge)
-        {
-            if (forceCharge)
-            {
-                TrySetAttackWeight(SkillAttackName, 1f);
-                TrySetAttackWeight(MeleeAttackName, 0f);
-                return;
-            }
-
-            TrySetAttackWeight(SkillAttackName, 0f);
-            TrySetAttackWeight(MeleeAttackName, 1f);
         }
 
         private static bool IsAttack(string attackName, string expectedName)

@@ -30,6 +30,10 @@ namespace Kuros.Core
 		[Export] public float AttackCooldown = 0.5f;
 		[Export] public int MaxHealth = 100;
 		[Export] public bool FaceLeftByDefault = false;
+		/// <summary>
+		/// 初始朝向。true=朝右，false=朝左。在 _Ready 时应用，不影响行为逻辑。
+		/// </summary>
+		[Export] public bool InitialFacingRight = true;
 		
 		
 		[ExportCategory("Components")]
@@ -187,6 +191,12 @@ namespace Kuros.Core
 
 			ApplyStatProfile();
 			NotifyHealthChanged();
+			
+			// 应用初始朝向（必须在所有子节点初始化之后）
+			if (FacingRight != InitialFacingRight)
+			{
+				FlipFacing(InitialFacingRight);
+			}
 		}
 
 		public void SetShieldValue(int shield)
