@@ -31,6 +31,12 @@ namespace Kuros.Actors.Npc
 		[Export] public NodePath BubbleAnchorPath { get; set; } = "Marker2D";
 
 		/// <summary>
+		/// 气泡对话框的偏移量（相对于 BubbleAnchorPath 指定的节点）
+		/// 例如：Vector2(0, -50) 会让气泡向上偏移 50 像素
+		/// </summary>
+		[Export] public Vector2 BubbleAnchorOffset { get; set; } = Vector2.Zero;
+
+		/// <summary>
 		/// 交互提示文字
 		/// </summary>
 		[Export] public string PromptText { get; set; } = "[E] 交互";   //留空时进入area2d范围自动触发对话
@@ -150,8 +156,19 @@ namespace Kuros.Actors.Npc
 				var anchor = GetNodeOrNull(BubbleAnchorPath);
 				if (anchor != null)
 				{
+					// 如果有偏移，创建一个虚拟的偏移容器节点
+					Node anchorWithOffset = anchor;
+					if (BubbleAnchorOffset != Vector2.Zero && anchor is Node2D anchor2D)
+					{
+						var offsetContainer = new Node2D();
+						offsetContainer.Name = "BubbleAnchorOffsetContainer";
+						offsetContainer.GlobalPosition = anchor2D.GlobalPosition + BubbleAnchorOffset;
+						AddChild(offsetContainer);
+						anchorWithOffset = offsetContainer;
+					}
+
 					// register_character(角色资源路径, 锚点节点) 告诉 Dialogic 气泡在哪显示
-					layoutNode.CallDeferred("register_character", CharacterPath, anchor);
+					layoutNode.CallDeferred("register_character", CharacterPath, anchorWithOffset);
 				}
 				else
 				{
@@ -174,6 +191,13 @@ namespace Kuros.Actors.Npc
 			{
 				dialogic.Call("end_timeline");
 			}
+
+			// 清理虚拟偏移容器
+			var offsetContainer = GetNodeOrNull("BubbleAnchorOffsetContainer");
+			if (offsetContainer != null)
+			{
+				offsetContainer.QueueFree();
+			}
 		}
 
 		private void OnTimelineEnded()
@@ -182,6 +206,13 @@ namespace Kuros.Actors.Npc
 			if (dialogic != null && dialogic.IsConnected("timeline_ended", new Callable(this, MethodName.OnTimelineEnded)))
 			{
 				dialogic.Disconnect("timeline_ended", new Callable(this, MethodName.OnTimelineEnded));
+			}
+
+			// 清理虚拟偏移容器
+			var offsetContainer = GetNodeOrNull("BubbleAnchorOffsetContainer");
+			if (offsetContainer != null)
+			{
+				offsetContainer.QueueFree();
 			}
 
 			if (TriggerOnce)

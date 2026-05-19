@@ -238,6 +238,7 @@ namespace Kuros.Managers
 
         /// <summary>
         /// 停用战斗：移除空气墙并解除相机锁定。
+        /// 优先恢复到玩家当前所在的 CameraZoneArea，其次才是战斗前的 Zone。
         /// </summary>
         private void DeactivateBattle()
         {
@@ -251,21 +252,71 @@ namespace Kuros.Managers
             // 恢复相机
             if (_cameraZoneManager != null)
             {
-                if (!string.IsNullOrEmpty(_originalCameraZoneName))
+                // 优先检查玩家是否处于某个 CameraZoneArea 内
+                var targetZoneName = FindPlayerCurrentCameraZone();
+                if (targetZoneName == null)
                 {
-                    _cameraZoneManager.SwitchToZone(_originalCameraZoneName);
+                    targetZoneName = _originalCameraZoneName;
+                }
+
+                if (!string.IsNullOrEmpty(targetZoneName))
+                {
+                    _cameraZoneManager.SwitchToZone(targetZoneName);
+                    GameLogger.Info(nameof(BattleArena), $"相机已恢复到区域：{targetZoneName}");
                 }
                 else
                 {
                     _cameraZoneManager.RemoveTemporaryCameraZone($"arena_{GetInstanceId()}");
+                    GameLogger.Info(nameof(BattleArena), "相机区域已移除");
                 }
 
                 _cameraZoneManager = null;
-                GameLogger.Info(nameof(BattleArena), "相机已恢复");
             }
 
             _trackedEnemies.Clear();
             EmitSignal(SignalName.BattleEnded);
+        }
+
+        /// <summary>
+        /// 查找玩家当前所在的 CameraZoneArea 对应的 Zone 名称。
+        /// 基于玩家位置在 CameraZoneArea 碰撞形状范围内的判断（不依赖物理查询）。
+        /// 若玩家处于多个 CameraZoneArea 的范围内，返回最后找到的那个。
+        /// </summary>
+        private string? FindPlayerCurrentCameraZone()
+        {
+            var player = GetTree().GetFirstNodeInGroup("player") as Node2D;
+            if (player == null) return null;
+
+            var playerPos = player.GlobalPosition;
+            string? currentZone = null;
+
+            // 遍历场景树中所有 CameraZoneArea，检查玩家位置是否在其碰撞形状范围内
+            var allCameraZones = GetTree().GetNodesInGroup("camera_zone");
+
+            foreach (var zone in allCameraZones)
+            {
+                if (zone is not CameraZoneArea cameraZone || !IsInstanceValid(cameraZone))
+                    continue;
+
+                // 获取 CameraZoneArea 的碰撞形状
+                var collisionShape = cameraZone.GetNodeOrNull<CollisionShape2D>("CollisionShape2D");
+                if (collisionShape?.Shape is not RectangleShape2D rectShape)
+                    continue;
+
+                // 计算世界范围
+                var worldCenter = cameraZone.GlobalPosition + collisionShape.Position;
+                var halfSize = rectShape.Size / 2f;
+                var aabbRect = new Rect2(worldCenter - halfSize, rectShape.Size);
+
+                // 检查玩家位置是否在范围内
+                if (aabbRect.HasPoint(playerPos))
+                {
+                    currentZone = cameraZone.ZoneName;
+                    GameLogger.Debug(nameof(BattleArena), $"检测到玩家位置在 CameraZone 内：{currentZone} 位置:{playerPos}");
+                }
+            }
+
+            return currentZone;
         }
 
         /// <summary>

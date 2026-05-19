@@ -30,21 +30,21 @@ namespace Kuros.Systems.Cutscene
         /// <summary>
         /// 转变时长（秒）：从当前 Alpha 转变到 TargetAlpha 所需的时间
         /// </summary>
-        [Export] public float TransitionDuration { get; set; } = 0.5f;
+        [Export] public float TransitionDuration { get; set; } = 0f;
 
         /// <summary>
         /// 是否使用电影式黑幕（上下条形移动）。
         /// 若为 true，使用 CutsceneManager 中配置的 TopBlackBarPath 和 BottomBlackBarPath。
         /// 若为 false，使用传统的透明度淡化（CutsceneManager.FadeOverlay）。
         /// </summary>
-        [Export] public bool UseMovieBlackBars { get; set; } = false;
+        [Export] public bool UseMovieBlackBars { get; set; } = true;
 
         /// <summary>
         /// 是否等待整个过程完成（延迟 + 转变）。
         /// true（默认）：阻塞执行，等待 Duration + TransitionDuration 秒后才执行下一步。
         /// false：启动动画后立即返回，不阻塞后续步骤（人物/UI 可同时出现）。
         /// </summary>
-        [Export] public bool WaitForCompletion { get; set; } = true;
+        [Export] public bool WaitForCompletion { get; set; } = false;
 
         public override async Task Execute(CutsceneContext ctx)
         {

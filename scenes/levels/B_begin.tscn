@@ -1,4 +1,4 @@
-[gd_scene load_steps=44 format=3 uid="uid://cnc8qhgt2qlco"]
+[gd_scene load_steps=45 format=3 uid="uid://cnc8qhgt2qlco"]
 
 [ext_resource type="Script" uid="uid://dmqu7phxi8gbi" path="res://scripts/managers/BattleArena.cs" id="1_kesvg"]
 [ext_resource type="Script" uid="uid://b3iq6dm2pc5y0" path="res://scripts/controllers/EnemySpawnManager.cs" id="2_py885"]
@@ -28,6 +28,7 @@
 [ext_resource type="PackedScene" uid="uid://d02ytff0caglq" path="res://scenes/items/Furniture_B_sofaA_rwd.tscn" id="21_av3q5"]
 [ext_resource type="Script" uid="uid://cra7y7mt0x1j8" path="res://scripts/managers/CameraZoneArea.cs" id="22_camzone"]
 [ext_resource type="PackedScene" uid="uid://chway4etqkroy" path="res://scenes/objects/Moving_A1_taxi.tscn" id="26_xi57c"]
+[ext_resource type="PackedScene" uid="uid://bya6to34ex05t" path="res://scenes/actors/npc/Dialogic_Interaction.tscn" id="29_xf8xq"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_d0c6g"]
 size = Vector2(11500, 3050)
@@ -95,7 +96,6 @@ debug_color = Color(0.6428762, 0.52304673, 0.06685588, 0.41960785)
 
 [node name="CameraZone" type="Area2D" parent="."]
 visible = false
-z_index = 10
 collision_layer = 0
 collision_mask = 4
 script = ExtResource("22_camzone")
@@ -355,3 +355,19 @@ position = Vector2(3153, -51)
 
 [node name="FurnitureSofaA_rwd" parent="." instance=ExtResource("21_av3q5")]
 position = Vector2(1259, -54)
+
+[node name="Enemy_Normal_guard2" parent="." instance=ExtResource("3_gvdxe")]
+position = Vector2(-3248.0002, -60.00003)
+
+[node name="DialogicInteraction" parent="Enemy_Normal_guard2" instance=ExtResource("29_xf8xq")]
+TimelinePath = "B_begin_timeline"
+CharacterPath = "Enemy_Normal_guard2_B_begin_gate"
+PromptText = ""
+
+[node name="Enemy_Normal_guard22" parent="." instance=ExtResource("3_gvdxe")]
+position = Vector2(-3222, 654)
+
+[node name="DialogicInteraction" parent="Enemy_Normal_guard22" instance=ExtResource("29_xf8xq")]
+TimelinePath = "B_begin_timeline"
+CharacterPath = "Enemy_Normal_guard2_B_begin_gate"
+PromptText = ""

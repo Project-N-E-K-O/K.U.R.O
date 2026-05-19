@@ -42,6 +42,9 @@ namespace Kuros.Managers
         {
             AreaEntered += OnAreaEntered;
             AreaExited  += OnAreaExited;
+            
+            // 添加到group，以便BattleArena等系统找到所有CameraZoneArea
+            AddToGroup("camera_zone");
         }
 
         public override void _ExitTree()

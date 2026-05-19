@@ -15,7 +15,7 @@ namespace Kuros.Systems.Loot
         /// </summary>
         public enum LootSelectionMode { Sequential, PickOne }
 
-        [Export] public LootSelectionMode SelectionMode { get; set; } = LootSelectionMode.Sequential;
+        [Export] public LootSelectionMode SelectionMode { get; set; } = LootSelectionMode.PickOne;
         [Export(PropertyHint.Range, "0,1,0.01")]
         public float GlobalDropChance { get; set; } = 1f;
 

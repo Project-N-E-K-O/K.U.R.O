@@ -6,6 +6,7 @@ namespace Kuros.Systems.Cutscene
     /// <summary>
     /// 播放指定节点上的 AnimationPlayer 动画。
     /// AnimationPlayerPath 相对于 CutsceneManager 所在节点。
+    /// 支持异步模式：WaitForCompletion=false 时不阻塞后续步骤。
     /// </summary>
     [GlobalClass]
     public partial class PlayAnimationStep : CutsceneStep
@@ -14,12 +15,16 @@ namespace Kuros.Systems.Cutscene
 
         [Export] public string AnimationName { get; set; } = "";
 
-        /// <summary>是否等待动画播放完毕再进行下一步。</summary>
-        [Export] public bool WaitForCompletion { get; set; } = true;
+        /// <summary>
+        /// 是否等待动画播放完毕。
+        /// true（默认）：阻塞执行，等动画播完才执行下一步。
+        /// false：启动动画后立即返回，动画在后台进行。
+        /// </summary>
+        [Export] public bool WaitForCompletion { get; set; } = false;
 
         public override async Task Execute(CutsceneContext ctx)
         {
-            GD.Print($"[Cutscene] PlayAnimationStep 开始，AnimationPlayerPath={AnimationPlayerPath}, AnimationName={AnimationName}");
+            GD.Print($"[Cutscene] PlayAnimationStep 开始，AnimationPlayerPath={AnimationPlayerPath}, AnimationName={AnimationName}, WaitForCompletion={WaitForCompletion}");
 
             if (AnimationPlayerPath.IsEmpty || string.IsNullOrEmpty(AnimationName))
             {
@@ -39,22 +44,43 @@ namespace Kuros.Systems.Cutscene
                 return;
             }
 
-            GD.Print($"[Cutscene] PlayAnimationStep: 播放动画 {AnimationName}，WaitForCompletion={WaitForCompletion}");
             animPlayer.Play(AnimationName);
+            GD.Print($"[Cutscene] PlayAnimationStep: 已播放动画 {AnimationName}");
 
             if (!WaitForCompletion)
             {
-                GD.Print("[Cutscene] PlayAnimationStep: 不等待完成，直接继续");
+                // 后台监听skip
+                _ = MonitorSkipAndFinishAsync(ctx, animPlayer);
+                GD.Print("[Cutscene] PlayAnimationStep 异步执行（WaitForCompletion=false），动画在后台进行");
                 return;
             }
 
+            // 阻塞等待动画完成
             while (!ctx.IsSkipping && animPlayer.IsPlaying())
                 await ctx.NextFrame();
 
             if (ctx.IsSkipping)
+            {
                 animPlayer.Seek(animPlayer.CurrentAnimationLength, true);
+                GD.Print("[Cutscene] PlayAnimationStep 被skip，动画快进到结尾");
+            }
 
             GD.Print("[Cutscene] PlayAnimationStep 完成");
+        }
+
+        /// <summary>
+        /// 后台监听skip事件，如果发生skip则快进动画到结尾
+        /// </summary>
+        private async Task MonitorSkipAndFinishAsync(CutsceneContext ctx, AnimationPlayer animPlayer)
+        {
+            while (!ctx.IsSkipping && animPlayer.IsPlaying())
+                await ctx.NextFrame();
+
+            if (ctx.IsSkipping)
+            {
+                animPlayer.Seek(animPlayer.CurrentAnimationLength, true);
+                GD.Print("[Cutscene] PlayAnimationStep 被skip，快进到结尾");
+            }
         }
     }
 }
