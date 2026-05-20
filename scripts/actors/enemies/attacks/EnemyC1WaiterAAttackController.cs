@@ -6,11 +6,9 @@ namespace Kuros.Actors.Enemies.Attacks
     /// <summary>
     /// C1 服务员 A 的攻击控制器。
     /// 
-    /// 工作原理：
-    ///   - 管理多个攻击模板（SimpleMeleeAttack、ThrowAttack）的权重和选择
-    ///   - 范围检测由各个攻击模板通过 CanStart() 自身实现
-    ///   - SimpleMeleeAttack 检查近战范围（Sprite2D/MeleeAttackArea）
-    ///   - ThrowAttack 检查远程范围（Sprite2D/ThrowAttackArea）
+    /// 攻击切换逻辑（每帧轮询）：
+    ///   - 玩家在近战 AttackArea 内 → SimpleMeleeAttack（权重 100），打断当前 ThrowAttack
+    ///   - 玩家不在近战 AttackArea 内 → ThrowAttack（权重 100），当前近战自然结束后生效
     /// </summary>
     public partial class EnemyC1WaiterAAttackController : EnemyAttackController
     {
@@ -22,9 +20,29 @@ namespace Kuros.Actors.Enemies.Attacks
 
         public string CurrentAttackName { get; private set; } = string.Empty;
 
-        public override void Initialize(SampleEnemy enemy)
+        private bool _playerInMeleeRange;
+
+        public override void _PhysicsProcess(double delta)
         {
-            base.Initialize(enemy);
+            base._PhysicsProcess(delta);
+            SyncWeightsToRange();
+        }
+
+        private void SyncWeightsToRange()
+        {
+            if (Enemy == null) return;
+
+            bool inMelee = Enemy.IsPlayerInAttackRange();
+            if (inMelee == _playerInMeleeRange) return;
+
+            _playerInMeleeRange = inMelee;
+
+            TrySetAttackWeight(MeleeAttackName, inMelee ? 100f : 0f);
+            TrySetAttackWeight(ThrowAttackName, inMelee ? 0f : 100f);
+
+            // 玩家进入近战范围时，若正在投掷则打断立即切换
+            if (inMelee && IsAttack(CurrentAttackName, ThrowAttackName))
+                ForceQueueNextAttack("PlayerEnteredMeleeRange");
         }
 
         protected override void OnChildAttackStarted(EnemyAttackTemplate attack)
@@ -40,9 +58,7 @@ namespace Kuros.Actors.Enemies.Attacks
         }
 
         private static bool IsAttack(string attackName, string expectedName)
-        {
-            return attackName.Equals(expectedName, StringComparison.OrdinalIgnoreCase);
-        }
+            => attackName.Equals(expectedName, StringComparison.OrdinalIgnoreCase);
     }
 }
 

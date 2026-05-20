@@ -33,6 +33,7 @@ LevelName = "test"
 y_sort_enabled = true
 
 [node name="EnemySpawnConsole" parent="World" instance=ExtResource("2_s6mo5")]
+z_index = 1
 position = Vector2(714, -170)
 SpawnParentPath = NodePath("..")
 EnemyScenes = Array[PackedScene]([ExtResource("5_y4lq6"), ExtResource("6_jqh86"), ExtResource("3_mkebo"), ExtResource("4_pxy7y"), ExtResource("7_5lslu"), ExtResource("8_gr5eg"), ExtResource("9_pxy7y")])

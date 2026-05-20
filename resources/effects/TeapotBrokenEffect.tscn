@@ -1,0 +1,29 @@
+[gd_scene load_steps=5 format=3 uid="uid://bwpejurlr7cvn"]
+
+[ext_resource type="Script" uid="uid://c77i0j0fu43rc" path="res://scripts/effects/TeapotBrokenEffect.cs" id="1_teapot"]
+[ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="2_yj7h6"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_eq1tq"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1r4hu"]
+radius = 200.0
+
+[node name="TeapotBrokenEffect" type="Node"]
+script = ExtResource("1_teapot")
+DamagePerTick = 1
+SpeedSlowPercent = 50.0
+FadeOutDuration = 1.0
+EffectId = "30c14cff-e772-44c5-af23-cde5d44cb6cb"
+IsBuff = false
+
+[node name="Area2D" type="Area2D" parent="."]
+z_as_relative = false
+
+[node name="Sprite2D" type="Sprite2D" parent="Area2D"]
+material = SubResource("ShaderMaterial_eq1tq")
+scale = Vector2(10, 5)
+texture = ExtResource("2_yj7h6")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+scale = Vector2(1, 0.5)
+shape = SubResource("CircleShape2D_1r4hu")

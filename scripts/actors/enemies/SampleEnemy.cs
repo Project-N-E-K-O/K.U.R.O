@@ -131,6 +131,29 @@ public partial class SampleEnemy : GameActor
 		return direction == Vector2.Zero ? Vector2.Zero : direction.Normalized();
 	}
 	
+	/// <summary>
+	/// 判断敌人是否可以进入 Attack 状态。
+	/// 优先委托给 AttackController.CanStart()，不存在时回退到 IsPlayerInAttackRange()。
+	/// 子类可重写此方法实现自定义条件。
+	/// </summary>
+	public virtual bool CanStartAttack()
+	{
+		if (AttackTimer > 0) return false;
+
+		// 尝试使用 AttackController 的 CanStart()（支持自定义范围检测的攻击）
+		if (_cachedAttackController == null || !IsInstanceValid(_cachedAttackController))
+		{
+			var attackState = StateMachine?.GetNodeOrNull("Attack");
+			_cachedAttackController = attackState?.GetNodeOrNull<EnemyAttackController>("AttackController");
+		}
+
+		if (_cachedAttackController != null && IsInstanceValid(_cachedAttackController))
+			return _cachedAttackController.CanStart();
+
+		// 回退：无 AttackController 时使用近战范围检测
+		return IsPlayerInAttackRange();
+	}
+
 	public void PerformAttack()
 	{
 		AttackTimer = AttackCooldown; 
