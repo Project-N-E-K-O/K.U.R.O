@@ -71,6 +71,12 @@ namespace Kuros.Effects
                 Setup();
         }
 
+        public override void _ExitTree()
+        {
+            Cleanup();
+            base._ExitTree();
+        }
+
         public override void _Process(double delta)
         {
             // 仅在独立模式下（Actor == null）自行驱动计时

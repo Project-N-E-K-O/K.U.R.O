@@ -1,12 +1,12 @@
 [gd_scene load_steps=5 format=3 uid="uid://bwpejurlr7cvn"]
 
 [ext_resource type="Script" uid="uid://c77i0j0fu43rc" path="res://scripts/effects/TeapotBrokenEffect.cs" id="1_teapot"]
-[ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="2_yj7h6"]
+[ext_resource type="Texture2D" uid="uid://cmgwvrbdnwaga" path="res://assets/weapons/茶壶破碎.png" id="2_yj7h6"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_eq1tq"]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_1r4hu"]
-radius = 200.0
+[sub_resource type="ConvexPolygonShape2D" id="ConvexPolygonShape2D_eq1tq"]
+points = PackedVector2Array(142, -80, 234, -47, 290, 28, 243, 74, 116, 101, -20, 115, -175, 98, -303.5, 40, -194, -60, -42, -98)
 
 [node name="TeapotBrokenEffect" type="Node"]
 script = ExtResource("1_teapot")
@@ -21,9 +21,9 @@ z_as_relative = false
 
 [node name="Sprite2D" type="Sprite2D" parent="Area2D"]
 material = SubResource("ShaderMaterial_eq1tq")
-scale = Vector2(10, 5)
+scale = Vector2(0.6, 0.8)
 texture = ExtResource("2_yj7h6")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
-scale = Vector2(1, 0.5)
-shape = SubResource("CircleShape2D_1r4hu")
+position = Vector2(29, 0)
+shape = SubResource("ConvexPolygonShape2D_eq1tq")

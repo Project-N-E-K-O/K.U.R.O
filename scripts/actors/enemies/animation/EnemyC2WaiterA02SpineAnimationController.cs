@@ -5,9 +5,9 @@ using Kuros.Actors.Enemies.Attacks;
 namespace Kuros.Actors.Enemies.Animation
 {
     /// <summary>
-    /// Enemy_C1_waiterA 专用 Spine 动画控制器，将动画与状态机/攻击模板绑定。
+    /// Enemy_C2_waiterA02 专用 Spine 动画控制器，将动画与状态机/攻击模板绑定。
     /// </summary>
-    public partial class EnemyC1WaiterASpineAnimationController : EnemySpineAnimationController
+    public partial class EnemyC2WaiterA02SpineAnimationController : EnemySpineAnimationController
     {
         [Export] public NodePath AttackControllerPath { get; set; } = new("StateMachine/Attack/AttackController");
         [Export] public string IdleAnimation = "idle";

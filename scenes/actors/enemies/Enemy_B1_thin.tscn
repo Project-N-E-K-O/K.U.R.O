@@ -266,6 +266,7 @@ script = ExtResource("19_h8apo")
 DashSpeed = 1500.0
 DashDuration = 0.6000000000000001
 AnimationName = "animations/Skill3"
+AttacksRequiredForDash = 2
 
 [node name="EnemySpawn" type="Node" parent="StateMachine"]
 script = ExtResource("20_ie6to")

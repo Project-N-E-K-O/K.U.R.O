@@ -47,6 +47,12 @@ namespace Kuros.Effects
         // 此效果在该敌人上应用的倍数（用于移除时恢复）
         private readonly Dictionary<GameActor, float> _appliedMultipliers = new();
 
+        public override void _ExitTree()
+        {
+            Cleanup();
+            base._ExitTree();
+        }
+
         protected override void OnApply()
         {
             base.OnApply();
