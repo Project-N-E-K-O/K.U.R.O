@@ -1,6 +1,8 @@
 class_name DialogicGameHandler
 extends Node
 
+const DialogicTimeline = preload("res://addons/dialogic/Resources/timeline.gd")
+
 ## Class that is used as the Dialogic autoload.
 
 ## Autoload script that allows you to interact with all of Dialogic's systems:[br]
