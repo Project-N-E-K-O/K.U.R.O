@@ -71,9 +71,16 @@ namespace Kuros.Controllers
         [Export(PropertyHint.Range, "1,30,1")] public int MaxSpawnAttempts { get; set; } = 10;
         [Export(PropertyHint.Range, "4,500,2")] public float SpawnCheckRadius { get; set; } = 60f; // 生成点周围这个半径范围内如果有障碍物则视为不合适的落点
 
+        private const string DefaultBackEffectPath = "res://scenes/actors/etc/enemy_spaw_back.tscn";
+        private const string DefaultFrontEffectPath = "res://scenes/actors/etc/enemy_spawn_front.tscn";
+
+        // 按需加载的运行时特效场景（在 SpawnSequenceAsync 期间加载，结束后释放）
+        private PackedScene? _runtimeBackEffectScene;
+        private PackedScene? _runtimeFrontEffectScene;
+
         [ExportCategory("Spawn FX")]
-        [Export] public PackedScene? SpawnBackEffectScene { get; set; } = GD.Load<PackedScene>("res://scenes/actors/etc/enemy_spaw_back.tscn");
-        [Export] public PackedScene? SpawnFrontEffectScene { get; set; } = GD.Load<PackedScene>("res://scenes/actors/etc/enemy_spawn_front.tscn");
+        [Export] public PackedScene? SpawnBackEffectScene { get; set; }
+        [Export] public PackedScene? SpawnFrontEffectScene { get; set; }
         [Export] public Vector2 SpawnBackEffectOffset { get; set; } = Vector2.Zero;
         [Export] public Vector2 SpawnFrontEffectOffset { get; set; } = Vector2.Zero;
         [Export(PropertyHint.Range, "0,5,0.05")] public float EnemyAppearDelay { get; set; } = 0.2f;
@@ -215,6 +222,8 @@ namespace Kuros.Controllers
             _hasTriggered = true;
             EmitSignal(SignalName.SpawnStarted);
 
+            await LoadSpawnEffectScenesAsync();
+
             List<PackedScene> spawnQueue = BuildSpawnQueue();
             if (spawnQueue.Count == 0)
             {
@@ -251,7 +260,42 @@ namespace Kuros.Controllers
             }
 
             _isSpawning = false;
+            ReleaseSpawnEffectScenes();
             EmitSignal(SignalName.SpawnCompleted);
+        }
+
+        private async System.Threading.Tasks.Task LoadSpawnEffectScenesAsync()
+        {
+            bool needBack  = SpawnBackEffectScene == null;
+            bool needFront = SpawnFrontEffectScene == null;
+
+            if (!needBack && !needFront)
+                return;
+
+            if (needBack)
+                ResourceLoader.LoadThreadedRequest(DefaultBackEffectPath);
+            if (needFront)
+                ResourceLoader.LoadThreadedRequest(DefaultFrontEffectPath);
+
+            if (needBack)
+            {
+                while (ResourceLoader.LoadThreadedGetStatus(DefaultBackEffectPath) == ResourceLoader.ThreadLoadStatus.InProgress)
+                    await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+                _runtimeBackEffectScene = ResourceLoader.LoadThreadedGet(DefaultBackEffectPath) as PackedScene;
+            }
+
+            if (needFront)
+            {
+                while (ResourceLoader.LoadThreadedGetStatus(DefaultFrontEffectPath) == ResourceLoader.ThreadLoadStatus.InProgress)
+                    await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+                _runtimeFrontEffectScene = ResourceLoader.LoadThreadedGet(DefaultFrontEffectPath) as PackedScene;
+            }
+        }
+
+        private void ReleaseSpawnEffectScenes()
+        {
+            _runtimeBackEffectScene  = null;
+            _runtimeFrontEffectScene = null;
         }
 
         private async System.Threading.Tasks.Task SpawnSingleEnemyAsync(PackedScene enemyScene, int index, int spawnTotal)
@@ -678,8 +722,11 @@ namespace Kuros.Controllers
                 GD.Print($"[{Name}] SpawnFX base={spawnPosition}, backOffset={SpawnBackEffectOffset}, backPos={backEffectPos}, frontOffset={SpawnFrontEffectOffset}, frontPos={frontEffectPos}");
             }
 
-            var backEffectInstance = SpawnEffect(SpawnBackEffectScene, backEffectPos);
-            var frontEffectInstance = SpawnEffect(SpawnFrontEffectScene, frontEffectPos);
+            PackedScene? backScene  = SpawnBackEffectScene  ?? _runtimeBackEffectScene;
+            PackedScene? frontScene = SpawnFrontEffectScene ?? _runtimeFrontEffectScene;
+
+            var backEffectInstance = SpawnEffect(backScene, backEffectPos);
+            var frontEffectInstance = SpawnEffect(frontScene, frontEffectPos);
 
             effectRefs.BackEffect = backEffectInstance?.Root;
             effectRefs.BackAnimatedSprite = backEffectInstance?.AnimatedSprite;

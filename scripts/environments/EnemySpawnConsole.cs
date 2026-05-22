@@ -57,11 +57,17 @@ namespace Kuros.Environments
             = "res://scenes/ui/windows/EnemySpawnConsoleWindow.tscn";
 
         [ExportCategory("Effects")]
-        /// <summary>背景出场特效场景。</summary>
-        [Export] public PackedScene? BackEffectScene { get; set; }
-        
-        /// <summary>前景出场特效场景。</summary>
-        [Export] public PackedScene? FrontEffectScene { get; set; }
+        /// <summary>背景出场特效场景路径（仅在激活时加载）。</summary>
+        [Export] public string BackEffectScenePath { get; set; }
+            = "res://scenes/actors/etc/enemy_spaw_back.tscn";
+
+        /// <summary>前景出场特效场景路径（仅在激活时加载）。</summary>
+        [Export] public string FrontEffectScenePath { get; set; }
+            = "res://scenes/actors/etc/enemy_spawn_front.tscn";
+
+        // 按需加载的运行时特效场景（在 ProcessSpawnRequestsAsync 期间加载，结束后释放）
+        private PackedScene? _runtimeBackEffectScene;
+        private PackedScene? _runtimeFrontEffectScene;
 
         /// <summary>背景特效的位置偏移。</summary>
         [Export] public Vector2 SpawnBackEffectOffset { get; set; } = Vector2.Zero;
@@ -388,6 +394,8 @@ namespace Kuros.Environments
 
             EmitSignal(SignalName.SpawnStarted);
 
+            await LoadSpawnEffectScenesAsync();
+
             // 构建敌人场景队列
             List<PackedScene> spawnQueue = new();
             foreach (var kvp in requests)
@@ -423,6 +431,38 @@ namespace Kuros.Environments
             }
 
             EmitSignal(SignalName.SpawnCompleted);
+            ReleaseSpawnEffectScenes();
+        }
+
+        private async System.Threading.Tasks.Task LoadSpawnEffectScenesAsync()
+        {
+            bool needBack  = !string.IsNullOrEmpty(BackEffectScenePath);
+            bool needFront = !string.IsNullOrEmpty(FrontEffectScenePath);
+
+            if (needBack)
+                ResourceLoader.LoadThreadedRequest(BackEffectScenePath);
+            if (needFront)
+                ResourceLoader.LoadThreadedRequest(FrontEffectScenePath);
+
+            if (needBack)
+            {
+                while (ResourceLoader.LoadThreadedGetStatus(BackEffectScenePath) == ResourceLoader.ThreadLoadStatus.InProgress)
+                    await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+                _runtimeBackEffectScene = ResourceLoader.LoadThreadedGet(BackEffectScenePath) as PackedScene;
+            }
+
+            if (needFront)
+            {
+                while (ResourceLoader.LoadThreadedGetStatus(FrontEffectScenePath) == ResourceLoader.ThreadLoadStatus.InProgress)
+                    await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+                _runtimeFrontEffectScene = ResourceLoader.LoadThreadedGet(FrontEffectScenePath) as PackedScene;
+            }
+        }
+
+        private void ReleaseSpawnEffectScenes()
+        {
+            _runtimeBackEffectScene  = null;
+            _runtimeFrontEffectScene = null;
         }
 
         private async System.Threading.Tasks.Task SpawnSingleEnemyAsync(
@@ -552,25 +592,25 @@ namespace Kuros.Environments
         private SpawnEffectRefs PlaySpawnEffects(Vector2 backEffectPos, Vector2 frontEffectPos)
         {
             SpawnEffectRefs effectRefs = new();
-            
-            if (BackEffectScene == null && FrontEffectScene == null)
+
+            if (_runtimeBackEffectScene == null && _runtimeFrontEffectScene == null)
                 return effectRefs;
 
             Node? parent = GetParent() ?? GetTree().Root;
             if (parent == null) return effectRefs;
 
-            if (BackEffectScene != null)
+            if (_runtimeBackEffectScene != null)
             {
-                var backInstance = BackEffectScene.Instantiate<Node2D>();
+                var backInstance = _runtimeBackEffectScene.Instantiate<Node2D>();
                 if (backInstance != null)
                 {
                     parent.AddChild(backInstance);
                     backInstance.GlobalPosition = backEffectPos;
                     var backAnimSprite = ConfigureAndPlayEffect(backInstance);
-                    
+
                     effectRefs.BackEffectInstance = backInstance;
                     effectRefs.BackAnimatedSprite = backAnimSprite;
-                    
+
                     if (LogSpawnEffects)
                     {
                         GD.Print($"[EnemySpawnConsole] Back effect spawned at {backEffectPos}");
@@ -578,31 +618,31 @@ namespace Kuros.Environments
                 }
             }
 
-            if (FrontEffectScene != null)
+            if (_runtimeFrontEffectScene != null)
             {
-                var frontInstance = FrontEffectScene.Instantiate<Node2D>();
+                var frontInstance = _runtimeFrontEffectScene.Instantiate<Node2D>();
                 if (frontInstance != null)
                 {
                     parent.AddChild(frontInstance);
                     frontInstance.GlobalPosition = frontEffectPos;
-                    
+
                     // 应用Z偏移
                     if (FrontEffectPostSpawnZOffset != 0 && frontInstance is CanvasItem canvasItem)
                     {
                         canvasItem.ZIndex += FrontEffectPostSpawnZOffset;
                     }
-                    
+
                     var frontAnimSprite = ConfigureAndPlayEffect(frontInstance);
                     effectRefs.FrontEffectInstance = frontInstance;
                     effectRefs.FrontAnimatedSprite = frontAnimSprite;
-                    
+
                     if (LogSpawnEffects)
                     {
                         GD.Print($"[EnemySpawnConsole] Front effect spawned at {frontEffectPos}, z offset={FrontEffectPostSpawnZOffset}");
                     }
                 }
             }
-            
+
             return effectRefs;
         }
 

@@ -1,5 +1,6 @@
 using Godot;
 using Kuros.Actors.Heroes;
+using Kuros.Items.World;
 using Kuros.Managers;
 
 namespace Kuros.Environments
@@ -12,7 +13,7 @@ namespace Kuros.Environments
     ///   Loading → 玩家按 E 后：播放 loading 动画 + 后台异步加载目标场景
     ///             满足【动画已播放 MinRideDuration 秒 AND 场景已加载】才进入 Arrived
     ///   Arrived → 停止动画，显示"[E] 离开电梯"提示
-    ///   （玩家按 E）→ ChangeSceneToPacked 切换到目标场景
+    ///   （玩家进入指定区域后）→ ChangeSceneToPacked 切换到目标场景
     ///
     /// 使用方式：
     ///   切换到 Stage_loading 前，写入：SaveManager.Instance.PendingNextStagePath = "res://scenes/Stage_3.tscn";
@@ -213,9 +214,17 @@ namespace Kuros.Environments
             if (PauseManager.Instance != null)
                 PauseManager.Instance.ClearAllPauses();
 
-            if (_loadedScene != null)
+            // 清理跨场景缓存，防止 PackedScene 在新场景中继续占用内存
+            WorldItemSpawner.ClearCache();
+
+            // 持有 _loadedScene 引用会阻止 Godot resource cache 释放纹理；
+            // 先取出再置 null，使旧场景卸载后 GC 可以回收该 PackedScene。
+            var sceneToLoad = _loadedScene;
+            _loadedScene = null;
+
+            if (sceneToLoad != null)
             {
-                tree.ChangeSceneToPacked(_loadedScene);
+                tree.ChangeSceneToPacked(sceneToLoad);
             }
             else if (!string.IsNullOrEmpty(_nextStagePath))
             {
