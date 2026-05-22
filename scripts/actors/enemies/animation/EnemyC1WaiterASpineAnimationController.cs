@@ -24,7 +24,7 @@ namespace Kuros.Actors.Enemies.Animation
         private StringComparison _comparison = StringComparison.OrdinalIgnoreCase;
         private float _activeLoopStart;
         private float _activeLoopEnd;
-        private EnemyMoveAttack? _skillChargeMoveAttack;
+        //private EnemyMoveAttack? _skillChargeMoveAttack;
         private Node? _spineControllerNode;
         private Callable _spineHitCallable;
         private bool _spineHitSubscribed;
@@ -292,16 +292,16 @@ namespace Kuros.Actors.Enemies.Animation
 
             return _attackController;
         }
-        private EnemyMoveAttack? ResolveSkillMoveAttack(EnemyC1WaiterAAttackController controller)
-        {
-            if (_skillChargeMoveAttack != null && IsInstanceValid(_skillChargeMoveAttack))
-            {
-                return _skillChargeMoveAttack;
-            }
+        // private EnemyMoveAttack? ResolveSkillMoveAttack(EnemyC1WaiterAAttackController controller)
+        // {
+        //     if (_skillChargeMoveAttack != null && IsInstanceValid(_skillChargeMoveAttack))
+        //     {
+        //         return _skillChargeMoveAttack;
+        //     }
 
-            //_skillChargeMoveAttack = controller.GetNodeOrNull<EnemyMoveAttack>(controller.SkillAttackName);
-            return _skillChargeMoveAttack;
-        }
+        //     //_skillChargeMoveAttack = controller.GetNodeOrNull<EnemyMoveAttack>(controller.SkillAttackName);
+        //     return _skillChargeMoveAttack;
+        // }
 
         private void EnsureSpineHitSupport()
         {

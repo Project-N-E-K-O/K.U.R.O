@@ -18,13 +18,13 @@ namespace Kuros.Actors.Enemies.Animation
         [Export] public string HitAnimation = "hit";
         [Export] public string StunAnimation = "stun";
         [Export] public string DieAnimation = "death";
-        private EnemyC1WaiterAAttackController? _attackController;
+        private EnemyC2WaiterA02AttackController? _attackController;
         private string _currentKey = string.Empty;
         private SpineAnimationPlaybackMode _currentMode = SpineAnimationPlaybackMode.Loop;
         private StringComparison _comparison = StringComparison.OrdinalIgnoreCase;
         private float _activeLoopStart;
         private float _activeLoopEnd;
-        private EnemyMoveAttack? _skillChargeMoveAttack;
+        //private EnemyMoveAttack? _skillChargeMoveAttack;
         private Node? _spineControllerNode;
         private Callable _spineHitCallable;
         private bool _spineHitSubscribed;
@@ -120,7 +120,7 @@ namespace Kuros.Actors.Enemies.Animation
                     return;
                 }
 
-                if (attackName.Equals(controller.ThrowAttackName, _comparison))
+                if (attackName.Equals(controller.SkillAttackName, _comparison))
                 {
                     PlayOnceIfNeeded("Stun", SkillAnimation, AttackMixDuration);
                     return;
@@ -272,7 +272,7 @@ namespace Kuros.Actors.Enemies.Animation
             }
         }
 
-        private EnemyC1WaiterAAttackController? ResolveAttackController()
+        private EnemyC2WaiterA02AttackController? ResolveAttackController()
         {
             if (_attackController != null && IsInstanceValid(_attackController))
             {
@@ -284,24 +284,24 @@ namespace Kuros.Actors.Enemies.Animation
                 return null;
             }
 
-            _attackController = GetNodeOrNull<EnemyC1WaiterAAttackController>(AttackControllerPath);
+            _attackController = GetNodeOrNull<EnemyC2WaiterA02AttackController>(AttackControllerPath);
             if (_attackController == null)
             {
-                _attackController = Enemy.GetNodeOrNull<EnemyC1WaiterAAttackController>(AttackControllerPath);
+                _attackController = Enemy.GetNodeOrNull<EnemyC2WaiterA02AttackController>(AttackControllerPath);
             }
 
             return _attackController;
         }
-        private EnemyMoveAttack? ResolveSkillMoveAttack(EnemyC1WaiterAAttackController controller)
-        {
-            if (_skillChargeMoveAttack != null && IsInstanceValid(_skillChargeMoveAttack))
-            {
-                return _skillChargeMoveAttack;
-            }
+        // private EnemyMoveAttack? ResolveSkillMoveAttack(EnemyC2WaiterA02AttackController controller)
+        // {
+        //     if (_skillChargeMoveAttack != null && IsInstanceValid(_skillChargeMoveAttack))
+        //     {
+        //         return _skillChargeMoveAttack;
+        //     }
 
-            //_skillChargeMoveAttack = controller.GetNodeOrNull<EnemyMoveAttack>(controller.SkillAttackName);
-            return _skillChargeMoveAttack;
-        }
+        //     //_skillChargeMoveAttack = controller.GetNodeOrNull<EnemyMoveAttack>(controller.SkillAttackName);
+        //     return _skillChargeMoveAttack;
+        // }
 
         private void EnsureSpineHitSupport()
         {
@@ -381,7 +381,7 @@ namespace Kuros.Actors.Enemies.Animation
             currentAttack.TriggerAnimationHit();
         }
 
-        private bool IsExpectedHitAnimation(EnemyC1WaiterAAttackController controller, string animationName)
+        private bool IsExpectedHitAnimation(EnemyC2WaiterA02AttackController controller, string animationName)
         {
             string expectedAnimation = string.Empty;
             if (controller.CurrentAttackName.Equals(controller.MeleeAttackName, _comparison))

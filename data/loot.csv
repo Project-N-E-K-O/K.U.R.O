@@ -1,0 +1,11 @@
+table_file,SelectionMode,GlobalDropChance,MaxDrops,ScatterRadius,DefaultImpulse,entry_index,item_file,DropChance,MaxStacks,ImpulseStrength,ImpulseSpreadDegrees
+Enemy_B_EliteDrops,1,1.0,1,48.0,400.0,1,Weapon_Brawl_MechGlove,0.5,1,260.0,100.0
+Enemy_B_EliteDrops,1,1.0,1,48.0,400.0,2,Weapon_Throw_GravityGrenade,0.5,1,240.0,120.0
+Enemy_B_NormalDrops,1,1.0,1,48.0,400.0,1,Weapon_Slash_BarrierGate,0.25,1,,
+Enemy_B_NormalDrops,1,1.0,1,48.0,400.0,2,Weapon_Throw_MetalSpike,0.25,1,,
+Enemy_B_NormalDrops,1,1.0,1,48.0,400.0,3,Weapon_Stab_drill,0.25,1,,
+Enemy_B_NormalDrops,1,1.0,1,48.0,400.0,4,Weapon_Stab_umbrella,0.25,1,,
+Enemy_Normal_NormalDrops,1,1.0,1,48.0,400.0,1,Weapon_Brawl_RiotBracer,0.25,2,260.0,120.0
+Enemy_Normal_NormalDrops,1,1.0,1,48.0,400.0,2,Weapon_Throw_SmokeGrenade,0.25,1,220.0,90.0
+Enemy_Normal_NormalDrops,1,1.0,1,48.0,400.0,3,Weapon_Brawl_RiotGlove,0.25,1,,
+Enemy_Normal_NormalDrops,1,1.0,1,48.0,400.0,4,Weapon_Slash_ExpandBaton,0.25,1,,

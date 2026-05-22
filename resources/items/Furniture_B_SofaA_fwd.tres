@@ -29,7 +29,7 @@ script = ExtResource("2_qgfd7")
 Trigger = 4
 EffectScene = ExtResource("5_v032e")
 PropertyOverrides = Dictionary[String, Variant]({
-"ShakeStrength": 18.0
+"ShakeStrength": 24.0
 })
 metadata/_custom_type_script = "uid://bv0es4osw3x0r"
 

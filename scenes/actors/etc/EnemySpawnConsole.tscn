@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://mwpdlx1yup0k"]
+[gd_scene load_steps=18 format=3 uid="uid://mwpdlx1yup0k"]
 
 [ext_resource type="Script" uid="uid://dlbrxuciurl4o" path="res://scripts/environments/EnemySpawnConsole.cs" id="1_2lj3c"]
 [ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="1_bllfa"]
@@ -9,8 +9,11 @@
 [ext_resource type="PackedScene" uid="uid://byi2utn347fwu" path="res://scenes/actors/enemies/Enemy_Normal_guard1.tscn" id="4_bt2sr"]
 [ext_resource type="PackedScene" uid="uid://djio6ojcqw8yf" path="res://scenes/actors/enemies/Enemy_Normal_guard2.tscn" id="5_njsr5"]
 [ext_resource type="PackedScene" uid="uid://wqcdwpyo1nji" path="res://scenes/actors/enemies/Enemy_B1_thin.tscn" id="6_w5fa5"]
+[ext_resource type="PackedScene" uid="uid://bvps5t0s8owhw" path="res://scenes/actors/enemies/Enemy_C1_waiterA.tscn" id="7_5vnba"]
 [ext_resource type="PackedScene" uid="uid://ct7yf5l4li46d" path="res://scenes/actors/etc/enemy_spaw_back.tscn" id="7_bt2sr"]
 [ext_resource type="PackedScene" uid="uid://dsofgohgx0eoo" path="res://scenes/actors/etc/enemy_spawn_front.tscn" id="8_njsr5"]
+[ext_resource type="PackedScene" uid="uid://ba8fktvib2e1o" path="res://scenes/actors/enemies/Enemy_C2_waiterA02.tscn" id="8_qj5ja"]
+[ext_resource type="PackedScene" uid="uid://8ce54l6083nt" path="res://scenes/actors/enemies/Enemy_C1_waiterB.tscn" id="9_qnjvr"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_nmbao"]
 shader = ExtResource("1_bllfa")
@@ -28,7 +31,7 @@ size = Vector2(200, 432)
 
 [node name="EnemySpawnConsole" type="Node2D"]
 script = ExtResource("1_2lj3c")
-EnemyScenes = Array[PackedScene]([ExtResource("2_bqlf7"), ExtResource("3_b7qyu"), ExtResource("4_bt2sr"), ExtResource("5_njsr5"), ExtResource("6_w5fa5")])
+EnemyScenes = Array[PackedScene]([ExtResource("4_bt2sr"), ExtResource("5_njsr5"), ExtResource("2_bqlf7"), ExtResource("3_b7qyu"), ExtResource("6_w5fa5"), ExtResource("7_5vnba"), ExtResource("8_qj5ja"), ExtResource("9_qnjvr")])
 BackEffectScene = ExtResource("7_bt2sr")
 FrontEffectScene = ExtResource("8_njsr5")
 EnemySpawnOffset = Vector2(0, 200)

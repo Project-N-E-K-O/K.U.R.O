@@ -1,5 +1,6 @@
 using Godot;
 using System.Collections.Generic;
+using Kuros.Managers;
 
 namespace Kuros.Actors.Enemies.States
 {
@@ -245,7 +246,11 @@ namespace Kuros.Actors.Enemies.States
             float dist = Enemy.GlobalPosition.DistanceTo(_cachedTarget.GlobalPosition);
             if (dist <= ContactDistance)
             {
+                // 先保存位置，避免 RestoreHealth 触发 HealthChanged → ReevaluateTarget() 将 _cachedTarget 置 null
+                Vector2 healPosition = _cachedTarget.GlobalPosition;
                 _cachedTarget.RestoreHealth(_cachedTarget.CurrentHealth + HealAmount);
+                // 显示治疗飘字
+                FloatingDamageTextManager.Instance.ShowFloatingHealing(HealAmount, healPosition, 0f);
                 _cachedTarget   = null;
                 _hasValidTarget = false;
                 ChangeState("Walk");

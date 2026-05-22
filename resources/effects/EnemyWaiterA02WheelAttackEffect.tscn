@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://1ysv463wivf5"]
+
+[ext_resource type="Script" uid="uid://ddsy68gvml10d" path="res://scripts/actors/enemies/attacks/EnemyWaiterA02WheelAttackController.cs" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://d2kl6hl4kwm2" path="res://resources/effects/EnemyWaiterA02Projectile.tscn" id="2_prefab"]
+
+[node name="EnemyWaiterA02WheelAttackEffect" type="Node2D"]
+script = ExtResource("1_script")
+SpawnIntervalPerProjectile = 0.5
+ProjectilePrefab = ExtResource("2_prefab")

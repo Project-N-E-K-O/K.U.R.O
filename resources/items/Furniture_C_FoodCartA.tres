@@ -1,0 +1,53 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=11 format=3 uid="uid://cpm7ew2qthkkj"]
+
+[ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="1_oqybt"]
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="2_tcx5p"]
+[ext_resource type="PackedScene" uid="uid://bi7guxtti6ocl" path="res://resources/effects/HeavyCarrySlowEffect.tscn" id="3_fcn1f"]
+[ext_resource type="PackedScene" uid="uid://ciwlpetibguab" path="res://shaders/destroy_somke.tscn" id="4_1ch32"]
+[ext_resource type="PackedScene" uid="uid://cmh3bnabinwi0" path="res://resources/effects/CameraShakeEffect.tscn" id="5_p8p0i"]
+[ext_resource type="Texture2D" uid="uid://b3ipocumrfmc3" path="res://assets/furnitures/hotel_scene3/FoodCartA.png" id="6_oqybt"]
+[ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="7_mx7mg"]
+
+[sub_resource type="Resource" id="Resource_sg2nw"]
+script = ExtResource("2_tcx5p")
+Trigger = 1
+EffectScene = ExtResource("3_fcn1f")
+Notes = "中型家具：减速50%"
+PropertyOverrides = Dictionary[String, Variant]({
+"SpeedMultiplierPerStack": 0.5
+})
+metadata/_custom_type_script = "uid://bv0es4osw3x0r"
+
+[sub_resource type="Resource" id="Resource_4k75e"]
+script = ExtResource("2_tcx5p")
+Trigger = 4
+EffectScene = ExtResource("4_1ch32")
+metadata/_custom_type_script = "uid://bv0es4osw3x0r"
+
+[sub_resource type="Resource" id="Resource_sgnlr"]
+script = ExtResource("2_tcx5p")
+Trigger = 4
+EffectScene = ExtResource("5_p8p0i")
+PropertyOverrides = Dictionary[String, Variant]({
+"ShakeStrength": 18.0
+})
+metadata/_custom_type_script = "uid://bv0es4osw3x0r"
+
+[resource]
+script = ExtResource("7_mx7mg")
+ItemId = "Furniture_C_FoodCartA"
+DisplayName = "食物推车"
+Description = "一次性投掷道具：食物推车"
+Icon = ExtResource("6_oqybt")
+Category = "Furniture"
+Tags = Array[String](["tag_throw", "furniture"])
+MaxStackSize = 1
+EffectEntries = Array[ExtResource("2_tcx5p")]([SubResource("Resource_sg2nw"), SubResource("Resource_4k75e"), SubResource("Resource_sgnlr")])
+LevelCount = 0
+IsThrowable = true
+IsFurniture = true
+ThrowStartOffset = Vector2(0, -350)
+ThrowParabolicDuration = 0.30000000000000004
+ThrowHorizontalDistance = 500.0
+ThrowParabolicLandingYOffset = 200.0
+WorldScenePath = "uid://ddorhljtetljs"

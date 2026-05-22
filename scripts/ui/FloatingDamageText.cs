@@ -178,7 +178,7 @@ namespace Kuros.UI
 		{
 			if (_label == null) return;
 
-			_label.Text = _totalDamage.ToString();
+			_label.Text = $"-{_totalDamage}";
 
 			// 根据是否暴击选择颜色，暴击时 Scale 额外 ×1.5
 			if (_isCritical)
@@ -204,13 +204,27 @@ namespace Kuros.UI
 		/// <summary>
 		/// 初始化治疗飘字
 		/// </summary>
-		public void InitializeHealing(int amount, Vector2 position, Vector2 sourceDirection = default)
+		public void InitializeHealing(int amount, Vector2 targetPosition, Vector2 sourceDirection = default)
 		{
-			GlobalPosition = position;
-			_startPosition = position;
+			// 计算最终显示位置：目标位置 + 基础偏移 + 随机偏移 + 额外偏移
+			Vector2 displayPosition = targetPosition + BasePositionOffset;
+			
+			// 添加随机偏移
+			float randomOffsetX = (GD.Randf() * RandomOffsetXRange) - (RandomOffsetXRange / 2f);
+			float randomOffsetY = (GD.Randf() * RandomOffsetYRange) - (RandomOffsetYRange / 2f);
+			displayPosition += new Vector2(randomOffsetX, randomOffsetY);
+			
+			// 应用额外偏移
+			displayPosition += AdditionalOffset;
+			
+			GlobalPosition = displayPosition;
+			_startPosition = displayPosition;
 			_totalDamage = amount;
 			_elapsedTime = 0f;
 			_lastDamageTime = 0f;
+			
+			// 应用伤害缩放（根据治疗量调整浮动高度、漂移距离、Scale）
+			ApplyDamageScale(_totalDamage);
 
 			// 治疗通常向外扩散
 			if (sourceDirection.LengthSquared() > 0.01f)
@@ -222,6 +236,10 @@ namespace Kuros.UI
 				_pushDirection = Vector2.Right;
 			}
 
+			// 设置为绿色治疗样式
+			_isCritical = false;
+			_currentLabelColor = HealColor;
+			
 			if (_label != null)
 			{
 				_label.Text = $"+{amount}";
@@ -229,8 +247,6 @@ namespace Kuros.UI
 				c.A = 1f;
 				_label.Modulate = c;
 			}
-
-			Scale = Vector2.One;
 		}
 	}
 }

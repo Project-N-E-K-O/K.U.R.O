@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=3 uid="uid://ba8fktvib2e1o"]
+[gd_scene load_steps=29 format=3 uid="uid://ba8fktvib2e1o"]
 
 [ext_resource type="Script" uid="uid://e0dl460gdllx" path="res://scripts/actors/enemies/EnemyC2WaiterA02.cs" id="1_n7wqi"]
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="2_4msjm"]
@@ -9,6 +9,9 @@
 [ext_resource type="Script" uid="uid://dy6nxg6ncc1dl" path="res://scripts/actors/enemies/states/EnemyWaiterAIdleState.cs" id="7_h32j6"]
 [ext_resource type="Script" uid="uid://ca6my22csxkmt" path="res://scripts/actors/enemies/states/EnemyWaiterAWalkState.cs" id="8_xaq7d"]
 [ext_resource type="Script" uid="uid://bniicdf3jtich" path="res://scripts/actors/enemies/states/EnemyWaiterAAttackState.cs" id="9_27i41"]
+[ext_resource type="Script" uid="uid://734u1l8c1gtw" path="res://scripts/actors/enemies/attacks/EnemyC2WaiterA02AttackController.cs" id="10_bd65j"]
+[ext_resource type="Script" uid="uid://bsff01dgd5m6a" path="res://scripts/actors/enemies/attacks/EnemyWheelAttack.cs" id="11_kjt0o"]
+[ext_resource type="PackedScene" uid="uid://1ysv463wivf5" path="res://resources/effects/EnemyWaiterA02WheelAttackEffect.tscn" id="12_kjt0o"]
 [ext_resource type="Script" uid="uid://cu6enbmbcicac" path="res://scripts/actors/enemies/attacks/EnemySimpleMeleeAttack.cs" id="13_a0san"]
 [ext_resource type="Script" uid="uid://ckc4yud52bmag" path="res://scripts/actors/enemies/states/EnemyAssistState.cs" id="14_0xfei"]
 [ext_resource type="Script" uid="uid://cwnxfhj8ysc2f" path="res://scripts/actors/enemies/states/EnemyHitState.cs" id="15_plwgt"]
@@ -51,7 +54,7 @@ motion_mode = 1
 script = ExtResource("1_n7wqi")
 EnableStateDebugOverlay = true
 DebugOverlayOffset = Vector2(-1200, 200)
-DebugOverlayFontSize = 28
+DebugOverlayFontSize = 128
 DetectionArea = NodePath("Sprite2D/ControllerDetectionArea")
 AttackArea = NodePath("Sprite2D/AttackArea")
 AttackDamage = 0.0
@@ -181,9 +184,18 @@ script = ExtResource("8_xaq7d")
 script = ExtResource("9_27i41")
 
 [node name="AttackController" type="Node" parent="StateMachine/Attack"]
+script = ExtResource("10_bd65j")
+PlayerDetectionAreaPath = NodePath("../../../Sprite2D/ControllerDetectionArea")
 
 [node name="WheelAttack" type="Node" parent="StateMachine/Attack/AttackController"]
-metadata/attack_weight = 100.0
+script = ExtResource("11_kjt0o")
+DetectionAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
+WarmupDuration = 0.3
+ActiveDuration = 0.24
+CooldownDuration = 0.3
+EffectScene = ExtResource("12_kjt0o")
+EffectOffset = Vector2(0, -400)
+metadata/attack_weight = 60.0
 
 [node name="SimpleMeleeAttack" type="Node" parent="StateMachine/Attack/AttackController"]
 script = ExtResource("13_a0san")
@@ -197,7 +209,7 @@ KnockbackDistance = 300.0
 KnockbackDuration = 0.06999999999999999
 KnockbackSpeed = 2000.0
 RequireAnimationHitTrigger = true
-metadata/attack_weight = 0.0
+metadata/attack_weight = 40.0
 
 [node name="Assist" type="Node" parent="StateMachine"]
 script = ExtResource("14_0xfei")
