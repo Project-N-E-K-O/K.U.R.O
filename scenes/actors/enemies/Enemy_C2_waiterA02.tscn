@@ -1,10 +1,11 @@
-[gd_scene load_steps=29 format=3 uid="uid://ba8fktvib2e1o"]
+[gd_scene load_steps=30 format=3 uid="uid://ba8fktvib2e1o"]
 
 [ext_resource type="Script" uid="uid://e0dl460gdllx" path="res://scripts/actors/enemies/EnemyC2WaiterA02.cs" id="1_n7wqi"]
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="2_4msjm"]
 [ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="3_r3uht"]
 [ext_resource type="SpineSkeletonDataResource" uid="uid://d2mipn3j22njv" path="res://animations/spine/Enemy_C1_waiterA.tres" id="4_glvvw"]
 [ext_resource type="Script" uid="uid://bbybuyitd10jr" path="res://scripts/controllers/SpineController.gd" id="5_htedi"]
+[ext_resource type="SpineSkeletonDataResource" uid="uid://2l1ucaortb0b" path="res://animations/spine/Enemy_C2_waiterA02.tres" id="6_4msjm"]
 [ext_resource type="Script" uid="uid://cenpuhlcgesin" path="res://scripts/systems/fsm/StateMachine.cs" id="6_ugem5"]
 [ext_resource type="Script" uid="uid://dy6nxg6ncc1dl" path="res://scripts/actors/enemies/states/EnemyWaiterAIdleState.cs" id="7_h32j6"]
 [ext_resource type="Script" uid="uid://ca6my22csxkmt" path="res://scripts/actors/enemies/states/EnemyWaiterAWalkState.cs" id="8_xaq7d"]
@@ -117,11 +118,11 @@ preview_time = 3.23
 script = ExtResource("5_htedi")
 
 [node name="SpineSprite" type="SpineSprite" parent="."]
-skeleton_data_res = ExtResource("4_glvvw")
+skeleton_data_res = ExtResource("6_4msjm")
 preview_skin = "Default"
-preview_animation = "-- Empty --"
-preview_frame = false
-preview_time = 0.6667
+preview_animation = "skill2"
+preview_frame = true
+preview_time = 3.13
 script = ExtResource("5_htedi")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
@@ -191,7 +192,8 @@ PlayerDetectionAreaPath = NodePath("../../../Sprite2D/ControllerDetectionArea")
 script = ExtResource("11_kjt0o")
 DetectionAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
 WarmupDuration = 0.3
-ActiveDuration = 0.24
+ActiveDuration = 2.2
+RecoveryDuration = 0.63
 CooldownDuration = 0.3
 EffectScene = ExtResource("12_kjt0o")
 EffectOffset = Vector2(0, -400)
@@ -200,10 +202,10 @@ metadata/attack_weight = 60.0
 [node name="SimpleMeleeAttack" type="Node" parent="StateMachine/Attack/AttackController"]
 script = ExtResource("13_a0san")
 Damage = 1
-WarmupDuration = 0.35
-ActiveDuration = 0.2
-RecoveryDuration = 0.28
-CooldownDuration = 0.35
+WarmupDuration = 0.3
+ActiveDuration = 0.3
+RecoveryDuration = 0.4
+CooldownDuration = 0.3
 AttackAreaPath = NodePath("../../../../Sprite2D/AttackArea")
 KnockbackDistance = 300.0
 KnockbackDuration = 0.06999999999999999
@@ -240,6 +242,8 @@ script = ExtResource("21_55afc")
 
 [node name="AnimationController" type="Node" parent="."]
 script = ExtResource("19_n7wqi")
+SkillAnimation = "skill2"
+AssistAnimation = "skill3"
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
 target_desired_distance = 50.0

@@ -1,0 +1,8 @@
+[gd_resource type="SpineSkeletonDataResource" load_steps=3 format=3 uid="uid://2l1ucaortb0b"]
+
+[ext_resource type="SpineAtlasResource" uid="uid://bxatldhk5061x" path="res://assets/spine/demo_enemy/Enemy_C1_waiterA02.atlas" id="1_ftxlv"]
+[ext_resource type="SpineSkeletonFileResource" uid="uid://k2fxb41kcv48" path="res://assets/spine/demo_enemy/Enemy_C1_waiterA02.spine-json" id="2_q1l08"]
+
+[resource]
+atlas_res = ExtResource("1_ftxlv")
+skeleton_file_res = ExtResource("2_q1l08")

@@ -5,5 +5,5 @@
 
 [node name="EnemyWaiterA02WheelAttackEffect" type="Node2D"]
 script = ExtResource("1_script")
-SpawnIntervalPerProjectile = 0.5
+SpawnIntervalPerProjectile = 0.3
 ProjectilePrefab = ExtResource("2_prefab")
