@@ -244,6 +244,8 @@ script = ExtResource("21_55afc")
 script = ExtResource("19_n7wqi")
 SkillAnimation = "skill2"
 AssistAnimation = "skill3"
+AttackMixDuration = 0.2
+SkillMixDuration = 0.1
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
 target_desired_distance = 50.0
