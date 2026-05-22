@@ -21,12 +21,14 @@ LevelName = "关卡 2"
 
 [node name="CameraZoneManager" type="Node" parent="." node_paths=PackedStringArray("TargetCamera", "Player")]
 script = ExtResource("4_camera")
-TargetCamera = NodePath("../World/MainCharacter/Camera2D")
+TargetCamera = NodePath("../World/Camera2D")
 Player = NodePath("../World/MainCharacter")
 
 [node name="CutsceneManager" type="Node" parent="."]
 script = ExtResource("1_csmgr")
 SkipActionName = "run"
+TopBlackBarPath = NodePath("../CanvasLayer/ColorRectTop")
+BottomBlackBarPath = NodePath("../CanvasLayer/ColorRectBottom")
 HideNodePaths = Array[NodePath]([NodePath("../World/P2")])
 BattleSceneManagerPath = NodePath("..")
 
@@ -41,14 +43,16 @@ y_sort_enabled = true
 
 [node name="MainCharacter" parent="World" instance=ExtResource("2_s0pgc")]
 
-[node name="Camera2D" type="Camera2D" parent="World/MainCharacter"]
+[node name="Camera2D" type="Camera2D" parent="World" node_paths=PackedStringArray("Target")]
+scale = Vector2(0.32999998, 0.32999998)
 ignore_rotation = false
-zoom = Vector2(0.43, 0.43)
+zoom = Vector2(0.35, 0.35)
 position_smoothing_enabled = true
 rotation_smoothing_enabled = true
 drag_horizontal_enabled = true
 drag_vertical_enabled = true
 script = ExtResource("3_vvtmr")
+Target = NodePath("../MainCharacter")
 ShakeOnPlayerDamaged = true
 ShakeRecoverySpeed = 20.0
 PlayerDamagedShakeStrength = 12.0
@@ -64,3 +68,18 @@ position = Vector2(300, 0)
 
 [node name="DropDebug" type="Node2D" parent="."]
 script = ExtResource("7_drop")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+layer = 128
+
+[node name="ColorRectTop" type="ColorRect" parent="CanvasLayer"]
+offset_right = 1920.0
+offset_bottom = 150.0
+color = Color(0, 0, 0, 1)
+metadata/_edit_use_anchors_ = true
+
+[node name="ColorRectBottom" type="ColorRect" parent="CanvasLayer"]
+offset_top = 930.0
+offset_right = 1920.0
+offset_bottom = 1080.0
+color = Color(0, 0, 0, 1)

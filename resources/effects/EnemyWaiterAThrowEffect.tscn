@@ -1,0 +1,19 @@
+[gd_scene load_steps=5 format=3 uid="uid://btu15dulpf6bd"]
+
+[ext_resource type="PackedScene" uid="uid://ciwlpetibguab" path="res://shaders/destroy_somke.tscn" id="2_5wm8k"]
+[ext_resource type="Script" uid="uid://bqrtl877lylyy" path="res://scripts/actors/enemies/attacks/EnemyWaiterAThrowProjectile.cs" id="2_throw"]
+[ext_resource type="Texture2D" uid="uid://bn76sdp254cs1" path="res://assets/weapons/茶壶.png" id="3_5wm8k"]
+[ext_resource type="PackedScene" uid="uid://bwpejurlr7cvn" path="res://resources/effects/TeapotBrokenEffect.tscn" id="3_h75qg"]
+
+[node name="EnemyWaiterAThrowEffect" type="Node2D"]
+z_index = 3
+script = ExtResource("2_throw")
+Duration = 1.0
+PeakHeight = 1000.0
+RotationDegreesPerSecond = 720.0
+ImpactEffectScenes = [ExtResource("2_5wm8k"), ExtResource("3_h75qg")]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+y_sort_enabled = true
+scale = Vector2(0.66, 0.66)
+texture = ExtResource("3_5wm8k")

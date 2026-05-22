@@ -20,6 +20,11 @@ namespace Kuros.Actors.Enemies.Attacks
         [Export(PropertyHint.Range, "10,2000,10")] public float DashSpeed = 600f;
         [Export] public bool LockFacingDuringDash = true;
         [Export(PropertyHint.Range, "0,5,0.1")] public float MinDashTimeBeforeAttack = 0f;
+        /// <summary>
+        /// 启用后 Dash 阶段通过 NavigationAgent2D 路径点计算方向，实现绕障冲刺。
+        /// 禁用则维持原始直线追踪行为。
+        /// </summary>
+        [Export] public bool UseNavDuringDash = true;
 
         [ExportCategory("Slash")]
         [Export(PropertyHint.Range, "1,200,1")] public int SlashDamage = 12;
@@ -30,6 +35,7 @@ namespace Kuros.Actors.Enemies.Attacks
         private Area2D? _dashStopArea;   // 小圈：dash 接触停止检测
         private Area2D? _dashSlashArea;  // 大圈：slash 伤害范围检测
         private EnemyAttackController? _controller;
+        private NavigationAgent2D? _navAgent;
         private bool _playerInsideDetection;
 
         private Vector2 _dashDirection = Vector2.Right;
@@ -74,6 +80,9 @@ namespace Kuros.Actors.Enemies.Attacks
             }
 
             SetPhysicsProcess(true);
+
+            // 缓存 NavigationAgent2D，用于 Dash 阶段避障路径跟随
+            _navAgent = Enemy?.GetNodeOrNull<NavigationAgent2D>("NavigationAgent2D");
         }
 
         public override void _ExitTree()
@@ -144,6 +153,13 @@ namespace Kuros.Actors.Enemies.Attacks
             Enemy.Velocity = Vector2.Zero;
             // Warmup 阶段立即开始冲刺；ShouldHoldWarmupPhase 将持续挂起直到 dash 结束
             _isDashing = true;
+
+            // 若启用导航避障，提前设置目标位置让 NavAgent 开始计算路径
+            if (UseNavDuringDash && _navAgent != null && Enemy.PlayerTarget != null)
+            {
+                _navAgent.TargetPosition = Enemy.PlayerTarget.GlobalPosition;
+            }
+
             Vector2 toPlayer = Enemy.PlayerTarget != null
                 ? (Enemy.PlayerTarget.GlobalPosition - Enemy.GlobalPosition).Normalized()
                 : (Enemy.FacingRight ? Vector2.Right : Vector2.Left);
@@ -261,14 +277,39 @@ namespace Kuros.Actors.Enemies.Attacks
             // 实时追踪玩家位置
             if (Enemy.PlayerTarget != null)
             {
-                Vector2 toPlayer = Enemy.PlayerTarget.GlobalPosition - Enemy.GlobalPosition;
-                if (toPlayer != Vector2.Zero)
+                Vector2 newDir;
+
+                if (UseNavDuringDash && _navAgent != null)
                 {
-                    _dashDirection = toPlayer.Normalized();
-                    if (LockFacingDuringDash && _dashDirection.X != 0)
+                    // 每帧更新目标位置，让 NavAgent 持续重新规划路径
+                    _navAgent.TargetPosition = Enemy.PlayerTarget.GlobalPosition;
+
+                    if (!_navAgent.IsNavigationFinished())
                     {
-                        Enemy.FlipFacing(_dashDirection.X > 0);
+                        // 使用路径下一个路径点作为方向，绕过障碍物
+                        Vector2 nextPoint = _navAgent.GetNextPathPosition();
+                        newDir = (nextPoint - Enemy.GlobalPosition).Normalized();
                     }
+                    else
+                    {
+                        // 路径已完成（已非常接近玩家），直接朝玩家方向冲
+                        newDir = (Enemy.PlayerTarget.GlobalPosition - Enemy.GlobalPosition).Normalized();
+                    }
+
+                    if (newDir.IsZeroApprox())
+                        newDir = _dashDirection; // 防止零向量
+                }
+                else
+                {
+                    // 原始直线追踪（UseNavDuringDash = false 时）
+                    Vector2 toPlayer = Enemy.PlayerTarget.GlobalPosition - Enemy.GlobalPosition;
+                    newDir = toPlayer != Vector2.Zero ? toPlayer.Normalized() : _dashDirection;
+                }
+
+                _dashDirection = newDir;
+                if (LockFacingDuringDash && _dashDirection.X != 0)
+                {
+                    Enemy.FlipFacing(_dashDirection.X > 0);
                 }
 
                 if (_canAttemptStrike && IsPlayerInsideDashStopArea(Enemy.PlayerTarget))

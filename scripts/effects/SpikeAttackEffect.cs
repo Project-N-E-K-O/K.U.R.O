@@ -47,6 +47,12 @@ namespace Kuros.Effects
         // 此效果在该敌人上应用的倍数（用于移除时恢复）
         private readonly Dictionary<GameActor, float> _appliedMultipliers = new();
 
+        public override void _ExitTree()
+        {
+            Cleanup();
+            base._ExitTree();
+        }
+
         protected override void OnApply()
         {
             base.OnApply();
@@ -190,15 +196,15 @@ namespace Kuros.Effects
         }
 
         /// <summary>
-        /// 重新计算敌人的当前速度（原始速度 * 所有倍数的乘积）。
+        /// 重新计算敌人的当前速度（原始速度 * 所有倍数中最小值，不叠乘）。
         /// </summary>
         private static void RecalculateSpeed(GameActor enemy)
         {
             if (!GlobalOriginalSpeeds.TryGetValue(enemy, out float originalSpeed)) return;
             if (!GlobalSpeedMultipliers.TryGetValue(enemy, out var multipliers)) return;
 
-            // 计算倍数乘积
-            float totalMultiplier = multipliers.Aggregate(1f, (a, b) => a * b);
+            // 取最强减速倍数（最小值），不做乘积叠加
+            float totalMultiplier = multipliers.Min();
             float finalSpeed = originalSpeed * totalMultiplier;
 
             if (IsInstanceValid(enemy) && !enemy.IsDead)

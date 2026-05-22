@@ -1,0 +1,54 @@
+file,ItemId,DisplayName,Description,Category,Tags,MaxStackSize,BuildClass,LevelCount,IsThrowable,IsFurniture,attack_power,MaxDurability,DamagePerHit,SkillRefs
+ExamplePotion,item_example_potion,示例药水,用于测试拾取与投掷流程的示例药水。,Consumable,,5,,1,false,false,5.0,,,ExampleSlashSkill
+Furniture_B_CautionTape_fwd,Furniture_B_CautionTape_fwd,警戒线(反),一次性投掷道具：警戒线(反),Furniture,tag_throw|furniture,1,,0,true,true,,,,
+Furniture_B_CautionTape_side,Furniture_B_CautionTape_side,警戒线(正),一次性投掷道具：警戒线(正),Furniture,tag_throw|furniture,1,,0,true,true,,,,
+Furniture_B_ChairA,Furniture_B_ChairA,白色座椅,一次性投掷道具：白色座椅,Furniture,tag_throw|furniture,1,,0,true,true,,,,
+Furniture_B_ChairA_fwd,Furniture_B_ChairA_fwd,白色座椅(反),一次性投掷道具：白色座椅(反),Furniture,tag_throw|furniture,1,,0,true,true,,,,
+Furniture_B_CoffeeMachineA,Furniture_B_CoffeeMachineA,咖啡机,一次性投掷道具：咖啡机,Furniture,tag_throw|furniture,1,,0,true,true,,,,
+Furniture_B_CounterA,Furniture_B_CounterA,酒店吧台,一次性投掷道具：酒店吧台,Furniture,tag_throw|furniture,1,,0,true,true,,,,
+Furniture_B_CounterB,Furniture_B_CounterB,昂贵的酒店柜台,一次性投掷道具：昂贵的酒店柜台,Furniture,tag_throw|furniture,1,,0,true,true,,,,
+Furniture_B_GarbageCanA,Furniture_B_GarbageCanA,大堂垃圾桶,一次性投掷道具：大堂垃圾桶,Furniture,tag_throw|furniture,1,,0,true,true,,,,
+Furniture_B_Gate,Furniture_B_Gate,大门,一次性投掷道具：大门,Furniture,tag_throw|furniture,1,,0,true,true,,,,
+Furniture_B_LuggageCartA,Furniture_B_LuggageCartA,行李推车,一次性投掷道具：行李推车,Furniture,tag_throw|furniture,1,,0,true,true,,,,
+Furniture_B_PlantA,Furniture_B_PlantA,大堂盆栽,一次性投掷道具：大堂盆栽,Furniture,tag_throw|furniture,1,,0,true,true,,,,
+Furniture_B_SofaA,Furniture_B_SofaA,迎宾沙发,一次性投掷道具：迎宾沙发,Furniture,tag_throw|furniture,1,,0,true,true,,,,
+Furniture_B_SofaA_bwd,Furniture_B_SofaA_bwd,迎宾沙发(背面),一次性投掷道具：迎宾沙发(背面),Furniture,tag_throw|furniture,1,,0,true,true,,,,
+Furniture_B_SofaA_fwd,Furniture_B_SofaA_fwd,迎宾沙发(侧面),一次性投掷道具：迎宾沙发(侧面),Furniture,tag_throw|furniture,1,,0,true,true,,,,
+Furniture_B_SofaA_rwd,Furniture_B_SofaA_rwd,迎宾沙发(侧面),一次性投掷道具：迎宾沙发(侧面),Furniture,tag_throw|furniture,1,,0,true,true,,,,
+Furniture_B_TableRoundA,Furniture_B_TableRoundA,圆桌,一次性投掷道具：圆桌,Furniture,tag_throw|furniture,1,,0,true,true,,,,
+Furniture_B_TableRoundB,Furniture_B_TableRoundB,迎宾茶几,一次性投掷道具：迎宾茶几,Furniture,tag_throw|furniture,1,,0,true,true,,,,
+Furniture_B_VendingMachineA,Furniture_B_VendingMachineA,自动售货机,一次性投掷道具：自动售货机,Furniture,tag_throw|furniture,1,,0,true,true,,,,
+Furniture_C_ChairB,Furniture_C_ChairB,米色座椅,一次性投掷道具：米色座椅,Furniture,tag_throw|furniture,1,,0,true,true,,,,
+Furniture_C_ChairB_fwd,Furniture_C_ChairB_fwd,米色座椅(反),一次性投掷道具：米色座椅(反),Furniture,tag_throw|furniture,1,,0,true,true,,,,
+Furniture_C_FoodCartA,Furniture_C_FoodCartA,食物推车,一次性投掷道具：食物推车,Furniture,tag_throw|furniture,1,,0,true,true,,,,
+Furniture_C_TableRoundC,Furniture_C_TableRoundC,圆形餐桌,一次性投掷道具：圆形餐桌,Furniture,tag_throw|furniture,1,,0,true,true,,,,
+Furniture_C_TableSquareA,Furniture_C_TableSquareA,方形餐桌,一次性投掷道具：方形餐桌,Furniture,tag_throw|furniture,1,,0,true,true,,,,
+Supplies_cake,supplies_cake,豪华蛋糕,大份蛋糕，可作为临时武器造成 3 点攻击力；食用后会立刻把生命值拉满，但只能享用一次。,Supplies,tag_food,1,,1,false,false,3.0,1,,
+Supplies_p2_support_test,supplies_p2_support_test,P2应急能量胶,临时测试道具：用于验证同伴支援消耗流程，食用后恢复 4 点生命。,Supplies,tag_food|tag_p2_support_test,3,,1,false,false,,,,
+Supplies_pudding,supplies_pudding,浓厚布丁,甜美布丁，既可当作轻型武器，也能在食用后永久提升 1 点最大生命并回复 1 点生命。,Supplies,tag_food,1,,1,false,false,2.0,1,,
+Supplies_watermelon,supplies_watermelon,多汁西瓜,既是食材也是武器：吃下可恢复 3 点生命，用手砸到敌人反而让对方回复 1 点生命。,Supplies,tag_food,1,,1,false,false,-1.0,1,,SuppliesWatermelonPassiveSkill
+Weapon_A0_bowl,weapon_a0_bowl,A0 木碗,轻便的小木碗，只能造成些许伤害。,Weapon,,1,,1,false,false,1.0,1,0,
+Weapon_A0_computer_A,weapon_a0_computer_a,A0 终端·A,高风险终端：普通攻击 5 点伤害，仅在命中敌人时才损耗这唯一的耐久。主动技能可秒杀全屏敌人，但累计 3 次就会报错并关闭游戏。,Weapon,,1,,1,false,false,5.0,1,1,WeaponComputerAActiveSkill
+Weapon_A0_lengyue,weapon_a0_lengyue,A0 冷月,蕴含冷冽月光的武器，除了 7 点攻击力，还会定期向背包投放西瓜补给。,Weapon,,1,,1,false,false,7.0,,,WeaponLengyuePassiveSkill
+Weapon_A0_manto,weapon_a0_manto,A0 披风,攻速平平，但每次命中敌人都会让持有者恢复 1 点生命值。,Weapon,,1,,1,false,false,1.0,,,
+Weapon_A0_neiku,weapon_a0_neiku,A0 内库,起始攻击力为 0，但每次命中敌人都会永久提升 1 点攻击力。,Weapon,,1,,1,false,false,0.0,,,WeaponNeikuPassiveSkill
+Weapon_A0_plate,weapon_a0_plate,A0 瓷盘,轻薄的瓷盘，攻击力 1。被投掷后命中任何单位都会造成等同攻击力的伤害，命中后即会损毁。,Weapon,,1,,1,false,false,1.0,1,,
+Weapon_A0_yaomeng1,weapon_a0_yaomeng1,A0 妖梦·壹式,以瞬闪之姿撕裂前路的武器，拥有 11 点攻击力。,Weapon,,1,,1,false,false,11.0,,,WeaponYaomeng1ActiveSkill|WeaponYaomengSynergyPassiveSkill
+Weapon_A0_yaomeng2,weapon_a0_yaomeng2,A0 妖梦·贰式,侧重审判的妖梦武器，具有 4 点攻击力与斩杀框架。,Weapon,,1,,1,false,false,4.0,,,WeaponYaomeng2ActiveSkill|WeaponYaomengSynergyPassiveSkill
+Weapon_A1_bed,weapon_a1_bed,A1大床,沉重的大床，敲击威力更高，但移动速度大幅下降。,Weapon,,1,,1,false,false,8.0,1,0,
+Weapon_A1_chest,weapon_a1_chest,A1 铁宝箱,沉甸甸的宝箱武器，敲击力度一般，损坏后会弹出少量金币。,Weapon,,1,,1,false,false,2.0,1,0,
+Weapon_A1_door,weapon_a1_door,A1 门板,坚固的门板，可用于格挡大范围攻击，但极其笨重。,Weapon,,1,,1,false,false,6.0,6,0,WeaponBlockSkill_Door
+Weapon_A1_nightstand,weapon_a1_nightstand,A1 床头柜,结实的床头柜，被当成武器挥舞时力度适中，携带会略微拖慢脚步，损坏后可掉出金币。,Weapon,,1,,1,false,false,4.0,1,0,
+Weapon_A1_tablelamp,weapon_a1_tablelamp,A1 桌灯,精致的桌灯，既可照明也能在关键时刻眩晕敌人。,Weapon,,1,,1,false,false,4.0,1,0,WeaponStunSkill
+Weapon_A2_table,weapon_a2_table,A2 木桌,厚重的木桌，抡起来威力十足，但行动会变得迟缓。,Weapon,,1,,1,false,false,6.0,2,0,
+Weapon_Brawl_MechGlove,Weapon_Brawl_MechGlove,机械冲撞臂,机械类拳套武器：机械冲撞臂,Weapon,tag_weapon|build_machine|tag_brawl|hit_3,1,machine,1,false,false,2.0,,,WeaponSkill_Brawl_MechGlove
+Weapon_Brawl_RiotBracer,Weapon_Brawl_RiotBracer,镇暴护腕,安保武器：镇暴护腕,Weapon,tag_weapon|build_guard|tag_brawl|hit_3,1,guard,1,false,false,1.0,,,WeaponSkill_Brawl_RiotBracer
+Weapon_Brawl_RiotGlove,Weapon_Brawl_RiotGlove,镇暴拳套,守护类拳套武器：镇暴拳套,Weapon,tag_weapon|build_guard|tag_brawl|hit_2,1,guard,1,false,false,1.0,,,WeaponSkill_Brawl_RiotGlove
+Weapon_Gravity_Grenade,Weapon_Gravity_Grenade,重力手雷,投掷生成黑洞，吸引并持续伤害周围敌人,Weapon,tag_weapon|throwable|tag_ranged|gravity,5,,1,false,false,3.0,,,
+Weapon_Slash_BarrierGate,Weapon_Slash_BarrierGate,开刃升降杆,机械武器：开刃升降杆,Weapon,tag_weapon|build_machine|tag_slash|hit_1,1,machine,1,false,false,2.0,,,WeaponSkill_Slash_BarrierGate
+Weapon_Slash_ExpandBaton,Weapon_Slash_ExpandBaton,甩棍,守护类挥砍武器：甩棍,Weapon,tag_weapon|build_guard|tag_slash|hit_1,1,guard,1,false,false,2.0,,,WeaponSkill_Slash_ExpandBaton
+Weapon_Stab_drill,Weapon_Stab_Drill,钻头,机械武器：钻头,Weapon,tag_weapon|build_machine|tag_stab|hit_1,1,machine,1,false,false,4.0,,,WeaponSkill_Stab_Drill
+Weapon_Stab_umbrella,Weapon_Stab_Umbrella,雨伞,坚固的战斗雨伞，既可攻击也可格挡。,Weapon,tag_weapon|build_machine|tag_stab|hit_3,1,machine,1,false,false,1.0,,,WeaponSkill_Stab_Umbrella
+Weapon_Throw_GravityGrenade,Weapon_Throw_GravityGrenade,引力手雷,机械类投掷武器：引力手雷,Weapon,tag_weapon|build_machine|tag_throw,1,machine,1,true,false,,,,
+Weapon_Throw_MetalSpike,Weapon_Throw_MetalSpike,金属地刺,机械类投掷武器：金属地刺,Weapon,tag_weapon|build_machine|tag_throw,1,machine,1,true,false,,,,
+Weapon_Throw_SmokeGrenade,Weapon_Throw_SmokeGrenade,镇暴烟雾弹,安保类投掷武器：镇暴烟雾弹,Weapon,tag_weapon|build_guard|tag_throw,1,guard,1,true,false,,,,

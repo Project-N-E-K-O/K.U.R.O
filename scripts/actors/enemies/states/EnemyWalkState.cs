@@ -18,7 +18,7 @@ namespace Kuros.Actors.Enemies.States
                 return;
             }
 
-            if (Enemy.IsPlayerInAttackRange() && Enemy.AttackTimer <= 0)
+            if (Enemy.CanStartAttack())
             {
                 ChangeState("Attack");
                 return;

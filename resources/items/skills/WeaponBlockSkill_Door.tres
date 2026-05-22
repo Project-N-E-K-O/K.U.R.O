@@ -20,7 +20,6 @@ PropertyOverrides = Dictionary[String, Variant]({
 script = ExtResource("1_skill_definition")
 SkillId = "weapon_block_heavy_door"
 DisplayName = "门板格挡"
-SkillType = 0
 CooldownSeconds = 4.0
 Description = "使用门板展开大范围防御，短时间内覆盖更大角度。"
 Effects = Array[ExtResource("2_effect_entry")]([SubResource("Skill_Block_Effect_Door")])

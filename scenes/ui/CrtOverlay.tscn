@@ -3,16 +3,16 @@
 [ext_resource type="Script" uid="uid://cusp5185wmj2x" path="res://scripts/ui/CrtOverlay.cs" id="1_crtovl"]
 
 [node name="CrtOverlay" type="CanvasLayer"]
-layer = 127
+layer = 999
 script = ExtResource("1_crtovl")
 ScanlinesOpacity = 0.0
 ScanlinesWidth = 0.0
-GrilleOpacity = 0.1
+Resolution = Vector2(960, 960)
 Pixelate = true
-Roll = true
 DistortIntensity = 0.005
 NoiseOpacity = 0.005
 Aberration = 0.00099999999999988
+WarpAmount = 0.0
 
 [node name="ColorRect" type="ColorRect" parent="."]
 anchors_preset = 15

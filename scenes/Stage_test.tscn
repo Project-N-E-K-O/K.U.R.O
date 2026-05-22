@@ -1,28 +1,21 @@
-[gd_scene load_steps=24 format=3 uid="uid://wluyqt2wxlvb"]
+[gd_scene load_steps=17 format=3 uid="uid://wluyqt2wxlvb"]
 
 [ext_resource type="Script" uid="uid://x1ic1ym4ykq8" path="res://scripts/scenes/BattleSceneManager.cs" id="1_s6mo5"]
 [ext_resource type="PackedScene" uid="uid://ufprfd4r8ijj" path="res://assets/spine/main_character/main_character.tscn" id="1_tv6fd"]
 [ext_resource type="PackedScene" uid="uid://mwpdlx1yup0k" path="res://scenes/actors/etc/EnemySpawnConsole.tscn" id="2_s6mo5"]
 [ext_resource type="Script" uid="uid://del8hgcg3sr4i" path="res://scripts/managers/CameraFollow.cs" id="2_ybuta"]
-[ext_resource type="PackedScene" uid="uid://cofm45kotvgto" path="res://scenes/actors/enemies/Enemy_B1_fat.tscn" id="3_mkebo"]
 [ext_resource type="PackedScene" uid="uid://ctpw5uqly3yu5" path="res://scenes/weapons/Weapon_Brawl_mechGlove.tscn" id="4_7yh4q"]
-[ext_resource type="PackedScene" uid="uid://wrebd662va23" path="res://scenes/actors/enemies/Enemy_B2_fat02.tscn" id="4_pxy7y"]
 [ext_resource type="PackedScene" uid="uid://bhjc0grsl76ep" path="res://scenes/weapons/Weapon_Brawl_riotBracer.tscn" id="5_s6mo5"]
-[ext_resource type="PackedScene" uid="uid://byi2utn347fwu" path="res://scenes/actors/enemies/Enemy_Normal_guard1.tscn" id="5_y4lq6"]
 [ext_resource type="PackedScene" uid="uid://blwgkboyojmcq" path="res://scenes/weapons/Weapon_Brawl_riotGlove.tscn" id="6_28ted"]
-[ext_resource type="PackedScene" uid="uid://djio6ojcqw8yf" path="res://scenes/actors/enemies/Enemy_Normal_guard2.tscn" id="6_jqh86"]
-[ext_resource type="PackedScene" uid="uid://wqcdwpyo1nji" path="res://scenes/actors/enemies/Enemy_B1_thin.tscn" id="7_5lslu"]
 [ext_resource type="PackedScene" uid="uid://2pny8f8vuu3j" path="res://scenes/weapons/Weapon_Slash_barrierGate.tscn" id="7_pja2j"]
-[ext_resource type="PackedScene" uid="uid://bvps5t0s8owhw" path="res://scenes/actors/enemies/Enemy_C1_waiterA.tscn" id="8_gr5eg"]
 [ext_resource type="PackedScene" uid="uid://csjvahh6hev8k" path="res://scenes/weapons/Weapon_Slash_expandBaton.tscn" id="8_w0p8f"]
 [ext_resource type="PackedScene" uid="uid://cdnitqquebaw6" path="res://scenes/weapons/Weapon_Stab_drill.tscn" id="9_ngl7c"]
-[ext_resource type="PackedScene" uid="uid://8ce54l6083nt" path="res://scenes/actors/enemies/Enemy_C1_waiterB.tscn" id="9_pxy7y"]
 [ext_resource type="PackedScene" uid="uid://6ghjqyjkk37w" path="res://scenes/weapons/Weapon_Stab_umbrella.tscn" id="10_dxexl"]
 [ext_resource type="PackedScene" uid="uid://bvvyo3wubh12j" path="res://scenes/weapons/Weapon_Throw_gravityGrenade.tscn" id="11_5dr7i"]
 [ext_resource type="PackedScene" uid="uid://dfmke56wtqt2x" path="res://scenes/weapons/Weapon_Throw_metalSpike.tscn" id="12_mkebo"]
 [ext_resource type="PackedScene" uid="uid://cipwjj7xx121y" path="res://scenes/weapons/Weapon_Throw_smokeGrenade.tscn" id="13_pxy7y"]
 [ext_resource type="PackedScene" uid="uid://v3n56xk6n8ca" path="res://scenes/loading/Loading_elevator.tscn" id="16_28ted"]
-[ext_resource type="PackedScene" uid="uid://beohs6gufqc3i" path="res://scenes/actors/npc/SimpleNPC.tscn" id="23_pxy7y"]
+[ext_resource type="Script" uid="uid://b7afb3wjghskq" path="res://scripts/items/world/DropItemDebugger.cs" id="25_jqh86"]
 
 [node name="BattleScene" type="Node2D" node_paths=PackedStringArray("Player")]
 script = ExtResource("1_s6mo5")
@@ -33,13 +26,14 @@ LevelName = "test"
 y_sort_enabled = true
 
 [node name="EnemySpawnConsole" parent="World" instance=ExtResource("2_s6mo5")]
+z_index = 1
 position = Vector2(714, -170)
 SpawnParentPath = NodePath("..")
-EnemyScenes = Array[PackedScene]([ExtResource("5_y4lq6"), ExtResource("6_jqh86"), ExtResource("3_mkebo"), ExtResource("4_pxy7y"), ExtResource("7_5lslu"), ExtResource("8_gr5eg"), ExtResource("9_pxy7y")])
 
 [node name="MainCharacter" parent="World" instance=ExtResource("1_tv6fd")]
 
-[node name="Camera2D" type="Camera2D" parent="World/MainCharacter"]
+[node name="Camera2D" type="Camera2D" parent="World" node_paths=PackedStringArray("Target")]
+scale = Vector2(0.33, 0.33)
 ignore_rotation = false
 zoom = Vector2(0.43, 0.43)
 position_smoothing_enabled = true
@@ -47,11 +41,12 @@ rotation_smoothing_enabled = true
 drag_horizontal_enabled = true
 drag_vertical_enabled = true
 script = ExtResource("2_ybuta")
+Target = NodePath("../MainCharacter")
 ShakeOnPlayerDamaged = true
 ShakeRecoverySpeed = 20.0
-PlayerDamagedShakeStrength = 24.0
+PlayerDamagedShakeStrength = 12.0
 ShakeOnPlayerAttackHit = true
-PlayerAttackKillShakeStrength = 32.0
+PlayerAttackKillShakeStrength = 20.0
 PlayerDamagedHitStopDuration = 0.18
 PlayerAttackHitHitStopDuration = 0.1
 PlayerAttackKillHitStopDuration = 0.3
@@ -91,6 +86,5 @@ position = Vector2(-515, -138)
 position = Vector2(5285, 154)
 NextStagePath = "uid://dwk6x3qcbsmul"
 
-[node name="NPC" parent="World" instance=ExtResource("23_pxy7y")]
-y_sort_enabled = true
-position = Vector2(-729, 536)
+[node name="DropDebug" type="Node2D" parent="."]
+script = ExtResource("25_jqh86")

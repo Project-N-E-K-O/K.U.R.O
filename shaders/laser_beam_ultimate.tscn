@@ -13,6 +13,7 @@ script = ExtResource("1_ultimate")
 Speed = 3000.0
 DragFactor = 0.01
 Duration = 1.0
+TrailPoints = 10
 BeamColor = Color(1, 0, 0, 1)
 GlowColor = Color(1, 0, 0, 0.3137255)
 BeamWidth = 32.0

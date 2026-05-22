@@ -1,4 +1,4 @@
-[gd_scene load_steps=35 format=3 uid="uid://8ce54l6083nt"]
+[gd_scene load_steps=36 format=3 uid="uid://8ce54l6083nt"]
 
 [ext_resource type="Script" uid="uid://d3gkoo7f3rxiq" path="res://scripts/actors/enemies/EnemyC1WaiterB.cs" id="1_enemy_script"]
 [ext_resource type="Script" uid="uid://crdjpji0qtc4q" path="res://scripts/core/stats/StatModifier.cs" id="2_eqcia"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://d6ppl6a6djpr" path="res://scripts/core/effects/EffectController.cs" id="3_effect_controller"]
 [ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="3_evlou"]
 [ext_resource type="Script" uid="uid://d4mh83kyh88kd" path="res://scripts/core/stats/CharacterStatProfile.cs" id="3_qgdql"]
+[ext_resource type="Resource" uid="uid://cqcx8udrey0v4" path="res://resources/loot/Enemy_B_EliteDrops.tres" id="4_qgdql"]
 [ext_resource type="Script" uid="uid://cenpuhlcgesin" path="res://scripts/systems/fsm/StateMachine.cs" id="4_state_machine"]
 [ext_resource type="Script" uid="uid://7sdhlullren0" path="res://scripts/actors/enemies/states/EnemyIdleState.cs" id="5_idle_state"]
 [ext_resource type="Script" uid="uid://bbybuyitd10jr" path="res://scripts/controllers/SpineController.gd" id="5_muxhp"]
@@ -65,7 +66,6 @@ collision_layer = 2
 collision_mask = 15
 motion_mode = 1
 script = ExtResource("1_enemy_script")
-EnableStateDebugOverlay = true
 DebugOverlayOffset = Vector2(-1200, 200)
 DebugOverlayFontSize = 128
 DetectionArea = NodePath("Sprite2D/ControllerDetectionArea")
@@ -77,6 +77,7 @@ AttackCooldown = 0.4
 StateMachine = NodePath("StateMachine")
 EffectController = NodePath("EffectController")
 StatProfile = SubResource("Resource_f4qnp")
+LootTable = ExtResource("4_qgdql")
 DamageFlashColor = Color(1, 1, 1, 1)
 
 [node name="Shadow" type="Sprite2D" parent="."]
@@ -193,7 +194,7 @@ monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/DashSlashArea"]
 position = Vector2(800, 0)
-scale = Vector2(1.2, 0.8)
+scale = Vector2(1.2, 0.9)
 shape = SubResource("CircleShape2D_evlou")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
@@ -215,7 +216,6 @@ script = ExtResource("7_attack_state")
 
 [node name="AttackController" type="Node" parent="StateMachine/Attack"]
 script = ExtResource("10_st2e3")
-MeleeCountBeforeCharge = 5
 UltimateHealthThresholds = PackedFloat32Array(0.9, 0.5, 0.1)
 PlayerDetectionAreaPath = NodePath("../../../Sprite2D/ControllerDetectionArea")
 
@@ -224,6 +224,7 @@ script = ExtResource("11_5drfe")
 DetectionAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
 DashStopAreaPath = NodePath("../../../../Sprite2D/DashStopArea")
 DashSlashAreaPath = NodePath("../../../../Sprite2D/DashSlashArea")
+DashSpeed = 800.0
 SlashDamage = 5
 WarmupDuration = 1.0
 ActiveDuration = 0.5

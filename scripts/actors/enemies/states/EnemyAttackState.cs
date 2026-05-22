@@ -63,7 +63,7 @@ namespace Kuros.Actors.Enemies.States
 			}
         }
 
-        private bool TryStartTemplateAttack()
+        protected virtual bool TryStartTemplateAttack()
         {
             if (_attackTemplates.Count == 0) return false;
 
@@ -124,7 +124,7 @@ namespace Kuros.Actors.Enemies.States
             return true;
         }
 
-        private void ChangeToNextState()
+        protected virtual void ChangeToNextState()
         {
             bool playerDetected = Enemy.IsPlayerWithinDetectionRange();
             bool playerInAttackRange = Enemy.IsPlayerInAttackRange();

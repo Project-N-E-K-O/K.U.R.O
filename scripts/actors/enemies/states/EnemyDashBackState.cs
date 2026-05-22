@@ -34,13 +34,49 @@ namespace Kuros.Actors.Enemies.States
         [Export]
         public bool EnableSuperArmor = true;
 
+        [ExportCategory("Use Cooldown")]
+        [Export(PropertyHint.Range, "1,20,1")]
+        public int UsesBeforeCooldown = 2;
+
+        [Export(PropertyHint.Range, "0.5,60,0.5")]
+        public float CooldownAfterUses = 5.0f;
+
+        private int _useCount;
+        private float _cooldownTimer;
+
         private float _timer;
         private Vector2 _dashDirection = Vector2.Zero;
         private bool? _previousIgnoreHitStateOnDamage;
 
+        // ── 使用次数冷却 ──────────────────────────────────────────────────────
+        public override void _Process(double delta)
+        {
+            // 无论当前处于哪个状态都持续倒计时
+            if (_cooldownTimer > 0f)
+            {
+                _cooldownTimer -= (float)delta;
+                if (_cooldownTimer <= 0f)
+                {
+                    _cooldownTimer = 0f;
+                    _useCount = 0; // 冷却结束后重置次数
+                }
+            }
+        }
+
+        public override bool CanEnterFrom(string? currentStateName)
+        {
+            if (_cooldownTimer > 0f) return false;
+            return base.CanEnterFrom(currentStateName);
+        }
+
         public override void Enter()
         {
             _timer = Mathf.Max(DashDuration, 0.01f);
+
+            // 累加使用次数，达到上限时触发冷却
+            _useCount++;
+            if (UsesBeforeCooldown > 0 && _useCount >= UsesBeforeCooldown)
+                _cooldownTimer = Mathf.Max(CooldownAfterUses, 0f);
 
             Vector2 preferredDirection = Vector2.Zero;
             Vector2 toPlayer = Enemy.GetDirectionToPlayer();

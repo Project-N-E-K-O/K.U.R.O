@@ -1,0 +1,337 @@
+using Godot;
+
+namespace Kuros.Actors.Npc
+{
+	/// <summary>
+	/// 使用 Dialogic 插件的 NPC 交互组件。
+	/// 当玩家进入 Area2D 范围并按下交互键时启动 Dialogic Timeline。
+	/// 当玩家离开范围时立即结束对话。
+	/// </summary>
+	public partial class DialogicInteraction : Node2D
+	{
+		/// <summary>
+		/// 要播放的 Dialogic Timeline 路径
+		/// 例如："res://dialogic/timeline/B_begin_timeline.dtl"
+		/// 或直接填写名称："B_begin_timeline"
+		/// </summary>
+		[Export] public string TimelinePath { get; set; } = "";
+
+		/// <summary>
+		/// 对应的 Dialogic 角色资源路径（.dch 文件）
+		/// 例如："res://dialogic/character/Enemy_Normal_guard2_B_begin_gate.dch"
+		/// 填写后气泡对话框会跟随 BubbleAnchorPath 指定的节点位置显示
+		/// 留空则气泡显示在默认位置
+		/// </summary>
+		[Export] public string CharacterPath { get; set; } = "";
+
+		/// <summary>
+		/// 气泡对话框跟随的锚点节点路径（默认为子节点 Marker2D）
+		/// 需要配合 CharacterPath 一起使用
+		/// </summary>
+		[Export] public NodePath BubbleAnchorPath { get; set; } = "Marker2D";
+
+		/// <summary>
+		/// 交互提示文字
+		/// </summary>
+		[Export] public string PromptText { get; set; } = "[E] 交互";   //留空时进入area2d范围自动触发对话
+
+		/// <summary>
+		/// 是否只触发一次（触发后禁用交互）
+		/// </summary>
+		[Export] public bool TriggerOnce { get; set; } = false;
+
+		private Area2D? _area;
+		private bool _playerInRange = false;
+		private bool _hasTriggered = false;
+		private Label? _promptLabel;
+		private Kuros.Core.GameActor? _parentActor;
+		private bool _dialogueActive = false;
+
+		public override void _ExitTree()
+		{
+			// 立即结束正在进行的对话
+			if (_dialogueActive)
+			{
+				try
+				{
+					ForceEndDialogueImmediate();
+				}
+				catch (System.Exception ex)
+				{
+					GD.PrintErr($"DialogicInteraction: _ExitTree 结束对话时出错：{ex.Message}");
+				}
+			}
+
+			// 清理信号连接
+			try
+			{
+				var dialogic = GetNodeOrNull("/root/Dialogic");
+				if (dialogic != null && dialogic.IsConnected("timeline_ended", new Callable(this, MethodName.OnTimelineEnded)))
+				{
+					dialogic.Disconnect("timeline_ended", new Callable(this, MethodName.OnTimelineEnded));
+				}
+			}
+			catch (System.Exception ex)
+			{
+				GD.PrintErr($"DialogicInteraction: _ExitTree 清理时出错：{ex.Message}");
+			}
+
+			// 清理 Area2D 信号
+			if (_area != null)
+			{
+				try
+				{
+					_area.AreaEntered -= OnAreaEntered;
+					_area.AreaExited -= OnAreaExited;
+					_area.BodyEntered -= OnBodyEntered;
+					_area.BodyExited -= OnBodyExited;
+				}
+				catch (System.Exception ex)
+				{
+					GD.PrintErr($"DialogicInteraction: 清理 Area2D 信号时出错：{ex.Message}");
+				}
+			}
+		}
+
+		public override void _Ready()
+		{
+			_area = GetNodeOrNull<Area2D>("Area2D");
+			if (_area == null)
+			{
+				GD.PrintErr("DialogicInteraction: 找不到 Area2D 子节点！");
+				return;
+			}
+
+			// 缓存父 GameActor（通常是敌人）
+			_parentActor = GetParent() as Kuros.Core.GameActor;
+
+			_area.AreaEntered += OnAreaEntered;
+			_area.AreaExited += OnAreaExited;
+			_area.BodyEntered += OnBodyEntered;
+			_area.BodyExited += OnBodyExited;
+
+			CreatePromptLabel();
+			UpdatePrompt();
+		}
+
+		public override void _Process(double delta)
+		{
+			// 监测敌人死亡，立即结束对话并销毁自身
+			// text_bubble.gd 中已有 is_inside_tree() 守卫，end_timeline 可安全同步调用
+			if (_dialogueActive && _parentActor != null && _parentActor.IsDead)
+			{
+				ForceEndDialogueImmediate();
+				QueueFree();
+				return;
+			}
+
+			if (!string.IsNullOrEmpty(PromptText) && _playerInRange && Input.IsActionJustPressed("interact"))
+			{
+				StartDialogue();
+			}
+		}
+
+		private void OnAreaEntered(Area2D area)
+		{
+			if (area.Name == "GrabArea" && area.GetParent()?.IsInGroup("player") == true)
+			{
+				_playerInRange = true;
+				UpdatePrompt();
+				if (string.IsNullOrEmpty(PromptText))
+					StartDialogue();
+			}
+		}
+
+		private void OnAreaExited(Area2D area)
+		{
+			if (area.Name == "GrabArea" && area.GetParent()?.IsInGroup("player") == true)
+			{
+				_playerInRange = false;
+				UpdatePrompt();
+				ForceEndDialogue();
+			}
+		}
+
+		private void OnBodyEntered(Node2D body)
+		{
+			if (body.IsInGroup("player"))
+			{
+				_playerInRange = true;
+				UpdatePrompt();
+				if (string.IsNullOrEmpty(PromptText))
+					StartDialogue();
+			}
+		}
+
+		private void OnBodyExited(Node2D body)
+		{
+			if (body.IsInGroup("player"))
+			{
+				_playerInRange = false;
+				UpdatePrompt();
+				ForceEndDialogue();
+			}
+		}
+
+		private void StartDialogue()
+		{
+			if (string.IsNullOrEmpty(TimelinePath))
+			{
+				GD.PrintErr("DialogicInteraction: TimelinePath 未设置！请在编辑器中填写 Timeline 路径。");
+				return;
+			}
+
+			if (TriggerOnce && _hasTriggered)
+				return;
+
+			_hasTriggered = true;
+			_dialogueActive = true;
+			UpdatePrompt();
+
+			try
+			{
+				var dialogic = GetNodeOrNull("/root/Dialogic");
+				if (dialogic == null)
+				{
+					GD.PrintErr("DialogicInteraction: 找不到 Dialogic autoload！请确认 project.godot 中已启用 Dialogic。");
+					_dialogueActive = false;
+					return;
+				}
+
+				// 连接 timeline_ended 信号
+				if (!dialogic.IsConnected("timeline_ended", new Callable(this, MethodName.OnTimelineEnded)))
+				{
+					dialogic.Connect("timeline_ended", new Callable(this, MethodName.OnTimelineEnded));
+				}
+
+				// 启动对话，start() 返回布局节点（Style 的根场景）
+				var layoutVariant = dialogic.Call("start", TimelinePath);
+
+				// 将 Marker2D 注册到布局节点，让气泡对话框定位到 Marker2D
+				// 必须在 start() 之后，且用 CallDeferred 等布局节点就绪后再注册
+				if (!string.IsNullOrEmpty(CharacterPath) && layoutVariant.AsGodotObject() is Node layoutNode)
+				{
+					var anchor = GetNodeOrNull(BubbleAnchorPath);
+					if (anchor != null && IsInstanceValid(anchor))
+					{
+						// register_character(角色资源路径, 锚点节点) 告诉 Dialogic 气泡在哪显示
+						layoutNode.CallDeferred("register_character", CharacterPath, anchor);
+					}
+					else
+					{
+						GD.PrintErr($"DialogicInteraction: 找不到或锚点节点无效 '{BubbleAnchorPath}'，气泡将显示在默认位置。");
+					}
+				}
+			}
+			catch (System.Exception ex)
+			{
+				GD.PrintErr($"DialogicInteraction: StartDialogue 时出错：{ex.Message}");
+				_hasTriggered = false; // 恢复状态，允许重试
+				_dialogueActive = false;
+			}
+		}
+
+		/// <summary>
+		/// 强制结束当前对话（玩家离开范围时调用）
+		/// </summary>
+		private void ForceEndDialogue()
+		{
+			if (!IsInstanceValid(this) || GetTree() == null)
+				return;
+
+			ForceEndDialogueImmediate();
+		}
+
+		/// <summary>
+		/// 立即结束对话的核心逻辑（可被 _ExitTree 直接调用）
+		/// </summary>
+		private void ForceEndDialogueImmediate()
+		{
+			_dialogueActive = false;
+
+			// 防止节点销毁过程中的访问错误
+			if (!IsInstanceValid(this))
+				return;
+
+			var dialogic = GetNodeOrNull("/root/Dialogic");
+			if (dialogic == null)
+				return;
+
+			try
+			{
+				// 检查是否有正在运行的对话
+				var currentTimeline = dialogic.Get("current_timeline");
+				if (currentTimeline.AsGodotObject() == null)
+					return; // 没有正在运行的对话
+
+				// 清理信号连接
+				if (dialogic.IsConnected("timeline_ended", new Callable(this, MethodName.OnTimelineEnded)))
+				{
+					dialogic.Disconnect("timeline_ended", new Callable(this, MethodName.OnTimelineEnded));
+				}
+
+				// 安全地调用 end_timeline
+				if (dialogic.HasMethod("end_timeline"))
+				{
+					dialogic.Call("end_timeline");
+					GD.Print("DialogicInteraction: 对话已通过 end_timeline 结束");
+				}
+			}
+			catch (System.Exception ex)
+			{
+				GD.PrintErr($"DialogicInteraction: ForceEndDialogueImmediate 时出错：{ex.Message}");
+			}
+		}
+
+		private void OnTimelineEnded()
+		{
+			_dialogueActive = false;
+
+			if (!IsInstanceValid(this))
+				return;
+
+			try
+			{
+				var dialogic = GetNodeOrNull("/root/Dialogic");
+				if (dialogic != null && dialogic.IsConnected("timeline_ended", new Callable(this, MethodName.OnTimelineEnded)))
+				{
+					dialogic.Disconnect("timeline_ended", new Callable(this, MethodName.OnTimelineEnded));
+				}
+			}
+			catch (System.Exception ex)
+			{
+				GD.PrintErr($"DialogicInteraction: OnTimelineEnded 清理连接时出错：{ex.Message}");
+			}
+
+			if (TriggerOnce)
+			{
+				if (_area != null)
+					_area.SetDeferred(Area2D.PropertyName.Monitoring, false);
+			}
+			else
+			{
+				_hasTriggered = false;
+			}
+
+			UpdatePrompt();
+		}
+
+		private void CreatePromptLabel()
+		{
+			_promptLabel = new Label();
+			_promptLabel.Text = PromptText;
+			_promptLabel.HorizontalAlignment = HorizontalAlignment.Center;
+			_promptLabel.Visible = false;
+			_promptLabel.Position = new Vector2(-60, -90);
+			_promptLabel.AddThemeFontSizeOverride("font_size", 24);
+			AddChild(_promptLabel);
+		}
+
+		private void UpdatePrompt()
+		{
+			if (_promptLabel == null) return;
+			bool canInteract = _playerInRange && !(TriggerOnce && _hasTriggered);
+			_promptLabel.Visible = canInteract;
+		}
+	}
+}

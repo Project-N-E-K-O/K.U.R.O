@@ -30,6 +30,16 @@ namespace Kuros.Systems.Cutscene
         [Export] public NodePath FadeOverlayPath   { get; set; } = new NodePath();
 
         /// <summary>
+        /// 电影式黑幕：上方黑色 ColorRect 的节点路径（用于 FadeStep 电影模式）
+        /// </summary>
+        [Export] public NodePath TopBlackBarPath { get; set; } = new NodePath();
+
+        /// <summary>
+        /// 电影式黑幕：下方黑色 ColorRect 的节点路径（用于 FadeStep 电影模式）
+        /// </summary>
+        [Export] public NodePath BottomBlackBarPath { get; set; } = new NodePath();
+
+        /// <summary>
         /// 过场期间隐藏并禁用 ProcessMode 的节点（如 P2、UI 根节点）。
         /// 结束后自动恢复显示和 ProcessMode。
         /// </summary>
@@ -49,6 +59,8 @@ namespace Kuros.Systems.Cutscene
         internal Camera2D?             Camera          { get; private set; }
         internal CutsceneDialoguePanel? DialoguePanel  { get; private set; }
         internal CanvasItem?           FadeOverlay     { get; private set; }
+        internal Control?              TopBlackBar     { get; private set; }
+        internal Control?              BottomBlackBar  { get; private set; }
 
         // ── 私有字段 ──────────────────────────────────────────────────────
         private Node2D? _player;
@@ -73,6 +85,12 @@ namespace Kuros.Systems.Cutscene
 
             if (!FadeOverlayPath.IsEmpty)
                 FadeOverlay = GetNodeOrNull<CanvasItem>(FadeOverlayPath);
+
+            if (!TopBlackBarPath.IsEmpty)
+                TopBlackBar = GetNodeOrNull<Control>(TopBlackBarPath);
+
+            if (!BottomBlackBarPath.IsEmpty)
+                BottomBlackBar = GetNodeOrNull<Control>(BottomBlackBarPath);
 
             if (!BattleSceneManagerPath.IsEmpty)
                 _battleSceneManager = GetNodeOrNull<Kuros.Scenes.BattleSceneManager>(BattleSceneManagerPath);

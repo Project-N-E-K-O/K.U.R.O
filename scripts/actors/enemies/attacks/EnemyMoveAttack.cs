@@ -24,6 +24,11 @@ namespace Kuros.Actors.Enemies.Attacks
 		[Export(PropertyHint.Range, "0,5,0.01")] public float MinDashTimeBeforeAttack = 0f; // 允许命中前的最短冲刺时间（秒）
 		[Export(PropertyHint.Range, "0,5,0.1")] public float SnapshotDelaySeconds = 0f; // 冲刺前等待一段时间再记录玩家位置
 		[Export(PropertyHint.Range, "0,9999,1")] public int MoveAttackDmg = 25;
+        /// <summary>
+        /// 启用后 Dash 阶段通过 NavigationAgent2D 路径点计算方向，实现绕障冲刺。
+        /// 禁用则维持原始直线追踪行为。
+        /// </summary>
+        [Export] public bool UseNavDuringDash = true;
 
         [ExportCategory("Effects")]
 		[Export] public StringName CooldownStateName = "CooldownFrozen";
@@ -34,6 +39,7 @@ namespace Kuros.Actors.Enemies.Attacks
         private Area2D? _detectionArea;
 		private Area2D? _moveArea;
         private EnemyAttackController? _controller;
+        private NavigationAgent2D? _navAgent;
 		private bool _playerInsideDetection;
 
         private Vector2 _dashDirection = Vector2.Right;
@@ -74,6 +80,9 @@ namespace Kuros.Actors.Enemies.Attacks
             }
 
 			SetPhysicsProcess(true);
+
+            // 缓存 NavigationAgent2D，用于 Dash 阶段避障路径跟随
+            _navAgent = Enemy?.GetNodeOrNull<NavigationAgent2D>("NavigationAgent2D");
         }
 
         public override void _ExitTree()
@@ -274,6 +283,19 @@ namespace Kuros.Actors.Enemies.Attacks
 
 			_dashDirection = direction.Normalized();
 
+            // 若启用导航避障，提前设置目标位置让 NavAgent 开始计算路径
+            if (UseNavDuringDash && _navAgent != null && Enemy.PlayerTarget != null)
+            {
+                _navAgent.TargetPosition = Enemy.PlayerTarget.GlobalPosition;
+                if (!_navAgent.IsNavigationFinished())
+                {
+                    Vector2 nextPoint = _navAgent.GetNextPathPosition();
+                    Vector2 navDir = (nextPoint - Enemy.GlobalPosition).Normalized();
+                    if (!navDir.IsZeroApprox())
+                        _dashDirection = navDir;
+                }
+            }
+
             if (LockFacingDuringDash && _dashDirection.X != 0)
             {
                 Enemy.FlipFacing(_dashDirection.X > 0);
@@ -457,14 +479,32 @@ namespace Kuros.Actors.Enemies.Attacks
 			// 实时追踪玩家位置更新冲刺方向
 			if (Enemy.PlayerTarget != null)
 			{
-				Vector2 toPlayer = Enemy.PlayerTarget.GlobalPosition - Enemy.GlobalPosition;
-				if (toPlayer != Vector2.Zero)
+				Vector2 newDir;
+
+				if (UseNavDuringDash && _navAgent != null)
 				{
-					_dashDirection = toPlayer.Normalized();
-					if (!LockFacingDuringDash && _dashDirection.X != 0)
+					_navAgent.TargetPosition = Enemy.PlayerTarget.GlobalPosition;
+					if (!_navAgent.IsNavigationFinished())
 					{
-						Enemy.FlipFacing(_dashDirection.X > 0);
+						Vector2 nextPoint = _navAgent.GetNextPathPosition();
+						newDir = (nextPoint - Enemy.GlobalPosition).Normalized();
 					}
+					else
+					{
+						newDir = (Enemy.PlayerTarget.GlobalPosition - Enemy.GlobalPosition).Normalized();
+					}
+					if (newDir.IsZeroApprox()) newDir = _dashDirection;
+				}
+				else
+				{
+					Vector2 toPlayer = Enemy.PlayerTarget.GlobalPosition - Enemy.GlobalPosition;
+					newDir = toPlayer != Vector2.Zero ? toPlayer.Normalized() : _dashDirection;
+				}
+
+				_dashDirection = newDir;
+				if (!LockFacingDuringDash && _dashDirection.X != 0)
+				{
+					Enemy.FlipFacing(_dashDirection.X > 0);
 				}
 			}
 

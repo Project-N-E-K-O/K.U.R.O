@@ -19,7 +19,6 @@ PropertyOverrides = Dictionary[String, Variant]({
 script = ExtResource("1_skill_definition")
 SkillId = "weapon_block_front"
 DisplayName = "前方格挡"
-SkillType = 0
 CooldownSeconds = 3.0
 Description = "展开格挡姿态，短时间内抵挡正面攻击。"
 Effects = Array[ExtResource("2_effect_entry")]([SubResource("Skill_Block_Effect")])

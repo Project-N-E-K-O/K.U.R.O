@@ -1,0 +1,7 @@
+file,BuildId,BuildClass,BuildName,Level,RequiredPoints,EffectId,EffectScript,Description
+Build_Guard_level1,Build_Guard_level1,guard,一级安保,1,1,Build_Guard_level1,BuildGuardLevel1Effect,略微减少玩家受到敌人的伤害
+Build_Guard_level2,Build_Guard_level2,guard,二级安保,2,2,Build_Guard_level2,BuildGuardLevel2Effect,延长玩家受到伤害后的无敌时间
+Build_Guard_level3,Build_Guard_level3,guard,三级安保,3,3,Build_Guard_level3,BuildGuardLevel3Effect,抵消玩家受到的下次伤害(8秒CD)
+Build_Machine_level1,Build_Machine_level1,machine,一级机械,1,1,Build_Machine_level1,BuildMachineLevel1Effect,减少玩家受到攻击时的击退力度
+Build_Machine_level2,Build_Machine_level2,machine,二级机械,2,2,Build_Machine_level2,BuildMachineLevel2Effect,玩家攻击和攻击结束后短时间内不会被非控制技能打断
+Build_Machine_level3,Build_Machine_level3,machine,三级机械,3,3,Build_Machine_level3,BuildMachineLevel3Effect,连续使用攻击时增加玩家攻击到敌人时的最终伤害

@@ -26,12 +26,12 @@ scripts/systems/cutscene/
 ├── CutsceneDialoguePanel.cs        ← 对话框抽象基类（Control）
 ├── DefaultCutsceneDialoguePanel.cs ← 默认对话框实现
 └── steps/
-    ├── WaitStep.cs                 ← 等待 N 秒
-    ├── DialogueLine.cs             ← 单条台词 Resource
-    ├── DialogueStep.cs             ← 显示一组台词
-    ├── CameraMoveStep.cs           ← 镜头移动
-    ├── PlayAnimationStep.cs        ← 播放动画
-    └── FadeStep.cs                 ← 黑幕淡变
+	├── WaitStep.cs                 ← 等待 N 秒
+	├── DialogueLine.cs             ← 单条台词 Resource
+	├── DialogueStep.cs             ← 显示一组台词
+	├── CameraMoveStep.cs           ← 镜头移动
+	├── PlayAnimationStep.cs        ← 播放动画
+	└── FadeStep.cs                 ← 黑幕淡变
 ```
 
 ---
@@ -93,25 +93,31 @@ Duration: 0.5      ← 过渡时长（秒）
 类型: DialogueStep
 Lines:
   [0] DialogueLine
-        Speaker: "主角"
-        Text:    "这里是对话内容……"
-        RevealSpeed: 40   ← 每秒显示字符数（0 = 立即全显）
+		Speaker: "主角"
+		Text:    "这里是对话内容……"
+		RevealSpeed: 40   ← 每秒显示字符数（0 = 立即全显）
   [1] DialogueLine
-        Speaker: "NPC"
-        Text:    "另一条台词"
+		Speaker: "NPC"
+		Text:    "另一条台词"
 ```
 
 #### CameraMoveStep — 镜头移动
 ```
 类型: CameraMoveStep
-TargetPath:     (NodePath，相对于 CutsceneManager) ← 优先级高于 TargetPosition
-TargetPosition: Vector2(1000, 200)                  ← TargetPath 为空时使用
-Duration:       2.0
-Ease:           IN_OUT
-Transition:     CUBIC
+TargetPath:         (NodePath，相对于 CutsceneManager) ← 优先级高于 TargetPosition
+TargetPosition:     Vector2(1000, 200)                  ← TargetPath 为空时使用
+TargetZoom:         0.8                                 ← 相机缩放级别（>0 启用，1.0=无缩放）
+Duration:           2.0                                 ← 动画时长（秒）
+Ease:               IN_OUT                              ← 缓动类型
+Transition:         CUBIC                               ← 过渡类型
+WaitForCompletion:  false                               ← false=异步（后续步骤立刻执行）
 ```
 
-> 需要 `CutsceneSequence.TakeOverCamera = true`
+> **需要**：`CutsceneSequence.TakeOverCamera = true`
+>
+> **新特性**：
+> - **Zoom 缩放**：设置 `TargetZoom > 0` 时启用，与位置移动 **并行执行**
+> - **异步模式**：`WaitForCompletion = false` 时，镜头动画在后台进行，**不阻塞后续步骤**（如对话、Taxi 出现等同时进行）。skip 时自动完成。
 
 #### PlayAnimationStep — 播放动画
 ```
@@ -188,6 +194,113 @@ Steps:
 
 ---
 
+## CameraMoveStep 属性详解
+
+### TargetPath 与 TargetPosition
+
+**两者都是指定镜头目标位置的方法，有优先级关系：**
+
+- **`TargetPath`** ✅ 推荐，优先级高
+  - 类型：`NodePath`，相对于 `CutsceneManager` 节点（即 Stage_2 根节点）
+  - 作用：自动获取某个**节点的当前世界坐标**
+  - 示例：`"../BBegin/Taxi"` → 镜头移动到 Taxi 当前位置
+  - 优势：目标动态更新（Taxi 移动时镜头跟随）
+  
+- **`TargetPosition`** 备选，优先级低
+  - 类型：`Vector2` 固定坐标
+  - 作用：**若 TargetPath 为空**，使用此绝对世界坐标
+  - 示例：`Vector2(1000, 500)` → 镜头移动到 (1000, 500)
+  - 使用场景：镜头扫过某个固定地点
+
+**优先级规则**：
+```csharp
+if (!TargetPath.IsEmpty)
+	target = GetNodeOrNull<Node2D>(TargetPath).GlobalPosition;  // ✓ 使用此值
+else
+	target = TargetPosition;  // ✓ 退而求其次
+```
+
+### Tween.EaseType 与 Tween.TransitionType
+
+**两者控制动画的"缓动曲线"，决定了镜头移动的**感觉**。**
+
+#### Ease（缓入缓出类型）
+
+| 值 | 含义 | 效果 |
+|----|------|------|
+| `IN` | 缓入 | 开始快 → 结束慢（急刹车） |
+| `OUT` | 缓出 | 开始慢 → 结束快（加速离开） |
+| `IN_OUT` ⭐ 推荐 | 缓入缓出 | 开始慢 + 中间快 + 结束慢（自然顺滑） |
+| `OUT_IN` | 缓出缓入 | 开始快 + 结束快（生硬，不推荐） |
+
+#### Transition（过渡曲线类型）
+
+| 值 | 含义 | 速度曲线 |
+|----|------|---------|
+| `LINEAR` | 线性 | 匀速直线（机械感） |
+| `SINE` | 正弦 | 平缓S形 |
+| `QUAD` | 二次 | 缓慢起伏 |
+| `CUBIC` ⭐ 推荐 | 三次 | 流畅S形（电影质感） |
+| `QUART` | 四次 | 更加夸张 |
+| `QUINT` | 五次 | 非常夸张 |
+
+**常见组合示例**：
+
+```
+Ease=IN_OUT + Transition=CUBIC   ← 标准（流畅自然）
+Ease=IN_OUT + Transition=SINE    ← 柔和温顺
+Ease=IN_OUT + Transition=QUAD    ← 略显机械
+Ease=IN     + Transition=CUBIC   ← 急停效果
+Ease=OUT    + Transition=CUBIC   ← 冲刺效果
+```
+
+### TargetZoom（相机缩放）
+
+**相机缩放级别，控制画面放大/缩小：**
+
+| 值 | 效果 | 用途 |
+|----|------|------|
+| `0.5` | 放大 2 倍（看近景） | 特写镜头（NPC 脸部） |
+| `1.0` | 100%（正常） | 标准距离 |
+| `1.5` | 缩小（看远景） | 俯视全景 |
+| `2.0` | 缩小 2 倍（更远） | 鸟瞰视角 |
+| `<= 0` | 不改变 | 保持当前缩放 |
+
+**使用示例**：
+```csharp
+// 移动到 NPC 并放大
+TargetPath: "NPC_Node"
+TargetZoom: 0.8       // 放大特写
+Duration: 1.5
+```
+
+### WaitForCompletion（异步控制）
+
+**控制动画是否阻塞后续步骤：**
+
+| 值 | 行为 | 何时使用 |
+|----|------|---------|
+| `true` | **阻塞** — 镜头动画完成后才执行下一步 | 镜头需要先到位才能对话 |
+| `false` | **异步** — 镜头动画在后台进行，立刻执行下一步 | 镜头跟随 + NPC 对话 同时进行（电影感） |
+
+**电影式示例**（WaitForCompletion=false）：
+```
+CameraMoveStep     TargetPath=Taxi, Duration=2.0, WaitForCompletion=false  ← 镜头开始跟 Taxi
+  ↓ (同时进行，不等待)
+DialogueStep       Speaker="???", Text="发生什么了？"  ← 同时播放对话
+  ↓
+WaitStep           Duration=0.5   ← 继续等待
+```
+
+**传统阻塞示例**（WaitForCompletion=true）：
+```
+CameraMoveStep     TargetPath=Taxi, Duration=2.0, WaitForCompletion=true  ← 镜头完全到位（等2秒）
+  ↓ (然后)
+DialogueStep       Speaker="???", Text="发生什么了？"  ← 才开始对话
+```
+
+---
+
 ## 信号
 
 `CutsceneManager` 发出两个信号，可在 Stage_2 或其他节点中连接：
@@ -210,9 +323,9 @@ cutsceneManager.CutsceneFinished += (id) => GD.Print($"过场结束: {id}");
 2. 子节点结构（参考）：
    ```
    Control (DefaultCutsceneDialoguePanel)
-     └─ Panel
-          ├─ SpeakerLabel  (Label)
-          └─ TextLabel     (RichTextLabel)
+	 └─ Panel
+		  ├─ SpeakerLabel  (Label)
+		  └─ TextLabel     (RichTextLabel)
    ```
 3. 在 Inspector 中修改 `SpeakerLabelPath` / `TextLabelPath` 对应实际节点路径
 4. 将此场景实例放到 `Stage_2.tscn` 的 `CanvasLayer` 下
@@ -236,19 +349,19 @@ cutsceneManager.CutsceneFinished += (id) => GD.Print($"过场结束: {id}");
 [GlobalClass]
 public partial class MyCustomStep : CutsceneStep
 {
-    [Export] public string SomeConfig { get; set; } = "";
+	[Export] public string SomeConfig { get; set; } = "";
 
-    public override async Task Execute(CutsceneContext ctx)
-    {
-        if (ctx.IsSkipping) return;
+	public override async Task Execute(CutsceneContext ctx)
+	{
+		if (ctx.IsSkipping) return;
 
-        // 做一些事情……
-        await ctx.NextFrame();  // 等一帧
+		// 做一些事情……
+		await ctx.NextFrame();  // 等一帧
 
-        // 检查跳过
-        while (!ctx.IsSkipping && /* 条件 */)
-            await ctx.NextFrame();
-    }
+		// 检查跳过
+		while (!ctx.IsSkipping && /* 条件 */)
+			await ctx.NextFrame();
+	}
 }
 ```
 

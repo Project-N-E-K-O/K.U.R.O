@@ -20,7 +20,6 @@ PropertyOverrides = Dictionary[String, Variant]({
 script = ExtResource("1_skill_definition")
 SkillId = "weapon_stun_pulse"
 DisplayName = "眩晕冲击"
-SkillType = 0
 CooldownSeconds = 5.0
 Description = "释放前向冲击波，命中的敌人将被冻结一段时间。"
 Effects = Array[ExtResource("2_effect_entry")]([SubResource("Skill_Stun_Effect")])
