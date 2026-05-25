@@ -19,7 +19,7 @@ namespace Kuros.Fx
         // ── 导出参数 ──────────────────────────────────────────────
 
         [ExportCategory("Movement")]
-        [Export(PropertyHint.Range, "50,3000,10")]  public float Speed             = 600f;
+        [Export(PropertyHint.Range, "50,12000,10")]  public float Speed             = 600f;
         [Export(PropertyHint.Range, "0.01,1,0.01")] public float DragFactor        = 0.08f; 
         /// <summary>初始速度偏转角（度）。0 = 直接朝玩家；±90 = 侧向出发形成大弧。</summary>
         [Export(PropertyHint.Range, "-180,180,1")]  public float InitialAngleOffset = 0f;

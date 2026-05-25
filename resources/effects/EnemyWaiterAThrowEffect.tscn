@@ -14,6 +14,5 @@ RotationDegreesPerSecond = 720.0
 ImpactEffectScenes = [ExtResource("2_5wm8k"), ExtResource("3_h75qg")]
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-y_sort_enabled = true
 scale = Vector2(0.66, 0.66)
 texture = ExtResource("3_5wm8k")

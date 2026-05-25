@@ -3827,6 +3827,9 @@
 					{ "slot": "009", "offset": 6 }
 				]
 			}
+		],
+		"events": [
+			{ "time": 0.6, "name": "hit" }
 		]
 	},
 	"skill3": {

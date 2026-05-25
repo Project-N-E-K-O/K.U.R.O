@@ -2918,7 +2918,7 @@
 			}
 		],
 		"events": [
-			{ "time": 1.2, "name": "hit" }
+			{ "time": 1.25, "name": "hit" }
 		]
 	},
 	"stun": {

@@ -1,0 +1,46 @@
+[gd_scene load_steps=10 format=3 uid="uid://cw3ds501wucw4"]
+
+[ext_resource type="Texture2D" uid="uid://bx37ocy10x3w5" path="res://assets/effect/AttackEffect/hit_h/HIT_H0001.png" id="1_ld0hk"]
+[ext_resource type="Texture2D" uid="uid://cp3ywoxk4lkxi" path="res://assets/effect/AttackEffect/hit_h/HIT_H0002.png" id="2_kiqy7"]
+[ext_resource type="Texture2D" uid="uid://dpgcn3rnubo12" path="res://assets/effect/AttackEffect/hit_h/HIT_H0003.png" id="3_felxo"]
+[ext_resource type="Texture2D" uid="uid://dj3cj57mnpxvl" path="res://assets/effect/AttackEffect/hit_h/HIT_H0004.png" id="4_2blc5"]
+[ext_resource type="Texture2D" uid="uid://bqi5y2ljne00e" path="res://assets/effect/AttackEffect/hit_h/HIT_H0005.png" id="5_y1q77"]
+[ext_resource type="Texture2D" uid="uid://cujom167pu87o" path="res://assets/effect/AttackEffect/hit_h/HIT_H0006.png" id="6_v085v"]
+[ext_resource type="Texture2D" uid="uid://dne85b3ejnuok" path="res://assets/effect/AttackEffect/hit_h/HIT_H0007.png" id="7_lddes"]
+[ext_resource type="Texture2D" uid="uid://bh1pwlpwr1hc8" path="res://assets/effect/AttackEffect/hit_h/HIT_H0008.png" id="8_2bjts"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_to6ee"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_ld0hk")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_kiqy7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_felxo")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_2blc5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_y1q77")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_v085v")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_lddes")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_2bjts")
+}],
+"loop": true,
+"name": &"default",
+"speed": 30.0
+}]
+
+[node name="HitH" type="AnimatedSprite2D"]
+sprite_frames = SubResource("SpriteFrames_to6ee")
+flip_h = true

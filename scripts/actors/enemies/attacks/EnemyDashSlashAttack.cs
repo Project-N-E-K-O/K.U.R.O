@@ -403,6 +403,7 @@ namespace Kuros.Actors.Enemies.Attacks
             {
                 return;
             }
+            if (_controller != null && !_controller.CanStart()) return;
 
             if (Enemy.StateMachine?.CurrentState?.Name != "Attack")
             {
@@ -477,11 +478,8 @@ namespace Kuros.Actors.Enemies.Attacks
         {
             if (Enemy?.StateMachine == null) return;
 
-            if (Enemy.StateMachine.CurrentState?.Name == "Attack")
-            {
-                Enemy.StateMachine.ChangeState("Walk");
-            }
-
+            // 新系统：攻击完成后 enemy 已退到 Walk/Idle（不再停留在 Attack），
+            // 直接由 Walk/Idle 的 CanStartAttack() 检测重入，此处无需主动切换状态。
             if (IsRunning)
             {
                 Cancel();

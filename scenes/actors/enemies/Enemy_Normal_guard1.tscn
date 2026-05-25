@@ -54,13 +54,14 @@ collision_layer = 2
 collision_mask = 15
 motion_mode = 1
 script = ExtResource("1_75dbm")
+EnableStateDebugOverlay = true
 DebugOverlayOffset = Vector2(-1200, 200)
 DebugOverlayFontSize = 128
 DetectionArea = NodePath("Sprite2D/ControllerDetectionArea")
 AttackArea = NodePath("Sprite2D/AttackArea")
 Speed = 350.0
 AttackDamage = 0.0
-AttackCooldown = 1.0
+AttackCooldown = 0.0
 MaxHealth = 15
 StateMachine = NodePath("StateMachine")
 EffectController = NodePath("EffectController")
@@ -192,7 +193,6 @@ script = ExtResource("9_h8efu")
 
 [node name="AttackController" type="Node" parent="StateMachine/Attack"]
 script = ExtResource("9_75dbm")
-MeleeCountBeforeCharge = 1
 PlayerDetectionAreaPath = NodePath("../../../Sprite2D/ControllerDetectionArea")
 
 [node name="OnePunchAttack" type="Node" parent="StateMachine/Attack/AttackController"]
@@ -207,7 +207,6 @@ OnePunchDmg = 3
 WarmupDuration = 1.0
 ActiveDuration = 0.2
 RecoveryDuration = 0.45
-CooldownDuration = 0.0
 KnockbackDistance = 500.0
 KnockbackDuration = 0.2
 KnockbackSpeed = 3000.0
@@ -221,7 +220,7 @@ Damage = 2
 WarmupDuration = 0.33
 ActiveDuration = 0.2
 RecoveryDuration = 0.47
-CooldownDuration = 0.0
+CooldownDuration = 2.0
 KnockbackDistance = 50.0
 KnockbackDuration = 0.1
 KnockbackSpeed = 1500.0

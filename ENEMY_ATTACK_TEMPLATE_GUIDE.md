@@ -10,8 +10,10 @@
 2. [攻击流程](#攻击流程)
 3. [基础实现](#基础实现)
 4. [进阶模式](#进阶模式)
-5. [冷却机制（PostCooldown）](#冷却机制postcooldown)
-6. [常见问题](#常见问题)
+5. [检测区域攻击](#检测区域攻击detection-based-attacks)
+6. [冷却机制（PostCooldown）](#冷却机制postcooldown)
+7. [控制器冷却协调](#控制器冷却协调controller-coordination)
+8. [常见问题](#常见问题)
 
 ---
 
@@ -257,6 +259,99 @@ protected override void OnAttackFinished()
 
 ---
 
+## 检测区域攻击（Detection-Based Attacks）
+
+### 场景说明
+
+某些复杂攻击（如 `EnemyDashSlashAttack`、`EnemySmashAttack`、`EnemyKickAttack`、`EnemyChargeGrabAttack`、`EnemyOnePunchAttack`）需要在特定检测区域内自动触发，无需等待控制器的状态机切换。
+
+这些攻击通过 `OnArea*` 信号回调（如 `_OnDetectionAreaEntered()`）或 `_PhysicsProcess()` 中的轮询（Poll）来调用 `TryRequestAttackFromDetection(reason: string)` 方法。
+
+### 关键问题：Cooldown 绕过
+
+⚠️ **常见错误**：`TryRequestAttackFromDetection()` 检查自身的冷却状态（`IsOnCooldown`, `IsRunning` 等），但**忽视了控制器级别的 `_interAttackDelay` 检查**。
+
+**后果**：
+- 攻击完成后，控制器设置 `_interAttackDelay` 以防止立即重新发起
+- 但检测区域立即触发 `TryRequestAttackFromDetection()`
+- 该方法只检查自身冷却（返回false），不知道控制器正在延迟
+- 结果：`ChangeState("Attack")` 被强制执行，敌人在Idle/Walk中不断振荡
+
+### 正确实现
+
+**关键防护**：在 `TryRequestAttackFromDetection()` 中加入 `_controller.CanStart()` 检查
+
+```csharp
+private void TryRequestAttackFromDetection(string reason)
+{
+	if (Enemy == null) return;
+	if (Enemy.IsDeathSequenceActive || Enemy.IsDead) return;
+	if (IsRunning || IsOnCooldown) return;
+	if (Enemy.AttackTimer > 0) return;
+	if (_postAttackCooldown > 0f) return;
+
+	if (_controller != null && _controller.PeekQueuedAttack() != this)
+	{
+		return;
+	}
+	
+	// ✅ 关键防护：检查控制器的 _interAttackDelay
+	if (_controller != null && !_controller.CanStart()) return;
+
+	if (Enemy.StateMachine?.CurrentState?.Name != "Attack")
+	{
+		Enemy.StateMachine?.ChangeState("Attack");
+	}
+}
+```
+
+### 为什么需要这个检查
+
+| 检查项 | 说明 |
+|--------|------|
+| `IsRunning` | 自身是否正在执行 |
+| `IsOnCooldown` | 自身的 `_cooldownTimer` 是否大于0 |
+| `_postAttackCooldown > 0` | PostCooldown 专用延迟（如果支持） |
+| **`_controller.CanStart()`** | **控制器级别的 `_interAttackDelay` 检查（防止切换攻击模式时卡住）** |
+
+`_controller.CanStart()` 内部检查 `_interAttackDelay > 0f`，返回 false 时表示：
+- 当前已有攻击正在冷却，所有新攻击应等待
+- 这是**跨攻击**的全局延迟，优于单个攻击的自检
+
+### 场景流程示例
+
+```
+Frame N:    SimpleMeleeAttack 完成 → OnAttackFinished()
+			→ _controller._interAttackDelay = SimpleMeleeAttack.CooldownDuration
+
+Frame N+1:  EnemyAttackState.ProcessTemplateAttack() → IsRunning=false
+			→ ChangeToNextState() → Idle
+
+Frame N+1:  EnemyIdleState 等待 CanStartAttack() = true
+			→ 继续返回false（因为_interAttackDelay > 0）
+
+同时N+1:    DashSlashAttack 检测区域信号触发
+			→ TryRequestAttackFromDetection()
+			✅ 检查 _controller.CanStart() → false
+			✅ 返回，不强制 ChangeState("Attack")
+
+Frame N+2:  _interAttackDelay 递减至0
+			→ CanStartAttack() 返回true
+			→ EnemyIdleState 切换到 Attack 或 DashSlashAttack 自动触发
+```
+
+### 常见检测区域攻击位置
+
+| 文件 | 检测类型 | 说明 |
+|-----|---------|------|
+| `EnemyDashSlashAttack.cs` | 区域信号 + 轮询 | 冲刺斩，检测玩家进入冲刺路径 |
+| `EnemySmashAttack.cs` | 区域信号 + 轮询 | 砸地板，检测地面范围 |
+| `EnemyKickAttack.cs` | 区域信号 + 轮询 | 踢击，检测前方范围 |
+| `EnemyChargeGrabAttack.cs` | 区域信号 + 轮询 | 抓取，检测抓取范围 |
+| `EnemyOnePunchAttack.cs` | 区域信号 + 轮询 | 一拳，检测拳击范围 |
+
+---
+
 ## 冷却机制（PostCooldown）
 
 ### 问题背景
@@ -385,6 +480,131 @@ public partial class EnemyChargeGrabAttack : EnemyAttackTemplate
 - ❌ 在 `FinishCooldownState()` 中无条件执行 `ChangeState("Walk")`，导致打断其他攻击
 - ❌ 遗漏对 `currentState == "Attack" && !IsRunning` 的检查，冷却计时在其他攻击运行时继续
 - ❌ 冷却期间允许新攻击启动
+
+---
+
+## 控制器冷却协调（Controller Coordination）
+
+### 背景：两层冷却系统
+
+敌人攻击系统包含**两层独立的冷却机制**：
+
+| 层级 | 位置 | 作用 | 管理者 |
+|------|------|------|--------|
+| **单个攻击冷却** | `EnemyAttackTemplate._cooldownTimer` | 防止同一攻击立即重复 | 各个攻击模板 |
+| **控制器全局延迟** | `EnemyAttackController._interAttackDelay` | 防止任何攻击立即切换 | 控制器 |
+
+### 为什么需要双层冷却
+
+**场景1：SimpleMeleeAttack 完成后**
+- `SimpleMeleeAttack._cooldownTimer = 0.5f`（自身冷却）
+- `_interAttackDelay = 0.5f`（全局延迟）
+- **结果**：任何攻击（包括DashSlashAttack）都无法启动
+
+**场景2：没有 `_interAttackDelay` 的世界**
+- SimpleMeleeAttack 自身冷却0.5秒，DashSlashAttack 冷却1.0秒
+- 0.2秒后，DashSlashAttack 冷却结束，检测区域触发
+- `TryRequestAttackFromDetection()` 看到 `!IsOnCooldown` = true，强制 `ChangeState("Attack")`
+- **问题**：敌人在Idle↔Attack中振荡，SimpleMeleeAttack 还未冷却完
+
+### 控制器初始化流程
+
+```csharp
+public partial class EnemyAttackController : EnemyAttackTemplate
+{
+	private float _interAttackDelay = 0f;  // 初始值为0
+
+	public override bool CanStart()
+	{
+		if (_entries.Count == 0) return false;
+		if (!base.CanStart()) return false;
+		if (_interAttackDelay > 0f) return false;  // ✅ 核心检查
+		// ... 其他检查 ...
+		return true;
+	}
+
+	public override void _PhysicsProcess(double delta)
+	{
+		base._PhysicsProcess(delta);
+		// ✅ 每帧递减
+		if (_interAttackDelay > 0f) _interAttackDelay -= (float)delta;
+		// ... 其他逻辑 ...
+	}
+
+	private void FinishControllerAttack(string reason, bool clearControllerCooldown = false)
+	{
+		float childInterAttackDelay = 0f;
+		if (reason == "ChildFinished" && _currentAttack != null)
+			childInterAttackDelay = _currentAttack.CooldownDuration;
+
+		// ✅ 攻击完成时，从子攻击的 CooldownDuration 继承延迟
+		if (clearControllerCooldown) _interAttackDelay = 0f;
+		else if (childInterAttackDelay > 0f) _interAttackDelay = childInterAttackDelay;
+	}
+}
+```
+
+### 检测区域攻击的防护修复
+
+上一章节介绍了在 `TryRequestAttackFromDetection()` 中添加 `_controller.CanStart()` 检查。这个检查的完整逻辑：
+
+```csharp
+if (_controller != null && !_controller.CanStart()) return;
+```
+
+**内部工作流程**：
+1. `_controller.CanStart()` 检查 `_interAttackDelay > 0f`
+2. 若为true，返回false（表示不能启动）
+3. `TryRequestAttackFromDetection()` 在此处返回，不执行 `ChangeState("Attack")`
+4. 敌人保持Idle/Walk，等待 `_interAttackDelay` 递减到0
+
+### 最佳实践：攻击完成后的正确流程
+
+```
+Frame N:    AttackA 完成
+			↓
+			OnAttackFinished()
+			↓
+			EnemyAttackState 立即 exit → Idle/Walk
+			↓
+			_interAttackDelay = AttackA.CooldownDuration
+
+Frame N+1:  检测区域触发 AttackB.TryRequestAttackFromDetection()
+			↓
+			检查 _controller.CanStart() → false（因为延迟中）
+			↓
+			返回（不强制切攻击）
+
+Frame N+1:  EnemyIdleState / EnemyWalkState
+			↓
+			每帧调用 CanStartAttack()
+			↓
+			返回false（_interAttackDelay > 0）
+			↓
+			保持Idle/Walk
+
+Frame N+k:  _interAttackDelay 递减至0
+			↓
+			EnemyIdleState 下次 PhysicsUpdate() 调用 CanStartAttack()
+			↓
+			返回true
+			↓
+			ChangeState("Attack") 并自动选择合适的攻击
+```
+
+### 性能提示
+
+- **不要频繁创建新的冷却计时器**：重用 `_interAttackDelay`
+- **不要在检测区域回调中做复杂计算**：只检查基本条件，留给 `_PhysicsProcess()` 处理
+- **使用 `PeekQueuedAttack()`**：快速检查队列中的攻击，避免重复触发
+
+### 调试方法
+
+若敌人在攻击模式切换时卡住：
+
+1. **检查 `_interAttackDelay`**：在Debug窗口查看 `EnemyAttackController._interAttackDelay` 值
+2. **检查 `TryRequestAttackFromDetection` 逻辑**：确保含有 `if (_controller != null && !_controller.CanStart()) return;`
+3. **查看状态日志**：添加 GD.PrintDebug() 到 `TryRequestAttackFromDetection()` 和 `CanStart()` 以跟踪调用顺序
 
 ---
 

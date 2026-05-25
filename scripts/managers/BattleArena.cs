@@ -45,7 +45,7 @@ namespace Kuros.Managers
         public bool ShowDebugOverlay { get; set; } = true;
 
         [Export]
-        public bool ShowDebugOverlayInGame { get; set; } = true;
+        public bool ShowDebugOverlayInGame { get; set; } = false;
 
         [Export]
         public Color DebugArenaColor { get; set; } = new Color(0.2f, 1f, 0.2f, 0.5f);
@@ -67,6 +67,7 @@ namespace Kuros.Managers
         private float _checkTimer = 0f;
         private bool _isBattleActive = false;
         private List<GameActor> _trackedEnemies = new();
+        private readonly List<GameActor> _detectedScratch = new(); // 复用缓冲区，避免每0.3s分配新列表
         private string? _originalCameraZoneName;
         /// <summary>
         /// 外部持锁标志。当为 true 时，即使检测到无敌人也不会撤销空气墙/相机锁定。
@@ -155,15 +156,15 @@ namespace Kuros.Managers
             // 更新现有敌人列表
             _trackedEnemies.RemoveAll(enemy => !IsInstanceValid(enemy) || enemy.IsDead);
 
-            // 通过物理查询找到范围内的所有敌人
+            // 通过物理查询找到范围内的所有敌人（复用暂存列表，避免每次 new List）
             var overlappingBodies = GetOverlappingBodies();
-            var detectedEnemies = new List<GameActor>();
+            _detectedScratch.Clear();
 
             foreach (var body in overlappingBodies)
             {
-                if (body is GameActor actor && !detectedEnemies.Contains(actor))
+                if (body is GameActor actor && !_detectedScratch.Contains(actor))
                 {
-                    detectedEnemies.Add(actor);
+                    _detectedScratch.Add(actor);
                     
                     // 新进入的敌人
                     if (!_trackedEnemies.Contains(actor))
@@ -173,16 +174,18 @@ namespace Kuros.Managers
                 }
             }
 
-            // 检查离开的敌人
-            foreach (var enemy in _trackedEnemies.ToList())
+            // 检查离开的敌人（直接遍历，无需 ToList 拷贝）
+            foreach (var enemy in _trackedEnemies)
             {
-                if (!detectedEnemies.Contains(enemy))
+                if (!_detectedScratch.Contains(enemy))
                 {
                     GameLogger.Debug(nameof(BattleArena), $"敌人离开检测范围：{enemy.Name}");
                 }
             }
 
-            _trackedEnemies = detectedEnemies;
+            // 将检测结果同步回追踪列表（复用，不分配新对象）
+            _trackedEnemies.Clear();
+            _trackedEnemies.AddRange(_detectedScratch);
 
             bool hasEnemies = _trackedEnemies.Count > 0;
 

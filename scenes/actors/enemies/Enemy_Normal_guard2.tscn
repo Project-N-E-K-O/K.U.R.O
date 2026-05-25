@@ -54,13 +54,14 @@ collision_layer = 2
 collision_mask = 15
 motion_mode = 1
 script = ExtResource("1_wixbd")
+EnableStateDebugOverlay = true
 DebugOverlayOffset = Vector2(-1200, 200)
 DebugOverlayFontSize = 128
 DetectionArea = NodePath("Sprite2D/ControllerDetectionArea")
 AttackArea = NodePath("Sprite2D/AttackArea")
 Speed = 350.0
 AttackDamage = 0.0
-AttackCooldown = 1.0
+AttackCooldown = 0.0
 MaxHealth = 15
 StateMachine = NodePath("StateMachine")
 EffectController = NodePath("EffectController")
@@ -125,7 +126,7 @@ skeleton_data_res = ExtResource("18_wixbd")
 preview_skin = "Default"
 preview_animation = "-- Empty --"
 preview_frame = true
-preview_time = 0.0
+preview_time = 0.6667
 script = ExtResource("19_gkl6r")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
@@ -196,6 +197,19 @@ script = ExtResource("9_wixbd")
 MeleeCountBeforeCharge = 4
 PlayerDetectionAreaPath = NodePath("../../../Sprite2D/ControllerDetectionArea")
 
+[node name="SimpleMeleeAttack" type="Node" parent="StateMachine/Attack/AttackController"]
+script = ExtResource("11_vt7ga")
+Damage = 1
+WarmupDuration = 0.33
+ActiveDuration = 0.11
+RecoveryDuration = 0.23
+AttackAreaPath = NodePath("../../../../Sprite2D/AttackArea")
+KnockbackDistance = 30.0
+KnockbackDuration = 0.06999999999999999
+KnockbackSpeed = 2000.0
+RequireAnimationHitTrigger = true
+metadata/attack_weight = 40.0
+
 [node name="MoveAttack" type="Node" parent="StateMachine/Attack/AttackController"]
 script = ExtResource("10_gkl6r")
 DetectionAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
@@ -216,20 +230,6 @@ AllowMultipleAnimationHits = true
 GrantedImmunities = 8
 IgnoreEnemyCollisionDuringAttack = true
 metadata/attack_weight = 60.0
-
-[node name="SimpleMeleeAttack" type="Node" parent="StateMachine/Attack/AttackController"]
-script = ExtResource("11_vt7ga")
-Damage = 1
-WarmupDuration = 0.33
-ActiveDuration = 0.11
-RecoveryDuration = 0.23
-CooldownDuration = 0.0
-AttackAreaPath = NodePath("../../../../Sprite2D/AttackArea")
-KnockbackDistance = 30.0
-KnockbackDuration = 0.06999999999999999
-KnockbackSpeed = 2000.0
-RequireAnimationHitTrigger = true
-metadata/attack_weight = 40.0
 
 [node name="Hit" type="Node" parent="StateMachine"]
 script = ExtResource("12_gdj2m")

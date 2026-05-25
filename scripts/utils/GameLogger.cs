@@ -1,17 +1,22 @@
 using Godot;
 using System;
+using System.Collections.Concurrent;
 using System.IO;
 using System.Text;
+using System.Threading;
 
 namespace Kuros.Utils
 {
 	/// <summary>
 	/// 全局日志工具：在导出版本中把日志写到可执行文件同级目录，开关受 ProjectSettings 控制。
+	/// 日志行通过后台线程异步写入，避免主线程因磁盘 I/O 产生卡顿。
 	/// </summary>
 	public static class GameLogger
 	{
 		private const string SettingKey = "kuro/logging/enable_file_logging";
-		private static readonly object FileLock = new();
+		private static readonly ConcurrentQueue<string> _logQueue = new();
+		private static Thread? _writerThread;
+		private static volatile bool _writerRunning = false;
 		private static bool _initialized;
 		private static string? _logFilePath;
 		private static bool _enabled = ReadInitialEnabledState();
@@ -53,6 +58,11 @@ namespace Kuros.Utils
 					_logFilePath = null;
 					Initialize();
 				}
+				else
+				{
+					// 停止后台写入线程
+					StopWriterThread();
+				}
 			}
 		}
 
@@ -64,6 +74,14 @@ namespace Kuros.Utils
 			{
 				Enabled = ProjectSettings.GetSetting(SettingKey).AsBool();
 			}
+		}
+
+		/// <summary>
+		/// 刷新队列中剩余日志并停止后台写入线程（退出时调用）。
+		/// </summary>
+		public static void Flush()
+		{
+			StopWriterThread();
 		}
 
 		public static void Debug(string category, string message) => Write(LogLevel.Debug, category, message);
@@ -113,17 +131,8 @@ namespace Kuros.Utils
 				return;
 			}
 
-			try
-			{
-				lock (FileLock)
-				{
-					File.AppendAllText(_logFilePath, line + System.Environment.NewLine, Encoding.UTF8);
-				}
-			}
-			catch (Exception ex)
-			{
-				GD.PrintErr($"GameLogger: Failed to write log file. {ex.Message}");
-			}
+			// 入队，由后台线程异步写入，不阻塞主线程
+			_logQueue.Enqueue(line + System.Environment.NewLine);
 		}
 
 		private static void Initialize()
@@ -141,12 +150,70 @@ namespace Kuros.Utils
 				_logFilePath = Path.Combine(directory, fileName);
 				File.WriteAllText(_logFilePath, $"[{DateTime.Now:O}] Log session started{System.Environment.NewLine}", Encoding.UTF8);
 				_initialized = true;
+
+				// 启动后台写入线程
+				StartWriterThread();
 			}
 			catch (Exception ex)
 			{
 				_initialized = false;
 				_logFilePath = null;
 				GD.PrintErr($"GameLogger: Failed to initialize log file. {ex.Message}");
+			}
+		}
+
+		private static void StartWriterThread()
+		{
+			if (_writerRunning)
+				return;
+
+			_writerRunning = true;
+			_writerThread = new Thread(WriterLoop)
+			{
+				IsBackground = true,
+				Name = "GameLogger.WriterThread"
+			};
+			_writerThread.Start();
+		}
+
+		private static void StopWriterThread()
+		{
+			_writerRunning = false;
+			_writerThread?.Join(2000); // 最多等2秒让剩余日志写完
+			_writerThread = null;
+		}
+
+		/// <summary>
+		/// 后台写入循环：批量消费队列中的日志行并写入文件。
+		/// </summary>
+		private static void WriterLoop()
+		{
+			var buffer = new StringBuilder(4096);
+			while (_writerRunning || !_logQueue.IsEmpty)
+			{
+				buffer.Clear();
+				// 批量取出队列中所有待写行
+				while (_logQueue.TryDequeue(out string? line))
+				{
+					buffer.Append(line);
+				}
+
+				if (buffer.Length > 0 && !string.IsNullOrEmpty(_logFilePath))
+				{
+					try
+					{
+						File.AppendAllText(_logFilePath, buffer.ToString(), Encoding.UTF8);
+					}
+					catch
+					{
+						// 忽略写入失败，不影响游戏运行
+					}
+				}
+
+				if (_writerRunning)
+				{
+					Thread.Sleep(100); // 每100ms批量刷盘一次
+				}
 			}
 		}
 

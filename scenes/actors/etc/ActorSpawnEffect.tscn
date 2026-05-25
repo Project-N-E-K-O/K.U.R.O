@@ -1,0 +1,45 @@
+[gd_scene load_steps=10 format=3 uid="uid://c4ecb44j734sb"]
+
+[ext_resource type="Texture2D" uid="uid://dg1hx2whsy180" path="res://assets/effect/SpawnEffect/SpawnEffectA/dianti0001.png" id="1_la2pw"]
+[ext_resource type="Texture2D" uid="uid://dfl6pdn2vepc7" path="res://assets/effect/SpawnEffect/SpawnEffectA/dianti0002.png" id="2_amu48"]
+[ext_resource type="Texture2D" uid="uid://j5femibrt312" path="res://assets/effect/SpawnEffect/SpawnEffectA/dianti0003.png" id="3_7mlti"]
+[ext_resource type="Texture2D" uid="uid://cp223lb06lj4r" path="res://assets/effect/SpawnEffect/SpawnEffectA/dianti0004.png" id="4_0rdt0"]
+[ext_resource type="Texture2D" uid="uid://biaid6soqpsim" path="res://assets/effect/SpawnEffect/SpawnEffectA/dianti0005.png" id="5_23nyo"]
+[ext_resource type="Texture2D" uid="uid://5ygkbiwtc0d7" path="res://assets/effect/SpawnEffect/SpawnEffectA/dianti0006.png" id="6_vb6ms"]
+[ext_resource type="Texture2D" uid="uid://dxuoipece117k" path="res://assets/effect/SpawnEffect/SpawnEffectA/dianti0007.png" id="7_xqrsv"]
+[ext_resource type="Texture2D" uid="uid://hieghj58smcg" path="res://assets/effect/SpawnEffect/SpawnEffectA/dianti0008.png" id="8_faehe"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_hhnpg"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_la2pw")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_amu48")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_7mlti")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_0rdt0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_23nyo")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_vb6ms")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_xqrsv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_faehe")
+}],
+"loop": false,
+"name": &"default",
+"speed": 30.0
+}]
+
+[node name="ActorSpawnEffect" type="AnimatedSprite2D"]
+sprite_frames = SubResource("SpriteFrames_hhnpg")
