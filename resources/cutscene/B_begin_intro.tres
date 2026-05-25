@@ -1,10 +1,11 @@
-[gd_resource type="Resource" script_class="CutsceneSequence" load_steps=9 format=3 uid="uid://dpxai5bvaoeto"]
+[gd_resource type="Resource" script_class="CutsceneSequence" load_steps=11 format=3 uid="uid://dpxai5bvaoeto"]
 
 [ext_resource type="Script" uid="uid://ctrko7add3r5h" path="res://scripts/systems/cutscene/CutsceneStep.cs" id="1_5l33l"]
 [ext_resource type="Script" uid="uid://cgnajq1ykl2mn" path="res://scripts/systems/cutscene/CutsceneSequence.cs" id="2_87567"]
 [ext_resource type="Script" uid="uid://dp0y7ubaf3v06" path="res://scripts/systems/cutscene/steps/WaitStep.cs" id="2_ref6e"]
 [ext_resource type="Script" uid="uid://cjl1hjmndwvcg" path="res://scripts/systems/cutscene/steps/FadeStep.cs" id="3_7qph7"]
 [ext_resource type="Script" uid="uid://b4pd4ynf4k04p" path="res://scripts/systems/cutscene/steps/CameraMoveStep.cs" id="3_bcybp"]
+[ext_resource type="Script" uid="uid://boec8wbtajskl" path="res://scripts/systems/cutscene/steps/EffectSpawnStep.cs" id="5_ref6e"]
 
 [sub_resource type="Resource" id="Resource_bcybp"]
 script = ExtResource("3_7qph7")
@@ -23,8 +24,13 @@ script = ExtResource("2_ref6e")
 Duration = 6.0
 metadata/_custom_type_script = "uid://dp0y7ubaf3v06"
 
+[sub_resource type="Resource" id="Resource_7qph7"]
+script = ExtResource("5_ref6e")
+EffectScene = "res://scenes/actors/etc/ActorSpawnEffect.tscn"
+metadata/_custom_type_script = "uid://boec8wbtajskl"
+
 [resource]
 script = ExtResource("2_87567")
 SequenceId = "B_begin_intro"
-Steps = Array[ExtResource("1_5l33l")]([SubResource("Resource_bcybp"), SubResource("Resource_ref6e"), SubResource("Resource_mork0")])
+Steps = Array[ExtResource("1_5l33l")]([SubResource("Resource_bcybp"), SubResource("Resource_ref6e"), SubResource("Resource_mork0"), SubResource("Resource_7qph7")])
 metadata/_custom_type_script = "uid://cgnajq1ykl2mn"
