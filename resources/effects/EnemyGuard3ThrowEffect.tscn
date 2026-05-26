@@ -1,0 +1,17 @@
+[gd_scene load_steps=4 format=3 uid="uid://c41bp3hlh4ix7"]
+
+[ext_resource type="Script" uid="uid://bqrtl877lylyy" path="res://scripts/actors/enemies/attacks/EnemyWaiterAThrowProjectile.cs" id="1_rwgl4"]
+[ext_resource type="PackedScene" uid="uid://cmxuejgw41osm" path="res://scenes/actors/etc/BoomB.tscn" id="2_hyunj"]
+[ext_resource type="Texture2D" uid="uid://dccrl4lpl0t2h" path="res://icon.svg" id="4_rwgl4"]
+
+[node name="EnemyGuard3ThrowEffect" type="Node2D"]
+z_index = 3
+script = ExtResource("1_rwgl4")
+Duration = 1.0
+PeakHeight = 1000.0
+RotationDegreesPerSecond = 720.0
+ImpactEffectScenes = [ExtResource("2_hyunj")]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.66, 0.66)
+texture = ExtResource("4_rwgl4")

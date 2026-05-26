@@ -1,7 +1,7 @@
 [gd_scene load_steps=10 format=3 uid="uid://bbcqflgys8xp2"]
 
-[ext_resource type="Texture2D" uid="uid://du35vjo11p7pn" path="res://textures/environments/wall/25.12.3 厨房大钢门.png" id="1_017rm"]
-[ext_resource type="Script" uid="uid://rpt50t16vkk7" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_iyx82"]
+[ext_resource type="Texture2D" uid="uid://pvyrj8h30psn" path="res://textures/environments/wall/25.12.3 厨房大钢门.png" id="1_017rm"]
+[ext_resource type="Script" uid="uid://dhfq2rrha0awm" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_iyx82"]
 [ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="2_e0roe"]
 [ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="3_x6xfs"]
 [ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="5_85cik"]
@@ -24,13 +24,12 @@ size = Vector2(20, 245)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jyvv2"]
 size = Vector2(45.02104, 67.611084)
 
-[node name="Door_1" type="Node2D"]
+[node name="Weapon_A1_door2" type="Node2D"]
 script = ExtResource("1_iyx82")
 ItemDefinition = SubResource("Resource_7dife")
 GrabAreaPath = NodePath("Weapon_A1_door2/GrabArea")
 ThrowDamage = 6.0
 StopOnHit = true
-MaxDurability = 6
 RigidBodyPath = NodePath("Weapon_A1_door2")
 HitboxAreaPath = NodePath("Weapon_A1_door2/Hitbox")
 

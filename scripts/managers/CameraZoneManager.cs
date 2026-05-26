@@ -25,6 +25,7 @@ namespace Kuros.Managers
             public int LimitTop { get; set; } = 0;
             public int LimitRight { get; set; } = 0;
             public int LimitBottom { get; set; } = 0;
+            public float ZoomLevel { get; set; } = 0.43f;
         }
 
         [Export] public Camera2D? TargetCamera { get; set; }
@@ -63,18 +64,18 @@ namespace Kuros.Managers
         /// <summary>
         /// 注册一个命名相机区域（不切换）。
         /// </summary>
-        public void RegisterZone(string name, Rect2 bounds)
+        public void RegisterZone(string name, Rect2 bounds, float zoomLevel = 0.43f)
         {
-            _registeredZones[name] = BoundsToZone(name, bounds);
+            _registeredZones[name] = BoundsToZone(name, bounds, zoomLevel);
             GameLogger.Debug(nameof(CameraZoneManager), $"注册区域: {name}  X[{(int)bounds.Position.X}, {(int)(bounds.Position.X + bounds.Size.X)}]");
         }
 
         /// <summary>
         /// 玩家进入某区域时调用：将该区域推入活跃栈并切换相机。
         /// </summary>
-        public void EnterZone(string name, Rect2 bounds)
+        public void EnterZone(string name, Rect2 bounds, float zoomLevel = 0.43f)
         {
-            RegisterZone(name, bounds);
+            RegisterZone(name, bounds, zoomLevel);
             if (!_activeZoneStack.Contains(name))
                 _activeZoneStack.Add(name);
             SwitchToZone(name);
@@ -111,7 +112,7 @@ namespace Kuros.Managers
         /// <summary>
         /// 注册并立即切换（向后兼容，内部调用 EnterZone）。
         /// </summary>
-        public void RegisterZoneAndSwitch(string name, Rect2 bounds) => EnterZone(name, bounds);
+        public void RegisterZoneAndSwitch(string name, Rect2 bounds, float zoomLevel = 0.43f) => EnterZone(name, bounds, zoomLevel);
 
         // ─── 区域切换 ──────────────────────────────────────────────────────────
 
@@ -144,9 +145,9 @@ namespace Kuros.Managers
         /// 创建临时战斗相机区域并立即切换。同时记录当前区域以便战斗结束后恢复。
         /// 由 BattleArena 在激活战斗时调用。
         /// </summary>
-        public void CreateAndSwitchTemporaryCameraZone(Rect2 arenaRect, string zoneName)
+        public void CreateAndSwitchTemporaryCameraZone(Rect2 arenaRect, string zoneName, float zoomLevel = 0.43f)
         {
-            _temporaryCameraZones[zoneName] = BoundsToZone(zoneName, arenaRect);
+            _temporaryCameraZones[zoneName] = BoundsToZone(zoneName, arenaRect, zoomLevel);
             _temporaryCameraZoneNameBeforeSwitch = _currentZone?.Name;
             SwitchToZone(zoneName);
             GameLogger.Info(nameof(CameraZoneManager), $"✓ 创建临时战斗区域: {zoneName}，战斗结束后恢复至: {_temporaryCameraZoneNameBeforeSwitch ?? "无"}");
@@ -177,24 +178,25 @@ namespace Kuros.Managers
         /// 设置关卡全局相机边界，关卡生成完毕后立即生效。
         /// 此区域作为默认基础区域，CameraZoneArea 进入房间后会覆盖为房间边界。
         /// </summary>
-        public void SetGlobalBounds(int limitLeft, int limitTop, int limitRight, int limitBottom)
+        public void SetGlobalBounds(int limitLeft, int limitTop, int limitRight, int limitBottom, float zoomLevel = 0.43f)
         {
             if (TargetCamera == null) return;
             var bounds = new Rect2(limitLeft, limitTop, limitRight - limitLeft, limitBottom - limitTop);
-            RegisterZoneAndSwitch("Stage_Global", bounds);
+            RegisterZoneAndSwitch("Stage_Global", bounds, zoomLevel);
             GameLogger.Info(nameof(CameraZoneManager),
                 $"全局相机边界已设置：X[{limitLeft}, {limitRight}]  Y[{limitTop}, {limitBottom}]");
         }
 
         // ─── 内部工具 ──────────────────────────────────────────────────────────
 
-        private static CameraZone BoundsToZone(string name, Rect2 bounds) => new CameraZone
+        private static CameraZone BoundsToZone(string name, Rect2 bounds, float zoomLevel = 0.43f) => new CameraZone
         {
             Name = name,
             LimitLeft   = (int)bounds.Position.X,
             LimitTop    = (int)bounds.Position.Y,
             LimitRight  = (int)(bounds.Position.X + bounds.Size.X),
             LimitBottom = (int)(bounds.Position.Y + bounds.Size.Y),
+            ZoomLevel   = zoomLevel,
         };
 
         private void ApplyZoneToCamera(CameraZone zone)
@@ -204,6 +206,7 @@ namespace Kuros.Managers
             TargetCamera.LimitTop    = zone.LimitTop;
             TargetCamera.LimitRight  = zone.LimitRight;
             TargetCamera.LimitBottom = zone.LimitBottom;
+            SetZoom(zone.ZoomLevel);
         }
 
         // ─── 缩放 ──────────────────────────────────────────────────────────────

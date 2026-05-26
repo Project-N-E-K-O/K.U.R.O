@@ -1,0 +1,134 @@
+[gd_scene load_steps=10 format=3 uid="uid://dlhn30h21ei8f"]
+
+[ext_resource type="Script" uid="uid://cyeq85rtved2j" path="res://scripts/environments/DoorController.cs" id="1_in2r7"]
+[ext_resource type="Texture2D" uid="uid://7bbxtr7o4uuf" path="res://assets/environments/scene_1_home/房间1 隔断墙1.png" id="1_rhpl8"]
+[ext_resource type="Texture2D" uid="uid://cqxyqtyqvj58d" path="res://assets/environments/scene_1_home/房间1 门.png" id="2_rtehq"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wvbf1"]
+size = Vector2(400, 800)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_in2r7"]
+size = Vector2(960, 800)
+
+[sub_resource type="Animation" id="Animation_w3gpr"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("door:offset:y")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0.0]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("CollisionShape2D:disabled")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+
+[sub_resource type="Animation" id="Animation_in2r7"]
+resource_name = "door_close"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("door:offset:y")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [600.0, 0.0]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("CollisionShape2D:disabled")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+
+[sub_resource type="Animation" id="Animation_wvbf1"]
+resource_name = "door_open"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("door:offset:y")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 600.0]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("CollisionShape2D:disabled")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [false, true]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_n8jvr"]
+_data = {
+&"RESET": SubResource("Animation_w3gpr"),
+&"door_close": SubResource("Animation_in2r7"),
+&"door_open": SubResource("Animation_wvbf1")
+}
+
+[node name="door1_A_begin" type="RigidBody2D"]
+gravity_scale = 0.0
+can_sleep = false
+freeze = true
+freeze_mode = 1
+script = ExtResource("1_in2r7")
+
+[node name="wall" type="Sprite2D" parent="."]
+z_index = 3
+texture = ExtResource("1_rhpl8")
+
+[node name="door" type="Sprite2D" parent="."]
+z_index = 2
+z_as_relative = false
+position = Vector2(0, -620)
+texture = ExtResource("2_rtehq")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(100, -500)
+shape = SubResource("RectangleShape2D_wvbf1")
+
+[node name="Area2D" type="Area2D" parent="."]
+collision_mask = 4
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+position = Vector2(80, -500)
+shape = SubResource("RectangleShape2D_in2r7")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_n8jvr")
+}

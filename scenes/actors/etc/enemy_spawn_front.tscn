@@ -395,15 +395,6 @@ animations = [{
 "texture": ExtResource("87_000pq")
 }, {
 "duration": 1.0,
-"texture": ExtResource("88_ublju")
-}, {
-"duration": 1.0,
-"texture": ExtResource("89_audde")
-}, {
-"duration": 1.0,
-"texture": ExtResource("90_e3pmm")
-}, {
-"duration": 1.0,
 "texture": ExtResource("91_w43aw")
 }, {
 "duration": 1.0,
@@ -423,6 +414,15 @@ animations = [{
 }, {
 "duration": 1.0,
 "texture": ExtResource("97_3l460")
+}, {
+"duration": 1.0,
+"texture": ExtResource("88_ublju")
+}, {
+"duration": 1.0,
+"texture": ExtResource("89_audde")
+}, {
+"duration": 1.0,
+"texture": ExtResource("90_e3pmm")
 }, {
 "duration": 1.0,
 "texture": ExtResource("98_364rr")
@@ -538,8 +538,6 @@ scale = Vector2(0.3, 0.3)
 sprite_frames = SubResource("SpriteFrames_y7i3i")
 animation = &"spawn"
 autoplay = "spawn"
-frame = 64
-frame_progress = 1.0
 offset = Vector2(0, -800)
 
 [node name="ActorSpawnSmokeEffect" type="AnimatedSprite2D" parent="."]
@@ -548,8 +546,6 @@ y_sort_enabled = true
 scale = Vector2(6, 6)
 sprite_frames = SubResource("SpriteFrames_5y1q6")
 autoplay = "default"
-frame = 64
-frame_progress = 1.0
 
 [node name="CharacterBody2D" type="CharacterBody2D" parent="."]
 collision_mask = 7

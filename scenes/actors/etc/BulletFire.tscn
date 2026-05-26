@@ -1,0 +1,30 @@
+[gd_scene load_steps=6 format=3 uid="uid://cfm1idhycevph"]
+
+[ext_resource type="Texture2D" uid="uid://ba8dy5ryvihww" path="res://assets/effect/AttackEffect/bullet_fire_a/BulletFire_A0003.png" id="1_rbm3e"]
+[ext_resource type="Texture2D" uid="uid://3dibt0xxwtyr" path="res://assets/effect/AttackEffect/bullet_fire_a/BulletFire_A0004.png" id="2_qirtm"]
+[ext_resource type="Texture2D" uid="uid://bk3sji4gijlsu" path="res://assets/effect/AttackEffect/bullet_fire_a/BulletFire_A0005.png" id="3_pum14"]
+[ext_resource type="Script" uid="uid://5tqak7y4n1s0" path="res://scripts/effects/EffectAutoDestroy.cs" id="6_auto"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_rnm45"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_rbm3e")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_qirtm")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_pum14")
+}],
+"loop": false,
+"name": &"default",
+"speed": 30.0
+}]
+
+[node name="BulletFire" type="AnimatedSprite2D"]
+z_index = 3
+scale = Vector2(0.1, 0.1)
+sprite_frames = SubResource("SpriteFrames_rnm45")
+autoplay = "default"
+script = ExtResource("6_auto")

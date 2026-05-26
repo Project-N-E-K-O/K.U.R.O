@@ -1,4 +1,4 @@
-[gd_scene load_steps=30 format=3 uid="uid://bj81vpm6lg1b8"]
+[gd_scene load_steps=31 format=3 uid="uid://bj81vpm6lg1b8"]
 
 [ext_resource type="Script" uid="uid://5imf5agux4ch" path="res://scripts/actors/enemies/EnemyNormalGuard2.cs" id="1_wjvmm"]
 [ext_resource type="Resource" uid="uid://xsa2wlasoj6i" path="res://resources/loot/Enemy_Normal_NormalDrops.tres" id="2_e1554"]
@@ -12,10 +12,11 @@
 [ext_resource type="Script" uid="uid://bo6uhkbqyxe6o" path="res://scripts/actors/enemies/states/EnemyAttackState.cs" id="10_0nljw"]
 [ext_resource type="Script" uid="uid://bgmignw03rdgx" path="res://scripts/actors/enemies/attacks/EnemyNormalGuard3AttackController.cs" id="11_wjvmm"]
 [ext_resource type="Script" uid="uid://d0gbx7fy0idfa" path="res://scripts/actors/enemies/attacks/EnemyThrowAttack.cs" id="12_wjvmm"]
-[ext_resource type="Script" uid="uid://cu6enbmbcicac" path="res://scripts/actors/enemies/attacks/EnemySimpleMeleeAttack.cs" id="13_41ksw"]
-[ext_resource type="PackedScene" uid="uid://btu15dulpf6bd" path="res://resources/effects/EnemyWaiterAThrowEffect.tscn" id="13_e1554"]
+[ext_resource type="PackedScene" uid="uid://c41bp3hlh4ix7" path="res://resources/effects/EnemyGuard3ThrowEffect.tscn" id="13_10g4w"]
+[ext_resource type="Script" uid="uid://bymxhmkwlyl21" path="res://scripts/actors/enemies/attacks/EnemyNormalGuard3MeleeAttack.cs" id="14_10g4w"]
 [ext_resource type="Script" uid="uid://cwnxfhj8ysc2f" path="res://scripts/actors/enemies/states/EnemyHitState.cs" id="14_e03sy"]
 [ext_resource type="Script" uid="uid://cihawgv4js52w" path="res://scripts/actors/enemies/states/EnemyFrozenState.cs" id="15_m8cja"]
+[ext_resource type="PackedScene" uid="uid://cfm1idhycevph" path="res://scenes/actors/etc/BulletFire.tscn" id="15_u8m7i"]
 [ext_resource type="PackedScene" uid="uid://c1c74ekxu24m1" path="res://shaders/enemy_bullet.tscn" id="15_ulog8"]
 [ext_resource type="Script" uid="uid://fpfidsmcwy6w" path="res://scripts/actors/enemies/states/EnemyCooldownFrozenState.cs" id="16_md8ck"]
 [ext_resource type="Script" uid="uid://cbmvuppulotha" path="res://scripts/actors/enemies/states/EnemyDyingState.cs" id="17_pg1qr"]
@@ -198,13 +199,15 @@ ActiveDuration = 0.34
 RecoveryDuration = 0.33
 AttackAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
 RequireAnimationHitTrigger = true
-EffectScene = ExtResource("13_e1554")
+EffectScene = ExtResource("13_10g4w")
 EffectOffset = Vector2(0, -200)
 SpawnTiming = 1
 metadata/attack_weight = 60.0
 
 [node name="SimpleMeleeAttack" type="Node" parent="StateMachine/Attack/AttackController"]
-script = ExtResource("13_41ksw")
+script = ExtResource("14_10g4w")
+SecondEffectScene = ExtResource("15_u8m7i")
+SecondEffectOffset = Vector2(150, -230)
 Damage = 1
 AttackName = "SimpleMeleeAttack"
 WarmupDuration = 0.65
@@ -216,7 +219,7 @@ KnockbackSpeed = 2000.0
 RequireAnimationHitTrigger = true
 GrantedImmunities = 8
 EffectScene = ExtResource("15_ulog8")
-EffectOffset = Vector2(10, -225)
+EffectOffset = Vector2(10, -230)
 SpawnTiming = 1
 metadata/attack_weight = 40.0
 

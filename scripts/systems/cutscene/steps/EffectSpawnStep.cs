@@ -9,16 +9,18 @@ namespace Kuros.Systems.Cutscene
     /// 用法：
     ///   - EffectScene：要生成的特效预制体路径
     ///   - SpawnType：生成方式（PlayerPosition / GlobalPosition / RelativeToNode）
-    ///   - GlobalSpawnPos：全局生成坐标（SpawnType=GlobalPosition 时使用）
+    ///   - Position：位置参数，含义根据 SpawnType 改变：
+    ///     * PlayerPosition：相对于玩家的偏移
+    ///     * GlobalPosition：绝对全局坐标
+    ///     * RelativeToNode：相对于目标节点的偏移
     ///   - TargetNodePath：目标节点路径（SpawnType=RelativeToNode 时使用）
-    ///   - OffsetFromTarget：相对目标的偏移量
-    ///   - DestroyAfterDuration：是否在指定秒数后销毁（0 = 不销毁，让特效自行销毁）
+    ///   - DestroyAfterDuration：是否在指定秒数后销毁（0 = 不销毁）
     ///   - WaitForCompletion：是否等待特效销毁后再继续（仅 DestroyAfterDuration > 0 时有效）
     /// 
     /// 示例配置：
-    ///   1. 在玩家位置生成登场特效（在 WaitStep 或 PlayAnimationStep 之后）
-    ///   2. 在指定全局坐标生成爆炸特效
-    ///   3. 在敌人节点处生成技能特效
+    ///   1. PlayerPosition + Position(100, -50)：在玩家右上方生成特效
+    ///   2. GlobalPosition + Position(500, 300)：在全局坐标 (500,300) 生成特效
+    ///   3. RelativeToNode(EnemyPath) + Position(50, -200)：在敌人右上方生成特效
     /// </summary>
     [GlobalClass]
     public partial class EffectSpawnStep : CutsceneStep
@@ -43,14 +45,16 @@ namespace Kuros.Systems.Cutscene
         /// <summary>生成方式</summary>
         [Export] public SpawnTypeEnum SpawnType { get; set; } = SpawnTypeEnum.PlayerPosition;
 
-        /// <summary>全局生成坐标（SpawnType=GlobalPosition 时使用）</summary>
-        [Export] public Vector2 GlobalSpawnPos { get; set; } = Vector2.Zero;
+        /// <summary>
+        /// 位置参数，含义根据 SpawnType 改变：
+        /// - PlayerPosition：相对于玩家的偏移
+        /// - GlobalPosition：绝对全局坐标
+        /// - RelativeToNode：相对于目标节点的偏移
+        /// </summary>
+        [Export] public Vector2 Position { get; set; } = Vector2.Zero;
 
-        /// <summary>目标节点路径（SpawnType=RelativeToNode 时使用，相对于 CutsceneManager）</summary>
+        /// <summary>目标节点路径（SpawnType=RelativeToNode 时使用）</summary>
         [Export] public NodePath TargetNodePath { get; set; } = new NodePath();
-
-        /// <summary>相对于目标节点的偏移量（本地坐标）</summary>
-        [Export] public Vector2 OffsetFromTarget { get; set; } = Vector2.Zero;
 
         [ExportCategory("Cleanup")]
         /// <summary>
@@ -148,9 +152,9 @@ namespace Kuros.Systems.Cutscene
         {
             return SpawnType switch
             {
-                SpawnTypeEnum.PlayerPosition => GetPlayerPosition(ctx),
-                SpawnTypeEnum.GlobalPosition => GlobalSpawnPos,
-                SpawnTypeEnum.RelativeToNode => GetRelativeToNodePosition(ctx),
+                SpawnTypeEnum.PlayerPosition => GetPlayerPosition(ctx) + Position,
+                SpawnTypeEnum.GlobalPosition => Position,
+                SpawnTypeEnum.RelativeToNode => GetRelativeToNodePosition(ctx) + Position,
                 _ => Vector2.Zero,
             };
         }
@@ -181,7 +185,7 @@ namespace Kuros.Systems.Cutscene
                 return Vector2.Zero;
             }
 
-            return targetNode.GlobalPosition + OffsetFromTarget;
+            return targetNode.GlobalPosition;
         }
 
         private async Task DestroyEffectAsync(Node2D effect, SceneTreeTimer timer, CutsceneContext ctx)

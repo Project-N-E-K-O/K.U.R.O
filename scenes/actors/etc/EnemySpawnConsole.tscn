@@ -1,8 +1,7 @@
-[gd_scene load_steps=17 format=3 uid="uid://mwpdlx1yup0k"]
+[gd_scene load_steps=18 format=3 uid="uid://mwpdlx1yup0k"]
 
 [ext_resource type="Script" uid="uid://dlbrxuciurl4o" path="res://scripts/environments/EnemySpawnConsole.cs" id="1_2lj3c"]
 [ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="1_bllfa"]
-[ext_resource type="Texture2D" uid="uid://bn101t3c88poy" path="res://assets/environments/scene_loading_elevator/Elevator2.png" id="2_2lj3c"]
 [ext_resource type="Script" uid="uid://dq0vqwi52hgyp" path="res://scripts/utils/ProximityOutlineHighlight.cs" id="2_2vmbw"]
 [ext_resource type="PackedScene" uid="uid://cofm45kotvgto" path="res://scenes/actors/enemies/Enemy_B1_fat.tscn" id="2_bqlf7"]
 [ext_resource type="PackedScene" uid="uid://wrebd662va23" path="res://scenes/actors/enemies/Enemy_B2_fat02.tscn" id="3_b7qyu"]
@@ -13,6 +12,7 @@
 [ext_resource type="PackedScene" uid="uid://bvps5t0s8owhw" path="res://scenes/actors/enemies/Enemy_C1_waiterA.tscn" id="7_5vnba"]
 [ext_resource type="PackedScene" uid="uid://ba8fktvib2e1o" path="res://scenes/actors/enemies/Enemy_C2_waiterA02.tscn" id="8_qj5ja"]
 [ext_resource type="PackedScene" uid="uid://8ce54l6083nt" path="res://scenes/actors/enemies/Enemy_C1_waiterB.tscn" id="9_qnjvr"]
+[ext_resource type="Texture2D" uid="uid://ukqku36q526l" path="res://assets/environments/scene_1_home/房间2控制台.png" id="13_w5fa5"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_nmbao"]
 shader = ExtResource("1_bllfa")
@@ -23,10 +23,13 @@ shader_parameter/edge_softness = 0.12
 shader_parameter/preserve_fill = true
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_nmbao"]
-size = Vector2(2000, 2000)
+size = Vector2(5300, 2100)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2lj3c"]
-size = Vector2(200, 432)
+size = Vector2(653, 381)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_w5fa5"]
+size = Vector2(600, 200)
 
 [node name="EnemySpawnConsole" type="Node2D"]
 script = ExtResource("1_2lj3c")
@@ -45,35 +48,44 @@ OutlineSpritePath = NodePath("../Outline")
 
 [node name="Outline" type="Sprite2D" parent="."]
 material = SubResource("ShaderMaterial_nmbao")
-texture = ExtResource("2_2lj3c")
+position = Vector2(-338, -907)
+texture = ExtResource("13_w5fa5")
 
 [node name="Sprite2D" type="Sprite2D" parent="Outline"]
-texture = ExtResource("2_2lj3c")
+texture = ExtResource("13_w5fa5")
 
 [node name="SpawnArea" type="Area2D" parent="."]
 position = Vector2(1200, 0)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="SpawnArea"]
+position = Vector2(745.5, 0)
 shape = SubResource("RectangleShape2D_nmbao")
 
 [node name="InteractArea" type="Area2D" parent="."]
-position = Vector2(0, 184)
+position = Vector2(-188, -723)
 collision_layer = 0
 collision_mask = 4
 monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="InteractArea"]
-position = Vector2(0, -84)
+position = Vector2(-145.5, -149.5)
 shape = SubResource("RectangleShape2D_2lj3c")
 
 [node name="HintLabel" type="Label" parent="."]
 z_index = 10
-offset_top = -195.0
-offset_right = 56.0
-offset_bottom = -156.0
+offset_left = -329.0
+offset_top = -1056.0
+offset_right = -273.0
+offset_bottom = -1017.0
 theme_override_colors/font_color = Color(1, 1, 0.6, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8)
 theme_override_constants/shadow_offset_x = 2
 theme_override_constants/shadow_offset_y = 2
-theme_override_font_sizes/font_size = 28
+theme_override_font_sizes/font_size = 64
 horizontal_alignment = 1
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+position = Vector2(-333, -763)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
+shape = SubResource("RectangleShape2D_w5fa5")

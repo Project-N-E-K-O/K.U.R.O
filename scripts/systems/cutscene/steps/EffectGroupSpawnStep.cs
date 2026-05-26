@@ -16,14 +16,16 @@ namespace Kuros.Systems.Cutscene
         /// <summary>生成方式</summary>
         [Export] public EffectSpawnStep.SpawnTypeEnum SpawnType { get; set; } = EffectSpawnStep.SpawnTypeEnum.PlayerPosition;
 
-        /// <summary>全局生成坐标（SpawnType=GlobalPosition 时使用）</summary>
-        [Export] public Vector2 GlobalSpawnPos { get; set; } = Vector2.Zero;
+        /// <summary>
+        /// 位置参数，含义根据 SpawnType 改变：
+        /// - PlayerPosition：相对于玩家的偏移
+        /// - GlobalPosition：绝对全局坐标
+        /// - RelativeToNode：相对于目标节点的偏移
+        /// </summary>
+        [Export] public Vector2 Position { get; set; } = Vector2.Zero;
 
         /// <summary>目标节点路径（SpawnType=RelativeToNode 时使用）</summary>
         [Export] public NodePath TargetNodePath { get; set; } = new NodePath();
-
-        /// <summary>相对于目标的偏移</summary>
-        [Export] public Vector2 OffsetFromTarget { get; set; } = Vector2.Zero;
 
         /// <summary>生成延迟（秒）。0 = 立即生成</summary>
         [Export(PropertyHint.Range, "0,30,0.1")] public float SpawnDelay { get; set; } = 0f;
@@ -227,9 +229,9 @@ namespace Kuros.Systems.Cutscene
         {
             return config.SpawnType switch
             {
-                EffectSpawnStep.SpawnTypeEnum.PlayerPosition => GetPlayerPosition(ctx),
-                EffectSpawnStep.SpawnTypeEnum.GlobalPosition => config.GlobalSpawnPos,
-                EffectSpawnStep.SpawnTypeEnum.RelativeToNode => GetRelativeToNodePosition(ctx, config),
+                EffectSpawnStep.SpawnTypeEnum.PlayerPosition => GetPlayerPosition(ctx) + config.Position,
+                EffectSpawnStep.SpawnTypeEnum.GlobalPosition => config.Position,
+                EffectSpawnStep.SpawnTypeEnum.RelativeToNode => GetRelativeToNodePosition(ctx, config) + config.Position,
                 _ => Vector2.Zero,
             };
         }
@@ -257,7 +259,7 @@ namespace Kuros.Systems.Cutscene
                 return Vector2.Zero;
             }
 
-            return targetNode.GlobalPosition + config.OffsetFromTarget;
+            return targetNode.GlobalPosition;
         }
     }
 }
