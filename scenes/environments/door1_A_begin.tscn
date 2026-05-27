@@ -5,10 +5,10 @@
 [ext_resource type="Texture2D" uid="uid://cqxyqtyqvj58d" path="res://assets/environments/scene_1_home/房间1 门.png" id="2_rtehq"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wvbf1"]
-size = Vector2(400, 800)
+size = Vector2(200, 800)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_in2r7"]
-size = Vector2(960, 800)
+size = Vector2(900, 1000)
 
 [sub_resource type="Animation" id="Animation_w3gpr"]
 length = 0.001
@@ -118,14 +118,14 @@ position = Vector2(0, -620)
 texture = ExtResource("2_rtehq")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(100, -500)
+position = Vector2(0, -500)
 shape = SubResource("RectangleShape2D_wvbf1")
 
 [node name="Area2D" type="Area2D" parent="."]
 collision_mask = 4
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
-position = Vector2(80, -500)
+position = Vector2(0, -500)
 shape = SubResource("RectangleShape2D_in2r7")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]

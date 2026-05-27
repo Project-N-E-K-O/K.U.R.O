@@ -17,7 +17,10 @@ shader_parameter/softness = 0.5
 shader_parameter/alpha = 0.4
 
 [node name="CharacterBody2D" type="CharacterBody2D"]
+z_index = 2
+y_sort_enabled = true
 scale = Vector2(0.33, 0.33)
+collision_layer = 4
 script = ExtResource("2_p2follow")
 
 [node name="Shadow" type="Sprite2D" parent="."]
@@ -27,10 +30,16 @@ scale = Vector2(7, 3)
 texture = ExtResource("3_74bjo")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
+z_index = 2
+z_as_relative = false
+y_sort_enabled = true
 position = Vector2(0, -350)
 texture = ExtResource("1_fj31g")
 
 [node name="HintBubble" parent="." instance=ExtResource("3_p2hint_scene")]
+z_index = 3
+z_as_relative = false
+y_sort_enabled = true
 
 [node name="SupportBrain" type="Node" parent="."]
 script = ExtResource("4_p2brain")

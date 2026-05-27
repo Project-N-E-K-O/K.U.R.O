@@ -170,9 +170,13 @@ public partial class EnemyChaseMovement : Node
 			var player = Enemy.PlayerTarget;
 			if (player != null)
 			{
-				NavAgent.TargetPosition = player.GlobalPosition;
+				// 仅在目标发生明显变化时才更新，避免每帧重置路径
+				if (NavAgent.TargetPosition.DistanceSquaredTo(player.GlobalPosition) > 100f)
+					NavAgent.TargetPosition = player.GlobalPosition;
 			}
 
+			// GetNextPathPosition() 仅在路径已计算完成后才返回有效路点
+			// IsNavigationFinished() 在路径有效且 agent 未到达终点时返回 false
 			if (!NavAgent.IsNavigationFinished())
 			{
 				Vector2 nextPoint = NavAgent.GetNextPathPosition();
@@ -182,7 +186,7 @@ public partial class EnemyChaseMovement : Node
 			}
 		}
 
-		// 回退：直线追踪
+		// 回退：直线追踪（路径未就绪或无导航网格时）
 		return Enemy?.GetDirectionToPlayer() ?? Vector2.Zero;
 	}
 

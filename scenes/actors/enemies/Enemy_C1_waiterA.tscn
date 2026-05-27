@@ -52,7 +52,6 @@ collision_layer = 2
 collision_mask = 15
 motion_mode = 1
 script = ExtResource("1_cc1qw")
-EnableStateDebugOverlay = true
 DebugOverlayOffset = Vector2(-1200, 200)
 DebugOverlayFontSize = 128
 DetectionArea = NodePath("Sprite2D/ControllerDetectionArea")
@@ -241,8 +240,6 @@ script = ExtResource("19_4a8hm")
 
 [node name="AnimationController" type="Node" parent="."]
 script = ExtResource("22_k41yo")
-SkillAnimation = "skill1"
-AssistAnimation = "skill3"
 SpineSpritePath = NodePath("../SpineSprite")
 AttackMixDuration = 0.2
 SkillMixDuration = 0.1

@@ -91,6 +91,10 @@ animations = [{
 }]
 
 [node name="BoomB" type="AnimatedSprite2D"]
+z_index = 2
+z_as_relative = false
+y_sort_enabled = true
+scale = Vector2(1.5, 1.5)
 sprite_frames = SubResource("SpriteFrames_rnm45")
 autoplay = "default"
 script = ExtResource("21_4jlpf")

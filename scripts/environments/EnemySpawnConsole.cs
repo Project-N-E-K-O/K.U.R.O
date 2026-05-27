@@ -34,6 +34,9 @@ namespace Kuros.Environments
         /// <summary>敌人生成的目标父节点。（如果为空则使用当前节点的父节点）</summary>
         [Export] public NodePath SpawnParentPath { get; set; } = new NodePath();
 
+        /// <summary>玩家死亡后的复活点（Node2D）。留空则不移动玩家位置。</summary>
+        [Export] public NodePath PlayerRespawnPointPath { get; set; } = new NodePath();
+
         [ExportCategory("Enemy Configuration")]
         /// <summary>可生成的敌人场景列表。</summary>
         [Export] public PackedScene[]? EnemyScenes { get; set; }
@@ -130,6 +133,8 @@ namespace Kuros.Environments
         private EnemySpawnConsoleWindow? _spawnWindow;
         private bool _playerInRange;
         private EnemySpawnConfig? _currentSpawnConfig;
+        private GameActor? _playerActor;         // 玩家引用，用于死亡监听
+        private bool _playerInSpawnArea;         // 玩家是否在 SpawnArea 内
 
         public override void _Ready()
         {
@@ -169,6 +174,20 @@ namespace Kuros.Environments
             }
 
             UpdateHintLabel();
+
+            // 连接 SpawnArea 玩家进出检测（SpawnArea 需设置 collision_mask 包含玩家层）
+            if (_spawnArea != null)
+            {
+                _spawnArea.BodyEntered += OnSpawnAreaBodyEntered;
+                _spawnArea.BodyExited += OnSpawnAreaBodyExited;
+            }
+
+            // 查找玩家并监听血量变化（用于死亡检测）
+            if (GetTree().GetFirstNodeInGroup("player") is GameActor pa)
+            {
+                _playerActor = pa;
+                _playerActor.HealthChanged += OnPlayerHealthChanged;
+            }
         }
 
         public override void _ExitTree()
@@ -179,7 +198,16 @@ namespace Kuros.Environments
                 _interactArea.BodyEntered -= OnBodyEntered;
                 _interactArea.BodyExited -= OnBodyExited;
             }
-            
+
+            if (_spawnArea != null)
+            {
+                _spawnArea.BodyEntered -= OnSpawnAreaBodyEntered;
+                _spawnArea.BodyExited -= OnSpawnAreaBodyExited;
+            }
+
+            if (_playerActor != null && GodotObject.IsInstanceValid(_playerActor))
+                _playerActor.HealthChanged -= OnPlayerHealthChanged;
+
             // 销毁空气墙
             RemoveTestAreaBoundaryWalls();
         }
@@ -214,6 +242,59 @@ namespace Kuros.Environments
             _hintLabel.Visible = _playerInRange;
             if (_playerInRange)
                 _hintLabel.Text = "[E] 打开生成器";
+        }
+
+        // ── SpawnArea 边界 & 玩家死亡处理 ─────────────────────────
+
+        private void OnSpawnAreaBodyEntered(Node2D body)
+        {
+            if (!body.IsInGroup("player")) return;
+            _playerInSpawnArea = true;
+        }
+
+        private void OnSpawnAreaBodyExited(Node2D body)
+        {
+            if (!body.IsInGroup("player")) return;
+            _playerInSpawnArea = false;
+            KillAllEnemies();
+        }
+
+        /// <summary>
+        /// 玩家血量变化回调：血量归零时同步恢复血量（在 TakeDamage 判断 Die() 之前抢先恢复），
+        /// 阻止死亡流程触发，同时消灭所有敌人并传送到复活点。
+        /// </summary>
+        private void OnPlayerHealthChanged(int current, int max)
+        {
+            if (current > 0 || !_playerInSpawnArea) return;
+            if (_playerActor == null || !GodotObject.IsInstanceValid(_playerActor)) return;
+
+            // 同步恢复满血：此时 TakeDamage 尚未调用 Die()，
+            // NotifyHealthChanged 返回后 TakeDamage 检查 CurrentHealth <= 0 时已为 MaxHealth，Die() 不会被调用。
+            _playerActor.RestoreHealth(_playerActor.MaxHealth);
+
+            // 传送到复活点
+            if (!PlayerRespawnPointPath.IsEmpty)
+            {
+                var point = GetNodeOrNull<Node2D>(PlayerRespawnPointPath);
+                if (point != null)
+                    _playerActor.GlobalPosition = point.GlobalPosition;
+            }
+
+            KillAllEnemies();
+        }
+
+        /// <summary>消灭场景内所有敌人（与 EnemySpawnConsoleWindow.OnKillAllEnemiesPressed 逻辑一致）。</summary>
+        private void KillAllEnemies()
+        {
+            var enemies = GetTree().GetNodesInGroup("enemies");
+            foreach (var enemyNode in enemies)
+            {
+                if (!GodotObject.IsInstanceValid(enemyNode)) continue;
+                if (enemyNode is GameActor actor)
+                    actor.TakeDamage(9999, actor.GlobalPosition, null);
+                else if (enemyNode is Node2D node2D)
+                    node2D.QueueFree();
+            }
         }
 
         /// <summary>

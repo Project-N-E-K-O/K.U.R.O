@@ -18,6 +18,7 @@
 [ext_resource type="Script" uid="uid://b7afb3wjghskq" path="res://scripts/items/world/DropItemDebugger.cs" id="25_jqh86"]
 
 [node name="BattleScene" type="Node2D" node_paths=PackedStringArray("Player")]
+y_sort_enabled = true
 script = ExtResource("1_s6mo5")
 Player = NodePath("World/MainCharacter")
 LevelName = "test"
@@ -26,7 +27,6 @@ LevelName = "test"
 y_sort_enabled = true
 
 [node name="EnemySpawnConsole" parent="World" instance=ExtResource("2_s6mo5")]
-z_index = 1
 position = Vector2(714, -170)
 SpawnParentPath = NodePath("..")
 
@@ -84,7 +84,7 @@ position = Vector2(-1006, -137)
 position = Vector2(-515, -138)
 
 [node name="LoadingElevator" type="Node2D" parent="World"]
-position = Vector2(4500, 0)
+position = Vector2(7332, -336)
 script = ExtResource("16_28ted")
 ElevatorScenePath = "uid://v3n56xk6n8ca"
 NextStagePath = "uid://dwk6x3qcbsmul"

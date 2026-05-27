@@ -13,8 +13,8 @@ namespace Kuros.Actors.Enemies.Animation
         [Export] public string IdleAnimation = "idle";
         [Export] public string WalkAnimation = "walk";
         [Export] public string AttackAnimation = "attack";
-        [Export] public string SkillAnimation = "stun";
-        [Export] public string AssistAnimation = "hit";
+        [Export] public string SkillAnimation = "skill1";
+        [Export] public string AssistAnimation = "skill3";
         [Export] public string HitAnimation = "hit";
         [Export] public string StunAnimation = "stun";
         [Export] public string DieAnimation = "death";
@@ -94,7 +94,7 @@ namespace Kuros.Actors.Enemies.Animation
                     HandleAttackAnimations();
                     break;
                 case "Assist":
-                    PlayLoopIfNeeded("Assist", AssistAnimation, SkillMixDuration);
+                    PlayLoopIfNeeded("Assist", AssistAnimation, WalkMixDuration);
                     break;
                 default:
                     PlayIdle();

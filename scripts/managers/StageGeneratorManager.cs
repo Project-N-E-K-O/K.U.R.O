@@ -116,6 +116,11 @@ namespace Kuros.Managers
             // 重定位玩家和同伴
             RepositionActors(world, playerSpawn, stageLeft);
 
+            // 强制 NavigationServer 立即同步所有房间的导航网格
+            // （各房间 AddChild + 设置 Position 后，NavigationServer 在下一物理帧才处理）
+            // 调用此方法确保生成信号发出前导航数据已就绪
+            NavigationServer2D.MapForceUpdate(GetViewport().FindWorld2D().NavigationMap);
+
             EmitSignal(SignalName.StageGenerated);
 
             GameLogger.Info(nameof(StageGeneratorManager),

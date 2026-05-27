@@ -53,9 +53,9 @@ collision_layer = 2
 collision_mask = 15
 motion_mode = 1
 script = ExtResource("1_n7wqi")
-EnableStateDebugOverlay = true
 DebugOverlayOffset = Vector2(-1200, 200)
 DebugOverlayFontSize = 128
+DebugOverlayColor = Color(1, 0.95, 0.2, 1)
 DetectionArea = NodePath("Sprite2D/ControllerDetectionArea")
 AttackArea = NodePath("Sprite2D/AttackArea")
 AttackDamage = 0.0
@@ -245,8 +245,6 @@ script = ExtResource("21_55afc")
 
 [node name="AnimationController" type="Node" parent="."]
 script = ExtResource("19_n7wqi")
-SkillAnimation = "skill2"
-AssistAnimation = "skill3"
 AttackMixDuration = 0.2
 SkillMixDuration = 0.1
 
