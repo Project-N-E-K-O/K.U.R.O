@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://yyltmrdqmlo8"]
+
+[ext_resource type="Script" uid="uid://dq0325c2hd33u" path="res://scripts/effects/BoomDmgEffect.cs" id="1_tgq3f"]
+
+[node name="BoomDmgEffect" type="Node2D"]
+script = ExtResource("1_tgq3f")
+Damage = 5
+KnockbackDistance = 200.0
+KnockbackSpeed = 2000.0
+AffectEnemies = true

@@ -7,6 +7,8 @@
 radius = 100.0
 
 [node name="EnemyWaiterA02Projectile" type="Node2D"]
+z_index = 3
+y_sort_enabled = true
 script = ExtResource("2_script")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]

@@ -1,0 +1,26 @@
+[gd_scene load_steps=5 format=3 uid="uid://d38pex7crmtju"]
+
+[ext_resource type="Texture2D" uid="uid://c1rc6olvwc8oe" path="res://assets/effect/AttackEffect/hit_b/HIT_B0001.png" id="1_vargc"]
+[ext_resource type="Texture2D" uid="uid://do2xbsgaa2kgb" path="res://assets/effect/AttackEffect/hit_b/HIT_B0002.png" id="2_ruyw6"]
+[ext_resource type="Texture2D" uid="uid://b1fw5vr3e18si" path="res://assets/effect/AttackEffect/hit_b/HIT_B0003.png" id="3_kcwv7"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_to6ee"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_vargc")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_ruyw6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_kcwv7")
+}],
+"loop": false,
+"name": &"default",
+"speed": 30.0
+}]
+
+[node name="HitB" type="AnimatedSprite2D"]
+sprite_frames = SubResource("SpriteFrames_to6ee")
+flip_h = true

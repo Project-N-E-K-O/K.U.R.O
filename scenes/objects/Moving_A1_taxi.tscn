@@ -35,14 +35,15 @@ shader_parameter/alpha = 0.4
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_lkpan"]
 shader = ExtResource("4_lkpan")
-shader_parameter/speed = 0.80000003474012
-shader_parameter/ring_count = 2
+shader_parameter/speed = 1.5000000679901202
+shader_parameter/ring_count = 3
 shader_parameter/ring_width = 0.07500000321324
 shader_parameter/max_radius = 0.46
 shader_parameter/inner_dead = 0.06
 shader_parameter/ring_color = Color(0.57996243, 0.57996243, 0.57996243, 0.60784316)
-shader_parameter/intensity = 1.0
+shader_parameter/intensity = 0.6000000285
 shader_parameter/aspect_y = 0.75000003236512
+shader_parameter/distortion_strength = 0.010000000475
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_l4djn"]
 animations = [{

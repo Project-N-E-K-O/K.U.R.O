@@ -1,0 +1,147 @@
+[gd_scene load_steps=19 format=3 uid="uid://cel0dl6h07it8"]
+
+[ext_resource type="Texture2D" uid="uid://cye54v0tcgk7u" path="res://assets/environments/scene_1_home/房间1 地面.png" id="1_1xo5x"]
+[ext_resource type="Script" uid="uid://cra7y7mt0x1j8" path="res://scripts/managers/CameraZoneArea.cs" id="1_exti5"]
+[ext_resource type="Texture2D" uid="uid://ddqu3x286qvkb" path="res://assets/environments/scene_1_home/房间1 墙壁.png" id="2_aiicl"]
+[ext_resource type="Texture2D" uid="uid://dglsvq66c7lld" path="res://assets/environments/scene_1_home/房间1背景.png" id="3_556c4"]
+[ext_resource type="Texture2D" uid="uid://b7d2xhua22eht" path="res://assets/environments/scene_1_home/房间1 隔断墙2.png" id="4_exti5"]
+[ext_resource type="PackedScene" uid="uid://dlhn30h21ei8f" path="res://scenes/environments/door1_A_begin.tscn" id="6_556c4"]
+[ext_resource type="Script" uid="uid://cbui22isww64v" path="res://scripts/systems/cutscene/CutsceneTrigger.cs" id="6_ocwig"]
+[ext_resource type="Script" uid="uid://dprlx2bg0y3k5" path="res://scripts/environments/ParallaxBackground2D.cs" id="7_paral"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ocwig"]
+size = Vector2(3538, 2140)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_556c4"]
+size = Vector2(3488, 1980)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_i3vs1"]
+size = Vector2(2000, 2000)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_5y2nu"]
+size = Vector2(3350, 400)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ibxjt"]
+size = Vector2(3350, 400)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_23r6t"]
+size = Vector2(400, 2300)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ch6p4"]
+size = Vector2(400, 2286)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wph1n"]
+size = Vector2(400, 1872)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_pal6r"]
+size = Vector2(400, 600)
+
+[sub_resource type="NavigationPolygon" id="NavigationPolygon_ocwig"]
+vertices = PackedVector2Array(2696.9219, -1471.0469, 2694.0703, 1490.0234, -2773.9219, 1491.9688, -2771.0703, -1474.9375)
+polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3)])
+outlines = Array[PackedVector2Array]([PackedVector2Array(-2851, -1555, 2777, -1551, 2774, 1570, -2854, 1572)])
+source_geometry_mode = 2
+agent_radius = 80.0
+
+[node name="ABegin" type="Node2D"]
+y_sort_enabled = true
+
+[node name="PlayerSpawnPoint" type="Node2D" parent="."]
+position = Vector2(-915, -500)
+
+[node name="AreaSize" type="Area2D" parent="."]
+visible = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AreaSize"]
+z_index = 10
+position = Vector2(-10, -237)
+shape = SubResource("RectangleShape2D_ocwig")
+debug_color = Color(0.6428762, 0.52304673, 0.06685588, 0.41960785)
+
+[node name="CameraZone" type="Area2D" parent="."]
+visible = false
+collision_layer = 0
+collision_mask = 4
+script = ExtResource("1_exti5")
+ZoneName = "Room_Zone_A_Begin"
+CameraLimitTop = -1305
+CameraLimitBottom = 815
+ZoomLevel = 0.65
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CameraZone"]
+z_index = 10
+position = Vector2(-21, -217)
+shape = SubResource("RectangleShape2D_556c4")
+debug_color = Color(0, 1, 0, 0.41960785)
+
+[node name="CutsceneTrigger" type="Area2D" parent="."]
+visible = false
+z_index = 10
+collision_layer = 0
+collision_mask = 4
+script = ExtResource("6_ocwig")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CutsceneTrigger"]
+shape = SubResource("RectangleShape2D_i3vs1")
+disabled = true
+debug_color = Color(1, 0, 1, 0.41960785)
+
+[node name="Environments" type="Node2D" parent="."]
+
+[node name="background" type="Sprite2D" parent="Environments"]
+position = Vector2(-518, -886)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("3_556c4")
+script = ExtResource("7_paral")
+AreaPath = NodePath("../../AreaSize")
+
+[node name="floor" type="Sprite2D" parent="Environments"]
+scale = Vector2(0.7, 0.7)
+texture = ExtResource("1_1xo5x")
+
+[node name="wall1" type="Sprite2D" parent="Environments"]
+position = Vector2(-20, -944)
+scale = Vector2(0.7, 0.7)
+texture = ExtResource("2_aiicl")
+
+[node name="wall2" type="Sprite2D" parent="Environments"]
+z_index = 1
+position = Vector2(1670.55, -689.5)
+scale = Vector2(0.7, 1)
+texture = ExtResource("4_exti5")
+
+[node name="door1_A_begin" parent="Environments" instance=ExtResource("6_556c4")]
+position = Vector2(1695.55, 632.5)
+scale = Vector2(0.7, 0.8)
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+z_index = 10
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(-111, -1043)
+shape = SubResource("RectangleShape2D_5y2nu")
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(-111, 997)
+shape = SubResource("RectangleShape2D_ibxjt")
+
+[node name="CollisionShape2D3" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(-1970, 0)
+shape = SubResource("RectangleShape2D_23r6t")
+
+[node name="CollisionShape2D4" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(1758, -1043)
+shape = SubResource("RectangleShape2D_ch6p4")
+
+[node name="CollisionShape2D5" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(1765, 1456)
+shape = SubResource("RectangleShape2D_wph1n")
+
+[node name="CollisionShape2D6" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(-1799.9999, -877.9999)
+rotation = 0.6981317
+shape = SubResource("RectangleShape2D_pal6r")
+
+[node name="NavigationRegion2D" type="NavigationRegion2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
+visible = false
+navigation_polygon = SubResource("NavigationPolygon_ocwig")

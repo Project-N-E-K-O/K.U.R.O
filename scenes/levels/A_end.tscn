@@ -1,0 +1,120 @@
+[gd_scene load_steps=16 format=3 uid="uid://byv7ty32mj11t"]
+
+[ext_resource type="Texture2D" uid="uid://dt0nmdyntreh8" path="res://assets/environments/scene_1_home/房间3背景.png" id="1_rmv6t"]
+[ext_resource type="Script" uid="uid://cra7y7mt0x1j8" path="res://scripts/managers/CameraZoneArea.cs" id="1_t2ifw"]
+[ext_resource type="Texture2D" uid="uid://bxoeo1yft0a0h" path="res://assets/environments/scene_1_home/房间3地面.png" id="2_t2ifw"]
+[ext_resource type="Texture2D" uid="uid://d0oxywii08nmt" path="res://assets/environments/scene_1_home/房间2隔断墙2.png" id="4_eacmu"]
+[ext_resource type="PackedScene" uid="uid://orctascxfe5c" path="res://scenes/environments/door2_A1.tscn" id="5_4di3j"]
+[ext_resource type="PackedScene" uid="uid://cgy13s0ewifos" path="res://scenes/environments/taxiSign.tscn" id="6_4di3j"]
+[ext_resource type="PackedScene" uid="uid://chway4etqkroy" path="res://scenes/objects/Moving_A1_taxi.tscn" id="7_hlafp"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_eacmu"]
+size = Vector2(6000, 3000)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_cn8a4"]
+size = Vector2(5617, 2573)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_3uxt7"]
+size = Vector2(1000, 1000)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_4di3j"]
+size = Vector2(300, 1500)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hlafp"]
+size = Vector2(300, 1000)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ggdpc"]
+size = Vector2(3000, 400)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_gw5dp"]
+size = Vector2(3000, 400)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_xhmyt"]
+size = Vector2(400, 3000)
+
+[node name="AEnd" type="Node2D"]
+y_sort_enabled = true
+
+[node name="AreaSize" type="Area2D" parent="."]
+visible = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AreaSize"]
+z_index = 10
+position = Vector2(-100, -340)
+shape = SubResource("RectangleShape2D_eacmu")
+debug_color = Color(0.6428762, 0.52304673, 0.06685588, 0.41960785)
+
+[node name="CameraZone" type="Area2D" parent="."]
+visible = false
+collision_layer = 0
+collision_mask = 4
+script = ExtResource("1_t2ifw")
+ZoneName = "Room_Zone_A_end"
+CameraLimitTop = -1840
+CameraLimitBottom = 1146
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CameraZone"]
+z_index = 10
+position = Vector2(-2.5, -213.5)
+shape = SubResource("RectangleShape2D_cn8a4")
+debug_color = Color(0, 1, 0, 0.41960785)
+
+[node name="ExitArea" type="Area2D" parent="."]
+position = Vector2(-1639, -287)
+collision_mask = 4
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ExitArea"]
+z_index = 10
+position = Vector2(281, -202)
+shape = SubResource("RectangleShape2D_3uxt7")
+
+[node name="Environments" type="Node2D" parent="."]
+
+[node name="background" type="Sprite2D" parent="Environments"]
+position = Vector2(12, -340)
+texture = ExtResource("1_rmv6t")
+
+[node name="floor" type="Sprite2D" parent="Environments"]
+position = Vector2(-1684, -198)
+texture = ExtResource("2_t2ifw")
+
+[node name="floor" type="Sprite2D" parent="Environments/floor"]
+z_index = -1
+position = Vector2(-347, 0)
+texture = ExtResource("2_t2ifw")
+
+[node name="wall2" type="Sprite2D" parent="Environments"]
+position = Vector2(-2845, -1114.5)
+texture = ExtResource("4_eacmu")
+
+[node name="door2_A1" parent="Environments" instance=ExtResource("5_4di3j")]
+position = Vector2(-2845, 487.5)
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+visible = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(-2850, -1200)
+shape = SubResource("RectangleShape2D_4di3j")
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(-2850, 896)
+shape = SubResource("RectangleShape2D_hlafp")
+
+[node name="CollisionShape2D3" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(-1500, -1450)
+shape = SubResource("RectangleShape2D_ggdpc")
+
+[node name="CollisionShape2D4" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(-1500, 1338)
+shape = SubResource("RectangleShape2D_gw5dp")
+
+[node name="CollisionShape2D5" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(-317, -9)
+shape = SubResource("RectangleShape2D_xhmyt")
+
+[node name="TaxiSign" parent="." instance=ExtResource("6_4di3j")]
+position = Vector2(-2002, -728)
+
+[node name="Taxi" parent="." instance=ExtResource("7_hlafp")]
+position = Vector2(-1345, -1938)

@@ -354,6 +354,7 @@ namespace Kuros.Actors.Enemies.Attacks
 			{
 				return;
 			}
+			if (_controller != null && !_controller.CanStart()) return;
 
 			if (Enemy.StateMachine?.CurrentState?.Name != "Attack")
             {

@@ -32,6 +32,9 @@ namespace Kuros.Actors.Enemies
 		private uint _savedAttackDetectionMask;
 		private uint _savedAttackAreaMask;
 
+	// 缓存玩家引用，避免每帧 GetNodesInGroup 分配
+		private GameActor? _cachedPlayer;
+
 		private static readonly StringName AttackStateName = new("Attack");
 
 		public override void _Ready()
@@ -43,7 +46,6 @@ namespace Kuros.Actors.Enemies
 				SetProcess(false);
 				return;
 			}
-
 			// 缓存检测区域并保存原始 CollisionMask
 			_controllerDetectionArea = _parentActor.GetNodeOrNull<Area2D>("Sprite2D/ControllerDetectionArea");
 			_attackDetectionArea     = _parentActor.GetNodeOrNull<Area2D>("Sprite2D/AttackDetectionArea");
@@ -74,18 +76,12 @@ namespace Kuros.Actors.Enemies
 
 		public override void _Process(double delta)
 		{
-			if (_aiEnabled || !_playerInRange) return;
+			if (_aiEnabled || !_playerInRange || _cachedPlayer == null) return;
 
-			// 玩家在范围内时，逐帧检查是否处于攻击状态
-			var players = GetTree().GetNodesInGroup("player");
-			foreach (var node in players)
+			// 直接使用缓存的玩家引用，避免每帧 GetNodesInGroup 分配
+			if (_cachedPlayer.StateMachine?.CurrentState?.Name == AttackStateName)
 			{
-				if (node is GameActor playerActor &&
-				    playerActor.StateMachine?.CurrentState?.Name == AttackStateName)
-				{
-					EnableAI();
-					return;
-				}
+				EnableAI();
 			}
 		}
 
@@ -100,13 +96,19 @@ namespace Kuros.Actors.Enemies
 		private void OnAreaEntered(Area2D area)
 		{
 			if (area.Name == "GrabArea" && area.GetParent()?.IsInGroup("player") == true)
+			{
 				_playerInRange = true;
+				_cachedPlayer = area.GetParent() as GameActor;
+			}
 		}
 
 		private void OnAreaExited(Area2D area)
 		{
 			if (area.Name == "GrabArea" && area.GetParent()?.IsInGroup("player") == true)
+			{
 				_playerInRange = false;
+				_cachedPlayer = null;
+			}
 		}
 
 		// ── AI 控制 ──────────────────────────────────────────────

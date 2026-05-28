@@ -1,0 +1,153 @@
+[gd_scene load_steps=20 format=3 uid="uid://cl1ki1csawpip"]
+
+[ext_resource type="Script" uid="uid://cra7y7mt0x1j8" path="res://scripts/managers/CameraZoneArea.cs" id="1_eajhg"]
+[ext_resource type="Texture2D" uid="uid://20khta50kpjb" path="res://assets/environments/scene_1_home/房间2地面.png" id="2_jv8iw"]
+[ext_resource type="Texture2D" uid="uid://bkvy3th2vg6k4" path="res://assets/environments/scene_1_home/房间2墙壁.png" id="3_kn5l6"]
+[ext_resource type="Texture2D" uid="uid://d0oxywii08nmt" path="res://assets/environments/scene_1_home/房间2隔断墙2.png" id="4_o4vmd"]
+[ext_resource type="PackedScene" uid="uid://orctascxfe5c" path="res://scenes/environments/door2_A1.tscn" id="5_utjd6"]
+[ext_resource type="PackedScene" uid="uid://mwpdlx1yup0k" path="res://scenes/actors/etc/EnemySpawnConsole.tscn" id="6_jv8iw"]
+[ext_resource type="Texture2D" uid="uid://b7d2xhua22eht" path="res://assets/environments/scene_1_home/房间1 隔断墙2.png" id="6_o4vmd"]
+[ext_resource type="PackedScene" uid="uid://dlhn30h21ei8f" path="res://scenes/environments/door1_A_begin.tscn" id="7_utjd6"]
+[ext_resource type="Texture2D" uid="uid://7bbxtr7o4uuf" path="res://assets/environments/scene_1_home/房间1 隔断墙1.png" id="8_utjd6"]
+[ext_resource type="Texture2D" uid="uid://dme4jeu32g0kg" path="res://assets/environments/scene_1_home/房间2洞洞板.png" id="9_r1xlm"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_r1xlm"]
+size = Vector2(5860, 3000)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_12yej"]
+size = Vector2(5607, 3000)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_eajhg"]
+size = Vector2(5800, 800)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_jv8iw"]
+size = Vector2(5800, 400)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_o4vmd"]
+size = Vector2(300, 2704)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_utjd6"]
+size = Vector2(300, 2957)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_40pjx"]
+size = Vector2(300, 1000)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_udrlq"]
+size = Vector2(300, 600)
+
+[sub_resource type="NavigationPolygon" id="NavigationPolygon_eajhg"]
+vertices = PackedVector2Array(-1881, -104, -1545.9375, -104, -1543.6328, 556, -1881, 556, -6353, 256, -7081, 816, -7329.5, 816, -7329.828, 282, -7081, 282, -1881, 1356, -7081, 1356, -7081, 256, -6353, -170, -1881, -714, -7081, -714, -7081, -170)
+polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3, 4), PackedInt32Array(5, 6, 7, 8, 3), PackedInt32Array(3, 9, 10, 5), PackedInt32Array(8, 11, 4, 3), PackedInt32Array(0, 4, 12, 13), PackedInt32Array(14, 13, 12, 15)])
+outlines = Array[PackedVector2Array]([PackedVector2Array(-7411, -1594, -1471, -1556, -1460, 1597, -7409, 1606)])
+source_geometry_mode = 2
+agent_radius = 80.0
+
+[node name="A1" type="Node2D"]
+y_sort_enabled = true
+
+[node name="PlayerSpawnPoint" type="Node2D" parent="."]
+position = Vector2(-2306, 0)
+
+[node name="AreaSize" type="Area2D" parent="."]
+visible = false
+y_sort_enabled = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AreaSize"]
+z_index = 10
+position = Vector2(-110, -340)
+shape = SubResource("RectangleShape2D_r1xlm")
+debug_color = Color(0.6428762, 0.52304673, 0.06685588, 0.41960785)
+
+[node name="CameraZone" type="Area2D" parent="."]
+visible = false
+collision_layer = 0
+collision_mask = 4
+script = ExtResource("1_eajhg")
+ZoneName = "Room_Zone_A1"
+CameraLimitTop = -1840
+CameraLimitBottom = 1100
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CameraZone"]
+z_index = 10
+position = Vector2(18.5, -340)
+shape = SubResource("RectangleShape2D_12yej")
+debug_color = Color(0, 1, 0, 0.41960785)
+
+[node name="Environments" type="Node2D" parent="."]
+
+[node name="floor" type="Sprite2D" parent="Environments"]
+texture = ExtResource("2_jv8iw")
+
+[node name="wall1" type="Sprite2D" parent="Environments"]
+position = Vector2(36, -1499)
+skew = 0.08726646
+texture = ExtResource("3_kn5l6")
+
+[node name="wall1_2" type="Sprite2D" parent="Environments"]
+z_index = -1
+position = Vector2(0, -1499)
+texture = ExtResource("3_kn5l6")
+
+[node name="wall2" type="Sprite2D" parent="Environments"]
+position = Vector2(2778, -1120)
+texture = ExtResource("4_o4vmd")
+
+[node name="door2_A1" parent="Environments" instance=ExtResource("5_utjd6")]
+position = Vector2(2778, 486)
+
+[node name="wall3" type="Sprite2D" parent="Environments"]
+position = Vector2(-2823.775, -694.5)
+scale = Vector2(0.65, 1)
+texture = ExtResource("6_o4vmd")
+
+[node name="door1_A_begin" parent="Environments" instance=ExtResource("7_utjd6")]
+position = Vector2(-2798.775, 627.5)
+scale = Vector2(0.65, 0.8)
+
+[node name="wall4" type="Sprite2D" parent="Environments"]
+position = Vector2(-2798, 782)
+scale = Vector2(0.65, 0.8)
+texture = ExtResource("8_utjd6")
+
+[node name="wall5" type="Sprite2D" parent="Environments"]
+position = Vector2(0, -1480)
+skew = 0.08726646
+texture = ExtResource("9_r1xlm")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
+visible = false
+z_index = 10
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(0, -1530)
+shape = SubResource("RectangleShape2D_eajhg")
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(0, 1300)
+shape = SubResource("RectangleShape2D_jv8iw")
+
+[node name="CollisionShape2D3" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(2780, -1872)
+shape = SubResource("RectangleShape2D_o4vmd")
+
+[node name="CollisionShape2D4" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(2780, 1778.5)
+shape = SubResource("RectangleShape2D_utjd6")
+
+[node name="CollisionShape2D5" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(-2880, -634)
+shape = SubResource("RectangleShape2D_40pjx")
+
+[node name="CollisionShape2D6" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(-2880, 860)
+shape = SubResource("RectangleShape2D_udrlq")
+
+[node name="NavigationRegion2D" type="NavigationRegion2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
+visible = false
+position = Vector2(4431, -336)
+navigation_polygon = SubResource("NavigationPolygon_eajhg")
+
+[node name="EnemySpawnConsole" parent="." instance=ExtResource("6_jv8iw")]
+position = Vector2(-1985, 0)
+SpawnParentPath = NodePath("..")
+PlayerRespawnPointPath = NodePath("../PlayerSpawnPoint")

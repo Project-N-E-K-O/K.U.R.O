@@ -19,6 +19,8 @@ namespace Kuros.Actors.Enemies.Attacks
         private Area2D? _playerDetectionArea;
         private string? _pendingQueueReason;
         private bool _playerInside;
+        /// <summary>子攻击完成后的攻击间隔（= 子攻击的 CooldownDuration），期间禁止发起任何攻击。</summary>
+        private float _interAttackDelay = 0f;
 
         public EnemyAttackController()
         {
@@ -79,6 +81,9 @@ namespace Kuros.Actors.Enemies.Attacks
             if (_entries.Count == 0) return false;
             if (!base.CanStart()) return false;
 
+            // 攻击间隔（上次子攻击的CD）尚未结束，禁止立即发起下一次攻击
+            if (_interAttackDelay > 0f) return false;
+
             var player = Enemy.PlayerTarget;
             if (player == null) return false;
 
@@ -87,9 +92,9 @@ namespace Kuros.Actors.Enemies.Attacks
                 if (!_playerDetectionArea.OverlapsBody(player)) return false;
             }
 
-            // 若排队的攻击已确定但其自身 CanStart() 不满足（如玩家不在攻击范围），
-            // 则控制器也视为不可开始，让 EnemyAttackState 正确退出到 Walk 状态。
-            if (_queuedAttack != null && !_queuedAttack.CanStart()) return false;
+            // 尚无排队攻击（全部CD中）或排队攻击仍在CD中，均视为不可开始
+            if (_queuedAttack == null) return false;
+            if (!_queuedAttack.CanStart()) return false;
 
             return true;
         }
@@ -162,6 +167,35 @@ namespace Kuros.Actors.Enemies.Attacks
         public override void _PhysicsProcess(double delta)
         {
             base._PhysicsProcess(delta);
+
+            // 递减攻击间隔计时器
+            if (_interAttackDelay > 0f) _interAttackDelay -= (float)delta;
+
+            // 对所有非活跃子模板调用 Tick，确保攻击结束后的冷却计时器能正常倒计时。
+            // Tick() 在 _phase == Idle 时只递减 _cooldownTimer 后立即返回，开销极低。
+            foreach (var entry in _entries)
+            {
+                if (entry.Template == null || entry.Template == _currentAttack) continue;
+                if (!GodotObject.IsInstanceValid(entry.Template)) continue;
+                entry.Template.Tick(delta);
+            }
+
+            // 控制器空闲时，若无可用攻击（全部CD中）则每帧检查是否有攻击CD已到期，
+            // 一旦有攻击可用立即更新 _queuedAttack 以便 CanStart() 重新返回 true。
+            if (!IsRunning && (_queuedAttack == null || _queuedAttack.IsOnCooldown))
+            {
+                var candidate = PickAttack();
+                if (candidate != null)
+                {
+                    _queuedAttack = candidate;
+                    DebugLog($"CD expired, re-queued: {_queuedAttack.Name}");
+                    if (ShouldForceAttackState())
+                    {
+                        Enemy?.StateMachine?.ChangeState("Attack");
+                    }
+                }
+            }
+
             if (_currentAttack == null)
             {
                 // OnAttackStarted 内子攻击 CanStart() 失败时，TryStart 仍会调用 SetPhase(Warmup)
@@ -188,9 +222,12 @@ namespace Kuros.Actors.Enemies.Attacks
 
         private EnemyAttackTemplate? PickAttack()
         {
+            // 只在非CD中的攻击里做加权随机选择，避免选中后立即无法启动
             float totalWeight = 0f;
             foreach (var entry in _entries)
             {
+                if (entry.Template == null || !GodotObject.IsInstanceValid(entry.Template)) continue;
+                if (entry.Template.IsOnCooldown) continue;
                 totalWeight += entry.Weight;
             }
             if (totalWeight <= 0f) return null;
@@ -200,6 +237,8 @@ namespace Kuros.Actors.Enemies.Attacks
 
             foreach (var entry in _entries)
             {
+                if (entry.Template == null || !GodotObject.IsInstanceValid(entry.Template)) continue;
+                if (entry.Template.IsOnCooldown) continue;
                 cumulative += entry.Weight;
                 if (roll <= cumulative)
                 {
@@ -258,6 +297,33 @@ namespace Kuros.Actors.Enemies.Attacks
 
         public EnemyAttackTemplate? PeekQueuedAttack() => _queuedAttack;
 
+        /// <summary>
+        /// 返回所有攻击中剩余CD最短的那个（即最快可用的攻击）的信息。
+        /// 若当前无攻击处于冷却中，Remaining 为 0。
+        /// </summary>
+        public (float Remaining, float Duration, string Name) GetShortestCooldownInfo()
+        {
+            float minRemaining = float.MaxValue;
+            float duration = 0f;
+            string name = string.Empty;
+            bool anyOnCd = false;
+
+            foreach (var entry in _entries)
+            {
+                if (entry.Template == null || !GodotObject.IsInstanceValid(entry.Template)) continue;
+                if (!entry.Template.IsOnCooldown) continue;
+                anyOnCd = true;
+                if (entry.Template.CooldownRemaining < minRemaining)
+                {
+                    minRemaining = entry.Template.CooldownRemaining;
+                    duration = entry.Template.CooldownDuration;
+                    name = entry.AttackName;
+                }
+            }
+
+            return anyOnCd ? (minRemaining, duration, name) : (0f, 0f, string.Empty);
+        }
+
         public void ForceQueueNextAttack(string reason = "Forced")
         {
 			DebugLog($"Force queue requested ({reason}).");
@@ -278,6 +344,12 @@ namespace Kuros.Actors.Enemies.Attacks
 
         private void FinishControllerAttack(string reason, bool clearControllerCooldown = false)
         {
+            // 子攻击正常完成时，将其 CooldownDuration 保存为攻击间隔，
+            // 确保结束后不会立即切换到另一种攻击（与旧 Enemy.AttackTimer 语义一致）
+            float childInterAttackDelay = 0f;
+            if (reason == "ChildFinished" && _currentAttack != null)
+                childInterAttackDelay = _currentAttack.CooldownDuration;
+
             CleanupChildAttack(clearCooldown: false);
             _pendingQueueReason = reason;
 			DebugLog($"Controller finishing because '{reason}'.");
@@ -291,6 +363,12 @@ namespace Kuros.Actors.Enemies.Attacks
                 QueueNextAttack(_pendingQueueReason);
                 _pendingQueueReason = null;
             }
+
+            // 强制清除时同步清除攻击间隔；否则应用子攻击的 CD 作为间隔
+            if (clearControllerCooldown)
+                _interAttackDelay = 0f;
+            else if (childInterAttackDelay > 0f)
+                _interAttackDelay = childInterAttackDelay;
         }
 
 		private void DebugLogPendingAttackIfPlayerInside()
@@ -373,14 +451,10 @@ namespace Kuros.Actors.Enemies.Attacks
         private bool ShouldForceAttackState()
         {
             if (!IsEnemyActionable() || Enemy?.StateMachine == null) return false;
-            if (_queuedAttack == null) return false;
-            if (_queuedAttack.CanStart())
-            {
-                var current = Enemy.StateMachine.CurrentState?.Name;
-                return current != "Attack";
-            }
-
-            return false;
+            // 使用完整的 CanStart()，确保 _interAttackDelay 和 _queuedAttack 均已就绪才强制切换
+            if (!CanStart()) return false;
+            var current = Enemy.StateMachine.CurrentState?.Name;
+            return current != "Attack";
         }
 
         private bool IsEnemyAlive()

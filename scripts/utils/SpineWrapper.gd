@@ -79,9 +79,6 @@ func play_animation(root: Node, anim_name: String, loop: bool, mix_duration: flo
 	if sprites.is_empty():
 		print("[SpineWrapper] ERROR: 無法找到 SpineSprite 節點在: ", root)
 		return false
-	
-	print("[SpineWrapper] 找到 SpineSprite 數量: ", sprites.size())
-	print("[SpineWrapper] 嘗試播放動畫: ", anim_name, " (loop: ", loop, ")")
 
 	var played_any := false
 	for sprite in sprites:

@@ -8,10 +8,14 @@ namespace Kuros.Systems.Cutscene
     /// 负责：统一跳过逻辑 / 禁用玩家输入 / 镜头接管 / 黑幕淡变。
     ///
     /// Inspector 必填项：
-    ///   PlayerPath       → 相对路径指向玩家节点（如 "World/MainCharacter"）
-    ///   CameraPath       → 相对路径指向 Camera2D（如 "World/MainCharacter/Camera2D"）
-    ///   DialoguePanelPath→ 可选，指向 CutsceneDialoguePanel 节点
-    ///   FadeOverlayPath  → 可选，指向全屏黑幕 CanvasItem
+    /// PlayerPath       → 相对路径指向玩家节点（如 "World/MainCharacter"）
+    /// CameraPath       → 相对路径指向 Camera2D（如 "World/MainCharacter/Camera2D"）
+    /// DialoguePanelPath→ 可选，指向 CutsceneDialoguePanel 节点
+    /// FadeOverlayPath  → 可选，指向全屏黑幕 CanvasItem
+    /// TopBlackBarPath → 可选，指向电影式黑幕上方 ColorRect
+    /// BottomBlackBarPath → 可选，指向电影式黑幕下方 ColorRect
+    /// HideNodePaths    → 可选，过场期间隐藏并禁用 ProcessMode 的节点路径列表（如 P2、UI 根节点）
+    /// BattleSceneManagerPath → 可选，过场开始时自动调用 HideAllUI()，结束时调用 ShowAllUI()，指向 BattleSceneManager 节点
     /// </summary>
     [GlobalClass]
     public partial class CutsceneManager : Node
@@ -56,6 +60,7 @@ namespace Kuros.Systems.Cutscene
 
         // ── 内部访问（供 Step 使用）──────────────────────────────────────
         internal bool                  IsSkipRequested { get; private set; } = false;
+        internal Node2D?               Player          { get; private set; }
         internal Camera2D?             Camera          { get; private set; }
         internal CutsceneDialoguePanel? DialoguePanel  { get; private set; }
         internal CanvasItem?           FadeOverlay     { get; private set; }
@@ -63,7 +68,6 @@ namespace Kuros.Systems.Cutscene
         internal Control?              BottomBlackBar  { get; private set; }
 
         // ── 私有字段 ──────────────────────────────────────────────────────
-        private Node2D? _player;
         private bool    _cameraWasTopLevel = false;
         private bool    _playerWasVisible  = false;
         private readonly System.Collections.Generic.List<CanvasItem> _hiddenNodes = new();
@@ -75,7 +79,7 @@ namespace Kuros.Systems.Cutscene
             AddToGroup("cutscene_manager");
 
             if (!PlayerPath.IsEmpty)
-                _player = GetNodeOrNull<Node2D>(PlayerPath);
+                Player = GetNodeOrNull<Node2D>(PlayerPath);
 
             if (!CameraPath.IsEmpty)
                 Camera = GetNodeOrNull<Camera2D>(CameraPath);
@@ -96,14 +100,14 @@ namespace Kuros.Systems.Cutscene
                 _battleSceneManager = GetNodeOrNull<Kuros.Scenes.BattleSceneManager>(BattleSceneManagerPath);
 
             // 若 NodePath 查找失败（节点顺序问题），延迟一帧再试
-            if (_player == null || Camera == null)
+            if (Player == null || Camera == null)
                 CallDeferred(MethodName.LateInit);
         }
 
         private void LateInit()
         {
-            if (_player == null && !PlayerPath.IsEmpty)
-                _player = GetNodeOrNull<Node2D>(PlayerPath);
+            if (Player == null && !PlayerPath.IsEmpty)
+                Player = GetNodeOrNull<Node2D>(PlayerPath);
             if (Camera == null && !CameraPath.IsEmpty)
                 Camera = GetNodeOrNull<Camera2D>(CameraPath);
             if (DialoguePanel == null && !DialoguePanelPath.IsEmpty)
@@ -112,15 +116,15 @@ namespace Kuros.Systems.Cutscene
                 FadeOverlay = GetNodeOrNull<CanvasItem>(FadeOverlayPath);
 
             // 若仍为 null，尝试通过 group 查找玩家（兜底）
-            if (_player == null)
-                _player = GetTree().GetFirstNodeInGroup("player") as Node2D;
-            if (_player != null && Camera == null)
-                Camera = _player.GetNodeOrNull<Camera2D>("Camera2D");
+            if (Player == null)
+                Player = GetTree().GetFirstNodeInGroup("player") as Node2D;
+            if (Player != null && Camera == null)
+                Camera = Player.GetNodeOrNull<Camera2D>("Camera2D");
 
             if (_battleSceneManager == null && !BattleSceneManagerPath.IsEmpty)
                 _battleSceneManager = GetNodeOrNull<Kuros.Scenes.BattleSceneManager>(BattleSceneManagerPath);
 
-            GD.Print($"[Cutscene] LateInit — Player: {(_player != null ? _player.Name : "null")}, Camera: {(Camera != null ? Camera.Name : "null")}, BattleSceneManager: {(_battleSceneManager != null ? _battleSceneManager.Name : "null")}");
+            GD.Print($"[Cutscene] LateInit — Player: {(Player != null ? Player.Name : "null")}, Camera: {(Camera != null ? Camera.Name : "null")}, BattleSceneManager: {(_battleSceneManager != null ? _battleSceneManager.Name : "null")}");
         }
 
         public override void _Input(InputEvent @event)
@@ -138,7 +142,7 @@ namespace Kuros.Systems.Cutscene
 
             GD.Print($"[Cutscene] === PlayCutscene 开始: {sequence.SequenceId}, Steps数量: {sequence.Steps?.Count ?? 0} ===");
             GD.Print($"[Cutscene] DisablePlayerInput={sequence.DisablePlayerInput}, TakeOverCamera={sequence.TakeOverCamera}");
-            GD.Print($"[Cutscene] Player节点: {(_player != null ? _player.Name : "null")}");
+            GD.Print($"[Cutscene] Player节点: {(Player != null ? Player.Name : "null")}");
             GD.Print($"[Cutscene] Camera节点: {(Camera != null ? Camera.Name : "null")}");
             GD.Print($"[Cutscene] DialoguePanel: {(DialoguePanel != null ? DialoguePanel.Name : "null")}");
             GD.Print($"[Cutscene] FadeOverlay: {(FadeOverlay != null ? FadeOverlay.Name : "null")}");
@@ -155,15 +159,15 @@ namespace Kuros.Systems.Cutscene
             _playerWasVisible = false;
             if (sequence.DisablePlayerInput)
             {
-                if (_player != null)
+                if (Player != null)
                 {
-                    _player.ProcessMode = ProcessModeEnum.Disabled;
-                    if (_player.Visible)
+                    Player.ProcessMode = ProcessModeEnum.Disabled;
+                    if (Player.Visible)
                     {
-                        _player.Hide();
+                        Player.Hide();
                         _playerWasVisible = true;
                     }
-                    GD.Print($"[Cutscene] 禁用+隐藏: {_player.Name}");
+                    GD.Print($"[Cutscene] 禁用+隐藏: {Player.Name}");
                 }
                 else
                 {
@@ -223,12 +227,12 @@ namespace Kuros.Systems.Cutscene
                 EndCameraOverride();
 
             // 恢复玩家输入与可见性
-            if (sequence.DisablePlayerInput && _player != null && GodotObject.IsInstanceValid(_player))
+            if (sequence.DisablePlayerInput && Player != null && GodotObject.IsInstanceValid(Player))
             {
-                _player.ProcessMode = ProcessModeEnum.Inherit;
+                Player.ProcessMode = ProcessModeEnum.Inherit;
                 if (_playerWasVisible)
-                    _player.Show();
-                GD.Print($"[Cutscene] 恢复输入+显示: {_player.Name}");
+                    Player.Show();
+                GD.Print($"[Cutscene] 恢复输入+显示: {Player.Name}");
             }
 
             // 恢复隐藏节点的显示和 ProcessMode

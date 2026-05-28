@@ -1,11 +1,11 @@
 [gd_scene load_steps=68 format=3 uid="uid://v3n56xk6n8ca"]
 
-[ext_resource type="Texture2D" uid="uid://tm160ewu2yyj" path="res://assets/environments/scene_loading_elevator/ElevatorBackground.png" id="1_1e411"]
-[ext_resource type="Texture2D" uid="uid://bd81ty7uf16q3" path="res://assets/environments/scene_loading_elevator/Elevator.png" id="2_1rckx"]
-[ext_resource type="Script" uid="uid://dq0vqwi52hgyp" path="res://scripts/utils/ProximityOutlineHighlight.cs" id="2_u66l2"]
-[ext_resource type="Texture2D" uid="uid://bn101t3c88poy" path="res://assets/environments/scene_loading_elevator/Elevator2.png" id="3_5rppg"]
-[ext_resource type="Script" uid="uid://jk14ii6siiwh" path="res://scripts/environments/ElevatorController.cs" id="3_elev"]
-[ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="3_h28jp"]
+[ext_resource type="Texture2D" uid="uid://b2rved21jbdle" path="res://assets/environments/scene_loading_elevator/ElevatorBackground.png" id="1_1e411"]
+[ext_resource type="Texture2D" uid="uid://bcihobxr4j623" path="res://assets/environments/scene_loading_elevator/Elevator.png" id="2_1rckx"]
+[ext_resource type="Script" uid="uid://dxh5r55crhlop" path="res://scripts/utils/ProximityOutlineHighlight.cs" id="2_u66l2"]
+[ext_resource type="Texture2D" uid="uid://cd32rwb16frax" path="res://assets/environments/scene_loading_elevator/Elevator2.png" id="3_5rppg"]
+[ext_resource type="Script" uid="uid://638l7fmdy78o" path="res://scripts/environments/ElevatorController.cs" id="3_elev"]
+[ext_resource type="Shader" uid="uid://8m1dqcvm2y7u" path="res://shaders/materials/sprite_outline.gdshader" id="3_h28jp"]
 [ext_resource type="Texture2D" uid="uid://byy0omy85i2mn" path="res://assets/environments/scene_loading_elevator/ElevatorGate/时间轴 1_0025.png" id="6_aqwex"]
 [ext_resource type="Texture2D" uid="uid://dcsgg1x6100qv" path="res://assets/environments/scene_loading_elevator/ElevatorGate/时间轴 1_0026.png" id="7_u66l2"]
 [ext_resource type="Texture2D" uid="uid://dovi6sr1a7lsl" path="res://assets/environments/scene_loading_elevator/ElevatorGate/时间轴 1_0027.png" id="8_06hmv"]
@@ -73,7 +73,7 @@ size = Vector2(1800, 200)
 size = Vector2(200, 1100)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_h28jp"]
-size = Vector2(1800, 200)
+size = Vector2(1800, 931)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_u66l2"]
 size = Vector2(200, 200)
@@ -421,6 +421,7 @@ _data = {
 z_index = -1
 z_as_relative = false
 script = ExtResource("3_elev")
+MinRideDuration = 10.0
 
 [node name="OutlineEffect" type="Node" parent="."]
 script = ExtResource("2_u66l2")
@@ -459,7 +460,7 @@ position = Vector2(950, 0)
 shape = SubResource("RectangleShape2D_5rppg")
 
 [node name="CollisionShape2D3" type="CollisionShape2D" parent="AirWall"]
-position = Vector2(0, 327)
+position = Vector2(0, -38.5)
 shape = SubResource("RectangleShape2D_h28jp")
 
 [node name="ExitArea" type="Area2D" parent="."]

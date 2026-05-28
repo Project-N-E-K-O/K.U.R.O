@@ -1,0 +1,146 @@
+[gd_scene load_steps=35 format=3 uid="uid://cea0a3niswxg1"]
+
+[ext_resource type="Texture2D" uid="uid://cd24tjl6wpw4i" path="res://assets/objects/emoji_boom/时间轴 1_0000.png" id="1_3r03d"]
+[ext_resource type="Texture2D" uid="uid://cjgenixkf7n4e" path="res://assets/objects/emoji_boom/时间轴 1_0001.png" id="2_xcitj"]
+[ext_resource type="Texture2D" uid="uid://3oai2ybjaj4f" path="res://assets/objects/emoji_boom/时间轴 1_0002.png" id="3_31mlr"]
+[ext_resource type="Texture2D" uid="uid://bxl8nmokock1q" path="res://assets/objects/emoji_boom/时间轴 1_0003.png" id="4_xrqcq"]
+[ext_resource type="Texture2D" uid="uid://3qx8easdoh00" path="res://assets/objects/emoji_boom/时间轴 1_0004.png" id="5_ioiya"]
+[ext_resource type="Texture2D" uid="uid://crsh7m8oim87y" path="res://assets/objects/emoji_boom/时间轴 1_0005.png" id="6_04wd5"]
+[ext_resource type="Texture2D" uid="uid://bjhkcfsvmms8w" path="res://assets/objects/emoji_boom/时间轴 1_0006.png" id="7_5v254"]
+[ext_resource type="Texture2D" uid="uid://bxsqc85lihujh" path="res://assets/objects/emoji_boom/时间轴 1_0007.png" id="8_lfx31"]
+[ext_resource type="Texture2D" uid="uid://760mjxq2r1su" path="res://assets/objects/emoji_boom/时间轴 1_0008.png" id="9_020uc"]
+[ext_resource type="Texture2D" uid="uid://frs87ufjfuoy" path="res://assets/objects/emoji_boom/时间轴 1_0009.png" id="10_xihaj"]
+[ext_resource type="Texture2D" uid="uid://cg7aibnohxiqi" path="res://assets/objects/emoji_boom/时间轴 1_0010.png" id="11_q2l3m"]
+[ext_resource type="Texture2D" uid="uid://dsxynllhqonml" path="res://assets/objects/emoji_boom/时间轴 1_0011.png" id="12_lslpk"]
+[ext_resource type="Texture2D" uid="uid://cwb56p07ivpfq" path="res://assets/objects/emoji_boom/时间轴 1_0012.png" id="13_pthx2"]
+[ext_resource type="Texture2D" uid="uid://ioxiwhmbwibt" path="res://assets/objects/emoji_boom/时间轴 1_0013.png" id="14_pecem"]
+[ext_resource type="Texture2D" uid="uid://bj4dh207off05" path="res://assets/objects/emoji_boom/时间轴 1_0014.png" id="15_wi5pi"]
+[ext_resource type="Texture2D" uid="uid://bewqrw68g1dbf" path="res://assets/objects/emoji_boom/时间轴 1_0015.png" id="16_f7wc8"]
+[ext_resource type="Texture2D" uid="uid://cdrqoum78k3xx" path="res://assets/objects/emoji_boom/时间轴 1_0016.png" id="17_2qirn"]
+[ext_resource type="Texture2D" uid="uid://s3uy5tc6o2g2" path="res://assets/objects/emoji_boom/时间轴 1_0017.png" id="18_51cir"]
+[ext_resource type="Texture2D" uid="uid://ceawnepcowvu2" path="res://assets/objects/emoji_boom/时间轴 1_0018.png" id="19_behwt"]
+[ext_resource type="Texture2D" uid="uid://dcejgf55qig04" path="res://assets/objects/emoji_boom/时间轴 1_0019.png" id="20_sch5s"]
+[ext_resource type="Texture2D" uid="uid://dvhwxr77r35hw" path="res://assets/objects/emoji_boom/时间轴 1_0020.png" id="21_5ho8k"]
+[ext_resource type="Texture2D" uid="uid://d306gkkompxnj" path="res://assets/objects/emoji_boom/时间轴 1_0021.png" id="22_4saoa"]
+[ext_resource type="Texture2D" uid="uid://c3rs8rf0ylgg1" path="res://assets/objects/emoji_boom/时间轴 1_0022.png" id="23_0w8i5"]
+[ext_resource type="Texture2D" uid="uid://brgc6t0kb4jo3" path="res://assets/objects/emoji_boom/时间轴 1_0023.png" id="24_eie0c"]
+[ext_resource type="Texture2D" uid="uid://ck2nckhietay5" path="res://assets/objects/emoji_boom/时间轴 1_0024.png" id="25_w6y68"]
+[ext_resource type="Texture2D" uid="uid://ct1auxmuplppd" path="res://assets/objects/emoji_boom/时间轴 1_0025.png" id="26_hyel0"]
+[ext_resource type="Texture2D" uid="uid://dy3cbk0jvlt0a" path="res://assets/objects/emoji_boom/时间轴 1_0026.png" id="27_vleng"]
+[ext_resource type="Texture2D" uid="uid://ch02xd1jd0mfd" path="res://assets/objects/emoji_boom/时间轴 1_0027.png" id="28_kj7sd"]
+[ext_resource type="Texture2D" uid="uid://cypm3kp87w6yx" path="res://assets/objects/emoji_boom/时间轴 1_0028.png" id="29_jdkfe"]
+[ext_resource type="Texture2D" uid="uid://c0pm3cnldrgcq" path="res://assets/objects/emoji_boom/时间轴 1_0029.png" id="30_dixqr"]
+[ext_resource type="Script" uid="uid://5tqak7y4n1s0" path="res://scripts/effects/EffectAutoDestroy.cs" id="31_script"]
+[ext_resource type="PackedScene" uid="uid://cmxuejgw41osm" path="res://scenes/actors/etc/BoomB.tscn" id="32_31mlr"]
+[ext_resource type="PackedScene" uid="uid://yyltmrdqmlo8" path="res://resources/effects/BoomDmgEffect.tscn" id="33_xrqcq"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_3r03d"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_3r03d")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_xcitj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_31mlr")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_xrqcq")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_ioiya")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_04wd5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_5v254")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_lfx31")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_020uc")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_xihaj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_q2l3m")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_lslpk")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_pthx2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_pecem")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_wi5pi")
+}, {
+"duration": 1.0,
+"texture": ExtResource("16_f7wc8")
+}, {
+"duration": 1.0,
+"texture": ExtResource("17_2qirn")
+}, {
+"duration": 1.0,
+"texture": ExtResource("18_51cir")
+}, {
+"duration": 1.0,
+"texture": ExtResource("19_behwt")
+}, {
+"duration": 1.0,
+"texture": ExtResource("20_sch5s")
+}, {
+"duration": 1.0,
+"texture": ExtResource("21_5ho8k")
+}, {
+"duration": 1.0,
+"texture": ExtResource("22_4saoa")
+}, {
+"duration": 1.0,
+"texture": ExtResource("23_0w8i5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("24_eie0c")
+}, {
+"duration": 1.0,
+"texture": ExtResource("25_w6y68")
+}, {
+"duration": 1.0,
+"texture": ExtResource("26_hyel0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("27_vleng")
+}, {
+"duration": 1.0,
+"texture": ExtResource("28_kj7sd")
+}, {
+"duration": 1.0,
+"texture": ExtResource("29_jdkfe")
+}, {
+"duration": 1.0,
+"texture": ExtResource("30_dixqr")
+}],
+"loop": false,
+"name": &"default",
+"speed": 25.0
+}]
+
+[node name="EmojiBoom" type="AnimatedSprite2D"]
+z_index = 2
+z_as_relative = false
+y_sort_enabled = true
+scale = Vector2(0.5, 0.5)
+sprite_frames = SubResource("SpriteFrames_3r03d")
+autoplay = "default"
+frame = 29
+frame_progress = 1.0
+script = ExtResource("31_script")
+SpawnOnDestroyScenes = [ExtResource("32_31mlr"), ExtResource("33_xrqcq")]
+DestroyDelay = 1.3

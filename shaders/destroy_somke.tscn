@@ -2,14 +2,14 @@
 
 [ext_resource type="Script" uid="uid://cur7ohvi004bi" path="res://scripts/fx/RandomLitterPartDisplay.cs" id="1_50drn"]
 [ext_resource type="Texture2D" uid="uid://bk0ipufx3kn76" path="res://assets/environments/26.3.17 烟.png" id="1_smoke"]
-[ext_resource type="Texture2D" uid="uid://djwpndlb3ggb" path="res://assets/effect/MetalA.png" id="3_50drn"]
-[ext_resource type="Texture2D" uid="uid://undrxhl85nk5" path="res://assets/effect/NailA.png" id="4_0p68k"]
-[ext_resource type="Texture2D" uid="uid://cb5tlkprmeeek" path="res://assets/effect/MetalB.png" id="4_cklsf"]
-[ext_resource type="Texture2D" uid="uid://di0o1m3ofpqrx" path="res://assets/effect/WoodA.png" id="5_gi07o"]
-[ext_resource type="Texture2D" uid="uid://8ejp3d5qqx5t" path="res://assets/effect/SpringA.png" id="6_hangd"]
-[ext_resource type="Texture2D" uid="uid://6nc4lmjgiend" path="res://assets/effect/NailB.png" id="6_piy5f"]
-[ext_resource type="Texture2D" uid="uid://cch3g32umpcvm" path="res://assets/effect/WoodC.png" id="8_7ftuu"]
-[ext_resource type="Texture2D" uid="uid://j3pb4tr7nx6o" path="res://assets/effect/SpringB.png" id="10_3pm0g"]
+[ext_resource type="Texture2D" uid="uid://djwpndlb3ggb" path="res://assets/effect/AttackEffect/item_broken_effect/MetalA.png" id="3_50drn"]
+[ext_resource type="Texture2D" uid="uid://undrxhl85nk5" path="res://assets/effect/AttackEffect/item_broken_effect/NailA.png" id="4_0p68k"]
+[ext_resource type="Texture2D" uid="uid://cb5tlkprmeeek" path="res://assets/effect/AttackEffect/item_broken_effect/MetalB.png" id="4_cklsf"]
+[ext_resource type="Texture2D" uid="uid://di0o1m3ofpqrx" path="res://assets/effect/AttackEffect/item_broken_effect/WoodA.png" id="5_gi07o"]
+[ext_resource type="Texture2D" uid="uid://8ejp3d5qqx5t" path="res://assets/effect/AttackEffect/item_broken_effect/SpringA.png" id="6_hangd"]
+[ext_resource type="Texture2D" uid="uid://6nc4lmjgiend" path="res://assets/effect/AttackEffect/item_broken_effect/NailB.png" id="6_piy5f"]
+[ext_resource type="Texture2D" uid="uid://cch3g32umpcvm" path="res://assets/effect/AttackEffect/item_broken_effect/WoodC.png" id="8_7ftuu"]
+[ext_resource type="Texture2D" uid="uid://j3pb4tr7nx6o" path="res://assets/effect/AttackEffect/item_broken_effect/SpringB.png" id="10_3pm0g"]
 
 [sub_resource type="Gradient" id="Gradient_large"]
 offsets = PackedFloat32Array(0, 0.2, 1)

@@ -33,7 +33,9 @@ namespace Kuros.Actors.Enemies.States
 
         public override void Exit()
         {
-            _activeTemplate?.Cancel(clearCooldown: true);
+            // clearCooldown: false 以保留子攻击的冷却计时，避免退出攻击状态时意外重置 CD。
+            // EnemyAttackController 内部已按需处理玩家离开/被打断时的 CD 清理逻辑。
+            _activeTemplate?.Cancel(clearCooldown: false);
             _activeTemplate = null;
         }
 
@@ -57,10 +59,11 @@ namespace Kuros.Actors.Enemies.States
                 return;
             }
 
-			if (!ProcessTemplateAttack(delta))
+		if (!ProcessTemplateAttack(delta))
             {
-            ChangeToNextState();
-			}
+                // 没有活跃模板时直接退出到合适状态，等Walk/Idle检测CanStartAttack()后再重入
+                ChangeToNextState();
+            }
         }
 
         protected virtual bool TryStartTemplateAttack()
@@ -106,20 +109,8 @@ namespace Kuros.Actors.Enemies.States
                 return true;
             }
 
+            // 攻击模板执行完毕：立即退出到 Walk/Idle，由它们检测 CanStartAttack() 重新发起攻击
             _activeTemplate = null;
-
-            if (TryStartTemplateAttack())
-            {
-                return true;
-            }
-
-			if (Enemy.AttackTimer > 0f)
-			{
-				Enemy.Velocity = Vector2.Zero;
-				Enemy.MoveAndSlide();
-				return true;
-			}
-
             ChangeToNextState();
             return true;
         }
@@ -129,31 +120,22 @@ namespace Kuros.Actors.Enemies.States
             bool playerDetected = Enemy.IsPlayerWithinDetectionRange();
             bool playerInAttackRange = Enemy.IsPlayerInAttackRange();
 
-            if (Enemy.AttackTimer > 0f)
-            {
-                if (playerDetected)
-                {
-                    ChangeState("Walk");
-                }
-                else
-                {
-                    ChangeState("Idle");
-                }
-                return;
-            }
-
             if (!playerDetected)
             {
                 ChangeState("Idle");
                 return;
             }
 
+            // 攻击完成后始终退出到 Walk/Idle（ChangeState("Attack") 在同状态下是no-op）
+            // Walk/Idle 每帧检查 CanStartAttack()，CD到期后自动重新进入 Attack
             if (playerInAttackRange)
             {
-                ChangeState("Attack");
+                // 玩家在攻击范围内：原地等待CD（Idle 会在 CanStartAttack() 为真时切回 Attack）
+                ChangeState("Idle");
             }
             else
             {
+                // 玩家在检测范围内但不在攻击范围：追击（Walk 同样检查 CanStartAttack()）
                 ChangeState("Walk");
             }
         }

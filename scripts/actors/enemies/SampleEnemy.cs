@@ -11,7 +11,7 @@ public partial class SampleEnemy : GameActor
 	[Export] public bool EnableStateDebugOverlay = false;
 	[Export] public Vector2 DebugOverlayOffset = new(-90f, -90f);
 	[Export(PropertyHint.Range, "8,128,1")] public int DebugOverlayFontSize = 14;
-	[Export] public Color DebugOverlayColor = new(1f, 0.95f, 0.2f, 1f);
+	[Export] public Color DebugOverlayColor = new(1f, 0f, 0f, 1f);
 
 	[ExportCategory("Detection")]
 	[Export] public Area2D? DetectionArea { get; private set; }
@@ -138,9 +138,7 @@ public partial class SampleEnemy : GameActor
 	/// </summary>
 	public virtual bool CanStartAttack()
 	{
-		if (AttackTimer > 0) return false;
-
-		// 尝试使用 AttackController 的 CanStart()（支持自定义范围检测的攻击）
+		// 优先委托给 AttackController（它通过 EnemyAttackTemplate._cooldownTimer 管理自己的 CD）
 		if (_cachedAttackController == null || !IsInstanceValid(_cachedAttackController))
 		{
 			var attackState = StateMachine?.GetNodeOrNull("Attack");
@@ -150,7 +148,8 @@ public partial class SampleEnemy : GameActor
 		if (_cachedAttackController != null && IsInstanceValid(_cachedAttackController))
 			return _cachedAttackController.CanStart();
 
-		// 回退：无 AttackController 时使用近战范围检测
+		// 回退：无 AttackController 时使用 AttackTimer 和近战范围检测
+		if (AttackTimer > 0) return false;
 		return IsPlayerInAttackRange();
 	}
 
@@ -209,6 +208,7 @@ public partial class SampleEnemy : GameActor
 		string stateName = StateMachine?.CurrentState?.Name ?? "None";
 		string frozenInfo = "";
 		string attackInfo = "";
+		string cooldownInfo = "";
 		
 		// 如果在Frozen状态，显示倒计时
 		if (stateName == "Frozen" && StateMachine?.CurrentState is EnemyFrozenState frozenState)
@@ -226,8 +226,24 @@ public partial class SampleEnemy : GameActor
 				attackInfo = $" | Attack: {currentAttackName}";
 			}
 		}
+
+		// 显示排队攻击的冷却倒计时
+		if (_cachedAttackController == null || !IsInstanceValid(_cachedAttackController))
+		{
+			var attackState = StateMachine?.GetNodeOrNull("Attack");
+			_cachedAttackController = attackState?.GetNodeOrNull<EnemyAttackController>("AttackController");
+		}
+		if (_cachedAttackController != null && IsInstanceValid(_cachedAttackController))
+		{
+			var (cdRemaining, cdDuration, cdName) = _cachedAttackController.GetShortestCooldownInfo();
+			if (cdRemaining > 0f)
+			{
+				string nameHint = string.IsNullOrEmpty(cdName) ? "" : $"({cdName})";
+				cooldownInfo = $" | CD: {cdRemaining:F2}s/{cdDuration:F1}s {nameHint}";
+			}
+		}
 		
-		_debugOverlayText = $"{Name} | State: {stateName}{attackInfo} | HP: {CurrentHealth}/{MaxHealth}{frozenInfo}";
+		_debugOverlayText = $"{Name} | State: {stateName}{attackInfo} | HP: {CurrentHealth}/{MaxHealth}{frozenInfo}{cooldownInfo}";
 	}
 
 	private string GetCurrentAttackName()

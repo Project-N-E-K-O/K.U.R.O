@@ -1,4 +1,4 @@
-[gd_scene load_steps=28 format=3 uid="uid://cg2o6k0etyc25"]
+[gd_scene load_steps=30 format=3 uid="uid://cg2o6k0etyc25"]
 
 [ext_resource type="Texture2D" uid="uid://behye8vdgemoq" path="res://assets/environments/scene_2_hotel/地板.png" id="1_4rhak"]
 [ext_resource type="Script" uid="uid://dmqu7phxi8gbi" path="res://scripts/managers/BattleArena.cs" id="1_lxqj5"]
@@ -12,8 +12,10 @@
 [ext_resource type="PackedScene" uid="uid://wrebd662va23" path="res://scenes/actors/enemies/Enemy_B2_fat02.tscn" id="6_4duw5"]
 [ext_resource type="PackedScene" uid="uid://bvps5t0s8owhw" path="res://scenes/actors/enemies/Enemy_C1_waiterA.tscn" id="6_ainwx"]
 [ext_resource type="PackedScene" uid="uid://dsfadn8x6iwkh" path="res://scenes/items/Furniture_B_plantA.tscn" id="6_lxqj5"]
+[ext_resource type="PackedScene" uid="uid://bj81vpm6lg1b8" path="res://scenes/actors/enemies/Enemy_Normal_guard3.tscn" id="6_y44ha"]
 [ext_resource type="PackedScene" uid="uid://dqrmlh3reek3f" path="res://scenes/items/Furniture_B_garbageCanA.tscn" id="7_mxkb7"]
 [ext_resource type="PackedScene" uid="uid://cofm45kotvgto" path="res://scenes/actors/enemies/Enemy_B1_fat.tscn" id="7_y44ha"]
+[ext_resource type="PackedScene" uid="uid://ba8fktvib2e1o" path="res://scenes/actors/enemies/Enemy_C2_waiterA02.tscn" id="8_7mqiy"]
 [ext_resource type="PackedScene" uid="uid://bkbhucnxqiys2" path="res://scenes/items/Furniture_B_counterB.tscn" id="8_wg0jq"]
 [ext_resource type="PackedScene" uid="uid://df51wgv346jhn" path="res://scenes/environments/elevatorGate_flip.tscn" id="9_1620r"]
 [ext_resource type="PackedScene" uid="uid://0anrcfm2pnsd" path="res://scenes/items/Furniture_B_luggageCartA.tscn" id="9_t2fey"]
@@ -95,7 +97,7 @@ debug_color = Color(1, 0, 0, 0.19607843)
 top_level = true
 position = Vector2(0, 350)
 script = ExtResource("2_t2fey")
-EnemyScenes = Array[PackedScene]([ExtResource("3_1620r"), ExtResource("4_0wqg8"), ExtResource("6_ainwx")])
+EnemyScenes = Array[PackedScene]([ExtResource("3_1620r"), ExtResource("4_0wqg8"), ExtResource("6_y44ha"), ExtResource("6_ainwx"), ExtResource("8_7mqiy")])
 MultiEnemySelectionMode = 1
 SpawnCount = 3
 SpawnInterval = 0.0
@@ -116,7 +118,7 @@ DebugLineWidth = 8.0
 top_level = true
 position = Vector2(0, 350)
 script = ExtResource("2_t2fey")
-EnemyScenes = Array[PackedScene]([ExtResource("6_4duw5"), ExtResource("7_y44ha")])
+EnemyScenes = Array[PackedScene]([ExtResource("6_4duw5"), ExtResource("7_y44ha"), ExtResource("6_ainwx"), ExtResource("8_7mqiy")])
 MultiEnemySelectionMode = 1
 SpawnCount = 4
 SpawnInterval = 0.0

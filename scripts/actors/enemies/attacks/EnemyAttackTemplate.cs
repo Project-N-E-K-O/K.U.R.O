@@ -84,6 +84,7 @@ namespace Kuros.Actors.Enemies.Attacks
 
         public bool IsRunning => _phase != AttackPhase.Idle;
         public bool IsOnCooldown => _cooldownTimer > 0.0f;
+        public float CooldownRemaining => Mathf.Max(_cooldownTimer, 0.0f);
 
         public virtual void Initialize(SampleEnemy enemy)
         {
@@ -109,7 +110,6 @@ namespace Kuros.Actors.Enemies.Attacks
             if (Enemy == null || Player == null) return false;
             if (Enemy.IsDeathSequenceActive || Enemy.IsDead) return false;
             if (IsRunning || IsOnCooldown) return false;
-            if (Enemy.AttackTimer > 0) return false;
 
             if (!Enemy.IsPlayerWithinDetectionRange())
             {
@@ -128,8 +128,6 @@ namespace Kuros.Actors.Enemies.Attacks
         {
             if (!CanStart()) return false;
 
-            _cooldownTimer = CooldownDuration;
-            Enemy.AttackTimer = Mathf.Max(Enemy.AttackTimer, CooldownDuration);
             _animationHitReady = false;
             _pendingAnimationHitFromWarmup = false;
 
@@ -156,15 +154,15 @@ namespace Kuros.Actors.Enemies.Attacks
 
         public void Cancel(bool clearCooldown = false)
         {
+            if (_phase != AttackPhase.Idle)
+            {
+                SetPhase(AttackPhase.Idle); // OnAttackFinished 会设置 _cooldownTimer = CooldownDuration
+            }
+
             if (clearCooldown)
             {
                 _cooldownTimer = 0.0f;
                 Enemy.AttackTimer = 0.0f;
-            }
-
-            if (_phase != AttackPhase.Idle)
-            {
-                SetPhase(AttackPhase.Idle);
             }
         }
 
@@ -230,6 +228,8 @@ namespace Kuros.Actors.Enemies.Attacks
 
         protected virtual void OnAttackFinished()
         {
+            _cooldownTimer = CooldownDuration;
+
             RestoreEnemyCollisionMask();
 
             if (Enemy != null && _previousIgnoreHitStateOnDamage.HasValue)
@@ -529,6 +529,10 @@ namespace Kuros.Actors.Enemies.Attacks
                     if (node2D is LaserBeam laserBeam)
                     {
                         laserBeam.FacingRight = Enemy.FacingRight;
+                    }
+                    else if (node2D is Kuros.Fx.EnemyBullet bullet)
+                    {
+                        bullet.FacingRight = Enemy.FacingRight;
                     }
                     // 世界坐标生成（如烟雾、粒子等视觉效果）
                     Enemy.GetParent()?.AddChild(node2D);
