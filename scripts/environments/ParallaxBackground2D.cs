@@ -23,7 +23,8 @@ public partial class ParallaxBackground2D : Sprite2D
     [Export] public NodePath AreaPath { get; set; } = new NodePath();
 
     private Camera2D? _camera;
-    private float _originX;       // 视差基准偏移
+    private float _originX;       // 视差基准偏移（首次进入激活区域时才计算）
+    private bool _originCalculated; // _originX 是否已完成计算
     private bool _initialized;
     private bool _isActive;       // 摄像机当前是否在生效区域内
 
@@ -50,6 +51,16 @@ public partial class ParallaxBackground2D : Sprite2D
         // 区域外：直接返回，背景停留在离开时的位置
         if (!_isActive) return;
 
+        // 首次进入激活区域时计算 _originX：
+        // 直接读取此刻的 GlobalPosition.X 作为自然基准——
+        // 区域外 _Process 提前 return 从不修改 GlobalPosition，
+        // 因此此时 GlobalPosition.X 就是背景的真实世界坐标，无需依赖初始化时机。
+        if (!_originCalculated)
+        {
+            _originX = GlobalPosition.X - screenCenter.X * ScrollSpeed;
+            _originCalculated = true;
+        }
+
         GlobalPosition = new Vector2(
             _originX + screenCenter.X * ScrollSpeed,
             GlobalPosition.Y
@@ -62,8 +73,7 @@ public partial class ParallaxBackground2D : Sprite2D
         if (_camera == null) return;
 
         // 此时房间已由 StageGeneratorManager 定位，GlobalPosition 为正确的世界坐标
-        // 用 GetScreenCenterPosition() 作为基准，与 _Process 中保持一致
-        _originX = GlobalPosition.X - _camera.GetScreenCenterPosition().X * ScrollSpeed;
+        // _originX 延迟到摄像机首次进入激活区域时再计算
 
         // 解析区域矩形（世界坐标）
         if (!AreaPath.IsEmpty)

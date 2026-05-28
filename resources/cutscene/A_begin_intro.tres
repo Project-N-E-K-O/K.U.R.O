@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CutsceneSequence" load_steps=5 format=3 uid="uid://hvl6chuo43us"]
+
+[ext_resource type="Script" uid="uid://ctrko7add3r5h" path="res://scripts/systems/cutscene/CutsceneStep.cs" id="1_wjjip"]
+[ext_resource type="Script" uid="uid://cgnajq1ykl2mn" path="res://scripts/systems/cutscene/CutsceneSequence.cs" id="2_gqujs"]
+[ext_resource type="Script" uid="uid://cjl1hjmndwvcg" path="res://scripts/systems/cutscene/steps/FadeStep.cs" id="2_mlsay"]
+
+[sub_resource type="Resource" id="Resource_84lnv"]
+script = ExtResource("2_mlsay")
+Duration = 3.0
+TransitionDuration = 0.5
+metadata/_custom_type_script = "uid://cjl1hjmndwvcg"
+
+[resource]
+script = ExtResource("2_gqujs")
+SequenceId = "A_begin_intro"
+Steps = Array[ExtResource("1_wjjip")]([SubResource("Resource_84lnv")])
+metadata/_custom_type_script = "uid://cgnajq1ykl2mn"

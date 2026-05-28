@@ -30,7 +30,7 @@ namespace Kuros.Managers
         [Export] public int CameraLimitBottom { get; set; } = 1500;
 
         /// <summary>进入此区域时相机的目标 Zoom（X/Y 相同）。</summary>
-        [Export(PropertyHint.Range, "0.1,2.0,0.01")] public float ZoomLevel { get; set; } = 0.43f;
+        [Export(PropertyHint.Range, "0.01,2.0,0.01")] public float ZoomLevel { get; set; } = 0.43f;
 
         private CameraZoneManager? _cameraZoneManager;
         private bool _playerInside = false;

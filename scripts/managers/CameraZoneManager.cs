@@ -37,9 +37,25 @@ namespace Kuros.Managers
         private string? _temporaryCameraZoneNameBeforeSwitch;
         // 玩家当前身处的区域有序列表（进入时追加，退出时移除）
         private readonly List<string> _activeZoneStack = new();
+        // 过场动画期间锁定，防止玩家被 Disabled 导致区域误退出
+        private bool _zoneLocked = false;
 
         /// <summary>当前激活的相机区域名称。</summary>
         public string? CurrentZoneName => _currentZone?.Name;
+
+        /// <summary>锁定区域切换，过场动画接管摄像机时调用。</summary>
+        public void LockZone()
+        {
+            _zoneLocked = true;
+            GameLogger.Debug(nameof(CameraZoneManager), $"区域锁定（当前: {_currentZone?.Name ?? "无"})，过场期间忽略区域进出");
+        }
+
+        /// <summary>解锁区域切换，过场动画结束时调用。</summary>
+        public void UnlockZone()
+        {
+            _zoneLocked = false;
+            GameLogger.Debug(nameof(CameraZoneManager), "区域解锁");
+        }
 
         public override void _Ready()
         {
@@ -78,6 +94,11 @@ namespace Kuros.Managers
             RegisterZone(name, bounds, zoomLevel);
             if (!_activeZoneStack.Contains(name))
                 _activeZoneStack.Add(name);
+            if (_zoneLocked)
+            {
+                GameLogger.Debug(nameof(CameraZoneManager), $"区域已锁定，忽略进入: {name}");
+                return;
+            }
             SwitchToZone(name);
             GameLogger.Debug(nameof(CameraZoneManager), $"进入区域: {name}，栈: [{string.Join(", ", _activeZoneStack)}]");
         }
@@ -89,6 +110,13 @@ namespace Kuros.Managers
         {
             _activeZoneStack.Remove(name);
             GameLogger.Debug(nameof(CameraZoneManager), $"离开区域: {name}，栈: [{string.Join(", ", _activeZoneStack)}]");
+
+            // 区域锁定期间不切换相机，仅维护栈
+            if (_zoneLocked)
+            {
+                GameLogger.Debug(nameof(CameraZoneManager), $"区域已锁定，忽略离开: {name}");
+                return;
+            }
 
             // 当前相机正是该区域才需要切换
             if (_currentZone?.Name == name)

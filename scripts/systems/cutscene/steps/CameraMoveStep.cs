@@ -10,6 +10,7 @@ namespace Kuros.Systems.Cutscene
     /// 功能：
     /// - 位置移动：从当前位置移动到 TargetPosition（或目标节点位置）
     /// - 缩放变换：从当前 Zoom 变换到 TargetZoom（若 TargetZoom != 1）
+    /// - 跟随模式：FollowDuration > 0 时，先做初始移动（Duration 秒），再持续每帧同步到目标 GlobalPosition
     /// - 异步模式：WaitForCompletion=false 时不阻塞后续步骤
     /// </summary>
     [GlobalClass]
@@ -37,9 +38,23 @@ namespace Kuros.Systems.Cutscene
         /// </summary>
         [Export] public bool WaitForCompletion { get; set; } = false;
 
+        /// <summary>
+        /// 跟随目标节点的持续时间（秒）。大于 0 时进入跟随模式：
+        /// 先用 Duration 秒做初始移动，然后每帧持续同步摄像机到目标的 GlobalPosition，直到经过 FollowDuration 秒。
+        /// 需配合有效的 TargetPath 使用。WaitForCompletion=false 时在后台运行，可与其他 Step 同时执行。
+        /// </summary>
+        [Export] public float FollowDuration { get; set; } = 0f;
+
+        /// <summary>
+        /// 跟随结束后摄像机的行为。
+        /// true（默认）：保留在跟随结束瞬间目标所在的位置。
+        /// false：回到跟随开始前摄像机的原始位置。
+        /// </summary>
+        [Export] public bool StayAtTargetAfterFollow { get; set; } = true;
+
         public override async Task Execute(CutsceneContext ctx)
         {
-            GD.Print($"[Cutscene] CameraMoveStep 开始，TargetPath={TargetPath}, TargetPosition={TargetPosition}, TargetZoom={TargetZoom}, Duration={Duration}, WaitForCompletion={WaitForCompletion}");
+            GD.Print($"[Cutscene] CameraMoveStep 开始，TargetPath={TargetPath}, TargetPosition={TargetPosition}, TargetZoom={TargetZoom}, Duration={Duration}, FollowDuration={FollowDuration}, WaitForCompletion={WaitForCompletion}");
             var camera = ctx.Manager.Camera;
             if (camera == null)
             {
@@ -47,14 +62,15 @@ namespace Kuros.Systems.Cutscene
                 return;
             }
 
+            Node2D? targetNode = null;
             var target = TargetPosition;
             if (!TargetPath.IsEmpty)
             {
-                var node = ctx.Manager.GetNodeOrNull<Node2D>(TargetPath);
-                if (node != null)
+                targetNode = ctx.Manager.GetNodeOrNull<Node2D>(TargetPath);
+                if (targetNode != null)
                 {
-                    target = node.GlobalPosition;
-                    GD.Print($"[Cutscene] CameraMoveStep: 目标节点 {node.Name}，GlobalPosition={target}");
+                    target = targetNode.GlobalPosition;
+                    GD.Print($"[Cutscene] CameraMoveStep: 目标节点 {targetNode.Name}，GlobalPosition={target}");
                 }
                 else
                 {
@@ -64,6 +80,20 @@ namespace Kuros.Systems.Cutscene
 
             GD.Print($"[Cutscene] CameraMoveStep: Camera.TopLevel={camera.TopLevel}，从 {camera.GlobalPosition} 移动到 {target}，Zoom: {camera.Zoom} → {(TargetZoom > 0 ? TargetZoom : "不变")}");
 
+            // ── 跟随模式：先初始移动，再持续同步目标 GlobalPosition ──────────────
+            if (FollowDuration > 0f && targetNode != null)
+            {
+                if (!WaitForCompletion)
+                {
+                    _ = RunFollowAsync(ctx, camera, targetNode);
+                    GD.Print($"[Cutscene] CameraMoveStep 跟随模式：异步执行 FollowDuration={FollowDuration}s");
+                    return;
+                }
+                await RunFollowAsync(ctx, camera, targetNode);
+                return;
+            }
+
+            // ── 普通单次移动模式 ─────────────────────────────────────────────────
             if (ctx.IsSkipping || Duration <= 0f)
             {
                 camera.GlobalPosition = target;
@@ -105,6 +135,63 @@ namespace Kuros.Systems.Cutscene
                     camera.Zoom = new Vector2(TargetZoom, TargetZoom);
             }
             GD.Print($"[Cutscene] CameraMoveStep 完成，Camera.GlobalPosition={camera.GlobalPosition}, Zoom={camera.Zoom}");
+        }
+
+        /// <summary>
+        /// 跟随模式：先做初始 Tween 移动到目标当前位置，再每帧持续同步，直到 FollowDuration 结束。
+        /// </summary>
+        private async Task RunFollowAsync(CutsceneContext ctx, Camera2D camera, Node2D targetNode)
+        {
+            // 记录跟随开始前的摄像机位置，用于 StayAtTargetAfterFollow=false 时还原
+            var posBeforeFollow = camera.GlobalPosition;
+
+            // Phase 1: 初始 Tween 移动到目标当前位置
+            if (Duration > 0f && !ctx.IsSkipping)
+            {
+                var tweenInit = camera.CreateTween();
+                tweenInit.TweenProperty(camera, "global_position", targetNode.GlobalPosition, Duration)
+                         .SetEase(Ease).SetTrans(Transition);
+                if (TargetZoom > 0f)
+                    tweenInit.Parallel().TweenProperty(camera, "zoom", new Vector2(TargetZoom, TargetZoom), Duration)
+                             .SetEase(Ease).SetTrans(Transition);
+
+                while (!ctx.IsSkipping && tweenInit.IsRunning())
+                    await ctx.NextFrame();
+
+                if (ctx.IsSkipping)
+                {
+                    tweenInit.Kill();
+                    GD.Print("[Cutscene] CameraMoveStep 跟随模式 skip at 初始移动阶段");
+                    return;
+                }
+            }
+            else if (TargetZoom > 0f)
+            {
+                camera.Zoom = new Vector2(TargetZoom, TargetZoom);
+            }
+
+            // Phase 2: 每帧同步 GlobalPosition，持续 FollowDuration 秒
+            ulong startMs = Godot.Time.GetTicksMsec();
+            ulong durationMs = (ulong)(FollowDuration * 1000.0);
+            while (!ctx.IsSkipping && Godot.Time.GetTicksMsec() - startMs < durationMs)
+            {
+                if (GodotObject.IsInstanceValid(targetNode))
+                    camera.GlobalPosition = targetNode.GlobalPosition;
+                await ctx.NextFrame();
+            }
+
+            if (GodotObject.IsInstanceValid(targetNode))
+                camera.GlobalPosition = targetNode.GlobalPosition;
+
+            if (!StayAtTargetAfterFollow)
+            {
+                camera.GlobalPosition = posBeforeFollow;
+                GD.Print($"[Cutscene] CameraMoveStep 跟随结束，已还原至原始位置 {posBeforeFollow}");
+            }
+            else
+            {
+                GD.Print($"[Cutscene] CameraMoveStep 跟随完成，Camera.GlobalPosition={camera.GlobalPosition}");
+            }
         }
 
         /// <summary>
