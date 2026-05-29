@@ -92,7 +92,7 @@ ScrollSpeed = 0.7
 AreaPath = NodePath("../../AreaSize")
 
 [node name="background2" type="Sprite2D" parent="Environments/background"]
-position = Vector2(-1962, 407)
+position = Vector2(-2007, 404)
 texture = ExtResource("6_3uxt7")
 flip_h = true
 

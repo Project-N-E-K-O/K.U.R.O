@@ -1,16 +1,29 @@
-[gd_scene load_steps=6 format=3 uid="uid://cgy13s0ewifos"]
+[gd_scene load_steps=10 format=3 uid="uid://cgy13s0ewifos"]
 
+[ext_resource type="Script" uid="uid://dq0vqwi52hgyp" path="res://scripts/utils/ProximityOutlineHighlight.cs" id="1_4unrl"]
 [ext_resource type="Texture2D" uid="uid://pmhcu661yxfl" path="res://assets/furnitures/hotel_scene2/TaxiSign.png" id="1_58ifs"]
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="1_ns468"]
 [ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="2_qg1cb"]
+[ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="3_qg1cb"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_4unrl"]
 shader = ExtResource("1_ns468")
 shader_parameter/softness = 0.5
 shader_parameter/alpha = 0.4
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ld8jn"]
+shader = ExtResource("3_qg1cb")
+shader_parameter/outline_color = Color(0.02, 0.02, 0.02, 1)
+shader_parameter/outline_size = 32.0
+shader_parameter/alpha_threshold = 0.5
+shader_parameter/edge_softness = 0.12
+shader_parameter/preserve_fill = true
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ns468"]
 size = Vector2(170, 128)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ld8jn"]
+size = Vector2(300, 300)
 
 [node name="TaxiSign" type="RigidBody2D"]
 z_index = 2
@@ -20,6 +33,11 @@ can_sleep = false
 freeze = true
 freeze_mode = 1
 
+[node name="OutlineEffect" type="Node" parent="."]
+script = ExtResource("1_4unrl")
+OutlineSpritePath = NodePath("../Outline")
+HighlightOutlineColor = Color(1, 0.3529412, 0, 1)
+
 [node name="Shadow" type="Sprite2D" parent="."]
 material = SubResource("ShaderMaterial_4unrl")
 position = Vector2(-3, 0)
@@ -27,8 +45,13 @@ scale = Vector2(3.5, 3.5)
 texture = ExtResource("2_qg1cb")
 offset = Vector2(0, 5)
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Outline" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_ld8jn")
 scale = Vector2(0.33, 0.33)
+texture = ExtResource("1_58ifs")
+offset = Vector2(0, -1000)
+
+[node name="Sprite2D" type="Sprite2D" parent="Outline"]
 texture = ExtResource("1_58ifs")
 offset = Vector2(0, -1000)
 
@@ -38,3 +61,13 @@ visible = false
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
 position = Vector2(1, 2)
 shape = SubResource("RectangleShape2D_ns468")
+
+[node name="InteractArea" type="Area2D" parent="."]
+position = Vector2(0, 180)
+collision_layer = 0
+collision_mask = 4
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InteractArea"]
+position = Vector2(2, -150)
+shape = SubResource("RectangleShape2D_ld8jn")

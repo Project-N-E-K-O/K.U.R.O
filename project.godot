@@ -31,10 +31,13 @@ Dialogic="*res://addons/dialogic/Core/DialogicGameHandler.gd"
 [dialogic]
 
 directories/dch_directory={
-"Enemy_Normal_guard2_B_begin_gate": "res://dialogic/character/Enemy_Normal_guard2_B_begin_gate.dch"
+"Enemy_Normal_guard2_B_begin_gate": "res://dialogic/character/Enemy_Normal_guard2_B_begin_gate.dch",
+"P2": "res://dialogic/character/P2.dch"
 }
 directories/dtl_directory={
-"B_begin_timeline": "res://dialogic/timeline/B_begin_timeline.dtl"
+"A_begin_timeline": "res://dialogic/timeline/A_begin_timeline.dtl",
+"B_begin_timeline": "res://dialogic/timeline/B_begin_timeline.dtl",
+"p2_hint": "res://dialogic/timeline/p2_hint.dtl"
 }
 layout/style_directory={
 "": "res://dialogic/styles/textbubble_A.tres",
@@ -76,7 +79,9 @@ audio/channel_defaults={
 glossary/default_case_sensitive=true
 layout/style_list=["res://dialogic/styles/textbubble_A.tres"]
 layout/default_style="res://dialogic/styles/textbubble_A.tres"
-variables={}
+variables={
+"p2_hint_text": ""
+}
 
 [display]
 

@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://cl1ki1csawpip"]
+[gd_scene load_steps=20 format=3 uid="uid://cl1ki1csawpip"]
 
 [ext_resource type="Script" uid="uid://cra7y7mt0x1j8" path="res://scripts/managers/CameraZoneArea.cs" id="1_eajhg"]
 [ext_resource type="Texture2D" uid="uid://20khta50kpjb" path="res://assets/environments/scene_1_home/房间2地面.png" id="2_jv8iw"]
@@ -10,7 +10,6 @@
 [ext_resource type="PackedScene" uid="uid://dlhn30h21ei8f" path="res://scenes/environments/door1_A_begin.tscn" id="7_utjd6"]
 [ext_resource type="Texture2D" uid="uid://7bbxtr7o4uuf" path="res://assets/environments/scene_1_home/房间1 隔断墙1.png" id="8_utjd6"]
 [ext_resource type="Texture2D" uid="uid://dme4jeu32g0kg" path="res://assets/environments/scene_1_home/房间2洞洞板.png" id="9_r1xlm"]
-[ext_resource type="PackedScene" uid="uid://3c5l27vhvwni" path="res://scenes/items/Furniture_B_sofaA.tscn" id="11_12yej"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_r1xlm"]
 size = Vector2(5860, 3000)
@@ -152,6 +151,3 @@ navigation_polygon = SubResource("NavigationPolygon_eajhg")
 position = Vector2(-1985, 0)
 SpawnParentPath = NodePath("..")
 PlayerRespawnPointPath = NodePath("../PlayerSpawnPoint")
-
-[node name="FurnitureSofaA" parent="." instance=ExtResource("11_12yej")]
-position = Vector2(-79, -494)

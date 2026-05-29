@@ -44,8 +44,8 @@ namespace Kuros.Companions
 
             string message = mappedIntent switch
             {
-                "suggest_retreat" => "先拉开距离更安全",
-                "suggest_pickup" => "附近有掉落，注意拾取",
+                "suggest_retreat" => "suggest_retreat",
+                "suggest_pickup" => "suggest_pickup",
                 _ => string.Empty
             };
 
@@ -114,7 +114,7 @@ namespace Kuros.Companions
             decision = intent switch
             {
                 "show_hint" => SupportDecision.Hint(
-                    message: string.IsNullOrWhiteSpace(message) ? "收到建议" : message,
+                    message: string.IsNullOrWhiteSpace(message) ? "ai_received" : message,
                     sourceRule: "ai_bridge",
                     reason: reason,
                     urgency: urgency,
@@ -122,7 +122,7 @@ namespace Kuros.Companions
                     target: target),
 
                 "suggest_retreat" => SupportDecision.Hint(
-                    message: string.IsNullOrWhiteSpace(message) ? "先拉开距离更安全" : message,
+                    message: string.IsNullOrWhiteSpace(message) ? "suggest_retreat" : message,
                     sourceRule: "ai_bridge",
                     reason: string.IsNullOrWhiteSpace(reason) ? "ai suggested retreat" : reason,
                     urgency: urgency,
@@ -130,7 +130,7 @@ namespace Kuros.Companions
                     target: target),
 
                 "suggest_pickup" => SupportDecision.Hint(
-                    message: string.IsNullOrWhiteSpace(message) ? "附近有掉落，注意拾取" : message,
+                    message: string.IsNullOrWhiteSpace(message) ? "suggest_pickup" : message,
                     sourceRule: "ai_bridge",
                     reason: string.IsNullOrWhiteSpace(reason) ? "ai suggested pickup" : reason,
                     urgency: urgency,

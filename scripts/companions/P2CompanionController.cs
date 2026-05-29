@@ -1,5 +1,6 @@
 using Godot;
 using Kuros.Actors.Heroes;
+using System.Collections.Generic;
 
 namespace Kuros.Companions
 {
@@ -27,7 +28,7 @@ namespace Kuros.Companions
         [Export(PropertyHint.Range, "0.1,30,0.1")] public float FollowSmoothing { get; set; } = 8.5f;
         [Export(PropertyHint.Range, "10,5000,1")] public float MaxCatchUpSpeed { get; set; } = 1400f;
         [Export] public bool AlwaysFollowBehindPlayer { get; set; } = true;
-        [Export] public bool KeepCompanionOnFacingSide { get; set; } = false;
+        [Export] public bool KeepCompanionOnFacingSide { get; set; } = false; 
 
         [ExportCategory("Floating")]
         [Export(PropertyHint.Range, "0,200,0.1")] public float FloatAmplitude { get; set; } = 22f;
@@ -43,7 +44,17 @@ namespace Kuros.Companions
         [ExportCategory("Visual")]
         [Export] public NodePath SpritePath { get; set; } = new("Sprite2D");
         [Export] public bool SyncFacingWithPlayer { get; set; } = true;
-        [Export] public NodePath HintBubblePath { get; set; } = new("HintBubble");
+
+        [ExportCategory("Dialogic Hint")]
+        /// <summary>
+        /// P2 的 Dialogic 角色资源路径（.dch）。气泡会跟随 BubbleAnchorPath 节点位置显示。
+        /// 需要在 Dialogic Variables 设置中定义 'p2_hint_text' 变量（默认值为空字符串）。
+        /// </summary>
+        [Export(PropertyHint.File, "*.dch")] public string P2CharacterPath { get; set; } = "res://dialogic/character/P2.dch";
+        /// <summary>气泡锚点节点（相对于 P2CompanionController 自身）。留空则以自身位置为锚点。</summary>
+        [Export] public NodePath BubbleAnchorPath { get; set; } = new(".");
+        [Export(PropertyHint.Range, "0.5,10,0.1")] public float HintDisplaySeconds { get; set; } = 2.2f;
+        [Export(PropertyHint.Range, "1,20,1")] public int MaxHintQueueSize { get; set; } = 6;
 
         [ExportCategory("Debug")]
         [Export] public bool EnableDebugHintHotkey { get; set; } = true;
@@ -52,13 +63,27 @@ namespace Kuros.Companions
         private MainCharacter? _player;
         private Node2D? _companionAnchor;
         private Sprite2D? _sprite;
-        private P2HintBubble? _hintBubble;
         private float _hoverClock;
         private int _layerSign = 1;
+
+        // Dialogic hint queue
+        private readonly Queue<string> _hintQueue = new();
+        private bool _dialogicBusy;
+        private bool _waitingForHintEnd;
+        private GodotObject? _dialogic;
+        private Callable _timelineEndedCallable;
 
         public override void _Ready()
         {
             AddToGroup("companions");
+
+            _dialogic = GetNodeOrNull("/root/Dialogic");
+            if (_dialogic != null)
+            {
+                _timelineEndedCallable = Callable.From(OnDialogicTimelineEnded);
+                _dialogic.Connect("timeline_ended", _timelineEndedCallable);
+            }
+
             ResolveReferences();
 
             if (_player != null)
@@ -66,8 +91,40 @@ namespace Kuros.Companions
                 GlobalPosition = ComputeTargetPosition(0f);
                 UpdateVisualFacing();
                 UpdateDynamicLayering();
-                PushHint("P2 已就位");
+                PushHint("ready");
             }
+
+            // P2CompanionController.cs _Ready() 末尾
+            var animHsm = GetNodeOrNull("AnimHSM");
+            animHsm?.Call("initialize", this);   // 触发 _setup()，建立状态和迁移
+            animHsm?.Call("set_active", true);   // 进入 StateIdle
+        }
+
+        public override void _ExitTree()
+        {
+            if (_dialogic != null && IsInstanceValid(_dialogic)
+                && _dialogic.IsConnected("timeline_ended", _timelineEndedCallable))
+            {
+                _dialogic.Disconnect("timeline_ended", _timelineEndedCallable);
+            }
+        }
+
+        public override void _Notification(int what)
+        {
+            // P2 被隐藏时（过场 HideNodePaths 触发），立即取消正在显示的 hint 气泡
+            if (what == NotificationVisibilityChanged && !Visible)
+                CancelActiveHint();
+        }
+
+        private void CancelActiveHint()
+        {
+            _hintQueue.Clear();
+            if (!_waitingForHintEnd) return;
+            _waitingForHintEnd = false;
+            _dialogicBusy = false;
+            _dialogic ??= GetNodeOrNull("/root/Dialogic");
+            if (_dialogic != null && IsInstanceValid(_dialogic) && _dialogic.HasMethod("end_timeline"))
+                _dialogic.Call("end_timeline");
         }
 
         public override void _PhysicsProcess(double delta)
@@ -97,7 +154,7 @@ namespace Kuros.Companions
 
             if (EnableDebugHintHotkey && Input.IsKeyPressed(DebugHintKey))
             {
-                PushHint("注意节奏，先稳住站位");
+                PushHint("combat");
             }
         }
 
@@ -117,7 +174,6 @@ namespace Kuros.Companions
             }
 
             _sprite ??= GetNodeOrNull<Sprite2D>(SpritePath);
-            _hintBubble ??= GetNodeOrNull<P2HintBubble>(HintBubblePath);
 
             if (_companionAnchor == null || !IsInstanceValid(_companionAnchor) || !_companionAnchor.IsInsideTree())
             {
@@ -211,10 +267,102 @@ namespace Kuros.Companions
             return new NodePath($"../{text}");
         }
 
-        public void PushHint(string message)
+        /// <summary>
+        /// 播放 p2_hint timeline 中对应 label 的对话气泡。
+        /// hintKey 对应 p2_hint.dtl 中的 label 名称（如 "ready"、"combat"）。
+        /// 在 Dialogic 编辑器中编辑 dialogic/timeline/p2_hint.dtl 来维护文本。
+        /// </summary>
+        public void PushHint(string hintKey)
         {
-            ResolveReferences();
-            _hintBubble?.EnqueueHint(message);
+            if (string.IsNullOrWhiteSpace(hintKey))
+                return;
+
+            // 过场播放期间禁止触发 hint
+            var cutsceneManager = GetTree().GetFirstNodeInGroup("cutscene_manager");
+            if (cutsceneManager is Kuros.Systems.Cutscene.CutsceneManager cm && cm.IsPlaying)
+                return;
+
+            _dialogic ??= GetNodeOrNull("/root/Dialogic");
+            if (_dialogic == null || !IsInstanceValid(_dialogic))
+                return;
+
+            // 如果 Dialogic 正在播放非本 hint 的 Timeline（例如剧情对话），则放弃
+            var currentTimeline = _dialogic.Get("current_timeline");
+            if (currentTimeline.VariantType != Variant.Type.Nil && !_waitingForHintEnd)
+                return;
+
+            if (_dialogicBusy)
+            {
+                if (_hintQueue.Count < Mathf.Max(1, MaxHintQueueSize))
+                    _hintQueue.Enqueue(hintKey);
+                return;
+            }
+
+            StartDialogicHint(hintKey);
+        }
+
+        /// <summary>
+        /// 显示运行时动态生成的文本（如 AI 个性台词），文本不在 DTL 中预定义。
+        /// 通过 Dialogic 变量 "p2_hint_text" 注入后播放 p2_hint.dtl 的 label:direct。
+        /// 需在 Dialogic 编辑器 Variables 中预先定义 "p2_hint_text" 变量（默认值留空即可）。
+        /// </summary>
+        public void PushHintDirect(string rawText)
+        {
+            if (string.IsNullOrWhiteSpace(rawText))
+                return;
+
+            _dialogic ??= GetNodeOrNull("/root/Dialogic");
+            if (_dialogic == null || !IsInstanceValid(_dialogic))
+                return;
+
+            // 在启动 timeline 前注入变量，label:direct 中的 {p2_hint_text} 会读取该值
+            _dialogic.Get("VAR").AsGodotObject()?.Call("set_variable", "p2_hint_text", rawText);
+            PushHint("direct");
+        }
+
+        private void StartDialogicHint(string hintKey)
+        {
+            if (_dialogic == null || !IsInstanceValid(_dialogic))
+                return;
+
+            _dialogicBusy = true;
+            _waitingForHintEnd = true;
+
+            // 若还没有激活的 Layout，先加载 textbubble_A 样式
+            var styles = _dialogic.Get("Styles").AsGodotObject();
+            if (styles != null && !(bool)styles.Call("has_active_layout_node"))
+                styles.Call("load_style", "textbubble_A");
+
+            // 以 label 为入口启动 p2_hint timeline（文本全部定义在 dtl 文件中）
+            var layoutNode = _dialogic.Call("start", "p2_hint", hintKey).AsGodotObject() as Node;
+
+            // 将气泡定位到 BubbleAnchorPath 指定节点
+            if (!string.IsNullOrEmpty(P2CharacterPath) && !BubbleAnchorPath.IsEmpty && layoutNode != null)
+            {
+                var anchor = GetNodeOrNull<Node2D>(BubbleAnchorPath);
+                if (anchor != null)
+                    layoutNode.CallDeferred("register_character", P2CharacterPath, anchor);
+            }
+
+            // 到时后自动结束（若玩家未手动推进）
+            float delay = Mathf.Max(0.5f, HintDisplaySeconds);
+            GetTree().CreateTimer(delay).Timeout += () =>
+            {
+                if (_waitingForHintEnd && _dialogic != null && IsInstanceValid(_dialogic))
+                    _dialogic.Call("end_timeline");
+            };
+        }
+
+        private void OnDialogicTimelineEnded()
+        {
+            if (!_waitingForHintEnd)
+                return;
+
+            _waitingForHintEnd = false;
+            _dialogicBusy = false;
+
+            if (_hintQueue.Count > 0)
+                StartDialogicHint(_hintQueue.Dequeue());
         }
     }
 }

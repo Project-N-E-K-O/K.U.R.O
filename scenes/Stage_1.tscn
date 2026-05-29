@@ -41,12 +41,11 @@ MaxMiddleRooms = 1
 y_sort_enabled = true
 
 [node name="MainCharacter" parent="World" instance=ExtResource("4_givaq")]
-Speed = 2000.0
+Speed = 600.0
 
 [node name="Camera2D" type="Camera2D" parent="World" node_paths=PackedStringArray("Target")]
 scale = Vector2(0.32999998, 0.32999998)
 ignore_rotation = false
-zoom = Vector2(0.35, 0.35)
 position_smoothing_enabled = true
 rotation_smoothing_enabled = true
 drag_horizontal_enabled = true

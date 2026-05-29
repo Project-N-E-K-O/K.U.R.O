@@ -1,8 +1,9 @@
-[gd_resource type="Resource" script_class="CutsceneSequence" load_steps=5 format=3 uid="uid://hvl6chuo43us"]
+[gd_resource type="Resource" script_class="CutsceneSequence" load_steps=7 format=3 uid="uid://hvl6chuo43us"]
 
 [ext_resource type="Script" uid="uid://ctrko7add3r5h" path="res://scripts/systems/cutscene/CutsceneStep.cs" id="1_wjjip"]
 [ext_resource type="Script" uid="uid://cgnajq1ykl2mn" path="res://scripts/systems/cutscene/CutsceneSequence.cs" id="2_gqujs"]
 [ext_resource type="Script" uid="uid://cjl1hjmndwvcg" path="res://scripts/systems/cutscene/steps/FadeStep.cs" id="2_mlsay"]
+[ext_resource type="Script" uid="uid://cnkygkr74mjs4" path="res://scripts/systems/cutscene/steps/DialogicStep.cs" id="4_egs0q"]
 
 [sub_resource type="Resource" id="Resource_84lnv"]
 script = ExtResource("2_mlsay")
@@ -10,8 +11,16 @@ Duration = 3.0
 TransitionDuration = 0.5
 metadata/_custom_type_script = "uid://cjl1hjmndwvcg"
 
+[sub_resource type="Resource" id="Resource_mlsay"]
+script = ExtResource("4_egs0q")
+TimelinePath = "uid://byqakushe1a1y"
+CharacterPath = "uid://45lviakfu623"
+WaitForCompletion = false
+metadata/_custom_type_script = "uid://cnkygkr74mjs4"
+
 [resource]
 script = ExtResource("2_gqujs")
 SequenceId = "A_begin_intro"
-Steps = Array[ExtResource("1_wjjip")]([SubResource("Resource_84lnv")])
+Steps = Array[ExtResource("1_wjjip")]([SubResource("Resource_84lnv"), SubResource("Resource_mlsay"), null])
+TakeOverCamera = true
 metadata/_custom_type_script = "uid://cgnajq1ykl2mn"

@@ -39,6 +39,31 @@ namespace Kuros.Companions
             };
         }
 
+        /// <summary>
+        /// 创建显示动态文本的 hint 决策（rawText 是运行时生成的文本，不在 DTL 中预定义）。
+        /// 对应 executor 的 "show_hint_raw" 意图，通过 Dialogic VAR 注入后播放 label:direct。
+        /// </summary>
+        public static SupportDecision HintRaw(
+            string rawText,
+            string sourceRule,
+            string reason,
+            string urgency = "medium",
+            float durationSeconds = 1.8f,
+            string target = "player")
+        {
+            return new SupportDecision
+            {
+                IsValid = !string.IsNullOrWhiteSpace(rawText),
+                Intent = "show_hint_raw",
+                Target = string.IsNullOrWhiteSpace(target) ? "player" : target,
+                Urgency = string.IsNullOrWhiteSpace(urgency) ? "medium" : urgency,
+                DurationSeconds = Mathf.Max(0f, durationSeconds),
+                Reason = reason ?? string.Empty,
+                Message = rawText ?? string.Empty,
+                SourceRule = sourceRule ?? string.Empty
+            };
+        }
+
         public static SupportDecision UseSupportItem(
             string sourceRule,
             string reason,
