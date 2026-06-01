@@ -30,7 +30,6 @@ AnimationName = "Weapon_Brawl_MechGlove"
 ShowHitboxDebug = false
 Description = "第三次攻击到敌人后击退敌人5 m，如果三次攻击都击中敌人则最后一击发生暴击"
 Effects = Array[ExtResource("1_rpm6u")]([SubResource("Resource_bk1ns"), SubResource("Resource_ni6ga")])
-ActivationAction = "weapon_skill_block"
 WarmupDuration = 0.5
 ActiveDuration = 0.43
 RecoveryDuration = 0.4

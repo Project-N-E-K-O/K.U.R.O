@@ -60,8 +60,8 @@ freeze_mode = 1
 
 [node name="Shadow" type="Sprite2D" parent="RigidBody2D"]
 material = SubResource("ShaderMaterial_swc0d")
-position = Vector2(-8, 81)
-scale = Vector2(3, 0.667)
+position = Vector2(-4, 81)
+scale = Vector2(3, 1)
 texture = ExtResource("4_630y6")
 
 [node name="Outline" type="Sprite2D" parent="RigidBody2D"]
@@ -76,11 +76,13 @@ texture = ExtResource("4_q0htg")
 region_rect = Rect2(-100, -100, 700, 700)
 
 [node name="CollisionArea" type="Area2D" parent="RigidBody2D"]
+visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/CollisionArea"]
 shape = SubResource("CircleShape2D_w5uvq")
 
 [node name="AttackArea" type="Area2D" parent="RigidBody2D"]
+visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/AttackArea"]
 position = Vector2(-1.5, 99)

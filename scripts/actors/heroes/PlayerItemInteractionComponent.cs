@@ -140,12 +140,12 @@ namespace Kuros.Actors.Heroes
                 return;
             }
 
-            if (Input.IsActionJustPressed("put_down"))
+            if (Input.IsActionJustPressed("put_down") && CanPerformItemAction())
             {
                 TryHandleDrop(DropDisposition.Place);
             }
 
-            if (Input.IsActionJustPressed("throw"))
+            if (Input.IsActionJustPressed("throw") && CanPerformItemAction())
             {
                 GD.Print($"[PlayerItemInteractionComponent] throw 快捷键被按下");
                 GD.Print($"[PlayerItemInteractionComponent] EnableInput={EnableInput}, Backpack={InventoryComponent?.Backpack != null}");
@@ -155,12 +155,12 @@ namespace Kuros.Actors.Heroes
                 TryHandleDrop(DropDisposition.Throw);
             }
 
-            if (Input.IsActionJustPressed("item_select_right"))
+            if (Input.IsActionJustPressed("item_select_right") && CanSwitchEquipment())
             {
                 InventoryComponent?.SelectNextBackpackSlot();
             }
 
-            if (Input.IsActionJustPressed("item_select_left"))
+            if (Input.IsActionJustPressed("item_select_left") && CanSwitchEquipment())
             {
                 InventoryComponent?.SelectPreviousBackpackSlot();
             }
@@ -431,6 +431,21 @@ namespace Kuros.Actors.Heroes
         }
 
         internal bool ExecutePickupAfterAnimation() => TryHandlePickup();
+
+        private bool CanPerformItemAction()
+        {
+            var currentState = _actor?.StateMachine?.CurrentState?.Name ?? string.Empty;
+            if (currentState == "Attack" || currentState == "Throw")
+            {
+                return false;
+            }
+            return true;
+        }
+
+        private bool CanSwitchEquipment()
+        {
+            return CanPerformItemAction();
+        }
 
         private void TriggerPickupState()
         {

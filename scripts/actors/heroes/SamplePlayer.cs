@@ -534,7 +534,10 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 			
 			if (slotIndex.HasValue)
 			{
-				SwitchToQuickBarSlot(slotIndex.Value);
+				if (CanSwitchQuickBarSlot())
+				{
+					SwitchToQuickBarSlot(slotIndex.Value);
+				}
 				GetViewport().SetInputAsHandled();
 			}
 		}
@@ -696,6 +699,16 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 	/// 同時同步 PlayerInventoryComponent.SelectedQuickBarSlot
 	/// </summary>
 	/// <param name="slotIndex">快捷栏槽位索引（0-4，对应数字键1-5）</param>
+	private bool CanSwitchQuickBarSlot()
+	{
+		var currentState = StateMachine?.CurrentState?.Name ?? string.Empty;
+		if (currentState == "Attack" || currentState == "Throw")
+		{
+			return false;
+		}
+		return true;
+	}
+
 	private void SwitchToQuickBarSlot(int slotIndex)
 	{
 		// 验证槽位索引范围（0-4）

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="WeaponSkillDefinition" load_steps=3 format=3 uid="uid://eccmh813ifss"]
+
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="1_8bkkx"]
+[ext_resource type="Script" uid="uid://bp6pwgoj44cuq" path="res://scripts/items/weapons/WeaponSkillDefinition.cs" id="2_uqor0"]
+
+[resource]
+script = ExtResource("2_uqor0")
+SkillId = "WeaponSkill_Slash_Baguette"
+DisplayName = "法棍攻击"
+AnimationName = "attack_swing"
+ShowHitboxDebug = false
+Description = "手持该武器攻击敌人后，有概率生成接触后恢复生命的面包碎块"
+WarmupDuration = 0.17
+ActiveDuration = 0.17
+RecoveryDuration = 0.19
+AttackCooldownDuration = 0.5

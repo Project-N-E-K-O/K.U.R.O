@@ -1,0 +1,76 @@
+[gd_scene load_steps=13 format=3 uid="uid://3d7hnjx31f45"]
+
+[ext_resource type="Script" uid="uid://dtgdjgrqgype7" path="res://scripts/items/world/WorldItemEntity.cs" id="1_rlv6v"]
+[ext_resource type="Resource" uid="uid://deh2q01buwkpa" path="res://resources/items/Weapon_Slash_ViolinBow.tres" id="2_rlv6v"]
+[ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="3_huuy5"]
+[ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="4_2yapo"]
+[ext_resource type="Shader" uid="uid://caxdo713k5kug" path="res://shaders/materials/sparkling.gdshader" id="5_fg7c5"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_nqlfu"]
+shader = ExtResource("3_huuy5")
+shader_parameter/softness = 0.5
+shader_parameter/alpha = 0.4
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_waoek"]
+load_path = "res://.godot/imported/影子.png-ff14a7a2861f691fc06fc4544603034d.ctex"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_waoek"]
+shader = ExtResource("4_2yapo")
+shader_parameter/outline_color = Color(0.02, 0.02, 0.02, 1)
+shader_parameter/outline_size = 32.0
+shader_parameter/alpha_threshold = 0.5
+shader_parameter/edge_softness = 0.12
+shader_parameter/preserve_fill = true
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_rlv6v"]
+load_path = "res://.godot/imported/琴弓.png-c5ddd81f4e6c4dd80ca285e8579834ce.ctex"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_lo6ct"]
+shader = ExtResource("5_fg7c5")
+shader_parameter/highlight_width = 0.08
+shader_parameter/highlight_speed = 2.0
+shader_parameter/highlight_intensity = 1.2
+shader_parameter/highlight_interval = 1.00000002375
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_rlv6v"]
+size = Vector2(1250, 150)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_8ydt5"]
+radius = 300.0
+
+[node name="WeaponSlashViolinBow" type="CharacterBody2D"]
+z_index = 1
+scale = Vector2(0.33, 0.33)
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_rlv6v")
+ItemDefinition = ExtResource("2_rlv6v")
+DefaultOutlineColor = Color(0, 0, 0, 0)
+
+[node name="Shadow" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_nqlfu")
+position = Vector2(0, 20)
+scale = Vector2(20, 2)
+texture = SubResource("CompressedTexture2D_waoek")
+
+[node name="Outline" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_waoek")
+texture = SubResource("CompressedTexture2D_rlv6v")
+region_rect = Rect2(0, 424, 1832, 177)
+
+[node name="Sprite2D" type="Sprite2D" parent="Outline"]
+material = SubResource("ShaderMaterial_lo6ct")
+texture = SubResource("CompressedTexture2D_rlv6v")
+
+[node name="CollisionArea" type="Area2D" parent="."]
+visible = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CollisionArea"]
+shape = SubResource("RectangleShape2D_rlv6v")
+
+[node name="AttackArea" type="Area2D" parent="."]
+visible = false
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AttackArea"]
+shape = SubResource("CircleShape2D_8ydt5")
