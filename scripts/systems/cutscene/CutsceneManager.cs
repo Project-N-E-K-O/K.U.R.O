@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Godot;
+using Kuros.Managers;
 
 namespace Kuros.Systems.Cutscene
 {
@@ -72,7 +73,7 @@ namespace Kuros.Systems.Cutscene
         private bool    _playerWasVisible  = false;
         private readonly System.Collections.Generic.List<CanvasItem> _hiddenNodes = new();
         private Kuros.Scenes.BattleSceneManager? _battleSceneManager;
-
+        private CameraZoneManager? _cameraZoneManager;
         // ── 生命周期 ──────────────────────────────────────────────────────
         public override void _Ready()
         {
@@ -205,14 +206,15 @@ namespace Kuros.Systems.Cutscene
             int stepIndex = 0;
             foreach (var step in sequence.Steps ?? new Godot.Collections.Array<CutsceneStep>())
             {
-                if (IsSkipRequested)
-                {
-                    GD.Print($"[Cutscene] 跳过请求，中断剩余步骤（当前第 {stepIndex} 步）");
-                    break;
-                }
                 if (step == null)
                 {
                     GD.PrintErr($"[Cutscene] 第 {stepIndex} 步为 null，跳过");
+                    stepIndex++;
+                    continue;
+                }
+                if (IsSkipRequested && !step.ExecuteOnSkip)
+                {
+                    GD.Print($"[Cutscene] 跳过请求，跳过第 {stepIndex} 步: {step.GetType().Name}");
                     stepIndex++;
                     continue;
                 }
@@ -274,6 +276,10 @@ namespace Kuros.Systems.Cutscene
             var gpos = Camera.GlobalPosition;
             Camera.TopLevel        = true;
             Camera.GlobalPosition  = gpos;
+
+            // 锁定 CameraZoneManager，防止玩家 ProcessMode.Disabled 导致区域误退出
+            _cameraZoneManager ??= GetTree().Root.GetNodeOrNull<CameraZoneManager>("BattleScene/CameraZoneManager");
+            _cameraZoneManager?.LockZone();
         }
 
         private void EndCameraOverride()
@@ -284,6 +290,9 @@ namespace Kuros.Systems.Cutscene
             Camera.SetProcess(true);
             Camera.SetPhysicsProcess(true);
             // CameraFollow 恢复后会通过 position_smoothing 平滑归位
+
+            // 解锁 CameraZoneManager
+            _cameraZoneManager?.UnlockZone();
         }
     }
 }

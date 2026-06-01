@@ -68,6 +68,15 @@ namespace Kuros.Systems.AI
             return CaptureGameState().ToAiInputDictionary();
         }
 
+        /// <summary>
+        /// GDScript-friendly alias — avoids "AI" abbreviation mapping ambiguity.
+        /// GDScript calls this as: provider.get_state_dict()
+        /// </summary>
+        public Godot.Collections.Dictionary<string, Variant> GetStateDict()
+        {
+            return GetAiInputDictionary();
+        }
+
         public string GetAiInputJson(bool pretty = true)
         {
             return CaptureGameState().ToAiInputJson(pretty);

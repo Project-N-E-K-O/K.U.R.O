@@ -1,11 +1,12 @@
-[gd_scene load_steps=12 format=3 uid="uid://cgjrdwkemgrcy"]
+[gd_scene load_steps=13 format=3 uid="uid://cgjrdwkemgrcy"]
 
-[ext_resource type="Texture2D" uid="uid://casaexun5c8dv" path="res://assets/p2/P2.png" id="1_fj31g"]
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="2_87y7c"]
 [ext_resource type="Script" uid="uid://csll5ffp7awd5" path="res://scripts/companions/P2CompanionController.cs" id="2_p2follow"]
 [ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="3_74bjo"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hud/P2HintBubble.tscn" id="3_p2hint_scene"]
+[ext_resource type="SpineSkeletonDataResource" uid="uid://c5bqnijir2ye0" path="res://animations/spine/Enemy_A1_yui.tres" id="4_87y7c"]
 [ext_resource type="Script" uid="uid://d0pebgaq6o2wu" path="res://scripts/companions/P2SupportBrain.cs" id="4_p2brain"]
+[ext_resource type="Script" uid="uid://bbybuyitd10jr" path="res://scripts/controllers/SpineController.gd" id="5_74bjo"]
 [ext_resource type="Script" uid="uid://djnyhimlasmm7" path="res://scripts/companions/P2SupportExecutor.cs" id="5_p2executor"]
 [ext_resource type="Script" uid="uid://blw2gqa3746s4" path="res://scripts/companions/P2SupportDecisionBridge.cs" id="6_p2bridge"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hud/P2DebugPanel.tscn" id="7_p2debug_scene"]
@@ -29,14 +30,66 @@ position = Vector2(0, 100)
 scale = Vector2(7, 3)
 texture = ExtResource("3_74bjo")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="OutlineLayer" type="Node2D" parent="."]
+show_behind_parent = true
+scale = Vector2(0.99999994, 0.99999994)
+
+[node name="OutlineSpineSprite_Left" type="SpineSprite" parent="OutlineLayer"]
+modulate = Color(0.02, 0.02, 0.02, 0.85)
+show_behind_parent = true
+position = Vector2(-20, 0)
+skeleton_data_res = ExtResource("4_87y7c")
+preview_skin = "Default"
+preview_animation = "-- Empty --"
+preview_frame = true
+preview_time = 0.99
+script = ExtResource("5_74bjo")
+
+[node name="OutlineSpineSprite_Right" type="SpineSprite" parent="OutlineLayer"]
+modulate = Color(0.02, 0.02, 0.02, 0.85)
+show_behind_parent = true
+position = Vector2(20, 0)
+skeleton_data_res = ExtResource("4_87y7c")
+preview_skin = "Default"
+preview_animation = "-- Empty --"
+preview_frame = true
+preview_time = 0.99
+script = ExtResource("5_74bjo")
+
+[node name="OutlineSpineSprite_Up" type="SpineSprite" parent="OutlineLayer"]
+modulate = Color(0.02, 0.02, 0.02, 0.85)
+show_behind_parent = true
+position = Vector2(0, -20)
+skeleton_data_res = ExtResource("4_87y7c")
+preview_skin = "Default"
+preview_animation = "-- Empty --"
+preview_frame = true
+preview_time = 0.99
+script = ExtResource("5_74bjo")
+
+[node name="OutlineSpineSprite_Down" type="SpineSprite" parent="OutlineLayer"]
+modulate = Color(0.02, 0.02, 0.02, 0.85)
+show_behind_parent = true
+position = Vector2(0, 20)
+skeleton_data_res = ExtResource("4_87y7c")
+preview_skin = "Default"
+preview_animation = "-- Empty --"
+preview_frame = true
+preview_time = 0.99
+script = ExtResource("5_74bjo")
+
+[node name="SpineSprite" type="SpineSprite" parent="."]
 z_index = 2
 z_as_relative = false
 y_sort_enabled = true
-position = Vector2(0, -350)
-texture = ExtResource("1_fj31g")
+skeleton_data_res = ExtResource("4_87y7c")
+preview_skin = "Default"
+preview_animation = "-- Empty --"
+preview_frame = false
+preview_time = 0.0
 
 [node name="HintBubble" parent="." instance=ExtResource("3_p2hint_scene")]
+visible = false
 z_index = 3
 z_as_relative = false
 y_sort_enabled = true

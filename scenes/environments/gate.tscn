@@ -418,3 +418,5 @@ libraries = {
 
 [node name="GateController" type="Node" parent="."]
 script = ExtResource("14_gatectrl")
+MaxHealth = 3
+BrokenThreshold = 2

@@ -22,6 +22,12 @@ Player = NodePath("../World/MainCharacter")
 
 [node name="CutsceneManager" type="Node" parent="."]
 script = ExtResource("3_31t1p")
+SkipActionName = "run"
+CameraPath = NodePath("../World/Camera2D")
+TopBlackBarPath = NodePath("../CanvasLayer/ColorRectTop")
+BottomBlackBarPath = NodePath("../CanvasLayer/ColorRectBottom")
+HideNodePaths = Array[NodePath]([NodePath("../World/P2")])
+BattleSceneManagerPath = NodePath("..")
 
 [node name="StageGeneratorManager" type="Node" parent="."]
 script = ExtResource("4_l5arx")
@@ -35,11 +41,11 @@ MaxMiddleRooms = 1
 y_sort_enabled = true
 
 [node name="MainCharacter" parent="World" instance=ExtResource("4_givaq")]
+Speed = 600.0
 
 [node name="Camera2D" type="Camera2D" parent="World" node_paths=PackedStringArray("Target")]
 scale = Vector2(0.32999998, 0.32999998)
 ignore_rotation = false
-zoom = Vector2(0.35, 0.35)
 position_smoothing_enabled = true
 rotation_smoothing_enabled = true
 drag_horizontal_enabled = true
@@ -58,3 +64,19 @@ HitStopDelay = 0.1
 
 [node name="P2" parent="World" instance=ExtResource("12_31t1p")]
 position = Vector2(300, 0)
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+layer = 128
+
+[node name="ColorRectTop" type="ColorRect" parent="CanvasLayer"]
+offset_right = 1920.0
+offset_bottom = 150.0
+color = Color(0, 0, 0, 1)
+metadata/_edit_use_anchors_ = true
+
+[node name="ColorRectBottom" type="ColorRect" parent="CanvasLayer"]
+offset_top = 930.0
+offset_right = 1920.0
+offset_bottom = 1080.0
+color = Color(0, 0, 0, 1)
+metadata/_edit_use_anchors_ = true

@@ -1,21 +1,25 @@
-[gd_scene load_steps=16 format=3 uid="uid://byv7ty32mj11t"]
+[gd_scene load_steps=20 format=3 uid="uid://byv7ty32mj11t"]
 
 [ext_resource type="Texture2D" uid="uid://dt0nmdyntreh8" path="res://assets/environments/scene_1_home/房间3背景.png" id="1_rmv6t"]
 [ext_resource type="Script" uid="uid://cra7y7mt0x1j8" path="res://scripts/managers/CameraZoneArea.cs" id="1_t2ifw"]
 [ext_resource type="Texture2D" uid="uid://bxoeo1yft0a0h" path="res://assets/environments/scene_1_home/房间3地面.png" id="2_t2ifw"]
+[ext_resource type="Resource" uid="uid://qsacvgs2q4fq" path="res://resources/cutscene/A_end_intro.tres" id="3_ggdpc"]
 [ext_resource type="Texture2D" uid="uid://d0oxywii08nmt" path="res://assets/environments/scene_1_home/房间2隔断墙2.png" id="4_eacmu"]
 [ext_resource type="PackedScene" uid="uid://orctascxfe5c" path="res://scenes/environments/door2_A1.tscn" id="5_4di3j"]
+[ext_resource type="Script" uid="uid://dprlx2bg0y3k5" path="res://scripts/environments/ParallaxBackground2D.cs" id="5_xhmyt"]
+[ext_resource type="Texture2D" uid="uid://cofpy8nif8mac" path="res://assets/environments/scene_1_home/房间3背景2.png" id="6_3uxt7"]
 [ext_resource type="PackedScene" uid="uid://cgy13s0ewifos" path="res://scenes/environments/taxiSign.tscn" id="6_4di3j"]
-[ext_resource type="PackedScene" uid="uid://chway4etqkroy" path="res://scenes/objects/Moving_A1_taxi.tscn" id="7_hlafp"]
+[ext_resource type="PackedScene" uid="uid://fym6u3tp6lve" path="res://scenes/objects/Moving_A_end_taxi.tscn" id="9_gw5dp"]
+[ext_resource type="Script" uid="uid://1rvj0kv60p00" path="res://scripts/environments/TaxiController.cs" id="10_taxi"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_eacmu"]
-size = Vector2(6000, 3000)
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_245md"]
+size = Vector2(10314, 3000)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_cn8a4"]
-size = Vector2(5617, 2573)
+size = Vector2(9640, 2826)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_3uxt7"]
-size = Vector2(1000, 1000)
+size = Vector2(300, 300)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4di3j"]
 size = Vector2(300, 1500)
@@ -35,13 +39,16 @@ size = Vector2(400, 3000)
 [node name="AEnd" type="Node2D"]
 y_sort_enabled = true
 
+[node name="PlayerSpawnPoint" type="Node2D" parent="."]
+position = Vector2(-2515, -672)
+
 [node name="AreaSize" type="Area2D" parent="."]
 visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AreaSize"]
 z_index = 10
-position = Vector2(-100, -340)
-shape = SubResource("RectangleShape2D_eacmu")
+position = Vector2(2057, -340)
+shape = SubResource("RectangleShape2D_245md")
 debug_color = Color(0.6428762, 0.52304673, 0.06685588, 0.41960785)
 
 [node name="CameraZone" type="Area2D" parent="."]
@@ -55,32 +62,48 @@ CameraLimitBottom = 1146
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CameraZone"]
 z_index = 10
-position = Vector2(-2.5, -213.5)
+position = Vector2(2009, -340)
 shape = SubResource("RectangleShape2D_cn8a4")
 debug_color = Color(0, 1, 0, 0.41960785)
 
-[node name="ExitArea" type="Area2D" parent="."]
-position = Vector2(-1639, -287)
+[node name="CutsceneTrigger" type="Area2D" parent="."]
+position = Vector2(-2016, -690)
+collision_layer = 0
 collision_mask = 4
+script = ExtResource("10_taxi")
+NextStagePath = "uid://qd5abd4opeob"
+Sequence = ExtResource("3_ggdpc")
+AnimationPlayerPath = NodePath("../MovingAEndTaxi/AnimationPlayer")
+HintLabelPath = NodePath("../HintLabel")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="ExitArea"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CutsceneTrigger"]
 z_index = 10
-position = Vector2(281, -202)
 shape = SubResource("RectangleShape2D_3uxt7")
+debug_color = Color(1, 0, 1, 0.41960785)
 
 [node name="Environments" type="Node2D" parent="."]
 
 [node name="background" type="Sprite2D" parent="Environments"]
-position = Vector2(12, -340)
+z_index = -10
+position = Vector2(20, -340)
 texture = ExtResource("1_rmv6t")
+script = ExtResource("5_xhmyt")
+ScrollSpeed = 0.7
+AreaPath = NodePath("../../AreaSize")
 
-[node name="floor" type="Sprite2D" parent="Environments"]
-position = Vector2(-1684, -198)
+[node name="background2" type="Sprite2D" parent="Environments/background"]
+position = Vector2(-2007, 404)
+texture = ExtResource("6_3uxt7")
+flip_h = true
+
+[node name="floor2" type="Sprite2D" parent="Environments"]
+z_index = -2
+z_as_relative = false
+position = Vector2(-2003, -197.5)
 texture = ExtResource("2_t2ifw")
 
-[node name="floor" type="Sprite2D" parent="Environments/floor"]
-z_index = -1
-position = Vector2(-347, 0)
+[node name="floor" type="Sprite2D" parent="Environments"]
+position = Vector2(-1656, -197.5)
 texture = ExtResource("2_t2ifw")
 
 [node name="wall2" type="Sprite2D" parent="Environments"]
@@ -116,5 +139,19 @@ shape = SubResource("RectangleShape2D_xhmyt")
 [node name="TaxiSign" parent="." instance=ExtResource("6_4di3j")]
 position = Vector2(-2002, -728)
 
-[node name="Taxi" parent="." instance=ExtResource("7_hlafp")]
-position = Vector2(-1345, -1938)
+[node name="MovingAEndTaxi" parent="." instance=ExtResource("9_gw5dp")]
+position = Vector2(-1466, -2080)
+
+[node name="HintLabel" type="Label" parent="."]
+z_index = 10
+offset_left = -2174.0
+offset_top = -792.0
+offset_right = -2096.0
+offset_bottom = -704.0
+theme_override_colors/font_color = Color(1, 1, 0.6, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 64
+text = "[E]"
+horizontal_alignment = 1

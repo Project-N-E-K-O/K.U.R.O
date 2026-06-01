@@ -23,6 +23,9 @@ namespace Kuros.Utils
         /// <summary>带 sprite_outline ShaderMaterial 的 Sprite2D 路径。</summary>
         [Export] public NodePath OutlineSpritePath { get; set; } = new NodePath("../Environments/Outline");
 
+        [ExportCategory("Detection")]
+        [Export] public string PlayerGroup { get; set; } = "player";
+
         [ExportCategory("Colors")]
         /// <summary>默认描边颜色（通常 alpha=0 即透明）。</summary>
         [Export] public Color DefaultOutlineColor   { get; set; } = new Color(0.02f, 0.02f, 0.02f, 0f);
@@ -61,29 +64,38 @@ namespace Kuros.Utils
                 GD.PushWarning($"[ProximityOutlineHighlight] Sprite2D 未找到或无 ShaderMaterial，路径：{OutlineSpritePath}");
             }
 
-            _area.BodyEntered += OnBodyEntered;
-            _area.BodyExited  += OnBodyExited;
+            _area.AreaEntered += OnAreaEntered;
+            _area.AreaExited  += OnAreaExited;
         }
 
         public override void _ExitTree()
         {
             if (_area == null) return;
-            _area.BodyEntered -= OnBodyEntered;
-            _area.BodyExited  -= OnBodyExited;
+            _area.AreaEntered -= OnAreaEntered;
+            _area.AreaExited  -= OnAreaExited;
         }
 
         // ── 事件 ──────────────────────────────────────────────────
 
-        private void OnBodyEntered(Node2D body)
+        private void OnAreaEntered(Area2D area)
         {
-            if (!body.IsInGroup("player")) return;
+            if (!IsPlayerArea(area)) return;
             _material?.SetShaderParameter("outline_color", HighlightOutlineColor);
         }
 
-        private void OnBodyExited(Node2D body)
+        private void OnAreaExited(Area2D area)
         {
-            if (!body.IsInGroup("player")) return;
+            if (!IsPlayerArea(area)) return;
             _material?.SetShaderParameter("outline_color", DefaultOutlineColor);
+        }
+
+        private bool IsPlayerArea(Area2D area)
+        {
+            var player = GetTree().GetFirstNodeInGroup(PlayerGroup) as Node2D;
+            if (player == null) return false;
+            var hitArea = player.GetNodeOrNull<Area2D>("HitArea");
+            if (hitArea != null && area == hitArea) return true;
+            return player.IsAncestorOf(area);
         }
     }
 }

@@ -10,4 +10,4 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_main_menu_manager")
-BattleScenePath = "res://scenes/Stage_2.tscn"
+BattleScenePath = "res://scenes/Stage_1.tscn"

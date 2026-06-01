@@ -18,18 +18,18 @@ namespace Kuros.Scenes
 		[ExportCategory("References")]
 		[Export] public GameActor Player { get; private set; } = null!;
 
-	[ExportCategory("UI Settings")]
-	[Export] public bool AutoLoadHUD = true;
-	[Export] public bool AutoLoadMenu = true;
-	[Export] public bool AutoLoadSkillWindow = true;
-	[Export] public bool AutoShowLevelName = true;
-	[Export] public string LevelName = "关卡 1"; // 关卡名称，如果为空则使用场景名称
+		[ExportCategory("UI Settings")]
+		[Export] public bool AutoLoadHUD = true;
+		[Export] public bool AutoLoadMenu = true;
+		[Export] public bool AutoLoadSkillWindow = true;
+		[Export] public bool AutoShowLevelName = true;
+		[Export] public string LevelName = "关卡 1"; // 关卡名称，如果为空则使用场景名称
 
-	private BattleHUD? _battleHUD;
-	private BattleMenu? _battleMenu;
-	private SkillWindow? _skillWindow;
-	private SaveSlotSelection? _saveSlotSelection;
-	private LevelNamePopup? _levelNamePopup;
+		private BattleHUD? _battleHUD;
+		private BattleMenu? _battleMenu;
+		private SkillWindow? _skillWindow;
+		private SaveSlotSelection? _saveSlotSelection;
+		private LevelNamePopup? _levelNamePopup;
 
 		public override void _Ready()
 		{

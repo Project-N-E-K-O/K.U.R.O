@@ -38,5 +38,5 @@ scale = Vector2(20, 20)
 amount = 3
 texture = ExtResource("1_bwjfg")
 one_shot = true
-explosiveness = 0.7
+explosiveness = 0.6
 process_material = SubResource("ParticleProcessMaterial_srf2u")

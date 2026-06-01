@@ -392,7 +392,6 @@ DefaultModel = "qwen3.5:latest"
 [node name="AiDecisionBridge" type="Node" parent="."]
 script = ExtResource("29_ai_decision_bridge")
 Model = "qwen3.5:latest"
-Stream = false
 
 [node name="AiDecisionExecutor" type="Node" parent="."]
 script = ExtResource("33_ai_decision_executor")

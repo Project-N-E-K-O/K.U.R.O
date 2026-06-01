@@ -1,0 +1,48 @@
+[gd_resource type="Resource" script_class="CutsceneSequence" load_steps=14 format=3 uid="uid://qsacvgs2q4fq"]
+
+[ext_resource type="Script" uid="uid://ctrko7add3r5h" path="res://scripts/systems/cutscene/CutsceneStep.cs" id="1_brdtp"]
+[ext_resource type="Script" uid="uid://cgnajq1ykl2mn" path="res://scripts/systems/cutscene/CutsceneSequence.cs" id="2_bob04"]
+[ext_resource type="Script" uid="uid://cjl1hjmndwvcg" path="res://scripts/systems/cutscene/steps/FadeStep.cs" id="2_hb1hi"]
+[ext_resource type="Script" uid="uid://b4pd4ynf4k04p" path="res://scripts/systems/cutscene/steps/CameraMoveStep.cs" id="3_hfoi8"]
+[ext_resource type="Script" uid="uid://dp0y7ubaf3v06" path="res://scripts/systems/cutscene/steps/WaitStep.cs" id="3_shld6"]
+[ext_resource type="PackedScene" uid="uid://qd5abd4opeob" path="res://scenes/Stage_2.tscn" id="4_hfoi8"]
+[ext_resource type="Script" uid="uid://5xu2sir0yhv1" path="res://scripts/systems/cutscene/steps/PlayAnimationStep.cs" id="4_shld6"]
+[ext_resource type="Script" uid="uid://bomrc4guqwn7l" path="res://scripts/systems/cutscene/steps/ChangeSceneStep.cs" id="5_nyepk"]
+
+[sub_resource type="Resource" id="Resource_rfho0"]
+script = ExtResource("2_hb1hi")
+Duration = 5.0
+TransitionDuration = 1.0
+metadata/_custom_type_script = "uid://cjl1hjmndwvcg"
+
+[sub_resource type="Resource" id="Resource_nyepk"]
+script = ExtResource("3_hfoi8")
+TargetPath = NodePath("../World/AEnd/MovingAEndTaxi/AnimatedSprite2D")
+TargetZoom = 0.35
+Ease = 0
+FollowDuration = 2.0
+metadata/_custom_type_script = "uid://b4pd4ynf4k04p"
+
+[sub_resource type="Resource" id="Resource_hfoi8"]
+script = ExtResource("4_shld6")
+AnimationPlayerPath = NodePath("../World/AEnd/MovingAEndTaxi/AnimationPlayer")
+AnimationName = "taxi_leave"
+WaitForCompletion = true
+metadata/_custom_type_script = "uid://5xu2sir0yhv1"
+
+[sub_resource type="Resource" id="Resource_008jv"]
+script = ExtResource("3_shld6")
+metadata/_custom_type_script = "uid://dp0y7ubaf3v06"
+
+[sub_resource type="Resource" id="Resource_e8fuv"]
+script = ExtResource("5_nyepk")
+ScenePath = "uid://qd5abd4opeob"
+SceneResource = ExtResource("4_hfoi8")
+metadata/_custom_type_script = "uid://bomrc4guqwn7l"
+
+[resource]
+script = ExtResource("2_bob04")
+SequenceId = "A_end_intro"
+Steps = Array[ExtResource("1_brdtp")]([SubResource("Resource_rfho0"), SubResource("Resource_nyepk"), SubResource("Resource_hfoi8"), SubResource("Resource_008jv"), SubResource("Resource_e8fuv")])
+TakeOverCamera = true
+metadata/_custom_type_script = "uid://cgnajq1ykl2mn"

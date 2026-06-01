@@ -139,7 +139,7 @@ namespace Kuros.Companions
                 TryEmitDecision(
                     ruleKey: "quiet_scene_pickup",
                     decision: SupportDecision.Hint(
-                        message: "暂时安全，看看附近掉落",
+                        message: "quiet_scene_pickup",
                         sourceRule: "quiet_scene_pickup",
                         reason: "no alive enemies",
                         urgency: "low",
@@ -331,8 +331,8 @@ namespace Kuros.Companions
                 return;
             }
 
-            var hint = SupportDecision.Hint(
-                message: text,
+            var hint = SupportDecision.HintRaw(
+                rawText: text,
                 sourceRule: "ai_personality_chatter",
                 reason: "ambient chatter from live ai decision",
                 urgency: "low",
@@ -377,17 +377,15 @@ namespace Kuros.Companions
         {
             if (ruleKey == "low_hp_under_attack")
             {
-                return "补给暂不可用，先撤一步保命";
+                return "fallback_low_hp";
             }
 
             if (ruleKey == "enemy_too_close")
             {
-                return "护盾暂不可用，注意拉开距离";
+                return "fallback_enemy_close";
             }
 
-            return string.IsNullOrWhiteSpace(rejectReason)
-                ? "当前辅助动作不可用"
-                : $"当前辅助不可用：{rejectReason}";
+            return "fallback_generic";
         }
 
         private void ResolveDependencies()

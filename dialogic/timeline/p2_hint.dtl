@@ -1,0 +1,43 @@
+label ready
+P2: P2 已就位
+[end_timeline]
+
+label combat
+P2: 注意节奏，先稳住站位
+[end_timeline]
+
+label quiet_scene_pickup
+P2: 暂时安全，看看附近掉落
+[end_timeline]
+
+label fallback_low_hp
+P2: 补给暂不可用，先撤一步保命
+[end_timeline]
+
+label fallback_enemy_close
+P2: 护盾暂不可用，注意拉开距离
+[end_timeline]
+
+label fallback_generic
+P2: 当前辅助动作不可用
+[end_timeline]
+
+label suggest_retreat
+P2: 先拉开距离更安全
+[end_timeline]
+
+label suggest_pickup
+P2: 附近有掉落，注意拾取
+[end_timeline]
+
+label ai_received
+P2: 收到建议
+[end_timeline]
+
+label shield_expired
+P2: P2 护盾已失效
+[end_timeline]
+
+label direct
+P2: {p2_hint_text}
+[end_timeline]

@@ -227,6 +227,20 @@ namespace Kuros.Companions
                     EmitSignal(SignalName.DecisionApplied, decision.ToJson(pretty: false));
                     return true;
 
+                case "show_hint_raw":
+                    _companionController.PushHintDirect(decision.Message);
+                    if (EnableLogging)
+                    {
+                        GD.Print($"[P2SupportExecutor] applied show_hint_raw: {decision.Message}");
+                    }
+                    LastAppliedDecisionJson = decision.ToJson(pretty: false);
+                    LastRejectedReason = string.Empty;
+                    LastResult = "applied";
+                    LastActionDetail = decision.Message;
+                    TotalDecisionApplied++;
+                    EmitSignal(SignalName.DecisionApplied, decision.ToJson(pretty: false));
+                    return true;
+
                 case "hold":
                     LastAppliedDecisionJson = decision.ToJson(pretty: false);
                     LastRejectedReason = string.Empty;
@@ -389,7 +403,7 @@ namespace Kuros.Companions
             BindShieldInterceptor();
             _player.SetShieldValue(_activeShieldPoints);
 
-            _companionController?.PushHint($"P2 护盾已施加（{_activeShieldPoints}）");
+            _companionController?.PushHintDirect($"P2 护盾已施加（{_activeShieldPoints}）");
             detail = $"{skillId}|shield={_activeShieldPoints}|dur={duration:0.0}s";
             return true;
         }
@@ -417,7 +431,7 @@ namespace Kuros.Companions
             _player.RestoreHealth(nextHealth, _player.MaxHealth);
             TotalHealFromSkills += finalHeal;
 
-            _companionController?.PushHint($"P2 恢复 +{finalHeal}");
+            _companionController?.PushHintDirect($"P2 恢复 +{finalHeal}");
             detail = $"{skillId}|heal={finalHeal}|mult={multiplier:0.00}";
             return true;
         }
@@ -450,7 +464,7 @@ namespace Kuros.Companions
             int nextHealth = Mathf.Min(_player.MaxHealth, _player.CurrentHealth + bonus);
             _player.RestoreHealth(nextHealth, _player.MaxHealth);
             TotalHealFromEquipBonus += bonus;
-            _companionController?.PushHint($"装备加成额外恢复 +{bonus}");
+            _companionController?.PushHintDirect($"装备加成额外恢复 +{bonus}");
 
             if (EnableLogging)
             {
@@ -513,7 +527,7 @@ namespace Kuros.Companions
             UnbindShieldInterceptor();
             if (notifyHint)
             {
-                _companionController?.PushHint("P2 护盾已失效");
+                _companionController?.PushHint("shield_expired");
             }
         }
 

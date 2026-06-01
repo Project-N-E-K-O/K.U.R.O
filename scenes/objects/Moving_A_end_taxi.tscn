@@ -1,0 +1,627 @@
+[gd_scene load_steps=35 format=3 uid="uid://fym6u3tp6lve"]
+
+[ext_resource type="Texture2D" uid="uid://038kjb47rgc5" path="res://assets/objects/taxi/时间轴1_0000.png" id="1_6xr8s"]
+[ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="1_vl1ej"]
+[ext_resource type="Texture2D" uid="uid://cfmqwo6h7h3sj" path="res://assets/objects/taxi/时间轴1_0001.png" id="2_bln6j"]
+[ext_resource type="Shader" uid="uid://vc0qhwc6jx88" path="res://shaders/fx/ground_wash_ripple.gdshader" id="3_00tm6"]
+[ext_resource type="Texture2D" uid="uid://og2gq2qj138m" path="res://assets/objects/taxi/时间轴1_0002.png" id="3_vl1ej"]
+[ext_resource type="Texture2D" uid="uid://rurwkln2flnh" path="res://assets/objects/taxi/时间轴1_0003.png" id="4_00tm6"]
+[ext_resource type="Texture2D" uid="uid://6x2atph4ejri" path="res://assets/objects/taxi/时间轴1_0004.png" id="5_plfoq"]
+[ext_resource type="Texture2D" uid="uid://cwammw7bvbcky" path="res://assets/objects/taxi/时间轴1_0005.png" id="6_hb3uy"]
+[ext_resource type="Texture2D" uid="uid://cywsxkgjddg4q" path="res://assets/objects/taxi/时间轴1_0006.png" id="7_10ppo"]
+[ext_resource type="Texture2D" uid="uid://e2gujcpebdkk" path="res://assets/objects/taxi/时间轴1_0007.png" id="8_0hwpl"]
+[ext_resource type="Texture2D" uid="uid://cux6hxc8oyc6a" path="res://assets/objects/taxi/时间轴1_0008.png" id="9_f6sd7"]
+[ext_resource type="Texture2D" uid="uid://cj2u2rke1nxxu" path="res://assets/objects/taxi/时间轴1_0009.png" id="10_qhjie"]
+[ext_resource type="Texture2D" uid="uid://c4bxdme7o8kqp" path="res://assets/objects/taxi/时间轴1_0010.png" id="11_8dyvv"]
+[ext_resource type="Texture2D" uid="uid://dn6s0eeh2by0w" path="res://assets/objects/taxi/时间轴1_0011.png" id="12_x01do"]
+[ext_resource type="Texture2D" uid="uid://bmyre4i1w0qfl" path="res://assets/objects/taxi/时间轴1_0012.png" id="13_w1ri0"]
+[ext_resource type="Texture2D" uid="uid://djnxnfrrykdco" path="res://assets/objects/taxi/时间轴1_0013.png" id="14_g0jlv"]
+[ext_resource type="Texture2D" uid="uid://b2p23aa4nt0sw" path="res://assets/objects/taxi/时间轴1_0014.png" id="15_b31qe"]
+[ext_resource type="Texture2D" uid="uid://br1p1t331ubn1" path="res://assets/objects/taxi/时间轴1_0015.png" id="16_tnml6"]
+[ext_resource type="Texture2D" uid="uid://b3mw31vf1tqmn" path="res://assets/objects/taxi/时间轴1_0016.png" id="17_qdrip"]
+[ext_resource type="Texture2D" uid="uid://ctnl1nrq3mkp5" path="res://assets/objects/taxi/时间轴1_0017.png" id="18_lwj1f"]
+[ext_resource type="Texture2D" uid="uid://bp1lsx17um7e1" path="res://assets/objects/taxi/时间轴1_0018.png" id="19_cdtxr"]
+[ext_resource type="Texture2D" uid="uid://btxwey75m68e1" path="res://assets/objects/taxi/时间轴1_0019.png" id="20_jn4mt"]
+[ext_resource type="Texture2D" uid="uid://olud751lkisy" path="res://assets/objects/taxi/时间轴1_0020.png" id="21_j0536"]
+[ext_resource type="Texture2D" uid="uid://dhfgrvmfsyq5a" path="res://assets/objects/taxi/时间轴1_0021.png" id="22_hc1fb"]
+[ext_resource type="Texture2D" uid="uid://h8xedqaqtjb4" path="res://assets/objects/taxi/时间轴1_0022.png" id="23_41h53"]
+[ext_resource type="Texture2D" uid="uid://maehyxtkrdks" path="res://assets/objects/taxi/时间轴1_0023.png" id="24_o0wmp"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_plfoq"]
+shader = ExtResource("1_vl1ej")
+shader_parameter/softness = 0.5
+shader_parameter/alpha = 0.4
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_hb3uy"]
+shader = ExtResource("3_00tm6")
+shader_parameter/speed = 1.5000000679901202
+shader_parameter/ring_count = 3
+shader_parameter/ring_width = 0.07500000321324
+shader_parameter/max_radius = 0.46
+shader_parameter/inner_dead = 0.06
+shader_parameter/ring_color = Color(0.57996243, 0.57996243, 0.57996243, 0.60784316)
+shader_parameter/intensity = 0.6000000285
+shader_parameter/aspect_y = 0.75000003236512
+shader_parameter/distortion_strength = 0.010000000475
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_10ppo"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_6xr8s")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_bln6j")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_vl1ej")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_00tm6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_plfoq")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_hb3uy")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_10ppo")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_0hwpl")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_f6sd7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_qhjie")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_8dyvv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_x01do")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_w1ri0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_g0jlv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_b31qe")
+}, {
+"duration": 1.0,
+"texture": ExtResource("16_tnml6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("17_qdrip")
+}, {
+"duration": 1.0,
+"texture": ExtResource("18_lwj1f")
+}, {
+"duration": 1.0,
+"texture": ExtResource("19_cdtxr")
+}, {
+"duration": 1.0,
+"texture": ExtResource("20_jn4mt")
+}, {
+"duration": 1.0,
+"texture": ExtResource("21_j0536")
+}, {
+"duration": 1.0,
+"texture": ExtResource("22_hc1fb")
+}, {
+"duration": 1.0,
+"texture": ExtResource("23_41h53")
+}, {
+"duration": 1.0,
+"texture": ExtResource("24_o0wmp")
+}],
+"loop": true,
+"name": &"taxi_action",
+"speed": 25.0
+}]
+
+[sub_resource type="Animation" id="Animation_d7g0g"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite2D:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("AnimatedSprite2D:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Shadow:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 1000)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Shadow:scale")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0.5, 0.5)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("GroundWash:visible")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("GroundWash:position")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("GroundWash:scale")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+tracks/7/type = "value"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath("AnimatedSprite2D:skew")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/8/type = "value"
+tracks/8/imported = false
+tracks/8/enabled = true
+tracks/8/path = NodePath("AnimatedSprite2D:rotation")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/9/type = "value"
+tracks/9/imported = false
+tracks/9/enabled = true
+tracks/9/path = NodePath("Shadow:visible")
+tracks/9/interp = 1
+tracks/9/loop_wrap = true
+tracks/9/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/10/type = "value"
+tracks/10/imported = false
+tracks/10/enabled = true
+tracks/10/path = NodePath("AnimatedSprite2D:visible")
+tracks/10/interp = 1
+tracks/10/loop_wrap = true
+tracks/10/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+
+[sub_resource type="Animation" id="Animation_rqshq"]
+resource_name = "taxi_intro"
+length = 6.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite2D:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 2, 2.3, 2.6, 2.8333333, 3, 6),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(1, 1), Vector2(0.66, 0.66), Vector2(0.65, 0.65), Vector2(0.664, 0.664), Vector2(0.658, 0.658), Vector2(0.66, 0.66), Vector2(0.45, 0.45)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("AnimatedSprite2D:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 2, 2.3, 2.6, 2.8333333, 3),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0, -2000), Vector2(0, 1500), Vector2(0, 1520), Vector2(0, 1490), Vector2(0, 1505), Vector2(0, 1500)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Shadow:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 2, 3, 6),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0, -1200), Vector2(0, 1600), Vector2(0, 1600), Vector2(0, 1500)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Shadow:scale")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 2, 6),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(0.2, 0.2), Vector2(0.22, 0.22), Vector2(0.22, 0.22)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("GroundWash:visible")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [false, true]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("GroundWash:position")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0, 2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(0, 1500)]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("GroundWash:scale")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0, 2, 6),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(0.1, 0.1), Vector2(0.1, 0.1), Vector2(1.3, 1.3)]
+}
+tracks/7/type = "value"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath("AnimatedSprite2D:visible")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+
+[sub_resource type="Animation" id="Animation_3td21"]
+resource_name = "taxi_idle"
+length = 2.0
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite2D:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5, 1, 1.5, 2),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0.45, 0.45), Vector2(0.445, 0.445), Vector2(0.45, 0.45), Vector2(0.445, 0.445), Vector2(0.45, 0.45)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("AnimatedSprite2D:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 1500)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Shadow:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 1500)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Shadow:scale")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0.22, 0.22)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("GroundWash:visible")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("GroundWash:position")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 1500)]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("GroundWash:scale")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1.3, 1.3)]
+}
+
+[sub_resource type="Animation" id="Animation_vl1ej"]
+resource_name = "taxi_leave"
+length = 4.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite2D:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 2, 4),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(0.45, 0.45), Vector2(0.66, 0.66), Vector2(1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("AnimatedSprite2D:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 2, 2.2, 4),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 1500), Vector2(0, 1500), Vector2(10, 1500), Vector2(8000, 2000)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Shadow:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(0, 1500), Vector2(0, 1600)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Shadow:scale")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(0.22, 0.22), Vector2(0.22, 0.22)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("GroundWash:visible")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("GroundWash:position")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 1500)]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("GroundWash:scale")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0, 2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(1.3, 1.3), Vector2(0.1, 0.1)]
+}
+tracks/7/type = "value"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath("AnimatedSprite2D:skew")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
+"times": PackedFloat32Array(0, 2.1, 2.2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [0.0, 0.0, -0.08726646259971647]
+}
+tracks/8/type = "value"
+tracks/8/imported = false
+tracks/8/enabled = true
+tracks/8/path = NodePath("AnimatedSprite2D:rotation")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/keys = {
+"times": PackedFloat32Array(0, 2.1, 2.2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [0.0, 0.0, 0.07853981633974483]
+}
+tracks/9/type = "value"
+tracks/9/imported = false
+tracks/9/enabled = true
+tracks/9/path = NodePath("Shadow:visible")
+tracks/9/interp = 1
+tracks/9/loop_wrap = true
+tracks/9/keys = {
+"times": PackedFloat32Array(0, 2.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+tracks/10/type = "value"
+tracks/10/imported = false
+tracks/10/enabled = true
+tracks/10/path = NodePath("AnimatedSprite2D:visible")
+tracks/10/interp = 1
+tracks/10/loop_wrap = true
+tracks/10/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_3td21"]
+_data = {
+&"RESET": SubResource("Animation_d7g0g"),
+&"taxi_enter": SubResource("Animation_rqshq"),
+&"taxi_idle": SubResource("Animation_3td21"),
+&"taxi_leave": SubResource("Animation_vl1ej")
+}
+
+[node name="MovingAEndTaxi" type="Node2D"]
+z_index = 10
+position = Vector2(44, -459)
+
+[node name="Shadow" type="Sprite2D" parent="."]
+visible = false
+material = SubResource("ShaderMaterial_plfoq")
+position = Vector2(0, 1000)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("1_6xr8s")
+
+[node name="GroundWash" type="Node2D" parent="."]
+visible = false
+
+[node name="WashRect" type="ColorRect" parent="GroundWash"]
+material = SubResource("ShaderMaterial_hb3uy")
+custom_minimum_size = Vector2(2000, 2000)
+offset_left = -1000.0
+offset_top = -1000.0
+offset_right = 1000.0
+offset_bottom = 1000.0
+metadata/_edit_use_anchors_ = true
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+visible = false
+sprite_frames = SubResource("SpriteFrames_10ppo")
+animation = &"taxi_action"
+autoplay = "taxi_action"
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_3td21")
+}

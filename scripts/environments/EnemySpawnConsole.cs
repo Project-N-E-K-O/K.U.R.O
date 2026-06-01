@@ -257,6 +257,15 @@ namespace Kuros.Environments
             if (!body.IsInGroup("player")) return;
             _playerInSpawnArea = false;
             KillAllEnemies();
+
+            // 恢复满血（不传送位置）
+            if (_playerActor != null && GodotObject.IsInstanceValid(_playerActor))
+            {
+                int healed = _playerActor.MaxHealth - _playerActor.CurrentHealth;
+                _playerActor.RestoreHealth(_playerActor.MaxHealth);
+                if (healed > 0)
+                    FloatingDamageTextManager.Instance?.ShowFloatingHealing(healed, _playerActor.GlobalPosition, 0f);
+            }
         }
 
         /// <summary>
@@ -270,7 +279,10 @@ namespace Kuros.Environments
 
             // 同步恢复满血：此时 TakeDamage 尚未调用 Die()，
             // NotifyHealthChanged 返回后 TakeDamage 检查 CurrentHealth <= 0 时已为 MaxHealth，Die() 不会被调用。
+            int healed = _playerActor.MaxHealth - _playerActor.CurrentHealth;
             _playerActor.RestoreHealth(_playerActor.MaxHealth);
+            if (healed > 0)
+                FloatingDamageTextManager.Instance?.ShowFloatingHealing(healed, _playerActor.GlobalPosition, 0f);
 
             // 传送到复活点
             if (!PlayerRespawnPointPath.IsEmpty)
