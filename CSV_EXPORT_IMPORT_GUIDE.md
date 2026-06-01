@@ -13,15 +13,15 @@ resources/items/*.tres  ──┐
 resources/builds/*.tres ──┤  [导出 Export]   data/items.csv
 resources/items/skills/  ──┤  ExportCsv.gd   data/builds.csv
 resources/loot/*.tres   ──┘  (GDScript)     data/skills.csv
-                                             data/loot.csv
-                                                 │
-                                                 │  [导入 Import]
-                                                 │  csv-data-importer 插件
-                                                 ▼
-                                         data/items.res  ← Array[Dictionary]
-                                         data/builds.res
-                                         data/skills.res
-                                         data/loot.res
+											 data/loot.csv
+												 │
+												 │  [导入 Import]
+												 │  csv-data-importer 插件
+												 ▼
+										 data/items.res  ← Array[Dictionary]
+										 data/builds.res
+										 data/skills.res
+										 data/loot.res
 ```
 
 | 方向 | 工具 | 说明 |
@@ -98,7 +98,7 @@ powershell -ExecutionPolicy Bypass -File scripts\tools\run_export.ps1
 # 加载已导入的 CSV 资源
 var csv = load("res://data/items.res") as CsvData
 for record in csv.records:
-    print(record["ItemId"], " - ", record["DisplayName"])
+	print(record["ItemId"], " - ", record["DisplayName"])
 ```
 
 ---

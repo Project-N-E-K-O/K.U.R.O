@@ -442,7 +442,11 @@ namespace Kuros.Actors.Heroes
 
             if (_actor.StateMachine.HasState("PickUp"))
             {
-                _actor.StateMachine.ChangeState("PickUp");
+                if (!_actor.StateMachine.ChangeState("PickUp"))
+                {
+                    // 状态转换被拒绝（如攻击/投掷中不允许进入 PickUp），直接执行拾取
+                    TryHandlePickup();
+                }
             }
             else
             {
