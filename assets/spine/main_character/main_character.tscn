@@ -78,6 +78,10 @@ script = ExtResource("1_om6pm")
 WalkAnimationSpeed = 2.0
 RunAnimationSpeed = 3.0
 AttackArea = NodePath("AttackArea")
+EnableStateDebugOverlay = true
+DebugOverlayOffset = Vector2(-1200, 200)
+DebugOverlayFontSize = 128
+DebugOverlayColor = Color(0, 1, 0, 1)
 AttackArea = NodePath("AttackArea")
 LeftHandAttachmentPath = NodePath("SpineSprite/SpineBoneNode")
 Speed = 500.0
@@ -151,16 +155,16 @@ script = ExtResource("4_ixg0x")
 [node name="SpineBoneNode" type="SpineBoneNode" parent="SpineSprite"]
 show_behind_parent = true
 z_index = -1
-position = Vector2(0.82191175, -473.95676)
-rotation = -1.6160004
-scale = Vector2(0.99999994, 0.99999994)
+position = Vector2(0.81878656, -473.96185)
+rotation = -1.6159917
+scale = Vector2(0.9999998, 0.9999998)
 bone_name = "Upper Body"
 
 [node name="SpineHoldingBoneNode" type="SpineBoneNode" parent="SpineSprite"]
 show_behind_parent = true
-position = Vector2(0.82191175, -473.95676)
-rotation = -1.6160004
-scale = Vector2(0.99999994, 0.99999994)
+position = Vector2(0.81878656, -473.96185)
+rotation = -1.6159917
+scale = Vector2(0.9999998, 0.9999998)
 bone_name = "Upper Body"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
@@ -260,6 +264,16 @@ HitEffectScene = ExtResource("11_6hy0m")
 HitEffectForceTopLevel = true
 HitEffectLocalOffset = Vector2(0, -350)
 RequiredItemId = "Weapon_Brawl_mechGlove"
+
+[node name="BrawlDiscoBall" type="Node" parent="StateMachine/Attack"]
+script = ExtResource("9_13pt2")
+AttackId = "disco_ball_melee_attack"
+DisplayName = "Disco Ball Melee Attack"
+Description = "迪斯科球专属攻击模板示例"
+HitEffectScene = ExtResource("11_6hy0m")
+HitEffectForceTopLevel = true
+HitEffectLocalOffset = Vector2(0, -350)
+RequiredItemId = "Weapon_Brawl_Iron"
 
 [node name="SlashExpandBaton" type="Node" parent="StateMachine/Attack"]
 script = ExtResource("9_13pt2")

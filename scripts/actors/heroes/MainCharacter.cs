@@ -15,7 +15,7 @@ namespace Kuros.Actors.Heroes
 	/// </summary>
 	public partial class MainCharacter : SamplePlayer
 	{
-		[ExportCategory("Animation")]
+	[ExportCategory("Animation")]
 	[Export] public NodePath SpineSpritePath { get; set; } = new NodePath("SpineSprite");
 	[Export] public NodePath OutlineSpineSpritePath { get; set; } = new NodePath("OutlineSpineSprite");
 	[Export] public string IdleAnimationName { get; set; } = "idle";

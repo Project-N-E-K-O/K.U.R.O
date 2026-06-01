@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://wluyqt2wxlvb"]
+[gd_scene load_steps=18 format=3 uid="uid://wluyqt2wxlvb"]
 
 [ext_resource type="Script" uid="uid://x1ic1ym4ykq8" path="res://scripts/scenes/BattleSceneManager.cs" id="1_s6mo5"]
 [ext_resource type="PackedScene" uid="uid://ufprfd4r8ijj" path="res://assets/spine/main_character/main_character.tscn" id="1_tv6fd"]
@@ -15,6 +15,7 @@
 [ext_resource type="PackedScene" uid="uid://dfmke56wtqt2x" path="res://scenes/weapons/Weapon_Throw_metalSpike.tscn" id="12_mkebo"]
 [ext_resource type="PackedScene" uid="uid://cipwjj7xx121y" path="res://scenes/weapons/Weapon_Throw_smokeGrenade.tscn" id="13_pxy7y"]
 [ext_resource type="Script" uid="uid://b2ljc7aqvo6al" path="res://scripts/environments/ElevatorSceneLoader.cs" id="16_28ted"]
+[ext_resource type="PackedScene" uid="uid://dmqi6co8gtn0l" path="res://scenes/weapons/Weapon_Brawl_discoBall.tscn" id="17_pja2j"]
 [ext_resource type="Script" uid="uid://b7afb3wjghskq" path="res://scripts/items/world/DropItemDebugger.cs" id="25_jqh86"]
 
 [node name="BattleScene" type="Node2D" node_paths=PackedStringArray("Player")]
@@ -53,7 +54,10 @@ PlayerAttackHitHitStopDuration = 0.1
 PlayerAttackKillHitStopDuration = 0.3
 HitStopDelay = 0.1
 
-[node name="WeaponMechGlove" parent="World" instance=ExtResource("4_7yh4q")]
+[node name="WeaponBrawlDiscoBall" parent="World" instance=ExtResource("17_pja2j")]
+position = Vector2(-71, -1133)
+
+[node name="WeaponBrawlMechGlove" parent="World" instance=ExtResource("4_7yh4q")]
 position = Vector2(-1470, -1153)
 
 [node name="WeaponBrawlRiotBracer" parent="World" instance=ExtResource("5_s6mo5")]

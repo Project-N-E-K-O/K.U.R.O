@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="WeaponSkillDefinition" load_steps=5 format=3 uid="uid://no6qoohk3jb6"]
+
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="1_gwghm"]
+[ext_resource type="PackedScene" uid="uid://cbcmkogcqffmo" path="res://resources/effects/CriticalStrikeEffect.tscn" id="2_ph7n4"]
+[ext_resource type="Script" uid="uid://bp6pwgoj44cuq" path="res://scripts/items/weapons/WeaponSkillDefinition.cs" id="3_k3bem"]
+
+[sub_resource type="Resource" id="Resource_rr1ju"]
+script = ExtResource("1_gwghm")
+Trigger = 1
+EffectScene = ExtResource("2_ph7n4")
+PropertyOverrides = Dictionary[String, Variant]({
+"CritBonusMultiplier": 1.0,
+"CritChance": 20.0,
+"WeaponAttackValue": 1.0
+})
+metadata/_custom_type_script = "uid://bv0es4osw3x0r"
+
+[resource]
+script = ExtResource("3_k3bem")
+SkillId = "WeaponSkill_Brawl_DiscoBall"
+DisplayName = "迪斯科闪光球攻击"
+AnimationName = "Weapon_Brawl_Iron"
+ShowHitboxDebug = false
+Description = "每次攻击到敌人时，都有20%概率使这一次的伤害发生暴击"
+Effects = Array[ExtResource("1_gwghm")]([SubResource("Resource_rr1ju")])
+ActivationAction = "weapon_skill_block"
+AttackTimingNote = ""
+WarmupDuration = 0.18999999999999995
+ActiveDuration = 0.30000000000000004
+RecoveryDuration = 0.17999999999999994
+AttackCooldownDuration = 0.5

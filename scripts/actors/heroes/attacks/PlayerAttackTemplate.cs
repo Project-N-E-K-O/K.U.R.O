@@ -110,6 +110,10 @@ namespace Kuros.Actors.Heroes.Attacks
         private int _currentHitStep = 1;  // 记录当前 Spine 动画段数（1-based）
         private float _weaponBaseDamage = 0f;  // 记录武器基础伤害（不含玩家基础伤害）
         private PlayerInventoryComponent? _inventoryComponent;
+        // 本轮攻击的有效 timing（可能被武器技能定义覆盖）
+        private float _effectiveWarmup = 0.15f;
+        private float _effectiveActive = 0.1f;
+        private float _effectiveRecovery = 0.25f;
         private List<ActorEffect> _appliedEquipEffects = new();  // 已应用的装备效果
         private bool _equipEffectsSubscribed = false;  // 是否已订阅装备事件
 
@@ -226,8 +230,15 @@ namespace Kuros.Actors.Heroes.Attacks
         {
             if (!CanStart(checkInput)) return false;
 
-            _cooldownTimer = CooldownDuration;
-            Player.AttackTimer = Mathf.Max(Player.AttackTimer, CooldownDuration);
+            // 提前解析当前武器技能，以便应用 timing 覆盖
+            _activeWeaponSkill = Player.WeaponSkillController?.GetPrimarySkillDefinition();
+            _effectiveWarmup   = ResolveSkillTiming(_activeWeaponSkill?.WarmupDuration, WarmupDuration);
+            _effectiveActive   = ResolveSkillTiming(_activeWeaponSkill?.ActiveDuration, ActiveDuration);
+            _effectiveRecovery = ResolveSkillTiming(_activeWeaponSkill?.RecoveryDuration, RecoveryDuration);
+            float effectiveCooldown = ResolveSkillTiming(_activeWeaponSkill?.AttackCooldownDuration, CooldownDuration);
+
+            _cooldownTimer = effectiveCooldown;
+            Player.AttackTimer = Mathf.Max(Player.AttackTimer, effectiveCooldown);
 
             // 先进入 Warmup 阶段，再启动攻击
             // 这样可以确保当动画 hit 事件触发时，IsRunning 已经是 true
@@ -368,9 +379,18 @@ namespace Kuros.Actors.Heroes.Attacks
             }
         }
 
+        /// <summary>
+        /// 根据武器技能定义的覆盖值（>=0）和模板默认值计算实际 timing。
+        /// skillOverride < 0 时返回 templateDefault。
+        /// </summary>
+        private static float ResolveSkillTiming(float? skillOverride, float templateDefault)
+        {
+            return (skillOverride.HasValue && skillOverride.Value >= 0f) ? skillOverride.Value : templateDefault;
+        }
+
         protected virtual void OnAttackStarted()
         {
-            _activeWeaponSkill = Player.WeaponSkillController?.GetPrimarySkillDefinition();
+            // _activeWeaponSkill 已在 TryStart() 中解析，此处无需重复赋值
             ShowCurrentHitboxDebug(_activeWeaponSkill);
             _resolvedAnimationName = ResolveAnimationName(_activeWeaponSkill);
             EnsureSpineHitSupport();
@@ -573,14 +593,14 @@ namespace Kuros.Actors.Heroes.Attacks
                     OnAttackFinished();
                     break;
                 case AttackPhase.Warmup:
-                    _phaseTimer = WarmupDuration;
+                    _phaseTimer = _effectiveWarmup;
                     // 在 Warmup 阶段也启用 _hitWindowActive，因为第一段 hit 可能在 Warmup 期间触发
                     _hitWindowActive = HitEffectScene != null;
                     _spineHitWindowActive = ShouldUseSpineHitEvents();
                     OnWarmupStarted();
                     break;
                 case AttackPhase.Active:
-                    _phaseTimer = ActiveDuration;
+                    _phaseTimer = _effectiveActive;
                     // 只要有特效场景，就保持 _hitWindowActive=true（不管是否使用 Spine 事件）
                     _hitWindowActive = HitEffectScene != null;
                     _spineHitWindowActive = ShouldUseSpineHitEvents();
@@ -594,7 +614,7 @@ namespace Kuros.Actors.Heroes.Attacks
                     }
                     break;
                 case AttackPhase.Recovery:
-                    _phaseTimer = RecoveryDuration;
+                    _phaseTimer = _effectiveRecovery;
                     _hitWindowActive = false;
                     _spineHitWindowActive = false;
                     OnRecoveryStarted();

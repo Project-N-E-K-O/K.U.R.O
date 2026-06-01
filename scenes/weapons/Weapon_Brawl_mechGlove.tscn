@@ -34,7 +34,7 @@ size = Vector2(1127.2727, 806.06067)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_82c6d"]
 size = Vector2(700, 400)
 
-[node name="WeaponMechGlove" type="CharacterBody2D"]
+[node name="WeaponBrawlMechGlove" type="CharacterBody2D"]
 z_index = 1
 scale = Vector2(0.33, 0.33)
 collision_layer = 0

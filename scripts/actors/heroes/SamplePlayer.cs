@@ -14,11 +14,11 @@ using Kuros.Utils;
 
 public partial class SamplePlayer : GameActor, IPlayerStatsSource
 {	
-	// [ExportCategory("Debug")]
-	// [Export] public bool EnableStateDebugOverlay = false;
-	// [Export] public Vector2 DebugOverlayOffset = new(-90f, -90f);
-	// [Export(PropertyHint.Range, "8,128,1")] public int DebugOverlayFontSize = 14;
-	// [Export] public Color DebugOverlayColor = new(1f, 0.95f, 0.2f, 1f);
+	[ExportCategory("Debug")]
+	[Export] public bool EnableStateDebugOverlay = false;
+	[Export] public Vector2 DebugOverlayOffset = new(-90f, -90f);
+	[Export(PropertyHint.Range, "8,128,1")] public int DebugOverlayFontSize = 14;
+	[Export] public Color DebugOverlayColor = new(1f, 0.95f, 0.2f, 1f);
 	
 	[ExportCategory("Combat")]
 	[Export] public Area2D AttackArea { get; private set; } = null!;
@@ -102,7 +102,7 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 	private int _score = 0;
 	private int _gold = 0; // 金币数量
 	private string _pendingAttackSourceState = string.Empty;
-	//private string _debugOverlayText = string.Empty;
+	private string _debugOverlayText = string.Empty;
 	private Vector2 _aiMovementInput = Vector2.Zero;
 	private bool _aiRunPressed;
 	private bool _aiAttackQueued;
@@ -176,26 +176,26 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 		//QueueRedraw();
 	}
 
-	// public override void _Process(double delta)
-	// {
-	// 	base._Process(delta);
-	// 	UpdateSyncedAttackAreaAttackBoneMotion();
-	// 	if (!EnableStateDebugOverlay) return;
+	public override void _Process(double delta)
+	{
+		base._Process(delta);
+		UpdateSyncedAttackAreaAttackBoneMotion();
+		if (!EnableStateDebugOverlay) return;
 
-	// 	UpdateDebugOverlayText();
-	// 	QueueRedraw();
-	// }
+		UpdateDebugOverlayText();
+		QueueRedraw();
+	}
 
-	// public override void _Draw()
-	// {
-	// 	base._Draw();
-	// 	if (!EnableStateDebugOverlay) return;
+	public override void _Draw()
+	{
+		base._Draw();
+		if (!EnableStateDebugOverlay) return;
 
-	// 	var font = ThemeDB.FallbackFont;
-	// 	if (font == null) return;
+		var font = ThemeDB.FallbackFont;
+		if (font == null) return;
 
-	// 	DrawString(font, DebugOverlayOffset, _debugOverlayText, HorizontalAlignment.Left, -1f, DebugOverlayFontSize, DebugOverlayColor);
-	// }
+		DrawString(font, DebugOverlayOffset, _debugOverlayText, HorizontalAlignment.Left, -1f, DebugOverlayFontSize, DebugOverlayColor);
+	}
 
 	public override void _ExitTree()
 	{
@@ -365,37 +365,37 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 		_attackAnchorRestLocalPosition = localPosition;
 	}
 
-	// private void UpdateSyncedAttackAreaAttackBoneMotion()
-	// {
-	// 	if (!SyncMainAttackAreaWithEquippedWeaponArea || !FollowSyncedAttackAreaWithAttackBoneMotion)
-	// 	{
-	// 		return;
-	// 	}
+	private void UpdateSyncedAttackAreaAttackBoneMotion()
+	{
+		if (!SyncMainAttackAreaWithEquippedWeaponArea || !FollowSyncedAttackAreaWithAttackBoneMotion)
+		{
+			return;
+		}
 
-	// 	if (AttackArea == null || _mainAttackCollisionShape == null)
-	// 	{
-	// 		return;
-	// 	}
+		if (AttackArea == null || _mainAttackCollisionShape == null)
+		{
+			return;
+		}
 
-	// 	if (!TryGetCurrentAttackAnchorLocalPosition(out var localPosition))
-	// 	{
-	// 		if (_currentAttackAnchorMotionOffset != Vector2.Zero)
-	// 		{
-	// 			_currentAttackAnchorMotionOffset = Vector2.Zero;
-	// 			ApplyAttackAreaFacingTransform(FacingRight);
-	// 		}
-	// 		return;
-	// 	}
+		if (!TryGetCurrentAttackAnchorLocalPosition(out var localPosition))
+		{
+			if (_currentAttackAnchorMotionOffset != Vector2.Zero)
+			{
+				_currentAttackAnchorMotionOffset = Vector2.Zero;
+				ApplyAttackAreaFacingTransform(FacingRight);
+			}
+			return;
+		}
 
-	// 	Vector2 newOffset = localPosition - _attackAnchorRestLocalPosition;
-	// 	if (newOffset.IsEqualApprox(_currentAttackAnchorMotionOffset))
-	// 	{
-	// 		return;
-	// 	}
+		Vector2 newOffset = localPosition - _attackAnchorRestLocalPosition;
+		if (newOffset.IsEqualApprox(_currentAttackAnchorMotionOffset))
+		{
+			return;
+		}
 
-	// 	_currentAttackAnchorMotionOffset = newOffset;
-	// 	ApplyAttackAreaFacingTransform(FacingRight);
-	// }
+		_currentAttackAnchorMotionOffset = newOffset;
+		ApplyAttackAreaFacingTransform(FacingRight);
+	}
 
 	private bool TryGetCurrentAttackAnchorLocalPosition(out Vector2 localPosition)
 	{
@@ -1682,11 +1682,11 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource
 		return false;
 	}
 	
-	// private void UpdateDebugOverlayText()
-	// {
-	// 	string stateName = StateMachine?.CurrentState?.Name ?? "None";
-	// 	_debugOverlayText = $"{Name} | State: {stateName} | HP: {CurrentHealth}/{MaxHealth}";
-	// }
+	private void UpdateDebugOverlayText()
+	{
+		string stateName = StateMachine?.CurrentState?.Name ?? "None";
+		_debugOverlayText = $"{Name} | State: {stateName} | HP: {CurrentHealth}/{MaxHealth}";
+	}
 
 	private void UpdateStatsUI()
 	{
