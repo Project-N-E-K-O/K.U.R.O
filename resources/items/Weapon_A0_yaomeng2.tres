@@ -1,11 +1,11 @@
-[gd_resource type="Resource" load_steps=8 format=3 uid="uid://weapon_a0_yaomeng2"]
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=8 format=3 uid="uid://bcnwaxblmsn3l"]
 
-[ext_resource type="Script" path="res://scripts/items/ItemDefinition.cs" id="1_item_definition"]
-[ext_resource type="Script" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="2_attribute_entry"]
-[ext_resource type="Texture2D" path="res://icon.svg" id="3_icon"]
-[ext_resource type="Resource" path="res://resources/items/skills/WeaponYaomeng2ActiveSkill.tres" id="4_active_skill"]
-[ext_resource type="Resource" path="res://resources/items/skills/WeaponYaomengSynergyPassiveSkill.tres" id="5_synergy_skill"]
-[ext_resource type="PackedScene" path="res://scenes/items/ExampleWorldItem.tscn" id="6_world_item"]
+[ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="1_item_definition"]
+[ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="2_attribute_entry"]
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="2_l7lr7"]
+[ext_resource type="Texture2D" uid="uid://dccrl4lpl0t2h" path="res://icon.svg" id="3_icon"]
+[ext_resource type="Resource" uid="uid://dy30tlu24mdvr" path="res://resources/items/skills/WeaponYaomeng2ActiveSkill.tres" id="4_active_skill"]
+[ext_resource type="Resource" uid="uid://buqiwr6vfhk0j" path="res://resources/items/skills/WeaponYaomengSynergyPassiveSkill.tres" id="5_synergy_skill"]
 
 [sub_resource type="Resource" id="Attribute_AttackPower"]
 script = ExtResource("2_attribute_entry")
@@ -21,10 +21,5 @@ Description = "侧重审判的妖梦武器，具有 4 点攻击力与斩杀框�
 Icon = ExtResource("3_icon")
 Category = "Weapon"
 MaxStackSize = 1
-Tags = PackedStringArray("tag_weapon")
-AttributeEntries = Array[Resource]([SubResource("Attribute_AttackPower")])
-EffectEntries = Array[Resource]([])
-DurabilityConfig = null
+AttributeEntries = Array[ExtResource("2_attribute_entry")]([SubResource("Attribute_AttackPower")])
 WeaponSkillResources = Array[Resource]([ExtResource("4_active_skill"), ExtResource("5_synergy_skill")])
-WorldScenePath = ExtResource("6_world_item")
-

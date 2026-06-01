@@ -22,3 +22,7 @@ CooldownSeconds = 2.5
 Description = "攻击到敌人时击退该敌人0.3m"
 Effects = Array[ExtResource("1_w8ttm")]([SubResource("Resource_a5flt")])
 ActivationAction = "weapon_skill_block"
+WarmupDuration = 0.17
+ActiveDuration = 0.63
+RecoveryDuration = 0.2
+AttackCooldownDuration = 0.5

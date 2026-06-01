@@ -24,3 +24,7 @@ ShowHitboxDebug = false
 Description = "每次攻击到敌人时，都有20%概率使这一次的伤害发生暴击"
 Effects = Array[ExtResource("1_bdrdo")]([SubResource("Resource_rr1ju")])
 ActivationAction = "weapon_skill_block"
+WarmupDuration = 0.19
+ActiveDuration = 0.3
+RecoveryDuration = 0.178
+AttackCooldownDuration = 0.5

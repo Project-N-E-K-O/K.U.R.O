@@ -23,3 +23,7 @@ ShowHitboxDebug = false
 Description = "攻击到敌人时击退该敌人1m并使其速度减少30%持续1秒"
 Effects = Array[ExtResource("1_7jkjn")]([SubResource("Resource_a5flt")])
 ActivationAction = "weapon_skill_block"
+WarmupDuration = 0.46
+ActiveDuration = 0.2
+RecoveryDuration = 0.34
+AttackCooldownDuration = 0.5
