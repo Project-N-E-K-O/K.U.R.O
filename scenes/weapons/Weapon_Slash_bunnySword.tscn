@@ -1,0 +1,73 @@
+[gd_scene load_steps=13 format=3 uid="uid://cnh6afaayr0iy"]
+
+[ext_resource type="Script" uid="uid://dtgdjgrqgype7" path="res://scripts/items/world/WorldItemEntity.cs" id="1_0inps"]
+[ext_resource type="Resource" uid="uid://cc5nnn2mscj2d" path="res://resources/items/Weapon_Slash_BunnySword.tres" id="2_0inps"]
+[ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="3_e5tjt"]
+[ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="4_mvfc7"]
+[ext_resource type="Texture2D" uid="uid://s6eufjdhipuu" path="res://assets/weapons/光剑.png" id="5_8iife"]
+[ext_resource type="Shader" uid="uid://caxdo713k5kug" path="res://shaders/materials/sparkling.gdshader" id="5_t8lja"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_nqlfu"]
+shader = ExtResource("3_e5tjt")
+shader_parameter/softness = 0.5
+shader_parameter/alpha = 0.4
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_mhf4g"]
+load_path = "res://.godot/imported/影子.png-ff14a7a2861f691fc06fc4544603034d.ctex"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_waoek"]
+shader = ExtResource("4_mvfc7")
+shader_parameter/outline_color = Color(0.02, 0.02, 0.02, 1)
+shader_parameter/outline_size = 32.0
+shader_parameter/alpha_threshold = 0.5
+shader_parameter/edge_softness = 0.12
+shader_parameter/preserve_fill = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_o1fls"]
+shader = ExtResource("5_t8lja")
+shader_parameter/highlight_width = 0.08
+shader_parameter/highlight_speed = 2.0
+shader_parameter/highlight_intensity = 1.2
+shader_parameter/highlight_interval = 1.00000002375
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_o1fls"]
+size = Vector2(500, 300)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_djioy"]
+radius = 200.0
+
+[node name="WeaponSlashBunnySword" type="CharacterBody2D"]
+z_index = 1
+scale = Vector2(0.5, 0.5)
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_0inps")
+ItemDefinition = ExtResource("2_0inps")
+DefaultOutlineColor = Color(0, 0, 0, 0)
+
+[node name="Shadow" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_nqlfu")
+position = Vector2(0, 8)
+scale = Vector2(5.5, 1.2)
+texture = SubResource("CompressedTexture2D_mhf4g")
+
+[node name="Outline" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_waoek")
+texture = ExtResource("5_8iife")
+
+[node name="Sprite2D" type="Sprite2D" parent="Outline"]
+material = SubResource("ShaderMaterial_o1fls")
+texture = ExtResource("5_8iife")
+
+[node name="CollisionArea" type="Area2D" parent="."]
+visible = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CollisionArea"]
+shape = SubResource("RectangleShape2D_o1fls")
+
+[node name="AttackArea" type="Area2D" parent="."]
+visible = false
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AttackArea"]
+shape = SubResource("CircleShape2D_djioy")

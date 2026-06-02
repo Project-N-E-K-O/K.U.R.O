@@ -463,6 +463,7 @@ size_flags_vertical = 3
 scroll_following = true
 
 [node name="HitboxEditorPreview" type="Node2D" parent="."]
+visible = false
 z_as_relative = false
 position = Vector2(464.24234, -569.99994)
 scale = Vector2(0.9999999, 0.9999999)

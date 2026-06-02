@@ -11,7 +11,7 @@ shader = ExtResource("3_o1fls")
 shader_parameter/softness = 0.5
 shader_parameter/alpha = 0.4
 
-[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_hnhuv"]
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_mhf4g"]
 load_path = "res://.godot/imported/影子.png-ff14a7a2861f691fc06fc4544603034d.ctex"
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_waoek"]
@@ -22,7 +22,7 @@ shader_parameter/alpha_threshold = 0.5
 shader_parameter/edge_softness = 0.12
 shader_parameter/preserve_fill = true
 
-[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_mhf4g"]
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_hnhuv"]
 load_path = "res://.godot/imported/甩棍.png-cb967a69ead333a0884aefc694f60152.ctex"
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_o1fls"]
@@ -54,11 +54,11 @@ DefaultOutlineColor = Color(0, 0, 0, 0)
 material = SubResource("ShaderMaterial_nqlfu")
 position = Vector2(0, 28)
 scale = Vector2(12, 1.2)
-texture = SubResource("CompressedTexture2D_hnhuv")
+texture = SubResource("CompressedTexture2D_mhf4g")
 
 [node name="Outline" type="Sprite2D" parent="."]
 material = SubResource("ShaderMaterial_waoek")
-texture = SubResource("CompressedTexture2D_mhf4g")
+texture = SubResource("CompressedTexture2D_hnhuv")
 
 [node name="Sprite2D" type="Sprite2D" parent="Outline"]
 material = SubResource("ShaderMaterial_o1fls")

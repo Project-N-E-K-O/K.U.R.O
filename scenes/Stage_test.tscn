@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://wluyqt2wxlvb"]
+[gd_scene load_steps=23 format=3 uid="uid://wluyqt2wxlvb"]
 
 [ext_resource type="Script" uid="uid://x1ic1ym4ykq8" path="res://scripts/scenes/BattleSceneManager.cs" id="1_s6mo5"]
 [ext_resource type="PackedScene" uid="uid://ufprfd4r8ijj" path="res://assets/spine/main_character/main_character.tscn" id="1_tv6fd"]
@@ -19,6 +19,8 @@
 [ext_resource type="PackedScene" uid="uid://dmqi6co8gtn0l" path="res://scenes/weapons/Weapon_Brawl_discoBall.tscn" id="17_pja2j"]
 [ext_resource type="PackedScene" uid="uid://caapdem6qh6k8" path="res://scenes/weapons/Weapon_Slash_baguette.tscn" id="17_w0p8f"]
 [ext_resource type="PackedScene" uid="uid://d0x0oxhsokka0" path="res://scenes/weapons/Weapon_Stab_corkscrew.tscn" id="19_dxexl"]
+[ext_resource type="PackedScene" uid="uid://b81xhi3r08vha" path="res://scenes/weapons/Weapon_Throw_emojiBomb.tscn" id="20_mkebo"]
+[ext_resource type="PackedScene" uid="uid://cnh6afaayr0iy" path="res://scenes/weapons/Weapon_Slash_bunnySword.tscn" id="21_5dr7i"]
 [ext_resource type="Script" uid="uid://b7afb3wjghskq" path="res://scripts/items/world/DropItemDebugger.cs" id="25_jqh86"]
 
 [node name="BattleScene" type="Node2D" node_paths=PackedStringArray("Player")]
@@ -75,11 +77,17 @@ position = Vector2(-1226.9999, -831)
 [node name="WeaponSlashBarrierGate" parent="World" instance=ExtResource("7_pja2j")]
 position = Vector2(-2338, -843)
 
+[node name="WeaponSlashBunnySword" parent="World" instance=ExtResource("21_5dr7i")]
+position = Vector2(-146, -813)
+
 [node name="WeaponSlashExpandBaton" parent="World" instance=ExtResource("8_w0p8f")]
 position = Vector2(-1690.0001, -831.00006)
 
 [node name="WeaponSlashViolinBow" parent="World" instance=ExtResource("12_ngl7c")]
 position = Vector2(-643, -823.00006)
+
+[node name="WeaponStabCorkscrew" parent="World" instance=ExtResource("19_dxexl")]
+position = Vector2(-1426, -496)
 
 [node name="WeaponStabDrill" parent="World" instance=ExtResource("9_ngl7c")]
 position = Vector2(-2468, -518)
@@ -96,15 +104,15 @@ position = Vector2(-2104, -137)
 [node name="WeaponThrowSmokeGrenade" parent="World" instance=ExtResource("13_pxy7y")]
 position = Vector2(-1613, -138)
 
+[node name="WeaponThrowEmojiBomb" parent="World" instance=ExtResource("20_mkebo")]
+position = Vector2(-1218, -129)
+
 [node name="LoadingElevator" type="Node2D" parent="World"]
 position = Vector2(7332, -336)
 script = ExtResource("16_28ted")
 ElevatorScenePath = "uid://v3n56xk6n8ca"
 NextStagePath = "uid://dwk6x3qcbsmul"
 LoadDistance = 2000.0
-
-[node name="WeaponStabCorkscrew" parent="World" instance=ExtResource("19_dxexl")]
-position = Vector2(-1426, -496)
 
 [node name="DropDebug" type="Node2D" parent="."]
 script = ExtResource("25_jqh86")

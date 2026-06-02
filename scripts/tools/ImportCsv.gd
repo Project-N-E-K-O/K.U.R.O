@@ -1,6 +1,8 @@
 ﻿@tool
 extends RefCounted
 
+class_name ImportCsv
+
 # 从 data/*.csv 读取数据并回写对应的 .tres 资源文件
 # 入口：RunImportCsv.gd 中调用 import_all()
 
