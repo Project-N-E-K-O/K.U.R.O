@@ -56,7 +56,6 @@ script = ExtResource("2_2vmbw")
 OutlineSpritePath = NodePath("../Outline")
 
 [node name="Outline" type="Sprite2D" parent="."]
-y_sort_enabled = true
 material = SubResource("ShaderMaterial_nmbao")
 position = Vector2(-333.99994, -413)
 texture = ExtResource("13_w5fa5")

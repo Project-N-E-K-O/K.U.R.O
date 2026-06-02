@@ -147,9 +147,9 @@ script = ExtResource("4_ixg0x")
 skeleton_data_res = ExtResource("4_o4xwm")
 bones_thickness = 10.09
 preview_skin = "Default"
-preview_animation = "-- Empty --"
+preview_animation = "run"
 preview_frame = true
-preview_time = 0.6667
+preview_time = 0.48
 script = ExtResource("4_ixg0x")
 
 [node name="SpineBoneNode" type="SpineBoneNode" parent="SpineSprite"]

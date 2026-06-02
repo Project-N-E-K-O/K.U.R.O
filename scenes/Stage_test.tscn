@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3 uid="uid://wluyqt2wxlvb"]
+[gd_scene load_steps=24 format=3 uid="uid://wluyqt2wxlvb"]
 
 [ext_resource type="Script" uid="uid://x1ic1ym4ykq8" path="res://scripts/scenes/BattleSceneManager.cs" id="1_s6mo5"]
 [ext_resource type="PackedScene" uid="uid://ufprfd4r8ijj" path="res://assets/spine/main_character/main_character.tscn" id="1_tv6fd"]
@@ -21,6 +21,7 @@
 [ext_resource type="PackedScene" uid="uid://d0x0oxhsokka0" path="res://scenes/weapons/Weapon_Stab_corkscrew.tscn" id="19_dxexl"]
 [ext_resource type="PackedScene" uid="uid://b81xhi3r08vha" path="res://scenes/weapons/Weapon_Throw_emojiBomb.tscn" id="20_mkebo"]
 [ext_resource type="PackedScene" uid="uid://cnh6afaayr0iy" path="res://scenes/weapons/Weapon_Slash_bunnySword.tscn" id="21_5dr7i"]
+[ext_resource type="Texture2D" uid="uid://bdusy0qqtw0th" path="res://demo/assets/smoke.png" id="22_pxy7y"]
 [ext_resource type="Script" uid="uid://b7afb3wjghskq" path="res://scripts/items/world/DropItemDebugger.cs" id="25_jqh86"]
 
 [node name="BattleScene" type="Node2D" node_paths=PackedStringArray("Player")]
@@ -78,7 +79,7 @@ position = Vector2(-1226.9999, -831)
 position = Vector2(-2338, -843)
 
 [node name="WeaponSlashBunnySword" parent="World" instance=ExtResource("21_5dr7i")]
-position = Vector2(-146, -813)
+position = Vector2(-169, -819)
 
 [node name="WeaponSlashExpandBaton" parent="World" instance=ExtResource("8_w0p8f")]
 position = Vector2(-1690.0001, -831.00006)
@@ -113,6 +114,9 @@ script = ExtResource("16_28ted")
 ElevatorScenePath = "uid://v3n56xk6n8ca"
 NextStagePath = "uid://dwk6x3qcbsmul"
 LoadDistance = 2000.0
+
+[node name="Smoke" type="Sprite2D" parent="World"]
+texture = ExtResource("22_pxy7y")
 
 [node name="DropDebug" type="Node2D" parent="."]
 script = ExtResource("25_jqh86")

@@ -124,7 +124,7 @@ script = ExtResource("6_ks25x")
 [node name="SpineSprite" type="SpineSprite" parent="."]
 skeleton_data_res = ExtResource("5_wjvmm")
 preview_skin = "Default"
-preview_animation = "skill"
+preview_animation = "-- Empty --"
 preview_frame = true
 preview_time = 1.83
 script = ExtResource("6_ks25x")
@@ -134,6 +134,7 @@ modulate = Color(0.8, 0.6, 0.5, 1)
 position = Vector2(0, -600)
 
 [node name="AttackArea" type="Area2D" parent="Sprite2D"]
+visible = false
 collision_layer = 0
 monitorable = false
 
@@ -170,6 +171,7 @@ position = Vector2(0, 130)
 shape = SubResource("CapsuleShape2D_gvrrx")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+visible = false
 shape = SubResource("CircleShape2D_d5sdg")
 
 [node name="StateMachine" type="Node" parent="." node_paths=PackedStringArray("InitialState")]
