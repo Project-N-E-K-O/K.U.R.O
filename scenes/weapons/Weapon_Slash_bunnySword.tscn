@@ -31,7 +31,7 @@ shader_parameter/highlight_intensity = 1.2
 shader_parameter/highlight_interval = 1.00000002375
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_o1fls"]
-size = Vector2(500, 300)
+size = Vector2(400, 300)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_djioy"]
 radius = 200.0
@@ -61,7 +61,6 @@ material = SubResource("ShaderMaterial_o1fls")
 texture = ExtResource("5_8iife")
 
 [node name="CollisionArea" type="Area2D" parent="."]
-visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CollisionArea"]
 shape = SubResource("RectangleShape2D_o1fls")

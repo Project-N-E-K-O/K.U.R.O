@@ -5,4 +5,6 @@
 [node name="CriticalStrikeEffect" type="Node"]
 script = ExtResource("1_0td6q")
 EffectId = "d2bb4a0c-5c4b-4d0f-8518-7e749b29846e"
+DisplayName = "武器概率暴击"
+Description = "每次攻击命中敌人时，有概率触发暴击"
 Duration = 0.0

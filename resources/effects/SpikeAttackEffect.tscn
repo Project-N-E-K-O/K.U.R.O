@@ -11,6 +11,8 @@ script = ExtResource("1_61h07")
 DamagePerTick = 1
 SpeedSlowPercent = 50.0
 EffectId = "f0f1b62e-cf75-4e12-b3ce-5758c772584f"
+DisplayName = "地刺"
+Description = "敌人进入范围持续收到伤害并减速，效果不可叠加"
 Duration = 20.0
 
 [node name="Area2D" type="Area2D" parent="."]

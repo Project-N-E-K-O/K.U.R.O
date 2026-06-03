@@ -1,0 +1,29 @@
+[gd_scene load_steps=5 format=3 uid="uid://by7x6mveu3f43"]
+
+[ext_resource type="Script" uid="uid://dlyr30sipxgg4" path="res://scripts/effects/BaguetteCrumb.cs" id="1_crumb"]
+[ext_resource type="Texture2D" uid="uid://bltspp0fp8rx8" path="res://assets/weapons/法棍碎片2.png" id="2_btvbp"]
+[ext_resource type="Script" uid="uid://d4dclpux8kajq" path="res://scripts/effects/HealOnContact.cs" id="2_heal"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_btvbp"]
+size = Vector2(200, 200)
+
+[node name="BaguetteCrumb" type="Node2D"]
+z_index = 1
+z_as_relative = false
+script = ExtResource("1_crumb")
+Duration = 0.5
+RotationDegreesPerSecond = 720.0
+StayDuration = 10.0
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("2_btvbp")
+
+[node name="HealArea" type="Area2D" parent="."]
+collision_mask = 4
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HealArea"]
+shape = SubResource("RectangleShape2D_btvbp")
+
+[node name="HealOnContact" type="Node" parent="HealArea"]
+script = ExtResource("2_heal")

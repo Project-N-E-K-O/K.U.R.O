@@ -36,7 +36,7 @@ shader_parameter/highlight_interval = 1.00000002375
 load_path = "res://.godot/imported/甩棍.png-cb967a69ead333a0884aefc694f60152.ctex"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_o1fls"]
-size = Vector2(650, 150)
+size = Vector2(650, 300)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_djioy"]
 radius = 200.0
@@ -65,7 +65,6 @@ material = SubResource("ShaderMaterial_o1fls")
 texture = SubResource("CompressedTexture2D_32rtd")
 
 [node name="CollisionArea" type="Area2D" parent="."]
-visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CollisionArea"]
 shape = SubResource("RectangleShape2D_o1fls")

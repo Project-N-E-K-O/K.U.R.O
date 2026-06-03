@@ -36,7 +36,7 @@ shader_parameter/highlight_interval = 1.00000002375
 load_path = "res://.godot/imported/钻头.png-2a47c7fe5d274a9cfe49d5c8ed85d08a.ctex"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_g0q5t"]
-size = Vector2(1200, 330)
+size = Vector2(1200, 400)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_t6geh"]
 size = Vector2(500, 100)
@@ -65,7 +65,6 @@ material = SubResource("ShaderMaterial_t6geh")
 texture = SubResource("CompressedTexture2D_ie112")
 
 [node name="CollisionArea" type="Area2D" parent="."]
-visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CollisionArea"]
 position = Vector2(0, 20)

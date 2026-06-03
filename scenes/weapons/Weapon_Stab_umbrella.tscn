@@ -29,7 +29,7 @@ shader_parameter/highlight_intensity = 1.2
 shader_parameter/highlight_interval = 1.00000002375
 
 [sub_resource type="RectangleShape2D" id="BodyShape_rr6vl"]
-size = Vector2(950, 200)
+size = Vector2(1000, 400)
 
 [sub_resource type="RectangleShape2D" id="TriggerShape_yahcm"]
 size = Vector2(350, 100)
@@ -58,7 +58,6 @@ material = SubResource("ShaderMaterial_ap2ar")
 texture = ExtResource("1_kyvej")
 
 [node name="CollisionArea" type="Area2D" parent="."]
-visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CollisionArea"]
 shape = SubResource("BodyShape_rr6vl")

@@ -36,7 +36,7 @@ shader_parameter/highlight_interval = 1.00000002375
 load_path = "res://.godot/imported/闸门刀.png-62da3b15c6dbcdb7dc0259889e21b21e.ctex"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ofv0e"]
-size = Vector2(1800, 200)
+size = Vector2(1800, 400)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_ofv0e"]
 radius = 400.0
@@ -66,7 +66,6 @@ material = SubResource("ShaderMaterial_lo6ct")
 texture = SubResource("CompressedTexture2D_ofv0e")
 
 [node name="CollisionArea" type="Area2D" parent="."]
-visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CollisionArea"]
 position = Vector2(0, 40)

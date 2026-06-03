@@ -30,7 +30,7 @@ shader_parameter/softness = 0.5
 shader_parameter/alpha = 0.4
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_nmbao"]
-size = Vector2(5300, 2100)
+size = Vector2(5500, 2500)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2lj3c"]
 size = Vector2(784, 670)

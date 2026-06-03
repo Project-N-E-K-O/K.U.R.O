@@ -5,3 +5,5 @@
 [node name="SlowOnHitEffect" type="Node"]
 script = ExtResource("1_btpv2")
 EffectId = "07ed55a9-67f6-406d-8f3b-8b8f55ab0087"
+DisplayName = "攻击减速"
+Description = "攻击命中时使目标减速"

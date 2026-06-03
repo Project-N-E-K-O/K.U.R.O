@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://cb63a03x1vhat"]
+
+[ext_resource type="Script" uid="uid://bt4utcwlhol6a" path="res://scripts/effects/WeaponSlashBaguetteEffect.cs" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://by7x6mveu3f43" path="res://resources/effects/BaguetteCrumb.tscn" id="2_fas7w"]
+
+[node name="WeaponSlashBaguetteEffect" type="Node"]
+script = ExtResource("1_script")
+CrumbScene = ExtResource("2_fas7w")
+SpawnChance = 100.0
+EffectId = "0a16dd84-94d8-47ce-bc16-c8b4a64d8402"
+DisplayName = "法棍攻击"
+Description = "攻击命中时有概率抛出一个面包碎块，拾取后恢复生命。"
+Duration = 0.0

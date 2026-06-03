@@ -10,7 +10,6 @@ MaxLength = 1500.0
 BeamWidth = 20.0
 GlowWidth = 60.0
 Lifetime = 0.3
-Damage = 1
 KnockbackDistance = 5.0
 KnockbackDuration = 0.05
 KnockbackSpeed = 250.0

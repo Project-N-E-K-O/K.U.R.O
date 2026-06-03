@@ -37,6 +37,7 @@ namespace Kuros.Fx
         private Color _initGlowColor;
         private bool _pendingFirstFrame;
         private readonly HashSet<GameActor> _damagedEnemies = new();
+        private readonly Vector2[] _beamPoints = new Vector2[2];
 
         public override void _Ready()
         {
@@ -175,9 +176,10 @@ namespace Kuros.Fx
                 ? ToLocal(_ray.GetCollisionPoint())
                 : new Vector2(MaxLength, 0f);
 
-            var pts = new[] { Vector2.Zero, endPt };
-            _beamLine.Points = pts;
-            _glowLine.Points = pts;
+            _beamPoints[0] = Vector2.Zero;
+            _beamPoints[1] = endPt;
+            _beamLine.Points = _beamPoints;
+            _glowLine.Points = _beamPoints;
         }
     }
 }

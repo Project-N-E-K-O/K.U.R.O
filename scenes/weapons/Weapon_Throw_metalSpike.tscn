@@ -29,7 +29,7 @@ shader_parameter/highlight_intensity = 1.2
 shader_parameter/highlight_interval = 1.00000002375
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_0wnlg"]
-size = Vector2(381.00006, 258.00003)
+size = Vector2(400, 250)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ec1yi"]
 size = Vector2(387.00006, 409.00006)
@@ -75,9 +75,9 @@ texture = ExtResource("1_0wnlg")
 region_rect = Rect2(-110, -50, 1400, 1200)
 
 [node name="CollisionArea" type="Area2D" parent="RigidBody2D"]
-visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/CollisionArea"]
+z_index = 10
 position = Vector2(1.5000143, 28.999992)
 scale = Vector2(0.9999999, 0.9999999)
 shape = SubResource("RectangleShape2D_0wnlg")

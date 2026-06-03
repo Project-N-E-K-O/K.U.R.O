@@ -1,7 +1,19 @@
-[gd_resource type="Resource" script_class="WeaponSkillDefinition" load_steps=3 format=3 uid="uid://vdq16nvnnvsv"]
+[gd_resource type="Resource" script_class="WeaponSkillDefinition" load_steps=5 format=3 uid="uid://vdq16nvnnvsv"]
 
 [ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="1_8mx5c"]
+[ext_resource type="PackedScene" uid="uid://kqvbemqvcf7" path="res://resources/effects/CriticalStrikeCountEffect.tscn" id="2_8kiax"]
 [ext_resource type="Script" uid="uid://bp6pwgoj44cuq" path="res://scripts/items/weapons/WeaponSkillDefinition.cs" id="2_msw50"]
+
+[sub_resource type="Resource" id="Resource_hr7lc"]
+script = ExtResource("1_8mx5c")
+Trigger = 1
+EffectScene = ExtResource("2_8kiax")
+PropertyOverrides = Dictionary[String, Variant]({
+"CritBonusMultiplier": 1.0,
+"HitCount": 4,
+"WeaponAttackValue": 2.0
+})
+metadata/_custom_type_script = "uid://bv0es4osw3x0r"
 
 [resource]
 script = ExtResource("2_msw50")
@@ -9,7 +21,8 @@ SkillId = "WeaponSkill_Slash_ExpandBaton"
 DisplayName = "甩棍攻击"
 AnimationName = "Weapon_Slash_ExpandBaton"
 ShowHitboxDebug = false
-Description = "手持该武器攻击敌人3次后，该武器的下一次攻击触发暴击"
+Description = "手持该武器攻击敌人4次后，该武器的下一次攻击触发暴击"
+Effects = Array[ExtResource("1_8mx5c")]([SubResource("Resource_hr7lc")])
 WarmupDuration = 0.17
 ActiveDuration = 0.17
 RecoveryDuration = 0.19
