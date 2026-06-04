@@ -5,3 +5,5 @@
 [node name="MechGloveEffect" type="Node"]
 script = ExtResource("1_qflls")
 EffectId = "9d586fdb-407b-4531-b03f-6fa5bbddcadb"
+DisplayName = "机械冲撞臂·暴击"
+Description = "三段攻击均命中时，最后一段暴击，伤害翻倍。"

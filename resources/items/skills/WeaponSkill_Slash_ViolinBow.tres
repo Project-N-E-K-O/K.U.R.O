@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="WeaponSkillDefinition" load_steps=5 format=3 uid="uid://be8r8tqkxldf2"]
+
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="1_0yij6"]
+[ext_resource type="PackedScene" uid="uid://s4nrcrs36gtl" path="res://resources/effects/SoundWaveEffect.tscn" id="2_0yij6"]
+[ext_resource type="Script" uid="uid://bp6pwgoj44cuq" path="res://scripts/items/weapons/WeaponSkillDefinition.cs" id="3_f3ese"]
+
+[sub_resource type="Resource" id="Resource_1tcmq"]
+script = ExtResource("1_0yij6")
+Trigger = 1
+EffectScene = ExtResource("2_0yij6")
+metadata/_custom_type_script = "uid://bv0es4osw3x0r"
+
+[resource]
+script = ExtResource("3_f3ese")
+SkillId = "Weapon_Slash_ViolinBow"
+DisplayName = "音乐家的琴弓攻击"
+SkillType = 1
+AnimationName = "Weapon_Slash_BarrierGate"
+ShowHitboxDebug = false
+Description = "攻击到敌人时生成一道对敌人造成伤害和减速的音波"
+Effects = Array[ExtResource("1_0yij6")]([SubResource("Resource_1tcmq")])
+WarmupDuration = 0.53
+ActiveDuration = 0.31
+RecoveryDuration = 0.16
+AttackCooldownDuration = 0.5

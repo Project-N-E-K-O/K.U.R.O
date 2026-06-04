@@ -156,7 +156,8 @@ func _export_skills() -> void:
 	var headers := [
 		"file", "SkillId", "DisplayName", "AnimationName",
 		"DamageMultiplier", "CooldownSeconds", "ShowHitboxDebug",
-		"Description", "ActivationAction"
+		"Description", "ActivationAction",
+		"WarmupDuration", "ActiveDuration", "RecoveryDuration", "AttackCooldownDuration"
 	]
 	var rows: Array = [headers]
 
@@ -175,7 +176,11 @@ func _export_skills() -> void:
 			str(r.get("CooldownSeconds", "0.5")),
 			str(r.get("ShowHitboxDebug", "true")),
 			_str(str(r.get("Description", ""))),
-			_str(str(r.get("ActivationAction", "")))
+			_str(str(r.get("ActivationAction", ""))),
+			str(r.get("WarmupDuration", "-1")),
+			str(r.get("ActiveDuration", "-1")),
+			str(r.get("RecoveryDuration", "-1")),
+			str(r.get("AttackCooldownDuration", "-1"))
 		])
 
 	_write_csv(OUT_SKILLS, rows)
@@ -428,8 +433,11 @@ func _list_tres(dir_path: String) -> Array:
 	return files
 
 ## 将 rows 数组写入 CSV 文件（res:// 路径）
+## 实际写入 abs_path + ".tmp"，由 run_export.ps1 在 Godot 退出后重命名，
+## 从而避免目标文件被编辑器锁定时写入失败的问题。
 func _write_csv(res_path: String, rows: Array) -> void:
 	var abs_path := ProjectSettings.globalize_path(res_path)
+	var tmp_path := abs_path + ".tmp"
 	var dir_path := abs_path.get_base_dir()
 	if not DirAccess.dir_exists_absolute(dir_path):
 		DirAccess.make_dir_recursive_absolute(dir_path)
@@ -441,9 +449,9 @@ func _write_csv(res_path: String, rows: Array) -> void:
 			cells.append(_csv_escape(str(cell)))
 		content += ",".join(cells) + "\n"
 
-	var f := FileAccess.open(abs_path, FileAccess.WRITE)
+	var f := FileAccess.open(tmp_path, FileAccess.WRITE)
 	if not f:
-		push_error("[ExportCsv] Cannot write: " + abs_path)
+		push_error("[ExportCsv] Cannot write: " + tmp_path)
 		return
 	f.store_string(content)
 	f.close()

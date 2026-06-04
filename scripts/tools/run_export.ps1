@@ -110,6 +110,32 @@ if ($ExitCode -ne 0) {
     Write-Warning "  Non-zero exit code from Godot. Check output above."
 }
 
+# ── Step 3.5: Rename .tmp → .csv (Godot writes .tmp to avoid file-lock issues) ─
+Write-Host ""
+Write-Host "[Step 3.5] Committing .tmp files..." -ForegroundColor Yellow
+
+foreach ($csv in $CsvFiles) {
+    $fp    = Join-Path $DataDir $csv
+    $tmpFp = "$fp.tmp"
+    if (Test-Path $tmpFp) {
+        # Try to delete the old .csv (lock should be released now that Godot exited)
+        if (Test-Path $fp) {
+            Remove-Item $fp -Force -ErrorAction SilentlyContinue
+            if (Test-Path $fp) {
+                Write-Host "  WARNING: Still cannot remove $csv — skipping rename" -ForegroundColor DarkYellow
+                Remove-Item $tmpFp -Force -ErrorAction SilentlyContinue
+                continue
+            }
+        }
+        Rename-Item $tmpFp $fp -ErrorAction SilentlyContinue
+        if (Test-Path $fp) {
+            Write-Host "  OK: $csv"
+        } else {
+            Write-Host "  ERROR: Rename failed for $csv" -ForegroundColor Red
+        }
+    }
+}
+
 # ── Step 4: Restore project.godot ───────────────────────────────────────────
 Write-Host ""
 Write-Host "[Step 4] Restoring plugin config..." -ForegroundColor Yellow

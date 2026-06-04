@@ -14,6 +14,8 @@ DamagePerTick = 1
 SpeedSlowPercent = 50.0
 FadeOutDuration = 1.0
 EffectId = "30c14cff-e772-44c5-af23-cde5d44cb6cb"
+DisplayName = "破碎茶壶"
+Description = "玩家进入该区域持续收到伤害并减速"
 IsBuff = false
 
 [node name="Area2D" type="Area2D" parent="."]

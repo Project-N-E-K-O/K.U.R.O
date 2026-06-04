@@ -13,6 +13,8 @@ namespace Kuros.Actors.Heroes.States
 		private readonly List<PlayerAttackTemplate> _attackTemplates = new();
 		private PlayerAttackTemplate? _activeTemplate;
 
+		public IReadOnlyList<PlayerAttackTemplate> AttackTemplates => _attackTemplates;
+
 		protected override void _ReadyState()
 			{
 			base._ReadyState();

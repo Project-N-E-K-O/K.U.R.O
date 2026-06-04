@@ -29,10 +29,10 @@ shader_parameter/highlight_intensity = 1.2
 shader_parameter/highlight_interval = 1.00000002375
 
 [sub_resource type="RectangleShape2D" id="BodyShape_rr6vl"]
-size = Vector2(1145.4546, 709.09094)
+size = Vector2(700, 400)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_82c6d"]
-size = Vector2(600, 400)
+size = Vector2(250, 200)
 
 [node name="WeaponBrawlRiotGlove" type="CharacterBody2D"]
 z_index = 1
@@ -58,19 +58,13 @@ material = SubResource("ShaderMaterial_1hnml")
 texture = ExtResource("5_altab")
 
 [node name="CollisionArea" type="Area2D" parent="."]
-visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CollisionArea"]
 z_index = 1
-position = Vector2(7.575757, 40.90909)
-scale = Vector2(0.49999994, 0.49999994)
 shape = SubResource("BodyShape_rr6vl")
 
 [node name="AttackArea" type="Area2D" parent="."]
-scale = Vector2(0.5, 0.5)
 collision_layer = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AttackArea"]
-position = Vector2(1.9999998, 3.9999995)
-scale = Vector2(0.9999999, 0.9999999)
 shape = SubResource("RectangleShape2D_82c6d")

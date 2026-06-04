@@ -99,23 +99,23 @@ private SpawnEffectRefs PlaySpawnEffects(Vector2 position) // 播放生成效果
 
 ```
 触发（TriggerArea接收身体进入事件）
-    ↓
+	↓
 OnTriggerBodyEntered() 触发
-    ↓
+	↓
 StartSpawnSequence() 启动
-    ↓
+	↓
 EmitSignal(SpawnStarted)
-    ↓
+	↓
 BuildSpawnQueue() 构建敌人队列
-    ↓
+	↓
 对每个敌人循环：
-    ├─ ResolveSpawnPosition(i) 计算位置
-    ├─ PlaySpawnEffects() 播放背景效果
-    ├─ WaitForEnemyAppearGateAsync() 等待出现条件
-    ├─ SpawnEnemy() 生成敌人实例
-    ├─ EmitSignal(EnemySpawned, enemy, i)
-    └─ 等待 SpawnInterval 后生成下一个
-    ↓
+	├─ ResolveSpawnPosition(i) 计算位置
+	├─ PlaySpawnEffects() 播放背景效果
+	├─ WaitForEnemyAppearGateAsync() 等待出现条件
+	├─ SpawnEnemy() 生成敌人实例
+	├─ EmitSignal(EnemySpawned, enemy, i)
+	└─ 等待 SpawnInterval 后生成下一个
+	↓
 EmitSignal(SpawnCompleted)
 ```
 
@@ -126,9 +126,9 @@ EmitSignal(SpawnCompleted)
 ```csharp
 public partial class EnemySpawnController : Node2D
 {
-    [Export] public bool AutoRespawn = false;
-    [Export(PropertyHint.Range, "0.5,60,0.5")] public float RespawnDelay = 5f;
-    private readonly List<GameActor> _managedActors = new();
+	[Export] public bool AutoRespawn = false;
+	[Export(PropertyHint.Range, "0.5,60,0.5")] public float RespawnDelay = 5f;
+	private readonly List<GameActor> _managedActors = new();
 }
 ```
 
@@ -170,16 +170,16 @@ spawnManager.SpawnAreaExtents = new Vector2(96, 48);
 
 public override void _Ready()
 {
-    var spawnManager = GetNode<EnemySpawnManager>(SpawnManagerPath);
-    spawnManager.SpawnStarted += OnSpawnStarted;
-    spawnManager.EnemySpawned += OnEnemySpawned;
-    spawnManager.SpawnCompleted += OnSpawnCompleted;
+	var spawnManager = GetNode<EnemySpawnManager>(SpawnManagerPath);
+	spawnManager.SpawnStarted += OnSpawnStarted;
+	spawnManager.EnemySpawned += OnEnemySpawned;
+	spawnManager.SpawnCompleted += OnSpawnCompleted;
 }
 
 private void OnSpawnCompleted()
 {
-    GD.Print("所有敌人生成完成！");
-    // 触发下一阶段逻辑
+	GD.Print("所有敌人生成完成！");
+	// 触发下一阶段逻辑
 }
 ```
 
@@ -205,15 +205,15 @@ scripts/managers/
 ```csharp
 public partial class CameraZoneManager : Node
 {
-    [System.Serializable]
-    public class CameraZone
-    {
-        [Export] public string Name { get; set; } = "Zone";
-        [Export] public int LimitLeft { get; set; } = 0;
-        [Export] public int LimitTop { get; set; } = 0;
-        [Export] public int LimitRight { get; set; } = 0;
-        [Export] public int LimitBottom { get; set; } = 0;
-    }
+	[System.Serializable]
+	public class CameraZone
+	{
+		[Export] public string Name { get; set; } = "Zone";
+		[Export] public int LimitLeft { get; set; } = 0;
+		[Export] public int LimitTop { get; set; } = 0;
+		[Export] public int LimitRight { get; set; } = 0;
+		[Export] public int LimitBottom { get; set; } = 0;
+	}
 }
 ```
 
@@ -244,17 +244,17 @@ public partial class CameraZoneManager : Node
 
 ```
 玩家移动
-    ↓
+	↓
 CameraZoneManager._Process() 每帧检查
-    ↓
+	↓
 通过 Area2D 检测玩家 HitArea 进入/离开
-    ↓
+	↓
 OnZoneXAreaEntered() 触发
-    ↓
+	↓
 SwitchToZone(int zoneIndex)
-    ↓
+	↓
 更新 Camera2D 的四个 Limit 属性
-    ↓
+	↓
 CameraFollow 在后续帧使用新限制
 ```
 
@@ -294,11 +294,11 @@ var cameraZoneManager = GetNode<CameraZoneManager>("path/to/CameraZoneManager");
 // 方式1：添加新区域
 var newZone = new CameraZoneManager.CameraZone
 {
-    Name = "Zone_3_新区域",
-    LimitLeft = 5000,
-    LimitTop = -1500,
-    LimitRight = 13000,
-    LimitBottom = 1500
+	Name = "Zone_3_新区域",
+	LimitLeft = 5000,
+	LimitTop = -1500,
+	LimitRight = 13000,
+	LimitBottom = 1500
 };
 cameraZoneManager.AddZone(newZone);
 
@@ -309,14 +309,14 @@ cameraZoneManager.RemoveZone(2);
 var currentZone = cameraZoneManager.GetCurrentZone();
 if (currentZone != null)
 {
-    GD.Print($"当前区域: {currentZone.Name}");
+	GD.Print($"当前区域: {currentZone.Name}");
 }
 
 // 方式4：按名称查询
 var zone = cameraZoneManager.GetZoneByName("Zone_1_左侧房间");
 if (zone != null)
 {
-    cameraZoneManager.SwitchToZone(0);
+	cameraZoneManager.SwitchToZone(0);
 }
 ```
 
@@ -324,15 +324,15 @@ if (zone != null)
 
 ```
 玩家在 Stage_2 中：
-    ↓
+	↓
 玩家有 HitArea (Area2D) 子节点
-    ↓
+	↓
 两个 Zone Area2D 监听 AreaEntered 信号
-    ↓
+	↓
 当玩家 HitArea 进入 Zone1Area 时：
-    ├─ OnZone1AreaEntered() 触发
-    ├─ IsPlayerHitArea() 验证是玩家
-    └─ SwitchToZone(0) 切换相机
+	├─ OnZone1AreaEntered() 触发
+	├─ IsPlayerHitArea() 验证是玩家
+	└─ SwitchToZone(0) 切换相机
 ```
 
 ### 2.4 CameraZone 的初始化方式
@@ -342,22 +342,22 @@ if (zone != null)
 ```csharp
 CameraZones = new CameraZone[]
 {
-    new CameraZone 
-    { 
-        Name = "Zone_1_左侧房间",
-        LimitLeft = Zone1_LimitLeft,
-        LimitTop = Zone1_LimitTop,
-        LimitRight = Zone1_LimitRight,
-        LimitBottom = Zone1_LimitBottom
-    },
-    new CameraZone 
-    { 
-        Name = "Zone_2_右侧房间",
-        LimitLeft = Zone2_LimitLeft,
-        LimitTop = Zone2_LimitTop,
-        LimitRight = Zone2_LimitRight,
-        LimitBottom = Zone2_LimitBottom
-    }
+	new CameraZone 
+	{ 
+		Name = "Zone_1_左侧房间",
+		LimitLeft = Zone1_LimitLeft,
+		LimitTop = Zone1_LimitTop,
+		LimitRight = Zone1_LimitRight,
+		LimitBottom = Zone1_LimitBottom
+	},
+	new CameraZone 
+	{ 
+		Name = "Zone_2_右侧房间",
+		LimitLeft = Zone2_LimitLeft,
+		LimitTop = Zone2_LimitTop,
+		LimitRight = Zone2_LimitRight,
+		LimitBottom = Zone2_LimitBottom
+	}
 };
 ```
 
@@ -457,7 +457,7 @@ _attractArea.CollisionMask = 1u << 1;  // 检测敌人层 (Layer 2)
    ```csharp
    if (player.GlobalPosition.X < LimitLeft)
    {
-       player.GlobalPosition = new Vector2(LimitLeft, player.GlobalPosition.Y);
+	   player.GlobalPosition = new Vector2(LimitLeft, player.GlobalPosition.Y);
    }
    ```
 
@@ -477,11 +477,11 @@ _attractArea.CollisionMask = 1u << 1;  // 检测敌人层 (Layer 2)
 
 ```
 玩家 AttackArea (Layer 0)
-    ↓ 检测 →
+	↓ 检测 →
 敌人 HitBox (Layer 2)
-    
+	
 敌人 AttackArea (某个层)
-    ↓ 检测 →
+	↓ 检测 →
 玩家 (Layer 0)
 ```
 
@@ -539,16 +539,16 @@ Stage_2.tscn
 // 在 Stage_2 管理脚本中
 public override void _Ready()
 {
-    var spawnManager = GetNode<EnemySpawnManager>("EnemySpawnManager_Zone1");
-    spawnManager.SpawnCompleted += () =>
-    {
-        GD.Print("Zone 1 敌人全部生成完成");
-        // 可以在这里触发：
-        // - 关闭通道
-        // - 启动音乐
-        // - 显示提示
-        // - 启动事件序列
-    };
+	var spawnManager = GetNode<EnemySpawnManager>("EnemySpawnManager_Zone1");
+	spawnManager.SpawnCompleted += () =>
+	{
+		GD.Print("Zone 1 敌人全部生成完成");
+		// 可以在这里触发：
+		// - 关闭通道
+		// - 启动音乐
+		// - 显示提示
+		// - 启动事件序列
+	};
 }
 ```
 
@@ -572,41 +572,41 @@ public override void _Ready()
 ```csharp
 public partial class StageController : Node
 {
-    private CameraZoneManager _cameraZoneManager;
-    private List<EnemySpawnManager> _spawnManagers = new();
+	private CameraZoneManager _cameraZoneManager;
+	private List<EnemySpawnManager> _spawnManagers = new();
 
-    public override void _Ready()
-    {
-        _cameraZoneManager = GetNode<CameraZoneManager>("CameraZoneManager");
-        
-        // 收集所有生成管理器
-        foreach (var spawnManager in GetTree().GetNodesInGroup("spawn_managers"))
-        {
-            if (spawnManager is EnemySpawnManager esm)
-            {
-                _spawnManagers.Add(esm);
-                esm.SpawnCompleted += OnSpawnCompleted;
-            }
-        }
-    }
+	public override void _Ready()
+	{
+		_cameraZoneManager = GetNode<CameraZoneManager>("CameraZoneManager");
+		
+		// 收集所有生成管理器
+		foreach (var spawnManager in GetTree().GetNodesInGroup("spawn_managers"))
+		{
+			if (spawnManager is EnemySpawnManager esm)
+			{
+				_spawnManagers.Add(esm);
+				esm.SpawnCompleted += OnSpawnCompleted;
+			}
+		}
+	}
 
-    private void OnSpawnCompleted()
-    {
-        GD.Print("检查所有生成管理器的状态...");
-    }
+	private void OnSpawnCompleted()
+	{
+		GD.Print("检查所有生成管理器的状态...");
+	}
 
-    public void AddCameraZone(string zoneName, Vector2 boundTopLeft, Vector2 boundBottomRight)
-    {
-        var newZone = new CameraZoneManager.CameraZone
-        {
-            Name = zoneName,
-            LimitLeft = (int)boundTopLeft.X,
-            LimitTop = (int)boundTopLeft.Y,
-            LimitRight = (int)boundBottomRight.X,
-            LimitBottom = (int)boundBottomRight.Y
-        };
-        // _cameraZoneManager.AddZone(newZone);  // 如果有此方法
-    }
+	public void AddCameraZone(string zoneName, Vector2 boundTopLeft, Vector2 boundBottomRight)
+	{
+		var newZone = new CameraZoneManager.CameraZone
+		{
+			Name = zoneName,
+			LimitLeft = (int)boundTopLeft.X,
+			LimitTop = (int)boundTopLeft.Y,
+			LimitRight = (int)boundBottomRight.X,
+			LimitBottom = (int)boundBottomRight.Y
+		};
+		// _cameraZoneManager.AddZone(newZone);  // 如果有此方法
+	}
 }
 ```
 

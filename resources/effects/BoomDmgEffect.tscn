@@ -4,7 +4,6 @@
 
 [node name="BoomDmgEffect" type="Node2D"]
 script = ExtResource("1_tgq3f")
-Damage = 5
+Damage = 6
 KnockbackDistance = 200.0
-KnockbackSpeed = 2000.0
 AffectEnemies = true

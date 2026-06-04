@@ -4,11 +4,13 @@ namespace Kuros.Actors.Heroes.States
 {
     /// <summary>
     /// 播放拾取动画，动画结束后执行拾取逻辑。
+    /// 若无拾取动画（如 Spine 角色），则立即执行拾取，不打断当前动画。
     /// </summary>
     public partial class PlayerPickUpState : PlayerState
     {
         public string PickAnimation = "animations/pickup";
         public float PickUpAnimationSpeed = 1.0f;
+        public float PickUpAnimationTotalTime = 0.3f;
 
         private PlayerItemInteractionComponent? _interaction;
         private float _animRemaining;
@@ -21,24 +23,38 @@ namespace Kuros.Actors.Heroes.States
             _interaction = Player.GetNodeOrNull<PlayerItemInteractionComponent>("ItemInteraction");
         }
 
+        public override bool CanEnterFrom(string? currentStateName)
+        {
+            // 攻击、投掷等状态有自己的动画，进入 PickUp 会导致动画被打断。
+            // 这些状态中拾取动作直接执行，不走状态切换。
+            if (currentStateName is "Attack" or "Throw" or "Hit" or "Dying" or "Dead" or "Frozen")
+            {
+                return false;
+            }
+            return base.CanEnterFrom(currentStateName);
+        }
+
         public override void Enter()
         {
-            Player.Velocity = Vector2.Zero;
             _animationFinished = false;
 
-            // 无论动画是否存在，只要有 AnimPlayer 就立即缓存当前 SpeedScale，
-            // 避免 Exit 时错误地恢复为硬编码的 1.0f。
             if (Actor.AnimPlayer != null)
             {
                 _originalSpeedScale = Actor.AnimPlayer.SpeedScale;
             }
 
-            PlayAnimation();
+            if (!TryPlayPickupAnimation())
+            {
+                _animationFinished = true;
+            }
+            else
+            {
+                Player.Velocity = Vector2.Zero;
+            }
         }
-        
+
         public override void Exit()
         {
-            // Restore original animation speed when leaving pick up state
             if (Actor.AnimPlayer != null)
             {
                 Actor.AnimPlayer.SpeedScale = _originalSpeedScale;
@@ -56,20 +72,30 @@ namespace Kuros.Actors.Heroes.States
             }
         }
 
-        private void PlayAnimation()
+        private bool TryPlayPickupAnimation()
         {
+            if (Player is MainCharacter)
+            {
+                // MainCharacter 使用 Spine 动画，当前 spine 中没有拾取动画，
+                // 跳过以保留上一个状态的动画不被中断。
+                // 若将来添加了拾取动画，改为：
+                //   var mc = (MainCharacter)Player;
+                //   mc.PlaySpineAnimation(PickAnimation, false, PickUpAnimationSpeed);
+                //   _animRemaining = PickUpAnimationTotalTime / PickUpAnimationSpeed;
+                //   return true;
+                return false;
+            }
+
             if (Actor.AnimPlayer != null && Actor.AnimPlayer.HasAnimation(PickAnimation))
             {
                 Actor.AnimPlayer.Play(PickAnimation);
-                // Set animation playback speed only for pick up animation
                 Actor.AnimPlayer.SpeedScale = PickUpAnimationSpeed;
                 var speed = Mathf.Max(PickUpAnimationSpeed, 0.0001f);
                 _animRemaining = (float)Actor.AnimPlayer.CurrentAnimationLength / speed;
+                return true;
             }
-            else
-            {
-                _animationFinished = true;
-            }
+
+            return false;
         }
 
         private void UpdateAnimationState(double delta)

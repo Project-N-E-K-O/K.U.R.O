@@ -1,0 +1,48 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=10 format=3 uid="uid://cmwneancnik65"]
+
+[ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="1_3xlkm"]
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="2_6ffm0"]
+[ext_resource type="PackedScene" uid="uid://cea0a3niswxg1" path="res://scenes/actors/etc/EmojiBoom.tscn" id="3_q0hkk"]
+[ext_resource type="PackedScene" uid="uid://cmh3bnabinwi0" path="res://resources/effects/CameraShakeEffect.tscn" id="4_3xlkm"]
+[ext_resource type="Texture2D" uid="uid://cd24tjl6wpw4i" path="res://assets/objects/emoji_boom/时间轴 1_0000.png" id="4_q0hkk"]
+[ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="6_ep3ds"]
+
+[sub_resource type="Resource" id="Attribute_AttackPower"]
+script = ExtResource("1_3xlkm")
+AttributeId = "attack_power"
+
+[sub_resource type="Resource" id="Resource_letw0"]
+script = ExtResource("2_6ffm0")
+Trigger = 4
+EffectScene = ExtResource("3_q0hkk")
+metadata/_custom_type_script = "uid://bv0es4osw3x0r"
+
+[sub_resource type="Resource" id="Resource_6ffm0"]
+script = ExtResource("2_6ffm0")
+Trigger = 4
+EffectScene = ExtResource("4_3xlkm")
+PropertyOverrides = Dictionary[String, Variant]({
+"ShakeDelay": 1.2,
+"ShakeStrength": 24.0
+})
+metadata/_custom_type_script = "uid://bv0es4osw3x0r"
+
+[resource]
+script = ExtResource("6_ep3ds")
+ItemId = "Weapon_Throw_EmojiBomb"
+DisplayName = "emoji炸弹"
+Description = "安保类投掷武器：emoji炸弹"
+Icon = ExtResource("4_q0hkk")
+Category = "Weapon"
+Tags = Array[String](["tag_weapon", "build_guard", "tag_throw"])
+MaxStackSize = 1
+AttributeEntries = Array[ExtResource("1_3xlkm")]([SubResource("Attribute_AttackPower")])
+EffectEntries = Array[ExtResource("2_6ffm0")]([SubResource("Resource_letw0"), SubResource("Resource_6ffm0")])
+BuildClass = "guard"
+IsThrowable = true
+ThrowStartOffset = Vector2(0, -300)
+ThrowParabolicDuration = 0.4
+ThrowParabolicPeakHeight = 50.0
+ThrowHorizontalDistance = 700.0
+ThrowParabolicLandingYOffset = 200.0
+WorldScenePath = "uid://b81xhi3r08vha"

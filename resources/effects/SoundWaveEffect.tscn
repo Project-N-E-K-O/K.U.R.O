@@ -1,0 +1,38 @@
+[gd_scene load_steps=4 format=3 uid="uid://s4nrcrs36gtl"]
+
+[ext_resource type="Shader" uid="uid://csl7wb216r7s4" path="res://shaders/fx/sound_wave_cone.gdshader" id="1_cone_shader"]
+[ext_resource type="Script" uid="uid://cfggauw8ifbs" path="res://scripts/effects/SoundWaveEffect.cs" id="1_script"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_cone"]
+shader = ExtResource("1_cone_shader")
+shader_parameter/cone_angle_deg = 160.000007125
+shader_parameter/speed = 0.75000003236512
+shader_parameter/ring_count = 3
+shader_parameter/ring_width = 0.05
+shader_parameter/max_dist = 0.95
+shader_parameter/ring_color = Color(0, 0, 0, 0.176)
+shader_parameter/intensity = 2.000000095
+shader_parameter/edge_fade_deg = 15.0
+shader_parameter/distortion_strength = 0.012
+
+[node name="SoundWaveEffect" type="Node"]
+script = ExtResource("1_script")
+ConeAngle = 90.0
+ConeRange = 1700.0
+Damage = 1
+EffectId = "5f04a737-8a86-4810-a1f1-dfb7efd22391"
+DisplayName = "声波攻击"
+Description = "攻击到敌人后在敌人身后生成一道锥形声波，对该范围内的敌人造成持续伤害和减速"
+Duration = 2.0
+
+[node name="ConeContainer" type="Node2D" parent="."]
+visible = false
+z_index = 3
+z_as_relative = false
+
+[node name="ConeRect" type="ColorRect" parent="ConeContainer"]
+material = SubResource("ShaderMaterial_cone")
+custom_minimum_size = Vector2(2000, 2000)
+offset_top = -1000.0
+offset_right = 2000.0
+offset_bottom = 1000.0

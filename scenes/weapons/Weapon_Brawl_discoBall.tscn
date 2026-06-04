@@ -1,0 +1,73 @@
+[gd_scene load_steps=13 format=3 uid="uid://dmqi6co8gtn0l"]
+
+[ext_resource type="Script" uid="uid://dtgdjgrqgype7" path="res://scripts/items/world/WorldItemEntity.cs" id="1_odxds"]
+[ext_resource type="Resource" uid="uid://bckpievppp7bh" path="res://resources/items/Weapon_Brawl_DiscoBall.tres" id="2_odxds"]
+[ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="3_3jtwq"]
+[ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="5_2aeow"]
+[ext_resource type="Texture2D" uid="uid://xnx60hboixpd" path="res://assets/weapons/迪斯科闪光球.png" id="5_v2efu"]
+[ext_resource type="Shader" uid="uid://caxdo713k5kug" path="res://shaders/materials/sparkling.gdshader" id="7_crgrq"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_rrc52"]
+shader = ExtResource("3_3jtwq")
+shader_parameter/softness = 0.5
+shader_parameter/alpha = 0.4
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_m1u32"]
+load_path = "res://.godot/imported/影子.png-ff14a7a2861f691fc06fc4544603034d.ctex"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_2q28g"]
+shader = ExtResource("5_2aeow")
+shader_parameter/outline_color = Color(0.02, 0.02, 0.02, 1)
+shader_parameter/outline_size = 32.0
+shader_parameter/alpha_threshold = 0.5
+shader_parameter/edge_softness = 0.12
+shader_parameter/preserve_fill = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_1hnml"]
+shader = ExtResource("7_crgrq")
+shader_parameter/highlight_width = 0.08
+shader_parameter/highlight_speed = 2.0
+shader_parameter/highlight_intensity = 1.2
+shader_parameter/highlight_interval = 1.00000002375
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_3jtwq"]
+size = Vector2(700, 500)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_odbs7"]
+size = Vector2(250, 200)
+
+[node name="WeaponBrawlDiscoBall" type="CharacterBody2D"]
+z_index = 1
+scale = Vector2(0.33, 0.33)
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_odxds")
+ItemDefinition = ExtResource("2_odxds")
+DefaultOutlineColor = Color(0, 0, 0, 0)
+
+[node name="Shadow" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_rrc52")
+position = Vector2(-4, 120)
+scale = Vector2(10, 4)
+texture = SubResource("CompressedTexture2D_m1u32")
+
+[node name="Outline" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_2q28g")
+texture = ExtResource("5_v2efu")
+
+[node name="Sprite2D" type="Sprite2D" parent="Outline"]
+material = SubResource("ShaderMaterial_1hnml")
+texture = ExtResource("5_v2efu")
+
+[node name="CollisionArea" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CollisionArea"]
+z_index = 1
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_3jtwq")
+
+[node name="AttackArea" type="Area2D" parent="."]
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AttackArea"]
+shape = SubResource("RectangleShape2D_odbs7")

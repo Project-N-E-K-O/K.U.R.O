@@ -5,5 +5,7 @@
 [node name="HeavyCarrySlowEffect" type="Node"]
 script = ExtResource("1_slow_effect_script")
 EffectId = "7cdfd3cb-19a2-4355-a11a-a6dafb9be6d0"
+DisplayName = "减速"
+Description = "挂载该场景直接减少移动速度"
 IsBuff = false
 Duration = 0.0

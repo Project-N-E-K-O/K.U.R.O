@@ -38,9 +38,9 @@ size = Vector2(400, 1872)
 size = Vector2(400, 600)
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_ocwig"]
-vertices = PackedVector2Array(2696.9219, -1471.0469, 2694.0703, 1490.0234, -2773.9219, 1491.9688, -2771.0703, -1474.9375)
+vertices = PackedVector2Array(1573.9219, 665.4531, -1620.4219, 683.53906, -1631.5703, -1419, 1572.0703, -1419)
 polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3)])
-outlines = Array[PackedVector2Array]([PackedVector2Array(-2851, -1555, 2777, -1551, 2774, 1570, -2854, 1572)])
+outlines = Array[PackedVector2Array]([PackedVector2Array(-1712, -1499, 1652, -1499, 1654, 745, -1700, 764)])
 source_geometry_mode = 2
 agent_radius = 80.0
 
@@ -76,6 +76,7 @@ shape = SubResource("RectangleShape2D_556c4")
 debug_color = Color(0, 1, 0, 0.41960785)
 
 [node name="CutsceneTrigger" type="Area2D" parent="."]
+visible = false
 z_index = 10
 collision_layer = 0
 collision_mask = 4
@@ -116,6 +117,7 @@ position = Vector2(1695.55, 632.5)
 scale = Vector2(0.7, 0.8)
 
 [node name="StaticBody2D" type="StaticBody2D" parent="."]
+visible = false
 z_index = 10
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
@@ -144,5 +146,4 @@ rotation = 0.6981317
 shape = SubResource("RectangleShape2D_pal6r")
 
 [node name="NavigationRegion2D" type="NavigationRegion2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
-visible = false
 navigation_polygon = SubResource("NavigationPolygon_ocwig")

@@ -35,6 +35,8 @@ DamagePerTick = 1
 AdsorbRadius = 600.0
 AdsorbForce = 200.0
 EffectId = "423beca3-dc85-457c-82c2-1cc7947fe5de"
+DisplayName = "黑洞"
+Description = "范围内的敌人直接位移牵引向黑洞中心并持续收到伤害"
 Duration = 8.0
 
 [node name="Area2D" type="Area2D" parent="."]

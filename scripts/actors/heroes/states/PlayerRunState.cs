@@ -26,10 +26,10 @@ namespace Kuros.Actors.Heroes.States
             {
                 _dustEffectScene = DustEffectScene;
             }
-            else
-            {
-                _dustEffectScene ??= GD.Load<PackedScene>("res://shaders/smoke.tscn");
-            }
+            // else
+            // {
+            //     _dustEffectScene ??= GD.Load<PackedScene>("res://shaders/smoke.tscn");
+            // }
             
             // 连接 SpineController 信号（用于灰尘特效）
             if (Player is MainCharacter mainChar)

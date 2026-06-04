@@ -28,8 +28,8 @@ shader_parameter/highlight_speed = 2.0
 shader_parameter/highlight_intensity = 1.2
 shader_parameter/highlight_interval = 1.00000002375
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_w5uvq"]
-radius = 100.0
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_630y6"]
+size = Vector2(300, 300)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_eecfu"]
 size = Vector2(199, 318)
@@ -60,8 +60,8 @@ freeze_mode = 1
 
 [node name="Shadow" type="Sprite2D" parent="RigidBody2D"]
 material = SubResource("ShaderMaterial_swc0d")
-position = Vector2(-8, 81)
-scale = Vector2(3, 0.667)
+position = Vector2(-4, 81)
+scale = Vector2(3, 1)
 texture = ExtResource("4_630y6")
 
 [node name="Outline" type="Sprite2D" parent="RigidBody2D"]
@@ -78,9 +78,10 @@ region_rect = Rect2(-100, -100, 700, 700)
 [node name="CollisionArea" type="Area2D" parent="RigidBody2D"]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/CollisionArea"]
-shape = SubResource("CircleShape2D_w5uvq")
+shape = SubResource("RectangleShape2D_630y6")
 
 [node name="AttackArea" type="Area2D" parent="RigidBody2D"]
+visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/AttackArea"]
 position = Vector2(-1.5, 99)

@@ -60,23 +60,23 @@ namespace Kuros.Systems.FSM
             return _states.ContainsKey(stateName);
         }
 
-        public void ChangeState(string stateName)
+        public bool ChangeState(string stateName)
         {
             if (!_states.ContainsKey(stateName))
             {
                 GameLogger.Error(nameof(StateMachine), $"State '{stateName}' not found!");
-                return;
+                return false;
             }
 
             if (!CanTransitionTo(stateName))
             {
-                return;
+                return false;
             }
 
             State newState = _states[stateName];
 
             // Don't re-enter the same state unless we explicitly want to (omitted for now)
-            if (CurrentState == newState) return;
+            if (CurrentState == newState) return true;
 
             CurrentState?.Exit();
 
@@ -84,6 +84,7 @@ namespace Kuros.Systems.FSM
             // GD.Print($"Entered State: {stateName}"); // Debug log
 
             CurrentState.Enter();
+            return true;
         }
 
         public void ReenterState(string stateName)

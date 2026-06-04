@@ -11,7 +11,7 @@ namespace Kuros.Effects
     /// 尖刺区域效果。
     /// 敌人进入 Area2D 后，每隔 DamageInterval 秒受到 DamagePerTick 点伤害，
     /// 并持续降低 SpeedSlowPercent% 的移动速度；离开区域后恢复速度。
-    /// 支持多个尖刺效果重叠（使用倍数乘积管理减速）。
+    /// 多个尖刺效果不重叠。
     /// </summary>
     [GlobalClass]
     public partial class SpikeAttackEffect : ActorEffect, Kuros.Core.Effects.IWorldSpawnable

@@ -26,6 +26,13 @@ namespace Kuros.Items.Weapons
         [Export] public bool UseDefaultAttackAnimationFallback { get; set; } = true;
         [Export] public string ActivationAction { get; set; } = string.Empty;
 
+        [ExportGroup("Attack Timing Override")]
+        [Export(PropertyHint.MultilineText)] public string AttackTimingNote { get; set; } = "负数 = 使用攻击模板的默认值";
+        [Export(PropertyHint.Range, "-1,5,0.01")] public float WarmupDuration { get; set; } = -1f;
+        [Export(PropertyHint.Range, "-1,5,0.01")] public float ActiveDuration { get; set; } = -1f;
+        [Export(PropertyHint.Range, "-1,5,0.01")] public float RecoveryDuration { get; set; } = -1f;
+        [Export(PropertyHint.Range, "-1,10,0.01")] public float AttackCooldownDuration { get; set; } = -1f;
+
         public bool IsUsableInState(string stateName)
         {
             if (StateWhitelist.Count == 0) return true;

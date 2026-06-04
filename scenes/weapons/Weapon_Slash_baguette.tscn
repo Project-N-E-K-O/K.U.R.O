@@ -1,0 +1,71 @@
+[gd_scene load_steps=13 format=3 uid="uid://caapdem6qh6k8"]
+
+[ext_resource type="Script" uid="uid://dtgdjgrqgype7" path="res://scripts/items/world/WorldItemEntity.cs" id="1_p6fpp"]
+[ext_resource type="Resource" uid="uid://b7cpmnpvb42rf" path="res://resources/items/Weapon_Slash_Baguette.tres" id="2_p6fpp"]
+[ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="3_4cgri"]
+[ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="4_em7lt"]
+[ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="5_jactd"]
+[ext_resource type="Texture2D" uid="uid://xcu3hnecxemh" path="res://assets/weapons/法棍.png" id="6_p6fpp"]
+[ext_resource type="Shader" uid="uid://caxdo713k5kug" path="res://shaders/materials/sparkling.gdshader" id="7_6masb"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_nqlfu"]
+shader = ExtResource("3_4cgri")
+shader_parameter/softness = 0.5
+shader_parameter/alpha = 0.4
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_waoek"]
+shader = ExtResource("5_jactd")
+shader_parameter/outline_color = Color(0.02, 0.02, 0.02, 1)
+shader_parameter/outline_size = 32.0
+shader_parameter/alpha_threshold = 0.5
+shader_parameter/edge_softness = 0.12
+shader_parameter/preserve_fill = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_o1fls"]
+shader = ExtResource("7_6masb")
+shader_parameter/highlight_width = 0.08
+shader_parameter/highlight_speed = 2.0
+shader_parameter/highlight_intensity = 1.2
+shader_parameter/highlight_interval = 1.00000002375
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1hj56"]
+size = Vector2(1000, 400)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_4cgri"]
+size = Vector2(800, 150)
+
+[node name="WeaponSlashBaguette" type="CharacterBody2D"]
+z_index = 1
+scale = Vector2(0.33, 0.33)
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_p6fpp")
+ItemDefinition = ExtResource("2_p6fpp")
+DefaultOutlineColor = Color(0, 0, 0, 0)
+
+[node name="Shadow" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_nqlfu")
+position = Vector2(0, 50)
+scale = Vector2(15, 3)
+texture = ExtResource("4_em7lt")
+
+[node name="Outline" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_waoek")
+texture = ExtResource("6_p6fpp")
+
+[node name="Sprite2D" type="Sprite2D" parent="Outline"]
+material = SubResource("ShaderMaterial_o1fls")
+texture = ExtResource("6_p6fpp")
+
+[node name="CollisionArea" type="Area2D" parent="."]
+visible = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CollisionArea"]
+shape = SubResource("RectangleShape2D_1hj56")
+
+[node name="AttackArea" type="Area2D" parent="."]
+visible = false
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AttackArea"]
+shape = SubResource("RectangleShape2D_4cgri")
