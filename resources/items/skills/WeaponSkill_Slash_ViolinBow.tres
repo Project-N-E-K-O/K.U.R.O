@@ -16,7 +16,6 @@ SkillId = "Weapon_Slash_ViolinBow"
 DisplayName = "音乐家的琴弓攻击"
 SkillType = 1
 AnimationName = "Weapon_Slash_BarrierGate"
-ShowHitboxDebug = false
 Description = "攻击到敌人时生成一道对敌人造成伤害和减速的音波"
 Effects = Array[ExtResource("1_0yij6")]([SubResource("Resource_1tcmq")])
 WarmupDuration = 0.53

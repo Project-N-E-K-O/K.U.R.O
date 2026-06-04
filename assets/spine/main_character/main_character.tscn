@@ -1,4 +1,4 @@
-[gd_scene load_steps=52 format=3 uid="uid://ufprfd4r8ijj"]
+[gd_scene load_steps=53 format=3 uid="uid://ufprfd4r8ijj"]
 
 [ext_resource type="Script" uid="uid://12wblt72y8xt" path="res://scripts/actors/heroes/MainCharacter.cs" id="1_om6pm"]
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="2_4ht1x"]
@@ -20,6 +20,7 @@
 [ext_resource type="Script" uid="uid://bsa4kolrnan6p" path="res://scripts/actors/heroes/states/PlayerDyingState.cs" id="13_tdm7a"]
 [ext_resource type="Script" uid="uid://cp40kowtn1ho3" path="res://scripts/actors/heroes/states/PlayerDeadState.cs" id="14_0y2r2"]
 [ext_resource type="Script" uid="uid://vr51ymsfyxws" path="res://scripts/actors/heroes/states/PlayerPickUpState.cs" id="15_0y6jy"]
+[ext_resource type="PackedScene" uid="uid://d1td06we8ip0i" path="res://scenes/actors/etc/BleedA.tscn" id="15_7xilr"]
 [ext_resource type="Script" uid="uid://dijk8ngvrs5g0" path="res://scripts/actors/heroes/states/PlayerThrowState.cs" id="16_oc5yk"]
 [ext_resource type="Script" uid="uid://b6vgqpdrtg1lh" path="res://scripts/actors/heroes/PlayerInventoryComponent.cs" id="17_13pt2"]
 [ext_resource type="Script" uid="uid://c002yrog1v7ag" path="res://scripts/actors/heroes/PlayerWeaponSkillController.cs" id="18_utqjm"]
@@ -180,7 +181,7 @@ position = Vector2(6.0606065, -515.15155)
 shape = SubResource("CapsuleShape2D_0y2r2")
 
 [node name="AttackArea" type="Area2D" parent="."]
-visible = false
+position = Vector2(0, 100)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AttackArea"]
 position = Vector2(464.24234, -569.99994)
@@ -324,10 +325,10 @@ script = ExtResource("9_13pt2")
 AttackId = "orkscrew_melee_attack"
 DisplayName = "Corkscrew Melee Attack"
 Description = "开瓶器专属攻击模板示例"
-HitEffectScene = ExtResource("13_7xilr")
+HitEffectScene = ExtResource("15_7xilr")
 HitEffectForceTopLevel = true
 HitEffectLocalOffset = Vector2(0, -350)
-RequiredItemId = "Weapon_Stab_orkscrew"
+RequiredItemId = "Weapon_Stab_corkscrew"
 
 [node name="Hit" type="Node" parent="StateMachine"]
 script = ExtResource("10_utqjm")

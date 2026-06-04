@@ -34,7 +34,7 @@ shader_parameter/highlight_interval = 1.00000002375
 size = Vector2(700, 500)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_odbs7"]
-size = Vector2(250, 200)
+size = Vector2(250, 100)
 
 [node name="WeaponBrawlDiscoBall" type="CharacterBody2D"]
 z_index = 1
@@ -67,6 +67,7 @@ position = Vector2(0, -20)
 shape = SubResource("RectangleShape2D_3jtwq")
 
 [node name="AttackArea" type="Area2D" parent="."]
+visible = false
 collision_layer = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AttackArea"]

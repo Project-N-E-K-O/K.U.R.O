@@ -180,7 +180,7 @@ position = Vector2(-1092, -1332.9999)
 position = Vector2(-1091, -1496.9999)
 
 [node name="WeaponSlashViolinBow" parent="World" instance=ExtResource("12_ngl7c")]
-position = Vector2(-354, -1499.9999)
+position = Vector2(-403.00003, -1504.0001)
 
 [node name="WeaponStabCorkscrew" parent="World" instance=ExtResource("19_dxexl")]
 position = Vector2(-386.00024, -1333.9999)
@@ -207,11 +207,12 @@ position = Vector2(209, -1359.9999)
 position = Vector2(4285, -336)
 script = ExtResource("16_28ted")
 ElevatorScenePath = "uid://v3n56xk6n8ca"
-NextStagePath = "uid://dwk6x3qcbsmul"
+NextStagePath = "uid://qd5abd4opeob"
 LoadDistance = 2000.0
 
 [node name="center" type="Sprite2D" parent="World"]
 z_index = 10
+scale = Vector2(0.1, 0.1)
 texture = ExtResource("30_m86xd")
 
 [node name="DropDebug" type="Node2D" parent="."]

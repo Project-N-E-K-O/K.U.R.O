@@ -153,7 +153,7 @@ scale = Vector2(3.6, 3.6)
 shape = SubResource("CircleShape2D_otg7e")
 
 [node name="HitArea" type="Area2D" parent="Sprite2D"]
-visible = false
+z_index = 10
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/HitArea"]
 position = Vector2(0, 70)
@@ -161,6 +161,7 @@ rotation = 1.5707964
 shape = SubResource("CapsuleShape2D_otg7e")
 
 [node name="AttackArea" type="Area2D" parent="Sprite2D"]
+visible = false
 collision_layer = 0
 monitorable = false
 
@@ -170,6 +171,7 @@ scale = Vector2(0.9999999, 0.9999999)
 shape = SubResource("2")
 
 [node name="GrabArea" type="Area2D" parent="Sprite2D"]
+visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/GrabArea"]
 position = Vector2(918.1816, 399.99997)

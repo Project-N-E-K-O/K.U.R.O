@@ -40,7 +40,7 @@ radius = 1024.0
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_dx6wd"]
 radius = 150.0
-height = 600.0
+height = 800.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_yski7"]
 radius = 180.0
@@ -126,7 +126,6 @@ preview_time = 0.55
 script = ExtResource("5_htedi")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-visible = false
 modulate = Color(0.8, 0.6, 0.5, 1)
 position = Vector2(0, -600)
 
@@ -161,10 +160,10 @@ scale = Vector2(9, 9)
 shape = SubResource("CircleShape2D_7t51a")
 
 [node name="HitArea" type="Area2D" parent="Sprite2D"]
-visible = false
+z_index = 10
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/HitArea"]
-position = Vector2(0, 130)
+position = Vector2(0, -120)
 shape = SubResource("CapsuleShape2D_dx6wd")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

@@ -1,7 +1,7 @@
 [gd_scene load_steps=11 format=3 uid="uid://bgkw4qeioiet3"]
 
 [ext_resource type="Texture2D" uid="uid://coa8804fc1wc6" path="res://assets/furnitures/椅子.png" id="1_bbajv"]
-[ext_resource type="Script" uid="uid://rpt50t16vkk7" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_f84p0"]
+[ext_resource type="Script" uid="uid://dhfq2rrha0awm" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_f84p0"]
 [ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="2_g101m"]
 [ext_resource type="Script" uid="uid://bkm4r2swk5lyl" path="res://scripts/items/durability/ItemDurabilityConfig.cs" id="3_wra1e"]
 [ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="4_o1n6d"]
@@ -40,7 +40,6 @@ GrabAreaPath = NodePath("Rigidbody2D/GrabArea")
 GrabAreaCollisionLayer = 1
 GrabAreaCollisionMask = 2
 StopOnHit = true
-MaxDurability = 1
 RigidBodyPath = NodePath("Rigidbody2D")
 ThrowCollisionLayer = 2
 ThrowCollisionMask = 2
@@ -58,10 +57,12 @@ scale = Vector2(0.34, 0.34)
 texture = ExtResource("1_bbajv")
 
 [node name="CollisionShape2D3" type="CollisionShape2D" parent="Rigidbody2D"]
+visible = false
 position = Vector2(-5, 27)
 shape = SubResource("CircleShape2D_bbajv")
 
 [node name="Hitbox" type="Area2D" parent="Rigidbody2D"]
+visible = false
 
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="Rigidbody2D/Hitbox"]
 position = Vector2(20, -32)
@@ -75,6 +76,7 @@ position = Vector2(-5, 27)
 shape = SubResource("CircleShape2D_bbajv")
 
 [node name="GrabArea" type="Area2D" parent="Rigidbody2D"]
+visible = false
 collision_layer = 2
 
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="Rigidbody2D/GrabArea"]
