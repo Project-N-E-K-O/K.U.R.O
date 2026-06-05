@@ -156,7 +156,8 @@ namespace Kuros.Effects
                 var freeze = new FreezeEffect
                 {
                     Duration = this.StunDuration,
-                    EffectId = $"{_idPrefix}_{enemy.GetInstanceId()}"
+                    EffectId = $"{_idPrefix}_{enemy.GetInstanceId()}",
+                    ResumePreviousState = false
                 };
                 enemy.ApplyEffect(freeze);
             }
