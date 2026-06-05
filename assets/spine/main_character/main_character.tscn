@@ -1,4 +1,4 @@
-[gd_scene load_steps=53 format=3 uid="uid://ufprfd4r8ijj"]
+[gd_scene load_steps=54 format=3 uid="uid://ufprfd4r8ijj"]
 
 [ext_resource type="Script" uid="uid://12wblt72y8xt" path="res://scripts/actors/heroes/MainCharacter.cs" id="1_om6pm"]
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="2_4ht1x"]
@@ -15,6 +15,7 @@
 [ext_resource type="Script" uid="uid://d1g4amacs13a3" path="res://scripts/actors/heroes/states/PlayerFrozenState.cs" id="11_t3prk"]
 [ext_resource type="Script" uid="uid://ba1kd5qgh17ag" path="res://scripts/actors/heroes/states/PlayerRunState.cs" id="12_4ht1x"]
 [ext_resource type="PackedScene" uid="uid://qhytc6rh50pe" path="res://scenes/actors/etc/SlashAttackEffect.tscn" id="12_f18x1"]
+[ext_resource type="PackedScene" uid="uid://cw3ds501wucw4" path="res://scenes/actors/etc/HitH.tscn" id="12_van21"]
 [ext_resource type="PackedScene" uid="uid://1dmiw35p7g47" path="res://scenes/actors/etc/StabAttackEffectA.tscn" id="13_7xilr"]
 [ext_resource type="PackedScene" uid="uid://bmseps5gh7qi3" path="res://scenes/actors/etc/StabAttackEffectB.tscn" id="13_f18x1"]
 [ext_resource type="Script" uid="uid://bsa4kolrnan6p" path="res://scripts/actors/heroes/states/PlayerDyingState.cs" id="13_tdm7a"]
@@ -147,24 +148,24 @@ script = ExtResource("4_ixg0x")
 skeleton_data_res = ExtResource("4_o4xwm")
 bones_thickness = 10.09
 preview_skin = "Default"
-preview_animation = "-- Empty --"
+preview_animation = "Weapon_Slash_BunnySword"
 preview_frame = true
-preview_time = 0.48
+preview_time = 0.8
 script = ExtResource("4_ixg0x")
 
 [node name="SpineBoneNode" type="SpineBoneNode" parent="SpineSprite"]
 show_behind_parent = true
 z_index = -1
-position = Vector2(0.81878656, -473.96185)
-rotation = -1.6159917
-scale = Vector2(0.9999998, 0.9999998)
+position = Vector2(-9.107266, -473.87503)
+rotation = -1.6369357
+scale = Vector2(0.9999999, 0.9999999)
 bone_name = "Upper Body"
 
 [node name="SpineHoldingBoneNode" type="SpineBoneNode" parent="SpineSprite"]
 show_behind_parent = true
-position = Vector2(0.81878656, -473.96185)
-rotation = -1.6159917
-scale = Vector2(0.9999998, 0.9999998)
+position = Vector2(-9.107266, -473.87503)
+rotation = -1.6369357
+scale = Vector2(0.9999999, 0.9999999)
 bone_name = "Upper Body"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
@@ -280,6 +281,16 @@ HitEffectForceTopLevel = true
 HitEffectLocalOffset = Vector2(0, -350)
 RequiredItemId = "Weapon_Slash_baguette"
 
+[node name="SlashBunnySword" type="Node" parent="StateMachine/Attack"]
+script = ExtResource("9_13pt2")
+AttackId = "bunny_sword_melee_attack"
+DisplayName = "Bunny Sword  Melee Attack"
+Description = "仿生兔女郎的光剑专属攻击模板示例"
+HitEffectScene = ExtResource("12_van21")
+HitEffectForceTopLevel = true
+HitEffectLocalOffset = Vector2(0, -250)
+RequiredItemId = "Weapon_Slash_bunnySword"
+
 [node name="SlashBarrierGate" type="Node" parent="StateMachine/Attack"]
 script = ExtResource("9_13pt2")
 AttackId = "barrier_gate_melee_attack"
@@ -298,7 +309,7 @@ Description = "琴弓专属攻击模板示例"
 HitEffectScene = ExtResource("12_f18x1")
 HitEffectForceTopLevel = true
 HitEffectLocalOffset = Vector2(0, -350)
-RequiredItemId = "Weapon_Slash_volinBow"
+RequiredItemId = "Weapon_Slash_violinBow"
 
 [node name="StabUmbrella" type="Node" parent="StateMachine/Attack"]
 script = ExtResource("9_13pt2")

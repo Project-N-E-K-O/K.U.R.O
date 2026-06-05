@@ -16,7 +16,7 @@ metadata/_custom_type_script = "uid://bv0es4osw3x0r"
 
 [resource]
 script = ExtResource("2_hxcpv")
-SkillId = "Weapon_Slash_BarrierGate"
+SkillId = "WeaponSkill_Slash_BarrierGate"
 DisplayName = "开刃升降杆攻击"
 AnimationName = "Weapon_Slash_BarrierGate"
 ShowHitboxDebug = false

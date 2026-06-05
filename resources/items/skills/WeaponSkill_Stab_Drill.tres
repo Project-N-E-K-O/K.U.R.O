@@ -15,7 +15,7 @@ metadata/_custom_type_script = "uid://bv0es4osw3x0r"
 
 [resource]
 script = ExtResource("2_wr56q")
-SkillId = "Weapon_Stab_Drill"
+SkillId = "WeaponSkill_Stab_Drill"
 DisplayName = "钻头攻击"
 AnimationName = "Weapon_Stab_Drill"
 CooldownSeconds = 3.0
