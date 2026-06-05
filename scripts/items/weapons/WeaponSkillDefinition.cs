@@ -31,7 +31,15 @@ namespace Kuros.Items.Weapons
         [Export(PropertyHint.Range, "-1,5,0.01")] public float WarmupDuration { get; set; } = -1f;
         [Export(PropertyHint.Range, "-1,5,0.01")] public float ActiveDuration { get; set; } = -1f;
         [Export(PropertyHint.Range, "-1,5,0.01")] public float RecoveryDuration { get; set; } = -1f;
-        [Export(PropertyHint.Range, "-1,10,0.01")] public float AttackCooldownDuration { get; set; } = -1f;
+
+        [Export(PropertyHint.Range, "0.1,3,0.1")]
+        public float WarmupAnimationSpeed { get; set; } = 1.0f;
+
+        [Export(PropertyHint.Range, "0.1,3,0.1")]
+        public float ActiveAnimationSpeed { get; set; } = 1.0f;
+
+        [Export(PropertyHint.Range, "0.1,3,0.1")]
+        public float RecoveryAnimationSpeed { get; set; } = 1.0f;
 
         public bool IsUsableInState(string stateName)
         {

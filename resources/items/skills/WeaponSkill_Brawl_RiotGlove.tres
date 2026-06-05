@@ -26,4 +26,3 @@ Effects = Array[ExtResource("1_bdrdo")]([SubResource("Resource_rr1ju")])
 WarmupDuration = 0.19
 ActiveDuration = 0.3
 RecoveryDuration = 0.178
-AttackCooldownDuration = 0.5

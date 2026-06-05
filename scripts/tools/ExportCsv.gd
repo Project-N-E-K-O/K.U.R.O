@@ -157,7 +157,8 @@ func _export_skills() -> void:
 		"file", "SkillId", "DisplayName", "AnimationName",
 		"DamageMultiplier", "CooldownSeconds", "ShowHitboxDebug",
 		"Description", "ActivationAction",
-		"WarmupDuration", "ActiveDuration", "RecoveryDuration", "AttackCooldownDuration"
+		"WarmupDuration", "ActiveDuration", "RecoveryDuration",
+			"WarmupAnimationSpeed", "ActiveAnimationSpeed", "RecoveryAnimationSpeed"
 	]
 	var rows: Array = [headers]
 
@@ -180,7 +181,9 @@ func _export_skills() -> void:
 			str(r.get("WarmupDuration", "-1")),
 			str(r.get("ActiveDuration", "-1")),
 			str(r.get("RecoveryDuration", "-1")),
-			str(r.get("AttackCooldownDuration", "-1"))
+			str(r.get("WarmupAnimationSpeed", "1.0")),
+			str(r.get("ActiveAnimationSpeed", "1.0")),
+			str(r.get("RecoveryAnimationSpeed", "1.0"))
 		])
 
 	_write_csv(OUT_SKILLS, rows)

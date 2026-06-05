@@ -21,4 +21,5 @@ Effects = Array[ExtResource("1_dfqri")]([SubResource("Resource_tjf6w")])
 WarmupDuration = 0.2
 ActiveDuration = 0.2
 RecoveryDuration = 0.1
-AttackCooldownDuration = 0.5
+WarmupAnimationSpeed = 0.5
+RecoveryAnimationSpeed = 0.5

@@ -52,7 +52,9 @@ func import_skills_from_csv() -> void:
 		_s_float_neg1(res, "WarmupDuration",         row, hm)
 		_s_float_neg1(res, "ActiveDuration",         row, hm)
 		_s_float_neg1(res, "RecoveryDuration",       row, hm)
-		_s_float_neg1(res, "AttackCooldownDuration",  row, hm)
+		_s_float(res, "WarmupAnimationSpeed",    row, hm, "WarmupAnimationSpeed")
+		_s_float(res, "ActiveAnimationSpeed",    row, hm, "ActiveAnimationSpeed")
+		_s_float(res, "RecoveryAnimationSpeed",  row, hm, "RecoveryAnimationSpeed")
 		if _save(res, path): count += 1
 	_log.info("  → 更新 %d 个" % count)
 

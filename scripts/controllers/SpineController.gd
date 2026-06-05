@@ -72,6 +72,18 @@ func play(anim: String, loop := true, mix_duration := 0.1, time_scale := 1.0):
 	
 	return entry
 
+## 动态修改当前正在播放动画的时间缩放，无需重启动画。
+func change_time_scale(time_scale: float):
+	var state = get_animation_state()
+	if not state:
+		return
+	var entry = state.get_current(0)
+	if entry:
+		if entry.has_method("set_time_scale"):
+			entry.set_time_scale(time_scale)
+		else:
+			entry.time_scale = time_scale
+
 ## 获取当前的 AnimationState
 func get_state():
 	return get_animation_state()

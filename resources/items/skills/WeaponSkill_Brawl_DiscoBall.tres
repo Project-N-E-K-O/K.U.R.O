@@ -1,18 +1,13 @@
 [gd_resource type="Resource" script_class="WeaponSkillDefinition" load_steps=5 format=3 uid="uid://no6qoohk3jb6"]
 
 [ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="1_gwghm"]
-[ext_resource type="PackedScene" uid="uid://cbcmkogcqffmo" path="res://resources/effects/CriticalStrikeEffect.tscn" id="2_ph7n4"]
+[ext_resource type="PackedScene" uid="uid://dyh38a1m2n8oj" path="res://resources/effects/DiscoFlashStunEffect.tscn" id="2_dis_stun"]
 [ext_resource type="Script" uid="uid://bp6pwgoj44cuq" path="res://scripts/items/weapons/WeaponSkillDefinition.cs" id="3_k3bem"]
 
-[sub_resource type="Resource" id="Resource_rr1ju"]
+[sub_resource type="Resource" id="Resource_dis_stun"]
 script = ExtResource("1_gwghm")
 Trigger = 1
-EffectScene = ExtResource("2_ph7n4")
-PropertyOverrides = Dictionary[String, Variant]({
-"CritBonusMultiplier": 1.0,
-"CritChance": 20.0,
-"WeaponAttackValue": 1.0
-})
+EffectScene = ExtResource("2_dis_stun")
 metadata/_custom_type_script = "uid://bv0es4osw3x0r"
 
 [resource]
@@ -22,9 +17,8 @@ DisplayName = "迪斯科闪光球攻击"
 AnimationName = "Weapon_Brawl_Iron"
 ShowHitboxDebug = false
 Description = "每次攻击到敌人时都20%概率触发闪光眩晕范围敌人"
-Effects = Array[ExtResource("1_gwghm")]([SubResource("Resource_rr1ju")])
+Effects = Array[ExtResource("1_gwghm")]([SubResource("Resource_dis_stun")])
 AttackTimingNote = ""
 WarmupDuration = 0.19
 ActiveDuration = 0.3
 RecoveryDuration = 0.178
-AttackCooldownDuration = 0.5

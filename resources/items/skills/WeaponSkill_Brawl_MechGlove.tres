@@ -33,4 +33,4 @@ Effects = Array[ExtResource("1_rpm6u")]([SubResource("Resource_bk1ns"), SubResou
 WarmupDuration = 0.5
 ActiveDuration = 0.43
 RecoveryDuration = 0.4
-AttackCooldownDuration = 0.5
+WarmupAnimationSpeed = 1.5

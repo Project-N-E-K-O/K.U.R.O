@@ -1,4 +1,4 @@
-[gd_scene load_steps=54 format=3 uid="uid://ufprfd4r8ijj"]
+[gd_scene load_steps=55 format=3 uid="uid://ufprfd4r8ijj"]
 
 [ext_resource type="Script" uid="uid://12wblt72y8xt" path="res://scripts/actors/heroes/MainCharacter.cs" id="1_om6pm"]
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="2_4ht1x"]
@@ -27,6 +27,7 @@
 [ext_resource type="Script" uid="uid://c002yrog1v7ag" path="res://scripts/actors/heroes/PlayerWeaponSkillController.cs" id="18_utqjm"]
 [ext_resource type="Script" uid="uid://b0t8cfl3khjix" path="res://scripts/actors/heroes/PlayerItemInteractionComponent.cs" id="19_t3prk"]
 [ext_resource type="Script" uid="uid://h02ofhsj1qa4" path="res://scripts/actors/heroes/PlayerItemAttachment.cs" id="20_4ht1x"]
+[ext_resource type="PackedScene" uid="uid://ddi6xmmkbkex2" path="res://shaders/run_smoke.tscn" id="20_30ctb"]
 [ext_resource type="Script" uid="uid://b6l0u6d5v5npj" path="res://scripts/actors/heroes/states/PlayerIdleHoldingState.cs" id="20_h3qap"]
 [ext_resource type="Script" uid="uid://stu62fj3xe3k" path="res://scripts/actors/heroes/states/PlayerRunHoldingState.cs" id="21_6hy0m"]
 [ext_resource type="Script" uid="uid://d6ppl6a6djpr" path="res://scripts/core/effects/EffectController.cs" id="21_utqjm"]
@@ -148,24 +149,24 @@ script = ExtResource("4_ixg0x")
 skeleton_data_res = ExtResource("4_o4xwm")
 bones_thickness = 10.09
 preview_skin = "Default"
-preview_animation = "Weapon_Slash_BunnySword"
+preview_animation = "-- Empty --"
 preview_frame = true
-preview_time = 0.8
+preview_time = 0.45
 script = ExtResource("4_ixg0x")
 
 [node name="SpineBoneNode" type="SpineBoneNode" parent="SpineSprite"]
 show_behind_parent = true
 z_index = -1
-position = Vector2(-9.107266, -473.87503)
-rotation = -1.6369357
-scale = Vector2(0.9999999, 0.9999999)
+position = Vector2(0.81878656, -473.96185)
+rotation = -1.6159917
+scale = Vector2(0.9999998, 0.9999998)
 bone_name = "Upper Body"
 
 [node name="SpineHoldingBoneNode" type="SpineBoneNode" parent="SpineSprite"]
 show_behind_parent = true
-position = Vector2(-9.107266, -473.87503)
-rotation = -1.6369357
-scale = Vector2(0.9999999, 0.9999999)
+position = Vector2(0.81878656, -473.96185)
+rotation = -1.6159917
+scale = Vector2(0.9999998, 0.9999998)
 bone_name = "Upper Body"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
@@ -349,6 +350,7 @@ script = ExtResource("11_t3prk")
 
 [node name="Run" type="Node" parent="StateMachine"]
 script = ExtResource("12_4ht1x")
+DustEffectScene = ExtResource("20_30ctb")
 
 [node name="Dying" type="Node" parent="StateMachine"]
 script = ExtResource("13_tdm7a")

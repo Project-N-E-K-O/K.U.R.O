@@ -28,10 +28,9 @@ Supplies_p2_support_test,supplies_p2_support_test,P2应急能量胶,临时测试
 Supplies_pudding,supplies_pudding,浓厚布丁,甜美布丁，既可当作轻型武器，也能在食用后永久提升 1 点最大生命并回复 1 点生命。,Supplies,tag_food,1,,1,false,false,2.0,1,,
 Supplies_watermelon,supplies_watermelon,多汁西瓜,既是食材也是武器：吃下可恢复 3 点生命，用手砸到敌人反而让对方回复 1 点生命。,Supplies,tag_food,1,,1,false,false,-1.0,1,,SuppliesWatermelonPassiveSkill
 Weapon_A0_bowl,weapon_a0_bowl,A0 木碗,轻便的小木碗，只能造成些许伤害。,Weapon,,1,,1,false,false,1.0,1,0,
-Weapon_A0_computer_A,weapon_a0_computer_a,A0 终端·A,高风险终端：普通攻击 5 点伤害，仅在命中敌人时才损耗这唯一的耐久。主动技能可秒杀全屏敌人，但累计 3 次就会报错并关闭游戏。,Weapon,,1,,1,false,false,5.0,1,1,WeaponComputerAActiveSkill
+Weapon_A0_computer_A,weapon_a0_computer_a,A0 终端·A,高风险终端：普通攻击 5 点伤害，仅在命中敌人时才损耗这唯一的耐久。主动技能可秒杀全屏敌人，但累计 3 次就会报错并关闭游戏。,Weapon,,1,,1,false,false,5.0,1,,WeaponComputerAActiveSkill
 Weapon_A0_lengyue,weapon_a0_lengyue,A0 冷月,蕴含冷冽月光的武器，除了 7 点攻击力，还会定期向背包投放西瓜补给。,Weapon,,1,,1,false,false,7.0,,,WeaponLengyuePassiveSkill
 Weapon_A0_manto,weapon_a0_manto,A0 披风,攻速平平，但每次命中敌人都会让持有者恢复 1 点生命值。,Weapon,,1,,1,false,false,1.0,,,
-Weapon_A0_neiku,weapon_a0_neiku,A0 内库,起始攻击力为 0，但每次命中敌人都会永久提升 1 点攻击力。,Weapon,,1,,1,false,false,0.0,,,WeaponNeikuPassiveSkill
 Weapon_A0_plate,weapon_a0_plate,A0 瓷盘,轻薄的瓷盘，攻击力 1。被投掷后命中任何单位都会造成等同攻击力的伤害，命中后即会损毁。,Weapon,,1,,1,false,false,1.0,1,,
 Weapon_A0_yaomeng1,weapon_a0_yaomeng1,A0 妖梦·壹式,以瞬闪之姿撕裂前路的武器，拥有 11 点攻击力。,Weapon,,1,,1,false,false,11.0,,,WeaponYaomeng1ActiveSkill|WeaponYaomengSynergyPassiveSkill
 Weapon_A0_yaomeng2,weapon_a0_yaomeng2,A0 妖梦·贰式,侧重审判的妖梦武器，具有 4 点攻击力与斩杀框架。,Weapon,,1,,1,false,false,4.0,,,WeaponYaomeng2ActiveSkill|WeaponYaomengSynergyPassiveSkill

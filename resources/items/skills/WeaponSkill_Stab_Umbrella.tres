@@ -25,4 +25,3 @@ ActivationAction = "weapon_skill_block"
 WarmupDuration = 0.17
 ActiveDuration = 0.63
 RecoveryDuration = 0.2
-AttackCooldownDuration = 0.5

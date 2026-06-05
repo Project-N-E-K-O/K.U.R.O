@@ -403,6 +403,29 @@ namespace Kuros.Actors.Heroes
 			return _spineController;
 		}
 
+		/// <summary>
+		/// 动态修改当前 Spine 动画的播放速度，无需重启动画。
+		/// </summary>
+		public void SetSpineAnimationSpeed(float timeScale)
+		{
+			if (_spineController == null || !IsInstanceValid(_spineController))
+				return;
+
+			if (_spineController.HasMethod("change_time_scale"))
+			{
+				_spineController.Call("change_time_scale", timeScale);
+			}
+
+			ResolveOutlineSpines();
+			foreach (Node outlineNode in _outlineSpineControllers)
+			{
+				if (IsInstanceValid(outlineNode) && outlineNode.HasMethod("change_time_scale"))
+				{
+					outlineNode.Call("change_time_scale", timeScale);
+				}
+			}
+		}
+
 
 		/// <summary>
 		/// 执行攻击检测（集成 WeaponSkillController）
