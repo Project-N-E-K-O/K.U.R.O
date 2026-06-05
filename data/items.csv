@@ -1,5 +1,7 @@
 file,ItemId,DisplayName,Description,Category,Tags,MaxStackSize,BuildClass,LevelCount,IsThrowable,IsFurniture,attack_power,MaxDurability,DamagePerHit,SkillRefs
 ExamplePotion,item_example_potion,示例药水,用于测试拾取与投掷流程的示例药水。,Consumable,,5,,1,false,false,5.0,,,ExampleSlashSkill
+Furniture_A_ChairOfficeB,Furniture_A_ChairOfficeB,办公座椅B,一次性投掷道具：办公座椅B,Furniture,tag_throw|furniture,1,,0,true,true,,,,
+Furniture_A_SofaB,Furniture_A_SofaB,黄色沙发,一次性投掷道具：黄色沙发,Furniture,tag_throw|furniture,1,,0,true,true,,,,
 Furniture_B_CautionTape_fwd,Furniture_B_CautionTape_fwd,警戒线(反),一次性投掷道具：警戒线(反),Furniture,tag_throw|furniture,1,,0,true,true,,,,
 Furniture_B_CautionTape_side,Furniture_B_CautionTape_side,警戒线(正),一次性投掷道具：警戒线(正),Furniture,tag_throw|furniture,1,,0,true,true,,,,
 Furniture_B_ChairA,Furniture_B_ChairA,白色座椅,一次性投掷道具：白色座椅,Furniture,tag_throw|furniture,1,,0,true,true,,,,

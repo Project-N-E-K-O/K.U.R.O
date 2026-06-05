@@ -5,12 +5,13 @@
 
 [node name="DiscoFlashStunEffect" type="Node"]
 script = ExtResource("1_dis_stun")
+TriggerChance = 10.0
 FlashRayScene = ExtResource("2_2r2ym")
 FlashRaySpawnOffset = Vector2(150, -150)
-CooldownDuration = 10.0
+ShowStunRadius = false
 EffectId = "a7e3c54e-8f2b-41d9-a6c1-d45043f8e72b"
-DisplayName = "闪光眩晕"
-Description = "攻击命中时有概率触发全屏闪光并眩晕范围敌人"
+DisplayName = "迪斯科球闪光眩晕"
+Description = "攻击命中时有概率触发闪光并眩晕范围敌人"
 Duration = 0.0
 
 [node name="FlashCanvas" type="CanvasLayer" parent="."]
