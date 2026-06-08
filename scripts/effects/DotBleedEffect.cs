@@ -73,7 +73,7 @@ namespace Kuros.Effects
             if (source != DamageSource.DirectAttack) return;
             if (Actor == null || attacker != Actor) return;
             if (damage <= 0) return;
-            if (target.IsDead) return;
+            if (target.IsDeathSequenceActive || target.IsDead) return;
 
             ApplyBleed(target);
         }
@@ -106,13 +106,13 @@ namespace Kuros.Effects
             var capturedEnemy = enemy;
             tickTimer.Timeout += () =>
             {
-                if (!IsInstanceValid(capturedEnemy) || capturedEnemy.IsDead)
+                if (!IsInstanceValid(capturedEnemy) || capturedEnemy.IsDeathSequenceActive || capturedEnemy.IsDead)
                 {
                     CleanupBleed(capturedEnemy);
                     return;
                 }
                 capturedEnemy.TakeDamage(DamagePerTick, Vector2.Zero);
-                if (capturedEnemy.IsDead)
+                if (capturedEnemy.IsDeathSequenceActive || capturedEnemy.IsDead)
                     CleanupBleed(capturedEnemy);
             };
 
@@ -120,7 +120,7 @@ namespace Kuros.Effects
             enemy.TreeExiting += () => CleanupBleed(capturedEnemy);
             enemy.DamageTaken += _ =>
             {
-                if (capturedEnemy.IsDead)
+                if (capturedEnemy.IsDeathSequenceActive || capturedEnemy.IsDead)
                     CleanupBleed(capturedEnemy);
             };
 
