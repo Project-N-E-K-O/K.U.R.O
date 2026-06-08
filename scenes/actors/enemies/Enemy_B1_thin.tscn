@@ -73,6 +73,7 @@ DebugOverlayFontSize = 128
 DetectionArea = NodePath("Sprite2D/ControllerDetectionArea")
 AttackRangeCheckDistance = 600.0
 AttackArea = NodePath("Sprite2D/AttackArea")
+ScoreValue = 50
 Speed = 400.0
 AttackDamage = 0.0
 AttackCooldown = 0.0
