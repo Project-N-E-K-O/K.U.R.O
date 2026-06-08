@@ -12,9 +12,11 @@ const ITEMS_DIR  := "res://resources/items"
 const SKILLS_DIR := "res://resources/items/skills"
 const BUILDS_DIR := "res://resources/builds"
 const LOOT_DIR   := "res://resources/loot"
+const ENEMY_DIR  := "res://scenes/actors/enemies"
 
 # ── 输出路径 ───────────────────────────────────────────────────────────────────
 const OUT_ITEMS  := "res://data/items.csv"
+const OUT_ENEMIES := "res://data/enemies.csv"
 const OUT_BUILDS := "res://data/builds.csv"
 const OUT_SKILLS := "res://data/skills.csv"
 const OUT_LOOT   := "res://data/loot.csv"
@@ -33,6 +35,7 @@ func _run() -> void:
 	_export_builds()
 	_export_skills()
 	_export_loot()
+	_export_enemies()
 	print("[ExportCsv] All exports completed.")
 # ══════════════════════════════════════════════════════════════════════════════
 #  ITEMS  (resources/items/*.tres  →  ItemDefinition)
@@ -255,6 +258,36 @@ func _export_loot() -> void:
 	print("[ExportCsv] loot.csv -> %d rows" % (rows.size() - 1))
 
 # ══════════════════════════════════════════════════════════════════════════════
+#  ENEMIES  (scenes/actors/enemies/*.tscn)
+# ══════════════════════════════════════════════════════════════════════════════
+
+func _export_enemies() -> void:
+	var files := _list_tscn(ENEMY_DIR)
+	if files.is_empty():
+		push_warning("[ExportCsv] No .tscn found in " + ENEMY_DIR)
+		return
+
+	var headers := ["file", "Speed", "AttackDamage", "AttackCooldown", "MaxHealth"]
+	var rows: Array = [headers]
+
+	for fpath_v in files:
+		var fpath: String = str(fpath_v)
+		var props: Dictionary = _parse_tscn_root(fpath)
+		if props.is_empty():
+			continue
+
+		rows.append([
+			fpath.get_file().get_basename(),
+			props.get("Speed", ""),
+			props.get("AttackDamage", ""),
+			props.get("AttackCooldown", ""),
+			props.get("MaxHealth", "")
+		])
+
+	_write_csv(OUT_ENEMIES, rows)
+	print("[ExportCsv] enemies.csv -> %d rows" % (rows.size() - 1))
+
+# ══════════════════════════════════════════════════════════════════════════════
 #  .tres 文本解析器
 # ══════════════════════════════════════════════════════════════════════════════
 
@@ -418,6 +451,57 @@ func _extres_ids(raw: String) -> Array:
 # ══════════════════════════════════════════════════════════════════════════════
 #  文件工具
 # ══════════════════════════════════════════════════════════════════════════════
+
+## 列出目录中所有 .tscn 文件（非递归）
+func _list_tscn(dir_path: String) -> Array:
+	var files: Array = []
+	var dir := DirAccess.open(dir_path)
+	if not dir:
+		push_error("[ExportCsv] Cannot open dir: " + dir_path)
+		return files
+	dir.list_dir_begin()
+	var name := dir.get_next()
+	while name != "":
+		if not dir.current_is_dir() and name.ends_with(".tscn"):
+			files.append(dir_path + "/" + name)
+		name = dir.get_next()
+	dir.list_dir_end()
+	return files
+
+## 解析 .tscn 文件，提取根节点属性字典
+func _parse_tscn_root(path: String) -> Dictionary:
+	var f := FileAccess.open(path, FileAccess.READ)
+	if not f:
+		push_error("[ExportCsv] Cannot read: " + path)
+		return {}
+	var lines := f.get_as_text().split("\n")
+	f.close()
+	var props := {}
+	var in_root := false
+	var cur_key := ""
+	var cur_val := ""
+	for raw_line in lines:
+		var s := raw_line.strip_edges()
+		if s.begins_with("[") and s.ends_with("]"):
+			if cur_key != "" and in_root:
+				props[cur_key] = cur_val.strip_edges()
+			cur_key = ""; cur_val = ""
+			var hdr := s.substr(1, s.length() - 2)
+			in_root = hdr.begins_with("node ") and not "parent=" in hdr
+			continue
+		if not in_root or s.is_empty():
+			continue
+		var eq := s.find(" = ")
+		if eq >= 0:
+			if cur_key != "":
+				props[cur_key] = cur_val.strip_edges()
+			cur_key = s.left(eq).strip_edges()
+			cur_val = s.substr(eq + 3)
+		elif cur_key != "":
+			cur_val += "\n" + s
+	if cur_key != "" and in_root:
+		props[cur_key] = cur_val.strip_edges()
+	return props
 
 ## 列出目录中所有 .tres 文件（非递归）
 func _list_tres(dir_path: String) -> Array:
