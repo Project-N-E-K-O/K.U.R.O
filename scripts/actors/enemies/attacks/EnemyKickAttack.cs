@@ -23,7 +23,6 @@ namespace Kuros.Actors.Enemies.Attacks
         [Export] public bool LockFacingDuringDash = true;
 		[Export(PropertyHint.Range, "0,5,0.01")] public float MinDashTimeBeforeAttack = 0f; // 允许命中前的最短冲刺时间（秒）
 		[Export(PropertyHint.Range, "0,5,0.1")] public float SnapshotDelaySeconds = 0f; // 冲刺前等待一段时间再记录玩家位置
-		[Export(PropertyHint.Range, "0,9999,1")] public int KickDamage = 25;
 
         [ExportCategory("Effects")]
 		[Export] public StringName CooldownStateName = "CooldownFrozen";
@@ -294,7 +293,7 @@ namespace Kuros.Actors.Enemies.Attacks
 		{
 			if (Enemy == null) return;
 
-			int damage = Mathf.Max(1, KickDamage);
+			int damage = GetDamage();
 			player.TakeDamage(damage, Enemy.GlobalPosition, Enemy);
 		}
 

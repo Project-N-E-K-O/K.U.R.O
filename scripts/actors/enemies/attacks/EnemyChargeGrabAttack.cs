@@ -25,7 +25,6 @@ namespace Kuros.Actors.Enemies.Attacks
 
         [ExportCategory("Effects")]
 		[Export(PropertyHint.Range, "0,10,0.1")] public float AppliedFrozenDuration = 5.0f;
-        [Export(PropertyHint.Range, "0,1000,1")] public int GrabHitDamage = 1;
 		[Export] public StringName CooldownStateName = "CooldownFrozen";
 
 		[ExportCategory("Escape")]
@@ -516,7 +515,7 @@ namespace Kuros.Actors.Enemies.Attacks
 
 			// 伤害来源为敌人当前坐标，若敌人在攻击过程中被击退或位移，伤害仍以当前坐标为准。
 			// IsEnemyAlive() 已确保 Enemy 不为 null，因此此时 Enemy 必定有效
-			_grabbedPlayer.TakeDamage(GrabHitDamage, Enemy.GlobalPosition, Enemy);
+			_grabbedPlayer.TakeDamage(GetDamage(), Enemy.GlobalPosition, Enemy);
 		}
 
 		private void StartPostCooldown()

@@ -29,7 +29,6 @@ namespace Kuros.Actors.Enemies.Attacks
         [Export] public AimRefreshMode AimMode { get; set; } = AimRefreshMode.PerVolley;
 
         [ExportGroup("Damage / Projectile")]
-        [Export(PropertyHint.Range, "0,50,1")] public int DamagePerShot { get; set; } = 1;
         [Export(PropertyHint.Range, "100,4000,10")] public float ProjectileImpulse { get; set; } = 800f;
         [Export] public Vector2 SpawnOffset { get; set; } = new Vector2(16, -4);
         [Export] public ItemDefinition? ProjectileItem { get; set; }
@@ -127,9 +126,9 @@ namespace Kuros.Actors.Enemies.Attacks
             {
                 SpawnProjectile(direction);
             }
-            else if (Player != null && DamagePerShot > 0)
+            else if (Player != null)
             {
-                Player.TakeDamage(DamagePerShot, Enemy.GlobalPosition, Enemy);
+                Player.TakeDamage(GetDamage(), Enemy.GlobalPosition, Enemy);
             }
         }
 

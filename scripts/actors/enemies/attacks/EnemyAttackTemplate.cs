@@ -38,6 +38,7 @@ namespace Kuros.Actors.Enemies.Attacks
         [Export(PropertyHint.Range, "0,10,0.01")] public float CooldownDuration = 1.0f;
 
         [ExportCategory("Combat")]
+        [Export(PropertyHint.Range, "0,10,0.1")] public float DamageMultiplier = 1.0f;
         [Export(PropertyHint.Range, "0,180,1")] public float MaxAllowedAngleToPlayer = 135.0f;
         [Export] public string AnimationName = "animations/attack";
         [Export] public NodePath AttackAreaPath = new NodePath();
@@ -85,6 +86,12 @@ namespace Kuros.Actors.Enemies.Attacks
         public bool IsRunning => _phase != AttackPhase.Idle;
         public bool IsOnCooldown => _cooldownTimer > 0.0f;
         public float CooldownRemaining => Mathf.Max(_cooldownTimer, 0.0f);
+
+        public int GetDamage()
+        {
+            if (Enemy == null) return 1;
+            return Mathf.Max(1, Mathf.RoundToInt(Enemy.AttackDamage * DamageMultiplier));
+        }
 
         public virtual void Initialize(SampleEnemy enemy)
         {
@@ -360,7 +367,10 @@ namespace Kuros.Actors.Enemies.Attacks
 
         protected void PerformAttackNow()
         {
+            float originalDamage = Enemy.AttackDamage;
+            Enemy.AttackDamage = GetDamage();
             Enemy.PerformAttack();
+            Enemy.AttackDamage = originalDamage;
         }
 
         /// <summary>

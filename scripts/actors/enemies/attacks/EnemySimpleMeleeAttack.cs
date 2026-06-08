@@ -11,7 +11,6 @@ namespace Kuros.Actors.Enemies.Attacks
     public partial class EnemySimpleMeleeAttack : EnemyAttackTemplate
     {
         [ExportCategory("Basic Attack Settings")]
-        [Export(PropertyHint.Range, "0,200,1")] public int Damage = 10;
 
         private SamplePlayer? _activeKnockbackTarget;
         private float _activeKnockbackTimer;
@@ -59,9 +58,6 @@ namespace Kuros.Actors.Enemies.Attacks
 
         protected override void OnActivePhase()
         {
-            float originalDamage = Enemy.AttackDamage;
-            Enemy.AttackDamage = Damage;
-
             base.OnActivePhase();
 
             // 启用动画事件触发时，击退在 OnAnimationHit 中执行。
@@ -69,8 +65,6 @@ namespace Kuros.Actors.Enemies.Attacks
             {
                 ApplySimpleMeleeAttackKnockback();
             }
-
-            Enemy.AttackDamage = originalDamage;
         }
 
         protected override void OnAnimationHit()

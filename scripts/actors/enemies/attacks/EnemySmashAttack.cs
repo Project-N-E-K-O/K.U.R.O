@@ -22,7 +22,6 @@ namespace Kuros.Actors.Enemies.Attacks
         [Export] public bool LockFacingDuringDash = true;
 		[Export(PropertyHint.Range, "0,5,0.01")] public float MinDashTimeBeforeSmash = 0f;
 		[Export(PropertyHint.Range, "0,5,0.1")] public float SnapshotDelaySeconds = 0f;
-		[Export(PropertyHint.Range, "0,9999,1")] public int SmashDmg = 25;
 
         [ExportCategory("Effects")]
 		[Export(PropertyHint.Range, "0,10,0.1")] public float AppliedStunDuration = 3.0f;
@@ -297,7 +296,7 @@ namespace Kuros.Actors.Enemies.Attacks
 		{
 			if (Enemy == null) return;
 
-			int damage = Mathf.Max(1, SmashDmg);
+			int damage = GetDamage();
 			player.TakeDamage(damage, Enemy.GlobalPosition, Enemy);
 		}
 

@@ -58,7 +58,7 @@ DebugOverlayFontSize = 128
 DebugOverlayColor = Color(1, 0.95, 0.2, 1)
 DetectionArea = NodePath("Sprite2D/ControllerDetectionArea")
 AttackArea = NodePath("Sprite2D/AttackArea")
-AttackDamage = 0.0
+AttackDamage = 2.0
 MaxHealth = 12
 StateMachine = NodePath("StateMachine")
 EffectController = NodePath("EffectController")
@@ -194,6 +194,7 @@ WarmupDuration = 0.3
 ActiveDuration = 2.2
 RecoveryDuration = 0.63
 CooldownDuration = 0.3
+DamageMultiplier = 0.0
 RequireAnimationHitTrigger = true
 GrantedImmunities = 8
 EffectScene = ExtResource("12_kjt0o")
@@ -203,7 +204,6 @@ metadata/attack_weight = 60.0
 
 [node name="SimpleMeleeAttack" type="Node" parent="StateMachine/Attack/AttackController"]
 script = ExtResource("13_a0san")
-Damage = 1
 WarmupDuration = 0.3
 ActiveDuration = 0.3
 RecoveryDuration = 0.4

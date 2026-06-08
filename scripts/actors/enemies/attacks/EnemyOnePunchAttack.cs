@@ -21,8 +21,7 @@ namespace Kuros.Actors.Enemies.Attacks
         [Export] public bool LockFacingDuringDash = true;
 		[Export(PropertyHint.Range, "0,500,1")] public float MinDashDistanceBeforeSmash = 24f;
 		[Export(PropertyHint.Range, "0,5,0.1")] public float SnapshotDelaySeconds = 0f; // 冲刺前等待一段时间再记录玩家位置
-		[Export(PropertyHint.Range, "0,9999,1")] public int OnePunchDmg = 25;
-
+		
         private const float MinDashDistance = 32f;
 		private const float PostCooldownDuration = 0.5f;
 
@@ -333,7 +332,7 @@ namespace Kuros.Actors.Enemies.Attacks
 		{
 			if (Enemy == null) return;
 
-			int damage = Mathf.Max(1, OnePunchDmg);
+			int damage = GetDamage();
 			player.TakeDamage(damage, Enemy.GlobalPosition, Enemy);
 		}
 
