@@ -204,6 +204,7 @@ SnapshotDelaySeconds = 0.9
 WarmupDuration = 1.0
 ActiveDuration = 0.2
 RecoveryDuration = 0.45
+CooldownDurationMultiplier = 1.5
 DamageMultiplier = 1.5
 KnockbackDistance = 500.0
 KnockbackDuration = 0.2

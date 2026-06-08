@@ -158,10 +158,22 @@ namespace Kuros.Effects
             SetScanlinePos(-1f);
         }
 
+        private Sprite2D? _outline;
+
         private void RotateToward(Vector2 target)
         {
             var direction = target - GetGlobalPos();
             Set("rotation", direction.Angle());
+
+            if (_outline == null && HasNode("outline"))
+                _outline = GetNode<Sprite2D>("outline");
+            if (_outline != null)
+            {
+                var scale = _outline.Scale;
+                scale.X = Mathf.Abs(scale.X);
+                scale.Y = direction.X < 0 ? -Mathf.Abs(scale.Y) : Mathf.Abs(scale.Y);
+                _outline.Scale = scale;
+            }
         }
 
         private GameActor? FindNearestEnemy()

@@ -15,14 +15,14 @@ shader_parameter/edge_softness = 0.12
 shader_parameter/preserve_fill = true
 shader_parameter/scanline_pos = -1.0
 shader_parameter/scanline_width = 0.04
-shader_parameter/scanline_color = Color(0.3, 0.8, 1, 1)
+shader_parameter/scanline_color = Color(1, 0.50980395, 0, 1)
 shader_parameter/reverse_scan = false
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_scan_inner"]
 shader = ExtResource("1_scan")
 shader_parameter/scanline_pos = -0.500000011176
 shader_parameter/scanline_width = 0.0999999977648
-shader_parameter/scanline_color = Color(0.3, 0.8, 1, 1)
+shader_parameter/scanline_color = Color(1, 0.50980395, 0, 1)
 shader_parameter/reverse_scan = false
 
 [sub_resource type="Animation" id="Animation_ec3lc"]

@@ -65,6 +65,8 @@ EffectController = NodePath("EffectController")
 LootTable = ExtResource("18_drop_table")
 DamageFlashColor = Color(18.892157, 18.892157, 18.892157, 1)
 
+Speed = 300
+AttackCooldown = 1.0
 [node name="Shadow" type="Sprite2D" parent="."]
 show_behind_parent = true
 material = SubResource("ShaderMaterial_b5vhy")

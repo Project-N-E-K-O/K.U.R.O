@@ -10,11 +10,13 @@ const ITEMS_CSV_PATH  = "res://data/items.csv"
 const SKILLS_CSV_PATH = "res://data/skills.csv"
 const BUILDS_CSV_PATH = "res://data/builds.csv"
 const LOOT_CSV_PATH   = "res://data/loot.csv"
+const ENEMIES_CSV_PATH = "res://data/enemies.csv"
 
 const ITEMS_DIR  = "res://resources/items/"
 const SKILLS_DIR = "res://resources/items/skills/"
 const BUILDS_DIR = "res://resources/builds/"
 const LOOT_DIR   = "res://resources/loot/"
+const ENEMIES_DIR = "res://scenes/actors/enemies/"
 
 var _log := CsvLogger.new()
 
@@ -25,6 +27,7 @@ func import_all() -> void:
 	import_items_from_csv()
 	import_builds_from_csv()
 	import_loot_from_csv()
+	import_enemies_from_csv()
 	_log.info("=== 全部导入完成 ===")
 
 # ── SKILLS ────────────────────────────────────────────────────────────────────
@@ -165,6 +168,27 @@ func import_loot_from_csv() -> void:
 		if _save(table, path): count += 1
 	_log.info("  → 更新 %d 个表" % count)
 
+# ── ENEMIES ────────────────────────────────────────────────────────────────────
+func import_enemies_from_csv() -> void:
+	_log.info("--- [enemies] ---")
+	var rows = _read_csv(ENEMIES_CSV_PATH)
+	if rows.is_empty(): return
+	var hm = _hmap(rows[0])
+	var count = 0
+	for i in range(1, rows.size()):
+		var row = rows[i]
+		var fname = _col(row, hm, "file")
+		if fname == "": continue
+		var path = "%s%s.tscn" % [ENEMIES_DIR, fname]
+		var content = _read_text(path)
+		if content == "": continue
+		content = _set_tscn_root_prop(content, "Speed", _col(row, hm, "Speed"))
+		content = _set_tscn_root_prop(content, "AttackDamage", _col(row, hm, "AttackDamage"))
+		content = _set_tscn_root_prop(content, "AttackCooldown", _col(row, hm, "AttackCooldown"))
+		content = _set_tscn_root_prop(content, "MaxHealth", _col(row, hm, "MaxHealth"))
+		if _write_text(path, content): count += 1
+	_log.info("  → 更新 %d 个" % count)
+
 # ── 工具函数 ──────────────────────────────────────────────────────────────────
 func _read_csv(path: String) -> Array:
 	var f = FileAccess.open(path, FileAccess.READ)
@@ -234,6 +258,71 @@ func _set_attribute(res: Resource, attr_id: String, value: float) -> void:
 			entry.set("Value", value)
 			return
 
+# ── 文本文件工具（用于 .tscn 场景文件） ────────────────────────────────────────
+func _read_text(path: String) -> String:
+	var f = FileAccess.open(path, FileAccess.READ)
+	if f == null:
+		_log.warn("无法打开：%s" % path)
+		return ""
+	var content = f.get_as_text()
+	f.close()
+	return content
+
+func _write_text(path: String, content: String) -> bool:
+	var f = FileAccess.open(path, FileAccess.WRITE)
+	if f == null:
+		_log.error("无法写入：%s" % path)
+		return false
+	f.store_string(content)
+	f.close()
+	_log.info("已更新：%s" % path.get_file())
+	return true
+
+## 在 .tscn 文本中设置根节点的属性值
+func _set_tscn_root_prop(content: String, prop: String, value: String) -> String:
+	if value == "":
+		return content
+
+	var lines: Array = content.split("\n")
+	var in_root: bool = false
+	var prop_found: bool = false
+	var new_lines: Array = []
+
+	for i in range(lines.size()):
+		var s: String = lines[i]
+		if s.begins_with("[") and s.ends_with("]"):
+			in_root = s.begins_with("[node ") and not "parent=" in s
+			new_lines.append(lines[i])
+			continue
+		if in_root and not prop_found:
+			var eq: int = s.find(" = ")
+			if eq >= 0:
+				var key: String = s.left(eq).strip_edges()
+				if key == prop:
+					var indent: String = ""
+					for c in lines[i]:
+						if c == "\t":
+							indent += "\t"
+						else:
+							break
+					new_lines.append(indent + prop + " = " + value)
+					prop_found = true
+					continue
+		new_lines.append(lines[i])
+
+	if not prop_found:
+		var out: Array = []
+		in_root = false
+		for i in range(new_lines.size()):
+			var s: String = new_lines[i]
+			if s.begins_with("[") and s.ends_with("]"):
+				if in_root:
+					out.append(prop + " = " + value)
+				in_root = s.begins_with("[node ") and not "parent=" in s
+			out.append(new_lines[i])
+		return "\n".join(out)
+
+	return "\n".join(new_lines)
 class CsvLogger:
 	func info(msg: String) -> void:
 		print("[ImportCsv] %s" % msg)
