@@ -25,10 +25,10 @@ namespace Kuros.Core
 
 		[ExportCategory("Stats")]
 		[Export] public float Speed = 300.0f;
-		[Export] public float AttackDamage = 25.0f;
+		[Export] public float AttackDamage = 5.0f;
 		// [Export] public float AttackRange = 100.0f; // Removed: Deprecated, rely on AttackArea logic
-		[Export] public float AttackCooldown = 0.5f;
-		[Export] public int MaxHealth = 100;
+		[Export] public float AttackCooldown = 1f;
+		[Export] public int MaxHealth = 15;
 		[Export] public bool FaceLeftByDefault = false;
 		/// <summary>
 		/// 初始朝向。true=朝右，false=朝左。在 _Ready 时应用，不影响行为逻辑。

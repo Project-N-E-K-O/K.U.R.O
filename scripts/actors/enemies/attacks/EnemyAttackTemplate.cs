@@ -35,7 +35,7 @@ namespace Kuros.Actors.Enemies.Attacks
         [Export(PropertyHint.Range, "0,5,0.01")] public float WarmupDuration = 0.2f;
         [Export(PropertyHint.Range, "0,5,0.01")] public float ActiveDuration = 0.15f;
         [Export(PropertyHint.Range, "0,5,0.01")] public float RecoveryDuration = 0.35f;
-        [Export(PropertyHint.Range, "0,10,0.01")] public float CooldownDuration = 1.0f;
+        [Export(PropertyHint.Range, "0,10,0.1")] public float CooldownDurationMultiplier = 1.0f;
 
         [ExportCategory("Combat")]
         [Export(PropertyHint.Range, "0,10,0.1")] public float DamageMultiplier = 1.0f;
@@ -91,6 +91,12 @@ namespace Kuros.Actors.Enemies.Attacks
         {
             if (Enemy == null) return 1;
             return Mathf.Max(1, Mathf.RoundToInt(Enemy.AttackDamage * DamageMultiplier));
+        }
+
+        public float GetCooldown()
+        {
+            if (Enemy == null) return 0f;
+            return Enemy.AttackCooldown * CooldownDurationMultiplier;
         }
 
         public virtual void Initialize(SampleEnemy enemy)
@@ -235,7 +241,7 @@ namespace Kuros.Actors.Enemies.Attacks
 
         protected virtual void OnAttackFinished()
         {
-            _cooldownTimer = CooldownDuration;
+            _cooldownTimer = GetCooldown();
 
             RestoreEnemyCollisionMask();
 

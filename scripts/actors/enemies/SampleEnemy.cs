@@ -102,6 +102,22 @@ public partial class SampleEnemy : GameActor
 		return _player.IsHitByArea(AttackArea);
 	}
 
+	public bool IsPlayerWithinStoppingRange()
+	{
+		RefreshPlayerReference();
+		if (_player == null || AttackArea == null) return false;
+
+		float stopDist = 48f;
+		var shapeNode = AttackArea.GetNodeOrNull<CollisionShape2D>("CollisionShape2D");
+		if (shapeNode?.Shape != null)
+		{
+			var rect = shapeNode.Shape.GetRect();
+			stopDist = Mathf.Max(rect.Size.X, rect.Size.Y);
+		}
+
+		return GlobalPosition.DistanceSquaredTo(_player.GlobalPosition) <= stopDist * stopDist;
+	}
+
 	/// <summary>
 	/// 检查玩家是否正在攻击（处于 Attack 状态）。
 	/// </summary>
@@ -155,7 +171,7 @@ public partial class SampleEnemy : GameActor
 
 	public void PerformAttack()
 	{
-		AttackTimer = AttackCooldown; 
+		//AttackTimer = AttackCooldown; 
 		GameLogger.Info(nameof(SampleEnemy), "Enemy PerformAttack");
 		
 		RefreshPlayerReference();

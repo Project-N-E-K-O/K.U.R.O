@@ -27,7 +27,7 @@ namespace Kuros.Actors.Enemies.Attacks
             WarmupDuration = 0f;
             ActiveDuration = ControllerActiveDuration;
             RecoveryDuration = 0f;
-            CooldownDuration = 0f;
+            CooldownDurationMultiplier = 0f;
         }
 
         public override void Initialize(SampleEnemy enemy)
@@ -316,7 +316,7 @@ namespace Kuros.Actors.Enemies.Attacks
                 if (entry.Template.CooldownRemaining < minRemaining)
                 {
                     minRemaining = entry.Template.CooldownRemaining;
-                    duration = entry.Template.CooldownDuration;
+                    duration = entry.Template.GetCooldown();
                     name = entry.AttackName;
                 }
             }
@@ -348,7 +348,7 @@ namespace Kuros.Actors.Enemies.Attacks
             // 确保结束后不会立即切换到另一种攻击（与旧 Enemy.AttackTimer 语义一致）
             float childInterAttackDelay = 0f;
             if (reason == "ChildFinished" && _currentAttack != null)
-                childInterAttackDelay = _currentAttack.CooldownDuration;
+                childInterAttackDelay = _currentAttack.GetCooldown();
 
             CleanupChildAttack(clearCooldown: false);
             _pendingQueueReason = reason;
