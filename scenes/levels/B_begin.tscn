@@ -237,7 +237,7 @@ region_rect = Rect2(1, 0, 1689, 3059)
 script = ExtResource("13_hjjd7")
 TriggerAreaPath = NodePath("Area2D")
 TargetPath = NodePath(".")
-FadedAlpha = 0.6
+FadedAlpha = 0.95
 
 [node name="gatewall" type="Sprite2D" parent="Environments/FrontWall/GateFrontWall"]
 z_as_relative = false

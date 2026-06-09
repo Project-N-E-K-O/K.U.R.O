@@ -1,8 +1,10 @@
-[gd_scene load_steps=20 format=3 uid="uid://cb4xinggegye7"]
+[gd_scene load_steps=22 format=3 uid="uid://cb4xinggegye7"]
 
 [ext_resource type="Texture2D" uid="uid://gxc75o5wrtfl" path="res://assets/environments/scene_2_hotel/酒店大门口.png" id="1_ahd7w"]
 [ext_resource type="Texture2D" uid="uid://csr8w1j7uq8x0" path="res://assets/environments/scene_2_hotel/破损的酒店大门口.png" id="1_sqrjw"]
+[ext_resource type="Texture2D" uid="uid://dg0dlvjyvdfed" path="res://assets/effect/LightEffect/强光1.png" id="2_xttcx"]
 [ext_resource type="Texture2D" uid="uid://bk0ipufx3kn76" path="res://assets/environments/26.3.17 烟.png" id="3_fkwno"]
+[ext_resource type="Texture2D" uid="uid://b5h0uuk6a21i0" path="res://assets/effect/LightEffect/强光2.png" id="3_gxwh4"]
 [ext_resource type="Script" uid="uid://drgauik0pftca" path="res://scripts/environments/GateController.cs" id="14_gatectrl"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_algbx"]
@@ -121,6 +123,18 @@ tracks/5/path = NodePath("CollisionShape2D:disabled")
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("light1:visible")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
@@ -365,6 +379,18 @@ tracks/4/keys = {
 "update": 1,
 "values": [false, true]
 }
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("light1:visible")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0, 0.1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [false, true]
+}
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_5c8l7"]
 _data = {
@@ -385,6 +411,16 @@ collision_mask = 7
 [node name="Broken" type="Sprite2D" parent="."]
 visible = false
 texture = ExtResource("1_sqrjw")
+
+[node name="light1" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(1, 1, 1, 0.9411765)
+z_index = 2
+position = Vector2(248, 94)
+texture = ExtResource("2_xttcx")
+
+[node name="light2" type="Sprite2D" parent="light1"]
+texture = ExtResource("3_gxwh4")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("1_ahd7w")

@@ -30,7 +30,7 @@
 [ext_resource type="PackedScene" uid="uid://b81xhi3r08vha" path="res://scenes/weapons/Weapon_Throw_emojiBomb.tscn" id="20_mkebo"]
 [ext_resource type="PackedScene" uid="uid://cnh6afaayr0iy" path="res://scenes/weapons/Weapon_Slash_bunnySword.tscn" id="21_5dr7i"]
 [ext_resource type="Texture2D" uid="uid://brjaqxel52a2o" path="res://assets/WeaponBuild/icon.svg" id="30_m86xd"]
-[ext_resource type="PackedScene" uid="uid://c6hw6lffbuhlb" path="res://scenes/items/Furniture_D_chairOfficeC.tscn" id="30_v4xrh"]
+[ext_resource type="PackedScene" uid="uid://cb4xinggegye7" path="res://scenes/environments/gate.tscn" id="30_v4xrh"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_m86xd"]
 size = Vector2(5800, 800)
@@ -146,6 +146,7 @@ SpawnParentPath = NodePath("..")
 
 [node name="MainCharacter" parent="World" instance=ExtResource("1_tv6fd")]
 MaxHealth = 10000
+PushSpeed = null
 
 [node name="Camera2D" type="Camera2D" parent="World" node_paths=PackedStringArray("Target")]
 scale = Vector2(0.33, 0.33)
@@ -222,8 +223,8 @@ ElevatorScenePath = "uid://v3n56xk6n8ca"
 NextStagePath = "uid://qd5abd4opeob"
 LoadDistance = 2000.0
 
-[node name="FurnitureChairOfficeC" parent="World" instance=ExtResource("30_v4xrh")]
-position = Vector2(-1568, 221)
+[node name="Gate" parent="World" instance=ExtResource("30_v4xrh")]
+position = Vector2(-1011, -252)
 
 [node name="center" type="Sprite2D" parent="."]
 z_index = 10
