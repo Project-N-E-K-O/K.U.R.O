@@ -82,8 +82,6 @@ StatProfile = SubResource("Resource_ie6to")
 LootTable = ExtResource("4_wdcme")
 DamageFlashColor = Color(18.892157, 18.751299, 18.892157, 1)
 
-AttackDamage = 5
-AttackCooldown = 1.0
 [node name="Shadow" type="Sprite2D" parent="."]
 show_behind_parent = true
 material = SubResource("ShaderMaterial_b5vhy")
@@ -242,6 +240,7 @@ KnockbackDistance = 30.0
 KnockbackDuration = 0.1
 KnockbackSpeed = 2500.0
 RequireAnimationHitTrigger = true
+GrantedImmunities = 16
 metadata/attack_weight = 40.0
 
 [node name="Hit" type="Node" parent="StateMachine"]

@@ -53,6 +53,7 @@ collision_layer = 2
 collision_mask = 15
 motion_mode = 1
 script = ExtResource("1_n7wqi")
+EnableStateDebugOverlay = true
 DebugOverlayOffset = Vector2(-1200, 200)
 DebugOverlayFontSize = 128
 DebugOverlayColor = Color(1, 0.95, 0.2, 1)
@@ -64,8 +65,6 @@ StateMachine = NodePath("StateMachine")
 EffectController = NodePath("EffectController")
 DamageFlashColor = Color(18.892157, 18.892157, 18.892157, 1)
 
-Speed = 300
-AttackCooldown = 1.0
 [node name="Shadow" type="Sprite2D" parent="."]
 show_behind_parent = true
 material = SubResource("ShaderMaterial_sycgy")
@@ -195,7 +194,6 @@ DetectionAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
 WarmupDuration = 0.3
 ActiveDuration = 2.2
 RecoveryDuration = 0.63
-CooldownDuration = 0.3
 DamageMultiplier = 0.0
 RequireAnimationHitTrigger = true
 GrantedImmunities = 8
@@ -209,7 +207,6 @@ script = ExtResource("13_a0san")
 WarmupDuration = 0.3
 ActiveDuration = 0.3
 RecoveryDuration = 0.4
-CooldownDuration = 0.3
 AttackAreaPath = NodePath("../../../../Sprite2D/AttackArea")
 KnockbackDistance = 300.0
 KnockbackDuration = 0.06999999999999999
@@ -219,7 +216,7 @@ metadata/attack_weight = 40.0
 
 [node name="Assist" type="Node" parent="StateMachine"]
 script = ExtResource("14_0xfei")
-HealAmount = 10
+HealDelay = 1.5
 AssistMoveSpeed = 200.0
 
 [node name="Hit" type="Node" parent="StateMachine"]

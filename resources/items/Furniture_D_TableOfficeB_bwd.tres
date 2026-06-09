@@ -1,0 +1,53 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=11 format=3 uid="uid://cp3er4cn0bqer"]
+
+[ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="1_4dmf2"]
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="2_jqt6o"]
+[ext_resource type="PackedScene" uid="uid://bi7guxtti6ocl" path="res://resources/effects/HeavyCarrySlowEffect.tscn" id="3_0fvxe"]
+[ext_resource type="PackedScene" uid="uid://ciwlpetibguab" path="res://shaders/destroy_somke.tscn" id="4_qsisn"]
+[ext_resource type="PackedScene" uid="uid://cmh3bnabinwi0" path="res://resources/effects/CameraShakeEffect.tscn" id="5_suq0p"]
+[ext_resource type="Texture2D" uid="uid://bay1k3725fv26" path="res://assets/furnitures/hotel_scene4/TableOfficeB_bwd.png" id="6_4dmf2"]
+[ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="7_0otdt"]
+
+[sub_resource type="Resource" id="Resource_48rr8"]
+script = ExtResource("2_jqt6o")
+Trigger = 1
+EffectScene = ExtResource("3_0fvxe")
+Notes = "中型家具：减速50%"
+PropertyOverrides = Dictionary[String, Variant]({
+"SpeedMultiplierPerStack": 0.5
+})
+metadata/_custom_type_script = "uid://bv0es4osw3x0r"
+
+[sub_resource type="Resource" id="Resource_fwe2t"]
+script = ExtResource("2_jqt6o")
+Trigger = 4
+EffectScene = ExtResource("4_qsisn")
+metadata/_custom_type_script = "uid://bv0es4osw3x0r"
+
+[sub_resource type="Resource" id="Resource_27clv"]
+script = ExtResource("2_jqt6o")
+Trigger = 4
+EffectScene = ExtResource("5_suq0p")
+PropertyOverrides = Dictionary[String, Variant]({
+"ShakeStrength": 18.0
+})
+metadata/_custom_type_script = "uid://bv0es4osw3x0r"
+
+[resource]
+script = ExtResource("7_0otdt")
+ItemId = "Furniture_D_TableOfficeB_bwd"
+DisplayName = "办公桌B(背面)"
+Description = "一次性投掷道具：办公桌B(背面)"
+Icon = ExtResource("6_4dmf2")
+Category = "Furniture"
+Tags = Array[String](["tag_throw", "furniture"])
+MaxStackSize = 1
+EffectEntries = Array[ExtResource("2_jqt6o")]([SubResource("Resource_48rr8"), SubResource("Resource_fwe2t"), SubResource("Resource_27clv")])
+LevelCount = 0
+IsThrowable = true
+IsFurniture = true
+ThrowStartOffset = Vector2(0, -450)
+ThrowParabolicDuration = 0.30000000000000004
+ThrowHorizontalDistance = 500.0
+ThrowParabolicLandingYOffset = 325.0
+WorldScenePath = "uid://o7ewxdu8bt76"

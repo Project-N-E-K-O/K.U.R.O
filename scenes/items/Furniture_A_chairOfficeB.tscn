@@ -25,10 +25,10 @@ shader_parameter/preserve_fill = true
 size = Vector2(360, 360)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_gy46y"]
-size = Vector2(320.5, 493)
+size = Vector2(320.5, 600)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jyvv2"]
-size = Vector2(100, 59.11765)
+size = Vector2(350, 180)
 
 [node name="FurnitureChairOfficeB" type="Node2D"]
 z_index = 2
@@ -67,23 +67,19 @@ texture = ExtResource("6_ra6er")
 texture = ExtResource("6_ra6er")
 
 [node name="CollisionArea" type="Area2D" parent="RigidBody2D"]
-visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/CollisionArea"]
-position = Vector2(-8.5, -28)
+position = Vector2(0, -20)
 shape = SubResource("RectangleShape2D_2omr6")
 
 [node name="AttackArea" type="Area2D" parent="RigidBody2D"]
-visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/AttackArea"]
-position = Vector2(-10.25, 168.5)
+position = Vector2(0, 200)
 shape = SubResource("RectangleShape2D_gy46y")
 
 [node name="StaticBody2D" type="StaticBody2D" parent="RigidBody2D" groups=["navigation_polygon_source_geometry_group"]]
-visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/StaticBody2D"]
-position = Vector2(-2.999998, 55.5)
-scale = Vector2(3.4, 3.4)
+position = Vector2(0, 80)
 shape = SubResource("RectangleShape2D_jyvv2")

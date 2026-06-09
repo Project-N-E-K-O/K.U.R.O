@@ -63,7 +63,6 @@ StateMachine = NodePath("StateMachine")
 EffectController = NodePath("EffectController")
 DamageFlashColor = Color(18.892, 18.892, 18.892, 1)
 
-AttackCooldown = 1.0
 [node name="Shadow" type="Sprite2D" parent="."]
 show_behind_parent = true
 material = SubResource("ShaderMaterial_sycgy")
@@ -192,7 +191,6 @@ DetectionAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
 WarmupDuration = 0.5
 ActiveDuration = 0.2
 RecoveryDuration = 0.65
-CooldownDuration = 0.5
 DamageMultiplier = 0.0
 EffectScene = ExtResource("12_sycgy")
 EffectOffset = Vector2(0, -500)
@@ -204,7 +202,6 @@ script = ExtResource("13_l8adk")
 WarmupDuration = 0.3
 ActiveDuration = 0.3
 RecoveryDuration = 0.4
-CooldownDuration = 0.3
 AttackAreaPath = NodePath("../../../../Sprite2D/AttackArea")
 KnockbackDistance = 300.0
 KnockbackDuration = 0.06999999999999999
@@ -214,7 +211,7 @@ metadata/attack_weight = 0.0
 
 [node name="Assist" type="Node" parent="StateMachine"]
 script = ExtResource("14_cc1qw")
-HealAmount = 10
+HealDelay = 1.5
 AssistMoveSpeed = 200.0
 
 [node name="Hit" type="Node" parent="StateMachine"]

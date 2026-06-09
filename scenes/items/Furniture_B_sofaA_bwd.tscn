@@ -23,7 +23,7 @@ shader_parameter/preserve_fill = true
 size = Vector2(1113, 380)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_bjrsg"]
-size = Vector2(1125, 475)
+size = Vector2(600, 500)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jyvv2"]
 size = Vector2(348.2353, 78.82353)
@@ -76,7 +76,7 @@ shape = SubResource("RectangleShape2D_gy46y")
 [node name="AttackArea" type="Area2D" parent="RigidBody2D"]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/AttackArea"]
-position = Vector2(-5.5, 247.5)
+position = Vector2(-5.5, 200)
 shape = SubResource("RectangleShape2D_bjrsg")
 
 [node name="StaticBody2D" type="StaticBody2D" parent="RigidBody2D" groups=["navigation_polygon_source_geometry_group"]]

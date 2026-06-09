@@ -38,9 +38,9 @@ size = Vector2(400, 1872)
 size = Vector2(400, 600)
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_ocwig"]
-vertices = PackedVector2Array(1573.9219, 665.4531, -1620.4219, 683.53906, -1631.5703, -1419, 1572.0703, -1419)
+vertices = PackedVector2Array(1573.9219, 665.1797, -1718.7422, 672.8125, -1712.2422, -1415.0938, 1572.0703, -1418.8984)
 polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3)])
-outlines = Array[PackedVector2Array]([PackedVector2Array(-1712, -1499, 1652, -1499, 1654, 745, -1700, 764)])
+outlines = Array[PackedVector2Array]([PackedVector2Array(-1792, -1495, 1652, -1499, 1654, 745, -1799, 753)])
 source_geometry_mode = 2
 agent_radius = 80.0
 
@@ -146,4 +146,5 @@ rotation = 0.6981317
 shape = SubResource("RectangleShape2D_pal6r")
 
 [node name="NavigationRegion2D" type="NavigationRegion2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
+visible = false
 navigation_polygon = SubResource("NavigationPolygon_ocwig")
