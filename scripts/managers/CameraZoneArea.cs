@@ -32,8 +32,12 @@ namespace Kuros.Managers
         /// <summary>进入此区域时相机的目标 Zoom（X/Y 相同）。</summary>
         [Export(PropertyHint.Range, "0.01,2.0,0.01")] public float ZoomLevel { get; set; } = 0.43f;
 
+        /// <summary>玩家首次进入此区域时需要销毁的节点路径列表（用于清理不再可见的一次性资源）。</summary>
+        [Export] public NodePath[] NodesToCleanup { get; set; } = System.Array.Empty<NodePath>();
+
         private CameraZoneManager? _cameraZoneManager;
         private bool _playerInside = false;
+        private bool _cleanupDone = false;
 
         public override void _Ready()
         {
@@ -59,6 +63,18 @@ namespace Kuros.Managers
             if (_playerInside) return; // 防止重复触发
 
             _playerInside = true;
+
+            if (!_cleanupDone && NodesToCleanup.Length > 0)
+            {
+                _cleanupDone = true;
+                foreach (var path in NodesToCleanup)
+                {
+                    var target = GetNodeOrNull(path);
+                    if (target != null && GodotObject.IsInstanceValid(target))
+                        target.QueueFree();
+                }
+            }
+
             var mgr = GetOrFindManager();
             if (mgr == null) return;
 

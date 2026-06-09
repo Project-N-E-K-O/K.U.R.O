@@ -80,7 +80,6 @@ position = Vector2(0, 200)
 shape = SubResource("RectangleShape2D_2jhlq")
 
 [node name="StaticBody2D" type="StaticBody2D" parent="RigidBody2D" groups=["navigation_polygon_source_geometry_group"]]
-visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/StaticBody2D"]
 shape = SubResource("RectangleShape2D_jyvv2")

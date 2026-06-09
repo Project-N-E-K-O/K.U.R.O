@@ -17,7 +17,7 @@
 [ext_resource type="PackedScene" uid="uid://cofm45kotvgto" path="res://scenes/actors/enemies/Enemy_B1_fat.tscn" id="7_y44ha"]
 [ext_resource type="PackedScene" uid="uid://ba8fktvib2e1o" path="res://scenes/actors/enemies/Enemy_C2_waiterA02.tscn" id="8_7mqiy"]
 [ext_resource type="PackedScene" uid="uid://bkbhucnxqiys2" path="res://scenes/items/Furniture_B_counterB.tscn" id="8_wg0jq"]
-[ext_resource type="PackedScene" uid="uid://df51wgv346jhn" path="res://scenes/environments/elevatorGate_flip.tscn" id="9_1620r"]
+[ext_resource type="PackedScene" uid="uid://df51wgv346jhn" path="res://scenes/environments/elevatorGate_C_flip.tscn" id="9_1620r"]
 [ext_resource type="PackedScene" uid="uid://0anrcfm2pnsd" path="res://scenes/items/Furniture_B_luggageCartA.tscn" id="9_t2fey"]
 [ext_resource type="PackedScene" uid="uid://1mc4twnj45va" path="res://scenes/items/Furniture_B_tableRoundB.tscn" id="10_1620r"]
 [ext_resource type="PackedScene" uid="uid://bkxqiwlgdq03s" path="res://scenes/items/Furniture_B_sofaA_fwd.tscn" id="11_0wqg8"]

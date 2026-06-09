@@ -1,11 +1,153 @@
-[gd_scene load_steps=22 format=3 uid="uid://cb4xinggegye7"]
+[gd_scene load_steps=28 format=3 uid="uid://cb4xinggegye7"]
 
 [ext_resource type="Texture2D" uid="uid://gxc75o5wrtfl" path="res://assets/environments/scene_2_hotel/酒店大门口.png" id="1_ahd7w"]
 [ext_resource type="Texture2D" uid="uid://csr8w1j7uq8x0" path="res://assets/environments/scene_2_hotel/破损的酒店大门口.png" id="1_sqrjw"]
 [ext_resource type="Texture2D" uid="uid://dg0dlvjyvdfed" path="res://assets/effect/LightEffect/强光1.png" id="2_xttcx"]
 [ext_resource type="Texture2D" uid="uid://bk0ipufx3kn76" path="res://assets/environments/26.3.17 烟.png" id="3_fkwno"]
-[ext_resource type="Texture2D" uid="uid://b5h0uuk6a21i0" path="res://assets/effect/LightEffect/强光2.png" id="3_gxwh4"]
+[ext_resource type="Texture2D" uid="uid://b6qys2indga4q" path="res://assets/effect/LightEffect/开门光.png" id="3_xttcx"]
 [ext_resource type="Script" uid="uid://drgauik0pftca" path="res://scripts/environments/GateController.cs" id="14_gatectrl"]
+
+[sub_resource type="Shader" id="Shader_xttcx"]
+code = "shader_type canvas_item;
+render_mode blend_add, unshaded;
+
+// ── 光束闪烁 ──
+uniform float flicker_speed : hint_range(0.5, 20.0) = 8.0;
+uniform float flicker_intensity : hint_range(0.0, 1.0) = 0.3;
+
+// ── 光束微光摇曳 (水平波纹) ──
+uniform float shimmer_speed : hint_range(0.1, 5.0) = 1.5;
+uniform float shimmer_strength : hint_range(0.0, 0.5) = 0.15;
+
+// ── 浮尘粒子 ──
+uniform float density : hint_range(0.1, 2.0) = 1.0;
+uniform float brightness : hint_range(0.0, 2.0) = 0.5;
+uniform float particle_size : hint_range(0.005, 0.08) = 0.025;
+uniform float anim_speed : hint_range(0.1, 3.0) = 1.0;
+
+float hash(vec2 p) {
+	return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+}
+
+float noise(vec2 p) {
+	vec2 i = floor(p);
+	vec2 f = fract(p);
+	f = f * f * (3.0 - 2.0 * f);
+	return mix(
+		mix(hash(i), hash(i + vec2(1.0, 0.0)), f.x),
+		mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), f.x),
+		f.y
+	);
+}
+
+void fragment() {
+	vec4 base = texture(TEXTURE, UV);
+
+	// 光束闪烁：多层噪声叠加产生不规则闪烁
+	float flicker = 1.0
+		+ noise(vec2(TIME * flicker_speed, 0.0)) * flicker_intensity
+		+ noise(vec2(TIME * flicker_speed * 1.7, 1.0)) * flicker_intensity * 0.6
+		- flicker_intensity * 0.8;
+	flicker = clamp(flicker, 0.0, 1.5);
+
+	// 水平微光波纹
+	float shimmer = 1.0 + sin(UV.x * 6.28318 + TIME * shimmer_speed) * shimmer_strength
+		+ cos(UV.x * 12.56637 - TIME * shimmer_speed * 0.7) * shimmer_strength * 0.5;
+
+	vec4 beam_color = base * flicker * shimmer;
+	beam_color.a = min(beam_color.a, 1.0);
+
+	// ── 浮尘粒子（叠加在光束之上） ──
+	float cell_count = 8.0 + density * 14.0;
+	vec2 cell_id = floor(UV * cell_count);
+	vec2 local_uv = fract(UV * cell_count);
+
+	float h1 = hash(cell_id);
+	float h2 = hash(cell_id + 17.0);
+	float h3 = hash(cell_id + 31.0);
+	float h4 = hash(cell_id + 53.0);
+
+	vec2 particle_center = vec2(h1, h2) * 0.6 + 0.2;
+
+	float lifetime = 1.0 + h3 * 4.0;
+	float cooldown = h4;
+	float total_cycle = lifetime + cooldown;
+	float phase = hash(cell_id + 7.0);
+	float cycle_time = mod(TIME * anim_speed + phase * total_cycle, total_cycle);
+
+	float life = 0.0;
+	if (cycle_time < lifetime) {
+		float progress = cycle_time / lifetime;
+		life = sin(progress * 3.14159265);
+	}
+
+	float angle = 0.174533;
+	vec2 rel = local_uv - particle_center;
+	float ca = cos(angle), sa = sin(angle);
+	rel = vec2(rel.x * ca - rel.y * sa, rel.x * sa + rel.y * ca);
+	rel.y /= 0.8 + h2 * 0.5;
+
+	float particle = 1.0 - smoothstep(0.0, particle_size, length(rel));
+	float alpha = particle * life * brightness;
+
+	COLOR = beam_color + vec4(vec3(1.0, 0.95, 0.75) * alpha, alpha);
+}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_gxwh4"]
+shader = SubResource("Shader_xttcx")
+shader_parameter/flicker_speed = 1.5000000475
+shader_parameter/flicker_intensity = 0.3
+shader_parameter/shimmer_speed = 1.5
+shader_parameter/shimmer_strength = 0.15
+shader_parameter/density = 1.80000008224012
+shader_parameter/brightness = 0.406000019285
+shader_parameter/particle_size = 0.07000000297574
+shader_parameter/anim_speed = 2.42000011169012
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_xttcx"]
+shader = SubResource("Shader_xttcx")
+shader_parameter/flicker_speed = 1.20000003325
+shader_parameter/flicker_intensity = 0.3
+shader_parameter/shimmer_speed = 1.5
+shader_parameter/shimmer_strength = 0.15
+shader_parameter/density = 1.80000008224012
+shader_parameter/brightness = 0.406000019285
+shader_parameter/particle_size = 0.07000000297574
+shader_parameter/anim_speed = 2.42000011169012
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_jp0ot"]
+shader = SubResource("Shader_xttcx")
+shader_parameter/flicker_speed = 1.300000038
+shader_parameter/flicker_intensity = 0.3
+shader_parameter/shimmer_speed = 1.5
+shader_parameter/shimmer_strength = 0.15
+shader_parameter/density = 1.80000008224012
+shader_parameter/brightness = 0.406000019285
+shader_parameter/particle_size = 0.07000000297574
+shader_parameter/anim_speed = 2.42000011169012
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_5c8l7"]
+shader = SubResource("Shader_xttcx")
+shader_parameter/flicker_speed = 1.60000005225
+shader_parameter/flicker_intensity = 0.3
+shader_parameter/shimmer_speed = 1.5
+shader_parameter/shimmer_strength = 0.15
+shader_parameter/density = 1.80000008224012
+shader_parameter/brightness = 0.406000019285
+shader_parameter/particle_size = 0.07000000297574
+shader_parameter/anim_speed = 2.42000011169012
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_g0gvw"]
+shader = SubResource("Shader_xttcx")
+shader_parameter/flicker_speed = 1.20000003325
+shader_parameter/flicker_intensity = 0.3
+shader_parameter/shimmer_speed = 1.5
+shader_parameter/shimmer_strength = 0.15
+shader_parameter/density = 1.80000008224012
+shader_parameter/brightness = 0.406000019285
+shader_parameter/particle_size = 0.07000000297574
+shader_parameter/anim_speed = 2.42000011169012
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_algbx"]
 size = Vector2(400, 1651)
@@ -414,13 +556,53 @@ texture = ExtResource("1_sqrjw")
 
 [node name="light1" type="Sprite2D" parent="."]
 visible = false
-modulate = Color(1, 1, 1, 0.9411765)
+modulate = Color(1, 1, 1, 0.5882353)
 z_index = 2
 position = Vector2(248, 94)
 texture = ExtResource("2_xttcx")
 
-[node name="light2" type="Sprite2D" parent="light1"]
-texture = ExtResource("3_gxwh4")
+[node name="Sprite2D" type="Sprite2D" parent="light1"]
+modulate = Color(1, 1, 1, 0.78431374)
+material = SubResource("ShaderMaterial_gxwh4")
+position = Vector2(-203.54492, -526.55)
+rotation = 0.2617994
+texture = ExtResource("3_xttcx")
+flip_h = true
+
+[node name="Sprite2D4" type="Sprite2D" parent="light1"]
+modulate = Color(1, 1, 1, 0.78431374)
+material = SubResource("ShaderMaterial_xttcx")
+position = Vector2(-331.54492, -384.55002)
+rotation = 0.08726646
+scale = Vector2(1, 0.8)
+texture = ExtResource("3_xttcx")
+flip_h = true
+
+[node name="Sprite2D2" type="Sprite2D" parent="light1"]
+modulate = Color(1, 1, 1, 0.78431374)
+material = SubResource("ShaderMaterial_jp0ot")
+position = Vector2(-483.54492, -157.54996)
+rotation = -0.017453292
+scale = Vector2(1, 1.2)
+texture = ExtResource("3_xttcx")
+flip_h = true
+
+[node name="Sprite2D5" type="Sprite2D" parent="light1"]
+modulate = Color(1, 1, 1, 0.78431374)
+material = SubResource("ShaderMaterial_5c8l7")
+position = Vector2(-308.54495, 10.45002)
+rotation = -0.34906584
+scale = Vector2(1, 0.7)
+texture = ExtResource("3_xttcx")
+flip_h = true
+
+[node name="Sprite2D3" type="Sprite2D" parent="light1"]
+modulate = Color(1, 1, 1, 0.78431374)
+material = SubResource("ShaderMaterial_g0gvw")
+position = Vector2(-250.54489, 125.45001)
+rotation = -0.6981317
+texture = ExtResource("3_xttcx")
+flip_h = true
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("1_ahd7w")
