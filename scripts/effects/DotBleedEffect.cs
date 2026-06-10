@@ -7,7 +7,7 @@ using Kuros.Core.Events;
 namespace Kuros.Effects
 {
     /// <summary>
-    /// 流血效果：攻击命中敌人后附加持续伤害，每 TickInterval 秒造成 DamagePerTick 点伤害，
+    /// 流血效果：攻击命中目标后后附加持续伤害，每 TickInterval 秒造成 DamagePerTick 点伤害，
     /// 持续 BleedDuration 秒。同一敌人重复命中刷新持续时间。
     /// 流血期间敌人身上显示血滴特效。切换武器后已存在的流血继续生效。
     /// 搭配 ItemDefinition 的 OnEquip 触发器使用。
