@@ -59,14 +59,13 @@ DebugOverlayFontSize = 128
 DebugOverlayColor = Color(1, 0.95, 0.2, 1)
 DetectionArea = NodePath("Sprite2D/ControllerDetectionArea")
 AttackArea = NodePath("Sprite2D/AttackArea")
+Speed = 350
 AttackDamage = 20
 MaxHealth = 120
 StateMachine = NodePath("StateMachine")
 EffectController = NodePath("EffectController")
 DamageFlashColor = Color(18.892157, 18.892157, 18.892157, 1)
 
-Speed = 350
-AttackCooldown = 1
 [node name="Shadow" type="Sprite2D" parent="."]
 show_behind_parent = true
 material = SubResource("ShaderMaterial_sycgy")
@@ -196,6 +195,7 @@ DetectionAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
 WarmupDuration = 0.3
 ActiveDuration = 2.2
 RecoveryDuration = 0.63
+CooldownDurationMultiplier = 2.0
 DamageMultiplier = 0.0
 RequireAnimationHitTrigger = true
 GrantedImmunities = 8

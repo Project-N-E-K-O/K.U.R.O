@@ -145,6 +145,8 @@ position = Vector2(-1972, 3)
 SpawnParentPath = NodePath("..")
 
 [node name="MainCharacter" parent="World" instance=ExtResource("1_tv6fd")]
+position = Vector2(-1086.9999, -70.99999)
+AttackDamage = 5.0
 AttackCooldown = 1.0
 
 [node name="Camera2D" type="Camera2D" parent="World" node_paths=PackedStringArray("Target")]

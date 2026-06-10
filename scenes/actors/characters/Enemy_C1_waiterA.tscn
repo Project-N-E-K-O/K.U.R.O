@@ -52,18 +52,16 @@ collision_layer = 2
 collision_mask = 15
 motion_mode = 1
 script = ExtResource("1_cc1qw")
+EnableStateDebugOverlay = true
 DebugOverlayOffset = Vector2(-1200, 200)
 DebugOverlayFontSize = 128
 DetectionArea = NodePath("Sprite2D/ControllerDetectionArea")
 AttackArea = NodePath("Sprite2D/AttackArea")
-Speed = 250
-AttackDamage = 20
 MaxHealth = 100
 StateMachine = NodePath("StateMachine")
 EffectController = NodePath("EffectController")
 DamageFlashColor = Color(18.892, 18.892, 18.892, 1)
 
-AttackCooldown = 1
 [node name="Shadow" type="Sprite2D" parent="."]
 show_behind_parent = true
 material = SubResource("ShaderMaterial_sycgy")
@@ -192,6 +190,7 @@ DetectionAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
 WarmupDuration = 0.5
 ActiveDuration = 0.2
 RecoveryDuration = 0.65
+CooldownDurationMultiplier = 2.0
 DamageMultiplier = 0.0
 EffectScene = ExtResource("12_sycgy")
 EffectOffset = Vector2(0, -500)

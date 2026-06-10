@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3 uid="uid://bwpejurlr7cvn"]
 
-[ext_resource type="Script" uid="uid://c77i0j0fu43rc" path="res://scripts/effects/TeapotBrokenEffect.cs" id="1_teapot"]
+[ext_resource type="Script" uid="uid://ufacv8lblpwq" path="res://scripts/effects/SlowHitAreaEffect.cs" id="1_yj7h6"]
 [ext_resource type="Texture2D" uid="uid://cmgwvrbdnwaga" path="res://assets/weapons/茶壶破碎.png" id="2_yj7h6"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_eq1tq"]
@@ -9,14 +9,13 @@
 points = PackedVector2Array(142, -80, 234, -47, 290, 28, 243, 74, 116, 101, -20, 115, -175, 98, -303.5, 40, -194, -60, -42, -98)
 
 [node name="TeapotBrokenEffect" type="Node"]
-script = ExtResource("1_teapot")
-DamagePerTick = 1
-SpeedSlowPercent = 50.0
-FadeOutDuration = 1.0
-EffectId = "30c14cff-e772-44c5-af23-cde5d44cb6cb"
-DisplayName = "破碎茶壶"
-Description = "玩家进入该区域持续收到伤害并减速"
-IsBuff = false
+script = ExtResource("1_yj7h6")
+DamagePerTick = 10
+TargetCollisionMask = 4
+FadeOutDuration = 0.5
+EffectId = "bf603bfc-da75-4fd8-a483-fe291ed85769"
+DisplayName = "伤害减速"
+Description = "对象进入该范围后持续收到伤害并减速"
 
 [node name="Area2D" type="Area2D" parent="."]
 z_as_relative = false
