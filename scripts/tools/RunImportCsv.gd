@@ -5,5 +5,5 @@ extends EditorScript
 # 在 Godot 编辑器中右键此脚本 → Run
 
 func _run() -> void:
-	var importer = load("res://scripts/tools/ImportCsv.gd").new()
+	var importer = ImportCsv.new()
 	importer.import_all()
