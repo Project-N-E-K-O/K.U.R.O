@@ -85,13 +85,14 @@ DebugOverlayFontSize = 128
 DebugOverlayColor = Color(0, 1, 0, 1)
 AttackArea = NodePath("AttackArea")
 LeftHandAttachmentPath = NodePath("SpineSprite/SpineBoneNode")
-Speed = 500.0
-AttackDamage = 1.0
-MaxHealth = 12
+Speed = 500
+AttackDamage = 10
+MaxHealth = 120
 StateMachine = NodePath("StateMachine")
 EffectController = NodePath("EffectController")
 DamageFlashColor = Color(18.892157, 18.892157, 18.892157, 1)
 
+AttackCooldown = 1
 [node name="Shadow" type="Sprite2D" parent="."]
 material = SubResource("ShaderMaterial_0y2r2")
 scale = Vector2(12, 5)
@@ -216,7 +217,6 @@ Description = "常规拳击模板"
 WarmupDuration = 0.19
 ActiveDuration = 0.3
 RecoveryDuration = 0.18
-CooldownDuration = 0.5
 HitEffectScene = ExtResource("11_6hy0m")
 HitEffectForceTopLevel = true
 HitEffectLocalOffset = Vector2(0, -350)

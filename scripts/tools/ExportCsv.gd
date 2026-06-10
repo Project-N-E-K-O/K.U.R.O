@@ -12,11 +12,11 @@ const ITEMS_DIR  := "res://resources/items"
 const SKILLS_DIR := "res://resources/items/skills"
 const BUILDS_DIR := "res://resources/builds"
 const LOOT_DIR   := "res://resources/loot"
-const ENEMY_DIR  := "res://scenes/actors/enemies"
+const CHAR_DIR  := "res://scenes/actors/characters"
 
 # ── 输出路径 ───────────────────────────────────────────────────────────────────
 const OUT_ITEMS  := "res://data/items.csv"
-const OUT_ENEMIES := "res://data/enemies.csv"
+const OUT_CHARACTERS := "res://data/characters.csv"
 const OUT_BUILDS := "res://data/builds.csv"
 const OUT_SKILLS := "res://data/skills.csv"
 const OUT_LOOT   := "res://data/loot.csv"
@@ -35,7 +35,7 @@ func _run() -> void:
 	_export_builds()
 	_export_skills()
 	_export_loot()
-	_export_enemies()
+	_export_characters()
 	print("[ExportCsv] All exports completed.")
 # ══════════════════════════════════════════════════════════════════════════════
 #  ITEMS  (resources/items/*.tres  →  ItemDefinition)
@@ -258,13 +258,13 @@ func _export_loot() -> void:
 	print("[ExportCsv] loot.csv -> %d rows" % (rows.size() - 1))
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  ENEMIES  (scenes/actors/enemies/*.tscn)
+#  CHARACTERS  (scenes/actors/characters/*.tscn)
 # ══════════════════════════════════════════════════════════════════════════════
 
-func _export_enemies() -> void:
-	var files := _list_tscn(ENEMY_DIR)
+func _export_characters() -> void:
+	var files := _list_tscn(CHAR_DIR)
 	if files.is_empty():
-		push_warning("[ExportCsv] No .tscn found in " + ENEMY_DIR)
+		push_warning("[ExportCsv] No .tscn found in " + CHAR_DIR)
 		return
 
 	var headers := ["file", "Speed", "AttackDamage", "AttackCooldown", "MaxHealth"]
@@ -284,8 +284,8 @@ func _export_enemies() -> void:
 			props.get("MaxHealth", "")
 		])
 
-	_write_csv(OUT_ENEMIES, rows)
-	print("[ExportCsv] enemies.csv -> %d rows" % (rows.size() - 1))
+	_write_csv(OUT_CHARACTERS, rows)
+	print("[ExportCsv] characters.csv -> %d rows" % (rows.size() - 1))
 
 # ══════════════════════════════════════════════════════════════════════════════
 #  .tres 文本解析器

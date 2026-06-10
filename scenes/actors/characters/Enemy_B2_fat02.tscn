@@ -59,15 +59,15 @@ DebugOverlayOffset = Vector2(-1200, 200)
 DebugOverlayFontSize = 128
 DetectionArea = NodePath("Sprite2D/ControllerDetectionArea")
 AttackArea = NodePath("Sprite2D/AttackArea")
-AttackDamage = 3.0
-MaxHealth = 18
+AttackDamage = 30
+MaxHealth = 180
 StateMachine = NodePath("StateMachine")
 EffectController = NodePath("EffectController")
 LootTable = ExtResource("2_ooggc")
 DamageFlashColor = Color(18.892157, 18.892157, 18.892157, 1)
 
 Speed = 300
-AttackCooldown = 1.0
+AttackCooldown = 1
 [node name="Shadow" type="Sprite2D" parent="."]
 show_behind_parent = true
 material = SubResource("ShaderMaterial_b5vhy")

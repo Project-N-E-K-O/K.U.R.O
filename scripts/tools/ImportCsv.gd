@@ -10,13 +10,13 @@ const ITEMS_CSV_PATH  = "res://data/items.csv"
 const SKILLS_CSV_PATH = "res://data/skills.csv"
 const BUILDS_CSV_PATH = "res://data/builds.csv"
 const LOOT_CSV_PATH   = "res://data/loot.csv"
-const ENEMIES_CSV_PATH = "res://data/enemies.csv"
+const CHARACTERS_CSV_PATH = "res://data/characters.csv"
 
 const ITEMS_DIR  = "res://resources/items/"
 const SKILLS_DIR = "res://resources/items/skills/"
 const BUILDS_DIR = "res://resources/builds/"
 const LOOT_DIR   = "res://resources/loot/"
-const ENEMIES_DIR = "res://scenes/actors/enemies/"
+const CHARACTERS_DIR = "res://scenes/actors/characters/"
 
 var _log := CsvLogger.new()
 
@@ -27,7 +27,7 @@ func import_all() -> void:
 	import_items_from_csv()
 	import_builds_from_csv()
 	import_loot_from_csv()
-	import_enemies_from_csv()
+	import_characters_from_csv()
 	_log.info("=== 全部导入完成 ===")
 
 # ── SKILLS ────────────────────────────────────────────────────────────────────
@@ -168,10 +168,10 @@ func import_loot_from_csv() -> void:
 		if _save(table, path): count += 1
 	_log.info("  → 更新 %d 个表" % count)
 
-# ── ENEMIES ────────────────────────────────────────────────────────────────────
-func import_enemies_from_csv() -> void:
-	_log.info("--- [enemies] ---")
-	var rows = _read_csv(ENEMIES_CSV_PATH)
+# ── CHARACTERS ────────────────────────────────────────────────────────────────────
+func import_characters_from_csv() -> void:
+	_log.info("--- [characters] ---")
+	var rows = _read_csv(CHARACTERS_CSV_PATH)
 	if rows.is_empty(): return
 	var hm = _hmap(rows[0])
 	var count = 0
@@ -179,7 +179,7 @@ func import_enemies_from_csv() -> void:
 		var row = rows[i]
 		var fname = _col(row, hm, "file")
 		if fname == "": continue
-		var path = "%s%s.tscn" % [ENEMIES_DIR, fname]
+		var path = "%s%s.tscn" % [CHARACTERS_DIR, fname]
 		var content = _read_text(path)
 		if content == "": continue
 		content = _set_tscn_root_prop(content, "Speed", _col(row, hm, "Speed"))

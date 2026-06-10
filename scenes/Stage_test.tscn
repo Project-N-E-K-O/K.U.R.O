@@ -1,7 +1,7 @@
 [gd_scene load_steps=38 format=3 uid="uid://wluyqt2wxlvb"]
 
 [ext_resource type="Script" uid="uid://x1ic1ym4ykq8" path="res://scripts/scenes/BattleSceneManager.cs" id="1_s6mo5"]
-[ext_resource type="PackedScene" uid="uid://ufprfd4r8ijj" path="res://assets/spine/main_character/main_character.tscn" id="1_tv6fd"]
+[ext_resource type="PackedScene" uid="uid://ufprfd4r8ijj" path="res://scenes/actors/characters/main_character.tscn" id="1_tv6fd"]
 [ext_resource type="Texture2D" uid="uid://20khta50kpjb" path="res://assets/environments/scene_1_home/房间2地面.png" id="2_m86xd"]
 [ext_resource type="PackedScene" uid="uid://mwpdlx1yup0k" path="res://scenes/actors/etc/EnemySpawnConsole.tscn" id="2_s6mo5"]
 [ext_resource type="Script" uid="uid://del8hgcg3sr4i" path="res://scripts/managers/CameraFollow.cs" id="2_ybuta"]
@@ -144,7 +144,7 @@ position = Vector2(-1972, 3)
 SpawnParentPath = NodePath("..")
 
 [node name="MainCharacter" parent="World" instance=ExtResource("1_tv6fd")]
-MaxHealth = 10000
+AttackCooldown = 1.0
 
 [node name="Camera2D" type="Camera2D" parent="World" node_paths=PackedStringArray("Target")]
 scale = Vector2(0.33, 0.33)
