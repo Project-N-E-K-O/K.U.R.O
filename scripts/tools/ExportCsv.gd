@@ -50,7 +50,7 @@ func _export_items() -> void:
 	var headers := [
 		"file", "ItemId", "DisplayName", "Description", "Category", "Tags",
 		"MaxStackSize", "BuildClass", "LevelCount", "IsThrowable", "IsFurniture",
-		"attack_power", "MaxDurability", "DamagePerHit", "SkillRefs"
+		"attack_power", "SkillRefs"
 	]
 	var rows: Array = [headers]
 
@@ -69,16 +69,6 @@ func _export_items() -> void:
 			if _str(str(sub[sid].get("AttributeId", ""))) == "attack_power":
 				atk = str(sub[sid].get("Value", ""))
 				break
-
-		# DurabilityConfig
-		var max_dur: String = ""
-		var dmg_per: String = ""
-		var dur_raw: String = str(r.get("DurabilityConfig", ""))
-		if dur_raw.begins_with("SubResource"):
-			var did: String = _subres_id(dur_raw)
-			if did in sub:
-				max_dur = str(sub[did].get("MaxDurability", ""))
-				dmg_per = str(sub[did].get("DamagePerHit", ""))
 
 		# WeaponSkillResources → 收集引用的技能文件名
 		var skill_refs: String = ""
@@ -103,7 +93,7 @@ func _export_items() -> void:
 			str(r.get("LevelCount", "1")),
 			str(r.get("IsThrowable", "false")),
 			str(r.get("IsFurniture", "false")),
-			atk, max_dur, dmg_per, skill_refs
+			atk, skill_refs
 		])
 
 	_write_csv(OUT_ITEMS, rows)
