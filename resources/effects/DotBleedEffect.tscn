@@ -45,11 +45,11 @@ hue_variation_max = 0.15
 
 [node name="DotBleedEffect" type="Node"]
 script = ExtResource("1_script")
-DamagePerTick = 1
-BleedDuration = 5.0
 EffectId = "0285c2fb-d82b-4b83-805d-c78ed4a93c48"
 DisplayName = "持续流血"
 Description = "攻击命中后对敌人造成持续流血伤害，重复命中刷新持续时间"
+IsBuff = false
+Duration = 0.0
 
 [node name="BleedVisual" type="GPUParticles2D" parent="."]
 visible = false

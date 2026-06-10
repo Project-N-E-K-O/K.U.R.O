@@ -2,10 +2,10 @@ file,Speed,AttackDamage,AttackCooldown,MaxHealth
 Enemy_B1_fat,300,30,1,200
 Enemy_B1_thin,400,50,1,600
 Enemy_B2_fat02,300,30,1,180
-Enemy_C1_waiterA,250,20,1,100
+Enemy_C1_waiterA,,,,100
 Enemy_C1_waiterB,400,50,1,800
-Enemy_C2_waiterA02,350,20,1,120
+Enemy_C2_waiterA02,350,20,,120
 Enemy_Normal_guard1,350,20,1,180
 Enemy_Normal_guard2,350,20,1,150
 Enemy_Normal_guard3,350,30,1,120
-main_character,500,10,1,120
+main_character,500.0,10.0,,120

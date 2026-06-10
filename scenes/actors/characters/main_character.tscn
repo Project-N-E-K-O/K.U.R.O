@@ -85,14 +85,13 @@ DebugOverlayFontSize = 128
 DebugOverlayColor = Color(0, 1, 0, 1)
 AttackArea = NodePath("AttackArea")
 LeftHandAttachmentPath = NodePath("SpineSprite/SpineBoneNode")
-Speed = 500
-AttackDamage = 10
+Speed = 500.0
+AttackDamage = 10.0
 MaxHealth = 120
 StateMachine = NodePath("StateMachine")
 EffectController = NodePath("EffectController")
 DamageFlashColor = Color(18.892157, 18.892157, 18.892157, 1)
 
-AttackCooldown = 1
 [node name="Shadow" type="Sprite2D" parent="."]
 material = SubResource("ShaderMaterial_0y2r2")
 scale = Vector2(12, 5)

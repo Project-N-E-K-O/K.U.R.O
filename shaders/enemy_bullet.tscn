@@ -12,7 +12,7 @@ script = ExtResource("1_sahqo")
 MaxVerticalTiltDegrees = 5.0
 Duration = 1.0
 TrailPoints = 2
-Damage = 1
+Damage = 30
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 

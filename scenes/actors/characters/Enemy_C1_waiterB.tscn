@@ -72,6 +72,7 @@ DetectionArea = NodePath("Sprite2D/ControllerDetectionArea")
 AttackArea = NodePath("Sprite2D/AttackArea")
 ScoreValue = 80
 Speed = 400
+AttackDamage = 50
 MaxHealth = 800
 StateMachine = NodePath("StateMachine")
 EffectController = NodePath("EffectController")
@@ -79,8 +80,6 @@ StatProfile = SubResource("Resource_f4qnp")
 LootTable = ExtResource("4_qgdql")
 DamageFlashColor = Color(1, 1, 1, 1)
 
-AttackDamage = 50
-AttackCooldown = 1
 [node name="Shadow" type="Sprite2D" parent="."]
 show_behind_parent = true
 material = SubResource("ShaderMaterial_eqcia")
@@ -255,7 +254,7 @@ KnockbackDistance = 50.0
 KnockbackSpeed = 1000.0
 RequireAnimationHitTrigger = true
 AllowMultipleAnimationHits = true
-GrantedImmunities = 16
+GrantedImmunities = 8
 EffectScene = ExtResource("14_evlou")
 EffectOffset = Vector2(0, -200)
 metadata/attack_weight = 40.0

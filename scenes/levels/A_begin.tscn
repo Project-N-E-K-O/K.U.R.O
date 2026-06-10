@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://cel0dl6h07it8"]
+[gd_scene load_steps=19 format=3 uid="uid://cel0dl6h07it8"]
 
 [ext_resource type="Texture2D" uid="uid://cye54v0tcgk7u" path="res://assets/environments/scene_1_home/房间1 地面.png" id="1_1xo5x"]
 [ext_resource type="Script" uid="uid://cra7y7mt0x1j8" path="res://scripts/managers/CameraZoneArea.cs" id="1_exti5"]
@@ -36,13 +36,6 @@ size = Vector2(400, 1872)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_pal6r"]
 size = Vector2(400, 600)
-
-[sub_resource type="NavigationPolygon" id="NavigationPolygon_ocwig"]
-vertices = PackedVector2Array(1573.9219, 665.1797, -1718.7422, 672.8125, -1712.2422, -1415.0938, 1572.0703, -1418.8984)
-polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3)])
-outlines = Array[PackedVector2Array]([PackedVector2Array(-1792, -1495, 1652, -1499, 1654, 745, -1799, 753)])
-source_geometry_mode = 2
-agent_radius = 80.0
 
 [node name="ABegin" type="Node2D"]
 y_sort_enabled = true
@@ -144,7 +137,3 @@ shape = SubResource("RectangleShape2D_wph1n")
 position = Vector2(-1799.9999, -877.9999)
 rotation = 0.6981317
 shape = SubResource("RectangleShape2D_pal6r")
-
-[node name="NavigationRegion2D" type="NavigationRegion2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
-visible = false
-navigation_polygon = SubResource("NavigationPolygon_ocwig")

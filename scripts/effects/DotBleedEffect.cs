@@ -7,17 +7,18 @@ using Kuros.Core.Events;
 namespace Kuros.Effects
 {
     /// <summary>
-    /// 流血效果：攻击命中目标后后附加持续伤害，每 TickInterval 秒造成 DamagePerTick 点伤害，
-    /// 持续 BleedDuration 秒。同一敌人重复命中刷新持续时间。
-    /// 流血期间敌人身上显示血滴特效。切换武器后已存在的流血继续生效。
+    /// 流血效果：攻击命中目标后附加持续伤害，每 TickInterval 秒造成 DamagePercentPerSecond% 当前生命值的伤害，
+    /// 持续 BleedDuration 秒。同一目标重复命中刷新持续时间。
+    /// 流血期间目标身上显示血滴特效。切换武器后已存在的流血继续生效。
     /// 搭配 ItemDefinition 的 OnEquip 触发器使用。
     /// </summary>
     [GlobalClass]
     public partial class DotBleedEffect : ActorEffect
     {
         [ExportGroup("Bleed")]
-        [Export(PropertyHint.Range, "1,500,1")]
-        public int DamagePerTick { get; set; } = 5;
+        /// <summary>每次 Tick 造成的伤害，按目标当前生命值的百分比（%）。</summary>
+        [Export(PropertyHint.Range, "0.5,50,0.5")]
+        public float DamagePercentPerSecond { get; set; } = 5f;
 
         [Export(PropertyHint.Range, "0.1,5,0.1")]
         public float TickInterval { get; set; } = 1f;
@@ -36,7 +37,7 @@ namespace Kuros.Effects
         {
             EffectId = "dot_bleed";
             DisplayName = "流血";
-            Description = "攻击命中后对敌人造成持续流血伤害。";
+            Description = "攻击命中后对目标造成基于当前生命值的持续流血伤害。";
             IsBuff = true;
             Duration = 0f;
             MaxStacks = 1;
@@ -78,9 +79,9 @@ namespace Kuros.Effects
             ApplyBleed(target);
         }
 
-        private void ApplyBleed(GameActor enemy)
+        private void ApplyBleed(GameActor target)
         {
-            if (_bleeds.TryGetValue(enemy, out var existing))
+            if (_bleeds.TryGetValue(target, out var existing))
             {
                 existing.ExpiryTimer.Start(BleedDuration);
                 return;
@@ -96,45 +97,52 @@ namespace Kuros.Effects
                 if (visual != null)
                 {
                     visual.Visible = true;
-                    visual.Position = GetHitCenterLocal(enemy) + VisualOffset;
+                    visual.Position = GetHitCenterLocal(target) + VisualOffset;
                     if (visual is GpuParticles2D particles)
                         particles.Emitting = true;
-                    enemy.AddChild(visual);
+                    target.AddChild(visual);
                 }
             }
 
-            var capturedEnemy = enemy;
+            var capturedTarget = target;
             tickTimer.Timeout += () =>
             {
-                if (!IsInstanceValid(capturedEnemy) || capturedEnemy.IsDeathSequenceActive || capturedEnemy.IsDead)
+                if (!IsInstanceValid(capturedTarget) || capturedTarget.IsDeathSequenceActive || capturedTarget.IsDead)
                 {
-                    CleanupBleed(capturedEnemy);
+                    CleanupBleed(capturedTarget);
                     return;
                 }
-                capturedEnemy.TakeDamage(DamagePerTick, Vector2.Zero);
-                if (capturedEnemy.IsDeathSequenceActive || capturedEnemy.IsDead)
-                    CleanupBleed(capturedEnemy);
+
+                int bleedDamage = Mathf.Max(1,
+                    Mathf.RoundToInt(capturedTarget.CurrentHealth * DamagePercentPerSecond / 100f * TickInterval));
+                capturedTarget.TakeDamage(bleedDamage, Vector2.Zero);
+
+                if (capturedTarget.IsDeathSequenceActive || capturedTarget.IsDead)
+                    CleanupBleed(capturedTarget);
             };
 
-            expiryTimer.Timeout += () => CleanupBleed(capturedEnemy);
-            enemy.TreeExiting += () => CleanupBleed(capturedEnemy);
-            enemy.DamageTaken += _ =>
+            expiryTimer.Timeout += () => CleanupBleed(capturedTarget);
+            target.TreeExiting += () => CleanupBleed(capturedTarget);
+            target.DamageTaken += _ =>
             {
-                if (capturedEnemy.IsDeathSequenceActive || capturedEnemy.IsDead)
-                    CleanupBleed(capturedEnemy);
+                if (capturedTarget.IsDeathSequenceActive || capturedTarget.IsDead)
+                    CleanupBleed(capturedTarget);
             };
 
-            enemy.AddChild(tickTimer);
-            enemy.AddChild(expiryTimer);
+            target.AddChild(tickTimer);
+            target.AddChild(expiryTimer);
 
-            _bleeds[enemy] = new BleedState { TickTimer = tickTimer, ExpiryTimer = expiryTimer, Visual = visual };
+            _bleeds[target] = new BleedState { TickTimer = tickTimer, ExpiryTimer = expiryTimer, Visual = visual };
 
-            enemy.TakeDamage(DamagePerTick, Vector2.Zero);
+            // 立即造成首次伤害
+            int initialDamage = Mathf.Max(1,
+                Mathf.RoundToInt(target.CurrentHealth * DamagePercentPerSecond / 100f * TickInterval));
+            target.TakeDamage(initialDamage, Vector2.Zero);
         }
 
-        private void CleanupBleed(GameActor enemy)
+        private void CleanupBleed(GameActor target)
         {
-            if (!_bleeds.Remove(enemy, out var state)) return;
+            if (!_bleeds.Remove(target, out var state)) return;
 
             if (IsInstanceValid(state.TickTimer))
                 state.TickTimer.QueueFree();
@@ -145,9 +153,9 @@ namespace Kuros.Effects
 
         private void ClearAllBleeds()
         {
-            foreach (var enemy in _bleeds.Keys)
+            foreach (var target in _bleeds.Keys)
             {
-                if (_bleeds.TryGetValue(enemy, out var state))
+                if (_bleeds.TryGetValue(target, out var state))
                 {
                     if (IsInstanceValid(state.TickTimer))
                         state.TickTimer.QueueFree();
@@ -166,15 +174,15 @@ namespace Kuros.Effects
             visual.QueueFree();
         }
 
-        private static Vector2 GetHitCenterLocal(GameActor enemy)
+        private static Vector2 GetHitCenterLocal(GameActor target)
         {
-            var hitArea = enemy.GetNodeOrNull<Area2D>("HitArea")
-                ?? enemy.FindChild("HitArea", recursive: true, owned: false) as Area2D;
+            var hitArea = target.GetNodeOrNull<Area2D>("HitArea")
+                ?? target.FindChild("HitArea", recursive: true, owned: false) as Area2D;
             var hitShape = hitArea?.GetNodeOrNull<CollisionShape2D>("CollisionShape2D");
             var globalCenter = hitShape?.GlobalPosition
                 ?? hitArea?.GlobalPosition
-                ?? enemy.GlobalPosition;
-            return enemy.ToLocal(globalCenter);
+                ?? target.GlobalPosition;
+            return target.ToLocal(globalCenter);
         }
 
         private static void ClearAllParticles(Node node)

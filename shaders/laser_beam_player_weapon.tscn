@@ -11,6 +11,7 @@ BeamColor = Color(1, 0.6627451, 0, 1)
 BeamWidth = 15.0
 GlowWidth = 45.0
 Lifetime = 0.3
+Damage = 20
 KnockbackDistance = 5.0
 KnockbackDuration = 0.05
 KnockbackSpeed = 250.0

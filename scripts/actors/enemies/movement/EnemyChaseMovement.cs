@@ -66,6 +66,9 @@ public partial class EnemyChaseMovement : Node
 		{
 			// 连接 velocity_computed 信号以接收 avoidance 计算后的安全速度
 			NavAgent.VelocityComputed += OnVelocityComputed;
+
+			// 覆盖 tscn 中的 path_max_distance，确保大场景中寻路不会因距离限制而失效
+			NavAgent.PathMaxDistance = 99999f;
 		}
 	}
 

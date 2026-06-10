@@ -11,7 +11,7 @@ EffectScene = ExtResource("2_8kiax")
 PropertyOverrides = Dictionary[String, Variant]({
 "CritBonusMultiplier": 1.0,
 "HitCount": 4,
-"WeaponAttackValue": 2.0
+"WeaponAttackValue": 20.0
 })
 metadata/_custom_type_script = "uid://bv0es4osw3x0r"
 
