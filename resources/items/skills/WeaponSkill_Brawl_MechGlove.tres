@@ -24,7 +24,7 @@ metadata/_custom_type_script = "uid://bv0es4osw3x0r"
 
 [resource]
 script = ExtResource("2_kidmo")
-SkillId = "Weapon_Brawl_MechGlove"
+SkillId = "WeaponSkill_Brawl_MechGlove"
 DisplayName = "机械冲撞臂攻击"
 AnimationName = "Weapon_Brawl_MechGlove"
 ShowHitboxDebug = false
@@ -33,4 +33,4 @@ Effects = Array[ExtResource("1_rpm6u")]([SubResource("Resource_bk1ns"), SubResou
 WarmupDuration = 0.5
 ActiveDuration = 0.43
 RecoveryDuration = 0.4
-AttackCooldownDuration = 0.5
+WarmupAnimationSpeed = 1.5

@@ -15,6 +15,7 @@
 [node name="BattleScene" type="Node2D" node_paths=PackedStringArray("Player")]
 script = ExtResource("1_ehms5")
 Player = NodePath("World/MainCharacter")
+LevelName = "关卡 2"
 
 [node name="CameraZoneManager" type="Node" parent="." node_paths=PackedStringArray("TargetCamera", "Player")]
 script = ExtResource("2_4xv61")

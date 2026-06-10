@@ -12,14 +12,14 @@ metadata/_custom_type_script = "uid://bv0es4osw3x0r"
 
 [resource]
 script = ExtResource("3_f3ese")
-SkillId = "Weapon_Slash_ViolinBow"
+SkillId = "WeaponSkill_Slash_ViolinBow"
 DisplayName = "音乐家的琴弓攻击"
 SkillType = 1
-AnimationName = "Weapon_Slash_BarrierGate"
+AnimationName = "Weapon_Slash_ViolinBow"
 ShowHitboxDebug = false
 Description = "攻击到敌人时生成一道对敌人造成伤害和减速的音波"
 Effects = Array[ExtResource("1_0yij6")]([SubResource("Resource_1tcmq")])
-WarmupDuration = 0.53
-ActiveDuration = 0.31
-RecoveryDuration = 0.16
-AttackCooldownDuration = 0.5
+WarmupDuration = 0.17
+ActiveDuration = 0.26
+RecoveryDuration = 0.17
+WarmupAnimationSpeed = 0.6

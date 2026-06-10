@@ -59,8 +59,8 @@ DebugOverlayFontSize = 128
 DetectionArea = NodePath("Sprite2D/ControllerDetectionArea")
 AttackArea = NodePath("Sprite2D/AttackArea")
 Speed = 350.0
-AttackDamage = 0.0
-AttackCooldown = 0.0
+AttackDamage = 2.0
+AttackCooldown = 1.0
 MaxHealth = 15
 StateMachine = NodePath("StateMachine")
 EffectController = NodePath("EffectController")
@@ -196,19 +196,6 @@ script = ExtResource("9_wixbd")
 MeleeCountBeforeCharge = 4
 PlayerDetectionAreaPath = NodePath("../../../Sprite2D/ControllerDetectionArea")
 
-[node name="SimpleMeleeAttack" type="Node" parent="StateMachine/Attack/AttackController"]
-script = ExtResource("11_vt7ga")
-Damage = 1
-WarmupDuration = 0.33
-ActiveDuration = 0.11
-RecoveryDuration = 0.23
-AttackAreaPath = NodePath("../../../../Sprite2D/AttackArea")
-KnockbackDistance = 30.0
-KnockbackDuration = 0.06999999999999999
-KnockbackSpeed = 2000.0
-RequireAnimationHitTrigger = true
-metadata/attack_weight = 40.0
-
 [node name="MoveAttack" type="Node" parent="StateMachine/Attack/AttackController"]
 script = ExtResource("10_gkl6r")
 DetectionAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
@@ -217,9 +204,9 @@ DashSpeed = 300.0
 DashDuration = 3.0
 LockFacingDuringDash = false
 SnapshotDelaySeconds = 0.3
-MoveAttackDmg = 1
 DashEndSelfFrozenDuration = 2.0
 WarmupDuration = 0.3
+DamageMultiplier = 0.5
 AttackAreaPath = NodePath("../../../../Sprite2D/MoveAttackArea")
 KnockbackDistance = 30.0
 KnockbackDuration = 0.06999999999999999
@@ -229,6 +216,18 @@ AllowMultipleAnimationHits = true
 GrantedImmunities = 8
 IgnoreEnemyCollisionDuringAttack = true
 metadata/attack_weight = 60.0
+
+[node name="SimpleMeleeAttack" type="Node" parent="StateMachine/Attack/AttackController"]
+script = ExtResource("11_vt7ga")
+WarmupDuration = 0.33
+ActiveDuration = 0.11
+RecoveryDuration = 0.23
+AttackAreaPath = NodePath("../../../../Sprite2D/AttackArea")
+KnockbackDistance = 30.0
+KnockbackDuration = 0.06999999999999999
+KnockbackSpeed = 2000.0
+RequireAnimationHitTrigger = true
+metadata/attack_weight = 40.0
 
 [node name="Hit" type="Node" parent="StateMachine"]
 script = ExtResource("12_gdj2m")

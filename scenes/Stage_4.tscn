@@ -1,0 +1,60 @@
+[gd_scene load_steps=12 format=3 uid="uid://ci2kfp5gmklqh"]
+
+[ext_resource type="Script" uid="uid://x1ic1ym4ykq8" path="res://scripts/scenes/BattleSceneManager.cs" id="1_ctvdj"]
+[ext_resource type="Script" uid="uid://b6qifqg0v8c6o" path="res://scripts/managers/CameraZoneManager.cs" id="2_qpui1"]
+[ext_resource type="Script" uid="uid://l1558pct4220" path="res://scripts/managers/StageGeneratorManager.cs" id="3_k6j0r"]
+[ext_resource type="PackedScene" uid="uid://efbd75vs2jik" path="res://scenes/levels/D_begin.tscn" id="4_ctvdj"]
+[ext_resource type="PackedScene" uid="uid://bco3niswcahcc" path="res://scenes/levels/B_end.tscn" id="5_q18lu"]
+[ext_resource type="PackedScene" uid="uid://duv46pbl7d7l6" path="res://scenes/levels/B1.tscn" id="6_iak2v"]
+[ext_resource type="PackedScene" uid="uid://b8ky5f2goteu0" path="res://scenes/levels/B2.tscn" id="7_osham"]
+[ext_resource type="PackedScene" uid="uid://cnrdifmso2jps" path="res://scenes/levels/B3.tscn" id="8_odvgk"]
+[ext_resource type="PackedScene" uid="uid://ufprfd4r8ijj" path="res://assets/spine/main_character/main_character.tscn" id="9_2ioy7"]
+[ext_resource type="Script" uid="uid://del8hgcg3sr4i" path="res://scripts/managers/CameraFollow.cs" id="10_tyjfc"]
+[ext_resource type="PackedScene" uid="uid://cgjrdwkemgrcy" path="res://scenes/actors/heroes/P2.tscn" id="11_kkoag"]
+
+[node name="BattleScene" type="Node2D" node_paths=PackedStringArray("Player")]
+script = ExtResource("1_ctvdj")
+Player = NodePath("World/MainCharacter")
+LevelName = "关卡 3"
+
+[node name="CameraZoneManager" type="Node" parent="." node_paths=PackedStringArray("TargetCamera", "Player")]
+script = ExtResource("2_qpui1")
+TargetCamera = NodePath("../World/Camera2D")
+Player = NodePath("../World/MainCharacter")
+
+[node name="StageGeneratorManager" type="Node" parent="."]
+script = ExtResource("3_k6j0r")
+BeginScene = ExtResource("4_ctvdj")
+EndScene = ExtResource("5_q18lu")
+MiddleScenePool = Array[PackedScene]([ExtResource("6_iak2v"), ExtResource("7_osham"), ExtResource("8_odvgk")])
+MinMiddleRooms = 0
+MaxMiddleRooms = 0
+CameraLimitTop = -1441
+CameraLimitBottom = 1373
+
+[node name="World" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="MainCharacter" parent="World" instance=ExtResource("9_2ioy7")]
+
+[node name="Camera2D" type="Camera2D" parent="World"]
+scale = Vector2(0.33, 0.33)
+ignore_rotation = false
+zoom = Vector2(0.43, 0.43)
+position_smoothing_enabled = true
+rotation_smoothing_enabled = true
+drag_horizontal_enabled = true
+drag_vertical_enabled = true
+script = ExtResource("10_tyjfc")
+ShakeOnPlayerDamaged = true
+ShakeRecoverySpeed = 20.0
+PlayerDamagedShakeStrength = 12.0
+ShakeOnPlayerAttackHit = true
+PlayerAttackKillShakeStrength = 20.0
+PlayerDamagedHitStopDuration = 0.18
+PlayerAttackHitHitStopDuration = 0.1
+PlayerAttackKillHitStopDuration = 0.3
+HitStopDelay = 0.1
+
+[node name="P2" parent="World" instance=ExtResource("11_kkoag")]
+position = Vector2(300, 0)

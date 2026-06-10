@@ -31,8 +31,8 @@ shader_parameter/highlight_interval = 1.00000002375
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1hj56"]
 size = Vector2(1000, 400)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_4cgri"]
-size = Vector2(800, 150)
+[sub_resource type="CircleShape2D" id="CircleShape2D_p6fpp"]
+radius = 250.0
 
 [node name="WeaponSlashBaguette" type="CharacterBody2D"]
 z_index = 1
@@ -58,7 +58,6 @@ material = SubResource("ShaderMaterial_o1fls")
 texture = ExtResource("6_p6fpp")
 
 [node name="CollisionArea" type="Area2D" parent="."]
-visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CollisionArea"]
 shape = SubResource("RectangleShape2D_1hj56")
@@ -68,4 +67,4 @@ visible = false
 collision_layer = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AttackArea"]
-shape = SubResource("RectangleShape2D_4cgri")
+shape = SubResource("CircleShape2D_p6fpp")

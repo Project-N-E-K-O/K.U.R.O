@@ -1,0 +1,50 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=11 format=3 uid="uid://cgu7oebpx76uo"]
+
+[ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="1_jsu6e"]
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="2_h60lx"]
+[ext_resource type="PackedScene" uid="uid://bi7guxtti6ocl" path="res://resources/effects/HeavyCarrySlowEffect.tscn" id="3_ocm81"]
+[ext_resource type="PackedScene" uid="uid://ciwlpetibguab" path="res://shaders/destroy_somke.tscn" id="4_a6oum"]
+[ext_resource type="PackedScene" uid="uid://cmh3bnabinwi0" path="res://resources/effects/CameraShakeEffect.tscn" id="5_ysvq0"]
+[ext_resource type="Texture2D" uid="uid://bni7br7sgi3v" path="res://assets/furnitures/hotel_scene4/WaterMachineA.png" id="6_jsu6e"]
+[ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="7_21xc1"]
+
+[sub_resource type="Resource" id="Resource_qoudf"]
+script = ExtResource("2_h60lx")
+Trigger = 1
+EffectScene = ExtResource("3_ocm81")
+Notes = "小型家具减速30%"
+metadata/_custom_type_script = "uid://bv0es4osw3x0r"
+
+[sub_resource type="Resource" id="Resource_jx5cc"]
+script = ExtResource("2_h60lx")
+Trigger = 4
+EffectScene = ExtResource("4_a6oum")
+metadata/_custom_type_script = "uid://bv0es4osw3x0r"
+
+[sub_resource type="Resource" id="Resource_er004"]
+script = ExtResource("2_h60lx")
+Trigger = 4
+EffectScene = ExtResource("5_ysvq0")
+PropertyOverrides = Dictionary[String, Variant]({
+"ShakeStrength": 12.0
+})
+metadata/_custom_type_script = "uid://bv0es4osw3x0r"
+
+[resource]
+script = ExtResource("7_21xc1")
+ItemId = "Furniture_D_WaterMachineA"
+DisplayName = "饮水机"
+Description = "一次性投掷道具：饮水机A"
+Icon = ExtResource("6_jsu6e")
+Category = "Furniture"
+Tags = Array[String](["tag_throw", "furniture"])
+MaxStackSize = 1
+EffectEntries = Array[ExtResource("2_h60lx")]([SubResource("Resource_qoudf"), SubResource("Resource_jx5cc"), SubResource("Resource_er004")])
+LevelCount = 0
+IsThrowable = true
+IsFurniture = true
+ThrowStartOffset = Vector2(0, -450)
+ThrowParabolicDuration = 0.30000000000000004
+ThrowHorizontalDistance = 700.0
+ThrowParabolicLandingYOffset = 325.0
+WorldScenePath = "uid://de5p3deu3oubn"

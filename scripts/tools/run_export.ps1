@@ -47,7 +47,7 @@ Write-Host ""
 Write-Host "[Step 2] Cleaning old CSV exports..." -ForegroundColor Yellow
 
 $DataDir  = Join-Path $ProjectRoot "data"
-$CsvFiles = @("items.csv", "builds.csv", "skills.csv", "loot.csv")
+$CsvFiles = @("items.csv", "builds.csv", "skills.csv", "loot.csv", "enemies.csv")
 
 foreach ($csv in $CsvFiles) {
     $fp       = Join-Path $DataDir $csv
@@ -152,7 +152,7 @@ Write-Host ""
 Write-Host "[Step 5] Checking output files..." -ForegroundColor Yellow
 
 $DataDir  = Join-Path $ProjectRoot "data"
-$CsvFiles = @("items.csv", "builds.csv", "skills.csv", "loot.csv")
+$CsvFiles = @("items.csv", "builds.csv", "skills.csv", "loot.csv", "enemies.csv")
 
 $AllOk = $true
 foreach ($csv in $CsvFiles) {

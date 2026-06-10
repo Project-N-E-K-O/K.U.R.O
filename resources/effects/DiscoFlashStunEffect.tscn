@@ -1,0 +1,25 @@
+[gd_scene load_steps=3 format=3 uid="uid://dyh38a1m2n8oj"]
+
+[ext_resource type="Script" uid="uid://dycfil5n08vj4" path="res://scripts/effects/DiscoFlashStunEffect.cs" id="1_dis_stun"]
+[ext_resource type="PackedScene" uid="uid://bsyv4oaosn2gp" path="res://resources/effects/DiscoFlashRays.tscn" id="2_2r2ym"]
+
+[node name="DiscoFlashStunEffect" type="Node"]
+script = ExtResource("1_dis_stun")
+TriggerChance = 10.0
+FlashRayScene = ExtResource("2_2r2ym")
+FlashRaySpawnOffset = Vector2(150, -150)
+ShowStunRadius = false
+EffectId = "a7e3c54e-8f2b-41d9-a6c1-d45043f8e72b"
+DisplayName = "迪斯科球闪光眩晕"
+Description = "攻击命中时有概率触发闪光并眩晕范围敌人"
+Duration = 0.0
+
+[node name="FlashCanvas" type="CanvasLayer" parent="."]
+
+[node name="FlashRect" type="ColorRect" parent="FlashCanvas"]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+color = Color(1, 1, 1, 0.85)

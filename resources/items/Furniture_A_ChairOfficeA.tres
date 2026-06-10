@@ -1,0 +1,48 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=11 format=3 uid="uid://y5md3ha66s8t"]
+
+[ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="1_ab7ls"]
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="2_3eovc"]
+[ext_resource type="PackedScene" uid="uid://bi7guxtti6ocl" path="res://resources/effects/HeavyCarrySlowEffect.tscn" id="3_1mahg"]
+[ext_resource type="PackedScene" uid="uid://ciwlpetibguab" path="res://shaders/destroy_somke.tscn" id="4_v34a1"]
+[ext_resource type="PackedScene" uid="uid://cmh3bnabinwi0" path="res://resources/effects/CameraShakeEffect.tscn" id="5_8x5uu"]
+[ext_resource type="Texture2D" uid="uid://rrdy7mkpomkv" path="res://assets/furnitures/home_scene1/ChairOfficeA.png" id="6_ab7ls"]
+[ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="7_65qhp"]
+
+[sub_resource type="Resource" id="Resource_6f3qv"]
+script = ExtResource("2_3eovc")
+Trigger = 1
+EffectScene = ExtResource("3_1mahg")
+Notes = "小型家具：减速30%
+"
+metadata/_custom_type_script = "uid://bv0es4osw3x0r"
+
+[sub_resource type="Resource" id="Resource_mqy4i"]
+script = ExtResource("2_3eovc")
+Trigger = 4
+EffectScene = ExtResource("4_v34a1")
+metadata/_custom_type_script = "uid://bv0es4osw3x0r"
+
+[sub_resource type="Resource" id="Resource_1qp51"]
+script = ExtResource("2_3eovc")
+Trigger = 4
+EffectScene = ExtResource("5_8x5uu")
+metadata/_custom_type_script = "uid://bv0es4osw3x0r"
+
+[resource]
+script = ExtResource("7_65qhp")
+ItemId = "Furniture_A_ChairOfficeA"
+DisplayName = "办公座椅A"
+Description = "一次性投掷道具：办公座椅A"
+Icon = ExtResource("6_ab7ls")
+Category = "Furniture"
+Tags = Array[String](["tag_throw", "furniture"])
+MaxStackSize = 1
+EffectEntries = Array[ExtResource("2_3eovc")]([SubResource("Resource_6f3qv"), SubResource("Resource_mqy4i"), SubResource("Resource_1qp51")])
+LevelCount = 0
+IsThrowable = true
+IsFurniture = true
+ThrowStartOffset = Vector2(0, -450)
+ThrowParabolicDuration = 0.30000000000000004
+ThrowHorizontalDistance = 700.0
+ThrowParabolicLandingYOffset = 325.0
+WorldScenePath = "uid://xr3dxjuou057"

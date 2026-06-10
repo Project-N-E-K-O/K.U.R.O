@@ -1,16 +1,25 @@
-[gd_resource type="Resource" script_class="WeaponSkillDefinition" load_steps=3 format=3 uid="uid://vo7baf5ntw2i"]
+[gd_resource type="Resource" script_class="WeaponSkillDefinition" load_steps=5 format=3 uid="uid://vo7baf5ntw2i"]
 
 [ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="1_dfqri"]
+[ext_resource type="PackedScene" uid="uid://dj4nbgnsfr38k" path="res://resources/effects/DotBleedEffect.tscn" id="2_dfqri"]
 [ext_resource type="Script" uid="uid://bp6pwgoj44cuq" path="res://scripts/items/weapons/WeaponSkillDefinition.cs" id="3_o0i2c"]
+
+[sub_resource type="Resource" id="Resource_tjf6w"]
+script = ExtResource("1_dfqri")
+Trigger = 1
+EffectScene = ExtResource("2_dfqri")
+metadata/_custom_type_script = "uid://bv0es4osw3x0r"
 
 [resource]
 script = ExtResource("3_o0i2c")
-SkillId = "Weapon_Stab_Corkscrew"
+SkillId = "WeaponSkill_Stab_Corkscrew"
 DisplayName = "开瓶器攻击"
-AnimationName = "Weapon_Stab_Drill"
+AnimationName = "Weapon_Stab_Corkscrew"
 ShowHitboxDebug = false
 Description = "攻击到敌人时使该敌人在三秒内损失10%的生命值，效果不可叠加"
-WarmupDuration = 0.46
+Effects = Array[ExtResource("1_dfqri")]([SubResource("Resource_tjf6w")])
+WarmupDuration = 0.2
 ActiveDuration = 0.2
-RecoveryDuration = 0.34
-AttackCooldownDuration = 0.5
+RecoveryDuration = 0.1
+WarmupAnimationSpeed = 0.5
+RecoveryAnimationSpeed = 0.5

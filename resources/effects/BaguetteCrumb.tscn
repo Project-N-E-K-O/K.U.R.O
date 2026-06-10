@@ -27,3 +27,4 @@ shape = SubResource("RectangleShape2D_btvbp")
 
 [node name="HealOnContact" type="Node" parent="HealArea"]
 script = ExtResource("2_heal")
+HealAmount = 3

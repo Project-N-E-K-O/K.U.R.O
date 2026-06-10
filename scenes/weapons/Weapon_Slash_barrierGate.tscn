@@ -39,7 +39,7 @@ load_path = "res://.godot/imported/闸门刀.png-62da3b15c6dbcdb7dc0259889e21b21
 size = Vector2(1800, 400)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_ofv0e"]
-radius = 400.0
+radius = 360.0
 
 [node name="WeaponSlashBarrierGate" type="CharacterBody2D"]
 z_index = 1

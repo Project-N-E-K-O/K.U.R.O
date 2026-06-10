@@ -1,0 +1,42 @@
+[gd_scene load_steps=8 format=3 uid="uid://d1td06we8ip0i"]
+
+[ext_resource type="Texture2D" uid="uid://crbl664dgmkv8" path="res://assets/effect/AttackEffect/bleed/bleed_a_01.png" id="1_utsje"]
+[ext_resource type="Texture2D" uid="uid://dd0x0lne0yb14" path="res://assets/effect/AttackEffect/bleed/bleed_a_02.png" id="2_wxdgr"]
+[ext_resource type="Texture2D" uid="uid://dqf30riyc0lsh" path="res://assets/effect/AttackEffect/bleed/bleed_a_03.png" id="3_yoci4"]
+[ext_resource type="Texture2D" uid="uid://dntkj67iwq6sb" path="res://assets/effect/AttackEffect/bleed/bleed_a_04.png" id="4_2sl52"]
+[ext_resource type="Texture2D" uid="uid://jmisrgomr5n8" path="res://assets/effect/AttackEffect/bleed/bleed_a_05.png" id="5_yhk84"]
+[ext_resource type="Texture2D" uid="uid://tfsafix7s0jp" path="res://assets/effect/AttackEffect/bleed/bleed_a_06.png" id="6_dcge3"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_to6ee"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_utsje")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_wxdgr")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_yoci4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_2sl52")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_yhk84")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_dcge3")
+}],
+"loop": false,
+"name": &"default",
+"speed": 25.0
+}]
+
+[node name="BleedA" type="AnimatedSprite2D"]
+modulate = Color(0.4597081, 0.4597081, 0.4597081, 1)
+sprite_frames = SubResource("SpriteFrames_to6ee")
+frame = 5
+frame_progress = 1.0
+offset = Vector2(-300, 100)
+flip_h = true

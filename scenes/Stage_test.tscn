@@ -29,7 +29,6 @@
 [ext_resource type="PackedScene" uid="uid://d0x0oxhsokka0" path="res://scenes/weapons/Weapon_Stab_corkscrew.tscn" id="19_dxexl"]
 [ext_resource type="PackedScene" uid="uid://b81xhi3r08vha" path="res://scenes/weapons/Weapon_Throw_emojiBomb.tscn" id="20_mkebo"]
 [ext_resource type="PackedScene" uid="uid://cnh6afaayr0iy" path="res://scenes/weapons/Weapon_Slash_bunnySword.tscn" id="21_5dr7i"]
-[ext_resource type="Script" uid="uid://b7afb3wjghskq" path="res://scripts/items/world/DropItemDebugger.cs" id="25_jqh86"]
 [ext_resource type="Texture2D" uid="uid://brjaqxel52a2o" path="res://assets/WeaponBuild/icon.svg" id="30_m86xd"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_m86xd"]
@@ -49,6 +48,13 @@ size = Vector2(300, 1000)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_bnjvr"]
 size = Vector2(300, 600)
+
+[sub_resource type="NavigationPolygon" id="NavigationPolygon_6eerp"]
+vertices = PackedVector2Array(-1709, 651, -1709, 1211, -1742, 945, -1742, 585, -446.5, 780, -446.5, 450, 2365, 420, 2365, 1220, -1309, 501, -1309, 161, -827.5, 450, -827.5, 651, -1769, 501, -2562, 585, 2733.4375, -240, 2740.1328, 420, 2365, -240, -2835, 680, -3118.3594, 680, -3116.1484, 146, -2835, 146, -1721, -404, -1721, -850, 2365, -850, -749, 1211, -749, 780, -2835, 123, -2094, 123, -2835, -303, -2835, -850, -2631, -850, -2631, -404, -2094, -303, -1769, 161, -2562, 945, -2835, 1220)
+polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3), PackedInt32Array(4, 5, 6, 7), PackedInt32Array(8, 9, 10, 11), PackedInt32Array(12, 8, 11, 0, 3), PackedInt32Array(12, 3, 13), PackedInt32Array(14, 15, 6, 16), PackedInt32Array(17, 18, 19, 20), PackedInt32Array(21, 22, 23, 16, 5, 10, 9), PackedInt32Array(24, 25, 4, 7), PackedInt32Array(20, 26, 27), PackedInt32Array(28, 29, 30, 31), PackedInt32Array(32, 28, 31, 21), PackedInt32Array(16, 6, 5), PackedInt32Array(32, 21, 9, 33, 27), PackedInt32Array(13, 17, 20, 27, 33), PackedInt32Array(33, 12, 13), PackedInt32Array(17, 13, 34, 35), PackedInt32Array(34, 2, 1, 35), PackedInt32Array(24, 7, 35, 1)])
+outlines = Array[PackedVector2Array]([PackedVector2Array(-3189, -1581, 2800, -1567, 2832, 1591, -3202, 1560)])
+source_geometry_mode = 2
+agent_radius = 80.0
 
 [node name="BattleScene" type="Node2D" node_paths=PackedStringArray("Player")]
 y_sort_enabled = true
@@ -128,6 +134,11 @@ shape = SubResource("RectangleShape2D_6eerp")
 position = Vector2(-2880, 860)
 shape = SubResource("RectangleShape2D_bnjvr")
 
+[node name="NavigationRegion2D" type="NavigationRegion2D" parent="World" groups=["navigation_polygon_source_geometry_group"]]
+visible = false
+position = Vector2(185, -200)
+navigation_polygon = SubResource("NavigationPolygon_6eerp")
+
 [node name="EnemySpawnConsole" parent="World" instance=ExtResource("2_s6mo5")]
 position = Vector2(-1972, 3)
 SpawnParentPath = NodePath("..")
@@ -180,7 +191,7 @@ position = Vector2(-1092, -1332.9999)
 position = Vector2(-1091, -1496.9999)
 
 [node name="WeaponSlashViolinBow" parent="World" instance=ExtResource("12_ngl7c")]
-position = Vector2(-354, -1499.9999)
+position = Vector2(-403.00003, -1504.0001)
 
 [node name="WeaponStabCorkscrew" parent="World" instance=ExtResource("19_dxexl")]
 position = Vector2(-386.00024, -1333.9999)
@@ -207,12 +218,10 @@ position = Vector2(209, -1359.9999)
 position = Vector2(4285, -336)
 script = ExtResource("16_28ted")
 ElevatorScenePath = "uid://v3n56xk6n8ca"
-NextStagePath = "uid://dwk6x3qcbsmul"
+NextStagePath = "uid://qd5abd4opeob"
 LoadDistance = 2000.0
 
-[node name="center" type="Sprite2D" parent="World"]
+[node name="center" type="Sprite2D" parent="."]
 z_index = 10
+scale = Vector2(0.1, 0.1)
 texture = ExtResource("30_m86xd")
-
-[node name="DropDebug" type="Node2D" parent="."]
-script = ExtResource("25_jqh86")

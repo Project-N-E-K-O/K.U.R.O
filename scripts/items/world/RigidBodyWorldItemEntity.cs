@@ -508,6 +508,8 @@ namespace Kuros.Items.World
 					_hitActors.Clear();
 					_isThrown = true;
 					
+						// 家具投掷时关闭 StaticBody2D 碰撞体，避免大碰撞体推开敌人导致 AttackArea 无法命中
+						SetFurnitureStaticBodyCollision(false);
 				// 投掷飞行期间隐藏阴影
 				SetShadowVisible(false);
 				
@@ -1268,6 +1270,7 @@ namespace Kuros.Items.World
 			{
 				_rigidBody.CollisionLayer = _initialRigidBodyCollisionLayer;
 				_rigidBody.CollisionMask = _initialRigidBodyCollisionMask;
+				SetFurnitureStaticBodyCollision(true);
 				_isThrown = false;
 				GD.Print($"[{Name}] 恢复碰撞设置: layer={_initialRigidBodyCollisionLayer}, mask={_initialRigidBodyCollisionMask}");
 			}
@@ -1277,7 +1280,15 @@ namespace Kuros.Items.World
 			}
 		}
 
-		/// <summary>
+		private void SetFurnitureStaticBodyCollision(bool enabled)
+		{
+			if (_rigidBody == null) return;
+			var staticBody = _rigidBody.GetNodeOrNull<StaticBody2D>("StaticBody2D");
+			if (staticBody == null) return;
+			var shape = staticBody.GetNodeOrNull<CollisionShape2D>("CollisionShape2D");
+			if (shape != null)
+				shape.Disabled = !enabled;
+		}
 		/// 将此物品归还背包（投掷武器落地后归还，仍有剩余使用次数时调用）
 		/// </summary>
 		private void ReturnToInventory()

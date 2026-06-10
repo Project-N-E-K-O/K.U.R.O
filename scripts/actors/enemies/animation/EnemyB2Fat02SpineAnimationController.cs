@@ -302,10 +302,7 @@ namespace Kuros.Actors.Enemies.Animation
 
             if (currentAttack is EnemySimpleMeleeAttack simpleMelee && simpleMelee.RequireAnimationHitTrigger)
             {
-                float originalDamage = Enemy != null ? Enemy.AttackDamage : 0f;
-                if (Enemy != null) Enemy.AttackDamage = simpleMelee.Damage;
                 currentAttack.TriggerAnimationHit();
-                if (Enemy != null) Enemy.AttackDamage = originalDamage;
                 return;
             }
 

@@ -36,11 +36,12 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("8_2bjts")
 }],
-"loop": true,
+"loop": false,
 "name": &"default",
 "speed": 30.0
 }]
 
 [node name="HitH" type="AnimatedSprite2D"]
+scale = Vector2(0.5, 0.5)
 sprite_frames = SubResource("SpriteFrames_to6ee")
 flip_h = true

@@ -63,7 +63,9 @@ namespace Kuros.Core.Effects
                     }
 
                     Actor.AttackTimer = 0f;
+                    Actor.FrozenStateRemainingTime = 0f;
                     Actor.StateMachine.ChangeState(targetState);
+                    Actor.FrozenStateRemainingTime = 0f;
                     TryForceQueueNextAttack("FreezeRemoved");
                 }
             }

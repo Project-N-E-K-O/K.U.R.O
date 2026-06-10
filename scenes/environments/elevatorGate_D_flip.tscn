@@ -1,0 +1,34 @@
+[gd_scene load_steps=5 format=3 uid="uid://m25wem7tlp6p"]
+
+[ext_resource type="Texture2D" uid="uid://ctkti5m3qtkre" path="res://assets/environments/scene_4_hotel/场景4左侧电梯墙后.png" id="1_qoc0w"]
+[ext_resource type="Texture2D" uid="uid://3ejeq8irxlnr" path="res://assets/environments/scene_4_hotel/场景4左侧电梯墙前.png" id="2_ixhfj"]
+[ext_resource type="Texture2D" uid="uid://dhj0cb6x84oqi" path="res://assets/environments/scene_4_hotel/场景4左侧电梯门.png" id="3_8dvhq"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_4jbtd"]
+size = Vector2(200, 700)
+
+[node name="ElevatorGate" type="RigidBody2D"]
+gravity_scale = 0.0
+can_sleep = false
+freeze = true
+freeze_mode = 1
+
+[node name="door" type="Sprite2D" parent="."]
+z_index = 1
+position = Vector2(-4, 22)
+texture = ExtResource("3_8dvhq")
+
+[node name="ElevatorFrontWall" type="Sprite2D" parent="."]
+z_index = 1
+texture = ExtResource("2_ixhfj")
+region_rect = Rect2(0, 0, 352, 1612)
+
+[node name="ElevatorBackWall" type="Sprite2D" parent="."]
+z_index = 1
+position = Vector2(4, -848)
+texture = ExtResource("1_qoc0w")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(201, 0)
+shape = SubResource("RectangleShape2D_4jbtd")
+disabled = true

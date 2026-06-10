@@ -39,7 +39,7 @@ load_path = "res://.godot/imported/钻头.png-2a47c7fe5d274a9cfe49d5c8ed85d08a.c
 size = Vector2(1200, 400)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_t6geh"]
-size = Vector2(500, 100)
+size = Vector2(500, 25)
 
 [node name="WeaponStabDrill" type="CharacterBody2D"]
 z_index = 1
@@ -71,7 +71,6 @@ position = Vector2(0, 20)
 shape = SubResource("RectangleShape2D_g0q5t")
 
 [node name="AttackArea" type="Area2D" parent="."]
-visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AttackArea"]
 shape = SubResource("RectangleShape2D_t6geh")

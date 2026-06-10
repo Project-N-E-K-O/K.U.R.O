@@ -6,7 +6,7 @@
 [node name="WeaponSlashBaguetteEffect" type="Node"]
 script = ExtResource("1_script")
 CrumbScene = ExtResource("2_fas7w")
-SpawnChance = 100.0
+SpawnChance = 20.0
 EffectId = "0a16dd84-94d8-47ce-bc16-c8b4a64d8402"
 DisplayName = "法棍攻击"
 Description = "攻击命中时有概率抛出一个面包碎块，拾取后恢复生命。"

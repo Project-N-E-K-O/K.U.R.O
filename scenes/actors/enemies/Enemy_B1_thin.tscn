@@ -73,9 +73,8 @@ DebugOverlayFontSize = 128
 DetectionArea = NodePath("Sprite2D/ControllerDetectionArea")
 AttackRangeCheckDistance = 600.0
 AttackArea = NodePath("Sprite2D/AttackArea")
+ScoreValue = 50
 Speed = 400.0
-AttackDamage = 0.0
-AttackCooldown = 0.0
 MaxHealth = 60
 StateMachine = NodePath("StateMachine")
 EffectController = NodePath("EffectController")
@@ -217,10 +216,11 @@ DetectionAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
 KickAttackAreaPath = NodePath("../../../../Sprite2D/KickArea")
 DashSpeed = 1500.0
 SnapshotDelaySeconds = 0.5
-KickDamage = 3
 WarmupDuration = 0.5
 ActiveDuration = 1.2
 RecoveryDuration = 0.4
+CooldownDurationMultiplier = 1.5
+DamageMultiplier = 0.5
 AttackAreaPath = NodePath("../../../../Sprite2D/KickArea")
 KnockbackDistance = 25.0
 KnockbackDuration = 0.06
@@ -233,7 +233,6 @@ metadata/attack_weight = 60.0
 
 [node name="SimpleMeleeAttack" type="Node" parent="StateMachine/Attack/AttackController"]
 script = ExtResource("12_4a6st")
-Damage = 3
 WarmupDuration = 0.5
 RecoveryDuration = 0.28
 AttackAreaPath = NodePath("../../../../Sprite2D/AttackArea")
@@ -241,6 +240,7 @@ KnockbackDistance = 30.0
 KnockbackDuration = 0.1
 KnockbackSpeed = 2500.0
 RequireAnimationHitTrigger = true
+GrantedImmunities = 16
 metadata/attack_weight = 40.0
 
 [node name="Hit" type="Node" parent="StateMachine"]

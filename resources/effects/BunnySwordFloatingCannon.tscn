@@ -1,17 +1,29 @@
-[gd_scene load_steps=9 format=3 uid="uid://cun60ye1ty36l"]
+[gd_scene load_steps=11 format=3 uid="uid://cun60ye1ty36l"]
 
-[ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="1_ehr72"]
 [ext_resource type="Script" uid="uid://cy1vc0bgy8u2y" path="res://scripts/effects/BunnySwardFloatingCannon.cs" id="1_jjiqi"]
+[ext_resource type="Shader" uid="uid://dm7c4s67g3dhw" path="res://shaders/materials/outline_scanline.gdshader" id="1_out_scan"]
+[ext_resource type="Shader" uid="uid://dg0rc7s2x8k2r" path="res://shaders/materials/scanline_reveal.gdshader" id="1_scan"]
 [ext_resource type="Texture2D" uid="uid://c52bxl80egf26" path="res://assets/weapons/浮游炮.png" id="2_jjiqi"]
 [ext_resource type="PackedScene" uid="uid://cfff2lvvaeu3q" path="res://shaders/laser_beam_player_weapon.tscn" id="3_laser"]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_wf0ax"]
-shader = ExtResource("1_ehr72")
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_scan_outline"]
+shader = ExtResource("1_out_scan")
 shader_parameter/outline_color = Color(0.02, 0.02, 0.02, 1)
-shader_parameter/outline_size = 7.0000001043084
+shader_parameter/outline_size = 7.0
 shader_parameter/alpha_threshold = 0.5
 shader_parameter/edge_softness = 0.12
 shader_parameter/preserve_fill = true
+shader_parameter/scanline_pos = -1.0
+shader_parameter/scanline_width = 0.04
+shader_parameter/scanline_color = Color(1, 0.50980395, 0, 1)
+shader_parameter/reverse_scan = false
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_scan_inner"]
+shader = ExtResource("1_scan")
+shader_parameter/scanline_pos = -0.500000011176
+shader_parameter/scanline_width = 0.0999999977648
+shader_parameter/scanline_color = Color(1, 0.50980395, 0, 1)
+shader_parameter/reverse_scan = false
 
 [sub_resource type="Animation" id="Animation_ec3lc"]
 length = 0.001
@@ -85,11 +97,12 @@ DisplayName = "浮游炮"
 Description = "装备光剑攻击时在玩家位置生成，朝范围内最近敌人旋转并发射激光"
 
 [node name="outline" type="Sprite2D" parent="."]
-material = SubResource("ShaderMaterial_wf0ax")
-scale = Vector2(0.5, 0.5)
+material = SubResource("ShaderMaterial_scan_outline")
+scale = Vector2(0.4, 0.4)
 texture = ExtResource("2_jjiqi")
 
 [node name="Sprite2D" type="Sprite2D" parent="outline"]
+material = SubResource("ShaderMaterial_scan_inner")
 texture = ExtResource("2_jjiqi")
 
 [node name="Marker2D" type="Marker2D" parent="."]

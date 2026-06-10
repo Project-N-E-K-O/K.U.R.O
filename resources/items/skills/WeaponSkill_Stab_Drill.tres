@@ -15,7 +15,7 @@ metadata/_custom_type_script = "uid://bv0es4osw3x0r"
 
 [resource]
 script = ExtResource("2_wr56q")
-SkillId = "Weapon_Stab_Drill"
+SkillId = "WeaponSkill_Stab_Drill"
 DisplayName = "钻头攻击"
 AnimationName = "Weapon_Stab_Drill"
 CooldownSeconds = 3.0
@@ -25,4 +25,3 @@ Effects = Array[ExtResource("1_7jkjn")]([SubResource("Resource_a5flt")])
 WarmupDuration = 0.46
 ActiveDuration = 0.2
 RecoveryDuration = 0.34
-AttackCooldownDuration = 0.5

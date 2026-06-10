@@ -32,7 +32,7 @@ shader_parameter/highlight_interval = 1.00000002375
 size = Vector2(700, 400)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_82c6d"]
-size = Vector2(250, 200)
+size = Vector2(250, 100)
 
 [node name="WeaponBrawlRiotGlove" type="CharacterBody2D"]
 z_index = 1
@@ -64,6 +64,7 @@ z_index = 1
 shape = SubResource("BodyShape_rr6vl")
 
 [node name="AttackArea" type="Area2D" parent="."]
+visible = false
 collision_layer = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AttackArea"]

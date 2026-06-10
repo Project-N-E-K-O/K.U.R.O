@@ -1,0 +1,16 @@
+[gd_scene load_steps=2 format=3 uid="uid://bsyv4oaosn2gp"]
+
+[ext_resource type="Script" uid="uid://dtku45lmvh675" path="res://scripts/effects/DiscoFlashRays.cs" id="1_rays"]
+
+[node name="DiscoFlashRays" type="Node2D"]
+z_index = 3
+script = ExtResource("1_rays")
+RayLength = 360.0
+RayCount = 12
+RayWidth = 4.0
+ColorIntensity = 2.0
+Duration = 0.7999999999999999
+SpeedMin = 800.0
+SpeedMax = 1200.0
+ExpandScale = 4.0
+RotationSweep = 90.0

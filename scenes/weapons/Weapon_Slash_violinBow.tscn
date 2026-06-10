@@ -33,10 +33,10 @@ shader_parameter/highlight_intensity = 1.2
 shader_parameter/highlight_interval = 1.00000002375
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_rlv6v"]
-size = Vector2(1250, 400)
+size = Vector2(1000, 400)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_8ydt5"]
-radius = 300.0
+radius = 250.0
 
 [node name="WeaponSlashViolinBow" type="CharacterBody2D"]
 z_index = 1
@@ -49,8 +49,7 @@ DefaultOutlineColor = Color(0, 0, 0, 0)
 
 [node name="Shadow" type="Sprite2D" parent="."]
 material = SubResource("ShaderMaterial_nqlfu")
-position = Vector2(0, 20)
-scale = Vector2(20, 2)
+scale = Vector2(15, 2)
 texture = SubResource("CompressedTexture2D_waoek")
 
 [node name="Outline" type="Sprite2D" parent="."]

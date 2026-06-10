@@ -27,18 +27,21 @@ namespace Kuros.Actors.Enemies.States
         public float HealthThresholdPercent { get; set; } = 50f;
 
         [ExportCategory("Healing")]
-        [Export(PropertyHint.Range, "1,999,1")]
-        public int HealAmount { get; set; } = 3;
+        [Export(PropertyHint.Range, "1,100,1")]
+        public int HealPercent { get; set; } = 30;
 
         [Export(PropertyHint.Range, "50,2000,50")]
         public float ContactDistance { get; set; } = 200f;
+
+        [Export(PropertyHint.Range, "0,10,0.1")]
+        public float HealDelay { get; set; } = 0f;
 
         [Export(PropertyHint.Range, "50,2000,50")]
         public float AssistMoveSpeed { get; set; } = 300f;
 
         [ExportCategory("Use Cooldown")]
         [Export(PropertyHint.Range, "1,20,1")]
-        public int UsesBeforeCooldown = 1;
+        public int UsesBeforeCooldown = 1; // 连续触发多少次后进入冷却
 
         [Export(PropertyHint.Range, "0.5,60,0.5")]
         public float CooldownAfterUses = 10.0f;
@@ -49,8 +52,11 @@ namespace Kuros.Actors.Enemies.States
         private SampleEnemy? _cachedTarget;
         private bool _hasValidTarget;
         private float _scanTimer = 0f;
+        private float _healDelayTimer;
+        private bool _waitingToHeal;
         private int _useCount;
         private float _cooldownTimer;
+        private NavigationAgent2D? _navAgent;
 
         // ─── 生命周期 ────────────────────────────────────────────────────────────
 
@@ -227,6 +233,10 @@ namespace Kuros.Actors.Enemies.States
             if (UsesBeforeCooldown > 0 && _useCount >= UsesBeforeCooldown)
                 _cooldownTimer = Mathf.Max(CooldownAfterUses, 0f);
 
+            _healDelayTimer = 0f;
+            _waitingToHeal = false;
+            _navAgent = Enemy.GetNodeOrNull<NavigationAgent2D>("NavigationAgent2D");
+
             Enemy.AnimPlayer?.Play("animations/Walk");
         }
 
@@ -246,24 +256,84 @@ namespace Kuros.Actors.Enemies.States
             float dist = Enemy.GlobalPosition.DistanceTo(_cachedTarget.GlobalPosition);
             if (dist <= ContactDistance)
             {
-                // 先保存位置，避免 RestoreHealth 触发 HealthChanged → ReevaluateTarget() 将 _cachedTarget 置 null
-                Vector2 healPosition = _cachedTarget.GlobalPosition;
-                _cachedTarget.RestoreHealth(_cachedTarget.CurrentHealth + HealAmount);
-                // 显示治疗飘字
-                FloatingDamageTextManager.Instance.ShowFloatingHealing(HealAmount, healPosition, 0f);
-                _cachedTarget   = null;
-                _hasValidTarget = false;
-                ChangeState("Walk");
+                if (HealDelay <= 0f)
+                {
+                    ApplyHeal();
+                    return;
+                }
+
+                if (!_waitingToHeal)
+                {
+                    _waitingToHeal = true;
+                    _healDelayTimer = HealDelay;
+                }
+
+                _healDelayTimer -= (float)delta;
+                if (_healDelayTimer <= 0f)
+                {
+                    ApplyHeal();
+                    return;
+                }
+
+                // 等待期间继续追踪，但不重置计时器
+                MoveTowardTarget();
                 return;
             }
 
-            Vector2 dir = Enemy.GlobalPosition.DirectionTo(_cachedTarget.GlobalPosition);
+            _waitingToHeal = false;
+            _healDelayTimer = 0f;
+
+            MoveTowardTarget();
+        }
+
+        private void MoveTowardTarget()
+        {
+            if (_cachedTarget == null) return;
+
+            Vector2 dir;
             float speed = AssistMoveSpeed > 0f ? AssistMoveSpeed : Enemy.Speed;
+
+            if (_navAgent != null)
+            {
+                if (_navAgent.TargetPosition.DistanceSquaredTo(_cachedTarget.GlobalPosition) > 100f)
+                    _navAgent.TargetPosition = _cachedTarget.GlobalPosition;
+
+                if (!_navAgent.IsNavigationFinished())
+                {
+                    Vector2 nextPoint = _navAgent.GetNextPathPosition();
+                    dir = (nextPoint - Enemy.GlobalPosition).Normalized();
+                }
+                else
+                {
+                    dir = Enemy.GlobalPosition.DirectionTo(_cachedTarget.GlobalPosition);
+                }
+            }
+            else
+            {
+                dir = Enemy.GlobalPosition.DirectionTo(_cachedTarget.GlobalPosition);
+            }
+
+            if (dir.IsZeroApprox()) return;
+
             Enemy.Velocity = dir * speed;
             if (dir.X != 0)
                 Enemy.FlipFacing(dir.X > 0);
             Enemy.MoveAndSlide();
             Enemy.ClampPositionToScreen();
+        }
+
+        private void ApplyHeal()
+        {
+            if (_cachedTarget == null) return;
+
+            int amount = Mathf.Max(1, Mathf.RoundToInt(_cachedTarget.MaxHealth * HealPercent / 100f));
+            Vector2 healPosition = _cachedTarget.GlobalPosition;
+            _cachedTarget.RestoreHealth(_cachedTarget.CurrentHealth + amount);
+            FloatingDamageTextManager.Instance.ShowFloatingHealing(amount, healPosition, 0f);
+            _cachedTarget = null;
+            _hasValidTarget = false;
+            _waitingToHeal = false;
+            ChangeState("Walk");
         }
     }
 }

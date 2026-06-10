@@ -59,14 +59,15 @@ DebugOverlayOffset = Vector2(-1200, 200)
 DebugOverlayFontSize = 128
 DetectionArea = NodePath("Sprite2D/ControllerDetectionArea")
 AttackArea = NodePath("Sprite2D/AttackArea")
-AttackDamage = 0.0
-AttackCooldown = 0.0
-MaxHealth = 20
+AttackDamage = 3.0
+MaxHealth = 18
 StateMachine = NodePath("StateMachine")
 EffectController = NodePath("EffectController")
 LootTable = ExtResource("2_ooggc")
 DamageFlashColor = Color(18.892157, 18.892157, 18.892157, 1)
 
+Speed = 300
+AttackCooldown = 1.0
 [node name="Shadow" type="Sprite2D" parent="."]
 show_behind_parent = true
 material = SubResource("ShaderMaterial_b5vhy")
@@ -153,7 +154,7 @@ scale = Vector2(3.6, 3.6)
 shape = SubResource("CircleShape2D_gvrrx")
 
 [node name="HitArea" type="Area2D" parent="Sprite2D"]
-visible = false
+z_index = 10
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/HitArea"]
 position = Vector2(0, 70)
@@ -205,12 +206,13 @@ SmashAreaPath = NodePath("../../../../Sprite2D/SmashArea")
 DashSpeed = 900.0
 DashDuration = 1.05
 SnapshotDelaySeconds = 0.5
-SmashDmg = 5
 AppliedStunDuration = 2.0
 AttackName = "SmashAttack"
 WarmupDuration = 0.6
 ActiveDuration = 0.45
 RecoveryDuration = 0.95
+CooldownDurationMultiplier = 1.5
+DamageMultiplier = 1.5
 AttackAreaPath = NodePath("../../../../Sprite2D/SmashArea")
 KnockbackDistance = 500.0
 KnockbackDuration = 0.1
@@ -225,7 +227,6 @@ metadata/attack_weight = 60.0
 
 [node name="SimpleMeleeAttack" type="Node" parent="StateMachine/Attack/AttackController"]
 script = ExtResource("12_daw10")
-Damage = 3
 AttackName = "SimpleMeleeAttack"
 WarmupDuration = 1.0
 ActiveDuration = 0.11

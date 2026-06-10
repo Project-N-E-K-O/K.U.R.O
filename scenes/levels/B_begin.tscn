@@ -115,6 +115,7 @@ collision_layer = 0
 collision_mask = 4
 script = ExtResource("22_camzone")
 ZoneName = "Room_Zone_B_Begin_2"
+NodesToCleanup = [NodePath("../Environments/Gate"), NodePath("../Taxi")]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CameraZone2"]
 shape = SubResource("RectangleShape2D_2etho")
@@ -237,7 +238,7 @@ region_rect = Rect2(1, 0, 1689, 3059)
 script = ExtResource("13_hjjd7")
 TriggerAreaPath = NodePath("Area2D")
 TargetPath = NodePath(".")
-FadedAlpha = 0.6
+FadedAlpha = 0.95
 
 [node name="gatewall" type="Sprite2D" parent="Environments/FrontWall/GateFrontWall"]
 z_as_relative = false

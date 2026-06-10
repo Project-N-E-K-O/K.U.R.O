@@ -235,15 +235,20 @@ namespace Kuros.Actors.Heroes.Attacks
             _effectiveWarmup   = ResolveSkillTiming(_activeWeaponSkill?.WarmupDuration, WarmupDuration);
             _effectiveActive   = ResolveSkillTiming(_activeWeaponSkill?.ActiveDuration, ActiveDuration);
             _effectiveRecovery = ResolveSkillTiming(_activeWeaponSkill?.RecoveryDuration, RecoveryDuration);
-            float effectiveCooldown = ResolveSkillTiming(_activeWeaponSkill?.AttackCooldownDuration, CooldownDuration);
 
-            _cooldownTimer = effectiveCooldown;
-            Player.AttackTimer = Mathf.Max(Player.AttackTimer, effectiveCooldown);
+            // 阶段时长按动画速度调整：速度越慢，阶段越久，确保动画完整播放
+            float warmupSpeed = _activeWeaponSkill?.WarmupAnimationSpeed ?? 1f;
+            float activeSpeed = _activeWeaponSkill?.ActiveAnimationSpeed ?? 1f;
+            float recoverySpeed = _activeWeaponSkill?.RecoveryAnimationSpeed ?? 1f;
+            _effectiveWarmup   /= Mathf.Max(warmupSpeed, 0.01f);
+            _effectiveActive   /= Mathf.Max(activeSpeed, 0.01f);
+            _effectiveRecovery /= Mathf.Max(recoverySpeed, 0.01f);
 
             // 先进入 Warmup 阶段，再启动攻击
             // 这样可以确保当动画 hit 事件触发时，IsRunning 已经是 true
             SetPhase(AttackPhase.Warmup);
             OnAttackStarted();
+            ApplyPhaseAnimationSpeed(AttackPhase.Warmup);
 
             if (ConsumeResourceOnStart)
             {
@@ -386,6 +391,38 @@ namespace Kuros.Actors.Heroes.Attacks
         private static float ResolveSkillTiming(float? skillOverride, float templateDefault)
         {
             return (skillOverride.HasValue && skillOverride.Value >= 0f) ? skillOverride.Value : templateDefault;
+        }
+
+        private void ApplyPhaseAnimationSpeed(AttackPhase phase)
+        {
+            float speed = phase switch
+            {
+                AttackPhase.Warmup => _activeWeaponSkill?.WarmupAnimationSpeed ?? 1f,
+                AttackPhase.Active => _activeWeaponSkill?.ActiveAnimationSpeed ?? 1f,
+                AttackPhase.Recovery => _activeWeaponSkill?.RecoveryAnimationSpeed ?? 1f,
+                _ => 1f
+            };
+
+            if (Player is MainCharacter mainChar)
+            {
+                mainChar.SetSpineAnimationSpeed(speed);
+            }
+            else if (Player.AnimPlayer != null)
+            {
+                Player.AnimPlayer.SpeedScale = speed;
+            }
+        }
+
+        private void ResetAnimationSpeed()
+        {
+            if (Player is MainCharacter mainChar)
+            {
+                mainChar.SetSpineAnimationSpeed(1f);
+            }
+            else if (Player.AnimPlayer != null)
+            {
+                Player.AnimPlayer.SpeedScale = 1f;
+            }
         }
 
         protected virtual void OnAttackStarted()
@@ -590,6 +627,7 @@ namespace Kuros.Actors.Heroes.Attacks
                     _hitWindowActive = false;
                     _spineHitWindowActive = false;
                     _spineAttackAnimationName = string.Empty;
+                    ResetAnimationSpeed();
                     OnAttackFinished();
                     break;
                 case AttackPhase.Warmup:
@@ -604,6 +642,7 @@ namespace Kuros.Actors.Heroes.Attacks
                     // 只要有特效场景，就保持 _hitWindowActive=true（不管是否使用 Spine 事件）
                     _hitWindowActive = HitEffectScene != null;
                     _spineHitWindowActive = ShouldUseSpineHitEvents();
+                    ApplyPhaseAnimationSpeed(AttackPhase.Active);
                     if (ShouldUseSpineHitEvents())
                     {
                         OnActivePhase();
@@ -617,6 +656,7 @@ namespace Kuros.Actors.Heroes.Attacks
                     _phaseTimer = _effectiveRecovery;
                     _hitWindowActive = false;
                     _spineHitWindowActive = false;
+                    ApplyPhaseAnimationSpeed(AttackPhase.Recovery);
                     OnRecoveryStarted();
                     break;
             }

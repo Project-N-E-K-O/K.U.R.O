@@ -23,8 +23,7 @@ namespace Kuros.Actors.Enemies.Attacks
         [Export] public bool LockFacingDuringDash = true;
 		[Export(PropertyHint.Range, "0,5,0.01")] public float MinDashTimeBeforeAttack = 0f; // 允许命中前的最短冲刺时间（秒）
 		[Export(PropertyHint.Range, "0,5,0.1")] public float SnapshotDelaySeconds = 0f; // 冲刺前等待一段时间再记录玩家位置
-		[Export(PropertyHint.Range, "0,9999,1")] public int MoveAttackDmg = 25;
-        /// <summary>
+		        /// <summary>
         /// 启用后 Dash 阶段通过 NavigationAgent2D 路径点计算方向，实现绕障冲刺。
         /// 禁用则维持原始直线追踪行为。
         /// </summary>
@@ -344,7 +343,7 @@ namespace Kuros.Actors.Enemies.Attacks
 		{
 			if (Enemy == null) return;
 
-			int damage = Mathf.Max(1, MoveAttackDmg);
+			int damage = GetDamage();
 			player.TakeDamage(damage, Enemy.GlobalPosition, Enemy);
 		}
 

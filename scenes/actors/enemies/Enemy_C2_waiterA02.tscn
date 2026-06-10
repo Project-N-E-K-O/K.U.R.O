@@ -40,7 +40,7 @@ radius = 1024.0
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_dx6wd"]
 radius = 150.0
-height = 600.0
+height = 800.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_yski7"]
 radius = 180.0
@@ -53,12 +53,13 @@ collision_layer = 2
 collision_mask = 15
 motion_mode = 1
 script = ExtResource("1_n7wqi")
+EnableStateDebugOverlay = true
 DebugOverlayOffset = Vector2(-1200, 200)
 DebugOverlayFontSize = 128
 DebugOverlayColor = Color(1, 0.95, 0.2, 1)
 DetectionArea = NodePath("Sprite2D/ControllerDetectionArea")
 AttackArea = NodePath("Sprite2D/AttackArea")
-AttackDamage = 0.0
+AttackDamage = 2.0
 MaxHealth = 12
 StateMachine = NodePath("StateMachine")
 EffectController = NodePath("EffectController")
@@ -126,7 +127,6 @@ preview_time = 0.55
 script = ExtResource("5_htedi")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-visible = false
 modulate = Color(0.8, 0.6, 0.5, 1)
 position = Vector2(0, -600)
 
@@ -161,10 +161,10 @@ scale = Vector2(9, 9)
 shape = SubResource("CircleShape2D_7t51a")
 
 [node name="HitArea" type="Area2D" parent="Sprite2D"]
-visible = false
+z_index = 10
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/HitArea"]
-position = Vector2(0, 130)
+position = Vector2(0, -120)
 shape = SubResource("CapsuleShape2D_dx6wd")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
@@ -194,7 +194,7 @@ DetectionAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
 WarmupDuration = 0.3
 ActiveDuration = 2.2
 RecoveryDuration = 0.63
-CooldownDuration = 0.3
+DamageMultiplier = 0.0
 RequireAnimationHitTrigger = true
 GrantedImmunities = 8
 EffectScene = ExtResource("12_kjt0o")
@@ -204,11 +204,9 @@ metadata/attack_weight = 60.0
 
 [node name="SimpleMeleeAttack" type="Node" parent="StateMachine/Attack/AttackController"]
 script = ExtResource("13_a0san")
-Damage = 1
 WarmupDuration = 0.3
 ActiveDuration = 0.3
 RecoveryDuration = 0.4
-CooldownDuration = 0.3
 AttackAreaPath = NodePath("../../../../Sprite2D/AttackArea")
 KnockbackDistance = 300.0
 KnockbackDuration = 0.06999999999999999
@@ -218,7 +216,7 @@ metadata/attack_weight = 40.0
 
 [node name="Assist" type="Node" parent="StateMachine"]
 script = ExtResource("14_0xfei")
-HealAmount = 10
+HealDelay = 1.5
 AssistMoveSpeed = 200.0
 
 [node name="Hit" type="Node" parent="StateMachine"]

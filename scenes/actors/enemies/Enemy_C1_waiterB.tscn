@@ -70,10 +70,9 @@ DebugOverlayOffset = Vector2(-1200, 200)
 DebugOverlayFontSize = 128
 DetectionArea = NodePath("Sprite2D/ControllerDetectionArea")
 AttackArea = NodePath("Sprite2D/AttackArea")
-ScoreValue = 50
+ScoreValue = 80
 Speed = 400.0
-AttackDamage = 0.0
-AttackCooldown = 0.0
+MaxHealth = 100
 StateMachine = NodePath("StateMachine")
 EffectController = NodePath("EffectController")
 StatProfile = SubResource("Resource_f4qnp")
@@ -174,13 +173,14 @@ scale = Vector2(9, 9)
 shape = SubResource("CircleShape2D_uohhx")
 
 [node name="HitArea" type="Area2D" parent="Sprite2D"]
-visible = false
+z_index = 10
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/HitArea"]
-position = Vector2(0, 130)
+position = Vector2(0, 80)
 shape = SubResource("CapsuleShape2D_5drfe")
 
 [node name="DashStopArea" type="Area2D" parent="Sprite2D"]
+visible = false
 scale = Vector2(0.99999994, 0.99999994)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/DashStopArea"]
@@ -188,6 +188,7 @@ position = Vector2(500, 100)
 shape = SubResource("RectangleShape2D_st2e3")
 
 [node name="DashSlashArea" type="Area2D" parent="Sprite2D"]
+visible = false
 collision_layer = 0
 collision_mask = 7
 monitorable = false
@@ -225,7 +226,6 @@ DetectionAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
 DashStopAreaPath = NodePath("../../../../Sprite2D/DashStopArea")
 DashSlashAreaPath = NodePath("../../../../Sprite2D/DashSlashArea")
 DashSpeed = 800.0
-SlashDamage = 5
 AttackName = "DashSlashAttack"
 WarmupDuration = 1.0
 ActiveDuration = 0.5
@@ -242,16 +242,18 @@ metadata/attack_weight = 60.0
 script = ExtResource("13_st2e3")
 SecondEffectScene = ExtResource("14_evlou")
 SecondEffectOffset = Vector2(280, -330)
-Damage = 2
 AttackName = "SimpleMeleeAttack"
 WarmupDuration = 0.4
 ActiveDuration = 1.4
 RecoveryDuration = 0.3
+CooldownDurationMultiplier = 1.5
+DamageMultiplier = 0.2
 AttackAreaPath = NodePath("../../../../Sprite2D/AttackArea")
 KnockbackDistance = 50.0
 KnockbackSpeed = 1000.0
 RequireAnimationHitTrigger = true
 AllowMultipleAnimationHits = true
+GrantedImmunities = 16
 EffectScene = ExtResource("14_evlou")
 EffectOffset = Vector2(0, -200)
 metadata/attack_weight = 40.0
@@ -263,6 +265,7 @@ AttackName = "UltimateBeamAttack"
 WarmupDuration = 1.5
 ActiveDuration = 1.1
 RecoveryDuration = 0.73
+DamageMultiplier = 0.2
 AttackAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
 KnockbackDistance = 50.0
 KnockbackSpeed = 1000.0

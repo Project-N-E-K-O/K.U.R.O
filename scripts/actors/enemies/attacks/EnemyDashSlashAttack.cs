@@ -27,7 +27,6 @@ namespace Kuros.Actors.Enemies.Attacks
         [Export] public bool UseNavDuringDash = true;
 
         [ExportCategory("Slash")]
-        [Export(PropertyHint.Range, "1,200,1")] public int SlashDamage = 12;
 
         private const float PostCooldownDuration = 1.0f;
 
@@ -442,7 +441,7 @@ namespace Kuros.Actors.Enemies.Attacks
                 return;
             }
 
-            Enemy.PlayerTarget.TakeDamage(SlashDamage, Enemy.GlobalPosition, Enemy);
+            Enemy.PlayerTarget.TakeDamage(GetDamage(), Enemy.GlobalPosition, Enemy);
 
             // 应用击退
             float distance = Mathf.Max(0f, KnockbackDistance);

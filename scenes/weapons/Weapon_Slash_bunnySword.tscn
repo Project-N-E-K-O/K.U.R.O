@@ -34,7 +34,7 @@ shader_parameter/highlight_interval = 1.00000002375
 size = Vector2(400, 300)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_djioy"]
-radius = 200.0
+radius = 250.0
 
 [node name="WeaponSlashBunnySword" type="CharacterBody2D"]
 z_index = 1

@@ -34,7 +34,7 @@ shader_parameter/highlight_interval = 1.00000002375
 size = Vector2(600, 400)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_t6geh"]
-size = Vector2(400, 100)
+size = Vector2(350, 25)
 
 [node name="WeaponStabCorkscrew" type="CharacterBody2D"]
 z_index = 1
@@ -65,7 +65,6 @@ texture = ExtResource("5_gccxh")
 shape = SubResource("RectangleShape2D_g0q5t")
 
 [node name="AttackArea" type="Area2D" parent="."]
-visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AttackArea"]
 shape = SubResource("RectangleShape2D_t6geh")
