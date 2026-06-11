@@ -74,8 +74,8 @@ size = Vector2(1650, 1250)
 size = Vector2(1650, 700)
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_d0c6g"]
-vertices = PackedVector2Array(-7359.0313, 1555.9922, -3094, 1332, 3456, 1302, 3720, 1302, 4080.8125, 1555, -559, -51, 227, -32, -1006, -32, -1387, -51, 2763, -325.5, 3476, -600, 3740, -600, 3469.5, -120, 2836.5, -120, 798, -114, 942.5, -114, 942.5, 633, 467, 633, 227, 396, 3740, -802, 4069.1797, -1550.9609, 3720, 1100, 3469.5, 761, -3358, 1332, 1423, 1117, 1575.5, 758, 1844, 557, 2571, 557, 2836.5, 761, 2571, 70, -545, 779, -545, 602, 467, 1014.5, -525, 894, 1575.5, -123, 1844, 70, -1006, 396, -1373, 602, -7360.961, -1544.0313, 3476, -802, 2763, -707, 418, -244, 418, -570, 798, -318, -559, -228, 1145, -802, 1145, -600, 2188, -707, 2188, -325.5, 1423, -437, -5339, -156, -3094, -568, -1387, -228, -5069, -156, -5069, -384, -3358, -568, 881, 1100, 881, 1302, -525, 1275.5, -3094, -770, -1257, -570, -1257, -244, 1423, -123, 881, -600, 1019, -437, 1019, -318, 1019, 1014.5, 1019, 1100, -1100, 894, -1373, 779, 1145, 1302, 1145, 1117, 1423, 763, 1042, 763, 1042, 758, 881, -802, -1100, 1275.5, -3094, 1130, -3358, -770, -5339, -384, 3456, 1100, -3358, 1130)
-polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3, 4), PackedInt32Array(5, 6, 7, 8), PackedInt32Array(9, 10, 11, 12, 13), PackedInt32Array(14, 15, 16, 17, 18, 6), PackedInt32Array(11, 19, 20, 4), PackedInt32Array(11, 4, 21, 22, 12), PackedInt32Array(23, 1, 0), PackedInt32Array(24, 25, 26, 27, 28, 2), PackedInt32Array(13, 28, 27, 29, 9), PackedInt32Array(30, 31, 18, 17, 32, 33), PackedInt32Array(26, 25, 34, 35), PackedInt32Array(36, 18, 31, 37), PackedInt32Array(38, 20, 19, 39), PackedInt32Array(10, 9, 40, 39), PackedInt32Array(41, 42, 43, 14), PackedInt32Array(44, 41, 14, 6, 5), PackedInt32Array(38, 39, 40, 45), PackedInt32Array(46, 45, 47, 48, 49), PackedInt32Array(23, 0, 38, 50), PackedInt32Array(51, 52, 8, 53, 54, 55), PackedInt32Array(56, 57, 58, 33, 32), PackedInt32Array(51, 59, 60, 61, 52), PackedInt32Array(34, 62, 49, 48), PackedInt32Array(63, 64, 65, 43, 42), PackedInt32Array(32, 66, 67, 56), PackedInt32Array(30, 33, 68, 69), PackedInt32Array(70, 71, 24, 2), PackedInt32Array(72, 73, 74, 25), PackedInt32Array(24, 72, 25), PackedInt32Array(8, 7, 36, 37, 53), PackedInt32Array(53, 37, 69), PackedInt32Array(48, 9, 29, 35, 34), PackedInt32Array(46, 49, 64, 63), PackedInt32Array(75, 63, 42, 60, 59, 38), PackedInt32Array(53, 69, 68, 76, 77), PackedInt32Array(61, 41, 44, 52), PackedInt32Array(38, 78, 55, 54, 79), PackedInt32Array(4, 3, 21), PackedInt32Array(22, 21, 80, 28), PackedInt32Array(28, 80, 2), PackedInt32Array(70, 2, 1), PackedInt32Array(57, 70, 1), PackedInt32Array(58, 57, 1, 76), PackedInt32Array(76, 1, 77), PackedInt32Array(53, 77, 81), PackedInt32Array(53, 81, 23, 50), PackedInt32Array(79, 50, 38), PackedInt32Array(59, 78, 38), PackedInt32Array(40, 47, 45), PackedInt32Array(75, 38, 45)])
+vertices = PackedVector2Array(-5039, -126, -3180, -144, -1417, -144, -1417, -21, -3180, 681, 3750, 1332, 4050.1172, 1370, -1370, 1370, 3426, 1332, 3446, -570, 3499.5, -150, 2806.5, -150, 2793, -295.5, 2793, -737, 3260, -770, 3770, -570, 3770, -832, 4039.8594, -1370, 3750, 1070, 3499.5, 791, 2806.5, 791, 2600, 575, 2600, 135, 1453, 1147, 1605.5, 788, 1821, 575, 1605.5, -153, 1821, 135, 3260, -1370, 3446, -832, 1175, -770, 2158, -737, 1175, -570, 2158, -295.5, 1453, -467, 851, 1070, 851, 1332, -495, 1305.5, 437, 1044.5, -3180, -538, -5039, -414, -3388, -538, -3180, -1370, -3180, -800, -3388, -800, -7270, -1370, -1036, -21, -1036, 426, -1403, 572, 257, -62, -529, -62, -529, -214, 448, -214, -1287, -600, -1287, -258, -1370, -258, -1370, -770, 851, -770, 448, -600, 851, -570, 768, -348, 1453, -153, 989, -467, 989, -348, 768, -84, 912.5, -84, 912.5, 603, 437, 603, 989, 1044.5, 989, 1070, -495, 864, 257, 426, 1175, 1332, 1175, 1147, 1453, 788, -1403, 681, -3180, 1100, -3388, 1100, -3388, 1362, -3180, 1362, -3180, 1370, -7270, 1370, -5369, -126, -5369, -414, 3426, 1070, -515, 572, -515, 809, -1130, 864, -1370, 809, -1130, 1305.5)
+polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3, 4), PackedInt32Array(5, 6, 7, 8), PackedInt32Array(9, 10, 11, 12, 13, 14), PackedInt32Array(15, 16, 17, 6), PackedInt32Array(15, 6, 18, 19, 10), PackedInt32Array(11, 20, 21, 22), PackedInt32Array(21, 20, 23, 24, 25), PackedInt32Array(25, 24, 26, 27), PackedInt32Array(9, 15, 10), PackedInt32Array(28, 17, 16, 29), PackedInt32Array(14, 28, 29, 9), PackedInt32Array(30, 14, 13, 31), PackedInt32Array(32, 30, 31, 33, 34), PackedInt32Array(35, 36, 37, 38), PackedInt32Array(39, 1, 0, 40, 41), PackedInt32Array(42, 43, 44, 45), PackedInt32Array(3, 46, 47, 48, 4), PackedInt32Array(49, 50, 51, 52), PackedInt32Array(53, 54, 55, 56), PackedInt32Array(53, 56, 57, 58), PackedInt32Array(52, 58, 57, 59, 60), PackedInt32Array(26, 61, 34, 33), PackedInt32Array(62, 63, 60, 59), PackedInt32Array(64, 65, 66, 67), PackedInt32Array(38, 68, 69, 35), PackedInt32Array(67, 38, 37, 70, 71), PackedInt32Array(72, 73, 23, 8), PackedInt32Array(23, 74, 24), PackedInt32Array(48, 75, 4), PackedInt32Array(4, 76, 77, 0), PackedInt32Array(78, 79, 80, 81), PackedInt32Array(78, 81, 45, 82), PackedInt32Array(45, 44, 41, 40, 83), PackedInt32Array(33, 12, 11, 22, 27, 26), PackedInt32Array(6, 5, 18), PackedInt32Array(19, 18, 84, 20), PackedInt32Array(32, 34, 62, 59), PackedInt32Array(49, 52, 60, 64, 67, 71), PackedInt32Array(20, 84, 8, 23), PackedInt32Array(45, 83, 82), PackedInt32Array(78, 82, 0, 77), PackedInt32Array(85, 48, 47, 71), PackedInt32Array(85, 71, 70, 86), PackedInt32Array(86, 70, 87, 88), PackedInt32Array(7, 88, 87, 89), PackedInt32Array(72, 8, 7), PackedInt32Array(36, 72, 7), PackedInt32Array(37, 36, 7, 89)])
 outlines = Array[PackedVector2Array]([PackedVector2Array(-7411, -1594, 4119, -1601, 4131, 1605, -7409, 1606)])
 source_geometry_mode = 2
 agent_radius = 80.0
@@ -267,7 +267,8 @@ Sequence = ExtResource("16_xf8xq")
 shape = SubResource("RectangleShape2D_av3q5")
 debug_color = Color(1, 0, 1, 0.41960785)
 
-[node name="AirWall" type="StaticBody2D" parent="."]
+[node name="AirWall" type="StaticBody2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
+visible = false
 z_index = 1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AirWall"]
@@ -301,7 +302,6 @@ shape = SubResource("RectangleShape2D_ad0tl")
 debug_color = Color(0, 0, 0, 0.21568628)
 
 [node name="NavigationRegion2D" type="NavigationRegion2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
-visible = false
 navigation_polygon = SubResource("NavigationPolygon_d0c6g")
 
 [node name="Taxi" parent="." instance=ExtResource("26_xi57c")]
@@ -370,6 +370,7 @@ position = Vector2(1259, -54)
 
 [node name="Enemy_Normal_guard2" parent="." instance=ExtResource("3_gvdxe")]
 position = Vector2(-3115, 321)
+AttackCooldown = 1.0
 MaxHealth = 4
 InitialFacingRight = false
 

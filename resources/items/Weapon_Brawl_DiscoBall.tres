@@ -23,5 +23,5 @@ Tags = Array[String](["tag_weapon", "build_waiter", "tag_brawl", "hit_2"])
 MaxStackSize = 1
 AttributeEntries = Array[ExtResource("1_o5168")]([SubResource("Resource_nek6n")])
 WeaponSkillResources = Array[Resource]([ExtResource("4_o5168")])
-BuildClass = "waiter"
+LevelCount = 0
 WorldScenePath = "uid://dmqi6co8gtn0l"

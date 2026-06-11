@@ -79,6 +79,7 @@ func import_items_from_csv() -> void:
 		_s_str(res,   "DisplayName", row, hm, "DisplayName")
 		_s_str(res,   "Description", row, hm, "Description")
 		_s_str(res,   "BuildClass",  row, hm, "BuildClass")
+		_s_int(res,   "LevelCount",   row, hm, "LevelCount")
 		_s_int(res,   "MaxStackSize", row, hm, "MaxStackSize")
 		_s_bool(res,  "IsThrowable",  row, hm, "IsThrowable")
 		_s_bool(res,  "IsFurniture",  row, hm, "IsFurniture")
@@ -229,7 +230,7 @@ func _save(res: Resource, path: String) -> bool:
 
 func _s_str(res: Resource, prop: String, row: Array, hm: Dictionary, col: String) -> void:
 	var v = _col(row, hm, col)
-	if v != "": res.set(prop, v)
+	res.set(prop, v)
 
 func _s_float(res: Resource, prop: String, row: Array, hm: Dictionary, col: String) -> void:
 	var v = _col(row, hm, col)

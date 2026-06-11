@@ -231,7 +231,7 @@ namespace Kuros.UI
             {
                 "Guard" => "安保协议",
                 "Machine" => "机械协议",
-                "Banquet" => "宴会协议",
+                "Waiter" => "宴会协议",
                 _ => buildClass
             };
         }

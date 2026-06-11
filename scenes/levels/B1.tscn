@@ -38,8 +38,8 @@ size = Vector2(6000, 700)
 size = Vector2(6000, 700)
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_ilowa"]
-vertices = PackedVector2Array(-1570, 1344, -341, 1491.1016, -2773.9219, 1491.9688, -2422, 1344, -222, -467, -222, -142, -648.5, -142, -1132, -299.5, -1132, -741, -416, -546, 2696.9219, -1471.0469, 2694.0703, 1490.0234, 2452, -535, 2452, -844, -648.5, 799, -809, 592, -809, 45, 1566, 601, 1566, 54, 2086, -504, -2771.0703, -1474.9375, -2422, 1035, -1596, 45, -1767, -299.5, 1964, -844, -341, 827.5, -1570, 1035, 1598, -813, 1598, -504, 242, -467, -92, -546, -92, -808, 1964, -813, -416, -808, 2086, -535, 445, -409, 779, 54, 644.5, -129, -63, 1491, -63, 1147, 168, 1147, 168, 1333, 492, 1333, 779, 601, 492, 1071, 644.5, 812, 242, 1071, 242, 812, 242, -129, 242, -145, 445, -145, 242, -409, -222, 799, -222, 827.5, -1596, 592, -1767, -741)
-polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3), PackedInt32Array(4, 5, 6, 7, 8, 9), PackedInt32Array(10, 11, 12, 13), PackedInt32Array(6, 14, 15, 16), PackedInt32Array(12, 11, 17, 18, 19), PackedInt32Array(3, 2, 20, 21), PackedInt32Array(7, 6, 16, 22, 23), PackedInt32Array(20, 10, 13, 24), PackedInt32Array(25, 1, 0, 26, 14), PackedInt32Array(27, 28, 29, 30, 31), PackedInt32Array(24, 32, 27, 20), PackedInt32Array(20, 27, 31, 33), PackedInt32Array(19, 34, 12), PackedInt32Array(35, 28, 19, 18, 36, 37), PackedInt32Array(38, 39, 40, 41), PackedInt32Array(11, 38, 41, 42), PackedInt32Array(43, 17, 11, 42, 44, 45), PackedInt32Array(44, 46, 47, 45), PackedInt32Array(43, 45, 37, 36), PackedInt32Array(37, 48, 49, 50), PackedInt32Array(35, 51, 29, 28), PackedInt32Array(14, 52, 53, 25), PackedInt32Array(54, 15, 14, 26, 21), PackedInt32Array(22, 54, 21, 20, 23), PackedInt32Array(55, 23, 20), PackedInt32Array(55, 20, 33, 8), PackedInt32Array(8, 33, 9), PackedInt32Array(4, 9, 30, 29), PackedInt32Array(35, 37, 50)])
+vertices = PackedVector2Array(-1570, 1344, -341, 1370, -2773.7969, 1370, -2422, 1344, -222, -467, -222, -142, -648.5, -142, -1132, -299.5, -1132, -741, -416, -546, -648.5, 799, -810, 580, -810, 140, 2696.25, -770, 2694.2031, 1370, 1565, 589, 2452, -535, -1589, 140, -1767, -299.5, -2771.7578, -770, -2422, 1035, -341, 827.5, -1570, 1035, -92, -546, -92, -770, 1598, -770, 1598, -504, 242, -467, 2086, -504, 2086, -535, 2452, -770, 1565, 149, 445, -409, 644.5, -129, -63, 1370, -63, 1147, 168, 1147, 168, 1333, 492, 1333, 786, 589, 492, 1071, 644.5, 812, 242, 1071, 242, 812, 786, 149, 242, -129, 242, -145, 445, -145, 242, -409, -222, 799, -222, 827.5, -1589, 580, -1767, -741, -416, -770)
+polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3), PackedInt32Array(4, 5, 6, 7, 8, 9), PackedInt32Array(6, 10, 11, 12), PackedInt32Array(13, 14, 15, 16), PackedInt32Array(7, 6, 12, 17, 18), PackedInt32Array(3, 2, 19, 20), PackedInt32Array(21, 1, 0, 22, 10), PackedInt32Array(23, 24, 25, 26, 27), PackedInt32Array(28, 29, 16), PackedInt32Array(16, 30, 13), PackedInt32Array(16, 15, 31, 28), PackedInt32Array(32, 26, 28, 31, 33), PackedInt32Array(34, 35, 36, 37), PackedInt32Array(14, 34, 37, 38), PackedInt32Array(39, 15, 14, 38, 40, 41), PackedInt32Array(40, 42, 43, 41), PackedInt32Array(39, 41, 33, 44), PackedInt32Array(33, 45, 46, 47), PackedInt32Array(32, 48, 27, 26), PackedInt32Array(10, 49, 50, 21), PackedInt32Array(51, 11, 10, 22, 20), PackedInt32Array(17, 51, 20, 19, 18), PackedInt32Array(52, 18, 19), PackedInt32Array(52, 19, 53, 8), PackedInt32Array(8, 53, 9), PackedInt32Array(4, 9, 23, 27), PackedInt32Array(33, 47, 32), PackedInt32Array(33, 31, 44)])
 outlines = Array[PackedVector2Array]([PackedVector2Array(-2851, -1555, 2777, -1551, 2774, 1570, -2854, 1572)])
 source_geometry_mode = 2
 agent_radius = 80.0
@@ -65,7 +65,6 @@ BoundaryCollisionMask = 6
 BoundaryThickness = 50.0
 EnemyDetectionMask = 2
 ShowDebugOverlay = false
-ShowDebugOverlayInGame = false
 DebugLineWidth = 8.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="BattleArena"]
@@ -157,7 +156,7 @@ texture = ExtResource("7_3u70b")
 position = Vector2(1280, -1530)
 texture = ExtResource("7_3u70b")
 
-[node name="AirWall" type="StaticBody2D" parent="."]
+[node name="AirWall" type="StaticBody2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
 visible = false
 z_index = 1
 

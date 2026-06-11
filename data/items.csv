@@ -1,5 +1,5 @@
 ﻿file,ItemId,DisplayName,Description,Category,Tags,MaxStackSize,BuildClass,LevelCount,IsThrowable,IsFurniture,attack_power,SkillRefs
-ExamplePotion,item_example_potion,示例药水,用于测试拾取与投掷流程的示例药水。,Consumable,,5,,1,FALSE,FALSE,5,ExampleSlashSkill
+ExamplePotion,item_example_potion,示例药水,用于测试拾取与投掷流程的示例药水。,Consumable,,5,,0,FALSE,FALSE,5,ExampleSlashSkill
 Furniture_A_ChairOfficeA,Furniture_A_ChairOfficeA,办公座椅A,一次性投掷道具：办公座椅A,Furniture,tag_throw|furniture,1,,0,TRUE,TRUE,20,
 Furniture_A_ChairOfficeB,Furniture_A_ChairOfficeB,办公座椅B,一次性投掷道具：办公座椅B,Furniture,tag_throw|furniture,1,,0,TRUE,TRUE,20,
 Furniture_A_LampFloorA,Furniture_A_LampFloorA,落地灯A,一次性投掷道具：落地灯A,Furniture,tag_throw|furniture,1,,0,TRUE,TRUE,20,
@@ -36,20 +36,20 @@ Furniture_D_TableOfficeB_bwd,Furniture_D_TableOfficeB_bwd,办公桌B(背面),一
 Furniture_D_TableOfficeB_rwd,Furniture_D_TableOfficeB_rwd,办公桌B(侧面),一次性投掷道具：办公桌B(侧面),Furniture,tag_throw|furniture,1,,0,TRUE,TRUE,60,
 Furniture_D_WaterMachineA,Furniture_D_WaterMachineA,饮水机,一次性投掷道具：饮水机A,Furniture,tag_throw|furniture,1,,0,TRUE,TRUE,20,
 Furniture_D_WhiteBoardA,Furniture_D_WhiteBoardA,白板A,一次性投掷道具：白板A,Furniture,tag_throw|furniture,1,,0,TRUE,TRUE,60,
-Supplies_p2_support_test,supplies_p2_support_test,P2应急能量胶,临时测试道具：用于验证同伴支援消耗流程，食用后恢复 4 点生命。,Supplies,tag_food|tag_p2_support_test,3,,1,FALSE,FALSE,,
-Weapon_Brawl_DiscoBall,Weapon_Brawl_DiscoBall,迪斯科闪光球,仆人类拳套武器：迪斯科闪光球,Weapon,tag_weapon|build_waiter|tag_brawl|hit_2,1,waiter,1,FALSE,FALSE,20,WeaponSkill_Brawl_DiscoBall
-Weapon_Brawl_MechGlove,Weapon_Brawl_MechGlove,机械冲撞臂,机械类拳套武器：机械冲撞臂,Weapon,tag_weapon|build_machine|tag_brawl|hit_3,1,machine,1,FALSE,FALSE,30,WeaponSkill_Brawl_MechGlove
-Weapon_Brawl_RiotBracer,Weapon_Brawl_RiotBracer,镇暴护腕,安保类拳套武器：镇暴护腕,Weapon,tag_weapon|build_guard|tag_brawl|hit_3,1,guard,1,FALSE,FALSE,20,WeaponSkill_Brawl_RiotBracer
-Weapon_Brawl_RiotGlove,Weapon_Brawl_RiotGlove,镇暴拳套,守护类拳套武器：镇暴拳套,Weapon,tag_weapon|build_guard|tag_brawl|hit_2,1,guard,1,FALSE,FALSE,20,WeaponSkill_Brawl_RiotGlove
-Weapon_Slash_Baguette,Weapon_Slash_Baguette,法棍,仆人类挥砍武器：法棍,Weapon,tag_weapon|build_waiter|tag_slash|hit_1,1,waiter,1,FALSE,FALSE,20,WeaponSkill_Slash_Baguette
-Weapon_Slash_BarrierGate,Weapon_Slash_BarrierGate,开刃升降杆,机械类挥砍武器：开刃升降杆,Weapon,tag_weapon|build_machine|tag_slash|hit_1,1,machine,1,FALSE,FALSE,20,WeaponSkill_Slash_BarrierGate
-Weapon_Slash_BunnySword,Weapon_Slash_BunnySword,仿生兔女郎的光剑,仆人类挥砍武器：光剑,Weapon,tag_weapon|build_waiter|tag_slash|hit_1,1,waiter,1,FALSE,FALSE,30,WeaponSkill_Slash_BunnySword
-Weapon_Slash_ExpandBaton,Weapon_Slash_ExpandBaton,甩棍,守护类挥砍武器：甩棍,Weapon,tag_weapon|build_guard|tag_slash|hit_1,1,guard,1,FALSE,FALSE,20,WeaponSkill_Slash_ExpandBaton
-Weapon_Slash_ViolinBow,Weapon_Slash_ViolinBow,音乐家的琴弓,仆人类挥砍武器：音乐家的琴弓,Weapon,tag_weapon|build_waiter|tag_slash|hit_1,1,waiter,1,FALSE,FALSE,30,WeaponSkill_Slash_ViolinBow
-Weapon_Stab_Corkscrew,Weapon_Stab_Corkscrew,开瓶器,仆人类戳刺武器：开瓶器,Weapon,tag_weapon|build_waiter|tag_stab|hit_1,1,waiter,1,FALSE,FALSE,20,WeaponSkill_Stab_Corkscrew
-Weapon_Stab_drill,Weapon_Stab_Drill,钻头,机械类戳刺武器：钻头,Weapon,tag_weapon|build_machine|tag_stab|hit_1,1,machine,1,FALSE,FALSE,30,WeaponSkill_Stab_Drill
-Weapon_Stab_umbrella,Weapon_Stab_Umbrella,雨伞,坚固的战斗雨伞，既可攻击也可格挡。,Weapon,tag_weapon|build_machine|tag_stab|hit_3,1,machine,1,FALSE,FALSE,20,WeaponSkill_Stab_Umbrella
-Weapon_Throw_EmojiBomb,Weapon_Throw_EmojiBomb,emoji炸弹,安保类投掷武器：emoji炸弹,Weapon,tag_weapon|build_guard|tag_throw,1,guard,1,TRUE,FALSE,,
-Weapon_Throw_GravityGrenade,Weapon_Throw_GravityGrenade,引力手雷,机械类投掷武器：引力手雷,Weapon,tag_weapon|build_machine|tag_throw,1,machine,1,TRUE,FALSE,,
-Weapon_Throw_MetalSpike,Weapon_Throw_MetalSpike,金属地刺,机械类投掷武器：金属地刺,Weapon,tag_weapon|build_machine|tag_throw,1,machine,1,TRUE,FALSE,,
-Weapon_Throw_SmokeGrenade,Weapon_Throw_SmokeGrenade,镇暴烟雾弹,安保类投掷武器：镇暴烟雾弹,Weapon,tag_weapon|build_guard|tag_throw,1,guard,1,TRUE,FALSE,,
+Supplies_p2_support_test,supplies_p2_support_test,P2应急能量胶,临时测试道具：用于验证同伴支援消耗流程，食用后恢复 4 点生命。,Supplies,tag_food|tag_p2_support_test,3,,0,FALSE,FALSE,,
+Weapon_Brawl_DiscoBall,Weapon_Brawl_DiscoBall,迪斯科闪光球,仆人类拳套武器：迪斯科闪光球,Weapon,tag_weapon|tag_brawl|hit_2,1,,0,FALSE,FALSE,20,WeaponSkill_Brawl_DiscoBall
+Weapon_Brawl_MechGlove,Weapon_Brawl_MechGlove,机械冲撞臂,机械类拳套武器：机械冲撞臂,Weapon,tag_weapon|tag_brawl|hit_3,1,,0,FALSE,FALSE,30,WeaponSkill_Brawl_MechGlove
+Weapon_Brawl_RiotBracer,Weapon_Brawl_RiotBracer,镇暴护腕,安保类拳套武器：镇暴护腕,Weapon,tag_weapon|tag_brawl|hit_3,1,,0,FALSE,FALSE,20,WeaponSkill_Brawl_RiotBracer
+Weapon_Brawl_RiotGlove,Weapon_Brawl_RiotGlove,镇暴拳套,守护类拳套武器：镇暴拳套,Weapon,tag_weapon||tag_brawl|hit_2,1,,0,FALSE,FALSE,20,WeaponSkill_Brawl_RiotGlove
+Weapon_Slash_Baguette,Weapon_Slash_Baguette,法棍,仆人类挥砍武器：法棍,Weapon,tag_weapon|tag_slash|hit_1,1,,0,FALSE,FALSE,20,WeaponSkill_Slash_Baguette
+Weapon_Slash_BarrierGate,Weapon_Slash_BarrierGate,开刃升降杆,机械类挥砍武器：开刃升降杆,Weapon,tag_weapon|tag_slash|hit_1,1,,0,FALSE,FALSE,20,WeaponSkill_Slash_BarrierGate
+Weapon_Slash_BunnySword,Weapon_Slash_BunnySword,仿生兔女郎的光剑,仆人类挥砍武器：光剑,Weapon,tag_weapon|tag_slash|hit_1,1,,0,FALSE,FALSE,30,WeaponSkill_Slash_BunnySword
+Weapon_Slash_ExpandBaton,Weapon_Slash_ExpandBaton,甩棍,守护类挥砍武器：甩棍,Weapon,tag_weapon|tag_slash|hit_1,1,,0,FALSE,FALSE,20,WeaponSkill_Slash_ExpandBaton
+Weapon_Slash_ViolinBow,Weapon_Slash_ViolinBow,音乐家的琴弓,仆人类挥砍武器：音乐家的琴弓,Weapon,tag_weapon|tag_slash|hit_1,1,,0,FALSE,FALSE,30,WeaponSkill_Slash_ViolinBow
+Weapon_Stab_Corkscrew,Weapon_Stab_Corkscrew,开瓶器,仆人类戳刺武器：开瓶器,Weapon,tag_weapon|tag_stab|hit_1,1,,0,FALSE,FALSE,20,WeaponSkill_Stab_Corkscrew
+Weapon_Stab_drill,Weapon_Stab_Drill,钻头,机械类戳刺武器：钻头,Weapon,tag_weapon|tag_stab|hit_1,1,,0,FALSE,FALSE,30,WeaponSkill_Stab_Drill
+Weapon_Stab_umbrella,Weapon_Stab_Umbrella,雨伞,坚固的战斗雨伞，既可攻击也可格挡。,Weapon,tag_weapon|tag_stab|hit_3,1,,0,FALSE,FALSE,20,WeaponSkill_Stab_Umbrella
+Weapon_Throw_EmojiBomb,Weapon_Throw_EmojiBomb,emoji炸弹,安保类投掷武器：emoji炸弹,Weapon,tag_weapon|tag_throw,1,,0,TRUE,FALSE,,
+Weapon_Throw_GravityGrenade,Weapon_Throw_GravityGrenade,引力手雷,机械类投掷武器：引力手雷,Weapon,tag_weapon|tag_throw,1,,0,TRUE,FALSE,,
+Weapon_Throw_MetalSpike,Weapon_Throw_MetalSpike,金属地刺,机械类投掷武器：金属地刺,Weapon,tag_weapon|tag_throw,1,,0,TRUE,FALSE,,
+Weapon_Throw_SmokeGrenade,Weapon_Throw_SmokeGrenade,镇暴烟雾弹,安保类投掷武器：镇暴烟雾弹,Weapon,tag_weapon|tag_throw,1,,0,TRUE,FALSE,,

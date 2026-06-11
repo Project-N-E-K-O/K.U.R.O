@@ -25,4 +25,5 @@ Category = "Supplies"
 Tags = Array[String](["tag_food", "tag_p2_support_test"])
 MaxStackSize = 3
 EffectEntries = Array[ExtResource("2_effect_entry")]([SubResource("Effect_OnConsume")])
+LevelCount = 0
 WorldScenePath = "res://scenes/items/Supplies_P2_support_test.tscn"
