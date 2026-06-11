@@ -1,0 +1,61 @@
+[gd_scene load_steps=11 format=3 uid="uid://bjwnor5ufbb8r"]
+
+[ext_resource type="Script" uid="uid://d3t47ery0onnl" path="res://scripts/managers/BuildSelectionManager.cs" id="1"]
+[ext_resource type="Script" uid="uid://7jkau6kxuvlf" path="res://scripts/systems/ScoreThresholdCurve.cs" id="2_ca1aj"]
+[ext_resource type="Script" uid="uid://3bb6nng4vb53" path="res://scripts/systems/BuildEffectDefinition.cs" id="3_emrpw"]
+
+[sub_resource type="Resource" id="Resource_emrpw"]
+script = ExtResource("2_ca1aj")
+metadata/_custom_type_script = "uid://7jkau6kxuvlf"
+
+[sub_resource type="Resource" id="Resource_xli8l"]
+script = ExtResource("3_emrpw")
+EffectId = "BuildGuardA"
+DisplayName = "BuildGuardA"
+Description = "安保构筑效果A"
+BuildClass = "guard"
+metadata/_custom_type_script = "uid://3bb6nng4vb53"
+
+[sub_resource type="Resource" id="Resource_1p4mg"]
+script = ExtResource("3_emrpw")
+EffectId = "BuildGuardB"
+DisplayName = "BuildGuardB"
+Description = "安保构筑效果B"
+BuildClass = "guard"
+metadata/_custom_type_script = "uid://3bb6nng4vb53"
+
+[sub_resource type="Resource" id="Resource_8vrvn"]
+script = ExtResource("3_emrpw")
+EffectId = "BuildGuardC"
+DisplayName = "BuildGuardC"
+Description = "安保构筑效果C"
+metadata/_custom_type_script = "uid://3bb6nng4vb53"
+
+[sub_resource type="Resource" id="Resource_1x0vg"]
+script = ExtResource("3_emrpw")
+EffectId = "BuildMachineA"
+DisplayName = "BuildMachineA"
+Description = "机械构筑效果A"
+BuildClass = "machine"
+metadata/_custom_type_script = "uid://3bb6nng4vb53"
+
+[sub_resource type="Resource" id="Resource_x7sk2"]
+script = ExtResource("3_emrpw")
+EffectId = "BuildMachine"
+DisplayName = "BuildMachineB"
+Description = "机械构筑效果B"
+BuildClass = "machine"
+metadata/_custom_type_script = "uid://3bb6nng4vb53"
+
+[sub_resource type="Resource" id="Resource_b3fdh"]
+script = ExtResource("3_emrpw")
+EffectId = "BuildMachine"
+DisplayName = "BuildMachineC"
+Description = "机械构筑效果C"
+BuildClass = "machine"
+metadata/_custom_type_script = "uid://3bb6nng4vb53"
+
+[node name="BuildSelectionManager" type="Node"]
+script = ExtResource("1")
+ThresholdCurve = SubResource("Resource_emrpw")
+EffectPool = Array[ExtResource("3_emrpw")]([SubResource("Resource_xli8l"), SubResource("Resource_1p4mg"), SubResource("Resource_8vrvn"), SubResource("Resource_1x0vg"), SubResource("Resource_x7sk2"), SubResource("Resource_b3fdh")])

@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://cel0dl6h07it8"]
+[gd_scene load_steps=20 format=3 uid="uid://cel0dl6h07it8"]
 
 [ext_resource type="Texture2D" uid="uid://cye54v0tcgk7u" path="res://assets/environments/scene_1_home/房间1 地面.png" id="1_1xo5x"]
 [ext_resource type="Script" uid="uid://cra7y7mt0x1j8" path="res://scripts/managers/CameraZoneArea.cs" id="1_exti5"]
@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://dlhn30h21ei8f" path="res://scenes/environments/door1_A_begin.tscn" id="6_556c4"]
 [ext_resource type="Script" uid="uid://cbui22isww64v" path="res://scripts/systems/cutscene/CutsceneTrigger.cs" id="6_ocwig"]
 [ext_resource type="Script" uid="uid://dprlx2bg0y3k5" path="res://scripts/environments/ParallaxBackground2D.cs" id="7_paral"]
+[ext_resource type="Texture2D" uid="uid://vtyxgh8jhdyx" path="res://assets/furnitures/home_scene1/BedA.png" id="10_ibxjt"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ocwig"]
 size = Vector2(3538, 2140)
@@ -137,3 +138,10 @@ shape = SubResource("RectangleShape2D_wph1n")
 position = Vector2(-1799.9999, -877.9999)
 rotation = 0.6981317
 shape = SubResource("RectangleShape2D_pal6r")
+
+[node name="homeBed" type="Node2D" parent="."]
+scale = Vector2(0.33, 0.33)
+
+[node name="Sprite2D" type="Sprite2D" parent="homeBed"]
+position = Vector2(-4469.697, -1163.6362)
+texture = ExtResource("10_ibxjt")

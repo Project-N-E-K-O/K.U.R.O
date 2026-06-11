@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="BuildEffectDefinition" load_steps=2 format=3 uid="uid://dvusawntbqd8k"]
+
+[ext_resource type="Script" uid="uid://3bb6nng4vb53" path="res://scripts/systems/BuildEffectDefinition.cs" id="1_ktrhb"]
+
+[resource]
+script = ExtResource("1_ktrhb")
+EffectId = "BuildGuard"
+DisplayName = "Guard"
+Description = "安保构筑效果A"
+BuildClass = "guard"

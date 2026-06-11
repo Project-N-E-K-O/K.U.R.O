@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://qd5abd4opeob"]
+[gd_scene load_steps=15 format=3 uid="uid://qd5abd4opeob"]
 
 [ext_resource type="Script" uid="uid://b0qiaumw3ige7" path="res://scripts/systems/cutscene/CutsceneManager.cs" id="1_csmgr"]
 [ext_resource type="Script" uid="uid://x1ic1ym4ykq8" path="res://scripts/scenes/BattleSceneManager.cs" id="1_ctuyy"]
@@ -13,6 +13,7 @@
 [ext_resource type="PackedScene" uid="uid://duv46pbl7d7l6" path="res://scenes/levels/B1.tscn" id="9_b1"]
 [ext_resource type="PackedScene" uid="uid://b8ky5f2goteu0" path="res://scenes/levels/B2.tscn" id="10_b2"]
 [ext_resource type="PackedScene" uid="uid://bco3niswcahcc" path="res://scenes/levels/B_end.tscn" id="11_end"]
+[ext_resource type="PackedScene" uid="uid://bjwnor5ufbb8r" path="res://scenes/managers/BuildSelectionManager.tscn" id="14_pvxkr"]
 
 [node name="BattleScene" type="Node2D" node_paths=PackedStringArray("Player")]
 script = ExtResource("1_ctuyy")
@@ -36,6 +37,8 @@ script = ExtResource("6_gen")
 BeginScene = ExtResource("8_begin")
 EndScene = ExtResource("11_end")
 MiddleScenePool = Array[PackedScene]([ExtResource("9_b1"), ExtResource("10_b2"), ExtResource("8_2l4aj")])
+
+[node name="BuildSelectionManager" parent="." instance=ExtResource("14_pvxkr")]
 
 [node name="World" type="Node2D" parent="."]
 y_sort_enabled = true

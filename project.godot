@@ -27,6 +27,7 @@ PauseManager="*res://scripts/managers/PauseManager.cs"
 FloatingDamageTextManager="*res://scripts/managers/FloatingDamageTextManager.cs"
 CrtOverlay="res://scenes/ui/CrtOverlay.tscn"
 Dialogic="*res://addons/dialogic/Core/DialogicGameHandler.gd"
+BuildSelectionManager="*res://scripts/managers/BuildSelectionManager.cs"
 
 [dialogic]
 
@@ -94,6 +95,10 @@ window/stretch/mode="canvas_items"
 [dotnet]
 
 project/assembly_name="Kuros"
+
+[editor]
+
+version_control/autoload_on_startup=true
 
 [editor_plugins]
 
