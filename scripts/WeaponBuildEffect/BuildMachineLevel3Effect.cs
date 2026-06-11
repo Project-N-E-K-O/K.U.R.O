@@ -3,7 +3,6 @@ using Godot;
 using Kuros.Core;
 using Kuros.Core.Effects;
 using Kuros.Core.Events;
-using Kuros.Actors.Heroes.Attacks;
 
 namespace Kuros.Builds
 {
@@ -74,15 +73,7 @@ namespace Kuros.Builds
 
         private void OnDamageResolved(GameActor attacker, GameActor target, int damage, DamageSource source)
         {
-            if (source != DamageSource.DirectAttack) return;
             if (Actor == null || attacker != Actor || target == null)
-            {
-                return;
-            }
-
-            // 只在第一段伤害时触发效果
-            // 后续段伤害不应用加成，以避免多段攻击时加成被放大
-            if (PlayerAttackTemplate.CurrentAttackHitStep != 1)
             {
                 return;
             }

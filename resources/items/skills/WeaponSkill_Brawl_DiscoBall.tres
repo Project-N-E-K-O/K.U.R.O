@@ -15,6 +15,7 @@ script = ExtResource("3_k3bem")
 SkillId = "WeaponSkill_Brawl_DiscoBall"
 DisplayName = "迪斯科闪光球攻击"
 AnimationName = "Weapon_Brawl_Iron"
+DamageMultiplier = 0.6
 ShowHitboxDebug = false
 Description = "每次攻击到敌人时都20%概率触发闪光眩晕范围敌人"
 Effects = Array[ExtResource("1_gwghm")]([SubResource("Resource_dis_stun")])

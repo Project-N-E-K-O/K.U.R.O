@@ -18,6 +18,7 @@ script = ExtResource("2_2o5f0")
 SkillId = "WeaponSkill_Brawl_RiotBracer"
 DisplayName = "镇暴护腕攻击"
 AnimationName = "Weapon_Brawl_RiotBracer"
+DamageMultiplier = 0.5
 ShowHitboxDebug = false
 Description = "每次攻击到敌人时击退该敌人0.25m"
 Effects = Array[ExtResource("1_vwwsf")]([SubResource("Resource_2o5f0")])

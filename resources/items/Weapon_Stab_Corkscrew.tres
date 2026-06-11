@@ -9,7 +9,7 @@
 [sub_resource type="Resource" id="Attribute_AttackPower"]
 script = ExtResource("1_23lp3")
 AttributeId = "attack_power"
-Value = 10.0
+Value = 20.0
 
 [resource]
 script = ExtResource("5_cnv46")
