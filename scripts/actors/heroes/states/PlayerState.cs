@@ -52,6 +52,18 @@ namespace Kuros.Actors.Heroes.States
         {
             return Player.ConsumeControlledActionJustPressed(actionName);
         }
+
+        protected bool IsAttackTriggered()
+        {
+            if (IsActionJustPressed("attack"))
+                return true;
+
+            var skill = Player.WeaponSkillController?.GetPrimarySkillDefinition();
+            if (skill?.AllowHoldContinuousAttack == true && IsActionPressed("attack"))
+                return true;
+
+            return false;
+        }
         
         /// <summary>
         /// 检查是否应该处理玩家输入（移动和攻击）

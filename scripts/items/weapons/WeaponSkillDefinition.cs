@@ -25,6 +25,7 @@ namespace Kuros.Items.Weapons
         [Export] public Godot.Collections.Array<string> StateWhitelist { get; set; } = new();
         [Export] public bool UseDefaultAttackAnimationFallback { get; set; } = true;
         [Export] public string ActivationAction { get; set; } = string.Empty;
+        [Export] public bool AllowHoldContinuousAttack { get; set; } = true;
 
         [ExportGroup("Attack Timing Override")]
         [Export(PropertyHint.MultilineText)] public string AttackTimingNote { get; set; } = "负数 = 使用攻击模板的默认值";

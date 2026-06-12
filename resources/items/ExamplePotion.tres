@@ -22,4 +22,5 @@ Category = "Consumable"
 MaxStackSize = 5
 AttributeEntries = Array[ExtResource("1_47noo")]([SubResource("Attribute_AttackPower")])
 WeaponSkillResources = Array[Resource]([ExtResource("3")])
+LevelCount = 0
 WorldScenePath = "res://scenes/items/ExampleWorldItem.tscn"

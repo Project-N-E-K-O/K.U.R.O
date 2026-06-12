@@ -55,6 +55,29 @@ namespace Kuros.Actors.Heroes
         // 投掷中的武器列表：武器被投出后暂存于此，确保构筑效果持续生效直到归还或销毁
         private readonly List<ItemDefinition> _inFlightThrowItems = new();
 
+        // 通过三选一弹窗/宝箱获取的构筑效果点数（按构筑类别统计，与武器点数合并计算）
+        private readonly Dictionary<string, int> _pickedEffectCountByClass = new(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// 添加通过三选一/宝箱获取的构筑效果点数，推动 Build Level 进度。
+        /// </summary>
+        public void AddBuildEffectPoints(string buildClass, int count)
+        {
+            if (string.IsNullOrWhiteSpace(buildClass) || count <= 0) return;
+
+            string key = buildClass.Trim();
+            if (!_pickedEffectCountByClass.ContainsKey(key))
+                _pickedEffectCountByClass[key] = 0;
+            _pickedEffectCountByClass[key] += count;
+
+            RefreshBuildState();
+        }
+
+        /// <summary>
+        /// 获取已通过三选一/宝箱获取的构筑效果点数（按构筑类别）。
+        /// </summary>
+        public IReadOnlyDictionary<string, int> PickedEffectCountByClass => _pickedEffectCountByClass;
+
         /// <summary>
         /// 注册一件投掷中的武器，使构筑效果在武器飞行/冷却期间保持生效。
         /// 在武器投出时调用。
@@ -129,7 +152,14 @@ namespace Kuros.Actors.Heroes
             // 重新计算各构筑类型的点数
             _buildCountByClass.Clear();
             _activeBuildClasses = ResolveActiveBuildClasses();
-            
+
+            // 将三选一/宝箱获取的构筑类别也加入活跃集合，确保 UI 和等级计算能识别
+            foreach (var kvp in _pickedEffectCountByClass)
+            {
+                if (kvp.Value > 0 && !string.IsNullOrWhiteSpace(kvp.Key))
+                    _activeBuildClasses.Add(kvp.Key.Trim());
+            }
+
             CountOwnedBuildWeaponsByClass();
             
             // 为每种构筑类型计算应有的等级
@@ -348,9 +378,20 @@ namespace Kuros.Actors.Heroes
             {
                 if (item != null)
                 {
-                    // GD.Print($"[{Name}][InFlight] 飞行武器计入: item={item.ItemId}, BuildClass={item.BuildClass}, IsTracked={IsTrackedBuildItem(item)}, ActiveClasses=[{string.Join(", ", _activeBuildClasses)}]");
                     AddItemPointsByClass(item);
                 }
+            }
+
+            // 合并三选一/宝箱获取的构筑效果点数
+            foreach (var kvp in _pickedEffectCountByClass)
+            {
+                if (kvp.Value <= 0) continue;
+                string buildClass = kvp.Key;
+                if (_activeBuildClasses.Count > 0 && !_activeBuildClasses.Contains(buildClass))
+                    continue;
+                if (!_buildCountByClass.ContainsKey(buildClass))
+                    _buildCountByClass[buildClass] = 0;
+                _buildCountByClass[buildClass] += kvp.Value;
             }
         }
 

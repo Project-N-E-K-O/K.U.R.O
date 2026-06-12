@@ -12,7 +12,7 @@ GlowColor = Color(1, 0, 0, 0.3137255)
 BeamWidth = 32.0
 GlowWidth = 92.0
 Lifetime = 0.2
-Damage = 2
+Damage = 20
 KnockbackDistance = 50.0
 KnockbackSpeed = 1000.0
 

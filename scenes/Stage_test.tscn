@@ -1,9 +1,10 @@
-[gd_scene load_steps=38 format=3 uid="uid://wluyqt2wxlvb"]
+[gd_scene load_steps=39 format=3 uid="uid://wluyqt2wxlvb"]
 
 [ext_resource type="Script" uid="uid://x1ic1ym4ykq8" path="res://scripts/scenes/BattleSceneManager.cs" id="1_s6mo5"]
-[ext_resource type="PackedScene" uid="uid://ufprfd4r8ijj" path="res://assets/spine/main_character/main_character.tscn" id="1_tv6fd"]
+[ext_resource type="PackedScene" uid="uid://ufprfd4r8ijj" path="res://scenes/actors/characters/main_character.tscn" id="1_tv6fd"]
 [ext_resource type="Texture2D" uid="uid://20khta50kpjb" path="res://assets/environments/scene_1_home/房间2地面.png" id="2_m86xd"]
 [ext_resource type="PackedScene" uid="uid://mwpdlx1yup0k" path="res://scenes/actors/etc/EnemySpawnConsole.tscn" id="2_s6mo5"]
+[ext_resource type="PackedScene" uid="uid://bjwnor5ufbb8r" path="res://scenes/managers/BuildSelectionManager.tscn" id="2_v4xrh"]
 [ext_resource type="Script" uid="uid://del8hgcg3sr4i" path="res://scripts/managers/CameraFollow.cs" id="2_ybuta"]
 [ext_resource type="Texture2D" uid="uid://bkvy3th2vg6k4" path="res://assets/environments/scene_1_home/房间2墙壁.png" id="3_v4xrh"]
 [ext_resource type="PackedScene" uid="uid://ctpw5uqly3yu5" path="res://scenes/weapons/Weapon_Brawl_mechGlove.tscn" id="4_7yh4q"]
@@ -64,6 +65,11 @@ LevelName = "test"
 
 [node name="World" type="Node2D" parent="."]
 y_sort_enabled = true
+
+[node name="BuildSelectionManager" parent="World" instance=ExtResource("2_v4xrh")]
+
+[node name="PlayerSpawnPoint" type="Node2D" parent="World"]
+position = Vector2(-2306, 0)
 
 [node name="Environments" type="Node2D" parent="World"]
 
@@ -142,9 +148,10 @@ navigation_polygon = SubResource("NavigationPolygon_6eerp")
 [node name="EnemySpawnConsole" parent="World" instance=ExtResource("2_s6mo5")]
 position = Vector2(-1972, 3)
 SpawnParentPath = NodePath("..")
+PlayerRespawnPointPath = NodePath("../PlayerSpawnPoint")
 
 [node name="MainCharacter" parent="World" instance=ExtResource("1_tv6fd")]
-MaxHealth = 10000
+position = Vector2(-1086.9999, -70.99999)
 
 [node name="Camera2D" type="Camera2D" parent="World" node_paths=PackedStringArray("Target")]
 scale = Vector2(0.33, 0.33)

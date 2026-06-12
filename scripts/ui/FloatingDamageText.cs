@@ -25,7 +25,7 @@ namespace Kuros.UI
 		[Export] public float RandomOffsetYRange = 20f;  // Y轴随机偏移范围（总范围）
 
 		[ExportCategory("伤害缩放与弹出速度")]
-		[Export] public float ReferenceDamage = 5f;     // 基准
+		[Export] public float ReferenceDamage = 50f;     // 基准
 		[Export] public float MinDamageScale = 0.75f;     
 		[Export] public float MaxDamageScale = 2.5f;     
 

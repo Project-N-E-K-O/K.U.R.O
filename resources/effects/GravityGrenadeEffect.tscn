@@ -16,7 +16,7 @@ shader_parameter/wave_speed = 5.455
 shader_parameter/chromatic_intensity = 0.48
 shader_parameter/distortion_intensity = 1.415
 shader_parameter/horizon_radius = 0.195
-shader_parameter/horizon_thickness = 0.022
+shader_parameter/horizon_thickness = 0.025
 shader_parameter/horizon_brightness = 1.08
 shader_parameter/ring_intensity = 2.84
 shader_parameter/ring_density = 23.77
@@ -29,19 +29,16 @@ shader_parameter/distortion_falloff = 0.415
 [sub_resource type="CircleShape2D" id="CircleShape2D_04aku"]
 radius = 270.0
 
-[node name="GravityGrenadeEffect" type="Node"]
+[node name="BlackHoleEffect" type="Node"]
 script = ExtResource("1_7j3d2")
-DamagePerTick = 1
 AdsorbRadius = 600.0
 AdsorbForce = 200.0
 EffectId = "423beca3-dc85-457c-82c2-1cc7947fe5de"
 DisplayName = "黑洞"
-Description = "范围内的敌人直接位移牵引向黑洞中心并持续收到伤害"
+Description = "范围内的目标直接位移牵引向黑洞中心并持续收到伤害"
 Duration = 8.0
 
 [node name="Area2D" type="Area2D" parent="."]
-collision_layer = 0
-collision_mask = 2
 
 [node name="Sprite2D" type="Sprite2D" parent="Area2D"]
 z_index = 3

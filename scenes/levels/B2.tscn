@@ -1,15 +1,16 @@
-[gd_scene load_steps=24 format=3 uid="uid://b8ky5f2goteu0"]
+[gd_scene load_steps=26 format=3 uid="uid://b8ky5f2goteu0"]
 
 [ext_resource type="Script" uid="uid://dmqu7phxi8gbi" path="res://scripts/managers/BattleArena.cs" id="1_2oxwq"]
+[ext_resource type="Script" uid="uid://cra7y7mt0x1j8" path="res://scripts/managers/CameraZoneArea.cs" id="1_7fatj"]
 [ext_resource type="Script" uid="uid://b3iq6dm2pc5y0" path="res://scripts/controllers/EnemySpawnManager.cs" id="2_4aqtp"]
 [ext_resource type="Script" uid="uid://orymlwdqv2xq" path="res://scripts/controllers/WaveSpawnManager.cs" id="2_7fatj"]
 [ext_resource type="Texture2D" uid="uid://behye8vdgemoq" path="res://assets/environments/scene_2_hotel/地板.png" id="2_eperr"]
 [ext_resource type="Texture2D" uid="uid://k45cthgn2dgq" path="res://assets/environments/scene_2_hotel/墙面.png" id="3_ln7e0"]
 [ext_resource type="Texture2D" uid="uid://dw2alagwosewh" path="res://assets/environments/scene_2_hotel/地毯.png" id="3_rjiuo"]
-[ext_resource type="PackedScene" uid="uid://djio6ojcqw8yf" path="res://scenes/actors/enemies/Enemy_Normal_guard2.tscn" id="3_u445e"]
+[ext_resource type="PackedScene" uid="uid://djio6ojcqw8yf" path="res://scenes/actors/characters/Enemy_Normal_guard2.tscn" id="3_u445e"]
 [ext_resource type="Texture2D" uid="uid://cu2c3j0gpbqhb" path="res://assets/environments/scene_2_hotel/无缝窗户模块.png" id="4_rjiuo"]
-[ext_resource type="PackedScene" uid="uid://byi2utn347fwu" path="res://scenes/actors/enemies/Enemy_Normal_guard1.tscn" id="4_t3blu"]
-[ext_resource type="PackedScene" uid="uid://wrebd662va23" path="res://scenes/actors/enemies/Enemy_B2_fat02.tscn" id="6_15bv8"]
+[ext_resource type="PackedScene" uid="uid://byi2utn347fwu" path="res://scenes/actors/characters/Enemy_Normal_guard1.tscn" id="4_t3blu"]
+[ext_resource type="PackedScene" uid="uid://wrebd662va23" path="res://scenes/actors/characters/Enemy_B2_fat02.tscn" id="6_15bv8"]
 [ext_resource type="PackedScene" uid="uid://bo6r21cbk3ftm" path="res://scenes/environments/columnsB.tscn" id="11_6t8tb"]
 [ext_resource type="PackedScene" uid="uid://dsfadn8x6iwkh" path="res://scenes/items/Furniture_B_plantA.tscn" id="12_7fatj"]
 [ext_resource type="PackedScene" uid="uid://dqrmlh3reek3f" path="res://scenes/items/Furniture_B_garbageCanA.tscn" id="13_6n3fl"]
@@ -20,6 +21,9 @@
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4aqtp"]
 size = Vector2(5590, 3050)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_7fatj"]
+size = Vector2(5500, 3050)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wh8eq"]
 size = Vector2(5000, 3050)
@@ -34,8 +38,8 @@ size = Vector2(6000, 700)
 size = Vector2(6000, 700)
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_4aqtp"]
-vertices = PackedVector2Array(-571, 1207, 508, 1194, 743, 1194, 743, 1342, -851, 1256, 1379, 1342, 1890, 1286, 2214, 1286, 2694.0703, 1490.0234, 242, 1147, -222, 1147, 2696.9219, -1471.0469, 2214, -538, 2214, -800, 1622, -183, 1622, -492, 1890, -538, 2214, 1024, -2771.0703, -1474.9375, 1890, -800, 1343, -838, -1833, -711, -1833, -402, -2041, -538, -2041, -800, 508, 885, 242, 733, -611, -402, -611, -711, -222, -467, -222, -194.5, -228, -194.5, 1890, 1024, 1379, 860, 1343, -492, 707, -356, 1134, -356, 1134, -183, 743, 860, 215, 54.5, 242, -53, 743, 885, 215, 733, 50, 54.5, 50, -53, -897, -711, -897, -842, -1533, -842, -1533, -711, -1533, -402, -1533, -360, -897, -360, -897, -402, -228, 587, -455, 791, -851, 774, -63, 587, -63, 733, -222, 733, -222, 791, -455, 1055, -222, 1055, -571, 898, -851, 898, -1487, 774, -1487, 946, -1830, 946, -2365, -538, -1830, 1255, -1487, 1255, -1487, 1256, -2041, 1286, -851, 1207, 707, -838, 242, -467, -2773.9219, 1491.9688, -2365, 1286, -2365, 1024, -2041, 1024, -2365, -800)
-polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3, 4), PackedInt32Array(5, 6, 7, 8), PackedInt32Array(9, 1, 0, 10), PackedInt32Array(11, 8, 12, 13), PackedInt32Array(14, 15, 16, 12, 8, 17), PackedInt32Array(18, 11, 13, 19, 20), PackedInt32Array(21, 22, 23, 24), PackedInt32Array(25, 1, 9, 26), PackedInt32Array(27, 28, 29, 30, 31), PackedInt32Array(32, 6, 5, 33, 14), PackedInt32Array(15, 34, 20, 19, 16), PackedInt32Array(35, 36, 37, 38, 25, 26, 39, 40), PackedInt32Array(38, 41, 25), PackedInt32Array(26, 42, 39), PackedInt32Array(39, 43, 44, 40), PackedInt32Array(28, 45, 46), PackedInt32Array(47, 48, 21, 24, 18), PackedInt32Array(22, 49, 50), PackedInt32Array(51, 52, 27, 31, 53, 54, 55), PackedInt32Array(53, 56, 57, 58), PackedInt32Array(58, 59, 54, 53), PackedInt32Array(60, 61, 10, 0), PackedInt32Array(60, 0, 62, 54), PackedInt32Array(62, 63, 55, 54), PackedInt32Array(23, 22, 64, 65, 66, 67), PackedInt32Array(68, 69, 70, 71), PackedInt32Array(4, 72, 0), PackedInt32Array(18, 20, 73), PackedInt32Array(18, 73, 35, 74, 46), PackedInt32Array(8, 7, 17), PackedInt32Array(14, 17, 32), PackedInt32Array(37, 14, 33, 38), PackedInt32Array(35, 40, 74), PackedInt32Array(51, 55, 64, 50), PackedInt32Array(22, 50, 64), PackedInt32Array(74, 29, 28), PackedInt32Array(5, 8, 75, 3), PackedInt32Array(4, 3, 75, 71, 70), PackedInt32Array(76, 71, 75), PackedInt32Array(76, 75, 18, 77), PackedInt32Array(78, 77, 18, 67), PackedInt32Array(67, 66, 68, 78), PackedInt32Array(68, 71, 78), PackedInt32Array(79, 67, 18), PackedInt32Array(24, 79, 18), PackedInt32Array(46, 47, 18), PackedInt32Array(46, 74, 28)])
+vertices = PackedVector2Array(1370, 1361, 2694.2031, 1370, -2773.7969, 1370, 762, 1361, -2041, 1286, -1468, 1275, -860, 1275, -571, 1207, 508, 1194, 762, 1194, 2214, 1286, 1890, 1286, 242, 1147, -222, 1147, 508, 885, 242, 733, 2696.25, -770, 2214, 1024, 1370, 915, 1890, 1024, -2041, -770, -1514, -770, -1514, -711, -1833, -711, -2041, -538, -1833, -402, -1514, -402, -1514, -341, -2365, 1024, -906, -341, -906, -402, -611, -402, -228, -194.5, -228, 587, -455, 791, -611, -711, -906, -711, -906, -770, 726, -770, 726, -337, 242, -467, 1134, -337, 1134, -183, 996, 885, 215, 54.5, 242, -53, 1622, -492, 1334, -492, 1334, -770, 1890, -770, 1890, -538, 2214, -538, 2214, -770, 1622, -183, 996, 915, 215, 733, 50, 54.5, 50, -53, -222, -467, -222, -194.5, -63, 587, -63, 733, -222, 733, -222, 791, -455, 1055, -222, 1055, -571, 898, -860, 898, -860, 829, -1468, 829, -1468, 946, -1830, 946, -1830, 1255, -1468, 1255, -2041, 1024, -860, 1207, -2771.7578, -770, -2365, -770, -2365, -538, -2365, 1286)
+polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3), PackedInt32Array(4, 5, 6, 3), PackedInt32Array(7, 8, 9, 3, 6), PackedInt32Array(10, 1, 0, 11), PackedInt32Array(12, 8, 7, 13), PackedInt32Array(14, 8, 12, 15), PackedInt32Array(16, 1, 10, 17), PackedInt32Array(11, 0, 18, 19), PackedInt32Array(20, 21, 22, 23), PackedInt32Array(24, 20, 23, 25), PackedInt32Array(2, 25, 26, 27, 28), PackedInt32Array(29, 30, 31, 32, 33, 34), PackedInt32Array(35, 36, 37, 38), PackedInt32Array(35, 38, 39, 40), PackedInt32Array(39, 41, 42, 43, 14, 15, 44, 45), PackedInt32Array(46, 47, 48, 49, 50), PackedInt32Array(51, 52, 16), PackedInt32Array(51, 16, 17), PackedInt32Array(50, 51, 17, 19, 18, 53), PackedInt32Array(18, 54, 43, 42, 53), PackedInt32Array(15, 55, 44), PackedInt32Array(44, 56, 57, 45), PackedInt32Array(58, 59, 32, 31, 35), PackedInt32Array(33, 60, 61, 62), PackedInt32Array(62, 63, 34, 33), PackedInt32Array(64, 65, 13, 7), PackedInt32Array(64, 7, 66, 34), PackedInt32Array(66, 67, 68), PackedInt32Array(69, 70, 71, 27), PackedInt32Array(72, 73, 5, 4), PackedInt32Array(72, 4, 74, 71), PackedInt32Array(6, 75, 7), PackedInt32Array(76, 77, 78, 2), PackedInt32Array(53, 46, 50), PackedInt32Array(39, 45, 40), PackedInt32Array(35, 40, 58), PackedInt32Array(2, 78, 24, 25), PackedInt32Array(29, 34, 66, 68), PackedInt32Array(29, 68, 69, 27), PackedInt32Array(27, 71, 74, 28), PackedInt32Array(2, 28, 79), PackedInt32Array(3, 2, 79, 4)])
 outlines = Array[PackedVector2Array]([PackedVector2Array(-2851, -1555, 2777, -1551, 2774, 1570, -2854, 1572)])
 source_geometry_mode = 2
 agent_radius = 80.0
@@ -51,6 +55,16 @@ z_index = 10
 shape = SubResource("RectangleShape2D_4aqtp")
 debug_color = Color(0.6428762, 0.52304673, 0.06685588, 0.41960785)
 
+[node name="CameraZone" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 4
+script = ExtResource("1_7fatj")
+ZoneName = "Room_Zone_B2"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CameraZone"]
+shape = SubResource("RectangleShape2D_7fatj")
+debug_color = Color(0, 1, 0, 0.41960785)
+
 [node name="BattleArena" type="Area2D" parent="."]
 visible = false
 z_index = 10
@@ -61,7 +75,6 @@ BoundaryCollisionMask = 6
 BoundaryThickness = 50.0
 EnemyDetectionMask = 2
 ShowDebugOverlay = false
-ShowDebugOverlayInGame = false
 DebugLineWidth = 8.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="BattleArena"]
@@ -150,7 +163,7 @@ texture = ExtResource("4_rjiuo")
 position = Vector2(1280, -1530)
 texture = ExtResource("4_rjiuo")
 
-[node name="AirWall" type="StaticBody2D" parent="."]
+[node name="AirWall" type="StaticBody2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
 visible = false
 z_index = 1
 
@@ -165,7 +178,6 @@ shape = SubResource("RectangleShape2D_33y2m")
 debug_color = Color(0, 0, 0, 0.19607843)
 
 [node name="NavigationRegion2D" type="NavigationRegion2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
-visible = false
 navigation_polygon = SubResource("NavigationPolygon_4aqtp")
 
 [node name="columnsB" parent="." instance=ExtResource("11_6t8tb")]

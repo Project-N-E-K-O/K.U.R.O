@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="ItemDefinition" load_steps=11 format=3 uid="uid://3w0avohv0hfl"]
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=12 format=3 uid="uid://3w0avohv0hfl"]
 
 [ext_resource type="Script" uid="uid://b4tcdtjy6u7ee" path="res://scripts/items/attributes/ItemAttributeEntry.cs" id="1_e6rc3"]
 [ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="2_j646q"]
@@ -7,6 +7,12 @@
 [ext_resource type="PackedScene" uid="uid://cmh3bnabinwi0" path="res://resources/effects/CameraShakeEffect.tscn" id="5_xtvlc"]
 [ext_resource type="Texture2D" uid="uid://d354srmumtbja" path="res://assets/furnitures/hotel_scene3/TableSquareA.png" id="6_e6rc3"]
 [ext_resource type="Script" uid="uid://dfgtff7mly02w" path="res://scripts/items/ItemDefinition.cs" id="7_b4b04"]
+
+[sub_resource type="Resource" id="Resource_e6rc3"]
+script = ExtResource("1_e6rc3")
+AttributeId = "attack_power"
+Value = 60.0
+metadata/_custom_type_script = "uid://b4tcdtjy6u7ee"
 
 [sub_resource type="Resource" id="Resource_48rr8"]
 script = ExtResource("2_j646q")
@@ -42,6 +48,7 @@ Icon = ExtResource("6_e6rc3")
 Category = "Furniture"
 Tags = Array[String](["tag_throw", "furniture"])
 MaxStackSize = 1
+AttributeEntries = Array[ExtResource("1_e6rc3")]([SubResource("Resource_e6rc3")])
 EffectEntries = Array[ExtResource("2_j646q")]([SubResource("Resource_48rr8"), SubResource("Resource_fwe2t"), SubResource("Resource_27clv")])
 LevelCount = 0
 IsThrowable = true

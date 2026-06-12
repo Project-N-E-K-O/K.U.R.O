@@ -99,7 +99,8 @@ namespace Kuros.Managers
                 GameLogger.Debug(nameof(CameraZoneManager), $"区域已锁定，忽略进入: {name}");
                 return;
             }
-            SwitchToZone(name);
+            if (_activeZoneStack.Count == 1)
+                SwitchToZone(name);
             GameLogger.Debug(nameof(CameraZoneManager), $"进入区域: {name}，栈: [{string.Join(", ", _activeZoneStack)}]");
         }
 
@@ -111,20 +112,18 @@ namespace Kuros.Managers
             _activeZoneStack.Remove(name);
             GameLogger.Debug(nameof(CameraZoneManager), $"离开区域: {name}，栈: [{string.Join(", ", _activeZoneStack)}]");
 
-            // 区域锁定期间不切换相机，仅维护栈
             if (_zoneLocked)
             {
                 GameLogger.Debug(nameof(CameraZoneManager), $"区域已锁定，忽略离开: {name}");
                 return;
             }
 
-            // 当前相机正是该区域才需要切换
             if (_currentZone?.Name == name)
             {
                 if (_activeZoneStack.Count > 0)
-                    SwitchToZone(_activeZoneStack[^1]); // 切回栈顶（最近进入的区域）
+                    SwitchToZone(_activeZoneStack[^1]);
                 else
-                    SwitchToZone("Stage_Global");       // 已无房间区域，回到全局
+                    SwitchToZone("Stage_Global");
             }
         }
 
@@ -210,7 +209,8 @@ namespace Kuros.Managers
         {
             if (TargetCamera == null) return;
             var bounds = new Rect2(limitLeft, limitTop, limitRight - limitLeft, limitBottom - limitTop);
-            RegisterZoneAndSwitch("Stage_Global", bounds, zoomLevel);
+            RegisterZone("Stage_Global", bounds, zoomLevel);
+            SwitchToZone("Stage_Global");
             GameLogger.Info(nameof(CameraZoneManager),
                 $"全局相机边界已设置：X[{limitLeft}, {limitRight}]  Y[{limitTop}, {limitBottom}]");
         }

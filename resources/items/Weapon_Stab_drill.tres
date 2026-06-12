@@ -9,7 +9,7 @@
 [sub_resource type="Resource" id="Attribute_AttackPower"]
 script = ExtResource("1_kq0dh")
 AttributeId = "attack_power"
-Value = 4.0
+Value = 30.0
 
 [resource]
 script = ExtResource("5_i15sv")
@@ -22,5 +22,5 @@ Tags = Array[String](["tag_weapon", "build_machine", "tag_stab", "hit_1"])
 MaxStackSize = 1
 AttributeEntries = Array[ExtResource("1_kq0dh")]([SubResource("Attribute_AttackPower")])
 WeaponSkillResources = Array[Resource]([ExtResource("4_kq0dh")])
-BuildClass = "machine"
+LevelCount = 0
 WorldScenePath = "res://scenes/weapons/Weapon_Stab_drill.tscn"

@@ -27,6 +27,7 @@ script = ExtResource("2_kidmo")
 SkillId = "WeaponSkill_Brawl_MechGlove"
 DisplayName = "机械冲撞臂攻击"
 AnimationName = "Weapon_Brawl_MechGlove"
+DamageMultiplier = 0.5
 ShowHitboxDebug = false
 Description = "第三次攻击到敌人后击退敌人5 m，如果三次攻击都击中敌人则最后一击发生暴击"
 Effects = Array[ExtResource("1_rpm6u")]([SubResource("Resource_bk1ns"), SubResource("Resource_ni6ga")])

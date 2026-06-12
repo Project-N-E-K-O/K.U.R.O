@@ -87,7 +87,7 @@ namespace Kuros.Actors.Heroes.States
 			}
 
 			// 检查攻击按键
-			if (IsActionJustPressed("attack") && Actor.AttackTimer <= 0)
+			if (IsAttackTriggered() && Actor.AttackTimer <= 0)
 			{
               	Player.RequestAttackFromState(Name);
                 ChangeState("Throw");

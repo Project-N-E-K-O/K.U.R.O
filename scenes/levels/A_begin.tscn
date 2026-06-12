@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://cel0dl6h07it8"]
+[gd_scene load_steps=29 format=3 uid="uid://cel0dl6h07it8"]
 
 [ext_resource type="Texture2D" uid="uid://cye54v0tcgk7u" path="res://assets/environments/scene_1_home/房间1 地面.png" id="1_1xo5x"]
 [ext_resource type="Script" uid="uid://cra7y7mt0x1j8" path="res://scripts/managers/CameraZoneArea.cs" id="1_exti5"]
@@ -9,6 +9,16 @@
 [ext_resource type="PackedScene" uid="uid://dlhn30h21ei8f" path="res://scenes/environments/door1_A_begin.tscn" id="6_556c4"]
 [ext_resource type="Script" uid="uid://cbui22isww64v" path="res://scripts/systems/cutscene/CutsceneTrigger.cs" id="6_ocwig"]
 [ext_resource type="Script" uid="uid://dprlx2bg0y3k5" path="res://scripts/environments/ParallaxBackground2D.cs" id="7_paral"]
+[ext_resource type="Texture2D" uid="uid://gd2g77t46552" path="res://assets/furnitures/home_scene1/TableOfficeA.png" id="11_23r6t"]
+[ext_resource type="PackedScene" uid="uid://dqb7hct2obgg5" path="res://scenes/items/Furniture_A_bedA.tscn" id="11_k0aw5"]
+[ext_resource type="PackedScene" uid="uid://xr3dxjuou057" path="res://scenes/items/Furniture_A_chairOfficeA.tscn" id="12_k0aw5"]
+[ext_resource type="PackedScene" uid="uid://dugfq8qy1okf1" path="res://scenes/items/Furniture_A_chairOfficeB.tscn" id="13_rnaj2"]
+[ext_resource type="PackedScene" uid="uid://cbm0exjbphlq5" path="res://scenes/items/Furniture_A_lampFloorA.tscn" id="14_oxmw7"]
+[ext_resource type="PackedScene" uid="uid://daox4k6bu5oqt" path="res://scenes/items/Furniture_A_sofaB.tscn" id="15_yj76n"]
+[ext_resource type="PackedScene" uid="uid://c4obvq7v87hkp" path="res://scenes/items/Furniture_A_tableBedsideA.tscn" id="16_ok3m1"]
+[ext_resource type="PackedScene" uid="uid://frx40xj4hkgp" path="res://scenes/items/Furniture_A_tableSquareB.tscn" id="17_x5o1h"]
+[ext_resource type="PackedScene" uid="uid://dsfadn8x6iwkh" path="res://scenes/items/Furniture_B_plantA.tscn" id="18_pe048"]
+[ext_resource type="PackedScene" uid="uid://dqrmlh3reek3f" path="res://scenes/items/Furniture_B_garbageCanA.tscn" id="19_ap35u"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ocwig"]
 size = Vector2(3538, 2140)
@@ -36,13 +46,6 @@ size = Vector2(400, 1872)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_pal6r"]
 size = Vector2(400, 600)
-
-[sub_resource type="NavigationPolygon" id="NavigationPolygon_ocwig"]
-vertices = PackedVector2Array(1573.9219, 665.1797, -1718.7422, 672.8125, -1712.2422, -1415.0938, 1572.0703, -1418.8984)
-polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3)])
-outlines = Array[PackedVector2Array]([PackedVector2Array(-1792, -1495, 1652, -1499, 1654, 745, -1799, 753)])
-source_geometry_mode = 2
-agent_radius = 80.0
 
 [node name="ABegin" type="Node2D"]
 y_sort_enabled = true
@@ -145,6 +148,38 @@ position = Vector2(-1799.9999, -877.9999)
 rotation = 0.6981317
 shape = SubResource("RectangleShape2D_pal6r")
 
-[node name="NavigationRegion2D" type="NavigationRegion2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
-visible = false
-navigation_polygon = SubResource("NavigationPolygon_ocwig")
+[node name="Node2D" type="Node2D" parent="."]
+z_index = 2
+y_sort_enabled = true
+position = Vector2(280.00003, -840)
+scale = Vector2(0.33, 0.33)
+
+[node name="Sprite2D" type="Sprite2D" parent="Node2D"]
+texture = ExtResource("11_23r6t")
+
+[node name="FurnitureBedA" parent="." instance=ExtResource("11_k0aw5")]
+position = Vector2(-1406, -544)
+
+[node name="FurnitureChairOfficeA" parent="." instance=ExtResource("12_k0aw5")]
+position = Vector2(1242, -662)
+
+[node name="FurnitureChairOfficeB" parent="." instance=ExtResource("13_rnaj2")]
+position = Vector2(218, -300)
+
+[node name="FurnitureLampFloorA" parent="." instance=ExtResource("14_oxmw7")]
+position = Vector2(-828, -750)
+
+[node name="FurnitureSofaB" parent="." instance=ExtResource("15_yj76n")]
+position = Vector2(-3, 248)
+
+[node name="FurnitureTableBedsideA" parent="." instance=ExtResource("16_ok3m1")]
+position = Vector2(-1046, -719)
+
+[node name="FurnitureTableSquareB" parent="." instance=ExtResource("17_x5o1h")]
+position = Vector2(14, 541)
+
+[node name="FurniturePlantA" parent="." instance=ExtResource("18_pe048")]
+position = Vector2(-193, -763)
+
+[node name="FurnitureGarbageCanA" parent="." instance=ExtResource("19_ap35u")]
+position = Vector2(732, -636)

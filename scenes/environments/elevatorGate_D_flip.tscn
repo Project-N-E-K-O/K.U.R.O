@@ -23,6 +23,14 @@ z_index = 1
 texture = ExtResource("2_ixhfj")
 region_rect = Rect2(0, 0, 352, 1612)
 
+[node name="ElevatorFrontWall" type="Sprite2D" parent="ElevatorFrontWall"]
+z_index = 1
+position = Vector2(0, 982)
+texture = ExtResource("2_ixhfj")
+flip_v = true
+region_enabled = true
+region_rect = Rect2(0, 1868.4436, 352, 104.08264)
+
 [node name="ElevatorBackWall" type="Sprite2D" parent="."]
 z_index = 1
 position = Vector2(4, -848)

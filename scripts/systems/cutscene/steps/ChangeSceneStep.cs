@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using Godot;
 using Kuros.Environments;
 using Kuros.Items.World;
+using Kuros.Utils;
 
 namespace Kuros.Systems.Cutscene
 {
@@ -59,6 +60,8 @@ namespace Kuros.Systems.Cutscene
                 WorldItemSpawner.ClearCache();
                 GD.Print("[Cutscene] ChangeSceneStep: WorldItemSpawner 缓存已清理");
             }
+
+            DialogicUtils.CleanupPersistentState(ctx.Manager);
 
             if (preloaded != null)
             {

@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://bpu8bki01p7e8"]
+[gd_scene load_steps=19 format=3 uid="uid://bpu8bki01p7e8"]
 
 [ext_resource type="Texture2D" uid="uid://de4c2xajty0y2" path="res://assets/environments/scene_2_hotel/电梯门右.png" id="1_4jbtd"]
 [ext_resource type="Script" uid="uid://k8jjrnqgrkqj" path="res://scripts/environments/ElevatorGate.cs" id="1_egscript"]
@@ -6,9 +6,153 @@
 [ext_resource type="Texture2D" uid="uid://c35fnrp1a4jbf" path="res://assets/environments/scene_2_hotel/电梯内饰.png" id="2_vcby0"]
 [ext_resource type="Texture2D" uid="uid://fjtsintqy2q3" path="res://assets/environments/scene_2_hotel/电梯墙后2.png" id="3_v7b0u"]
 [ext_resource type="Texture2D" uid="uid://pan0auvatm1f" path="res://assets/environments/scene_2_hotel/电梯墙前.png" id="4_y3mbp"]
+[ext_resource type="Texture2D" uid="uid://dg0dlvjyvdfed" path="res://assets/effect/LightEffect/强光1.png" id="7_um4yj"]
+[ext_resource type="Texture2D" uid="uid://b6qys2indga4q" path="res://assets/effect/LightEffect/开门光.png" id="8_8fwri"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4jbtd"]
 size = Vector2(200, 700)
+
+[sub_resource type="Shader" id="Shader_xttcx"]
+code = "shader_type canvas_item;
+render_mode blend_add, unshaded;
+
+// ── 光束闪烁 ──
+uniform float flicker_speed : hint_range(0.5, 20.0) = 8.0;
+uniform float flicker_intensity : hint_range(0.0, 1.0) = 0.3;
+
+// ── 光束微光摇曳 (水平波纹) ──
+uniform float shimmer_speed : hint_range(0.1, 5.0) = 1.5;
+uniform float shimmer_strength : hint_range(0.0, 0.5) = 0.15;
+
+// ── 浮尘粒子 ──
+uniform float density : hint_range(0.1, 2.0) = 1.0;
+uniform float brightness : hint_range(0.0, 2.0) = 0.5;
+uniform float particle_size : hint_range(0.005, 0.08) = 0.025;
+uniform float anim_speed : hint_range(0.1, 3.0) = 1.0;
+
+float hash(vec2 p) {
+	return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+}
+
+float noise(vec2 p) {
+	vec2 i = floor(p);
+	vec2 f = fract(p);
+	f = f * f * (3.0 - 2.0 * f);
+	return mix(
+		mix(hash(i), hash(i + vec2(1.0, 0.0)), f.x),
+		mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), f.x),
+		f.y
+	);
+}
+
+void fragment() {
+	vec4 base = texture(TEXTURE, UV);
+
+	// 光束闪烁：多层噪声叠加产生不规则闪烁
+	float flicker = 1.0
+		+ noise(vec2(TIME * flicker_speed, 0.0)) * flicker_intensity
+		+ noise(vec2(TIME * flicker_speed * 1.7, 1.0)) * flicker_intensity * 0.6
+		- flicker_intensity * 0.8;
+	flicker = clamp(flicker, 0.0, 1.5);
+
+	// 水平微光波纹
+	float shimmer = 1.0 + sin(UV.x * 6.28318 + TIME * shimmer_speed) * shimmer_strength
+		+ cos(UV.x * 12.56637 - TIME * shimmer_speed * 0.7) * shimmer_strength * 0.5;
+
+	vec4 beam_color = base * flicker * shimmer;
+	beam_color.a = min(beam_color.a, 1.0);
+
+	// ── 浮尘粒子（叠加在光束之上） ──
+	float cell_count = 8.0 + density * 14.0;
+	vec2 cell_id = floor(UV * cell_count);
+	vec2 local_uv = fract(UV * cell_count);
+
+	float h1 = hash(cell_id);
+	float h2 = hash(cell_id + 17.0);
+	float h3 = hash(cell_id + 31.0);
+	float h4 = hash(cell_id + 53.0);
+
+	vec2 particle_center = vec2(h1, h2) * 0.6 + 0.2;
+
+	float lifetime = 1.0 + h3 * 4.0;
+	float cooldown = h4;
+	float total_cycle = lifetime + cooldown;
+	float phase = hash(cell_id + 7.0);
+	float cycle_time = mod(TIME * anim_speed + phase * total_cycle, total_cycle);
+
+	float life = 0.0;
+	if (cycle_time < lifetime) {
+		float progress = cycle_time / lifetime;
+		life = sin(progress * 3.14159265);
+	}
+
+	float angle = 0.174533;
+	vec2 rel = local_uv - particle_center;
+	float ca = cos(angle), sa = sin(angle);
+	rel = vec2(rel.x * ca - rel.y * sa, rel.x * sa + rel.y * ca);
+	rel.y /= 0.8 + h2 * 0.5;
+
+	float particle = 1.0 - smoothstep(0.0, particle_size, length(rel));
+	float alpha = particle * life * brightness;
+
+	COLOR = beam_color + vec4(vec3(1.0, 0.95, 0.75) * alpha, alpha);
+}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_u26ev"]
+shader = SubResource("Shader_xttcx")
+shader_parameter/flicker_speed = 1.5000000475
+shader_parameter/flicker_intensity = 0.3
+shader_parameter/shimmer_speed = 1.5
+shader_parameter/shimmer_strength = 0.15
+shader_parameter/density = 1.80000008224012
+shader_parameter/brightness = 0.406000019285
+shader_parameter/particle_size = 0.07000000297574
+shader_parameter/anim_speed = 2.42000011169012
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_x4lsf"]
+shader = SubResource("Shader_xttcx")
+shader_parameter/flicker_speed = 1.20000003325
+shader_parameter/flicker_intensity = 0.3
+shader_parameter/shimmer_speed = 1.5
+shader_parameter/shimmer_strength = 0.15
+shader_parameter/density = 1.80000008224012
+shader_parameter/brightness = 0.406000019285
+shader_parameter/particle_size = 0.07000000297574
+shader_parameter/anim_speed = 2.42000011169012
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_uh1f5"]
+shader = SubResource("Shader_xttcx")
+shader_parameter/flicker_speed = 1.300000038
+shader_parameter/flicker_intensity = 0.3
+shader_parameter/shimmer_speed = 1.5
+shader_parameter/shimmer_strength = 0.15
+shader_parameter/density = 1.80000008224012
+shader_parameter/brightness = 0.406000019285
+shader_parameter/particle_size = 0.07000000297574
+shader_parameter/anim_speed = 2.42000011169012
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_1k4xi"]
+shader = SubResource("Shader_xttcx")
+shader_parameter/flicker_speed = 1.60000005225
+shader_parameter/flicker_intensity = 0.3
+shader_parameter/shimmer_speed = 1.5
+shader_parameter/shimmer_strength = 0.15
+shader_parameter/density = 1.80000008224012
+shader_parameter/brightness = 0.406000019285
+shader_parameter/particle_size = 0.07000000297574
+shader_parameter/anim_speed = 2.42000011169012
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_58q64"]
+shader = SubResource("Shader_xttcx")
+shader_parameter/flicker_speed = 1.20000003325
+shader_parameter/flicker_intensity = 0.3
+shader_parameter/shimmer_speed = 1.5
+shader_parameter/shimmer_strength = 0.15
+shader_parameter/density = 1.80000008224012
+shader_parameter/brightness = 0.406000019285
+shader_parameter/particle_size = 0.07000000297574
+shader_parameter/anim_speed = 2.42000011169012
 
 [sub_resource type="Animation" id="Animation_v7b0u"]
 length = 0.001
@@ -43,6 +187,18 @@ tracks/2/path = NodePath("CollisionShape2D:disabled")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("light1:visible")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
@@ -87,6 +243,18 @@ tracks/2/keys = {
 "update": 1,
 "values": [true]
 }
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("light1:visible")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [false, true]
+}
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_y3mbp"]
 _data = {
@@ -112,7 +280,7 @@ position = Vector2(186, -405)
 texture = ExtResource("3_v7b0u")
 
 [node name="ElevatorFrontWall" type="Sprite2D" parent="."]
-z_index = 3
+z_index = 4
 position = Vector2(187, -411)
 texture = ExtResource("4_y3mbp")
 region_rect = Rect2(0, 0, 352, 1612)
@@ -126,6 +294,58 @@ texture = ExtResource("1_4jbtd")
 
 [node name="left" type="Sprite2D" parent="."]
 texture = ExtResource("2_ldo24")
+
+[node name="light1" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(1, 1, 1, 0.5882353)
+z_index = 3
+position = Vector2(47, 58)
+rotation = 0.18325958
+scale = Vector2(0.33, 0.5)
+texture = ExtResource("7_um4yj")
+
+[node name="Sprite2D" type="Sprite2D" parent="light1"]
+modulate = Color(1, 1, 1, 0.78431374)
+material = SubResource("ShaderMaterial_u26ev")
+position = Vector2(-199.31747, -545.15576)
+rotation = 0.2617994
+texture = ExtResource("8_8fwri")
+flip_h = true
+
+[node name="Sprite2D4" type="Sprite2D" parent="light1"]
+modulate = Color(1, 1, 1, 0.78431374)
+material = SubResource("ShaderMaterial_x4lsf")
+position = Vector2(-332.28186, -330.07965)
+rotation = 0.08726646
+scale = Vector2(1, 0.8)
+texture = ExtResource("8_8fwri")
+flip_h = true
+
+[node name="Sprite2D2" type="Sprite2D" parent="light1"]
+modulate = Color(1, 1, 1, 0.78431374)
+material = SubResource("ShaderMaterial_uh1f5")
+position = Vector2(-352.1651, -68.795166)
+rotation = -0.017453292
+scale = Vector2(1, 1.2)
+texture = ExtResource("8_8fwri")
+flip_h = true
+
+[node name="Sprite2D5" type="Sprite2D" parent="light1"]
+modulate = Color(1, 1, 1, 0.78431374)
+material = SubResource("ShaderMaterial_1k4xi")
+position = Vector2(-215.1712, 111.75109)
+rotation = -0.34906584
+scale = Vector2(1, 0.7)
+texture = ExtResource("8_8fwri")
+flip_h = true
+
+[node name="Sprite2D3" type="Sprite2D" parent="light1"]
+modulate = Color(1, 1, 1, 0.78431374)
+material = SubResource("ShaderMaterial_58q64")
+position = Vector2(-198.13037, 315.1067)
+rotation = -0.6981317
+texture = ExtResource("8_8fwri")
+flip_h = true
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {

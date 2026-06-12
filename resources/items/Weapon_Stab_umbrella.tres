@@ -9,7 +9,7 @@
 [sub_resource type="Resource" id="Attribute_AttackPower"]
 script = ExtResource("1_q00hu")
 AttributeId = "attack_power"
-Value = 1.0
+Value = 20.0
 
 [resource]
 script = ExtResource("5_vndrb")
@@ -23,5 +23,5 @@ MaxStackSize = 1
 AttributeEntries = Array[ExtResource("1_q00hu")]([SubResource("Attribute_AttackPower")])
 EffectEntries = Array[ExtResource("2_iq0we")]([null])
 WeaponSkillResources = Array[Resource]([ExtResource("4_qwcde")])
-BuildClass = "machine"
+LevelCount = 0
 WorldScenePath = "uid://6ghjqyjkk37w"

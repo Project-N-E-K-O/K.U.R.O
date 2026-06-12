@@ -36,6 +36,7 @@ namespace Kuros.Actors.Heroes.Attacks
         [Export] public Array<StringName> TriggerActions { get; set; } = new();
         [Export] public bool AllowHoldInput = false;
         [Export] public bool BufferInputUntilReady = true;
+        [Export] public bool AllowRecoveryCancel = true;
 
         [ExportCategory("Timing (s)")]
         [Export(PropertyHint.Range, "0,5,0.01")] public float WarmupDuration = 0.15f;
@@ -95,6 +96,8 @@ namespace Kuros.Actors.Heroes.Attacks
         private float _phaseTimer = 0f;
         private float _cooldownTimer = 0f;
         private bool _bufferedInput = false;
+        private bool _wantsRestart = false;
+        private bool _wantsMove = false;
         private bool _hitEffectSubscribed = false;
         private bool _hitWindowActive = false;
         private Node? _hitEffectParent;
@@ -108,7 +111,6 @@ namespace Kuros.Actors.Heroes.Attacks
         private WeaponSkillDefinition? _activeWeaponSkill;
         private AttackHitboxDebugDrawer? _hitboxDebugDrawer;
         private int _currentHitStep = 1;  // 记录当前 Spine 动画段数（1-based）
-        private float _weaponBaseDamage = 0f;  // 记录武器基础伤害（不含玩家基础伤害）
         private PlayerInventoryComponent? _inventoryComponent;
         // 本轮攻击的有效 timing（可能被武器技能定义覆盖）
         private float _effectiveWarmup = 0.15f;
@@ -119,6 +121,8 @@ namespace Kuros.Actors.Heroes.Attacks
 
         public bool IsRunning => _phase != AttackPhase.Idle;
         public bool IsOnCooldown => _cooldownTimer > 0f;
+        public bool WantsRestart => _wantsRestart;
+        public bool WantsMove => _wantsMove;
 
         public virtual void Initialize(SamplePlayer player)
         {
@@ -214,6 +218,23 @@ namespace Kuros.Actors.Heroes.Attacks
 
             if (_phase == AttackPhase.Idle) return;
 
+            if (_phase == AttackPhase.Recovery && AllowRecoveryCancel)
+            {
+                if (IsInputTriggered())
+                {
+                    _wantsRestart = true;
+                    SetPhase(AttackPhase.Idle);
+                    return;
+                }
+                Vector2 moveInput = Player.GetControlledMovementInput();
+                if (moveInput.LengthSquared() > 0.01f)
+                {
+                    _wantsMove = true;
+                    SetPhase(AttackPhase.Idle);
+                    return;
+                }
+            }
+
             _phaseTimer -= (float)delta;
             if (_phaseTimer <= 0f)
             {
@@ -229,6 +250,9 @@ namespace Kuros.Actors.Heroes.Attacks
         public bool TryStart(bool checkInput = true)
         {
             if (!CanStart(checkInput)) return false;
+
+            _wantsRestart = false;
+            _wantsMove = false;
 
             // 提前解析当前武器技能，以便应用 timing 覆盖
             _activeWeaponSkill = Player.WeaponSkillController?.GetPrimarySkillDefinition();
@@ -354,6 +378,9 @@ namespace Kuros.Actors.Heroes.Attacks
                 return true;
             }
 
+            var activeSkill = Player.WeaponSkillController?.GetPrimarySkillDefinition();
+            bool holdAllowed = AllowHoldInput || activeSkill?.AllowHoldContinuousAttack == true;
+
             foreach (var action in TriggerActions)
             {
                 if (Input.IsActionJustPressed(action))
@@ -361,7 +388,7 @@ namespace Kuros.Actors.Heroes.Attacks
                     return true;
                 }
 
-                if (AllowHoldInput && Input.IsActionPressed(action))
+                if (holdAllowed && Input.IsActionPressed(action))
                 {
                     return true;
                 }
@@ -436,11 +463,6 @@ namespace Kuros.Actors.Heroes.Attacks
             _spineHitWindowActive = ShouldUseSpineHitEvents();
             _currentHitStep = 1;  // 重置段数计数器
             CurrentAttackHitStep = 1;  // 重置静态段数
-            
-            // 计算武器基础伤害：DamageOverride - Player.AttackDamage
-            // 只有在第一段才应用玩家基础伤害和增伤效果
-            _weaponBaseDamage = DamageOverride - Player.AttackDamage;
-            if (_weaponBaseDamage < 0) _weaponBaseDamage = 0;
 
             // 如果是 MainCharacter，使用 Spine 动画
             if (Player is MainCharacter mainChar)
@@ -688,28 +710,8 @@ namespace Kuros.Actors.Heroes.Attacks
             if (Player == null) return;
 
             float originalDamage = Player.AttackDamage;
-            
-            // 区分有武器和徒手的情况：
-            // - 徒手（_weaponBaseDamage == 0）：所有段都应用完整伤害 DamageOverride
-            // - 有武器（_weaponBaseDamage > 0）：第一段应用 DamageOverride，后续段仅应用武器伤害
-            if (_weaponBaseDamage <= 0)
-            {
-                // 徒手攻击：所有段都应用完整伤害
-                Player.AttackDamage = DamageOverride;
-            }
-            else if (_currentHitStep == 1)
-            {
-                // 有武器的第一段：应用完整伤害（基础伤害 + 武器伤害 + 增伤效果）
-                Player.AttackDamage = DamageOverride;
-            }
-            else
-            {
-                // 有武器的后续段：仅应用武器伤害，避免基础伤害和增伤效果被多段武器放大
-                Player.AttackDamage = _weaponBaseDamage;
-            }
-
+            Player.AttackDamage = DamageOverride;
             Player.PerformAttackCheck();
-
             Player.AttackDamage = originalDamage;
         }
 

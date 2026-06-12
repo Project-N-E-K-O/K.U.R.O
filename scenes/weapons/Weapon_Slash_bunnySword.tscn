@@ -48,9 +48,9 @@ DefaultOutlineColor = Color(0, 0, 0, 0)
 
 [node name="Shadow" type="Sprite2D" parent="."]
 material = SubResource("ShaderMaterial_nqlfu")
-position = Vector2(0, 8)
 scale = Vector2(5.5, 1.2)
 texture = SubResource("CompressedTexture2D_mhf4g")
+offset = Vector2(0, 8)
 
 [node name="Outline" type="Sprite2D" parent="."]
 material = SubResource("ShaderMaterial_waoek")

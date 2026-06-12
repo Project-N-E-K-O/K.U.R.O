@@ -1,4 +1,5 @@
 file,BuildId,BuildClass,BuildName,Level,RequiredPoints,EffectId,EffectScript,Description
+BuildEffectDefinition,,guard,,1,1,BuildGuard,,安保构筑效果A
 Build_Guard_level1,Build_Guard_level1,guard,一级安保,1,1,Build_Guard_level1,BuildGuardLevel1Effect,略微减少玩家受到敌人的伤害
 Build_Guard_level2,Build_Guard_level2,guard,二级安保,2,2,Build_Guard_level2,BuildGuardLevel2Effect,延长玩家受到伤害后的无敌时间
 Build_Guard_level3,Build_Guard_level3,guard,三级安保,3,3,Build_Guard_level3,BuildGuardLevel3Effect,抵消玩家受到的下次伤害(8秒CD)

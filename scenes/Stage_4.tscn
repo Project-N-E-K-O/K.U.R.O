@@ -8,7 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://duv46pbl7d7l6" path="res://scenes/levels/B1.tscn" id="6_iak2v"]
 [ext_resource type="PackedScene" uid="uid://b8ky5f2goteu0" path="res://scenes/levels/B2.tscn" id="7_osham"]
 [ext_resource type="PackedScene" uid="uid://cnrdifmso2jps" path="res://scenes/levels/B3.tscn" id="8_odvgk"]
-[ext_resource type="PackedScene" uid="uid://ufprfd4r8ijj" path="res://assets/spine/main_character/main_character.tscn" id="9_2ioy7"]
+[ext_resource type="PackedScene" uid="uid://ufprfd4r8ijj" path="res://scenes/actors/characters/main_character.tscn" id="9_2ioy7"]
 [ext_resource type="Script" uid="uid://del8hgcg3sr4i" path="res://scripts/managers/CameraFollow.cs" id="10_tyjfc"]
 [ext_resource type="PackedScene" uid="uid://cgjrdwkemgrcy" path="res://scenes/actors/heroes/P2.tscn" id="11_kkoag"]
 

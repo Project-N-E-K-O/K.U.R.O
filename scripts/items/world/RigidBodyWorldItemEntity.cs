@@ -1064,8 +1064,13 @@ namespace Kuros.Items.World
 				return false;
 			}
 
-			// 计算伤害
-			int damage = Mathf.Max(1, Mathf.RoundToInt(ThrowDamage));
+			// 计算伤害：优先从 ItemDefinition.AttributeEntries 取 attack_power，否则回退到脚本 ThrowDamage
+			float attributeDamage = 0f;
+			var snapshot = GetAttributeSnapshot();
+			if (snapshot.TryGetValue("attack_power", out float ap) && ap > 0f)
+				attributeDamage = ap;
+			float baseDamage = attributeDamage > 0f ? attributeDamage : ThrowDamage;
+			int damage = Mathf.Max(1, Mathf.RoundToInt(baseDamage));
 			
 			if (damage <= 0)
 			{

@@ -11,7 +11,7 @@ EffectScene = ExtResource("2_42yta")
 PropertyOverrides = Dictionary[String, Variant]({
 "CritBonusMultiplier": 1.0,
 "CritChance": 20.0,
-"WeaponAttackValue": 1.0
+"WeaponAttackValue": 10.0
 })
 metadata/_custom_type_script = "uid://bv0es4osw3x0r"
 
@@ -20,6 +20,7 @@ script = ExtResource("2_egp4s")
 SkillId = "WeaponSkill_Brawl_RiotGlove"
 DisplayName = "镇暴拳套攻击"
 AnimationName = "Weapon_Brawl_RiotGlove"
+DamageMultiplier = 0.6
 ShowHitboxDebug = false
 Description = "每次攻击到敌人时，都有20%概率使这一次的伤害发生暴击"
 Effects = Array[ExtResource("1_bdrdo")]([SubResource("Resource_rr1ju")])

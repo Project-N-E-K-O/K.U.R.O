@@ -12,11 +12,11 @@ const ITEMS_DIR  := "res://resources/items"
 const SKILLS_DIR := "res://resources/items/skills"
 const BUILDS_DIR := "res://resources/builds"
 const LOOT_DIR   := "res://resources/loot"
-const ENEMY_DIR  := "res://scenes/actors/enemies"
+const CHAR_DIR  := "res://scenes/actors/characters"
 
 # ── 输出路径 ───────────────────────────────────────────────────────────────────
 const OUT_ITEMS  := "res://data/items.csv"
-const OUT_ENEMIES := "res://data/enemies.csv"
+const OUT_CHARACTERS := "res://data/characters.csv"
 const OUT_BUILDS := "res://data/builds.csv"
 const OUT_SKILLS := "res://data/skills.csv"
 const OUT_LOOT   := "res://data/loot.csv"
@@ -35,7 +35,7 @@ func _run() -> void:
 	_export_builds()
 	_export_skills()
 	_export_loot()
-	_export_enemies()
+	_export_characters()
 	print("[ExportCsv] All exports completed.")
 # ══════════════════════════════════════════════════════════════════════════════
 #  ITEMS  (resources/items/*.tres  →  ItemDefinition)
@@ -50,7 +50,7 @@ func _export_items() -> void:
 	var headers := [
 		"file", "ItemId", "DisplayName", "Description", "Category", "Tags",
 		"MaxStackSize", "BuildClass", "LevelCount", "IsThrowable", "IsFurniture",
-		"attack_power", "MaxDurability", "DamagePerHit", "SkillRefs"
+		"attack_power", "SkillRefs"
 	]
 	var rows: Array = [headers]
 
@@ -69,16 +69,6 @@ func _export_items() -> void:
 			if _str(str(sub[sid].get("AttributeId", ""))) == "attack_power":
 				atk = str(sub[sid].get("Value", ""))
 				break
-
-		# DurabilityConfig
-		var max_dur: String = ""
-		var dmg_per: String = ""
-		var dur_raw: String = str(r.get("DurabilityConfig", ""))
-		if dur_raw.begins_with("SubResource"):
-			var did: String = _subres_id(dur_raw)
-			if did in sub:
-				max_dur = str(sub[did].get("MaxDurability", ""))
-				dmg_per = str(sub[did].get("DamagePerHit", ""))
 
 		# WeaponSkillResources → 收集引用的技能文件名
 		var skill_refs: String = ""
@@ -103,7 +93,7 @@ func _export_items() -> void:
 			str(r.get("LevelCount", "1")),
 			str(r.get("IsThrowable", "false")),
 			str(r.get("IsFurniture", "false")),
-			atk, max_dur, dmg_per, skill_refs
+			atk, skill_refs
 		])
 
 	_write_csv(OUT_ITEMS, rows)
@@ -159,7 +149,7 @@ func _export_skills() -> void:
 	var headers := [
 		"file", "SkillId", "DisplayName", "AnimationName",
 		"DamageMultiplier", "CooldownSeconds", "ShowHitboxDebug",
-		"Description", "ActivationAction",
+		"Description", "ActivationAction", "AllowHoldContinuousAttack",
 		"WarmupDuration", "ActiveDuration", "RecoveryDuration",
 			"WarmupAnimationSpeed", "ActiveAnimationSpeed", "RecoveryAnimationSpeed"
 	]
@@ -181,6 +171,7 @@ func _export_skills() -> void:
 			str(r.get("ShowHitboxDebug", "true")),
 			_str(str(r.get("Description", ""))),
 			_str(str(r.get("ActivationAction", ""))),
+			str(r.get("AllowHoldContinuousAttack", "true")),
 			str(r.get("WarmupDuration", "-1")),
 			str(r.get("ActiveDuration", "-1")),
 			str(r.get("RecoveryDuration", "-1")),
@@ -258,13 +249,13 @@ func _export_loot() -> void:
 	print("[ExportCsv] loot.csv -> %d rows" % (rows.size() - 1))
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  ENEMIES  (scenes/actors/enemies/*.tscn)
+#  CHARACTERS  (scenes/actors/characters/*.tscn)
 # ══════════════════════════════════════════════════════════════════════════════
 
-func _export_enemies() -> void:
-	var files := _list_tscn(ENEMY_DIR)
+func _export_characters() -> void:
+	var files := _list_tscn(CHAR_DIR)
 	if files.is_empty():
-		push_warning("[ExportCsv] No .tscn found in " + ENEMY_DIR)
+		push_warning("[ExportCsv] No .tscn found in " + CHAR_DIR)
 		return
 
 	var headers := ["file", "Speed", "AttackDamage", "AttackCooldown", "MaxHealth"]
@@ -284,8 +275,8 @@ func _export_enemies() -> void:
 			props.get("MaxHealth", "")
 		])
 
-	_write_csv(OUT_ENEMIES, rows)
-	print("[ExportCsv] enemies.csv -> %d rows" % (rows.size() - 1))
+	_write_csv(OUT_CHARACTERS, rows)
+	print("[ExportCsv] characters.csv -> %d rows" % (rows.size() - 1))
 
 # ══════════════════════════════════════════════════════════════════════════════
 #  .tres 文本解析器
