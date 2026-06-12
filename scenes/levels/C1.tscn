@@ -50,6 +50,7 @@ agent_radius = 80.0
 y_sort_enabled = true
 
 [node name="AreaSize" type="Area2D" parent="."]
+visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AreaSize"]
 z_index = 10
@@ -57,6 +58,7 @@ shape = SubResource("RectangleShape2D_3x13k")
 debug_color = Color(0.6428762, 0.52304673, 0.06685588, 0.41960785)
 
 [node name="CameraZone" type="Area2D" parent="."]
+visible = false
 collision_layer = 0
 collision_mask = 4
 script = ExtResource("1_v2w3b")
@@ -68,6 +70,7 @@ shape = SubResource("RectangleShape2D_51aoc")
 debug_color = Color(0, 1, 0, 0.41960785)
 
 [node name="BattleArena" type="Area2D" parent="."]
+visible = false
 z_index = 10
 script = ExtResource("1_65ofg")
 ArenaSize = Vector2(4800, 3000)

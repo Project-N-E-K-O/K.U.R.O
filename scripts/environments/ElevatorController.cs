@@ -2,6 +2,7 @@ using Godot;
 using Kuros.Actors.Heroes;
 using Kuros.Items.World;
 using Kuros.Managers;
+using Kuros.Utils;
 
 namespace Kuros.Environments
 {
@@ -216,6 +217,7 @@ namespace Kuros.Environments
 
             // 清理跨场景缓存，防止 PackedScene 在新场景中继续占用内存
             WorldItemSpawner.ClearCache();
+            DialogicUtils.CleanupPersistentState(this);
 
             // 持有 _loadedScene 引用会阻止 Godot resource cache 释放纹理；
             // 先取出再置 null，使旧场景卸载后 GC 可以回收该 PackedScene。

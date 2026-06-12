@@ -37,8 +37,6 @@ namespace Kuros.Managers
         private string? _temporaryCameraZoneNameBeforeSwitch;
         // 玩家当前身处的区域有序列表（进入时追加，退出时移除）
         private readonly List<string> _activeZoneStack = new();
-        // 同名区域引用计数：处理同一场景中存在多个同名 CameraZoneArea 的情况
-        private readonly Dictionary<string, int> _zoneRefCounts = new();
         // 过场动画期间锁定，防止玩家被 Disabled 导致区域误退出
         private bool _zoneLocked = false;
 
@@ -94,22 +92,16 @@ namespace Kuros.Managers
         public void EnterZone(string name, Rect2 bounds, float zoomLevel = 0.43f)
         {
             RegisterZone(name, bounds, zoomLevel);
-
-            int count = _zoneRefCounts.GetValueOrDefault(name, 0);
-            _zoneRefCounts[name] = count + 1;
-
-            if (count == 0)
+            if (!_activeZoneStack.Contains(name))
                 _activeZoneStack.Add(name);
-
             if (_zoneLocked)
             {
                 GameLogger.Debug(nameof(CameraZoneManager), $"区域已锁定，忽略进入: {name}");
                 return;
             }
-            // 只有当栈中仅有本区域时（无其他重叠区域）才立刻切换，否则留在当前区域
             if (_activeZoneStack.Count == 1)
                 SwitchToZone(name);
-            GameLogger.Debug(nameof(CameraZoneManager), $"进入区域: {name} (ref:{count + 1})，栈: [{string.Join(", ", _activeZoneStack)}]");
+            GameLogger.Debug(nameof(CameraZoneManager), $"进入区域: {name}，栈: [{string.Join(", ", _activeZoneStack)}]");
         }
 
         /// <summary>
@@ -117,34 +109,21 @@ namespace Kuros.Managers
         /// </summary>
         public void ExitZone(string name)
         {
-            int count = _zoneRefCounts.GetValueOrDefault(name, 0);
-            if (count <= 0) return;
-
-            _zoneRefCounts[name] = count - 1;
-
-            if (count > 1)
-            {
-                GameLogger.Debug(nameof(CameraZoneManager), $"离开区域: {name} (ref:{count - 1})，仍有同名区域未退出");
-                return;
-            }
-
             _activeZoneStack.Remove(name);
             GameLogger.Debug(nameof(CameraZoneManager), $"离开区域: {name}，栈: [{string.Join(", ", _activeZoneStack)}]");
 
-            // 区域锁定期间不切换相机，仅维护栈
             if (_zoneLocked)
             {
                 GameLogger.Debug(nameof(CameraZoneManager), $"区域已锁定，忽略离开: {name}");
                 return;
             }
 
-            // 当前相机正是该区域才需要切换
             if (_currentZone?.Name == name)
             {
                 if (_activeZoneStack.Count > 0)
-                    SwitchToZone(_activeZoneStack[^1]); // 切回栈顶（最近进入的区域）
+                    SwitchToZone(_activeZoneStack[^1]);
                 else
-                    SwitchToZone("Stage_Global");       // 已无房间区域，回到全局
+                    SwitchToZone("Stage_Global");
             }
         }
 
@@ -155,7 +134,6 @@ namespace Kuros.Managers
         {
             _registeredZones.Remove(name);
             _activeZoneStack.Remove(name);
-            _zoneRefCounts.Remove(name);
         }
 
         /// <summary>

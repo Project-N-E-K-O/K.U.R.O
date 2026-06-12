@@ -28,6 +28,7 @@ FloatingDamageTextManager="*res://scripts/managers/FloatingDamageTextManager.cs"
 CrtOverlay="res://scenes/ui/CrtOverlay.tscn"
 Dialogic="*res://addons/dialogic/Core/DialogicGameHandler.gd"
 BuildSelectionManager="*res://scripts/managers/BuildSelectionManager.cs"
+DialogicBridge="*res://scripts/utils/DialogicBridge.gd"
 
 [dialogic]
 

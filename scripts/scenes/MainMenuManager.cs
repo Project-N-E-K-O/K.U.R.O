@@ -25,10 +25,8 @@ namespace Kuros.Scenes
 
 		public override void _Ready()
 		{
-			// 清理可能残留的UI
 			CleanupUI();
-			
-			// 延迟加载，确保UIManager已初始化
+			DialogicUtils.CleanupPersistentState(this);
 			CallDeferred(MethodName.InitializeMenus);
 		}
 
