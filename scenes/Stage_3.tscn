@@ -1,10 +1,12 @@
-[gd_scene load_steps=9 format=3 uid="uid://dwk6x3qcbsmul"]
+[gd_scene load_steps=11 format=3 uid="uid://dwk6x3qcbsmul"]
 
 [ext_resource type="Script" uid="uid://x1ic1ym4ykq8" path="res://scripts/scenes/BattleSceneManager.cs" id="1_ehms5"]
 [ext_resource type="Script" uid="uid://b6qifqg0v8c6o" path="res://scripts/managers/CameraZoneManager.cs" id="2_4xv61"]
 [ext_resource type="Script" uid="uid://l1558pct4220" path="res://scripts/managers/StageGeneratorManager.cs" id="3_fohb2"]
 [ext_resource type="PackedScene" uid="uid://cg2o6k0etyc25" path="res://scenes/levels/C_begin.tscn" id="4_ehms5"]
 [ext_resource type="PackedScene" uid="uid://bco3niswcahcc" path="res://scenes/levels/B_end.tscn" id="5_fhce4"]
+[ext_resource type="PackedScene" uid="uid://cqdtru26cvd8g" path="res://scenes/levels/C1.tscn" id="6_57jea"]
+[ext_resource type="PackedScene" uid="uid://bjwnor5ufbb8r" path="res://scenes/managers/BuildSelectionManager.tscn" id="6_gk4vp"]
 [ext_resource type="PackedScene" uid="uid://ufprfd4r8ijj" path="res://scenes/actors/characters/main_character.tscn" id="9_tperv"]
 [ext_resource type="Script" uid="uid://del8hgcg3sr4i" path="res://scripts/managers/CameraFollow.cs" id="10_l20m2"]
 [ext_resource type="PackedScene" uid="uid://cgjrdwkemgrcy" path="res://scenes/actors/heroes/P2.tscn" id="11_phqoj"]
@@ -16,22 +18,24 @@ LevelName = "关卡 2"
 
 [node name="CameraZoneManager" type="Node" parent="." node_paths=PackedStringArray("TargetCamera", "Player")]
 script = ExtResource("2_4xv61")
-TargetCamera = NodePath("../World/MainCharacter/Camera2D")
+TargetCamera = NodePath("../World/Camera2D")
 Player = NodePath("../World/MainCharacter")
 
 [node name="StageGeneratorManager" type="Node" parent="."]
 script = ExtResource("3_fohb2")
 BeginScene = ExtResource("4_ehms5")
 EndScene = ExtResource("5_fhce4")
-MinMiddleRooms = 0
-MaxMiddleRooms = 0
+MiddleScenePool = Array[PackedScene]([ExtResource("6_57jea")])
+
+[node name="BuildSelectionManager" parent="." instance=ExtResource("6_gk4vp")]
 
 [node name="World" type="Node2D" parent="."]
 y_sort_enabled = true
 
 [node name="MainCharacter" parent="World" instance=ExtResource("9_tperv")]
 
-[node name="Camera2D" type="Camera2D" parent="World/MainCharacter"]
+[node name="Camera2D" type="Camera2D" parent="World" node_paths=PackedStringArray("Target")]
+scale = Vector2(0.33, 0.33)
 ignore_rotation = false
 zoom = Vector2(0.43, 0.43)
 position_smoothing_enabled = true
@@ -39,6 +43,7 @@ rotation_smoothing_enabled = true
 drag_horizontal_enabled = true
 drag_vertical_enabled = true
 script = ExtResource("10_l20m2")
+Target = NodePath("../MainCharacter")
 ShakeOnPlayerDamaged = true
 ShakeRecoverySpeed = 20.0
 PlayerDamagedShakeStrength = 12.0

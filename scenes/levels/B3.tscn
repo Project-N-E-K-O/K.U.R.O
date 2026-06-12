@@ -1,6 +1,7 @@
-[gd_scene load_steps=27 format=3 uid="uid://cnrdifmso2jps"]
+[gd_scene load_steps=29 format=3 uid="uid://cnrdifmso2jps"]
 
 [ext_resource type="Script" uid="uid://dmqu7phxi8gbi" path="res://scripts/managers/BattleArena.cs" id="1_pkdn6"]
+[ext_resource type="Script" uid="uid://cra7y7mt0x1j8" path="res://scripts/managers/CameraZoneArea.cs" id="1_x5dwv"]
 [ext_resource type="Script" uid="uid://b3iq6dm2pc5y0" path="res://scripts/controllers/EnemySpawnManager.cs" id="2_m6is1"]
 [ext_resource type="Script" uid="uid://orymlwdqv2xq" path="res://scripts/controllers/WaveSpawnManager.cs" id="2_x5dwv"]
 [ext_resource type="PackedScene" uid="uid://byi2utn347fwu" path="res://scenes/actors/characters/Enemy_Normal_guard1.tscn" id="4_wv8k2"]
@@ -23,6 +24,9 @@
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4aqtp"]
 size = Vector2(5590, 3050)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_x5dwv"]
+size = Vector2(5500, 3050)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wh8eq"]
 size = Vector2(5000, 3050)
@@ -53,6 +57,17 @@ visible = false
 z_index = 10
 shape = SubResource("RectangleShape2D_4aqtp")
 debug_color = Color(0.6428762, 0.52304673, 0.06685588, 0.41960785)
+
+[node name="CameraZone" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 4
+script = ExtResource("1_x5dwv")
+ZoneName = "Room_Zone_B3"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CameraZone"]
+z_index = 10
+shape = SubResource("RectangleShape2D_x5dwv")
+debug_color = Color(0, 1, 0, 0.41960785)
 
 [node name="BattleArena" type="Area2D" parent="."]
 visible = false

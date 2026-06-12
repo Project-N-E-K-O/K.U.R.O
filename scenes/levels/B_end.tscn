@@ -1,4 +1,4 @@
-[gd_scene load_steps=35 format=3 uid="uid://bco3niswcahcc"]
+[gd_scene load_steps=36 format=3 uid="uid://bco3niswcahcc"]
 
 [ext_resource type="Script" uid="uid://cra7y7mt0x1j8" path="res://scripts/managers/CameraZoneArea.cs" id="1_b2kum"]
 [ext_resource type="Texture2D" uid="uid://behye8vdgemoq" path="res://assets/environments/scene_2_hotel/地板.png" id="1_fjfxm"]
@@ -27,6 +27,9 @@
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_oqqdb"]
 size = Vector2(5610, 3050)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_3a114"]
+size = Vector2(5592, 3050)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_oh5lj"]
 size = Vector2(1950, 1200)
@@ -72,17 +75,28 @@ shape = SubResource("RectangleShape2D_oqqdb")
 debug_color = Color(0.6428762, 0.52304673, 0.06685588, 0.41960785)
 
 [node name="CameraZone" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 4
+script = ExtResource("1_b2kum")
+ZoneName = "Room_Zone_B_End_1"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CameraZone"]
+position = Vector2(46, 0)
+shape = SubResource("RectangleShape2D_3a114")
+debug_color = Color(0, 1, 0, 0.41960785)
+
+[node name="CameraZone2" type="Area2D" parent="."]
 z_index = 10
 position = Vector2(3939, 362)
 collision_layer = 0
 collision_mask = 4
 script = ExtResource("1_b2kum")
-ZoneName = "Room_Zone_B_end"
+ZoneName = "Room_Zone_B_End_2"
 CameraLimitTop = -500
 CameraLimitBottom = 900
 ZoomLevel = 0.95
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="CameraZone"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CameraZone2"]
 shape = SubResource("RectangleShape2D_oh5lj")
 
 [node name="BattleArena" type="Area2D" parent="."]
