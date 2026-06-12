@@ -65,6 +65,8 @@ namespace Kuros.Actors.Heroes.States
 
 			if (!_activeTemplate.IsRunning)
 			{
+				if (_activeTemplate.WantsRestart && TryStartTemplateAttack())
+					return;
 				ChangeState("Idle");
 			}
 		}

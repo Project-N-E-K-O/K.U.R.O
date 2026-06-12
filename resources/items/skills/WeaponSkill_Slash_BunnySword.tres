@@ -22,4 +22,5 @@ Description = "攻击时召唤浮游炮，冷却10秒，浮游炮每秒对目标
 Effects = Array[ExtResource("1_2po5m")]([SubResource("Resource_2po5m")])
 WarmupDuration = 0.17
 ActiveDuration = 0.5
-RecoveryDuration = 0.23
+RecoveryDuration = 0.13
+WarmupAnimationSpeed = 0.5

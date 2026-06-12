@@ -52,6 +52,7 @@ func import_skills_from_csv() -> void:
 		_s_bool(res,  "ShowHitboxDebug",  row, hm, "ShowHitboxDebug")
 		_s_str(res, "Description",      row, hm, "Description")
 		_s_str(res, "ActivationAction", row, hm, "ActivationAction")
+		_s_bool(res, "AllowHoldContinuousAttack", row, hm, "AllowHoldContinuousAttack")
 		_s_float_neg1(res, "WarmupDuration",         row, hm)
 		_s_float_neg1(res, "ActiveDuration",         row, hm)
 		_s_float_neg1(res, "RecoveryDuration",       row, hm)

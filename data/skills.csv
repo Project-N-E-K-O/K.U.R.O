@@ -1,15 +1,15 @@
-﻿file,SkillId,DisplayName,AnimationName,DamageMultiplier,CooldownSeconds,ShowHitboxDebug,Description,ActivationAction,WarmupDuration,ActiveDuration,RecoveryDuration,WarmupAnimationSpeed,ActiveAnimationSpeed,RecoveryAnimationSpeed
-ExampleSlashSkill,,,,1,0.5,TRUE,,,-1,-1,-1,1,1,1
-SuppliesWatermelonPassiveSkill,supplies_watermelon_passive,甜蜜反哺,,1,0.5,TRUE,持用此武器攻击会反向治疗受击者。,,-1,-1,-1,1,1,1
-WeaponSkill_Brawl_DiscoBall,WeaponSkill_Brawl_DiscoBall,迪斯科闪光球攻击,Weapon_Brawl_Iron,0.6,0.5,FALSE,每次攻击到敌人时都20%概率触发闪光眩晕范围敌人,,0.19,0.3,0.178,1,1,1
-WeaponSkill_Brawl_MechGlove,WeaponSkill_Brawl_MechGlove,机械冲撞臂攻击,Weapon_Brawl_MechGlove,0.5,0.5,FALSE,第三次攻击到敌人后击退敌人5 m，如果三次攻击都击中敌人则最后一击发生暴击,,0.5,0.43,0.4,1.5,1,1
-WeaponSkill_Brawl_RiotBracer,WeaponSkill_Brawl_RiotBracer,镇暴护腕攻击,Weapon_Brawl_RiotBracer,0.5,0.5,FALSE,每次攻击到敌人时击退该敌人0.25m,,0.17,0.66,0.17,1,1,1
-WeaponSkill_Brawl_RiotGlove,WeaponSkill_Brawl_RiotGlove,镇暴拳套攻击,Weapon_Brawl_RiotGlove,0.6,0.5,FALSE,每次攻击到敌人时，都有20%概率使这一次的伤害发生暴击,,0.19,0.3,0.178,1,1,1
-WeaponSkill_Slash_Baguette,WeaponSkill_Slash_Baguette,法棍攻击,Weapon_Slash_Baguette,1,0.5,FALSE,手持该武器攻击敌人后，有概率生成接触后恢复生命的面包碎块,,0.17,0.17,0.19,1,1,1
-WeaponSkill_Slash_BarrierGate,WeaponSkill_Slash_BarrierGate,开刃升降杆攻击,Weapon_Slash_BarrierGate,1,0.5,FALSE,攻击到敌人时使该敌人移动速度减少50%，持续1秒,,0.53,0.31,0.16,0.8,1,1
-WeaponSkill_Slash_BunnySword,WeaponSkill_Slash_BunnySword,光剑攻击,Weapon_Slash_BunnySword,0.6,0.5,FALSE,攻击时召唤浮游炮，冷却10秒，浮游炮每秒对目标的敌人发射激光造成伤害，持续5秒,,0.17,0.5,0.23,1,1,1
-WeaponSkill_Slash_ExpandBaton,WeaponSkill_Slash_ExpandBaton,甩棍攻击,Weapon_Slash_ExpandBaton,1,0.5,FALSE,手持该武器攻击敌人3次后，该武器的下一次攻击触发暴击,,0.17,0.17,0.19,0.8,1,1
-WeaponSkill_Slash_ViolinBow,WeaponSkill_Slash_ViolinBow,音乐家的琴弓攻击,Weapon_Slash_ViolinBow,1,0.5,FALSE,攻击到敌人时生成一道对敌人造成伤害和减速的音波,,0.17,0.26,0.17,0.6,1,1
-WeaponSkill_Stab_Corkscrew,WeaponSkill_Stab_Corkscrew,开瓶器攻击,Weapon_Stab_Corkscrew,1,0.5,FALSE,攻击到敌人时使该敌人在三秒内损失10%的生命值，效果不可叠加,,0.2,0.2,0.1,0.5,1,0.5
-WeaponSkill_Stab_Drill,WeaponSkill_Stab_Drill,钻头攻击,Weapon_Stab_Drill,1,3,FALSE,攻击到敌人时击退该敌人1m并使其速度减少30%持续1秒,,0.46,0.2,0.34,1,1,1
-WeaponSkill_Stab_Umbrella,WeaponSkill_Stab_Umbrella,雨伞攻击,attack_thrust,0.5,0.5,FALSE,攻击到敌人时击退该敌人0.3m,weapon_skill_block,0.17,0.63,0.2,1,1,1
+﻿file,SkillId,DisplayName,AnimationName,DamageMultiplier,CooldownSeconds,ShowHitboxDebug,Description,ActivationAction,AllowHoldContinuousAttack,WarmupDuration,ActiveDuration,RecoveryDuration,WarmupAnimationSpeed,ActiveAnimationSpeed,RecoveryAnimationSpeed
+ExampleSlashSkill,,,,1,0.5,TRUE,,,TRUE,-1,-1,-1,1,1,1
+SuppliesWatermelonPassiveSkill,supplies_watermelon_passive,甜蜜反哺,,1,0.5,TRUE,持用此武器攻击会反向治疗受击者。,,TRUE,-1,-1,-1,1,1,1
+WeaponSkill_Brawl_DiscoBall,WeaponSkill_Brawl_DiscoBall,迪斯科闪光球攻击,Weapon_Brawl_Iron,0.6,0.5,FALSE,每次攻击到敌人时都20%概率触发闪光眩晕范围敌人,,TRUE,0.19,0.3,0.178,1,1,1
+WeaponSkill_Brawl_MechGlove,WeaponSkill_Brawl_MechGlove,机械冲撞臂攻击,Weapon_Brawl_MechGlove,0.5,0.5,FALSE,第三次攻击到敌人后击退敌人5 m，如果三次攻击都击中敌人则最后一击发生暴击,,TRUE,0.5,0.43,0.4,1.5,1,1
+WeaponSkill_Brawl_RiotBracer,WeaponSkill_Brawl_RiotBracer,镇暴护腕攻击,Weapon_Brawl_RiotBracer,0.5,0.5,FALSE,每次攻击到敌人时击退该敌人0.25m,,TRUE,0.17,0.66,0.17,1,1,1
+WeaponSkill_Brawl_RiotGlove,WeaponSkill_Brawl_RiotGlove,镇暴拳套攻击,Weapon_Brawl_RiotGlove,0.6,0.5,FALSE,每次攻击到敌人时，都有20%概率使这一次的伤害发生暴击,,TRUE,0.19,0.3,0.178,1,1,1
+WeaponSkill_Slash_Baguette,WeaponSkill_Slash_Baguette,法棍攻击,Weapon_Slash_Baguette,1,0.5,FALSE,手持该武器攻击敌人后，有概率生成接触后恢复生命的面包碎块,,TRUE,0.17,0.17,0.19,0.4,1,1
+WeaponSkill_Slash_BarrierGate,WeaponSkill_Slash_BarrierGate,开刃升降杆攻击,Weapon_Slash_BarrierGate,1,0.5,FALSE,攻击到敌人时使该敌人移动速度减少50%，持续1秒,,TRUE,0.53,0.31,0.16,0.7,1,1
+WeaponSkill_Slash_BunnySword,WeaponSkill_Slash_BunnySword,光剑攻击,Weapon_Slash_BunnySword,0.6,0.5,FALSE,攻击时召唤浮游炮，冷却10秒，浮游炮每秒对目标的敌人发射激光造成伤害，持续5秒,,TRUE,0.17,0.5,0.13,0.5,1,1
+WeaponSkill_Slash_ExpandBaton,WeaponSkill_Slash_ExpandBaton,甩棍攻击,Weapon_Slash_ExpandBaton,1,0.5,FALSE,手持该武器攻击敌人3次后，该武器的下一次攻击触发暴击,,TRUE,0.17,0.17,0.19,0.4,1,1
+WeaponSkill_Slash_ViolinBow,WeaponSkill_Slash_ViolinBow,音乐家的琴弓攻击,Weapon_Slash_ViolinBow,1,0.5,FALSE,攻击到敌人时生成一道对敌人造成伤害和减速的音波,,TRUE,0.17,0.26,0.17,0.5,1,1
+WeaponSkill_Stab_Corkscrew,WeaponSkill_Stab_Corkscrew,开瓶器攻击,Weapon_Stab_Corkscrew,1,0.5,FALSE,攻击到敌人时使该敌人在三秒内损失10%的生命值，效果不可叠加,,TRUE,0.2,0.2,0.1,0.5,1,0.5
+WeaponSkill_Stab_Drill,WeaponSkill_Stab_Drill,钻头攻击,Weapon_Stab_Drill,1,3,FALSE,攻击到敌人时击退该敌人1m并使其速度减少30%持续1秒,,TRUE,0.46,0.2,0.34,0.7,1,1
+WeaponSkill_Stab_Umbrella,WeaponSkill_Stab_Umbrella,雨伞攻击,attack_thrust,0.5,0.5,FALSE,攻击到敌人时击退该敌人0.3m,weapon_skill_block,TRUE,0.17,0.63,0.2,1,1,1

@@ -64,7 +64,7 @@ namespace Kuros.Actors.Heroes.States
 			}
 			
 			// Check for transitions
-			if (IsActionJustPressed("attack") && Actor.AttackTimer <= 0)
+			if (IsAttackTriggered() && Actor.AttackTimer <= 0)
 			{
 				Player.RequestAttackFromState(Name);
 				ChangeState("Attack");

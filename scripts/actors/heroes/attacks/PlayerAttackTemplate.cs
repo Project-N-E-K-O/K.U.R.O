@@ -36,6 +36,7 @@ namespace Kuros.Actors.Heroes.Attacks
         [Export] public Array<StringName> TriggerActions { get; set; } = new();
         [Export] public bool AllowHoldInput = false;
         [Export] public bool BufferInputUntilReady = true;
+        [Export] public bool AllowRecoveryCancel = true;
 
         [ExportCategory("Timing (s)")]
         [Export(PropertyHint.Range, "0,5,0.01")] public float WarmupDuration = 0.15f;
@@ -95,6 +96,8 @@ namespace Kuros.Actors.Heroes.Attacks
         private float _phaseTimer = 0f;
         private float _cooldownTimer = 0f;
         private bool _bufferedInput = false;
+        private bool _wantsRestart = false;
+        private bool _wantsMove = false;
         private bool _hitEffectSubscribed = false;
         private bool _hitWindowActive = false;
         private Node? _hitEffectParent;
@@ -118,6 +121,8 @@ namespace Kuros.Actors.Heroes.Attacks
 
         public bool IsRunning => _phase != AttackPhase.Idle;
         public bool IsOnCooldown => _cooldownTimer > 0f;
+        public bool WantsRestart => _wantsRestart;
+        public bool WantsMove => _wantsMove;
 
         public virtual void Initialize(SamplePlayer player)
         {
@@ -213,6 +218,23 @@ namespace Kuros.Actors.Heroes.Attacks
 
             if (_phase == AttackPhase.Idle) return;
 
+            if (_phase == AttackPhase.Recovery && AllowRecoveryCancel)
+            {
+                if (IsInputTriggered())
+                {
+                    _wantsRestart = true;
+                    SetPhase(AttackPhase.Idle);
+                    return;
+                }
+                Vector2 moveInput = Player.GetControlledMovementInput();
+                if (moveInput.LengthSquared() > 0.01f)
+                {
+                    _wantsMove = true;
+                    SetPhase(AttackPhase.Idle);
+                    return;
+                }
+            }
+
             _phaseTimer -= (float)delta;
             if (_phaseTimer <= 0f)
             {
@@ -228,6 +250,9 @@ namespace Kuros.Actors.Heroes.Attacks
         public bool TryStart(bool checkInput = true)
         {
             if (!CanStart(checkInput)) return false;
+
+            _wantsRestart = false;
+            _wantsMove = false;
 
             // 提前解析当前武器技能，以便应用 timing 覆盖
             _activeWeaponSkill = Player.WeaponSkillController?.GetPrimarySkillDefinition();
@@ -353,6 +378,9 @@ namespace Kuros.Actors.Heroes.Attacks
                 return true;
             }
 
+            var activeSkill = Player.WeaponSkillController?.GetPrimarySkillDefinition();
+            bool holdAllowed = AllowHoldInput || activeSkill?.AllowHoldContinuousAttack == true;
+
             foreach (var action in TriggerActions)
             {
                 if (Input.IsActionJustPressed(action))
@@ -360,7 +388,7 @@ namespace Kuros.Actors.Heroes.Attacks
                     return true;
                 }
 
-                if (AllowHoldInput && Input.IsActionPressed(action))
+                if (holdAllowed && Input.IsActionPressed(action))
                 {
                     return true;
                 }

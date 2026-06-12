@@ -21,3 +21,4 @@ Effects = Array[ExtResource("1_8bkkx")]([SubResource("Resource_axkj6")])
 WarmupDuration = 0.17
 ActiveDuration = 0.17
 RecoveryDuration = 0.19
+WarmupAnimationSpeed = 0.4

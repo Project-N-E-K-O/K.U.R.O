@@ -149,7 +149,7 @@ func _export_skills() -> void:
 	var headers := [
 		"file", "SkillId", "DisplayName", "AnimationName",
 		"DamageMultiplier", "CooldownSeconds", "ShowHitboxDebug",
-		"Description", "ActivationAction",
+		"Description", "ActivationAction", "AllowHoldContinuousAttack",
 		"WarmupDuration", "ActiveDuration", "RecoveryDuration",
 			"WarmupAnimationSpeed", "ActiveAnimationSpeed", "RecoveryAnimationSpeed"
 	]
@@ -171,6 +171,7 @@ func _export_skills() -> void:
 			str(r.get("ShowHitboxDebug", "true")),
 			_str(str(r.get("Description", ""))),
 			_str(str(r.get("ActivationAction", ""))),
+			str(r.get("AllowHoldContinuousAttack", "true")),
 			str(r.get("WarmupDuration", "-1")),
 			str(r.get("ActiveDuration", "-1")),
 			str(r.get("RecoveryDuration", "-1")),

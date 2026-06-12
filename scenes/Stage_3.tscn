@@ -1,12 +1,10 @@
-[gd_scene load_steps=11 format=3 uid="uid://dwk6x3qcbsmul"]
+[gd_scene load_steps=9 format=3 uid="uid://dwk6x3qcbsmul"]
 
 [ext_resource type="Script" uid="uid://x1ic1ym4ykq8" path="res://scripts/scenes/BattleSceneManager.cs" id="1_ehms5"]
 [ext_resource type="Script" uid="uid://b6qifqg0v8c6o" path="res://scripts/managers/CameraZoneManager.cs" id="2_4xv61"]
 [ext_resource type="Script" uid="uid://l1558pct4220" path="res://scripts/managers/StageGeneratorManager.cs" id="3_fohb2"]
+[ext_resource type="PackedScene" uid="uid://cg2o6k0etyc25" path="res://scenes/levels/C_begin.tscn" id="4_ehms5"]
 [ext_resource type="PackedScene" uid="uid://bco3niswcahcc" path="res://scenes/levels/B_end.tscn" id="5_fhce4"]
-[ext_resource type="PackedScene" uid="uid://duv46pbl7d7l6" path="res://scenes/levels/B1.tscn" id="6_k7md6"]
-[ext_resource type="PackedScene" uid="uid://b8ky5f2goteu0" path="res://scenes/levels/B2.tscn" id="7_gcbwp"]
-[ext_resource type="PackedScene" uid="uid://cnrdifmso2jps" path="res://scenes/levels/B3.tscn" id="8_iafd3"]
 [ext_resource type="PackedScene" uid="uid://ufprfd4r8ijj" path="res://scenes/actors/characters/main_character.tscn" id="9_tperv"]
 [ext_resource type="Script" uid="uid://del8hgcg3sr4i" path="res://scripts/managers/CameraFollow.cs" id="10_l20m2"]
 [ext_resource type="PackedScene" uid="uid://cgjrdwkemgrcy" path="res://scenes/actors/heroes/P2.tscn" id="11_phqoj"]
@@ -23,8 +21,8 @@ Player = NodePath("../World/MainCharacter")
 
 [node name="StageGeneratorManager" type="Node" parent="."]
 script = ExtResource("3_fohb2")
+BeginScene = ExtResource("4_ehms5")
 EndScene = ExtResource("5_fhce4")
-MiddleScenePool = Array[PackedScene]([ExtResource("6_k7md6"), ExtResource("7_gcbwp"), ExtResource("8_iafd3")])
 MinMiddleRooms = 0
 MaxMiddleRooms = 0
 

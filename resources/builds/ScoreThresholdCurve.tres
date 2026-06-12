@@ -1,6 +1,0 @@
-[gd_resource type="Resource" script_class="ScoreThresholdCurve" load_steps=2 format=3 uid="uid://e86q3fs76w52"]
-
-[ext_resource type="Script" uid="uid://7jkau6kxuvlf" path="res://scripts/systems/ScoreThresholdCurve.cs" id="1_6birr"]
-
-[resource]
-script = ExtResource("1_6birr")

@@ -148,24 +148,24 @@ script = ExtResource("4_ixg0x")
 skeleton_data_res = ExtResource("4_o4xwm")
 bones_thickness = 10.09
 preview_skin = "Default"
-preview_animation = "-- Empty --"
+preview_animation = "Weapon_Slash_BunnySword"
 preview_frame = true
-preview_time = 0.45
+preview_time = 0.8
 script = ExtResource("4_ixg0x")
 
 [node name="SpineBoneNode" type="SpineBoneNode" parent="SpineSprite"]
 show_behind_parent = true
 z_index = -1
-position = Vector2(0.81878656, -473.96185)
-rotation = -1.6159917
-scale = Vector2(0.9999998, 0.9999998)
+position = Vector2(-9.107266, -473.87503)
+rotation = -1.6369357
+scale = Vector2(0.9999999, 0.9999999)
 bone_name = "Upper Body"
 
 [node name="SpineHoldingBoneNode" type="SpineBoneNode" parent="SpineSprite"]
 show_behind_parent = true
-position = Vector2(0.81878656, -473.96185)
-rotation = -1.6159917
-scale = Vector2(0.9999998, 0.9999998)
+position = Vector2(-9.107266, -473.87503)
+rotation = -1.6369357
+scale = Vector2(0.9999999, 0.9999999)
 bone_name = "Upper Body"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

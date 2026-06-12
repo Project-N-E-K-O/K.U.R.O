@@ -25,7 +25,7 @@ namespace Kuros.Actors.Heroes.States
 			if (HandleDialogueGating(delta)) return;
 			
 			// Check for transitions
-			if (IsActionJustPressed("attack") && Actor.AttackTimer <= 0)
+			if (IsAttackTriggered() && Actor.AttackTimer <= 0)
 			{
 				MainCharacter.RequestAttackFromState(Name);
 				ChangeState("Attack");
