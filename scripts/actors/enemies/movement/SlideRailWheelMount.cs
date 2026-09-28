@@ -15,9 +15,11 @@ using Kuros.Core.Events;
 ///   2. **接触体原样交给伤害管线**：家具的阻挡体是它 `RigidBody2D` 下的 `StaticBody2D`（不是 GameActor），
 ///      而 `DamageDispatcher.DealDamage` 会自己沿父链往上走到家具根命中 `TakeDamage`——这里不做归属解析，
 ///      只有"击退目标"那一步才要求 `GameActor`。
-///   3. **回弹的触发 = 这一下真的造成了伤害**（`DealDamage` 返回 true）：所以"打不动的东西不会顶住轮子"。
-///      能伤害 + 能顶住由同一个 `TargetableFactions` 决定（玩家的代价：站在轮子下会短暂把它顶住，
-///      但会持续吃伤害+击退，通常自解）。
+///   3. **回弹的触发 = `DealDamage` 返回 true：所以"打不动的东西不会顶住轮子"。
+///   4. **轮子是机械的工具，不是独立危险物**：判定区挂在轨道上（`Visual/HitArea`），机械被销毁
+///      （满进度归位后 QueueFree / 被击杀）后它仍然存在——所以每次接触与每帧回弹都要先问
+///      <see cref="HasLiveMachine"/>：Mount 下没有活着的机械时，轨道只剩布景，**不再伤害任何目标**
+///      （连一次性家具也不打）、不击退、不回弹、不顶住。
 ///
 /// 回弹本体是**一维冲量叠加**（不是贝塞尔曲线）：参数只有 初速 BounceSpeed / 回落加速度 BounceGravity，
 /// 方向在撞击那一刻按"当时的下压方向取反"锁定（避免回弹期间来回翻符号抖动）。
@@ -133,6 +135,7 @@ public partial class SlideRailWheelMount : SlideRailMount
 	private void TryContact(Node hitNode)
 	{
 		if (hitNode is GameActor ga && (ga.IsDeathSequenceActive || ga.IsDead)) return;
+		if (!HasLiveMachine()) return;   // 机械没了 = 纯布景：不伤害、不击退、也不回弹
 		if (!_contactBodies.Add(hitNode)) return;
 
 		if (!ApplyHit(hitNode))
@@ -195,7 +198,8 @@ public partial class SlideRailWheelMount : SlideRailMount
 	/// 回弹结束时若仍被压着 → 再弹一次（连续撞击）；家具被打碎/移开 → 重叠消失 → 恢复正常下压。</summary>
 	private void TickBlockAndBounce(float delta)
 	{
-		bool blocked = HasLiveBlocker();
+		// 机械没了（被销毁 / 满进度退场）→ 轮子只是布景：不顶住、不回弹、也不再结算撞击
+		bool blocked = HasLiveMachine() && HasLiveBlocker();
 		HoldTargetDrive = blocked;
 
 		if (!blocked) return;
@@ -285,8 +289,29 @@ public partial class SlideRailWheelMount : SlideRailMount
 		return x == Vector2.Zero ? Vector2.Right : x.Normalized();
 	}
 
+	/// <summary>本轨是否还有"活着的机械"：显式 <see cref="AttackerPath"/> &gt; Mount 下第一个活着的 GameActor。
+	/// 轮子的接触伤害 / 击退 / 回弹 / 顶住全部由它驱动——机械被销毁（满进度归位 QueueFree、被击杀）后，
+	/// 轨道只是布景：不再伤害任何目标（连一次性家具也不打）、不击退、不回弹、不顶住。
+	/// 每帧/每次接触都现查（不缓存布尔），这样"机械没了又来了一台"能自动恢复。</summary>
+	private bool HasLiveMachine()
+	{
+		if (!AttackerPath.IsEmpty)
+			return IsLiveMachine(GetNodeOrNull<GameActor>(AttackerPath));
+
+		var mount = GetNodeOrNull<Node2D>("Mount");
+		if (mount == null) return false;
+
+		foreach (var child in mount.GetChildren())
+			if (IsLiveMachine(child as GameActor)) return true;
+		return false;
+	}
+
+	private static bool IsLiveMachine(GameActor? machine)
+		=> machine != null && GodotObject.IsInstanceValid(machine)
+			&& !machine.IsDead && !machine.IsDeathSequenceActive;
+
 	/// <summary>伤害来源：显式 AttackerPath &gt; 挂在本轨 Mount 下的机械（第一条 GameActor 子节点）。
-	/// 拿不到时家具仍能被打（走 TakeDamage 通道，不需要攻击者），但对 GameActor（玩家）不会结算伤害，警告一次。</summary>
+	/// 只在 <see cref="HasLiveMachine"/> 放行后才调用，所以这里的警告只会在"机械恰好在这次结算前一刻消失"时出现。</summary>
 	private GameActor? ResolveAttacker()
 	{
 		if (_attacker != null && GodotObject.IsInstanceValid(_attacker)) return _attacker;

@@ -7,7 +7,7 @@
 [ext_resource type="Script" uid="uid://cgnajq1ykl2mn" path="res://scripts/systems/cutscene/CutsceneSequence.cs" id="4_seq"]
 [ext_resource type="Script" uid="uid://dhch281hkryms" path="res://scripts/systems/cutscene/steps/EffectConfig.cs" id="5_xm0fp"]
 [ext_resource type="PackedScene" uid="uid://be30f0gopxel3" path="res://scenes/actors/etc/SlideRail_wheel.tscn" id="6_2si8d"]
-[ext_resource type="PackedScene" uid="uid://cx332v8gr3ytf" path="res://scenes/actors/characters/Enemy_F1_rogueAI_Magnet.tscn" id="7_2si8d"]
+[ext_resource type="PackedScene" uid="uid://duryvwia2gyyc" path="res://scenes/actors/characters/Enemy_F1_rogueAI_Cannon.tscn" id="7_2si8d"]
 [ext_resource type="Script" uid="uid://bdni42t83syt8" path="res://scripts/systems/cutscene/steps/EffectGroupSpawnStep.cs" id="7_v6k0a"]
 [ext_resource type="PackedScene" uid="uid://30w6ddbm18ga" path="res://scenes/actors/etc/SlideRail.tscn" id="8_v6k0a"]
 [ext_resource type="PackedScene" uid="uid://c08u473nbnuxg" path="res://scenes/actors/characters/Enemy_F1_rogueAI.tscn" id="9_nnnpt"]
@@ -60,12 +60,7 @@ metadata/_custom_type_script = "uid://5xu2sir0yhv1"
 script = ExtResource("3_m4q78")
 AnimationPlayerPath = NodePath("../World/FBegin/AnimationPlayer")
 AnimationName = "up_to_top_event"
-metadata/_custom_type_script = "uid://5xu2sir0yhv1"
-
-[sub_resource type="Resource" id="Resource_nnnpt"]
-script = ExtResource("3_m4q78")
-AnimationPlayerPath = NodePath("../World/FBegin/Animation_rogueAI/AnimationPlayer")
-AnimationName = "move_down"
+WaitForCompletion = true
 metadata/_custom_type_script = "uid://5xu2sir0yhv1"
 
 [sub_resource type="Resource" id="Resource_dfbxa"]
@@ -74,12 +69,18 @@ AnimationPlayerPath = NodePath("../World/FBegin/AnimationPlayer2")
 AnimationName = "rail_move_in"
 metadata/_custom_type_script = "uid://5xu2sir0yhv1"
 
+[sub_resource type="Resource" id="Resource_nnnpt"]
+script = ExtResource("3_m4q78")
+AnimationPlayerPath = NodePath("../World/FBegin/Animation_rogueAI/AnimationPlayer")
+AnimationName = "move_down"
+metadata/_custom_type_script = "uid://5xu2sir0yhv1"
+
 [sub_resource type="Resource" id="Resource_untg7"]
 script = ExtResource("5_xm0fp")
 EffectScene = ExtResource("6_2si8d")
 SpawnType = 2
 TargetNodePath = NodePath("../World/FBegin/SlideRailSpawnPoint")
-SpawnDelay = 0.3
+SpawnDelay = 0.4
 SpawnTag = "SlideRailWheelLeft"
 PropertyOverrides = Dictionary[String, Variant]({
 "CarriagePrefab": ExtResource("7_2si8d")
@@ -91,9 +92,10 @@ script = ExtResource("5_xm0fp")
 EffectScene = ExtResource("6_2si8d")
 SpawnType = 2
 TargetNodePath = NodePath("../World/FBegin/SlideRailSpawnPoint2")
-SpawnDelay = 0.3
-SpawnTag = "SlideRailWheelRight"
+SpawnDelay = 0.4
+SpawnTag = "SlideRailWheeRight"
 PropertyOverrides = Dictionary[String, Variant]({
+"CarriagePrefab": ExtResource("7_2si8d"),
 "FlipCarriageEnds": true
 })
 metadata/_custom_type_script = "uid://dhch281hkryms"
@@ -103,13 +105,12 @@ script = ExtResource("5_xm0fp")
 EffectScene = ExtResource("8_v6k0a")
 SpawnType = 2
 TargetNodePath = NodePath("../World/FBegin/Animation_rogueAI")
-SpawnDelay = 1.8
-SpawnTag = "SlideRailMiddle"
+SpawnDelay = 1.9
+SpawnTag = "AnimationRogueAI"
 PropertyOverrides = Dictionary[String, Variant]({
 "CarriagePrefab": ExtResource("9_nnnpt"),
 "CarriageSpawn": 2,
-"FlipCarriageEnds": true,
-"z_index": 3
+"z_index": 2
 })
 metadata/_custom_type_script = "uid://dhch281hkryms"
 
@@ -121,7 +122,7 @@ metadata/_custom_type_script = "uid://bdni42t83syt8"
 [resource]
 script = ExtResource("4_seq")
 SequenceId = "F_begin_3_intro"
-Steps = Array[ExtResource("1_step")]([SubResource("Resource_62k4c"), SubResource("Resource_2si8d"), SubResource("Resource_pn8jt"), SubResource("Resource_xm0fp"), SubResource("Resource_b6ijc"), SubResource("Resource_krxc6"), SubResource("Resource_m4q78"), SubResource("Resource_v6k0a"), SubResource("Resource_nnnpt"), SubResource("Resource_dfbxa"), SubResource("Resource_yqcfi")])
+Steps = Array[ExtResource("1_step")]([SubResource("Resource_62k4c"), SubResource("Resource_2si8d"), SubResource("Resource_pn8jt"), SubResource("Resource_xm0fp"), SubResource("Resource_b6ijc"), SubResource("Resource_krxc6"), SubResource("Resource_m4q78"), SubResource("Resource_v6k0a"), SubResource("Resource_dfbxa"), SubResource("Resource_nnnpt"), SubResource("Resource_yqcfi")])
 DisablePlayerInput = false
 HidePlayer = false
 metadata/_custom_type_script = "uid://cgnajq1ykl2mn"

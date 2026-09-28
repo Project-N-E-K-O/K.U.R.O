@@ -78,6 +78,7 @@ collision_mask = 15
 motion_mode = 1
 script = ExtResource("1_1mbwy")
 BehaviorConfig = ExtResource("2_vkvw7")
+IsBoss = true
 DebugOverlayOffset = Vector2(-1500, 200)
 DebugOverlayFontSize = 128
 DetectionArea = NodePath("Sprite2D/ControllerDetectionArea")
@@ -151,7 +152,7 @@ script = ExtResource("8_7asvr")
 skeleton_data_res = ExtResource("7_1mbwy")
 preview_skin = "Default"
 preview_animation = "-- Empty --"
-preview_frame = false
+preview_frame = true
 preview_time = 0.0
 script = ExtResource("8_7asvr")
 

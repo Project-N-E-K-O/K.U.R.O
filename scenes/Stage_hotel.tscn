@@ -45,7 +45,7 @@ GenerateOnReady = false
 [node name="StageSession" type="Node" parent="."]
 script = ExtResource("16_sess")
 AllConfigs = Array[ExtResource("17_scfg")]([ExtResource("8_83iw7"), ExtResource("9_5g8wj"), ExtResource("10_axi2i"), ExtResource("11_i2bjf"), ExtResource("12_axi2i"), ExtResource("13_i2bjf"), ExtResource("13_ohqcc"), ExtResource("14_i2bjf")])
-StartStage = ExtResource("13_ohqcc")
+StartStage = ExtResource("14_i2bjf")
 
 [node name="BuildSelectionManager" parent="." instance=ExtResource("14_pvxkr")]
 

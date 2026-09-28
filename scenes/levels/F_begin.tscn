@@ -101,7 +101,7 @@ size = Vector2(8000, 3000)
 size = Vector2(7300, 3000)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_kge03"]
-size = Vector2(7300, 4000)
+size = Vector2(7200, 4000)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1d5w0"]
 size = Vector2(500, 1000)
@@ -125,9 +125,9 @@ shader_parameter/inset = 0.0
 shader = ExtResource("1_xart7")
 shader_parameter/cull_backface = true
 shader_parameter/use_front = true
-shader_parameter/fov = 60.0000028025
+shader_parameter/fov = 40.0000018525
 shader_parameter/rot_y_deg = 0.0
-shader_parameter/rot_x_deg = -29.999984325000018
+shader_parameter/rot_x_deg = -19.99998384999998
 shader_parameter/inset = 0.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_qm83g"]
@@ -1556,7 +1556,6 @@ disabled = true
 debug_color = Color(0, 1, 0, 0.41960785)
 
 [node name="CameraZone3" type="Area2D" parent="."]
-visible = false
 collision_layer = 0
 collision_mask = 4
 script = ExtResource("1_mbxjs")
@@ -1566,7 +1565,7 @@ ZoomLevel = 0.3
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CameraZone3"]
 z_index = 10
-position = Vector2(1190, -520)
+position = Vector2(1240, -520)
 shape = SubResource("RectangleShape2D_kge03")
 disabled = true
 debug_color = Color(0, 1, 0, 0.41960785)

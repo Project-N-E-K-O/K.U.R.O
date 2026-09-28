@@ -27,6 +27,12 @@ namespace Kuros.Actors.Enemies.Attacks
         /// <summary>独立朝向翻转。Inherit = 未配置（回退不翻转）。</summary>
         [Export] public FacingFlipMode FlipMode = FacingFlipMode.Inherit;
 
+        /// <summary>独立"锚点偏移随朝向翻 X"开关。Inherit = 未配置（回退模板行为：非跟随类特效会把锚点偏移按朝向翻 X，
+        /// 适配"锚点按未镜像姿态手工摆放"的常规用法）；<b>NoFlip</b> = 锚点自己已经带朝向
+        /// （如挂在 SpineBoneNode 下、由 SpineBoneAnchor 按骨骼矩阵镜像的炮口 marker），模板不要再翻一次；
+        /// Flip = 强制翻。</summary>
+        [Export] public FacingFlipMode OffsetFlip = FacingFlipMode.Inherit;
+
         /// <summary>独立阻塞特效组。空 = 未配置（不阻塞）。</summary>
         [Export] public string BlockedByFxGroup { get; set; } = string.Empty;
 
@@ -59,6 +65,10 @@ namespace Kuros.Actors.Enemies.Attacks
 
         public bool ResolveFlip(bool fallback)
             => FlipMode == FacingFlipMode.Inherit ? fallback : FlipMode == FacingFlipMode.Flip;
+
+        /// <summary>解析"锚点偏移是否随朝向翻 X"：Inherit 用模板行为（true），其余按配置。</summary>
+        public bool ResolveOffsetFlip(bool fallback)
+            => OffsetFlip == FacingFlipMode.Inherit ? fallback : OffsetFlip == FacingFlipMode.Flip;
 
         public string ResolveBlockedGroup(string fallback)
             => string.IsNullOrEmpty(BlockedByFxGroup) ? fallback : BlockedByFxGroup;

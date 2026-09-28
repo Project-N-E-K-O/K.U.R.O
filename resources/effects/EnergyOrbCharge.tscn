@@ -1,0 +1,98 @@
+[gd_scene load_steps=8 format=3 uid="uid://1i57pudem5og"]
+
+[ext_resource type="Script" uid="uid://7ua5f3p2rfye" path="res://scripts/fx/FollowAndDestroy.cs" id="1_ggvqo"]
+[ext_resource type="Shader" uid="uid://brx1cpcxxgrup" path="res://shaders/materials/energy_orb.gdshader" id="1_orb"]
+[ext_resource type="Texture2D" uid="uid://dabxdflvss2xs" path="res://assets/art/godot_icon.png" id="2_cit2k"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_orb"]
+shader = ExtResource("1_orb")
+shader_parameter/outer_color = Color(0.050980393, 0.23529412, 0.078431375, 1)
+shader_parameter/inner_color = Color(0.35, 1, 0.25, 1)
+shader_parameter/core_color = Color(0.95, 1, 0.92, 1)
+shader_parameter/fill = 0.82
+shader_parameter/ellipse_x = 1.0
+shader_parameter/ellipse_y = 1.0
+shader_parameter/wobble_strength = 0.0150000007125
+shader_parameter/wobble_speed = 30.0
+shader_parameter/wobble_frequency = 1.0
+shader_parameter/inner_ratio = 0.74
+shader_parameter/core_ratio = 0.36
+shader_parameter/edge_softness = 0.2000000095
+shader_parameter/glow_strength = 1.0000000475
+
+[sub_resource type="Animation" id="Animation_ojysj"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Orb:material:shader_parameter/fill")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.82]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Orb:material:shader_parameter/glow_strength")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.0000000475]
+}
+
+[sub_resource type="Animation" id="Animation_ggvqo"]
+resource_name = "warmup"
+length = 3.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Orb:material:shader_parameter/fill")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1, 3),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [0.10000000149012, 0.50000002049012, 0.50000002049012]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Orb:material:shader_parameter/glow_strength")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 1, 3),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [0.0, 2.000000095, 3.0000001425]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_d1cye"]
+_data = {
+&"RESET": SubResource("Animation_ojysj"),
+&"warmup": SubResource("Animation_ggvqo")
+}
+
+[node name="EnergyOrb" type="Node2D"]
+z_index = 2
+script = ExtResource("1_ggvqo")
+Duration = 0.0
+
+[node name="Orb" type="Sprite2D" parent="."]
+z_index = 3
+material = SubResource("ShaderMaterial_orb")
+texture = ExtResource("2_cit2k")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_d1cye")
+}
+autoplay = "warmup"

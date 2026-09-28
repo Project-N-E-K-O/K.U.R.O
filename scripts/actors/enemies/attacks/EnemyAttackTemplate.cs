@@ -957,8 +957,12 @@ namespace Kuros.Actors.Enemies.Attacks
                     var marker = entryMarkers[idx];
                     if (marker != null && GodotObject.IsInstanceValid(marker))
                     {
+                        // 锚点偏移按朝向翻 X：常规锚点（按未镜像姿态手工摆放）要翻；
+                        // 自镜像锚点（如挂在 SpineBoneNode 下、由 SpineBoneAnchor 跟骨骼矩阵的炮口 marker）由 entry 关掉（OffsetFlip = NoFlip），
+                        // 否则会翻两次（特效落到镜像的相反侧）
+                        bool offsetFlip = entry?.ResolveOffsetFlip(true) ?? true;
                         Vector2 rel = marker.GlobalPosition - Enemy.GlobalPosition;
-                        if (!Enemy.FacingRight && !isFollowFx) rel.X = -rel.X;
+                        if (!Enemy.FacingRight && !isFollowFx && offsetFlip) rel.X = -rel.X;
                         basePos = Enemy.GlobalPosition + rel;
                         usedMarker = marker;
                     }

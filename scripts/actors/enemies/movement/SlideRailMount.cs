@@ -13,7 +13,7 @@ public partial class SlideRailMount : Node2D
 {
 	public enum RailAxis { X, Y }
 
-	/// <summary>机械出生锚点：Far/Near 是**角色语义**（勾了 FlipCarriageEnds 会自动互换）。</summary>
+	/// <summary>机械出生锚点：Far/Near 是**角色语义**（勾了 FlipCarriageEnds 时跟着端点一起镜像到另一侧）。</summary>
 	public enum SpawnAnchor { Far, Near, Origin }
 
 	[ExportCategory("Rail")]
@@ -23,16 +23,20 @@ public partial class SlideRailMount : Node2D
 	/// 两端相等（含 0/0）= 无行程 → 滑槽静止（<see cref="HasSlotLimits"/> = false）。</summary>
 	[Export] public float SlotStartOffset { get; set; } = -1000f;
 	[Export] public float SlotEndOffset { get; set; } = 500f;
-	/// <summary>机械行程的两个端点：沿 <see cref="CarriageAxis"/> 的**带符号局部偏移**。
-	/// 角色语义不变——Near = 贴玩家侧（场内/内侧）端，Far = 场外端（勾 <see cref="FlipCarriageEnds"/> 互换解释）。
+	/// <summary>机械行程的两个端点：沿 <see cref="CarriageAxis"/> 的**带符号局部偏移**（相对本节点的摆放位置）。
+	/// Near = 贴玩家侧（场内/内侧）端，Far = 场外端；勾了 <see cref="FlipCarriageEnds"/> 时两个偏移**一起取负**（沿轴镜像）。
 	/// 两端相等（含 0/0）= 机械锁死在该偏移处。</summary>
 	[Export] public float CarriageNearOffset { get; set; } = 2600f;
 	[Export] public float CarriageFarOffset { get; set; } = -2600f;
 	/// <summary>
-	/// 镜像这条轨：把两端点的**角色**互换（Near ⇄ Far），偏移数字都不用改；
+	/// 把这条轨**沿轴镜像**：两个行程偏移一起取负（+2600 / −1300 → −2600 / +1300），
 	/// 同时把 <see cref="VisualPath"/> 的 scale.x 取负，**连整块外观一起镜像**。
-	/// 左右两条镜像轨只需在其中一条上勾选本开关，机械侧就能共用同一份配置
-	/// （机械的 RetreatEnd 一律指"场外端"，翻转后语义自动跟着走）。
+	/// 角色语义不变——Near 仍是"贴玩家侧"、Far 仍是"场外端"，只是它们落到镜像后的那一侧；
+	/// 左右两条镜像轨因此能共用同一份配置（机械侧一律"退场去 Far"即可）。
+	///
+	/// 注意它**不是**"把两个角色对调"：两端偏移不对称时（如 +2600 / −1300），对调只会让两端换个名字、
+	/// 行程仍留在原地（镜像轨的行程就会跑到错误的一侧）；取负才是真正的镜像。
+	/// 两端对称时（±2600）两种做法结果相同，所以老配置不受影响。
 	/// </summary>
 	[Export] public bool FlipCarriageEnds { get; set; }
 	/// <summary>外观子节点：只放 Sprite 之类，**里面不能有 Marker / Mount / 物理体**（负缩放不保证碰撞结果）。
@@ -42,7 +46,7 @@ public partial class SlideRailMount : Node2D
 	/// <summary>被挂载的机械场景：配了就自动实例化进 Mount（"机械固定在滑槽内"的父子结构）。</summary>
 	[Export] public PackedScene? CarriagePrefab { get; set; }
 	/// <summary>机械出生锚点：Far = 场外/待命端（默认）、Near = 贴玩家端、Origin = 滑槽原点（关卡摆放点/轨道中点）。
-	/// Far/Near 与限位解释同源，勾了 <see cref="FlipCarriageEnds"/> 时自动跟着互换。
+	/// Far/Near 与行程端点同源，勾了 <see cref="FlipCarriageEnds"/> 时跟着一起镜像到另一侧。
 	/// 过场生成的 PropertyOverrides 会在入树前写好这个值，正好赶得上 <see cref="_Ready"/> 里的摆位。</summary>
 	[Export] public SpawnAnchor CarriageSpawn { get; set; } = SpawnAnchor.Far;
 	/// <summary>滑槽自身滑动速度（px/s）。</summary>
@@ -68,7 +72,7 @@ public partial class SlideRailMount : Node2D
 	public float SlotEnd => _slotEnd;
 	/// <summary>
 	/// 两个行程端点的坐标（世界坐标 = 本节点摆放位置 + 偏移，沿 <see cref="CarriageAxis"/>），**已按角色解释**：
-	/// Near = 贴玩家侧端、Far = 场外端；勾了 <see cref="FlipCarriageEnds"/> 则两者互换。
+	/// Near = 贴玩家侧端、Far = 场外端；勾了 <see cref="FlipCarriageEnds"/> 时两个端点**整体镜像**到轴的另一侧（角色不变）。
 	/// 机械直接用这两个选端点（退场去 Far），用下面的区间做夹取/钳位。
 	/// </summary>
 	public float CarriageNear => _carriageNear;
@@ -161,9 +165,10 @@ public partial class SlideRailMount : Node2D
 	{
 		if (CarriageSpawn == SpawnAnchor.Origin) return Vector2.Zero;
 
-		// wantFar 与限位解释同一套：翻转后"要场外端"读的其实是 Near 那侧的偏移
+		// 角色 → 偏移一一对应（不再对调）；镜像只体现在符号上
 		bool wantFar = CarriageSpawn == SpawnAnchor.Far;
-		float offset = wantFar != FlipCarriageEnds ? CarriageFarOffset : CarriageNearOffset;
+		float offset = wantFar ? CarriageFarOffset : CarriageNearOffset;
+		if (FlipCarriageEnds) offset = -offset;
 		return CarriageAxis == RailAxis.X ? new Vector2(offset, 0f) : new Vector2(0f, offset);
 	}
 
@@ -241,10 +246,12 @@ public partial class SlideRailMount : Node2D
 			_slotStart = _slotEnd = CurrentRailCoordinate;
 		}
 
-		// 机械行程（沿 CarriageAxis）：角色约定（Near = 玩家侧、Far = 场外）在读取后按 FlipCarriageEnds 解释，不排序
+		// 机械行程（沿 CarriageAxis）：角色约定（Near = 玩家侧、Far = 场外）不变；FlipCarriageEnds = 沿轴镜像
+		// （两个偏移一起取负，不是对调角色——不对称偏移时两者结果完全不同）
 		float carriageOrigin = GetCarriageCoordinate(GlobalPosition);
-		_carriageNear = carriageOrigin + (FlipCarriageEnds ? CarriageFarOffset : CarriageNearOffset);
-		_carriageFar = carriageOrigin + (FlipCarriageEnds ? CarriageNearOffset : CarriageFarOffset);
+		float mirror = FlipCarriageEnds ? -1f : 1f;
+		_carriageNear = carriageOrigin + CarriageNearOffset * mirror;
+		_carriageFar = carriageOrigin + CarriageFarOffset * mirror;
 	}
 
 	/// <summary>把世界坐标投影到滑动轴（= 该轴分量）。</summary>

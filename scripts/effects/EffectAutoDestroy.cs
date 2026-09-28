@@ -81,6 +81,12 @@ namespace Kuros.Fx
 				if (scene == null) continue;
 				var fx = scene.Instantiate<Node2D>();
 				spawnParent?.AddChild(fx);
+
+				// 自身是"世界锚定"的（TopLevel，如落在滑槽机械旁的爆炸）→ 衍生特效同样锚定：
+				// 否则它们会挂在 Mount 这类会移动的父节点下，跟着滑槽一起漂走
+				if (TopLevel)
+					fx.TopLevel = true;
+
 				fx.GlobalPosition = spawnPos;
 
 				// 继承自身调制：预热器（ParticleEffectWarmer）全透明预热时，衍生特效同样透明，

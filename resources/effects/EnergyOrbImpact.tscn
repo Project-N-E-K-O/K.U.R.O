@@ -1,0 +1,48 @@
+[gd_scene load_steps=6 format=3 uid="uid://cnrhl7kxikejk"]
+
+[ext_resource type="Script" uid="uid://ufacv8lblpwq" path="res://scripts/effects/SlowHitAreaEffect.cs" id="1_slow"]
+[ext_resource type="Shader" uid="uid://brx1cpcxxgrup" path="res://shaders/materials/energy_orb.gdshader" id="2_orb"]
+[ext_resource type="Texture2D" uid="uid://dabxdflvss2xs" path="res://assets/art/godot_icon.png" id="3_icon"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_orb"]
+shader = ExtResource("2_orb")
+shader_parameter/outer_color = Color(0.050980393, 0.23529412, 0.078431375, 1)
+shader_parameter/inner_color = Color(0.35, 1, 0.25, 1)
+shader_parameter/core_color = Color(0.95, 1, 0.92, 1)
+shader_parameter/fill = 1.0
+shader_parameter/ellipse_x = 1.5
+shader_parameter/ellipse_y = 1.0
+shader_parameter/wobble_strength = 0.0150000007125
+shader_parameter/wobble_speed = 12.0
+shader_parameter/wobble_frequency = 5.0
+shader_parameter/inner_ratio = 0.74
+shader_parameter/core_ratio = 0.36
+shader_parameter/edge_softness = 0.30000001425
+shader_parameter/glow_strength = 2.0
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_1wkvw"]
+radius = 250.0
+height = 700.0
+
+[node name="EnergyOrbImpact" type="Node2D"]
+z_index = 1
+script = ExtResource("1_slow")
+DamagePerTick = 8
+DamageInterval = 0.5
+SpeedSlowPercent = 40.0
+TargetCollisionMask = 4
+FadeOutDuration = 0.6
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_orb")
+scale = Vector2(1.75, 1.75)
+texture = ExtResource("3_icon")
+
+[node name="Area2D" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 4
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+rotation = 1.5707964
+shape = SubResource("CapsuleShape2D_1wkvw")
