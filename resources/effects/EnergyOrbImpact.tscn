@@ -39,6 +39,7 @@ scale = Vector2(1.75, 1.75)
 texture = ExtResource("3_icon")
 
 [node name="Area2D" type="Area2D" parent="."]
+visible = false
 collision_layer = 0
 collision_mask = 4
 monitorable = false

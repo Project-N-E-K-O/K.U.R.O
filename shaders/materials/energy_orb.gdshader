@@ -93,21 +93,28 @@ void fragment()
 
 	// ========================================================
 	// 动态抖动（三层不同频率的正弦叠加 = 不规则轮廓）
+	//
+	// 分段数必须取整：抖动是 angle 的三角函数，而 atan2 在 ±π（正左方）会从 +π 跳到 -π，
+	// 只有整数倍频率才满足 sin(f·(θ+2π)) = sin(f·θ)，圆环才不会在一侧留下一道切口。
 	// ========================================================
 
+	float segments = max(1.0, round(wobble_frequency));
+
 	float wobble =
-		sin(angle * wobble_frequency + TIME * wobble_speed) * 0.55 +
-		sin(angle * wobble_frequency * 1.73 - TIME * wobble_speed * 1.31) * 0.30 +
-		sin(angle * wobble_frequency * 3.21 + TIME * wobble_speed * 0.63) * 0.15;
+		sin(angle * segments + TIME * wobble_speed) * 0.55 +
+		sin(angle * segments * 2.0 - TIME * wobble_speed * 1.31) * 0.30 +
+		sin(angle * segments * 3.0 + TIME * wobble_speed * 0.63) * 0.15;
 
 	wobble *= wobble_strength;
 
 
 	// --------------------------------------------------------
 	// 半径：都相对画布半宽，所以改尺寸 / 改 fill 都不会改变观感
+	// fill 上限 = 椭圆横向刚好装进画布（抖动幅度也算在内）：超了球体就会被画布边缘切出直边
 	// --------------------------------------------------------
 
-	float outer_radius = fill * 0.5 / ellipse_x + wobble;
+	float fit_fill = min(fill, max(0.2, 1.0 - 2.0 * wobble_strength * ellipse_x));
+	float outer_radius = fit_fill * 0.5 / ellipse_x + wobble;
 	float inner_radius = outer_radius * inner_ratio + wobble * 0.45;
 	float core_radius = outer_radius * core_ratio + wobble * 0.15;
 

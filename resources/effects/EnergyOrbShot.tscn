@@ -1,10 +1,9 @@
-[gd_scene load_steps=8 format=3 uid="uid://c3a0j5lhckwlq"]
+[gd_scene load_steps=7 format=3 uid="uid://c3a0j5lhckwlq"]
 
 [ext_resource type="Script" uid="uid://bo8ysfr4peyv0" path="res://scripts/actors/enemies/attacks/EnergyOrbShot.cs" id="1_shot"]
 [ext_resource type="Shader" uid="uid://brx1cpcxxgrup" path="res://shaders/materials/energy_orb.gdshader" id="2_orb"]
 [ext_resource type="Texture2D" uid="uid://dabxdflvss2xs" path="res://assets/art/godot_icon.png" id="3_icon"]
 [ext_resource type="PackedScene" uid="uid://yyltmrdqmlo8" path="res://resources/effects/BoomDmgEffect.tscn" id="4_gkvu3"]
-[ext_resource type="PackedScene" uid="uid://bl2nwvbijnwtd" path="res://scenes/actors/etc/LandingIndicatorA.tscn" id="4_landing"]
 [ext_resource type="PackedScene" uid="uid://cnrhl7kxikejk" path="res://resources/effects/EnergyOrbImpact.tscn" id="5_orbimpact"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_orb"]
@@ -26,7 +25,6 @@ shader_parameter/glow_strength = 3.0000001425
 [node name="EnergyOrbShot" type="Node2D"]
 z_index = 3
 script = ExtResource("1_shot")
-LandingIndicatorPrefab = ExtResource("4_landing")
 ImpactEffectScenes = [ExtResource("4_gkvu3"), ExtResource("5_orbimpact")]
 
 [node name="Orb" type="Sprite2D" parent="."]
