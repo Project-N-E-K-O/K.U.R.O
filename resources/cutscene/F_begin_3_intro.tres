@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CutsceneSequence" load_steps=26 format=3 uid="uid://c7dnkxl20sbvy"]
+[gd_resource type="Resource" script_class="CutsceneSequence" load_steps=27 format=3 uid="uid://c7dnkxl20sbvy"]
 
 [ext_resource type="Script" uid="uid://ctrko7add3r5h" path="res://scripts/systems/cutscene/CutsceneStep.cs" id="1_step"]
 [ext_resource type="Script" uid="uid://cjl1hjmndwvcg" path="res://scripts/systems/cutscene/steps/FadeStep.cs" id="2_fade"]
@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://be30f0gopxel3" path="res://scenes/actors/etc/SlideRail_wheel.tscn" id="6_2si8d"]
 [ext_resource type="PackedScene" uid="uid://duryvwia2gyyc" path="res://scenes/actors/characters/Enemy_F1_rogueAI_Cannon.tscn" id="7_2si8d"]
 [ext_resource type="Script" uid="uid://bdni42t83syt8" path="res://scripts/systems/cutscene/steps/EffectGroupSpawnStep.cs" id="7_v6k0a"]
+[ext_resource type="PackedScene" uid="uid://cw42j1o501x83" path="res://scenes/actors/characters/Enemy_F1_rogueAI_MachineGun.tscn" id="8_dfbxa"]
 [ext_resource type="PackedScene" uid="uid://30w6ddbm18ga" path="res://scenes/actors/etc/SlideRail.tscn" id="8_v6k0a"]
 [ext_resource type="PackedScene" uid="uid://c08u473nbnuxg" path="res://scenes/actors/characters/Enemy_F1_rogueAI.tscn" id="9_nnnpt"]
 
@@ -95,7 +96,7 @@ TargetNodePath = NodePath("../World/FBegin/SlideRailSpawnPoint2")
 SpawnDelay = 0.4
 SpawnTag = "SlideRailWheeRight"
 PropertyOverrides = Dictionary[String, Variant]({
-"CarriagePrefab": ExtResource("7_2si8d"),
+"CarriagePrefab": ExtResource("8_dfbxa"),
 "FlipCarriageEnds": true
 })
 metadata/_custom_type_script = "uid://dhch281hkryms"

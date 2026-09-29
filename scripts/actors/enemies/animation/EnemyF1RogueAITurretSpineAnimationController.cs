@@ -1,3 +1,4 @@
+using System;
 using Godot;
 using Kuros.Actors.Enemies.Attacks;
 
@@ -35,12 +36,79 @@ namespace Kuros.Actors.Enemies.Animation
 
 		private EnemyF1RogueAITurretFacingController? _facing;
 
+		// ── Spine hit 事件转发（SpawnTiming = OnAnimationHit 的条目靠这条链）────────────
+		//
+		// 骨架里的 `attack` / `d_attack` 带一串 `hit` 事件（机枪台是每片 10 个）；事件本身由
+		// SpineController.gd 发成 `hit_received` 信号，但**必须由敌人自己的动画控制器订阅并转发**给
+		// 正在跑的招式（项目里每个敌人的动画控制器都有一份这段，基类没有）。炮台骨架没有事件，
+		// 所以最早那版没接——机枪台有，缺了这段就会"日志里能看到 hit、特效却不生成"。
+		private Node? _spineControllerNode;
+		private Callable _spineHitCallable;
+		private bool _spineHitSubscribed;
+		private readonly StringComparison _comparison = StringComparison.OrdinalIgnoreCase;
+
 		public override void _Ready()
 		{
 			// 基类 OnControllerReady 会播 DefaultLoopAnimation，先给它一个名字（朝向键在 Update 里接管）
 			if (string.IsNullOrEmpty(DefaultLoopAnimation))
 				DefaultLoopAnimation = IdleAnimation;
 			base._Ready();
+		}
+
+		protected override void OnControllerReady()
+		{
+			base.OnControllerReady();
+			EnsureSpineHitSubscription();
+		}
+
+		public override void _ExitTree()
+		{
+			UnsubscribeSpineHit();
+			base._ExitTree();
+		}
+
+		private void EnsureSpineHitSubscription()
+		{
+			if (_spineHitSubscribed || SpineSpritePath.IsEmpty) return;
+
+			_spineControllerNode = GetNodeOrNull(SpineSpritePath) ?? Enemy?.GetNodeOrNull(SpineSpritePath);
+			if (_spineControllerNode == null || !_spineControllerNode.HasSignal("hit_received"))
+			{
+				_spineControllerNode = null;
+				return;
+			}
+
+			_spineHitCallable = Callable.From<int, string>(OnSpineHitReceived);
+			_spineControllerNode.Connect("hit_received", _spineHitCallable);
+			_spineHitSubscribed = true;
+		}
+
+		private void UnsubscribeSpineHit()
+		{
+			if (!_spineHitSubscribed || _spineControllerNode == null) return;
+
+			if (GodotObject.IsInstanceValid(_spineControllerNode)
+				&& _spineControllerNode.IsConnected("hit_received", _spineHitCallable))
+				_spineControllerNode.Disconnect("hit_received", _spineHitCallable);
+
+			_spineHitSubscribed = false;
+			_spineControllerNode = null;
+		}
+
+		/// <summary>Spine 的 hit 事件 → 转发给正在跑的招式（`TriggerAnimationHit`）。
+		/// 只在 Attack 状态、且事件确实来自本次攻击的片段（attack / d_attack）时转发——
+		/// 受击片 `hit`、转身片等也带同名事件时不会误触。</summary>
+		private void OnSpineHitReceived(int hitStep, string animationName)
+		{
+			if (Enemy?.StateMachine?.CurrentState?.Name != "Attack") return;
+
+			var template = ResolveRunningTemplate();
+			if (template == null) return;
+
+			string expected = ResolveName(Enemy.FacingRight, AttackAnimation);
+			if (!string.Equals(animationName, expected, _comparison)) return;
+
+			template.TriggerAnimationHit();
 		}
 
 		protected override float GetPreferredMixDuration() => IdleMixDuration;

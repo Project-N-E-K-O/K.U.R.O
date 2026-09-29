@@ -51,7 +51,7 @@ radius = 5120.0
 size = Vector2(350, 200)
 
 [sub_resource type="RectangleShape2D" id="2"]
-size = Vector2(3000, 2000)
+size = Vector2(4000, 4000)
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_w5mqq"]
 radius = 100.0
@@ -213,7 +213,7 @@ collision_layer = 0
 monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/AttackArea"]
-position = Vector2(1500, 0)
+position = Vector2(2000, 0)
 shape = SubResource("2")
 
 [node name="VisualEffectPosition" type="Node2D" parent="."]

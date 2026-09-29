@@ -77,7 +77,6 @@ RarityMultiplier = Dictionary[String, float]({
 "Epic": 1.0,
 "Rare": 2.0
 })
-CardsPerSelection = 10
 SkipGoldReward = 5
 CoreSkipGoldReward = 15
 DefaultBuildClass = "Normal"

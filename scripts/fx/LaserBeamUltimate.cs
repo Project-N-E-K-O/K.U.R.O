@@ -293,11 +293,12 @@ namespace Kuros.Fx
             }
         }
 
-        /// <summary>击退（参考子弹）：玩家无敌帧内跳过；位移制（KnockbackDistance/Duration）。</summary>
+        /// <summary>击退：位移制（KnockbackDistance/Duration）。
+        /// 玩家侧放行由 GameActor.ApplyKnockbackDisplacement 内部统一处理，这里**不能**再看
+        /// IsHitInvincible——这一下命中本身就会开无敌帧，事后判会把刚命中的这一击也判成已无敌
+        /// （EFFECT_STANDARD 第四条）。</summary>
         private void ApplyKnockbackTo(GameActor actor)
         {
-            if (actor is Kuros.Actors.Heroes.MainCharacter mc && mc.IsHitInvincible) return;
-
             if (KnockbackDistance > 0f && _currentVelocity.LengthSquared() > 0.01f)
                 actor.ApplyKnockbackDisplacement(_currentVelocity.Normalized(), KnockbackDistance, KnockbackDuration);
         }

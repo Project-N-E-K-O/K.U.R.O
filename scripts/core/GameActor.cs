@@ -178,6 +178,7 @@ namespace Kuros.Core
 			// 让死亡也走完整的"后仰 + 击退"表现；Hit 结束后 IsDyingDeferred 清空，门恢复关闭。
 			if (IsDeadOrDying && !IsDyingDeferred) return;
 			if (ActiveImmunities.HasFlag(ImmunityFlags.ForcedMovement)) return;
+			if (!AllowsKnockback()) return;
 
 			// 旧二参 API 保留（fx/爆炸/投掷物）：无时长语义——sentinel duration=0，
 			// 由受击方 Hit 状态按自身 HitImpactDuration 解析（speed 借存于 Distance 槽位）。
@@ -198,6 +199,7 @@ namespace Kuros.Core
 			// 同 ApplyKnockback：致死反馈窗口内放行致死一击自身的击退
 			if (IsDeadOrDying && !IsDyingDeferred) return;
 			if (ActiveImmunities.HasFlag(ImmunityFlags.ForcedMovement)) return;
+			if (!AllowsKnockback()) return;
 			if (direction == Vector2.Zero || distance <= 0f) return;
 
 			_knockDirection = direction.Normalized();
@@ -206,6 +208,12 @@ namespace Kuros.Core
 			_knockWriteMsec = Time.GetTicksMsec();
 			_hasKnockRequest = true;
 		}
+
+		/// <summary>本次击退是否放行。子类可拦截——**玩家侧就靠它**：`MainCharacter` 覆写成
+		/// "消费 `ConsumePendingHitKnockback()`"，即只有"刚结算的这次伤害允许被击退"时才推得动。
+		/// 因此**调用点不需要也不应该自己判断无敌帧**（见 EFFECT_STANDARD.md 第四条）。
+		/// 注意：这个钩子带副作用（读一次即消费），每次命中只会放行一次击退。</summary>
+		protected virtual bool AllowsKnockback() => true;
 
 		/// <summary>击退请求有效期（毫秒）：超过视为滞留陈旧（Frozen/超甲期间写入无人消费），消费时丢弃。
 		/// 攻击链内"先写入后进 Hit"（同帧/紧邻）远小于该值，不受影响。</summary>
@@ -527,6 +535,13 @@ namespace Kuros.Core
 				&& damageSource != Events.DamageSource.ThrowImpact)
 				return false;
 			if (damage <= 0) return false;
+
+			// 楼层难度：敌人打出的伤害按攻击者的系数放大。
+			// 放在这里而不是各攻击特效里——多数敌人的伤害写在**特效**上（BoomDmgEffect / 弹幕 / DoT…），
+			// 攻击者只知道系数（SampleEnemy.OutgoingDamageMultiplier），受击侧是唯一必经点。
+			// 防溢出：ComputerAAnnihilationEffect 之类会用 int.MaxValue 打伤害，直接整数乘会翻负。
+			if (attacker is SampleEnemy enemyAttacker && enemyAttacker.OutgoingDamageMultiplier != 1f)
+				damage = (int)Math.Min((double)int.MaxValue, Math.Round(damage * (double)enemyAttacker.OutgoingDamageMultiplier));
 
 			if (IncomingDamageMultiplier != 1f)
 				damage = Mathf.Max(1, Mathf.RoundToInt(damage * IncomingDamageMultiplier));

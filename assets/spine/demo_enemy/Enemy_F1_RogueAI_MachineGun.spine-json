@@ -194,6 +194,9 @@
 		}
 	}
 ],
+"events": {
+	"hit": {}
+},
 "animations": {
 	"attack": {
 		"slots": {
@@ -489,7 +492,14 @@
 					{ "time": 1 }
 				]
 			}
-		}
+		},		
+		"events": [
+			{ "time": 0.09, "name": "hit" },
+			{ "time": 0.29, "name": "hit" },
+			{ "time": 0.49, "name": "hit" },
+			{ "time": 0.69, "name": "hit" },
+			{ "time": 0.89, "name": "hit" }
+		]
 	},
 	"d_attack": {
 		"slots": {
@@ -804,7 +814,14 @@
 					}
 				}
 			}
-		}
+		},	
+		"events": [
+			{ "time": 0.09, "name": "hit" },
+			{ "time": 0.29, "name": "hit" },
+			{ "time": 0.49, "name": "hit" },
+			{ "time": 0.69, "name": "hit" },
+			{ "time": 0.89, "name": "hit" }
+		]
 	},
 	"d_hit": {
 		"bones": {

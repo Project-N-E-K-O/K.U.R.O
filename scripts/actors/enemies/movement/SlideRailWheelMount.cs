@@ -166,14 +166,14 @@ public partial class SlideRailWheelMount : SlideRailMount
 
 		// 击退：只对角色生效（家具是被撞碎的，不会被"击退"）。
 		// **不能事后判断无敌帧**：这一下命中本身就会给玩家无敌帧，"打完之后再看 IsHitInvincible" 会把
-		// 刚命中的这一击也判成已无敌 → 表现就是"掉血但不弹"。项目标准做法（EnemyAttackTemplate）是走
-		// MainCharacter.ConsumePendingHitKnockback()：它由刚才这次 TakeDamage 置位，
-		// 无敌帧 / 护盾完全格挡 / IgnoreHitStateOnDamage（不打断攻击）时为 false
-		// —— "格挡了就不该被弹飞"这条语义因此也一并正确。
+		// 刚命中的这一击也判成已无敌 → 表现就是"掉血但不弹"。玩家侧放行由
+		// GameActor.ApplyKnockbackDisplacement 内部统一处理（MainCharacter 覆写 AllowsKnockback，
+		// 读一次 ConsumePendingHitKnockback：无敌帧/护盾格挡/IgnoreHitStateOnDamage 时为 false）。
+		// 这里只读不消费，避免和内部那道门重复消费。
 		if (dealt && hitNode is GameActor target && KnockbackDistance > 0f)
 		{
 			bool allowKnock = target is not Kuros.Actors.Heroes.MainCharacter mc
-				|| mc.ConsumePendingHitKnockback();
+				|| mc.HasPendingHitKnockback;
 
 			if (allowKnock && !target.ActiveImmunities.HasFlag(ImmunityFlags.ForcedMovement))
 				target.ApplyKnockbackDisplacement(dir, KnockbackDistance, KnockbackDuration);

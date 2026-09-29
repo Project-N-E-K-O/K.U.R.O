@@ -38,7 +38,7 @@ radius = 20000.0
 radius = 10000.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_attack"]
-size = Vector2(4000, 300)
+size = Vector2(6000, 300)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_hit"]
 size = Vector2(500, 300)
@@ -215,7 +215,7 @@ collision_layer = 0
 monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/AttackArea"]
-position = Vector2(2000, 0)
+position = Vector2(3000, 0)
 shape = SubResource("RectangleShape2D_attack")
 
 [node name="HitArea" type="Area2D" parent="Sprite2D"]
@@ -308,8 +308,12 @@ script = ExtResource("26_facing")
 
 [node name="AnimationController" type="Node" parent="."]
 script = ExtResource("25_fjhpe")
-AttackMixDuration = 0.1
-SkillMixDuration = 0.1
+IdleMixDuration = 0.0
+WalkMixDuration = 0.0
+HitMixDuration = 0.0
+DieMixDuration = 0.0
+AttackMixDuration = 0.0
+SkillMixDuration = 0.0
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
 target_desired_distance = 50.0

@@ -2,6 +2,7 @@ using Godot;
 using System;
 using Kuros.Core;
 using Kuros.Utils;
+using Kuros.Systems.Stage;
 using Kuros.Actors.Enemies.States;
 using Kuros.Actors.Enemies.Attacks;
 using Kuros.Actors.Enemies;
@@ -59,8 +60,35 @@ public partial class SampleEnemy : GameActor
 	// 	MaxHealth = 50;
 	// }
 
+	/// <summary>本敌人的**对外伤害系数**（楼层难度）。默认 1；由 <see cref="ApplyStageScaling"/> 按当前层数写入，
+	/// 实际乘算发生在受击侧（<see cref="GameActor.TakeDamage"/>）——因为多数敌人的伤害写在攻击特效里，
+	/// 不在自己身上，只有统一在受击侧缩放才能覆盖"发射特效型"敌人（printerMachine / guard3 等）。</summary>
+	public float OutgoingDamageMultiplier { get; set; } = 1f;
+
+	private bool _stageScaled;
+
+	/// <summary>按楼层缩放本敌人的数值：血量上限 ×血量系数、对外伤害系数。仅调用一次。
+	///
+	/// 必须在 <c>base._Ready()</c> **之前**调用——基类在 _Ready 开头就把 MaxHealth 抄进
+	/// BaseMaxHealth / CurrentHealth，晚了就只改上限不改当前血。
+	///
+	/// 不缩放 AttackDamage：那是近战/接触伤害的输入，而受击侧还会再乘一次系数，会双倍。
+	/// 子类要让某个敌人豁免（例如固定强度的特殊敌人），override 成空即可。</summary>
+	protected virtual void ApplyStageScaling()
+	{
+		if (_stageScaled) return;
+		_stageScaled = true;
+
+		var session = StageSession.Current;
+		if (session == null) return;   // 独立场景（测试/工具）没有会话 → 一律 ×1
+
+		MaxHealth = Mathf.RoundToInt(MaxHealth * session.EnemyHealthMultiplier);
+		OutgoingDamageMultiplier = session.EnemyDamageMultiplier;
+	}
+
 	public override void _Ready()
 	{
+		ApplyStageScaling();
 		base._Ready();
 		if (!IsInGroup("enemies"))
 		{

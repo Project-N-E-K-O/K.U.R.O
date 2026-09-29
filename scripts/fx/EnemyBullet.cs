@@ -236,13 +236,11 @@ namespace Kuros.Fx
             if (_hit) return;
             if (!AllowSelfDamage && DamageDispatcher.BelongsToActor(body, _attacker)) return;
 
-            bool alreadyInvincible = body is Actors.Heroes.MainCharacter mc && mc.IsHitInvincible;
-
             bool dealt = DamageDispatcher.DealDamage(body, Damage, GlobalPosition, _attacker,
                 DamageSource.DirectAttack, TargetableFactions, AllowSelfDamage, _attackArea, _currentVelocity);
             if (!dealt) return;
 
-            if (!alreadyInvincible && body is GameActor hitActor)
+            if (body is GameActor hitActor)
                 ApplyKnockback(hitActor);
 
             _hit = true;
@@ -255,19 +253,19 @@ namespace Kuros.Fx
             var target = area.Owner ?? area;
             if (!AllowSelfDamage && DamageDispatcher.BelongsToActor(target, _attacker)) return;
 
-            bool alreadyInvincible = area.Owner is Actors.Heroes.MainCharacter mc && mc.IsHitInvincible;
-
             bool dealt = DamageDispatcher.DealDamage(target, Damage, GlobalPosition, _attacker,
                 DamageSource.DirectAttack, TargetableFactions, AllowSelfDamage, _attackArea, _currentVelocity);
             if (!dealt) return;
 
-            if (!alreadyInvincible && area.Owner is GameActor hitActor)
+            if (area.Owner is GameActor hitActor)
                 ApplyKnockback(hitActor);
 
             _hit = true;
             QueueFree();
         }
 
+        /// <summary>击退：位移制。玩家侧放行由 GameActor.ApplyKnockbackDisplacement 内部统一处理
+        /// （EFFECT_STANDARD 第四条），这里不再自己判断无敌帧。</summary>
         private void ApplyKnockback(GameActor actor)
         {
             if (KnockbackDistance > 0f && _currentVelocity.LengthSquared() > 0.01f)

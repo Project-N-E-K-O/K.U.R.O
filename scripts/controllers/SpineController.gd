@@ -45,7 +45,7 @@ func _on_animation_event(_sprite: SpineSprite, _anim_state: SpineAnimationState,
 
 		# 調試資訊：默認注釋不輸出（高频攻击（如长按连段）下同步写 stdout 会造成卡顿）。
 		# 需要檢查 hit 事件時取消下方注释：
-		## print("[Spine Event] 觸發 hit: ", anim_name, " 原始值: ", raw_hit_step, " 自增段數: ", _hit_sequence, " 輸出段數: ", hit_step)
+		print("[Spine Event] 觸發 hit: ", anim_name, " 原始值: ", raw_hit_step, " 自增段數: ", _hit_sequence, " 輸出段數: ", hit_step)
 	
 	elif event_name == "effect":
 		# 處理特效事件

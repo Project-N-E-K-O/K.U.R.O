@@ -173,24 +173,24 @@ namespace Kuros.Fx
             if (direction == Vector2.Zero) direction = Vector2.Up;
             Vector2 dirNormalized = direction.Normalized();
 
-            // 位移请求：目标 Hit 状态在 KnockbackDuration 内匀减速滑完 KnockbackDistance（内置 ForcedMovement 守门）
+            // 位移请求：目标 Hit 状态在 KnockbackDuration 内匀减速滑完 KnockbackDistance。
+            // 玩家侧先"只读地"看一眼这一下允不允许被击退（不消费）——要决定冰冻位移跟不跟；
+            // 真正的放行与消费在 GameActor.ApplyKnockbackDisplacement 内部（EFFECT_STANDARD 第四条）。
             if (actor is Actors.Heroes.MainCharacter mainCharacter)
             {
-                if (mainCharacter.ConsumePendingHitKnockback())
-                {
-                    mainCharacter.ApplyKnockbackDisplacement(dirNormalized, KnockbackDistance, KnockbackDuration);
+                if (!mainCharacter.HasPendingHitKnockback) return;
+                mainCharacter.ApplyKnockbackDisplacement(dirNormalized, KnockbackDistance, KnockbackDuration);
 
-                    // 若玩家处于 Frozen 状态且允许外力位移，同步通知（平均速度 = distance/duration）
-                    var frozenState = mainCharacter.StateMachine?
-                        .GetNodeOrNull<Actors.Heroes.States.PlayerFrozenState>("Frozen");
-                    if (frozenState != null
-                        && mainCharacter.StateMachine?.CurrentState == frozenState
-                        && frozenState.AllowExternalDisplacementWhileFrozen)
-                    {
-                        frozenState.ApplyExternalDisplacement(
-                            dirNormalized * (KnockbackDistance / Mathf.Max(KnockbackDuration, 0.01f)),
-                            KnockbackDuration);
-                    }
+                // 若玩家处于 Frozen 状态且允许外力位移，同步通知（平均速度 = distance/duration）
+                var frozenState = mainCharacter.StateMachine?
+                    .GetNodeOrNull<Actors.Heroes.States.PlayerFrozenState>("Frozen");
+                if (frozenState != null
+                    && mainCharacter.StateMachine?.CurrentState == frozenState
+                    && frozenState.AllowExternalDisplacementWhileFrozen)
+                {
+                    frozenState.ApplyExternalDisplacement(
+                        dirNormalized * (KnockbackDistance / Mathf.Max(KnockbackDuration, 0.01f)),
+                        KnockbackDuration);
                 }
             }
             else

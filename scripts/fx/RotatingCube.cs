@@ -310,9 +310,6 @@ namespace Kuros.Fx
             if (_hit || _spawning) return;
             if (!AllowSelfDamage && DamageDispatcher.BelongsToActor(body, _attacker)) return;
 
-            // MainCharacter 无敌状态跳过击退但仍造成伤害
-            bool alreadyInvincible = body is Actors.Heroes.MainCharacter mc && mc.IsHitInvincible;
-
             // 传 null 跳过 IsHitByArea 二次重叠检测：信号已确认碰撞，
             // 高速飞行时二次查询可能与物理状态错开导致漏伤害
             bool dealt = DamageDispatcher.DealDamage(body, Damage, GlobalPosition, _attacker,
@@ -330,7 +327,7 @@ namespace Kuros.Fx
                 return;
             }
 
-            if (!alreadyInvincible && body is GameActor hitActor)
+            if (body is GameActor hitActor)
                 ApplyKnockback(hitActor);
 
             _hit = true;
@@ -349,13 +346,11 @@ namespace Kuros.Fx
             var target = area.Owner ?? area;
             if (!AllowSelfDamage && DamageDispatcher.BelongsToActor(target, _attacker)) return;
 
-            bool alreadyInvincible = area.Owner is Actors.Heroes.MainCharacter mc && mc.IsHitInvincible;
-
             bool dealt = DamageDispatcher.DealDamage(target, Damage, GlobalPosition, _attacker,
                 DamageSource.DirectAttack, TargetableFactions, AllowSelfDamage, null, _velocity);
             if (!dealt) return;
 
-            if (!alreadyInvincible && area.Owner is GameActor hitActor)
+            if (area.Owner is GameActor hitActor)
                 ApplyKnockback(hitActor);
 
             _hit = true;

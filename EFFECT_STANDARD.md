@@ -195,7 +195,34 @@ if (!dealt) return;  // 阵营不匹配时不继续
 
 ---
 
-## 四、击退：只走 GameActor.ApplyKnockback
+## 四、击退：只走 GameActor.ApplyKnockback / ApplyKnockbackDisplacement
+
+### 两个入口（都在 `GameActor` 上，都带 `ForcedMovement` 免疫门）
+
+| API | 语义 | 典型场合 |
+|-----|------|---------|
+| `ApplyKnockback(dir, speed)` | **速度制**：直接给一次速度，由受击状态自行衰减 | 光束/接触这类"一下弹开"的小位移 |
+| `ApplyKnockbackDisplacement(dir, distance, duration)` | **位移制**：指定"推多远、多久推完"，受击状态在时长内匀减速滑完 | 特效 / 爆炸 / 子弹等需要**可预期距离**的场合（当前主流写法，20+ 处） |
+
+**两者都不得用 `Velocity = ` 直接写**：那会绕过免疫门与受击状态。
+
+### 玩家侧：放行由 API 内部处理，调用点不用管
+
+对 `MainCharacter` 的击退**不能事后判断 `IsHitInvincible`**：这一下命中本身就会开无敌帧，
+打完之后再看会把"刚命中的这一击"也判成已无敌 → 表现就是"只推得动敌人、推不动玩家"（§八 的反例同源）。
+
+**这条规则已经收进 API 内部**：`GameActor.ApplyKnockbackDisplacement` / `ApplyKnockback` 会先过
+`AllowsKnockback()` 这个虚钩子，`MainCharacter` 把它覆写成"消费 `ConsumePendingHitKnockback()`"
+（由刚才那次 `TakeDamage` 置位；无敌帧 / 护盾完全格挡 / IgnoreHitStateOnDamage 时为 false）。
+所以**攻击方一律直接调用即可**：
+
+```csharp
+actor.ApplyKnockbackDisplacement(dir, distance, duration);   // 玩家侧该不该弹，API 自己判断
+```
+
+需要"知道这一下到底弹没弹"的场合（例如 BoomDmgEffect 要顺带做冰冻外部位移、或要给调用方返回布尔），
+用**只读**的 `MainCharacter.HasPendingHitKnockback` 先看一眼——**不要自己调 `ConsumePendingHitKnockback()`**，
+那会和内部那道门重复消费、把击退吃掉。
 
 ### 新增：统一击退入口
 
@@ -255,7 +282,9 @@ public void ApplyEffect(ActorEffect effect)
 |------|------|---------|
 | `TakeDamage(damage, ...)` | 造成伤害 | IsDead, ActiveImmunities |
 | `ApplyEffect(effect)` | 施加效果（眩晕/减速/Buff...） | CanBeAffected |
-| `ApplyKnockback(dir, speed)` | 击退位移 | ForcedMovement |
+| `ApplyKnockback(dir, speed)` | 击退（速度制） | ForcedMovement |
+| `ApplyKnockbackDisplacement(dir, distance, duration)` | 击退（位移制，主流） | ForcedMovement |
+| `ConsumePendingHitKnockback()` | 玩家侧：这一下命中是否允许被击退（须在 `TakeDamage` 之后立刻调用） | 无敌帧 / 护盾格挡 / IgnoreHitStateOnDamage |
 | `CanBeAffected(effect?)` | 子类覆写，条件免疫 | — |
 
 ---
@@ -323,7 +352,7 @@ if (receiver is GameActor immune && !immune.CanBeAffected(null)) return;
 
 - [ ] 目标发现：`IntersectShape` 或 `Area2D` 信号，不用 `GetNodesInGroup`
 - [ ] 伤害：`DamageDispatcher.DealDamage`，不用 `actor.TakeDamage`
-- [ ] 击退：`actor.ApplyKnockback`，不用 `actor.Velocity =`
+- [ ] 击退：`actor.ApplyKnockback` / `ApplyKnockbackDisplacement`，不用 `actor.Velocity =`；对玩家必须先过 `ConsumePendingHitKnockback()` 门（见第四节），**不得事后判断 `IsHitInvincible`**
 - [ ] 效果施加：`actor.ApplyEffect`，不用手动判断免疫
 - [ ] `TargetCollisionMask` 导出配置，不写死组名/层号
 - [ ] 变量名用 `target`/`actor`，不硬编码 `enemy`/`player`
