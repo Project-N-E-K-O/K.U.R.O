@@ -41,9 +41,8 @@ TargetableFactions = 5
 SlotStartOffset = -800.0
 SlotEndOffset = 2000.0
 CarriageFarOffset = -1300.0
-Speed = 300.0
+Speed = 400.0
 ArriveDeadzone = 10.0
-DebugEnds = 1
 
 [node name="Visual" type="Sprite2D" parent="."]
 y_sort_enabled = true

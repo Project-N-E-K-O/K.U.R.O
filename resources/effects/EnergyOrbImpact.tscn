@@ -1,8 +1,9 @@
-[gd_scene load_steps=6 format=3 uid="uid://cnrhl7kxikejk"]
+[gd_scene load_steps=13 format=3 uid="uid://cnrhl7kxikejk"]
 
 [ext_resource type="Script" uid="uid://ufacv8lblpwq" path="res://scripts/effects/SlowHitAreaEffect.cs" id="1_slow"]
 [ext_resource type="Shader" uid="uid://brx1cpcxxgrup" path="res://shaders/materials/energy_orb.gdshader" id="2_orb"]
-[ext_resource type="Texture2D" uid="uid://dabxdflvss2xs" path="res://assets/art/godot_icon.png" id="3_icon"]
+[ext_resource type="Texture2D" uid="uid://dx40t86586dxk" path="res://assets/effect/EnergyOrb/liquid.png" id="4_8w0uh"]
+[ext_resource type="Texture2D" uid="uid://dabxdflvss2xs" path="res://assets/art/godot_icon.png" id="4_icon"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_orb"]
 shader = ExtResource("2_orb")
@@ -14,14 +15,62 @@ shader_parameter/ellipse_x = 1.5
 shader_parameter/ellipse_y = 1.0
 shader_parameter/wobble_strength = 0.0150000007125
 shader_parameter/wobble_speed = 12.0
-shader_parameter/wobble_frequency = 5.0
+shader_parameter/wobble_frequency = 2.6
 shader_parameter/inner_ratio = 0.74
 shader_parameter/core_ratio = 0.36
 shader_parameter/edge_softness = 0.30000001425
-shader_parameter/glow_strength = 2.0
+shader_parameter/glow_strength = 2.000000095
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_7am2s"]
+particles_animation = true
+particles_anim_h_frames = 3
+particles_anim_v_frames = 3
+particles_anim_loop = false
+
+[sub_resource type="Gradient" id="Gradient_kamgj"]
+offsets = PackedFloat32Array(0, 0.2, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 0.85, 0, 0, 0, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTex_large"]
+gradient = SubResource("Gradient_kamgj")
+
+[sub_resource type="Curve" id="Curve_komka"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.45, 0.8), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTex_large_scale"]
+curve = SubResource("Curve_komka")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_x2gcd"]
+particle_flag_disable_z = true
+emission_shape = 6
+emission_ring_axis = Vector3(0, 0, 1)
+emission_ring_height = 0.0
+emission_ring_radius = 60.0
+emission_ring_inner_radius = 40.0
+emission_ring_cone_angle = 90.0
+angle_min = -14.9999895
+angle_max = 15.0000105
+direction = Vector3(0, -1, 0)
+spread = 0.0
+initial_velocity_min = 200.0
+initial_velocity_max = 200.0
+angular_velocity_min = -1.6093254e-05
+angular_velocity_max = -1.6093254e-05
+gravity = Vector3(0, 2000, 0)
+damping_min = 20.0
+damping_max = 40.0
+scale_min = 2.0
+scale_max = 6.0
+scale_curve = SubResource("CurveTex_large_scale")
+color_ramp = SubResource("GradientTex_large")
+anim_speed_min = 0.5
+anim_speed_max = 1.5
+turbulence_noise_strength = 0.3
+turbulence_noise_scale = 2.5
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_1wkvw"]
-radius = 250.0
+radius = 220.0
 height = 700.0
 
 [node name="EnergyOrbImpact" type="Node2D"]
@@ -31,15 +80,23 @@ DamagePerTick = 8
 DamageInterval = 0.5
 SpeedSlowPercent = 40.0
 TargetCollisionMask = 4
-FadeOutDuration = 0.6
+FadeOutDuration = 1.0
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
-material = SubResource("ShaderMaterial_orb")
-scale = Vector2(1.75, 1.75)
-texture = ExtResource("3_icon")
+[node name="Splash" type="GPUParticles2D" parent="."]
+modulate = Color(0.08235294, 0.44705883, 0, 1)
+z_index = 1
+texture_filter = 1
+material = SubResource("CanvasItemMaterial_7am2s")
+scale = Vector2(6, 4)
+amount = 24
+texture = ExtResource("4_8w0uh")
+lifetime = 0.6
+one_shot = true
+explosiveness = 0.95
+randomness = 0.2
+process_material = SubResource("ParticleProcessMaterial_x2gcd")
 
 [node name="Area2D" type="Area2D" parent="."]
-visible = false
 collision_layer = 0
 collision_mask = 4
 monitorable = false
@@ -47,3 +104,8 @@ monitorable = false
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
 rotation = 1.5707964
 shape = SubResource("CapsuleShape2D_1wkvw")
+
+[node name="Sprite2D" type="Sprite2D" parent="Area2D"]
+material = SubResource("ShaderMaterial_orb")
+scale = Vector2(1.75, 1.75)
+texture = ExtResource("4_icon")

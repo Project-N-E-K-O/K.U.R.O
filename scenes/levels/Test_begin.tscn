@@ -95,6 +95,7 @@ size = Vector2(200, 800)
 
 [node name="Test_begin" type="Node2D"]
 y_sort_enabled = true
+position = Vector2(1, 0)
 
 [node name="PlayerSpawnPoint" type="Node2D" parent="."]
 position = Vector2(-2246, 330)

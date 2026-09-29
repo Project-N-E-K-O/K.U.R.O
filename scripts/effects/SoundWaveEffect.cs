@@ -36,7 +36,8 @@ namespace Kuros.Effects
         [Export] public bool ShowDebugCone { get; set; } = false;
 
         private bool _subscribed;
-        private readonly Dictionary<GameActor, float> _slowedEnemies = new();
+        /// <summary>正在被本音波减速的敌人（减速本身记在 SharedSpeedSlowManager 里，这里只记"我登记过谁"）。</summary>
+        private readonly HashSet<GameActor> _slowedEnemies = new();
         private readonly List<Node2D> _activeVisuals = new();
         private Node2D? _coneTemplate;
 
@@ -208,7 +209,7 @@ namespace Kuros.Effects
             {
                 if (node is not GameActor enemy || !IsInstanceValid(enemy) || enemy.IsDeadOrDying)
                     continue;
-                if (_slowedEnemies.ContainsKey(enemy))
+                if (_slowedEnemies.Contains(enemy))
                     continue;
 
                 if (!IsEnemyInCone(enemy, coneOrigin, coneDir, halfAngleRad))
@@ -352,8 +353,10 @@ namespace Kuros.Effects
 
         private void ApplySlow(GameActor enemy)
         {
-            _slowedEnemies[enemy] = enemy.Speed;
-            enemy.Speed *= SlowMultiplier;
+            // 已经在减速中就不重复登记（重复登记会让之后撤不干净）
+            if (!_slowedEnemies.Add(enemy)) return;
+
+            SharedSpeedSlowManager.Apply(enemy, SlowMultiplier);
 
             if (Duration > 0f)
             {
@@ -361,11 +364,8 @@ namespace Kuros.Effects
                 var capturedEnemy = enemy;
                 timer.Timeout += () =>
                 {
-                    if (_slowedEnemies.Remove(capturedEnemy, out float originalSpeed)
-                        && IsInstanceValid(capturedEnemy))
-                    {
-                        capturedEnemy.Speed = originalSpeed;
-                    }
+                    if (_slowedEnemies.Remove(capturedEnemy) && IsInstanceValid(capturedEnemy))
+                        SharedSpeedSlowManager.Remove(capturedEnemy, SlowMultiplier);
                     timer.QueueFree();
                 };
                 enemy.AddChild(timer);
@@ -375,10 +375,10 @@ namespace Kuros.Effects
 
         private void RestoreSlowedEnemies()
         {
-            foreach (var (enemy, originalSpeed) in _slowedEnemies)
+            foreach (var enemy in _slowedEnemies)
             {
                 if (IsInstanceValid(enemy))
-                    enemy.Speed = originalSpeed;
+                    SharedSpeedSlowManager.Remove(enemy, SlowMultiplier);
             }
             _slowedEnemies.Clear();
         }

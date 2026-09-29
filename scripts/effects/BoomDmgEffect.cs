@@ -18,7 +18,11 @@ namespace Kuros.Fx
 
         [ExportCategory("Damage")]
         [Export(PropertyHint.Range, "0,9999,1")] public int Damage { get; set; } = 5;
+        /// <summary>爆炸范围的**横向**半径（px）。纵向半径 = 本值 × <see cref="VerticalSquash"/>。</summary>
         [Export(PropertyHint.Range, "0,2000,1")] public float Radius { get; set; } = 400f;
+        /// <summary>纵向压缩：1 = 正圆（默认，老场景行为不变）；俯视关卡里地面上的爆炸应是"X 长 Y 短"的椭圆，
+        /// 0.65 ≈ 45° 俯视的地面透视（与液团 aspect 1.55 同源）。判定范围与视觉因此对得上。</summary>
+        [Export(PropertyHint.Range, "0.1,1,0.01")] public float VerticalSquash { get; set; } = 1f;
 
         [ExportCategory("Knockback")]
         /// <summary>击退位移距离（像素）——目标 Hit 状态在 KnockbackDuration 内匀减速滑完。</summary>
@@ -45,7 +49,11 @@ namespace Kuros.Fx
         public override void _Draw()
         {
             if (!ShowDebugRadius) return;
+
+            // 绘制用非等比缩放是安全的（纯几何，不进物理世界）——一个圆被压成椭圆
+            DrawSetTransform(Vector2.Zero, 0f, new Vector2(1f, VerticalSquash));
             DrawCircle(Vector2.Zero, Radius, DebugRadiusColor);
+            DrawSetTransform(Vector2.Zero, 0f, Vector2.One);
         }
 
         private async void Execute()
@@ -88,19 +96,23 @@ namespace Kuros.Fx
         }
 
         /// <summary>
-        /// WorldItem 伤害：物理查询（圆，半径 Radius）——碰撞体任意部位进入爆炸圆即命中，
+        /// WorldItem 伤害：物理查询（半径 Radius 的形状）——碰撞体任意部位进入爆炸范围即命中，
         /// 与视觉接触一致（"中心点距离"判定对大碰撞体（中心到边缘可达数百像素）会在
         /// 爆炸碰到边缘时漏判）。解析接收者（FireWallA/家具）后无视方向限制结算。
+        /// <see cref="VerticalSquash"/> &lt; 1 时用凸多边形近似椭圆（Godot 2D 没有椭圆碰撞形状）。
         /// </summary>
         private void DealDamageToWorldItemsInRadius(Vector2 origin)
         {
             var space = GetWorld2D()?.DirectSpaceState;
             if (space == null) return;
 
-            var circle = new CircleShape2D { Radius = Radius };
+            Shape2D areaShape = VerticalSquash >= 0.999f
+                ? new CircleShape2D { Radius = Radius }
+                : BuildEllipseShape(Radius, Radius * VerticalSquash);
+
             var query = new PhysicsShapeQueryParameters2D
             {
-                Shape = circle,
+                Shape = areaShape,
                 Transform = new Transform2D(0f, origin),
                 CollisionMask = 1u, // layer 1：barrier StaticBody2D / 家具 RigidBody2D 碰撞体
                 CollideWithAreas = true,
@@ -123,8 +135,29 @@ namespace Kuros.Fx
             }
         }
 
+        /// <summary>椭圆范围判定：X 半轴 = <see cref="Radius"/>、Y 半轴 = Radius × <see cref="VerticalSquash"/>。
+        /// VerticalSquash = 1 时退化成原来的圆形判定（distance ≤ Radius）。</summary>
         private bool IsWithinRadius(Vector2 position, Vector2 origin)
-            => position.DistanceTo(origin) <= Radius;
+        {
+            float xRadius = Mathf.Max(0.001f, Radius);
+            float yRadius = Mathf.Max(0.001f, xRadius * VerticalSquash);
+            Vector2 delta = position - origin;
+            float nx = delta.X / xRadius;
+            float ny = delta.Y / yRadius;
+            return nx * nx + ny * ny <= 1f;
+        }
+
+        /// <summary>用 N 边凸多边形近似椭圆（Godot 2D 没有椭圆碰撞形状；椭圆恒为凸，凸多边形足够）。</summary>
+        private static ConvexPolygonShape2D BuildEllipseShape(float xRadius, float yRadius, int segments = 24)
+        {
+            var points = new Vector2[segments];
+            for (int i = 0; i < segments; i++)
+            {
+                float t = Mathf.Tau * i / segments;
+                points[i] = new Vector2(Mathf.Cos(t) * xRadius, Mathf.Sin(t) * yRadius);
+            }
+            return new ConvexPolygonShape2D { Points = points };
+        }
 
         private void ApplyDamageAndKnockback(GameActor actor, Vector2 origin)
         {

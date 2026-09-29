@@ -3,10 +3,11 @@
 [ext_resource type="Script" uid="uid://dq0325c2hd33u" path="res://scripts/effects/BoomDmgEffect.cs" id="1_tgq3f"]
 
 [node name="BoomDmgEffect" type="Node2D"]
-z_index = 1
+z_index = 3
 script = ExtResource("1_tgq3f")
 Damage = 60
 Radius = 300.0
+VerticalSquash = 0.7999999999999999
 KnockbackDistance = 200.0
 KnockbackDuration = 0.2
 TargetableFactions = 7

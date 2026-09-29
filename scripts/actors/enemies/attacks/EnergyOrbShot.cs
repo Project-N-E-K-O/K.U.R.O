@@ -67,6 +67,9 @@ namespace Kuros.Actors.Enemies.Attacks
                 _startPos = GlobalPosition;
                 _launched = true;
 
+                // 炮口只能朝前打：快照落在射手背后时，按同一距离镜像到身前（表现成"打空了"）
+                _targetPos = MirrorTargetToFront(_targetPos);
+
                 _flightTime = Mathf.Max(0.05f, _startPos.DistanceTo(_targetPos) / Mathf.Max(1f, Speed));
 
                 if (FaceTarget)
@@ -85,6 +88,22 @@ namespace Kuros.Actors.Enemies.Attacks
             GlobalPosition = _startPos.Lerp(_targetPos, t);   // 直线：没有抛物线抬升
 
             if (t >= 1f) OnArrived();
+        }
+
+        /// <summary>落点落到射手**背后**时，沿 X 按同一距离镜像到身前。
+        ///
+        /// 起因：快照发生在开火那一刻，而蓄力（WarmupDuration，本炮台 2 秒）期间玩家可以绕到背后——
+        /// 起手时他确实在身前，所以这次开火是合法的，但快照点已经在身后了；不处理的话炮弹会反着飞、
+        /// 从炮管里往回窜。镜像后表现为"炮台朝前打了一发但打空了"，方向永远与朝向一致。
+        /// 非 GameActor 的射手（没有朝向概念）不处理。</summary>
+        private Vector2 MirrorTargetToFront(Vector2 target)
+        {
+            if (Attacker is not GameActor shooter) return target;
+
+            bool behind = shooter.FacingRight ? target.X < _startPos.X : target.X > _startPos.X;
+            if (!behind) return target;
+
+            return new Vector2(2f * _startPos.X - target.X, target.Y);
         }
 
         /// <summary>落点预警：时长与本次飞行时长一致（预警结束的那一刻就是落地）。

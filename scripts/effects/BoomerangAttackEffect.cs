@@ -280,7 +280,9 @@ namespace Kuros.Fx
         {
             public float SlowPercent { get; set; }
 
-            private float _originalSpeed;
+            /// <summary>登记到共享管理器的乘数（≤1 表示已登记）。减速统一走 SharedSpeedSlowManager，
+            /// 不再自己快照 Actor.Speed——否则和区域减速/负重重叠时会互相覆盖快照、丢原始速度。</summary>
+            private float _registeredMultiplier = 1f;
 
             public BoomerangSlowDebuff()
             {
@@ -294,17 +296,16 @@ namespace Kuros.Fx
             protected override void OnApply()
             {
                 base.OnApply();
-                _originalSpeed = Actor.Speed;
-                float multiplier = 1f - Mathf.Clamp(SlowPercent / 100f, 0f, 1f);
-                Actor.Speed = _originalSpeed * multiplier;
+                _registeredMultiplier = 1f - Mathf.Clamp(SlowPercent / 100f, 0f, 1f);
+                SharedSpeedSlowManager.Apply(Actor, _registeredMultiplier);
             }
 
             public override void OnRemoved()
             {
-                if (Actor != null && !Actor.IsDeadOrDying)
-                {
-                    Actor.Speed = _originalSpeed;
-                }
+                // 只撤自己那一档：别的减速源还在时继续生效，最后一个撤掉时才由管理器还原原始速度
+                if (Actor != null && _registeredMultiplier < 1f)
+                    SharedSpeedSlowManager.Remove(Actor, _registeredMultiplier);
+                _registeredMultiplier = 1f;
                 base.OnRemoved();
             }
         }
