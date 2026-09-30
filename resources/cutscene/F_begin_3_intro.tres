@@ -57,17 +57,18 @@ AnimationName = "open"
 WaitForCompletion = true
 metadata/_custom_type_script = "uid://5xu2sir0yhv1"
 
+[sub_resource type="Resource" id="Resource_dfbxa"]
+script = ExtResource("3_m4q78")
+AnimationPlayerPath = NodePath("../World/FBegin/AnimationPlayer2")
+AnimationName = "rail_move_in"
+WaitForCompletion = true
+metadata/_custom_type_script = "uid://5xu2sir0yhv1"
+
 [sub_resource type="Resource" id="Resource_v6k0a"]
 script = ExtResource("3_m4q78")
 AnimationPlayerPath = NodePath("../World/FBegin/AnimationPlayer")
 AnimationName = "up_to_top_event"
 WaitForCompletion = true
-metadata/_custom_type_script = "uid://5xu2sir0yhv1"
-
-[sub_resource type="Resource" id="Resource_dfbxa"]
-script = ExtResource("3_m4q78")
-AnimationPlayerPath = NodePath("../World/FBegin/AnimationPlayer2")
-AnimationName = "rail_move_in"
 metadata/_custom_type_script = "uid://5xu2sir0yhv1"
 
 [sub_resource type="Resource" id="Resource_nnnpt"]
@@ -81,7 +82,6 @@ script = ExtResource("5_xm0fp")
 EffectScene = ExtResource("6_2si8d")
 SpawnType = 2
 TargetNodePath = NodePath("../World/FBegin/SlideRailSpawnPoint")
-SpawnDelay = 0.4
 SpawnTag = "SlideRailWheelLeft"
 PropertyOverrides = Dictionary[String, Variant]({
 "CarriagePrefab": ExtResource("7_2si8d")
@@ -93,7 +93,6 @@ script = ExtResource("5_xm0fp")
 EffectScene = ExtResource("6_2si8d")
 SpawnType = 2
 TargetNodePath = NodePath("../World/FBegin/SlideRailSpawnPoint2")
-SpawnDelay = 0.4
 SpawnTag = "SlideRailWheeRight"
 PropertyOverrides = Dictionary[String, Variant]({
 "CarriagePrefab": ExtResource("8_dfbxa"),
@@ -123,7 +122,7 @@ metadata/_custom_type_script = "uid://bdni42t83syt8"
 [resource]
 script = ExtResource("4_seq")
 SequenceId = "F_begin_3_intro"
-Steps = Array[ExtResource("1_step")]([SubResource("Resource_62k4c"), SubResource("Resource_2si8d"), SubResource("Resource_pn8jt"), SubResource("Resource_xm0fp"), SubResource("Resource_b6ijc"), SubResource("Resource_krxc6"), SubResource("Resource_m4q78"), SubResource("Resource_v6k0a"), SubResource("Resource_dfbxa"), SubResource("Resource_nnnpt"), SubResource("Resource_yqcfi")])
+Steps = Array[ExtResource("1_step")]([SubResource("Resource_62k4c"), SubResource("Resource_2si8d"), SubResource("Resource_pn8jt"), SubResource("Resource_xm0fp"), SubResource("Resource_b6ijc"), SubResource("Resource_krxc6"), SubResource("Resource_m4q78"), SubResource("Resource_dfbxa"), SubResource("Resource_v6k0a"), SubResource("Resource_nnnpt"), SubResource("Resource_yqcfi")])
 DisablePlayerInput = false
 HidePlayer = false
 metadata/_custom_type_script = "uid://cgnajq1ykl2mn"

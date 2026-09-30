@@ -1,7 +1,8 @@
-[gd_scene load_steps=32 format=3 uid="uid://cw42j1o501x83"]
+[gd_scene load_steps=33 format=3 uid="uid://cw42j1o501x83"]
 
 [ext_resource type="Script" uid="uid://cw8xmc5jou66u" path="res://scripts/actors/enemies/EnemyF1RogueAIMachineGun.cs" id="1_1mbwy"]
 [ext_resource type="Resource" uid="uid://05yoqk7rf6ax" path="res://resources/behavior/EnemyBehaviorConfig.tres" id="2_vkvw7"]
+[ext_resource type="Texture2D" uid="uid://brjaqxel52a2o" path="res://assets/BuildIcon/icon.svg" id="3_1mbwy"]
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="4_fda0u"]
 [ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="5_str0p"]
 [ext_resource type="Script" uid="uid://4dd56677a2aa" path="res://scripts/controllers/ShadowFollower.cs" id="6_o2s87"]
@@ -56,7 +57,7 @@ OffsetFlip = 2
 metadata/_custom_type_script = "uid://fd5076f50ca0"
 
 [node name="Enemy_F1_rogueAI_MachineGun" type="CharacterBody2D" node_paths=PackedStringArray("DetectionArea", "AttackArea", "StateMachine", "EffectController")]
-z_index = 2
+z_index = 3
 y_sort_enabled = true
 scale = Vector2(0.6, 0.6)
 collision_layer = 2
@@ -64,6 +65,8 @@ collision_mask = 15
 motion_mode = 1
 script = ExtResource("1_1mbwy")
 BehaviorConfig = ExtResource("2_vkvw7")
+IsBoss = true
+BossIcon = ExtResource("3_1mbwy")
 DebugOverlayOffset = Vector2(-1500, 200)
 DebugOverlayFontSize = 128
 DetectionArea = NodePath("Sprite2D/ControllerDetectionArea")
@@ -88,7 +91,7 @@ TargetBone = NodePath("../SpineSprite/SpineBoneNode")
 
 [node name="OutlineLayer" type="Node2D" parent="."]
 show_behind_parent = true
-position = Vector2(0, -900)
+position = Vector2(0, -500)
 
 [node name="OutlineSpineSprite_Left" type="SpineSprite" parent="OutlineLayer"]
 modulate = Color(0.02, 0.02, 0.02, 0.85)
@@ -135,7 +138,7 @@ preview_time = 0.0
 script = ExtResource("8_7asvr")
 
 [node name="SpineSprite" type="SpineSprite" parent="."]
-position = Vector2(0, -900)
+position = Vector2(0, -500)
 skeleton_data_res = ExtResource("7_1mbwy")
 preview_skin = "Default"
 preview_animation = "-- Empty --"
@@ -277,7 +280,10 @@ script = ExtResource("27_railchase")
 
 [node name="RailKeepDistanceBehavior" type="Node" parent="."]
 script = ExtResource("28_keepdist")
-KeepDistance = 900.0
+Active = true
+KeepDistance = 1250.0
+Speed = 300.0
+Smoothing = 1.0
 
 [node name="FacingController" type="Node" parent="."]
 script = ExtResource("26_facing")

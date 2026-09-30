@@ -40,7 +40,6 @@
 [sub_resource type="Resource" id="Resource_rqd1e"]
 script = ExtResource("2_82263")
 PhaseId = "stage_up"
-TotalKillsForFull = 1
 ArrivalTriggerPath = NodePath("CutsceneTrigger3")
 ArrivalTriggerDelay = 2.5
 MinSpeedScale = 0.5
@@ -1748,14 +1747,14 @@ texture = ExtResource("29_0pejj")
 z_index = 5
 material = SubResource("ShaderMaterial_som2a")
 position = Vector2(-3250, -596)
-scale = Vector2(0.66, 0.88)
+scale = Vector2(0.66, 0.8)
 texture = ExtResource("6_rqd1e")
 
 [node name="RightRailWheel" type="Sprite2D" parent="Environments/FloorTop"]
 z_index = 5
 material = SubResource("ShaderMaterial_som2a")
 position = Vector2(3380, -600)
-scale = Vector2(0.66, 0.88)
+scale = Vector2(0.66, 0.8)
 texture = ExtResource("33_som2a")
 
 [node name="AirWall" type="StaticBody2D" parent="." groups=["navigation_polygon_source_geometry_group"]]

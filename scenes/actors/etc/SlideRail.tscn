@@ -16,12 +16,9 @@ shader_parameter/inset = 0.0
 [node name="SlideRail" type="Node2D"]
 z_index = 3
 script = ExtResource("1_rail")
-SlotStartOffset = -1000.0
-SlotEndOffset = 500.0
-CarriageNearOffset = 2600.0
-CarriageFarOffset = -2600.0
 Speed = 500.0
 ArriveDeadzone = 10.0
+FollowSmoothing = 2.0
 
 [node name="Visual" type="Sprite2D" parent="."]
 

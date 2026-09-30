@@ -49,9 +49,17 @@ public partial class SlideRailMount : Node2D
 	/// Far/Near 与行程端点同源，勾了 <see cref="FlipCarriageEnds"/> 时跟着一起镜像到另一侧。
 	/// 过场生成的 PropertyOverrides 会在入树前写好这个值，正好赶得上 <see cref="_Ready"/> 里的摆位。</summary>
 	[Export] public SpawnAnchor CarriageSpawn { get; set; } = SpawnAnchor.Far;
-	/// <summary>滑槽自身滑动速度（px/s）。</summary>
+	/// <summary>滑槽自身滑动速度（px/s），也是匀速上限。</summary>
 	[Export(PropertyHint.Range, "10,2000,1")] public float Speed { get; set; } = 200f;
 	[Export(PropertyHint.Range, "0,64,1")] public float ArriveDeadzone { get; set; } = 4f;
+
+	/// <summary>跟随平滑度（1/s）：与 <c>ShieldUmbrellaEffect</c> / <c>BunnySwardFloatingCannon</c> / P2 的
+	/// `FollowSmoothing` **同源同值（8.5）**——目标坐标按 `1 − exp(−Smoothing·dt)` 指数趋近，
+	/// 稳态落后 = 目标速度 ÷ Smoothing（玩家 500 → 落后 ≈ 59px、1000 → ≈ 118px），
+	/// 随速度连续变化，不会"追得上就锁死、追不上就爬坡"。
+	/// **≤ 0 = 关闭平滑**（直接吸附到目标，旧行为）。
+	/// 只作用于普通 <see cref="SetTarget"/>；<see cref="SetTargetInTime"/> 按时长锁定速度、不受影响。</summary>
+	[Export(PropertyHint.Range, "0,30,0.1")] public float FollowSmoothing { get; set; } = 8.5f;
 
 	private bool _resolved;
 	private float _slotStart;
@@ -125,14 +133,32 @@ public partial class SlideRailMount : Node2D
 		}
 
 		float step = _target - CurrentRailCoordinate;
-		if (Mathf.Abs(step) <= ArriveDeadzone)
-		{
-			SetCoordinate(_target);
-			return;
-		}
+		float distance = Mathf.Abs(step);
 
-		float speed = _targetSpeed > 0f ? _targetSpeed : Speed;
-		SetCoordinate(CurrentRailCoordinate + Mathf.Sign(step) * speed * (float)delta);
+		// 推进方式二选一：
+		//   ① _targetSpeed > 0（SetTargetInTime）→ 速度按时长锁定，不做平滑（精确计时），死区收口
+		//   ② 普通 SetTarget → **与伞/浮游炮/P2 同款的位置一阶滞后**（FollowSmoothing ≤ 0 时直接吸附）
+		if (_targetSpeed > 0f)
+		{
+			if (distance <= ArriveDeadzone)
+			{
+				SetCoordinate(_target);
+				return;
+			}
+			SetCoordinate(CurrentRailCoordinate + Mathf.Sign(step) * _targetSpeed * (float)delta);
+		}
+		else if (FollowSmoothing > 0f)
+		{
+			// 平滑档**不做"到点吸附"**：目标缓慢移动时每帧位移都可能小于死区，
+			// 吸附会把轨道逐帧直接拽到目标上 = 逐帧锁步，看起来"完全没有惯性"
+			//（参考实现 伞/浮游炮/P2 也没有吸附；到位判定仍由 Arrived 按死区容差给出）。
+			float blend = 1f - Mathf.Exp(-FollowSmoothing * (float)delta);
+			SetCoordinate(Mathf.Lerp(CurrentRailCoordinate, _target, blend));
+		}
+		else
+		{
+			SetCoordinate(_target);   // 关闭平滑：直接到位
+		}
 		// 硬钳兜底：外部系统（爆炸/黑洞直接写位置）也推不出滑槽
 		SetCoordinate(Mathf.Clamp(CurrentRailCoordinate, _slotStart, _slotEnd));
 	}

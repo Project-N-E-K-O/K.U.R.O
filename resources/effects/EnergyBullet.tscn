@@ -26,12 +26,12 @@ radius = 60.0
 [node name="EnergyBullet" type="Node2D"]
 z_index = 3
 script = ExtResource("1_bullet")
-Speed = 2000.0
-LaunchAngleDegrees = 45.0
-AimJitterPixels = 50.0
+Speed = 1200.0
+DragFactor = 0.005
+AimJitterPixels = 400.0
 SpinSpritePath = NodePath("Visual/bullet")
 SpinDegreesPerSecond = 1440.0
-TargetableFactions = 7
+TargetableFactions = 5
 Damage = 8
 
 [node name="Visual" type="Node2D" parent="."]

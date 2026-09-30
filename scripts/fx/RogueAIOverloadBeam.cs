@@ -48,17 +48,28 @@ namespace Kuros.Fx
 		private readonly HashSet<ulong> _damaged = new();
 		private float _damageTickTimer;
 
+		/// <summary>已落到视觉层/判定带的角度，用于检测 AngleDegrees 的运行时变化。</summary>
+		private float _appliedAngleDegrees = float.NaN;
+
 		/// <summary>首帧方向：固定 AngleDegrees（不做瞄准、不随朝向翻）。</summary>
-		protected override void InitializeDirection()
+		protected override void InitializeDirection() => ApplyDirection();
+
+		/// <summary>把当前 <see cref="AngleDegrees"/> 落到视觉层与判定带（根节点恒 0）。
+		/// AngleDegrees 是**活属性**：扇束张开时逐帧改角度，这里按变化重落。</summary>
+		private void ApplyDirection()
 		{
 			float angle = Mathf.DegToRad(AngleDegrees);
 			if (_visual != null) _visual.Rotation = angle;
 			else Rotation = angle;
 			if (_hitArea != null) _hitArea.Rotation = angle;
+			_appliedAngleDegrees = AngleDegrees;
 		}
 
 		public override void _Process(double delta)
 		{
+			// 角度变了先重落（本帧的判定带方向要跟着走），再跑基类的生长/伤害
+			if (!Mathf.IsEqualApprox(_appliedAngleDegrees, AngleDegrees)) ApplyDirection();
+
 			// 跟随放最前：本帧的命中判定要基于更新后的位置
 			if (SyncToAnchor && FollowAnchor != null && GodotObject.IsInstanceValid(FollowAnchor))
 				GlobalPosition = FollowAnchor.GlobalPosition;

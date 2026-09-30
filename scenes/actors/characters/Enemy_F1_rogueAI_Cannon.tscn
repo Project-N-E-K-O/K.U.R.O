@@ -1,7 +1,8 @@
-[gd_scene load_steps=34 format=3 uid="uid://duryvwia2gyyc"]
+[gd_scene load_steps=35 format=3 uid="uid://duryvwia2gyyc"]
 
 [ext_resource type="Script" uid="uid://ccqcbk4merfnt" path="res://scripts/actors/enemies/EnemyF1RogueAICannon.cs" id="1_3cfw7"]
 [ext_resource type="Resource" uid="uid://05yoqk7rf6ax" path="res://resources/behavior/EnemyBehaviorConfig.tres" id="2_3eyky"]
+[ext_resource type="Texture2D" uid="uid://brjaqxel52a2o" path="res://assets/BuildIcon/icon.svg" id="3_3eyky"]
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="4_by072"]
 [ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="5_r52tf"]
 [ext_resource type="Script" uid="uid://4dd56677a2aa" path="res://scripts/controllers/ShadowFollower.cs" id="6_hyfyo"]
@@ -89,6 +90,8 @@ collision_mask = 15
 motion_mode = 1
 script = ExtResource("1_3cfw7")
 BehaviorConfig = ExtResource("2_3eyky")
+IsBoss = true
+BossIcon = ExtResource("3_3eyky")
 DebugOverlayOffset = Vector2(-1500, 200)
 DebugOverlayFontSize = 128
 DetectionArea = NodePath("Sprite2D/ControllerDetectionArea")
@@ -113,7 +116,7 @@ TargetBone = NodePath("../SpineSprite/SpineBoneNode")
 
 [node name="OutlineLayer" type="Node2D" parent="."]
 show_behind_parent = true
-position = Vector2(0, -900)
+position = Vector2(0, -500)
 
 [node name="OutlineSpineSprite_Left" type="SpineSprite" parent="OutlineLayer"]
 modulate = Color(0.02, 0.02, 0.02, 0.85)
@@ -160,7 +163,7 @@ preview_time = 0.0
 script = ExtResource("8_6o35y")
 
 [node name="SpineSprite" type="SpineSprite" parent="."]
-position = Vector2(0, -900)
+position = Vector2(0, -500)
 skeleton_data_res = ExtResource("7_3cfw7")
 preview_skin = "Default"
 preview_animation = "-- Empty --"
@@ -176,7 +179,7 @@ bone_name = "bone3"
 
 [node name="SpineBoneNode2" type="SpineBoneNode" parent="SpineSprite"]
 show_behind_parent = true
-position = Vector2(1066.2709, -145.85144)
+position = Vector2(1066.2709, -145.85138)
 rotation = -0.73912066
 scale = Vector2(1.0000001, 1)
 bone_name = "bone12"
@@ -301,7 +304,10 @@ script = ExtResource("27_railchase")
 
 [node name="RailKeepDistanceBehavior" type="Node" parent="."]
 script = ExtResource("28_keepdist")
-KeepDistance = 900.0
+Active = true
+KeepDistance = 1500.0
+Speed = 250.0
+Smoothing = 1.0
 
 [node name="FacingController" type="Node" parent="."]
 script = ExtResource("26_facing")

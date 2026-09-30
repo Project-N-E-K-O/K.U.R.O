@@ -42,7 +42,7 @@ SlotStartOffset = -800.0
 SlotEndOffset = 2000.0
 CarriageFarOffset = -1300.0
 Speed = 400.0
-ArriveDeadzone = 10.0
+FollowSmoothing = 1.0
 
 [node name="Visual" type="Sprite2D" parent="."]
 y_sort_enabled = true
@@ -58,21 +58,21 @@ texture = ExtResource("6_52j3d")
 z_index = 2
 material = SubResource("ShaderMaterial_lxxxg")
 position = Vector2(-465, -146)
-scale = Vector2(0.66, 0.88)
+scale = Vector2(0.66, 0.8)
 texture = ExtResource("2_uodhj")
 offset = Vector2(0, -850)
 
 [node name="RailSprite" type="Sprite2D" parent="Visual"]
 z_index = 3
 material = SubResource("ShaderMaterial_qf1ce")
-position = Vector2(1400, -2000)
+position = Vector2(1400, -1800)
 scale = Vector2(0.66, 0.66)
 texture = ExtResource("3_uodhj")
 
 [node name="RailSprite2" type="Sprite2D" parent="Visual"]
 z_index = 3
 material = SubResource("ShaderMaterial_qf1ce")
-position = Vector2(-1400, -2000)
+position = Vector2(-1400, -1800)
 scale = Vector2(0.66, 0.66)
 texture = ExtResource("3_uodhj")
 

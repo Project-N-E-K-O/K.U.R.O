@@ -1,0 +1,36 @@
+[gd_scene load_steps=3 format=3 uid="uid://dn0xxip3a0jbb"]
+
+[ext_resource type="Script" uid="uid://d2110gg02orle" path="res://scripts/fx/FanBeam.cs" id="1_fanbeam"]
+[ext_resource type="PackedScene" uid="uid://b1osuixafvh7g" path="res://resources/effects/RogueAIOverloadBeam.tscn" id="2_beam"]
+
+[node name="FanBeam" type="Node2D"]
+y_sort_enabled = true
+position = Vector2(6, 0)
+script = ExtResource("1_fanbeam")
+SpreadDegrees = 10.0
+SpreadSpeed = 2000.0
+SpreadPauseAfter = 0.3
+SpreadPauseDuration = 1.0
+SpreadPauseDegrees = 25.0
+SpreadResumeSpeed = 6000.0
+BeamWidth = 50.0
+GlowWidth = 100.0
+SpotlightDuration = 2.0
+TargetableFactions = 5
+Damage = 10
+
+[node name="BeamMinus" parent="." instance=ExtResource("2_beam")]
+z_index = 2
+AngleDegrees = 30.0
+TargetableFactions = 5
+MaxLength = 8000.0
+
+[node name="BeamCenter" parent="." instance=ExtResource("2_beam")]
+z_index = 2
+TargetableFactions = 5
+
+[node name="BeamPlus" parent="." instance=ExtResource("2_beam")]
+z_index = 2
+AngleDegrees = 150.0
+TargetableFactions = 5
+MaxLength = 8000.0

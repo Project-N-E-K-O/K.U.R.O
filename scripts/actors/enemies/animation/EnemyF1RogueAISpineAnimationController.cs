@@ -19,7 +19,7 @@ namespace Kuros.Actors.Enemies.Animation
 		/// <summary>死亡动画名。</summary>
 		[Export] public string DieAnimation { get; set; } = "death_down";
 		/// <summary>攻击动画槽位：攻击未实现，留空 = 不切换。（以后有 attack_up / attack_down 两套时再扩。）</summary>
-		[Export] public string AttackAnimation { get; set; } = string.Empty;
+		[Export] public string AttackAnimation { get; set; } = "attack_up";
 
 		[ExportCategory("Ultimate 大招循环")]
 		/// <summary>大招攻击名（与 AttackController 上的一致）。</summary>
@@ -123,7 +123,7 @@ namespace Kuros.Actors.Enemies.Animation
 		private void PlayAttackIfConfigured()
 		{
 			if (string.IsNullOrEmpty(AttackAnimation)) return;
-			PlayOnceIfNeeded("Attack", AttackAnimation, AttackMixDuration);
+			PlayLoopIfNeeded("Attack", AttackAnimation, AttackMixDuration);
 		}
 
 		private void PlayIdle() => PlayLoopIfNeeded(IdleAnimation, IdleAnimation, IdleMixDuration);

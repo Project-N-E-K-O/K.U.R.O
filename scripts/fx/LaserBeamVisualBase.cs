@@ -34,6 +34,11 @@ namespace Kuros.Fx
 		[Export(PropertyHint.Range, "1,2000,1")] public float BeamWidth = 32f;
 		/// <summary>光晕宽度（像素）。</summary>
 		[Export(PropertyHint.Range, "1,2000,1")] public float GlowWidth = 96f;
+		/// <summary>宽度是否随生长进度由 0 展到目标宽度（默认开：激光"由细变粗"地显形）。
+		/// 关掉则宽度恒为 <see cref="BeamWidth"/> / <see cref="GlowWidth"/>，只有长度在变——
+		/// "扫描/张开"类复合效果（扇束）用它：那里的生长进度表示"扫到哪儿了"，不是"光束显形了多少"。
+		/// 淡出收窄不受它影响（淡出照样把宽度收到 0）。</summary>
+		[Export] public bool WidthFollowsGrow { get; set; } = true;
 		/// <summary>初始长度（像素，生长起点）。</summary>
 		[Export(PropertyHint.Range, "0,3000,10")] public float MinLength = 0f;
 		/// <summary>光束延迟时长（秒）：发射后先等待此时间才开始生长（前摇）。</summary>
@@ -102,6 +107,10 @@ namespace Kuros.Fx
 				_hitShape = _hitArea.GetNodeOrNull<CollisionShape2D>("CollisionShape2D");
 				if (_hitShape?.Shape is RectangleShape2D rs)
 				{
+					// 形状按实例独立复制（同下方材质那一行的理由）：同一场景多实例（如扇束）会共享 sub_resource，
+					// 否则每帧 UpdateBeam 里后写的那条束长度会盖掉全部 → 三条判定带全长一样（并且都不是自己的值）
+					rs = (RectangleShape2D)rs.Duplicate();
+					_hitShape.Shape = rs;
 					rs.Size = new Vector2(MinLength, DetectionRadius * 2f);
 					// 带从发射点向一端伸展（同光束视觉 centered=false）：shape 居中前移半个长度，方向由判定带旋转驱动
 					_hitShape.Position = new Vector2(MinLength * 0.5f, 0f);
@@ -231,10 +240,11 @@ namespace Kuros.Fx
 			// 阶段时间 < 0（BeamDelay 内）→ grow 为 0，长度 MinLength、宽度 0（不可见）
 			float phase = Mathf.Max(_beamPhaseElapsed, 0f);
 			float grow = GrowDuration > 0f ? Mathf.Clamp(phase / GrowDuration, 0f, 1f) : 1f;
+			if (_externalGrowProgress is float external) grow = external;   // 组合特效接管进度（扇束）
 			_currentLength = Mathf.Lerp(MinLength, MaxLength, grow);
 
-			// 宽度动画：生长阶段 0 → 目标宽度；淡出阶段 目标宽度 → 0（与 shader fade 的透明度叠加）
-			float widthFactor = grow;
+			// 宽度动画：生长阶段 0 → 目标宽度（WidthFollowsGrow=false 时恒为目标宽度）；淡出阶段 目标宽度 → 0
+			float widthFactor = WidthFollowsGrow ? grow : 1f;
 			float fadeStart = GrowDuration + BeamDuration;
 			if (FadeDuration > 0f && phase > fadeStart)
 				widthFactor *= 1f - Mathf.Clamp((phase - fadeStart) / FadeDuration, 0f, 1f);
@@ -324,6 +334,28 @@ namespace Kuros.Fx
 					_spotGlowSprite = null;
 				}
 			}
+		}
+
+		/// <summary>由组合类特效（如扇束）接管的生长进度 0~1：非 null 时长度/宽度都按它展开，
+		/// 子束自身的生长时钟让位；null = 用自身时钟。
+		/// 用于"子束只是零件、时间轴由合成方决定"的场合——例如扇束的张开横跨整段 <see cref="BeamDuration"/>：
+		/// 子束 GrowDuration 置 0、BeamDuration = 净张开 + 停顿，长度由合成方每帧按张开进度下发，
+		/// 于是子束的伤害窗口（生长完成 → 全亮结束）正好覆盖整段张开。</summary>
+		public float? ExternalGrowProgress
+		{
+			get => _externalGrowProgress;
+			set => _externalGrowProgress = value.HasValue ? Mathf.Clamp(value.Value, 0f, 1f) : null;
+		}
+
+		private float? _externalGrowProgress;
+
+		/// <summary>运行时重设兜底总时长（秒）：<c>_totalTimer</c> 在 _Ready 已按场景 Lifetime 初始化，
+		/// 之后只改 <see cref="Lifetime"/> 字段不会重算倒计时——组合类特效（如扇束）在子束 _Ready 之后
+		/// 统一下发 Lifetime 时走这个入口。</summary>
+		public void SetTotalLifetime(float seconds)
+		{
+			Lifetime = seconds;
+			_totalTimer = seconds;
 		}
 
 		/// <summary>光束视觉截断（供子类"首个目标截断/不可穿透"共用）：把本帧光束长度（含 sprite 缩放）
