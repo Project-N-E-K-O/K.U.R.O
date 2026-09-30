@@ -375,11 +375,15 @@ namespace Kuros.Managers
                 return;
 
             UpdateViewportSizeIfNeeded();
-            
+
             Vector2 halfViewport = _cachedViewportSize / 2.0f;
             Vector2 targetPosition = Target.GlobalPosition + Offset;
-            
+
             GlobalPosition = CalculateClampedPosition(targetPosition, halfViewport);
+
+            // 只写节点坐标不够：本相机在场景里开着 position_smoothing_enabled（引擎级平滑），
+            // 视口仍会按平滑速度滑过去——表现就是"加速的平滑"而不是瞬移。必须重置引擎侧的平滑缓存。
+            ResetSmoothing();
         }
         #endregion
 

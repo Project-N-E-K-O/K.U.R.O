@@ -1,4 +1,5 @@
 using Godot;
+using Kuros.Actors.Enemies.Attacks;
 
 namespace Kuros.Actors.Enemies.Animation
 {
@@ -18,7 +19,17 @@ namespace Kuros.Actors.Enemies.Animation
 		/// <summary>死亡动画名。</summary>
 		[Export] public string DieAnimation { get; set; } = "death_down";
 		/// <summary>攻击动画槽位：攻击未实现，留空 = 不切换。（以后有 attack_up / attack_down 两套时再扩。）</summary>
-		[Export] public string AttackAnimation { get; set; } = string.Empty;
+		[Export] public string AttackAnimation { get; set; } = "attack_up";
+
+		[ExportCategory("Ultimate 大招循环")]
+		/// <summary>大招攻击名（与 AttackController 上的一致）。</summary>
+		[Export] public string UltimateAttackName { get; set; } = "RogueAIOverload";
+		/// <summary>强化版大招攻击名（进度升级后取代上面那个）：解析"正在跑的是哪一支"时两者都试。</summary>
+		[Export] public string UltimateProAttackName { get; set; } = "RogueAIOverloadPro";
+		/// <summary>蓄力段（滑向随机一端）循环动画。</summary>
+		[Export] public string UltimateChargeAnimation { get; set; } = "attack_warming_up";
+		/// <summary>冲刺段（横扫到另一端）循环动画。</summary>
+		[Export] public string UltimateDashAnimation { get; set; } = "attack_up";
 
 		public override void _Ready()
 		{
@@ -58,8 +69,8 @@ namespace Kuros.Actors.Enemies.Animation
 				case "Dead":
 					PlayEmptyIfNeeded();
 					break;
-				case "Attack":          // 攻击未接入：配了动画名才播
-					PlayAttackIfConfigured();
+				case "Attack":
+					PlayAttackPhaseAnimation();
 					break;
 				case "Frozen":          // 骨架没有眩晕动画：保持当前姿势，不切换
 					break;
@@ -69,10 +80,50 @@ namespace Kuros.Actors.Enemies.Animation
 			}
 		}
 
+		/// <summary>Attack 状态：大招按模板阶段播对应循环（蓄力 / 冲刺），其它攻击走 AttackAnimation 槽位。</summary>
+		private void PlayAttackPhaseAnimation()
+		{
+			var ultimate = ResolveRunningUltimate();
+			if (ultimate != null)
+			{
+				switch (ultimate.Phase)
+				{
+					case EnemyF1RogueAIUltimateAttack.UltPhase.Charge:
+						PlayLoopIfNeeded(UltimateChargeAnimation, UltimateChargeAnimation, WalkMixDuration);
+						return;
+					case EnemyF1RogueAIUltimateAttack.UltPhase.Dash:
+						PlayLoopIfNeeded(UltimateDashAnimation, UltimateDashAnimation, WalkMixDuration);
+						return;
+					default:   // Settle / None：收招，回常态循环
+						PlayIdle();
+						return;
+				}
+			}
+
+			PlayAttackIfConfigured();
+		}
+
+		/// <summary>正在跑的是不是大招（原版或强化版）；是则返回模板实例（供读 Phase），否则 null。</summary>
+		private EnemyF1RogueAIUltimateAttack? ResolveRunningUltimate()
+		{
+			var controller = Enemy?.StateMachine?.GetNodeOrNull<EnemyAttackController>("Attack/AttackController");
+			if (controller == null) return null;
+
+			return ResolveRunningUltimate(controller, UltimateProAttackName)
+				?? ResolveRunningUltimate(controller, UltimateAttackName);
+		}
+
+		private static EnemyF1RogueAIUltimateAttack? ResolveRunningUltimate(EnemyAttackController controller, string attackName)
+		{
+			if (string.IsNullOrEmpty(attackName)) return null;
+			var template = controller.GetNodeOrNull<EnemyF1RogueAIUltimateAttack>(attackName);
+			return template is { IsRunning: true } ? template : null;
+		}
+
 		private void PlayAttackIfConfigured()
 		{
 			if (string.IsNullOrEmpty(AttackAnimation)) return;
-			PlayOnceIfNeeded("Attack", AttackAnimation, AttackMixDuration);
+			PlayLoopIfNeeded("Attack", AttackAnimation, AttackMixDuration);
 		}
 
 		private void PlayIdle() => PlayLoopIfNeeded(IdleAnimation, IdleAnimation, IdleMixDuration);

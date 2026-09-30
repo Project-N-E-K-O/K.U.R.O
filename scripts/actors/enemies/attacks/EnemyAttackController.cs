@@ -23,9 +23,9 @@ namespace Kuros.Actors.Enemies.Attacks
         private float _interAttackDelay = 0f;
 
 	    /// <summary>两次攻击之间的全局最小间隔（呼吸窗）：攻击结束后必须经过此间隔才能选下一招。
-/// 各技能仍由自身的 CooldownDurationMultiplier 独立 CD（只锁自己，不锁其他技能）。
-/// 0 = 无间隔（旧行为：纯独立 CD，可能出现 A 结束 B 零间隔连发）。</summary>
-[Export(PropertyHint.Range, "0,2,0.05")] public float MinInterAttackDelay = 0f;
+        /// 各技能仍由自身的 CooldownDurationMultiplier 独立 CD（只锁自己，不锁其他技能）。
+        /// 0 = 无间隔（旧行为：纯独立 CD，可能出现 A 结束 B 零间隔连发）。</summary>
+        [Export(PropertyHint.Range, "0,2,0.05")] public float MinInterAttackDelay = 0f;
 
         /// <summary>
         /// 排队攻击等待超时（秒）：选中的攻击因距离/角度一直无法启动（CanStart 不满足）时，
@@ -436,22 +436,6 @@ namespace Kuros.Actors.Enemies.Attacks
             {
 				DebugLog($"({reason}) no attack available to queue.");
             }
-        }
-
-        private Area2D? ResolveArea(NodePath path, Area2D? fallback = null)
-        {
-            if (path.IsEmpty)
-            {
-                return fallback;
-            }
-
-            var area = GetNodeOrNull<Area2D>(path);
-            if (area != null)
-            {
-                return area;
-            }
-
-            return Enemy?.GetNodeOrNull<Area2D>(path) ?? fallback;
         }
 
         public EnemyAttackTemplate? PeekQueuedAttack() => _queuedAttack;

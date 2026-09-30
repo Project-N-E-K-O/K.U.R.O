@@ -259,8 +259,6 @@ QueuedAttackTimeout = 3.0
 
 [node name="SmashAttack" type="Node" parent="StateMachine/Attack/AttackController"]
 script = ExtResource("10_6yc1u")
-DetectionAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
-SmashAreaPath = NodePath("../../../../Sprite2D/SmashArea")
 DashSpeedMultiplier = 5.0
 DashDuration = 0.6
 SnapshotDelaySeconds = 0.5
@@ -270,9 +268,10 @@ AttackName = "SmashAttack"
 WarmupDuration = 0.7
 ActiveDuration = 0.5
 RecoveryDuration = 0.8
-CooldownDurationMultiplier = 8.0
 DamageMultiplier = 1.5
-AttackAreaPath = NodePath("../../../../Sprite2D/SmashArea")
+AttackAreaPath = NodePath("../../../../Sprite2D/AttackArea")
+DamageAreaPath = NodePath("../../../../Sprite2D/SmashArea")
+TriggerAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
 RequireAnimationHitTrigger = true
 AllowMultipleAnimationHits = true
 GrantedImmunities = 26
@@ -282,7 +281,7 @@ InterruptDamageSources = 2
 EnableInterruptSlowMo = true
 IgnoreEnemyCollisionDuringAttack = true
 Effects = Array[ExtResource("13_s42mu")]([SubResource("Resource_s42mu"), SubResource("Resource_3u4qs"), SubResource("Resource_kl8y6")])
-metadata/attack_weight = 20.0
+metadata/attack_weight = 30.0
 
 [node name="SimpleMeleeAttack" type="Node" parent="StateMachine/Attack/AttackController"]
 script = ExtResource("12_daw10")
@@ -292,11 +291,13 @@ ActiveDuration = 0.11
 RecoveryDuration = 0.39
 DamageMultiplier = 1.5
 AttackAreaPath = NodePath("../../../../Sprite2D/AttackArea")
+DamageAreaPath = NodePath("../../../../Sprite2D/AttackArea")
+TriggerAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
 KnockbackDistance = 200.0
 RequireAnimationHitTrigger = true
 AllowMultipleAnimationHits = true
 GrantedImmunities = 24
-metadata/attack_weight = 80.0
+metadata/attack_weight = 70.0
 
 [node name="Hit" type="Node" parent="StateMachine"]
 script = ExtResource("13_ey01n")

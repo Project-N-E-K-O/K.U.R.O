@@ -2,7 +2,7 @@
 
 [ext_resource type="Shader" uid="uid://dplanr5qipvoo" path="res://shaders/materials/hexagon_shield.gdshader" id="1_wlahh"]
 [ext_resource type="Texture2D" uid="uid://dpaedwsaacise" path="res://assets/effect/noise/noise_combined.png" id="2_noise"]
-[ext_resource type="Texture2D" uid="uid://ccjk13i0v7vai" path="res://assets/effect/noise/polygon.png" id="2_sh4ay"]
+[ext_resource type="Texture2D" uid="uid://gel6yoq0cinn" path="res://assets/effect/noise/polygon2.png" id="2_wlahh"]
 [ext_resource type="Script" uid="uid://mbol0v4le42t" path="res://scripts/effects/FadeInOutDestroy.cs" id="3_fade"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ring"]
@@ -10,7 +10,7 @@ shader = ExtResource("1_wlahh")
 shader_parameter/Color_Shield = Color(0.45, 0.85, 1, 1)
 shader_parameter/Step = 0.70000003325
 shader_parameter/Speed = Vector3(0.2, 0, 0)
-shader_parameter/ShieldTexture = ExtResource("2_sh4ay")
+shader_parameter/ShieldTexture = ExtResource("2_wlahh")
 shader_parameter/Size_Inner = 0.18
 shader_parameter/Size_Outer = 0.400000019
 shader_parameter/Opaticy = 0.70000003325

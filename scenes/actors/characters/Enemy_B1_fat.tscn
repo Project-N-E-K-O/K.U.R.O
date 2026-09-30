@@ -237,8 +237,6 @@ QueuedAttackTimeout = 3.0
 
 [node name="ChargeEscapeAttack" type="Node" parent="StateMachine/Attack/AttackController"]
 script = ExtResource("11_otg7e")
-DetectionAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
-GrabAreaPath = NodePath("../../../../Sprite2D/GrabArea")
 DashDistance = 800.0
 SnapshotDelaySeconds = 0.9
 DestroyFurnitureDuringDash = true
@@ -250,6 +248,8 @@ ActiveDuration = 0.5
 CooldownDurationMultiplier = 6.0
 DamageMultiplier = 0.3
 AttackAreaPath = NodePath("../../../../Sprite2D/GrabArea")
+DamageAreaPath = NodePath("../../../../Sprite2D/GrabArea")
+TriggerAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
 KnockbackDuration = 0.01
 RequireAnimationHitTrigger = true
 AllowMultipleAnimationHits = true
@@ -268,6 +268,8 @@ WarmupDuration = 1.0
 ActiveDuration = 0.11
 RecoveryDuration = 0.39
 AttackAreaPath = NodePath("../../../../Sprite2D/AttackArea")
+DamageAreaPath = NodePath("../../../../Sprite2D/AttackArea")
+TriggerAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
 KnockbackDistance = 200.0
 RequireAnimationHitTrigger = true
 AllowMultipleAnimationHits = true

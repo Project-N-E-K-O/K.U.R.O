@@ -13,6 +13,7 @@
 [ext_resource type="PackedScene" uid="uid://cgjrdwkemgrcy" path="res://scenes/actors/characters/P2.tscn" id="12_31t1p"]
 
 [node name="BattleScene" type="Node2D" node_paths=PackedStringArray("Player")]
+y_sort_enabled = true
 script = ExtResource("1_givaq")
 Player = NodePath("World/MainCharacter")
 LevelName = "住宅区D23_A091_1806"

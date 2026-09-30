@@ -5,10 +5,10 @@ namespace Kuros.Actors.Enemies.Attacks
 {
 	public partial class EnemyDashSlashAttack : EnemyAttackTemplate
 	{
-		[ExportCategory("Areas")]
-		[Export] public NodePath DetectionAreaPath = new NodePath();
-		[Export] public NodePath DashStopAreaPath = new NodePath();
-		[Export] public NodePath DashSlashAreaPath = new NodePath();
+		// 区域由基类统一提供：TriggerAreaPath（起手检测区；未配置 = 不做额外限制）、
+		// AttackAreaPath（命中/冲刺停止判定带）、DamageAreaPath（伤害落点；未配置 = AttackArea）。
+		// 旧的 DetectionAreaPath / DashStopAreaPath / DashSlashAreaPath 已并入基类
+		// —— 其中 DashStopArea 就是"命中判定带"，DashSlashArea 就是"伤害落点"。
 
 		[ExportCategory("Dash")]
 		/// <summary>冲刺速度 = 基础 Speed × 倍率（倍率语义：基础速度调整时冲刺自动适配）。</summary>
@@ -35,8 +35,6 @@ namespace Kuros.Actors.Enemies.Attacks
 		private const float PostCooldownDuration = 1.0f;
 
 		private Area2D? _detectionArea;
-		private Area2D? _dashStopArea;
-		private Area2D? _dashSlashArea;
 		private EnemyAttackController? _controller;
 		private NavigationAgent2D? _navAgent;
 		private bool _playerInsideDetection;
@@ -64,7 +62,7 @@ namespace Kuros.Actors.Enemies.Attacks
 			base.OnInitialized();
 			_controller = GetParent() as EnemyAttackController;
 
-			_detectionArea = ResolveArea(DetectionAreaPath);
+			_detectionArea = TriggerArea;
 			if (_detectionArea != null)
 			{
 				_detectionArea.Monitoring = true;
@@ -75,14 +73,6 @@ namespace Kuros.Actors.Enemies.Attacks
 			{
 				GD.PushWarning($"[EnemyDashSlashAttack] DetectionArea not found for {Enemy?.Name ?? Name}, fallback to DetectionRange.");
 			}
-
-			_dashSlashArea = ResolveArea(DashSlashAreaPath);
-			if (_dashSlashArea == null)
-				_dashSlashArea = AttackArea;
-
-			_dashStopArea = ResolveArea(DashStopAreaPath);
-			if (_dashStopArea == null)
-				_dashStopArea = _dashSlashArea;
 
 			SetPhysicsProcess(true);
 			_navAgent = Enemy?.GetNodeOrNull<NavigationAgent2D>("NavigationAgent2D");
@@ -337,16 +327,13 @@ namespace Kuros.Actors.Enemies.Attacks
 
 		protected bool IsPlayerInsideDashStopArea(SamplePlayer player)
 		{
-			if (_dashStopArea != null)
-				return player.IsHitByArea(_dashStopArea);
 			return player.IsHitByArea(AttackArea);
 		}
 
 		private bool IsPlayerInsideDashSlashArea(SamplePlayer player)
 		{
-			var targetArea = _dashSlashArea ?? AttackArea;
-			if (targetArea == null) return true;
-			return player.IsHitByArea(targetArea);
+			if (AttackArea == null) return true;
+			return player.IsHitByArea(AttackArea);
 		}
 
 		private void UpdateDetectionTracking()
@@ -398,8 +385,8 @@ namespace Kuros.Actors.Enemies.Attacks
 		{
 			if (Enemy == null || Enemy.IsDead || Enemy.IsDeathSequenceActive) return;
 			if (Enemy.PlayerTarget == null) return;
-			if (_dashSlashArea != null) ApplyAttackAreaMaskOverride(_dashSlashArea);
-			DealDamage((_dashSlashArea ?? AttackArea)!);
+			if (DamageArea != null) ApplyAttackAreaMaskOverride(DamageArea);
+			DealDamage(DamageArea!);
 			if (!IsPlayerInsideDashSlashArea(Enemy.PlayerTarget)) return;
 			ExecuteStrike();
 		}
@@ -446,14 +433,6 @@ namespace Kuros.Actors.Enemies.Attacks
 		{
 			if (Enemy == null || body != Enemy.PlayerTarget) return;
 			_playerInsideDetection = false;
-		}
-
-		private Area2D? ResolveArea(NodePath path)
-		{
-			if (path.IsEmpty) return null;
-			var area = GetNodeOrNull<Area2D>(path);
-			if (area != null) return area;
-			return Enemy?.GetNodeOrNull<Area2D>(path);
 		}
 
 		private void AlignFacingWithPlayer()

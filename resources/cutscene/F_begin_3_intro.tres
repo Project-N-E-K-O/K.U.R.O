@@ -1,0 +1,128 @@
+[gd_resource type="Resource" script_class="CutsceneSequence" load_steps=27 format=3 uid="uid://c7dnkxl20sbvy"]
+
+[ext_resource type="Script" uid="uid://ctrko7add3r5h" path="res://scripts/systems/cutscene/CutsceneStep.cs" id="1_step"]
+[ext_resource type="Script" uid="uid://cjl1hjmndwvcg" path="res://scripts/systems/cutscene/steps/FadeStep.cs" id="2_fade"]
+[ext_resource type="Script" uid="uid://dfa1ahl1vdlc1" path="res://scripts/systems/cutscene/steps/EffectDespawnStep.cs" id="3_krxc6"]
+[ext_resource type="Script" uid="uid://5xu2sir0yhv1" path="res://scripts/systems/cutscene/steps/PlayAnimationStep.cs" id="3_m4q78"]
+[ext_resource type="Script" uid="uid://cgnajq1ykl2mn" path="res://scripts/systems/cutscene/CutsceneSequence.cs" id="4_seq"]
+[ext_resource type="Script" uid="uid://dhch281hkryms" path="res://scripts/systems/cutscene/steps/EffectConfig.cs" id="5_xm0fp"]
+[ext_resource type="PackedScene" uid="uid://be30f0gopxel3" path="res://scenes/actors/etc/SlideRail_wheel.tscn" id="6_2si8d"]
+[ext_resource type="PackedScene" uid="uid://duryvwia2gyyc" path="res://scenes/actors/characters/Enemy_F1_rogueAI_Cannon.tscn" id="7_2si8d"]
+[ext_resource type="Script" uid="uid://bdni42t83syt8" path="res://scripts/systems/cutscene/steps/EffectGroupSpawnStep.cs" id="7_v6k0a"]
+[ext_resource type="PackedScene" uid="uid://cw42j1o501x83" path="res://scenes/actors/characters/Enemy_F1_rogueAI_MachineGun.tscn" id="8_dfbxa"]
+[ext_resource type="PackedScene" uid="uid://30w6ddbm18ga" path="res://scenes/actors/etc/SlideRail.tscn" id="8_v6k0a"]
+[ext_resource type="PackedScene" uid="uid://c08u473nbnuxg" path="res://scenes/actors/characters/Enemy_F1_rogueAI.tscn" id="9_nnnpt"]
+
+[sub_resource type="Resource" id="Resource_62k4c"]
+script = ExtResource("2_fade")
+Duration = 1.5
+TransitionDuration = 1.0
+UseMovieBlackBars = false
+metadata/_custom_type_script = "uid://cjl1hjmndwvcg"
+
+[sub_resource type="Resource" id="Resource_2si8d"]
+script = ExtResource("3_krxc6")
+metadata/_custom_type_script = "uid://dfa1ahl1vdlc1"
+
+[sub_resource type="Resource" id="Resource_pn8jt"]
+script = ExtResource("3_m4q78")
+AnimationPlayerPath = NodePath("../World/FBegin/AnimationPlayer")
+AnimationName = "up_loop"
+metadata/_custom_type_script = "uid://5xu2sir0yhv1"
+
+[sub_resource type="Resource" id="Resource_xm0fp"]
+script = ExtResource("3_m4q78")
+AnimationPlayerPath = NodePath("../World/FBegin/AnimationPlayer2")
+AnimationName = "rail_move_out"
+metadata/_custom_type_script = "uid://5xu2sir0yhv1"
+
+[sub_resource type="Resource" id="Resource_b6ijc"]
+script = ExtResource("3_m4q78")
+AnimationPlayerPath = NodePath("../World/FBegin/Animation_rogueAI/AnimationPlayer")
+AnimationName = "leave"
+WaitForCompletion = true
+metadata/_custom_type_script = "uid://5xu2sir0yhv1"
+
+[sub_resource type="Resource" id="Resource_krxc6"]
+script = ExtResource("3_m4q78")
+AnimationPlayerPath = NodePath("../World/FBegin/AnimationPlayer")
+AnimationName = "up_to_top"
+WaitForCompletion = true
+metadata/_custom_type_script = "uid://5xu2sir0yhv1"
+
+[sub_resource type="Resource" id="Resource_m4q78"]
+script = ExtResource("3_m4q78")
+AnimationPlayerPath = NodePath("../World/FBegin/LiftingPlatform/AnimationPlayer")
+AnimationName = "open"
+WaitForCompletion = true
+metadata/_custom_type_script = "uid://5xu2sir0yhv1"
+
+[sub_resource type="Resource" id="Resource_dfbxa"]
+script = ExtResource("3_m4q78")
+AnimationPlayerPath = NodePath("../World/FBegin/AnimationPlayer2")
+AnimationName = "rail_move_in"
+WaitForCompletion = true
+metadata/_custom_type_script = "uid://5xu2sir0yhv1"
+
+[sub_resource type="Resource" id="Resource_v6k0a"]
+script = ExtResource("3_m4q78")
+AnimationPlayerPath = NodePath("../World/FBegin/AnimationPlayer")
+AnimationName = "up_to_top_event"
+WaitForCompletion = true
+metadata/_custom_type_script = "uid://5xu2sir0yhv1"
+
+[sub_resource type="Resource" id="Resource_nnnpt"]
+script = ExtResource("3_m4q78")
+AnimationPlayerPath = NodePath("../World/FBegin/Animation_rogueAI/AnimationPlayer")
+AnimationName = "move_down"
+metadata/_custom_type_script = "uid://5xu2sir0yhv1"
+
+[sub_resource type="Resource" id="Resource_untg7"]
+script = ExtResource("5_xm0fp")
+EffectScene = ExtResource("6_2si8d")
+SpawnType = 2
+TargetNodePath = NodePath("../World/FBegin/SlideRailSpawnPoint")
+SpawnTag = "SlideRailWheelLeft"
+PropertyOverrides = Dictionary[String, Variant]({
+"CarriagePrefab": ExtResource("7_2si8d")
+})
+metadata/_custom_type_script = "uid://dhch281hkryms"
+
+[sub_resource type="Resource" id="Resource_cogwa"]
+script = ExtResource("5_xm0fp")
+EffectScene = ExtResource("6_2si8d")
+SpawnType = 2
+TargetNodePath = NodePath("../World/FBegin/SlideRailSpawnPoint2")
+SpawnTag = "SlideRailWheeRight"
+PropertyOverrides = Dictionary[String, Variant]({
+"CarriagePrefab": ExtResource("8_dfbxa"),
+"FlipCarriageEnds": true
+})
+metadata/_custom_type_script = "uid://dhch281hkryms"
+
+[sub_resource type="Resource" id="Resource_3erl1"]
+script = ExtResource("5_xm0fp")
+EffectScene = ExtResource("8_v6k0a")
+SpawnType = 2
+TargetNodePath = NodePath("../World/FBegin/Animation_rogueAI")
+SpawnDelay = 1.9
+SpawnTag = "AnimationRogueAI"
+PropertyOverrides = Dictionary[String, Variant]({
+"CarriagePrefab": ExtResource("9_nnnpt"),
+"CarriageSpawn": 2,
+"z_index": 2
+})
+metadata/_custom_type_script = "uid://dhch281hkryms"
+
+[sub_resource type="Resource" id="Resource_yqcfi"]
+script = ExtResource("7_v6k0a")
+Effects = Array[ExtResource("5_xm0fp")]([SubResource("Resource_untg7"), SubResource("Resource_cogwa"), SubResource("Resource_3erl1")])
+metadata/_custom_type_script = "uid://bdni42t83syt8"
+
+[resource]
+script = ExtResource("4_seq")
+SequenceId = "F_begin_3_intro"
+Steps = Array[ExtResource("1_step")]([SubResource("Resource_62k4c"), SubResource("Resource_2si8d"), SubResource("Resource_pn8jt"), SubResource("Resource_xm0fp"), SubResource("Resource_b6ijc"), SubResource("Resource_krxc6"), SubResource("Resource_m4q78"), SubResource("Resource_dfbxa"), SubResource("Resource_v6k0a"), SubResource("Resource_nnnpt"), SubResource("Resource_yqcfi")])
+DisablePlayerInput = false
+HidePlayer = false
+metadata/_custom_type_script = "uid://cgnajq1ykl2mn"

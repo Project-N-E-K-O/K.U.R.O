@@ -8,5 +8,5 @@ script = ExtResource("2_tlmiy")
 StageId = "stage6"
 DisplayName = "AI工厂"
 LevelDescription = "酒店五层最终层"
-Floor = 5
+Floor = 4
 BeginPool = Array[PackedScene]([ExtResource("1_p3sbr")])

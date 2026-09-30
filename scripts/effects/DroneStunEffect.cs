@@ -5,59 +5,53 @@ using Kuros.Core.Effects;
 namespace Kuros.Effects
 {
     /// <summary>
-    /// 无人机眩晕效果：瞬间检测范围内是否存在 Boss 的 StunArea。
-    /// 命中后对敌人应用 FreezeEffect，持续时间为 effect.Duration。
-    /// 使用物理空间直接查询，检测完毕后立即停用 Area2D。
+    /// 无人机眩晕效果（**世界型一次性效果**）：实例化后立刻在 <see cref="WorldSpawnPosition"/>（无则根节点位置）
+    /// 做一次空间扫描，命中带 `StunArea` 的敌人则施加 <see cref="FreezeEffect"/>（眩晕 <see cref="Duration"/> 秒），随后自毁。
+    ///
+    /// 用 Node2D 而非 ActorEffect：本效果的位置由世界坐标决定，**不需要宿主 actor**。
+    /// 旧实现是 ActorEffect，破坏时由物品管线挂到 `LastDroppedBy`（最后投掷者）身上——drone 死亡掉落、
+    /// 从未被拾取投掷的家具没有投掷者，于是该效果被直接丢弃（"死亡掉落的无人机炸了不眩晕 netAdmin"）。
+    /// 世界型与投掷者无关，两种来源都能生效。
     /// </summary>
     [GlobalClass]
-    public partial class DroneStunEffect : ActorEffect, IWorldSpawnable
+    public partial class DroneStunEffect : Node2D, IWorldSpawnable
     {
+        /// <summary>由生成方（投掷/破坏管线）注入的世界落点。</summary>
         public Vector2? WorldSpawnPosition { get; set; }
 
-        private Area2D? _area;
-        private bool _applied;
+        /// <summary>眩晕持续时长（秒）。</summary>
+        [Export(PropertyHint.Range, "0,60,0.1")] public float Duration { get; set; } = 6.0f;
 
-        protected override void OnApply()
+        private bool _scanned;
+
+        public override void _Process(double delta)
         {
-            base.OnApply();
-            EffectId = $"drone_stun_{GetInstanceId()}";
-
-            _area = GetNodeOrNull<Area2D>("Area2D");
-            if (_area == null) return;
-
-            if (WorldSpawnPosition.HasValue)
-                _area.GlobalPosition = WorldSpawnPosition.Value;
-
-            CallDeferred("InstantScan");
+            // 扫描放在首个"可处理帧"而不是 _Ready：物品的投掷破坏特效**预热**会以
+            // ProcessMode.Disabled + 隐藏 的方式实例化本场景一次（RigidBodyWorldItemEntity.WarmUpThrowDestroyEffectShaders），
+            // _Ready 照跑，而 Disabled 的实例永远走不到这里——不会被预热误当成一次真触发。
+            if (_scanned) return;
+            _scanned = true;
+            InstantScan();
         }
 
         private void InstantScan()
         {
-            if (_applied || _area == null || !IsInstanceValid(_area))
+            if (WorldSpawnPosition.HasValue)
+                GlobalPosition = WorldSpawnPosition.Value;
+
+            var area = GetNodeOrNull<Area2D>("Area2D");
+            var shapeNode = area?.GetNodeOrNull<CollisionShape2D>("CollisionShape2D");
+            var spaceState = area?.GetWorld2D()?.DirectSpaceState;
+            if (shapeNode?.Shape == null || spaceState == null)
             {
-                CleanupAndRemoveSelf();
+                QueueFree();
                 return;
             }
 
-            var shapeNode = _area.GetNodeOrNull<CollisionShape2D>("CollisionShape2D");
-            if (shapeNode?.Shape == null)
-            {
-                CleanupAndRemoveSelf();
-                return;
-            }
-
-            var spaceState = _area.GetWorld2D().DirectSpaceState;
-            if (spaceState == null)
-            {
-                CleanupAndRemoveSelf();
-                return;
-            }
-
-            Vector2 center = WorldSpawnPosition ?? _area.GlobalPosition;
             var query = new PhysicsShapeQueryParameters2D
             {
                 Shape = shapeNode.Shape,
-                Transform = new Transform2D(0f, center),
+                Transform = new Transform2D(0f, GlobalPosition),
                 CollisionMask = 1u,
                 CollideWithAreas = true,
                 CollideWithBodies = false,
@@ -73,35 +67,21 @@ namespace Kuros.Effects
                 if (enemy == null || !IsInstanceValid(enemy)) continue;
                 if (enemy.ActiveImmunities.HasFlag(ImmunityFlags.Stun)) continue;
 
-                _applied = true;
-
-                // Remove any previous drone stun, clear stale Frozen state, apply new one
+                // 同一敌人身上的旧无人机眩晕先移除，再压新的（避免叠成两份 FreezeEffect）
                 var existing = enemy.EffectController?.GetEffect<FreezeEffect>();
-                if (existing != null && existing.EffectId?.StartsWith("drone_stun_") == true)
+                if (existing?.EffectId?.StartsWith("drone_stun_") == true)
                     enemy.RemoveEffect(existing.EffectId);
                 enemy.FrozenStateRemainingTime = 0f;
 
                 enemy.ApplyEffect(new FreezeEffect
                 {
-                    Duration = this.Duration,
+                    Duration = Duration,
                     EffectId = $"drone_stun_{GetInstanceId()}"
                 });
                 break;
             }
 
-            CleanupAndRemoveSelf();
+            QueueFree();
         }
-
-        private void CleanupAndRemoveSelf()
-        {
-            if (_area != null && IsInstanceValid(_area))
-            {
-                _area.Monitoring = false;
-                _area.Monitorable = false;
-            }
-            Target?.RemoveEffect(EffectId);
-        }
-
-        private GameActor? Target => (GameActor?)GetParent();
     }
 }

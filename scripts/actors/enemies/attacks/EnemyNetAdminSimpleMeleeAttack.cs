@@ -9,27 +9,23 @@ namespace Kuros.Actors.Enemies.Attacks
     /// </summary>
     public partial class EnemyNetAdminSimpleMeleeAttack : EnemySimpleMeleeAttack
     {
-        [Export] public NodePath DetectionAreaPath = new();
-        [Export] public NodePath DamageAreaPath = new();
+        // 起手检测区由基类提供：TriggerAreaPath（未配置 = 不做额外限制）。
+        // 旧的 DetectionAreaPath 已并入基类；伤害区走基类 DamageAreaPath（未配置 = AttackArea）。
         [Export] public bool TrackTargetDuringWarmup = false;
 
-        private Area2D? _detectionArea;
-        private Area2D? _damageArea;
         private CollisionShape2D? _damageShape;
 
         protected override void OnInitialized()
         {
             base.OnInitialized();
-            _detectionArea = ResolveArea(DetectionAreaPath) ?? AttackArea;
-            _damageArea = ResolveArea(DamageAreaPath) ?? AttackArea;
-            _damageShape = _damageArea?.GetNodeOrNull<CollisionShape2D>("CollisionShape2D");
+            // 伤害区走基类统一解析：DamageAreaPath → 回退 AttackArea（等价于原来的 `?? AttackArea`）
+            _damageShape = DamageArea?.GetNodeOrNull<CollisionShape2D>("CollisionShape2D");
         }
 
         public override bool CanStart()
         {
             if (!base.CanStart()) return false;
-            if (Player == null) return false;
-            return Player.IsHitByArea(_detectionArea);
+            return IsPlayerInTriggerArea();   // 未配置 TriggerAreaPath = 不做额外限制
         }
 
         public override void _PhysicsProcess(double delta)
@@ -57,17 +53,17 @@ namespace Kuros.Actors.Enemies.Attacks
                 _animationHitReady = true;
                 return;
             }
-            ApplyAttackAreaMaskOverride(_damageArea);
-            DealDamage(_damageArea);
-            ApplyKnockbackWithArea(_damageArea);
+            ApplyAttackAreaMaskOverride(DamageArea);
+            DealDamage(DamageArea);
+            ApplyKnockbackWithArea(DamageArea);
         }
 
         protected override void OnAnimationHit()
         {
             SpawnEffectAtEnemy(EffectSpawnTiming.OnAnimationHit); // entry 独立时机生效
-            ApplyAttackAreaMaskOverride(_damageArea);
-            DealDamage(_damageArea);
-            ApplyKnockbackWithArea(_damageArea);
+            ApplyAttackAreaMaskOverride(DamageArea);
+            DealDamage(DamageArea);
+            ApplyKnockbackWithArea(DamageArea);
         }
 
         private void ApplyKnockbackWithArea(Area2D? area)
@@ -85,12 +81,5 @@ namespace Kuros.Actors.Enemies.Attacks
                 area);
         }
 
-        private Area2D? ResolveArea(NodePath path)
-        {
-            if (path.IsEmpty) return null;
-            var area = GetNodeOrNull<Area2D>(path);
-            if (area != null) return area;
-            return Enemy?.GetNodeOrNull<Area2D>(path);
-        }
     }
 }

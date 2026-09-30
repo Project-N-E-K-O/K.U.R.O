@@ -1,12 +1,19 @@
-[gd_scene load_steps=33 format=3 uid="uid://c1acqfacsuky6"]
+[gd_scene load_steps=38 format=3 uid="uid://c1acqfacsuky6"]
 
 [ext_resource type="Script" uid="uid://cnm33l1nmqohv" path="res://scripts/fx/DirectionalSceneEffect.cs" id="1_y33dl"]
+[ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="2_pa1ur"]
+[ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="3_spsct"]
 [ext_resource type="Texture2D" uid="uid://5cvi3ej8m7r3" path="res://assets/effect/LightEffect/屏幕光晕.png" id="5_5sirc"]
 [ext_resource type="SpineSkeletonDataResource" uid="uid://cu7dh3atg6s4d" path="res://animations/spine/Enemy_F1_rogueAI.tres" id="5_y33dl"]
 [ext_resource type="Texture2D" uid="uid://752sqoqmoavc" path="res://addons/dialogic/Modules/Signal/sign/exit_sign.png" id="6_5sirc"]
 [ext_resource type="Script" uid="uid://4dd56677a2aa" path="res://scripts/controllers/ShadowFollower.cs" id="7_pa1ur"]
 
-[sub_resource type="Animation" id="Animation_y33dl"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_f7mh0"]
+shader = ExtResource("2_pa1ur")
+shader_parameter/softness = 0.0
+shader_parameter/alpha = 0.0
+
+[sub_resource type="Animation" id="Animation_pa1ur"]
 resource_name = "attack_down_looped"
 length = 0.4
 tracks/0/type = "value"
@@ -34,7 +41,7 @@ tracks/1/keys = {
 "values": [true]
 }
 
-[sub_resource type="Animation" id="Animation_5sirc"]
+[sub_resource type="Animation" id="Animation_spsct"]
 resource_name = "attack_down"
 length = 0.4
 tracks/0/type = "value"
@@ -62,7 +69,7 @@ tracks/1/keys = {
 "values": [false]
 }
 
-[sub_resource type="Animation" id="Animation_pa1ur"]
+[sub_resource type="Animation" id="Animation_f7mh0"]
 resource_name = "attack_up_looped"
 length = 0.4
 tracks/0/type = "value"
@@ -90,7 +97,7 @@ tracks/1/keys = {
 "values": [true]
 }
 
-[sub_resource type="Animation" id="Animation_spsct"]
+[sub_resource type="Animation" id="Animation_qehse"]
 resource_name = "attack_up"
 length = 0.4
 tracks/0/type = "value"
@@ -118,7 +125,7 @@ tracks/1/keys = {
 "values": [false]
 }
 
-[sub_resource type="Animation" id="Animation_f7mh0"]
+[sub_resource type="Animation" id="Animation_w7snn"]
 resource_name = "attack_warming_down_looped"
 length = 0.4
 tracks/0/type = "value"
@@ -146,7 +153,7 @@ tracks/1/keys = {
 "values": [true]
 }
 
-[sub_resource type="Animation" id="Animation_qehse"]
+[sub_resource type="Animation" id="Animation_m7tr1"]
 resource_name = "attack_warming_down"
 length = 0.4
 tracks/0/type = "value"
@@ -174,7 +181,7 @@ tracks/1/keys = {
 "values": [false]
 }
 
-[sub_resource type="Animation" id="Animation_w7snn"]
+[sub_resource type="Animation" id="Animation_6gqwt"]
 resource_name = "attack_warming_up_looped"
 length = 1.2
 tracks/0/type = "value"
@@ -202,7 +209,7 @@ tracks/1/keys = {
 "values": [true]
 }
 
-[sub_resource type="Animation" id="Animation_m7tr1"]
+[sub_resource type="Animation" id="Animation_5ulvi"]
 resource_name = "attack_warming_up"
 length = 1.2
 tracks/0/type = "value"
@@ -230,7 +237,7 @@ tracks/1/keys = {
 "values": [false]
 }
 
-[sub_resource type="Animation" id="Animation_6gqwt"]
+[sub_resource type="Animation" id="Animation_1h105"]
 resource_name = "death_down_looped"
 length = 2.0
 tracks/0/type = "value"
@@ -258,7 +265,7 @@ tracks/1/keys = {
 "values": [true]
 }
 
-[sub_resource type="Animation" id="Animation_5ulvi"]
+[sub_resource type="Animation" id="Animation_w84lq"]
 resource_name = "death_down"
 length = 2.0
 tracks/0/type = "value"
@@ -286,7 +293,7 @@ tracks/1/keys = {
 "values": [false]
 }
 
-[sub_resource type="Animation" id="Animation_1h105"]
+[sub_resource type="Animation" id="Animation_i0roh"]
 resource_name = "hit_down_looped"
 length = 0.4
 tracks/0/type = "value"
@@ -314,7 +321,7 @@ tracks/1/keys = {
 "values": [true]
 }
 
-[sub_resource type="Animation" id="Animation_w84lq"]
+[sub_resource type="Animation" id="Animation_rbra3"]
 resource_name = "hit_down"
 length = 0.4
 tracks/0/type = "value"
@@ -342,7 +349,7 @@ tracks/1/keys = {
 "values": [false]
 }
 
-[sub_resource type="Animation" id="Animation_i0roh"]
+[sub_resource type="Animation" id="Animation_04lk8"]
 resource_name = "idle_up_looped"
 length = 2.666667
 tracks/0/type = "value"
@@ -370,7 +377,7 @@ tracks/1/keys = {
 "values": [true]
 }
 
-[sub_resource type="Animation" id="Animation_rbra3"]
+[sub_resource type="Animation" id="Animation_41u8u"]
 resource_name = "idle_up"
 length = 2.666667
 tracks/0/type = "value"
@@ -398,7 +405,7 @@ tracks/1/keys = {
 "values": [false]
 }
 
-[sub_resource type="Animation" id="Animation_04lk8"]
+[sub_resource type="Animation" id="Animation_cw1d4"]
 resource_name = "ldle_down_looped"
 length = 1.6
 tracks/0/type = "value"
@@ -426,7 +433,7 @@ tracks/1/keys = {
 "values": [true]
 }
 
-[sub_resource type="Animation" id="Animation_41u8u"]
+[sub_resource type="Animation" id="Animation_bv5su"]
 resource_name = "ldle_down"
 length = 1.6
 tracks/0/type = "value"
@@ -454,7 +461,7 @@ tracks/1/keys = {
 "values": [false]
 }
 
-[sub_resource type="Animation" id="Animation_cw1d4"]
+[sub_resource type="Animation" id="Animation_k8a06"]
 resource_name = "up_to_down_looped"
 length = 0.8
 tracks/0/type = "value"
@@ -482,7 +489,7 @@ tracks/1/keys = {
 "values": [true]
 }
 
-[sub_resource type="Animation" id="Animation_bv5su"]
+[sub_resource type="Animation" id="Animation_bsx8u"]
 resource_name = "up_to_down"
 length = 0.8
 tracks/0/type = "value"
@@ -510,7 +517,7 @@ tracks/1/keys = {
 "values": [false]
 }
 
-[sub_resource type="Animation" id="Animation_k8a06"]
+[sub_resource type="Animation" id="Animation_c15j1"]
 resource_name = "walk_down_looped"
 length = 0.5
 tracks/0/type = "value"
@@ -538,7 +545,7 @@ tracks/1/keys = {
 "values": [true]
 }
 
-[sub_resource type="Animation" id="Animation_bsx8u"]
+[sub_resource type="Animation" id="Animation_pejhq"]
 resource_name = "walk_down"
 length = 0.5
 tracks/0/type = "value"
@@ -566,7 +573,7 @@ tracks/1/keys = {
 "values": [false]
 }
 
-[sub_resource type="Animation" id="Animation_c15j1"]
+[sub_resource type="Animation" id="Animation_78mhh"]
 resource_name = "walk_up_looped"
 length = 1.7
 tracks/0/type = "value"
@@ -594,7 +601,7 @@ tracks/1/keys = {
 "values": [true]
 }
 
-[sub_resource type="Animation" id="Animation_pejhq"]
+[sub_resource type="Animation" id="Animation_ljew7"]
 resource_name = "walk_up"
 length = 1.7
 tracks/0/type = "value"
@@ -622,7 +629,7 @@ tracks/1/keys = {
 "values": [false]
 }
 
-[sub_resource type="Animation" id="Animation_78mhh"]
+[sub_resource type="Animation" id="Animation_jgm8m"]
 resource_name = "RESET"
 length = 0.5
 tracks/0/type = "value"
@@ -650,32 +657,32 @@ tracks/1/keys = {
 "values": [false]
 }
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_ljew7"]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_pjmx8"]
 _data = {
-&"-- Empty --": SubResource("Animation_78mhh"),
-&"RESET": SubResource("Animation_78mhh"),
-&"attack_down": SubResource("Animation_5sirc"),
-&"attack_down_looped": SubResource("Animation_y33dl"),
-&"attack_up": SubResource("Animation_spsct"),
-&"attack_up_looped": SubResource("Animation_pa1ur"),
-&"attack_warming_down": SubResource("Animation_qehse"),
-&"attack_warming_down_looped": SubResource("Animation_f7mh0"),
-&"attack_warming_up": SubResource("Animation_m7tr1"),
-&"attack_warming_up_looped": SubResource("Animation_w7snn"),
-&"death_down": SubResource("Animation_5ulvi"),
-&"death_down_looped": SubResource("Animation_6gqwt"),
-&"hit_down": SubResource("Animation_w84lq"),
-&"hit_down_looped": SubResource("Animation_1h105"),
-&"idle_up": SubResource("Animation_rbra3"),
-&"idle_up_looped": SubResource("Animation_i0roh"),
-&"ldle_down": SubResource("Animation_41u8u"),
-&"ldle_down_looped": SubResource("Animation_04lk8"),
-&"up_to_down": SubResource("Animation_bv5su"),
-&"up_to_down_looped": SubResource("Animation_cw1d4"),
-&"walk_down": SubResource("Animation_bsx8u"),
-&"walk_down_looped": SubResource("Animation_k8a06"),
-&"walk_up": SubResource("Animation_pejhq"),
-&"walk_up_looped": SubResource("Animation_c15j1")
+&"-- Empty --": SubResource("Animation_jgm8m"),
+&"RESET": SubResource("Animation_jgm8m"),
+&"attack_down": SubResource("Animation_spsct"),
+&"attack_down_looped": SubResource("Animation_pa1ur"),
+&"attack_up": SubResource("Animation_qehse"),
+&"attack_up_looped": SubResource("Animation_f7mh0"),
+&"attack_warming_down": SubResource("Animation_m7tr1"),
+&"attack_warming_down_looped": SubResource("Animation_w7snn"),
+&"attack_warming_up": SubResource("Animation_5ulvi"),
+&"attack_warming_up_looped": SubResource("Animation_6gqwt"),
+&"death_down": SubResource("Animation_w84lq"),
+&"death_down_looped": SubResource("Animation_1h105"),
+&"hit_down": SubResource("Animation_rbra3"),
+&"hit_down_looped": SubResource("Animation_i0roh"),
+&"idle_up": SubResource("Animation_41u8u"),
+&"idle_up_looped": SubResource("Animation_04lk8"),
+&"ldle_down": SubResource("Animation_bv5su"),
+&"ldle_down_looped": SubResource("Animation_cw1d4"),
+&"up_to_down": SubResource("Animation_bsx8u"),
+&"up_to_down_looped": SubResource("Animation_k8a06"),
+&"walk_down": SubResource("Animation_pejhq"),
+&"walk_down_looped": SubResource("Animation_c15j1"),
+&"walk_up": SubResource("Animation_ljew7"),
+&"walk_up_looped": SubResource("Animation_78mhh")
 }
 
 [sub_resource type="Animation" id="Animation_80asv"]
@@ -728,6 +735,214 @@ tracks/3/keys = {
 "update": 0,
 "values": [Color(1, 1, 1, 0)]
 }
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("position:rotation")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath(".:z_index")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("Shadow:material:shader_parameter/softness")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/7/type = "value"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath("Shadow:material:shader_parameter/alpha")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="Animation" id="Animation_wtpwj"]
+resource_name = "leave"
+length = 2.0
+tracks/0/type = "animation"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("position/SpineSprite/SpineAnimationTrack/SpineSprite Track 0")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"clips": PackedStringArray("idle_up"),
+"times": PackedFloat32Array(0)
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("position/SpineSprite:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 1, 2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Color(0.54901963, 0.54901963, 0.54901963, 1), Color(0, 0, 0, 1), Color(0, 0, 0, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".:visible")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("position:position:y")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 1, 1.4, 1.5),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [-300.0, -300.0, -100.0, -1500.0]
+}
+
+[sub_resource type="Animation" id="Animation_i5f6q"]
+resource_name = "move_down"
+length = 2.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("position/Sprite2D:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("position/SpineSprite:modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("position:position:y")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0.5, 1.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [-2000.0, -990.0]
+}
+tracks/4/type = "animation"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("position/SpineSprite/SpineAnimationTrack/SpineSprite Track 0")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"clips": PackedStringArray("idle_up"),
+"times": PackedFloat32Array(0)
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("position:rotation")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0.8, 0.9, 1, 1.1, 1.2, 1.3),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [0.0, -0.04363323129985824, 0.04363323129985824, -0.04363323129985824, 0.04363323129985824, 0.0]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath(".:z_index")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [3]
+}
+tracks/7/type = "value"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath("Shadow:material:shader_parameter/softness")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
+"times": PackedFloat32Array(0.5, 1.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 0.35]
+}
+tracks/8/type = "value"
+tracks/8/imported = false
+tracks/8/enabled = true
+tracks/8/path = NodePath("Shadow:material:shader_parameter/alpha")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/keys = {
+"times": PackedFloat32Array(0.5, 1.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 0.3]
+}
 
 [sub_resource type="Animation" id="Animation_t4vhn"]
 resource_name = "wake_up"
@@ -749,7 +964,7 @@ tracks/1/path = NodePath("position/Sprite2D:visible")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0, 1, 1.1, 1.2, 1.2666667, 1.3333334, 1.4),
+"times": PackedFloat32Array(0, 1, 1.0666667, 1.2, 1.2666667, 1.4, 1.4666667),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
 "update": 1,
 "values": [true, true, false, true, false, true, false]
@@ -761,7 +976,7 @@ tracks/2/path = NodePath("position:position:y")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
-"times": PackedFloat32Array(0, 1),
+"times": PackedFloat32Array(0.5, 1.4),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [0.0, -300.0]
@@ -773,10 +988,10 @@ tracks/3/path = NodePath(".:visible")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
+"times": PackedFloat32Array(0, 2),
+"transitions": PackedFloat32Array(1, 1),
 "update": 1,
-"values": [true]
+"values": [true, false]
 }
 tracks/4/type = "value"
 tracks/4/imported = false
@@ -788,32 +1003,25 @@ tracks/4/keys = {
 "times": PackedFloat32Array(0, 0.6, 2),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [Color(0, 0, 0, 0), Color(0, 0, 0, 1), Color(0.55295575, 0.55295557, 0.5529553, 1)]
-}
-tracks/5/type = "method"
-tracks/5/imported = false
-tracks/5/enabled = true
-tracks/5/path = NodePath(".")
-tracks/5/interp = 1
-tracks/5/loop_wrap = true
-tracks/5/keys = {
-"times": PackedFloat32Array(2),
-"transitions": PackedFloat32Array(1),
-"values": [{
-"args": [],
-"method": &"DestroySelf"
-}]
+"values": [Color(0, 0, 0, 0), Color(0, 0, 0, 1), Color(0.54901963, 0.54901963, 0.54901963, 1)]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_wtpwj"]
 _data = {
 &"RESET": SubResource("Animation_80asv"),
+&"leave": SubResource("Animation_wtpwj"),
+&"move_down": SubResource("Animation_i5f6q"),
 &"wake_up": SubResource("Animation_t4vhn")
 }
 
 [node name="Animation_rogueAI" type="Node2D"]
 visible = false
 script = ExtResource("1_y33dl")
+
+[node name="Shadow" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_f7mh0")
+scale = Vector2(12, 6)
+texture = ExtResource("3_spsct")
 
 [node name="position" type="Node2D" parent="."]
 
@@ -828,7 +1036,7 @@ preview_time = 0.0
 
 [node name="SpineBoneNode" type="SpineBoneNode" parent="position/SpineSprite"]
 show_behind_parent = true
-position = Vector2(-27.368896, -558.8517)
+position = Vector2(-27.368896, -558.85156)
 rotation = 0.013512622
 scale = Vector2(0.9999998, 0.9999998)
 bone_name = "bone5"
@@ -838,7 +1046,7 @@ track_index = 0
 
 [node name="SpineSprite Track 0" type="AnimationPlayer" parent="position/SpineSprite/SpineAnimationTrack"]
 libraries = {
-&"": SubResource("AnimationLibrary_ljew7")
+&"": SubResource("AnimationLibrary_pjmx8")
 }
 
 [node name="Sprite2D" type="Sprite2D" parent="position"]

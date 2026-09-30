@@ -263,13 +263,13 @@ QueuedAttackTimeout = 3.0
 
 [node name="WheelAttack" type="Node" parent="StateMachine/Attack/AttackController"]
 script = ExtResource("11_kjt0o")
-DetectionAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
 AttackName = "WheelAttack"
 WarmupDuration = 0.3
 ActiveDuration = 2.2
 RecoveryDuration = 0.63
 CooldownDurationMultiplier = 10.0
 DamageMultiplier = 0.0
+TriggerAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
 RequireAnimationHitTrigger = true
 AllowMultipleAnimationHits = true
 GrantedImmunities = 24
@@ -288,6 +288,8 @@ ActiveDuration = 0.2
 RecoveryDuration = 0.48
 CooldownDurationMultiplier = 0.5
 AttackAreaPath = NodePath("../../../../Sprite2D/AttackArea")
+DamageAreaPath = NodePath("../../../../Sprite2D/AttackArea")
+TriggerAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
 KnockbackDistance = 200.0
 KnockbackDuration = 0.1
 RequireAnimationHitTrigger = true

@@ -1,16 +1,17 @@
-[gd_scene load_steps=32 format=3 uid="uid://cl1ki1csawpip"]
+[gd_scene load_steps=35 format=3 uid="uid://cl1ki1csawpip"]
 
-[ext_resource type="Script" uid="uid://b217dd0r612wc" path="res://scripts/managers/CameraZoneArea.cs" id="1_eajhg"]
-[ext_resource type="Script" uid="uid://c48gl80t8ko65" path="res://scripts/managers/LightRevealController.cs" id="1_lightreveal"]
-[ext_resource type="Texture2D" uid="uid://crnd0nvw77ix2" path="res://assets/environments/scene_1_home/房间2地面.png" id="2_jv8iw"]
-[ext_resource type="Texture2D" uid="uid://bwy3ynxccmpby" path="res://assets/environments/scene_1_home/房间2墙壁.png" id="3_kn5l6"]
-[ext_resource type="Texture2D" uid="uid://b044wsmc6wo4d" path="res://assets/environments/scene_1_home/房间2隔断墙2.png" id="4_o4vmd"]
+[ext_resource type="Script" uid="uid://cra7y7mt0x1j8" path="res://scripts/managers/CameraZoneArea.cs" id="1_eajhg"]
+[ext_resource type="Script" uid="uid://cifwu23mu55li" path="res://scripts/managers/LightRevealController.cs" id="1_lightreveal"]
+[ext_resource type="Texture2D" uid="uid://20khta50kpjb" path="res://assets/environments/scene_1_home/房间2地面.png" id="2_jv8iw"]
+[ext_resource type="Texture2D" uid="uid://bkvy3th2vg6k4" path="res://assets/environments/scene_1_home/房间2墙壁.png" id="3_kn5l6"]
+[ext_resource type="Shader" uid="uid://dwi65rioev5hr" path="res://shaders/materials/pseudo_3d_card.gdshader" id="3_w6i5k"]
+[ext_resource type="Texture2D" uid="uid://d0oxywii08nmt" path="res://assets/environments/scene_1_home/房间2隔断墙2.png" id="4_o4vmd"]
 [ext_resource type="PackedScene" uid="uid://orctascxfe5c" path="res://scenes/environments/door2_A1.tscn" id="5_utjd6"]
 [ext_resource type="PackedScene" uid="uid://mwpdlx1yup0k" path="res://scenes/actors/etc/EnemySpawnConsole.tscn" id="6_jv8iw"]
-[ext_resource type="Texture2D" uid="uid://dcewcyug72e3w" path="res://assets/environments/scene_1_home/房间1 隔断墙2.png" id="6_o4vmd"]
+[ext_resource type="Texture2D" uid="uid://b7d2xhua22eht" path="res://assets/environments/scene_1_home/房间1 隔断墙2.png" id="6_o4vmd"]
 [ext_resource type="PackedScene" uid="uid://dlhn30h21ei8f" path="res://scenes/environments/door1_A_begin.tscn" id="7_utjd6"]
-[ext_resource type="Texture2D" uid="uid://cecnum8sfj2jh" path="res://assets/environments/scene_1_home/房间1 隔断墙1.png" id="8_utjd6"]
-[ext_resource type="Texture2D" uid="uid://cjttmrhar2ued" path="res://assets/environments/scene_1_home/房间2洞洞板.png" id="9_r1xlm"]
+[ext_resource type="Texture2D" uid="uid://7bbxtr7o4uuf" path="res://assets/environments/scene_1_home/房间1 隔断墙1.png" id="8_utjd6"]
+[ext_resource type="Texture2D" uid="uid://dme4jeu32g0kg" path="res://assets/environments/scene_1_home/房间2洞洞板.png" id="9_r1xlm"]
 [ext_resource type="Texture2D" uid="uid://c5qmoopotuh2n" path="res://assets/art/教程1.png" id="10_hi5ln"]
 [ext_resource type="Texture2D" uid="uid://6tl1lc7x4l77" path="res://assets/art/教程2.png" id="11_olnxo"]
 [ext_resource type="Texture2D" uid="uid://dn4sc3xqp51jw" path="res://assets/art/教程3.png" id="12_5xsao"]
@@ -29,6 +30,24 @@ size = Vector2(5600, 3000)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4wkas"]
 size = Vector2(5281, 3000)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_kd83u"]
+shader = ExtResource("3_w6i5k")
+shader_parameter/cull_backface = true
+shader_parameter/use_front = true
+shader_parameter/fov = 10.0000004275
+shader_parameter/rot_y_deg = 0.0
+shader_parameter/rot_x_deg = -19.99998384999998
+shader_parameter/inset = 0.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_um1ns"]
+shader = ExtResource("3_w6i5k")
+shader_parameter/cull_backface = true
+shader_parameter/use_front = true
+shader_parameter/fov = 7.000000285
+shader_parameter/rot_y_deg = 0.0
+shader_parameter/rot_x_deg = -19.99998384999998
+shader_parameter/inset = 0.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_eajhg"]
 size = Vector2(5800, 800)
@@ -104,13 +123,9 @@ debug_color = Color(0.9607843, 0, 0, 0.41960785)
 texture = ExtResource("2_jv8iw")
 
 [node name="wall1" type="Sprite2D" parent="Environments"]
-position = Vector2(36, -1499)
-skew = 0.08726646
-texture = ExtResource("3_kn5l6")
-
-[node name="wall1_2" type="Sprite2D" parent="Environments"]
-z_index = -1
-position = Vector2(0, -1499)
+material = SubResource("ShaderMaterial_kd83u")
+position = Vector2(2, -1474)
+scale = Vector2(1.03, 1)
 texture = ExtResource("3_kn5l6")
 
 [node name="wall6" type="Sprite2D" parent="Environments"]
@@ -139,8 +154,8 @@ scale = Vector2(0.65, 0.8)
 texture = ExtResource("8_utjd6")
 
 [node name="wall5" type="Sprite2D" parent="Environments"]
+material = SubResource("ShaderMaterial_um1ns")
 position = Vector2(0, -1480)
-skew = 0.08726646
 texture = ExtResource("9_r1xlm")
 
 [node name="Sprite2D" type="Sprite2D" parent="Environments"]

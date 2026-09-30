@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://beup3s3dr4q8h"]
+[gd_scene load_steps=21 format=3 uid="uid://beup3s3dr4q8h"]
 
 [ext_resource type="Script" uid="uid://b0qiaumw3ige7" path="res://scripts/systems/cutscene/CutsceneManager.cs" id="1_csmgr"]
 [ext_resource type="Script" uid="uid://x1ic1ym4ykq8" path="res://scripts/scenes/BattleSceneManager.cs" id="1_ctuyy"]
@@ -19,8 +19,10 @@
 [ext_resource type="PackedScene" uid="uid://bjwnor5ufbb8r" path="res://scenes/managers/BuildSelectionManager.tscn" id="14_pvxkr"]
 [ext_resource type="Script" uid="uid://ghxude6q2vj8" path="res://scripts/systems/stage/StageSession.cs" id="16_sess"]
 [ext_resource type="Script" uid="uid://dim2ctx63qcxt" path="res://scripts/systems/stage/StageConfig.cs" id="17_scfg"]
+[ext_resource type="Resource" uid="uid://bj4jgj656v1r0" path="res://resources/stages/stage_difficulty.tres" id="18_diff"]
 
 [node name="BattleScene" type="Node2D" node_paths=PackedStringArray("Player")]
+y_sort_enabled = true
 script = ExtResource("1_ctuyy")
 Player = NodePath("World/MainCharacter")
 LevelName = "KURO酒店"
@@ -45,6 +47,7 @@ GenerateOnReady = false
 script = ExtResource("16_sess")
 AllConfigs = Array[ExtResource("17_scfg")]([ExtResource("8_83iw7"), ExtResource("9_5g8wj"), ExtResource("10_axi2i"), ExtResource("11_i2bjf"), ExtResource("12_axi2i"), ExtResource("13_i2bjf"), ExtResource("13_ohqcc"), ExtResource("14_i2bjf")])
 StartStage = ExtResource("13_ohqcc")
+Difficulty = ExtResource("18_diff")
 
 [node name="BuildSelectionManager" parent="." instance=ExtResource("14_pvxkr")]
 
@@ -52,6 +55,7 @@ StartStage = ExtResource("13_ohqcc")
 y_sort_enabled = true
 
 [node name="MainCharacter" parent="World" instance=ExtResource("2_s0pgc")]
+AttackDamage = 1000.0
 
 [node name="Camera2D" type="Camera2D" parent="World" node_paths=PackedStringArray("Target")]
 scale = Vector2(0.32999998, 0.32999998)

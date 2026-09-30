@@ -1,8 +1,7 @@
-[gd_resource type="Resource" script_class="CutsceneSequence" load_steps=25 format=3 uid="uid://ttehlcct8cgr"]
+[gd_resource type="Resource" script_class="CutsceneSequence" load_steps=23 format=3 uid="uid://ttehlcct8cgr"]
 
 [ext_resource type="Script" uid="uid://ctrko7add3r5h" path="res://scripts/systems/cutscene/CutsceneStep.cs" id="1_283r1"]
 [ext_resource type="Script" uid="uid://cjl1hjmndwvcg" path="res://scripts/systems/cutscene/steps/FadeStep.cs" id="2_00y1s"]
-[ext_resource type="Script" uid="uid://b4pd4ynf4k04p" path="res://scripts/systems/cutscene/steps/CameraMoveStep.cs" id="3_kbexi"]
 [ext_resource type="Script" uid="uid://5xu2sir0yhv1" path="res://scripts/systems/cutscene/steps/PlayAnimationStep.cs" id="4_4xa1m"]
 [ext_resource type="Script" uid="uid://dhch281hkryms" path="res://scripts/systems/cutscene/steps/EffectConfig.cs" id="5_kbexi"]
 [ext_resource type="Script" uid="uid://cgnajq1ykl2mn" path="res://scripts/systems/cutscene/CutsceneSequence.cs" id="5_l7d0y"]
@@ -19,18 +18,9 @@ TransitionDuration = 1.0
 UseMovieBlackBars = false
 metadata/_custom_type_script = "uid://cjl1hjmndwvcg"
 
-[sub_resource type="Resource" id="Resource_n13f1"]
-script = ExtResource("3_kbexi")
-TargetPath = NodePath("../World/FBegin/PlayerSpawnPoint")
-TargetZoom = 0.33
-Duration = 0.5
-Ease = 0
-StayAtTargetAfterFollow = false
-metadata/_custom_type_script = "uid://b4pd4ynf4k04p"
-
 [sub_resource type="Resource" id="Resource_kdt07"]
 script = ExtResource("4_4xa1m")
-AnimationPlayerPath = NodePath("../World/FBegin/Environments/LiftingPlatform/AnimationPlayer")
+AnimationPlayerPath = NodePath("../World/FBegin/LiftingPlatform/AnimationPlayer")
 AnimationName = "close_leftside"
 WaitForCompletion = true
 metadata/_custom_type_script = "uid://5xu2sir0yhv1"
@@ -74,6 +64,7 @@ EffectScene = ExtResource("7_sliderail")
 SpawnType = 2
 TargetNodePath = NodePath("../World/FBegin/SlideRailSpawnPoint")
 SpawnDelay = 0.4
+SpawnTag = "SlideRailLeft"
 PropertyOverrides = Dictionary[String, Variant]({
 "CarriagePrefab": ExtResource("8_magnet")
 })
@@ -85,6 +76,7 @@ EffectScene = ExtResource("7_sliderail")
 SpawnType = 2
 TargetNodePath = NodePath("../World/FBegin/SlideRailSpawnPoint2")
 SpawnDelay = 0.4
+SpawnTag = "SlideRailRight"
 PropertyOverrides = Dictionary[String, Variant]({
 "CarriagePrefab": ExtResource("8_magnet"),
 "FlipCarriageEnds": true
@@ -96,6 +88,7 @@ script = ExtResource("5_kbexi")
 EffectScene = ExtResource("7_sliderail")
 SpawnType = 2
 TargetNodePath = NodePath("../World/FBegin/SlideRailSpawnPoint3")
+SpawnTag = "SlideRailMiddle"
 PropertyOverrides = Dictionary[String, Variant]({
 "CarriagePrefab": ExtResource("8_0ltgo"),
 "CarriageSpawn": 2,
@@ -107,10 +100,10 @@ metadata/_custom_type_script = "uid://dhch281hkryms"
 [sub_resource type="Resource" id="Resource_m7swt"]
 script = ExtResource("5_kbexi")
 EffectScene = ExtResource("9_w8qgw")
-SpawnDelay = 0.1
+SpawnDelay = 0.2
 PropertyOverrides = Dictionary[String, Variant]({
-"ShakeStrength": 20,
-"Duration": 0.1,
+"Duration": 0.2,
+"ShakeStrength": 20
 })
 metadata/_custom_type_script = "uid://dhch281hkryms"
 
@@ -122,7 +115,7 @@ metadata/_custom_type_script = "uid://bdni42t83syt8"
 [resource]
 script = ExtResource("5_l7d0y")
 SequenceId = "F_begin_2_intro"
-Steps = Array[ExtResource("1_283r1")]([SubResource("Resource_bcybp"), SubResource("Resource_n13f1"), SubResource("Resource_kdt07"), SubResource("Resource_4mijq"), SubResource("Resource_00y1s"), SubResource("Resource_4xa1m"), SubResource("Resource_xxti7"), SubResource("Resource_7v3ug"), SubResource("Resource_l7d0y")])
+Steps = Array[ExtResource("1_283r1")]([SubResource("Resource_bcybp"), SubResource("Resource_kdt07"), SubResource("Resource_4mijq"), SubResource("Resource_00y1s"), SubResource("Resource_4xa1m"), SubResource("Resource_xxti7"), SubResource("Resource_7v3ug"), SubResource("Resource_l7d0y")])
 DisablePlayerInput = false
 HidePlayer = false
 metadata/_custom_type_script = "uid://cgnajq1ykl2mn"

@@ -18,29 +18,20 @@ z_index = 3
 script = ExtResource("1_rail")
 Speed = 500.0
 ArriveDeadzone = 10.0
+FollowSmoothing = 2.0
 
-[node name="RailSprite" type="Sprite2D" parent="."]
+[node name="Visual" type="Sprite2D" parent="."]
+
+[node name="RailSprite" type="Sprite2D" parent="Visual"]
 material = SubResource("ShaderMaterial_qf1ce")
 position = Vector2(1400, -2000)
 scale = Vector2(0.66, 0.66)
 texture = ExtResource("2_track")
 
-[node name="RailSprite2" type="Sprite2D" parent="."]
+[node name="RailSprite2" type="Sprite2D" parent="Visual"]
 material = SubResource("ShaderMaterial_qf1ce")
 position = Vector2(-1400, -2000)
 scale = Vector2(0.66, 0.66)
 texture = ExtResource("2_track")
-
-[node name="SlotStartMarker" type="Marker2D" parent="."]
-position = Vector2(0, -1000)
-
-[node name="SlotEndMarker" type="Marker2D" parent="."]
-position = Vector2(0, 500)
-
-[node name="CarriageNearMarker" type="Marker2D" parent="."]
-position = Vector2(2600, 0)
-
-[node name="CarriageFarMarker" type="Marker2D" parent="."]
-position = Vector2(-2600, 0)
 
 [node name="Mount" type="Node2D" parent="."]

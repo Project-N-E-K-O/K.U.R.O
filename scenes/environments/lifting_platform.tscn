@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://dw1xkbpfrwstb"]
+[gd_scene load_steps=26 format=3 uid="uid://dw1xkbpfrwstb"]
 
 [ext_resource type="Texture2D" uid="uid://d2t5sufqce5pb" path="res://assets/environments/scene_6_hotel/升降平台地板.png" id="1_2heha"]
 [ext_resource type="Texture2D" uid="uid://daniog7pr0csf" path="res://assets/environments/scene_6_hotel/前护栏.png" id="1_l3qau"]
@@ -7,6 +7,8 @@
 [ext_resource type="Texture2D" uid="uid://c5gikfpfwe1lp" path="res://assets/environments/scene_6_hotel/左后柱子.png" id="2_tygy6"]
 [ext_resource type="Texture2D" uid="uid://cpgayfikx63s4" path="res://assets/environments/scene_6_hotel/右后柱子.png" id="3_2nl78"]
 [ext_resource type="Texture2D" uid="uid://dnvyb1jxmu58j" path="res://assets/environments/scene_6_hotel/右上护栏.png" id="3_ilmd8"]
+[ext_resource type="Texture2D" uid="uid://dv6heq3vbs3ix" path="res://assets/environments/scene_6_hotel/左前柱子_裁.png" id="4_ntquy"]
+[ext_resource type="Texture2D" uid="uid://w583r17gl2fp" path="res://assets/environments/scene_6_hotel/右前柱子_裁.png" id="6_qwpse"]
 [ext_resource type="Texture2D" uid="uid://bdk0db5acmvp8" path="res://assets/environments/scene_6_hotel/左护栏.png" id="7_k1fse"]
 [ext_resource type="Texture2D" uid="uid://djoiagif5vvew" path="res://assets/environments/scene_6_hotel/右护栏.png" id="8_8wxp7"]
 [ext_resource type="Texture2D" uid="uid://ddd8xrhyxn8o1" path="res://assets/environments/scene_6_hotel/左前柱子.png" id="10_vfnfu"]
@@ -23,6 +25,18 @@ size = Vector2(500, 2500)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_qn8n0"]
 size = Vector2(500, 2500)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_o4gkb"]
+size = Vector2(180, 100)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_3whrp"]
+size = Vector2(180, 100)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wh7ht"]
+size = Vector2(180, 100)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_083k8"]
+size = Vector2(180, 100)
 
 [sub_resource type="Animation" id="Animation_3whrp"]
 length = 0.001
@@ -72,7 +86,7 @@ tracks/3/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [-950.0]
+"values": [-930.0]
 }
 tracks/4/type = "value"
 tracks/4/imported = false
@@ -108,7 +122,7 @@ tracks/6/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [555.0]
+"values": [655.0]
 }
 tracks/7/type = "value"
 tracks/7/imported = false
@@ -156,15 +170,99 @@ tracks/10/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [1]
+"values": [0]
 }
 tracks/11/type = "value"
 tracks/11/imported = false
 tracks/11/enabled = true
-tracks/11/path = NodePath("items/right:z_index")
+tracks/11/path = NodePath("items/front:z_index")
 tracks/11/interp = 1
 tracks/11/loop_wrap = true
 tracks/11/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [3]
+}
+tracks/12/type = "value"
+tracks/12/imported = false
+tracks/12/enabled = true
+tracks/12/path = NodePath("items/right:z_index")
+tracks/12/interp = 1
+tracks/12/loop_wrap = true
+tracks/12/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [2]
+}
+tracks/13/type = "value"
+tracks/13/imported = false
+tracks/13/enabled = true
+tracks/13/path = NodePath("StaticBody2D/CollisionShape2D5:disabled")
+tracks/13/interp = 1
+tracks/13/loop_wrap = true
+tracks/13/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/14/type = "value"
+tracks/14/imported = false
+tracks/14/enabled = true
+tracks/14/path = NodePath("StaticBody2D/CollisionShape2D6:disabled")
+tracks/14/interp = 1
+tracks/14/loop_wrap = true
+tracks/14/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/15/type = "value"
+tracks/15/imported = false
+tracks/15/enabled = true
+tracks/15/path = NodePath("StaticBody2D/CollisionShape2D7:disabled")
+tracks/15/interp = 1
+tracks/15/loop_wrap = true
+tracks/15/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/16/type = "value"
+tracks/16/imported = false
+tracks/16/enabled = true
+tracks/16/path = NodePath("StaticBody2D/CollisionShape2D8:disabled")
+tracks/16/interp = 1
+tracks/16/loop_wrap = true
+tracks/16/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/17/type = "value"
+tracks/17/imported = false
+tracks/17/enabled = true
+tracks/17/path = NodePath("column/front_left_column:z_index")
+tracks/17/interp = 1
+tracks/17/loop_wrap = true
+tracks/17/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [3]
+}
+tracks/18/type = "value"
+tracks/18/imported = false
+tracks/18/enabled = true
+tracks/18/path = NodePath("column/front_right_column:z_index")
+tracks/18/interp = 1
+tracks/18/loop_wrap = true
+tracks/18/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
@@ -180,10 +278,10 @@ tracks/0/path = NodePath("items/behind_left:position:y")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.19999999, 0.36666667, 0.46666667, 0.53333336, 0.56666666, 0.6, 0.6333333),
+"times": PackedFloat32Array(0.3, 0.56666666, 0.73333335, 0.8333333, 0.9, 0.93333334, 0.96666664, 1),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
 "update": 0,
-"values": [-700.0, -950.0, -925.0, -950.0, -940.0, -950.0, -945.0, -950.0]
+"values": [-700.0, -930.0, -905.0, -930.0, -920.0, -930.0, -925.0, -930.0]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -192,7 +290,7 @@ tracks/1/path = NodePath("items/left:position:y")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.19999999, 0.36666667, 0.46666667, 0.53333336, 0.56666666, 0.6, 0.6333333),
+"times": PackedFloat32Array(0.3, 0.56666666, 0.73333335, 0.8333333, 0.9, 0.93333334, 0.96666664, 1),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
 "update": 0,
 "values": [75.0, -175.0, -150.0, -175.0, -165.0, -175.0, -170.0, -175.0]
@@ -216,10 +314,10 @@ tracks/3/path = NodePath("items/left:z_index")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
-"times": PackedFloat32Array(0, 0.2),
-"transitions": PackedFloat32Array(1, 1),
+"times": PackedFloat32Array(0.3),
+"transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [1, 3]
+"values": [2]
 }
 
 [sub_resource type="Animation" id="Animation_vfnfu"]
@@ -231,10 +329,10 @@ tracks/0/path = NodePath("items/behind_left:position:y")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.2, 0.36666667, 0.46666667, 0.53333336, 0.56666666, 0.6, 0.6333333),
+"times": PackedFloat32Array(0.4, 0.6, 0.73333335, 0.8333333, 0.9, 0.93333334, 0.96666664, 1),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
 "update": 0,
-"values": [-950.0, -700.0, -725.0, -700.0, -710.0, -700.0, -705.0, -700.0]
+"values": [-930.0, -700.0, -725.0, -700.0, -710.0, -700.0, -705.0, -700.0]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -243,7 +341,7 @@ tracks/1/path = NodePath("items/left:position:y")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.2, 0.36666667, 0.46666667, 0.53333336, 0.56666666, 0.6, 0.6333333),
+"times": PackedFloat32Array(0.4, 0.6, 0.73333335, 0.8333333, 0.9, 0.93333334, 0.96666664, 1),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
 "update": 0,
 "values": [-175.0, 75.0, 50.0, 75.0, 65.0, 75.0, 70.0, 75.0]
@@ -255,10 +353,10 @@ tracks/2/path = NodePath("items/behind_right:position:y")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
-"times": PackedFloat32Array(0, 0.2, 0.36666667, 0.46666667, 0.53333336, 0.56666666, 0.6, 0.6333333),
+"times": PackedFloat32Array(0.4, 0.6, 0.73333335, 0.8333333, 0.9, 0.93333334, 0.96666664, 1),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
 "update": 0,
-"values": [-950.0, -700.0, -725.0, -700.0, -710.0, -700.0, -705.0, -700.0]
+"values": [-930.0, -700.0, -725.0, -700.0, -710.0, -700.0, -705.0, -700.0]
 }
 tracks/3/type = "value"
 tracks/3/imported = false
@@ -267,7 +365,7 @@ tracks/3/path = NodePath("items/right:position:y")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
-"times": PackedFloat32Array(0, 0.2, 0.36666667, 0.46666667, 0.53333336, 0.56666666, 0.6, 0.6333333),
+"times": PackedFloat32Array(0.4, 0.6, 0.73333335, 0.8333333, 0.9, 0.93333334, 0.96666664, 1),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
 "update": 0,
 "values": [-175.0, 75.0, 50.0, 75.0, 65.0, 75.0, 70.0, 75.0]
@@ -279,10 +377,10 @@ tracks/4/path = NodePath("items/behind:position:y")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
-"times": PackedFloat32Array(0, 0.2, 0.36666667, 0.46666667, 0.53333336, 0.56666666, 0.6, 0.6333333),
+"times": PackedFloat32Array(0.4, 0.6, 0.73333335, 0.8333333, 0.9, 0.93333334, 0.96666664, 1),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
 "update": 0,
-"values": [-975.0, -775.0, -790.0, -775.0, -785.0, -775.0, -780.0, -775.0]
+"values": [-975.0, -790.0, -815.0, -790.0, -800.0, -790.0, -795.0, -790.0]
 }
 tracks/5/type = "value"
 tracks/5/imported = false
@@ -291,10 +389,10 @@ tracks/5/path = NodePath("items/front:position:y")
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
-"times": PackedFloat32Array(0, 0.2, 0.36666667, 0.46666667, 0.53333336, 0.56666666, 0.6, 0.6333333),
+"times": PackedFloat32Array(0.4, 0.6, 0.73333335, 0.8333333, 0.9, 0.93333334, 0.96666664, 1),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
 "update": 0,
-"values": [555.0, 805.0, 780.0, 805.0, 795.0, 805.0, 800.0, 805.0]
+"values": [655.0, 860.0, 835.0, 860.0, 850.0, 860.0, 855.0, 860.0]
 }
 tracks/6/type = "value"
 tracks/6/imported = false
@@ -303,7 +401,7 @@ tracks/6/path = NodePath("StaticBody2D/CollisionShape2D:disabled")
 tracks/6/interp = 1
 tracks/6/loop_wrap = true
 tracks/6/keys = {
-"times": PackedFloat32Array(0, 0.2),
+"times": PackedFloat32Array(0, 0.6),
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
 "values": [false, true]
@@ -315,7 +413,7 @@ tracks/7/path = NodePath("StaticBody2D/CollisionShape2D2:disabled")
 tracks/7/interp = 1
 tracks/7/loop_wrap = true
 tracks/7/keys = {
-"times": PackedFloat32Array(0, 0.2),
+"times": PackedFloat32Array(0, 0.6),
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
 "values": [false, true]
@@ -327,7 +425,7 @@ tracks/8/path = NodePath("StaticBody2D/CollisionShape2D3:disabled")
 tracks/8/interp = 1
 tracks/8/loop_wrap = true
 tracks/8/keys = {
-"times": PackedFloat32Array(0, 0.2),
+"times": PackedFloat32Array(0, 0.6),
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
 "values": [false, true]
@@ -339,7 +437,7 @@ tracks/9/path = NodePath("StaticBody2D/CollisionShape2D4:disabled")
 tracks/9/interp = 1
 tracks/9/loop_wrap = true
 tracks/9/keys = {
-"times": PackedFloat32Array(0, 0.2),
+"times": PackedFloat32Array(0, 0.6),
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
 "values": [false, true]
@@ -351,10 +449,10 @@ tracks/10/path = NodePath("items/left:z_index")
 tracks/10/interp = 1
 tracks/10/loop_wrap = true
 tracks/10/keys = {
-"times": PackedFloat32Array(0, 0.2),
-"transitions": PackedFloat32Array(1, 1),
+"times": PackedFloat32Array(0.4),
+"transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [3, 1]
+"values": [0]
 }
 tracks/11/type = "value"
 tracks/11/imported = false
@@ -363,10 +461,94 @@ tracks/11/path = NodePath("items/right:z_index")
 tracks/11/interp = 1
 tracks/11/loop_wrap = true
 tracks/11/keys = {
-"times": PackedFloat32Array(0, 0.2),
+"times": PackedFloat32Array(0.4),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+tracks/12/type = "value"
+tracks/12/imported = false
+tracks/12/enabled = true
+tracks/12/path = NodePath("items/front:z_index")
+tracks/12/interp = 1
+tracks/12/loop_wrap = true
+tracks/12/keys = {
+"times": PackedFloat32Array(0.4),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+tracks/13/type = "value"
+tracks/13/imported = false
+tracks/13/enabled = true
+tracks/13/path = NodePath("StaticBody2D/CollisionShape2D5:disabled")
+tracks/13/interp = 1
+tracks/13/loop_wrap = true
+tracks/13/keys = {
+"times": PackedFloat32Array(0, 0.6),
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
-"values": [3, 1]
+"values": [true, false]
+}
+tracks/14/type = "value"
+tracks/14/imported = false
+tracks/14/enabled = true
+tracks/14/path = NodePath("StaticBody2D/CollisionShape2D6:disabled")
+tracks/14/interp = 1
+tracks/14/loop_wrap = true
+tracks/14/keys = {
+"times": PackedFloat32Array(0, 0.6),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+tracks/15/type = "value"
+tracks/15/imported = false
+tracks/15/enabled = true
+tracks/15/path = NodePath("StaticBody2D/CollisionShape2D7:disabled")
+tracks/15/interp = 1
+tracks/15/loop_wrap = true
+tracks/15/keys = {
+"times": PackedFloat32Array(0, 0.6),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+tracks/16/type = "value"
+tracks/16/imported = false
+tracks/16/enabled = true
+tracks/16/path = NodePath("StaticBody2D/CollisionShape2D8:disabled")
+tracks/16/interp = 1
+tracks/16/loop_wrap = true
+tracks/16/keys = {
+"times": PackedFloat32Array(0, 0.6),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+tracks/17/type = "value"
+tracks/17/imported = false
+tracks/17/enabled = true
+tracks/17/path = NodePath("column/front_left_column:z_index")
+tracks/17/interp = 1
+tracks/17/loop_wrap = true
+tracks/17/keys = {
+"times": PackedFloat32Array(0, 0.36666667),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [3, 0]
+}
+tracks/18/type = "value"
+tracks/18/imported = false
+tracks/18/enabled = true
+tracks/18/path = NodePath("column/front_right_column:z_index")
+tracks/18/interp = 1
+tracks/18/loop_wrap = true
+tracks/18/keys = {
+"times": PackedFloat32Array(0, 0.36666667),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [3, 0]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_wh7ht"]
@@ -377,58 +559,82 @@ _data = {
 }
 
 [node name="LiftingPlatform" type="Node2D"]
+y_sort_enabled = true
+
+[node name="column" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="behind_left_column" type="Sprite2D" parent="column"]
+z_index = 2
+position = Vector2(-2005, -922)
+texture = ExtResource("2_tygy6")
+offset = Vector2(0, -150)
+
+[node name="behind_right_column" type="Sprite2D" parent="column"]
+z_index = 2
+position = Vector2(2025, -918)
+texture = ExtResource("3_2nl78")
+offset = Vector2(0, -150)
+
+[node name="front_left_column" type="Sprite2D" parent="column"]
+z_index = 3
+position = Vector2(-2008, 635)
+texture = ExtResource("10_vfnfu")
+offset = Vector2(0, -100)
+
+[node name="front_left_column2" type="Sprite2D" parent="column"]
+z_index = 2
+position = Vector2(-2009, 645)
+texture = ExtResource("4_ntquy")
+offset = Vector2(0, -200)
+
+[node name="front_right_column" type="Sprite2D" parent="column"]
+z_index = 3
+position = Vector2(2008, 635)
+texture = ExtResource("11_ntquy")
+offset = Vector2(0, -100)
+
+[node name="front_right_column2" type="Sprite2D" parent="column"]
+z_index = 2
+position = Vector2(2008, 645)
+texture = ExtResource("6_qwpse")
+offset = Vector2(0, -200)
 
 [node name="items" type="Node2D" parent="."]
 
 [node name="behind" type="Sprite2D" parent="items"]
 position = Vector2(0, -975)
 texture = ExtResource("2_jccg4")
+region_enabled = true
+region_rect = Rect2(0, 0, 4097, 220)
 
 [node name="behind_left" type="Sprite2D" parent="items"]
-position = Vector2(-2110, -700)
+position = Vector2(-2130, -700)
 texture = ExtResource("2_2nl78")
 
 [node name="behind_right" type="Sprite2D" parent="items"]
-position = Vector2(2110, -950)
+position = Vector2(2135, -930)
 texture = ExtResource("3_ilmd8")
-
-[node name="behind_left_column" type="Sprite2D" parent="items"]
-position = Vector2(-2000, -1000)
-texture = ExtResource("2_tygy6")
-
-[node name="behind_right_column" type="Sprite2D" parent="items"]
-position = Vector2(2000, -1000)
-texture = ExtResource("3_2nl78")
 
 [node name="Platform" type="Sprite2D" parent="items"]
 texture = ExtResource("1_2heha")
 
 [node name="left" type="Sprite2D" parent="items"]
-z_index = 1
-position = Vector2(-2115, 75)
+position = Vector2(-2120, 75)
 texture = ExtResource("7_k1fse")
 
 [node name="right" type="Sprite2D" parent="items"]
-z_index = 3
-position = Vector2(2115, -175)
+z_index = 2
+position = Vector2(2135, -175)
 texture = ExtResource("8_8wxp7")
 
 [node name="front" type="Sprite2D" parent="items"]
 z_index = 3
-position = Vector2(0, 555)
+position = Vector2(0, 655)
 texture = ExtResource("1_l3qau")
+offset = Vector2(0, -100)
 
-[node name="front_left_column" type="Sprite2D" parent="items"]
-z_index = 3
-position = Vector2(-2008, 535)
-texture = ExtResource("10_vfnfu")
-
-[node name="front_right_column" type="Sprite2D" parent="items"]
-z_index = 3
-position = Vector2(2008, 535)
-texture = ExtResource("11_ntquy")
-
-[node name="StaticBody2D" type="StaticBody2D" parent="."]
+[node name="StaticBody2D" type="StaticBody2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
 z_index = 10
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
@@ -440,13 +646,33 @@ position = Vector2(0, 890)
 shape = SubResource("RectangleShape2D_ntquy")
 
 [node name="CollisionShape2D3" type="CollisionShape2D" parent="StaticBody2D"]
-position = Vector2(-2400, -120)
+position = Vector2(-2300, -120)
 shape = SubResource("RectangleShape2D_qwpse")
 disabled = true
 
 [node name="CollisionShape2D4" type="CollisionShape2D" parent="StaticBody2D"]
-position = Vector2(2400, -120)
+position = Vector2(2300, -120)
 shape = SubResource("RectangleShape2D_qn8n0")
+
+[node name="CollisionShape2D5" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(-2010, -890)
+shape = SubResource("RectangleShape2D_o4gkb")
+disabled = true
+
+[node name="CollisionShape2D6" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(2030, -890)
+shape = SubResource("RectangleShape2D_3whrp")
+disabled = true
+
+[node name="CollisionShape2D7" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(-2015, 650)
+shape = SubResource("RectangleShape2D_wh7ht")
+disabled = true
+
+[node name="CollisionShape2D8" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(2015, 650)
+shape = SubResource("RectangleShape2D_083k8")
+disabled = true
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {

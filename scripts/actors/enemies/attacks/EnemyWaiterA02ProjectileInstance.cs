@@ -204,13 +204,13 @@ namespace Kuros.Actors.Enemies.Attacks
                 return;
             }
 
-            // 对于 MainCharacter，检查是否消耗了待处理击退标记
-            if (player is Kuros.Actors.Heroes.MainCharacter mainCharacter)
+            // 对于 MainCharacter，先只读地看一眼这一下允不允许被击退（无敌帧/护盾格挡时为 false）——
+            // 决定下面的 Frozen 外部位移跟不跟；真正的放行与消费在 ApplyKnockbackDisplacement 内部
+            // （EFFECT_STANDARD 第四条）。
+            if (player is Kuros.Actors.Heroes.MainCharacter mainCharacter
+                && !mainCharacter.HasPendingHitKnockback)
             {
-                if (!mainCharacter.ConsumePendingHitKnockback())
-                {
-                    return;  // 无敌帧或护盾格挡，不应用击退
-                }
+                return;
             }
 
             // 位移驱动击退：受击方 Hit 状态在 clampedDuration 内匀减速滑完 clampedDistance

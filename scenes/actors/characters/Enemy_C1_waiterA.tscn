@@ -260,11 +260,11 @@ MinInterAttackDelay = 1.0
 
 [node name="ThrowAttack" type="Node" parent="StateMachine/Attack/AttackController"]
 script = ExtResource("11_dw0yq")
-DetectionAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
 WarmupDuration = 0.65
 RecoveryDuration = 0.53
 CooldownDurationMultiplier = 5.0
 DamageMultiplier = 0.0
+TriggerAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
 RequireAnimationHitTrigger = true
 AllowMultipleAnimationHits = true
 GrantedImmunities = 16
@@ -278,6 +278,8 @@ ActiveDuration = 0.2
 RecoveryDuration = 0.48
 CooldownDurationMultiplier = 0.5
 AttackAreaPath = NodePath("../../../../Sprite2D/AttackArea")
+DamageAreaPath = NodePath("../../../../Sprite2D/AttackArea")
+TriggerAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
 KnockbackDistance = 200.0
 KnockbackDuration = 0.1
 RequireAnimationHitTrigger = true

@@ -266,8 +266,6 @@ QueuedAttackTimeout = 2.0
 
 [node name="PinballAttack" type="Node" parent="StateMachine/Attack/AttackController"]
 script = ExtResource("21_pinball")
-DetectionAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
-PinballAreaPath = NodePath("../../../../Sprite2D/PinballAttackArea")
 PinballMinSpeed = 50.0
 SpeedDecayPerSecond = 600.0
 AttackName = "PinballAttack"
@@ -275,6 +273,8 @@ WarmupDuration = 0.5
 ActiveDuration = 2.2
 RecoveryDuration = 0.5
 CooldownDurationMultiplier = 10.0
+AttackAreaPath = NodePath("../../../../Sprite2D/PinballAttackArea")
+TriggerAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
 KnockbackDistance = 200.0
 AllowMultipleAnimationHits = true
 GrantedImmunities = 24
@@ -294,6 +294,7 @@ RecoveryDuration = 1.0
 CooldownDurationMultiplier = 2.0
 DamageMultiplier = 0.0
 AttackAreaPath = NodePath("../../../../Sprite2D/AttackArea")
+TriggerAreaPath = NodePath("../../../../Sprite2D/ControllerDetectionArea")
 RequireAnimationHitTrigger = true
 AllowMultipleAnimationHits = true
 GrantedImmunities = 16
@@ -302,13 +303,13 @@ metadata/attack_weight = 60.0
 
 [node name="LockdownAttack" type="Node" parent="StateMachine/Attack/AttackController"]
 script = ExtResource("24_lockdown")
-DetectionAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
 AttackName = "LockdownAttack"
 WarmupDuration = 2.0
 ActiveDuration = 1.2
 RecoveryDuration = 0.8
 CooldownDurationMultiplier = 20.0
 DamageMultiplier = 0.0
+TriggerAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
 GrantedImmunities = 24
 Effects = Array[ExtResource("14_xtsxx")]([SubResource("Resource_xtsxx")])
 metadata/attack_weight = 20.0

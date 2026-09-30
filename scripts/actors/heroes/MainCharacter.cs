@@ -541,6 +541,15 @@ namespace Kuros.Actors.Heroes
 		return true;
 	}
 
+	/// <summary>这一下命中是否允许被击退（**只读、不消费**）：给"要不要顺带做外部位移"的攻击方读
+	/// （如 BoomDmgEffect 的冰冻位移分支）。真正施加击退时由 <see cref="AllowsKnockback"/> 消费。</summary>
+	public bool HasPendingHitKnockback => _pendingHitKnockback;
+
+	/// <summary>击退放行钩子（EFFECT_STANDARD.md 第四条）：玩家只有"刚结算的这次伤害允许被击退"时
+	/// 才推得动。无敌帧 / 护盾完全格挡 / IgnoreHitStateOnDamage 都是 false。
+	/// 攻击方一律直接调 <c>ApplyKnockbackDisplacement</c>，不要再自己判断无敌帧。</summary>
+	protected override bool AllowsKnockback() => ConsumePendingHitKnockback();
+
 	public void StartHitInvincibility(float durationOverride = -1.0f)
 	{
 		if (!EnableHitInvincibility || IsDeathSequenceActive || IsDead)

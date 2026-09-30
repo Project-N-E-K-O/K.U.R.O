@@ -13,34 +13,21 @@ namespace Kuros.Actors.Enemies.Attacks
         [Export(PropertyHint.Range, "0.05,5,0.05")]
         public float IntervalBetweenStrikes = 0.4f;
 
-        [Export] public NodePath DetectionAreaPath = new NodePath();
+        // 区域由基类统一提供：TriggerAreaPath（起手检测区；未配置 = 不做额外限制）、
+        // DamageAreaPath（伤害落点；未配置 = AttackArea）。旧的 DetectionAreaPath 已并入基类。
 
-        private Area2D? _detectionArea;
         private int _strikesDone = 0;
         private float _strikeTimer = 0f;
         private bool _comboActive = false;
-
-        protected override void OnInitialized()
-        {
-            base.OnInitialized();
-
-            if (!DetectionAreaPath.IsEmpty)
-            {
-                _detectionArea = Enemy.GetNodeOrNull<Area2D>(DetectionAreaPath);
-            }
-        }
 
         public override bool CanStart()
         {
             if (!base.CanStart()) return false;
 
-            if (_detectionArea == null)
-            {
-                return true;
-            }
+            if (TriggerArea == null) return true;
 
             var player = Enemy.PlayerTarget;
-            return player != null && _detectionArea.OverlapsBody(player);
+            return player != null && TriggerArea.OverlapsBody(player);
         }
 
         protected override void OnAttackStarted()
@@ -85,7 +72,7 @@ namespace Kuros.Actors.Enemies.Attacks
 
         private void ExecuteStrike()
         {
-            Enemy.PerformAttack();
+            Enemy.PerformAttack(DamageArea, TargetableFactions);
             _strikesDone++;
 
             if (_strikesDone >= StrikeCount)

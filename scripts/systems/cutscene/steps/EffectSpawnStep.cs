@@ -71,6 +71,13 @@ namespace Kuros.Systems.Cutscene
 
         [ExportCategory("Cleanup")]
         /// <summary>
+        /// 生成登记标签：生成后把实例**根节点**登记到 CutsceneManager，供后续 **EffectDespawnStep** 按标签销毁
+        /// （空 = 只参与"清全部"）。登记根就够了——子树里的东西（如滑槽 Mount 下自动入驻的 CarriagePrefab、
+        /// 以及挂在它下面的机械/敌人）随父节点一起释放，不必单独登记。
+        /// </summary>
+        [Export] public string SpawnTag { get; set; } = "";
+
+        /// <summary>
         /// 是否在指定秒数后自动销毁生成的特效。
         /// 0 = 不销毁（让特效依据其自身生命周期销毁）
         /// > 0 = 在此秒数后销毁
@@ -121,12 +128,15 @@ namespace Kuros.Systems.Cutscene
                 // CarriagePrefab / 限位 Marker 路径）必须已是覆盖后的值
                 CutsceneSpawnUtil.ApplyPropertyOverrides(effectNode2D, PropertyOverrides, nameof(EffectSpawnStep));
 
-                // 添加到场景树
+                // 添加到场景树（基准 = 管理器所在节点的父级）
                 var parent = ctx.Manager.GetParent() ?? ctx.Tree.Root;
                 parent.AddChild(effectNode2D);
                 effectNode2D.GlobalPosition = spawnPos;
 
-                GD.Print($"[Cutscene] EffectSpawnStep: 特效已生成，位置: {spawnPos}");
+                // 登记生成物根（EffectDespawnStep 按 SpawnTag 回收；不登记就只能靠它自己的生命周期）
+                ctx.Manager.RegisterSpawnedRoot(effectNode2D, SpawnTag);
+
+                GD.Print($"[Cutscene] EffectSpawnStep: 特效已生成，位置: {spawnPos}，标签: {(string.IsNullOrEmpty(SpawnTag) ? "(无)" : SpawnTag)}");
 
                 // 若无需自动销毁，直接返回
                 if (DestroyAfterDuration <= 0f)

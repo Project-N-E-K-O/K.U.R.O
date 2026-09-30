@@ -23,6 +23,11 @@ namespace Kuros.Systems.Stage
         /// <summary>下行目标层：0 = 无向下出口（大堂→地下1层等反向链）。</summary>
         [Export(PropertyHint.Range, "-20,20,1")] public int DownFloorTarget { get; set; } = 0;
 
+        /// <summary>本关的敌人强度**覆盖**：留空 = 用会话级默认（按 <see cref="Floor"/> 推导）。
+        /// 只给特例关填——彩蛋关（放宽）、Boss 层（收紧）——同一份配置可被多关共享。
+        /// 不填就不会错：新关只要 Floor 对，强度自动一致。</summary>
+        [Export] public StageDifficultyConfig? DifficultyOverride { get; set; }
+
         /// <summary>隐藏彩蛋关：不出现在普通下一层列表，满足解锁条件后附在选项尾部。</summary>
         [Export] public bool EasterEgg { get; set; } = false;
 

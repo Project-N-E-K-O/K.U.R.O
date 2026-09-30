@@ -14,9 +14,9 @@ namespace Kuros.Actors.Enemies.Attacks
     /// </summary>
     public partial class EnemyMoveAttack : EnemyAttackTemplate
     {
-        [ExportCategory("Areas")]
-        [Export] public NodePath DetectionAreaPath = new NodePath();
-        [Export] public NodePath MoveAttackAreaPath = new NodePath();
+        // 区域由基类统一提供：TriggerAreaPath（起手检测区；未配置 = 不做额外限制）、
+        // AttackAreaPath（命中判定带）、DamageAreaPath（伤害落点；未配置 = AttackArea）。
+        // 旧的 DetectionAreaPath / MoveAttackAreaPath 已并入基类。
 
         [ExportCategory("Dash")]
         /// <summary>冲刺速度 = 基础 Speed × 倍率（倍率语义：基础速度调整时冲刺自动适配，无需同步改绝对值）。</summary>
@@ -46,7 +46,6 @@ namespace Kuros.Actors.Enemies.Attacks
 		private const float PostCooldownDuration = 1.0f;
 
         private Area2D? _detectionArea;
-		private Area2D? _moveArea;
         private EnemyAttackController? _controller;
         private NavigationAgent2D? _navAgent;
 		private bool _playerInsideDetection;
@@ -70,7 +69,7 @@ namespace Kuros.Actors.Enemies.Attacks
             base.OnInitialized();
             _controller = GetParent() as EnemyAttackController;
 
-            _detectionArea = ResolveArea(DetectionAreaPath);
+            _detectionArea = TriggerArea;
             if (_detectionArea != null)
             {
 				_detectionArea.Monitoring = true;
@@ -80,12 +79,6 @@ namespace Kuros.Actors.Enemies.Attacks
 			else
 			{
 				GD.PushWarning($"[EnemySmashAttack] DetectionArea not found for {Enemy?.Name ?? Name}, fallback to DetectionRange.");
-            }
-
-	            _moveArea = ResolveArea(MoveAttackAreaPath);
-	            if (_moveArea == null)
-            {
-	                _moveArea = AttackArea;
             }
 
 			SetPhysicsProcess(true);
@@ -348,21 +341,15 @@ namespace Kuros.Actors.Enemies.Attacks
 
 		private bool IsPlayerInsideMoveAttackZone(SamplePlayer player)
         {
-	            if (_moveArea != null)
-            {
-				return player.IsHitByArea(_moveArea);
-            }
-
 			return player.IsHitByArea(AttackArea);
         }
 
 		private void ApplyMoveAttackDamage(SamplePlayer player)
 		{
-			var area = _moveArea ?? AttackArea;
-			if (area == null || Enemy == null) return;
+			if (DamageArea == null || Enemy == null) return;
 
-			ApplyAttackAreaMaskOverride(area);
-			DealDamage(area);
+			ApplyAttackAreaMaskOverride(DamageArea);
+			DealDamage(DamageArea);
 		}
 
 		private void ApplyMoveAttackKnockback(SamplePlayer player)
@@ -551,22 +538,6 @@ namespace Kuros.Actors.Enemies.Attacks
 				ApplyMoveAttackKnockback(Enemy.PlayerTarget);
 			}
 		}
-
-        private Area2D? ResolveArea(NodePath path)
-        {
-            if (path.IsEmpty)
-            {
-                return null;
-            }
-
-            var area = GetNodeOrNull<Area2D>(path);
-            if (area != null)
-            {
-                return area;
-            }
-
-            return Enemy?.GetNodeOrNull<Area2D>(path);
-        }
 
         private void AlignFacingWithPlayer()
         {

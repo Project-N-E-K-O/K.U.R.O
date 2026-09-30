@@ -10,9 +10,9 @@ namespace Kuros.Actors.Enemies.Attacks
 	/// </summary>
 	public partial class EnemyPinballAttack : EnemyAttackTemplate
 	{
-		[ExportCategory("Areas")]
-		[Export] public NodePath DetectionAreaPath = new();
-		[Export] public NodePath PinballAreaPath = new();
+		// 区域由基类统一提供：TriggerAreaPath（起手检测区，供选招钩子用；未配置 = 不限制）、
+		// AttackAreaPath（弹球接触判定带）。旧的 DetectionAreaPath / PinballAreaPath 已并入基类。
+		// 本招伤害按接触逐个结算（不按区域），所以不涉及 DamageArea。
 
 		[ExportCategory("Pinball")]
 		[Export(PropertyHint.Range, "0,3000,10")] public float PinballMaxSpeed = 800f;
@@ -25,7 +25,6 @@ namespace Kuros.Actors.Enemies.Attacks
 
 		public bool IsStopping { get; private set; }
 
-		private Area2D? _detectionArea;
 		private bool _isDashing;
 		private Vector2 _dashDirection = Vector2.Right;
 		private float _currentSpeed;
@@ -33,23 +32,15 @@ namespace Kuros.Actors.Enemies.Attacks
 		private float _bounceCooldownRemaining;
 		private bool _canDealDamage;
 		private float _dashTimeElapsed;
-		private Area2D? _pinballArea;
 
 		protected override void OnInitialized()
 		{
 			base.OnInitialized();
 			SetPhysicsProcess(true);
-
-			if (!DetectionAreaPath.IsEmpty)
-				_detectionArea = GetNodeOrNull<Area2D>(DetectionAreaPath)
-					?? Enemy?.GetNodeOrNull<Area2D>(DetectionAreaPath);
 		}
 
-		public override bool IsPlayerInDetectionRange()
-		{
-			if (_detectionArea == null) return true;
-			return _detectionArea.OverlapsBody(Player);
-		}
+		/// <summary>选招用的检测：玩家在 TriggerAreaPath 指定的区内（未配置 = 不限制）。</summary>
+		public override bool IsPlayerInDetectionRange() => IsPlayerInTriggerArea();
 
 		protected override void OnAttackStarted()
 		{
@@ -61,7 +52,6 @@ namespace Kuros.Actors.Enemies.Attacks
 			_canDealDamage = MinBounceTimeBeforeDamage <= 0f;
 			_dashTimeElapsed = 0f;
 
-			ResolvePinballArea();
 			ConnectAttackAreaSignals();
 			GameActor.AnyDamageTaken += OnAnyDamageTaken;
 		}
@@ -96,12 +86,12 @@ namespace Kuros.Actors.Enemies.Attacks
 		// 处理信号连接前已处于 PinballArea 内的对象（BodyEntered/AreaEntered 只对新进入者触发）
 		private void ProcessInitialOverlaps()
 		{
-			if (_pinballArea == null || Enemy == null) return;
+			if (AttackArea == null || Enemy == null) return;
 
-			foreach (var body in _pinballArea.GetOverlappingBodies())
+			foreach (var body in AttackArea.GetOverlappingBodies())
 				OnAttackAreaBodyEntered(body);
 
-			foreach (var area in _pinballArea.GetOverlappingAreas())
+			foreach (var area in AttackArea.GetOverlappingAreas())
 				OnAttackAreaAreaEntered(area);
 		}
 
@@ -181,7 +171,7 @@ namespace Kuros.Actors.Enemies.Attacks
 			if (!AllowSelfDamage && DamageDispatcher.BelongsToActor(body, Enemy)) return;
 
 			// 只对命中目标 HitArea 的接触产生反应（忽略 GrabArea 等非受击区域）
-			if (body is GameActor actor && _pinballArea != null && !actor.IsHitByArea(_pinballArea))
+			if (body is GameActor actor && AttackArea != null && !actor.IsHitByArea(AttackArea))
 				return;
 
 			Vector2 enemyPos = Enemy.GlobalPosition;
@@ -194,7 +184,7 @@ namespace Kuros.Actors.Enemies.Attacks
 			if (!_canDealDamage) return;
 
 			bool dealt = DamageDispatcher.DealDamage(body, GetDamage(), enemyPos, Enemy,
-				DamageSource.DirectAttack, TargetableFactions, AllowSelfDamage, _pinballArea, _dashDirection);
+				DamageSource.DirectAttack, TargetableFactions, AllowSelfDamage, AttackArea, _dashDirection);
 			if (!dealt) return;
 
 			TryApplyKnockback(body);
@@ -209,7 +199,7 @@ namespace Kuros.Actors.Enemies.Attacks
 			if (!AllowSelfDamage && DamageDispatcher.BelongsToActor(target, Enemy)) return;
 
 			// 只对命中目标 HitArea 的接触产生反应（跳过 GrabArea 等非受击区域）
-			if (target is GameActor actor && _pinballArea != null && !actor.IsHitByArea(_pinballArea))
+			if (target is GameActor actor && AttackArea != null && !actor.IsHitByArea(AttackArea))
 				return;
 
 			Vector2 enemyPos = Enemy.GlobalPosition;
@@ -221,7 +211,7 @@ namespace Kuros.Actors.Enemies.Attacks
 			if (!_canDealDamage) return;
 
 			bool dealt = DamageDispatcher.DealDamage(target, GetDamage(), enemyPos, Enemy,
-				DamageSource.DirectAttack, TargetableFactions, AllowSelfDamage, _pinballArea, _dashDirection);
+				DamageSource.DirectAttack, TargetableFactions, AllowSelfDamage, AttackArea, _dashDirection);
 			if (!dealt) return;
 
 			TryApplyKnockback(area.Owner);
@@ -287,30 +277,20 @@ namespace Kuros.Actors.Enemies.Attacks
 			ForceEnterRecoveryPhase();
 		}
 
-		// 从 PinballAreaPath 解析 Area2D 引用
-		private void ResolvePinballArea()
-		{
-			_pinballArea = null;
-			if (PinballAreaPath.IsEmpty) return;
-
-			_pinballArea = GetNodeOrNull<Area2D>(PinballAreaPath)
-				?? Enemy?.GetNodeOrNull<Area2D>(PinballAreaPath);
-		}
-
-		// 连接 PinballArea 的 BodyEntered/AreaEntered 信号
+		// 连接接触判定带（基类 AttackAreaPath 解析结果）的 BodyEntered/AreaEntered 信号
 		private void ConnectAttackAreaSignals()
 		{
-			if (_pinballArea == null) return;
-			_pinballArea.BodyEntered += OnAttackAreaBodyEntered;
-			_pinballArea.AreaEntered += OnAttackAreaAreaEntered;
+			if (AttackArea == null) return;
+			AttackArea.BodyEntered += OnAttackAreaBodyEntered;
+			AttackArea.AreaEntered += OnAttackAreaAreaEntered;
 		}
 
 		// 断开 PinballArea 的 BodyEntered/AreaEntered 信号
 		private void DisconnectAttackAreaSignals()
 		{
-			if (_pinballArea == null) return;
-			_pinballArea.BodyEntered -= OnAttackAreaBodyEntered;
-			_pinballArea.AreaEntered -= OnAttackAreaAreaEntered;
+			if (AttackArea == null) return;
+			AttackArea.BodyEntered -= OnAttackAreaBodyEntered;
+			AttackArea.AreaEntered -= OnAttackAreaAreaEntered;
 		}
 
 		// 节点退出时清理信号连接与事件订阅

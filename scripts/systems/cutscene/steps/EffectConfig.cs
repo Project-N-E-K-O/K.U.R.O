@@ -33,6 +33,10 @@ namespace Kuros.Systems.Cutscene
         /// <summary>自动销毁时长（秒）。0 = 不自动销毁</summary>
         [Export(PropertyHint.Range, "0,30,0.1")] public float DestroyAfterDuration { get; set; } = 0f;
 
+        /// <summary>生成登记标签（供 EffectDespawnStep 按标签销毁；空 = 只参与"清全部"）。
+        /// 登记的是实例**根节点**，子树随父节点一起释放。</summary>
+        [Export] public string SpawnTag { get; set; } = "";
+
         /// <summary>跳过过场时是否仍然生成（默认 true）。关键生成（道具/轨道等）保持 true；
         /// 纯视觉（爆炸/烟雾）可设 false，避免按跳过时闪现一下。</summary>
         [Export] public bool GenerateOnSkip { get; set; } = true;

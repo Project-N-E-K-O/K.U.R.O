@@ -22,6 +22,7 @@
 [ext_resource type="PackedScene" uid="uid://boyb8yme2l4pq" path="res://scenes/levels/B9.tscn" id="15_22xbq"]
 
 [node name="BattleScene" type="Node2D" node_paths=PackedStringArray("Player")]
+y_sort_enabled = true
 script = ExtResource("1_ctuyy")
 Player = NodePath("World/MainCharacter")
 LevelName = "酒店门口A_001"

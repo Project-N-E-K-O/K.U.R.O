@@ -35,7 +35,7 @@ shader_parameter/alpha = 0.4
 radius = 20000.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_attack_detect"]
-radius = 3072.0
+radius = 6000.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_attack"]
 size = Vector2(4000, 2000)
@@ -243,6 +243,7 @@ RecoveryDuration = 0.53
 CooldownDurationMultiplier = 3.0
 DamageMultiplier = 0.0
 AttackAreaPath = NodePath("../../../../Sprite2D/AttackArea")
+TriggerAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
 RequireAnimationHitTrigger = true
 AllowMultipleAnimationHits = true
 GrantedImmunities = 16

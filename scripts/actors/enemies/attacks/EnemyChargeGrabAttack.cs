@@ -13,9 +13,9 @@ namespace Kuros.Actors.Enemies.Attacks
     /// </summary>
     public partial class EnemyChargeGrabAttack : EnemyAttackTemplate
     {
-        [ExportCategory("Areas")]
-        [Export] public NodePath DetectionAreaPath = new NodePath();
-        [Export] public NodePath GrabAreaPath = new NodePath();
+        // 区域由基类统一提供：TriggerAreaPath（起手检测区；未配置 = 不做额外限制）、
+        // AttackAreaPath（命中判定带）、DamageAreaPath（伤害落点；未配置 = AttackArea）。
+        // 旧的 DetectionAreaPath / GrabAreaPath 已并入基类。
 
         [ExportCategory("Dash")]
 		/// <summary>冲刺速度 = 基础 Speed × 倍率（倍率语义：基础速度调整时冲刺自动适配）。</summary>
@@ -47,7 +47,6 @@ namespace Kuros.Actors.Enemies.Attacks
 		private const float PostCooldownDuration = 1.0f;
 
         private Area2D? _detectionArea;
-        private Area2D? _grabArea;
         private EnemyAttackController? _controller;
 		private bool _playerInsideDetection;
 
@@ -87,7 +86,7 @@ namespace Kuros.Actors.Enemies.Attacks
             base.OnInitialized();
             _controller = GetParent() as EnemyAttackController;
 
-            _detectionArea = ResolveArea(DetectionAreaPath);
+            _detectionArea = TriggerArea;
             if (_detectionArea != null)
             {
 				_detectionArea.Monitoring = true;
@@ -97,12 +96,6 @@ namespace Kuros.Actors.Enemies.Attacks
 			else
 			{
 				GD.PushWarning($"[EnemyChargeGrabAttack] DetectionArea not found for {Enemy?.Name ?? Name}, fallback to DetectionRange.");
-            }
-
-            _grabArea = ResolveArea(GrabAreaPath);
-            if (_grabArea == null)
-            {
-                _grabArea = AttackArea;
             }
 
 			SetPhysicsProcess(true);
@@ -483,12 +476,7 @@ namespace Kuros.Actors.Enemies.Attacks
 
         private bool IsPlayerInsideGrabZone(SamplePlayer player)
         {
-            if (_grabArea != null)
-            {
-				return player.IsHitByArea(_grabArea);
-            }
-
-			return player.IsHitByArea(AttackArea);
+            return player.IsHitByArea(AttackArea);
         }
 
         private void ApplyFrozenState(SamplePlayer player)
@@ -527,8 +515,8 @@ namespace Kuros.Actors.Enemies.Attacks
 
 		protected override void OnAnimationHit()
 		{
-			if (_grabArea != null) ApplyAttackAreaMaskOverride(_grabArea);
-			DealDamage((_grabArea ?? AttackArea)!);
+			if (AttackArea != null) ApplyAttackAreaMaskOverride(AttackArea);
+			DealDamage(DamageArea!);
 
 			if (_grabbedPlayer == null || !IsEnemyAlive())
 			{
@@ -716,22 +704,6 @@ namespace Kuros.Actors.Enemies.Attacks
 				}
 			}
 		}
-
-        private Area2D? ResolveArea(NodePath path)
-        {
-            if (path.IsEmpty)
-            {
-                return null;
-            }
-
-            var area = GetNodeOrNull<Area2D>(path);
-            if (area != null)
-            {
-                return area;
-            }
-
-            return Enemy?.GetNodeOrNull<Area2D>(path);
-        }
 
         private void AlignFacingWithPlayer()
         {

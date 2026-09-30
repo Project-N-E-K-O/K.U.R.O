@@ -1,0 +1,47 @@
+[gd_scene load_steps=7 format=3 uid="uid://cq03m6wlrgxdp"]
+
+[ext_resource type="Script" uid="uid://7ua5f3p2rfye" path="res://scripts/fx/FollowAndDestroy.cs" id="1_by3r7"]
+[ext_resource type="Shader" uid="uid://mgoi3nxo6p5p" path="res://shaders/materials/laser_blaster_glow.gdshader" id="2_j5dg7"]
+[ext_resource type="Texture2D" uid="uid://cv6ol02rd852j" path="res://assets/effect/LightEffect/spotlight_1.png" id="2_mvhfy"]
+[ext_resource type="Texture2D" uid="uid://dpaedwsaacise" path="res://assets/effect/noise/noise_combined.png" id="3_6g8ku"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_6g8ku"]
+shader = ExtResource("2_j5dg7")
+shader_parameter/glow_intensity = 6.0
+shader_parameter/core_width = 0.50000002375
+shader_parameter/core_length = 0.50000002375
+shader_parameter/core_start_length = 0.50000002375
+shader_parameter/fade = 1.0
+shader_parameter/flow_noise = ExtResource("3_6g8ku")
+shader_parameter/flow_speed = Vector2(20, 10)
+shader_parameter/flow_scale = 0.50000002049012
+shader_parameter/flow_strength = 0.2000000095
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_7rmk8"]
+shader = ExtResource("2_j5dg7")
+shader_parameter/glow_intensity = 4.00000019
+shader_parameter/core_width = 0.50000002375
+shader_parameter/core_length = 0.50000002375
+shader_parameter/core_start_length = 0.50000002375
+shader_parameter/fade = 1.0
+shader_parameter/flow_noise = ExtResource("3_6g8ku")
+shader_parameter/flow_speed = Vector2(-20, -10)
+shader_parameter/flow_scale = 8.0
+shader_parameter/flow_strength = 0.2000000095
+
+[node name="RogueAIOverloadBeamWarming" type="Node2D"]
+script = ExtResource("1_by3r7")
+Duration = 0.0
+
+[node name="SpotGlow" type="Sprite2D" parent="."]
+modulate = Color(0, 1, 0, 1)
+self_modulate = Color(0, 1, 0, 1)
+material = SubResource("ShaderMaterial_6g8ku")
+scale = Vector2(1.5, 1.5)
+texture = ExtResource("2_mvhfy")
+
+[node name="Spotlight" type="Sprite2D" parent="."]
+modulate = Color(1, 1, 0, 1)
+material = SubResource("ShaderMaterial_7rmk8")
+scale = Vector2(0.75, 0.75)
+texture = ExtResource("2_mvhfy")

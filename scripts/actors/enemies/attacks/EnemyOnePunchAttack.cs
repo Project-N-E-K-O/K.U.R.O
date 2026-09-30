@@ -12,9 +12,9 @@ namespace Kuros.Actors.Enemies.Attacks
     /// </summary>
     public partial class EnemyOnePunchAttack : EnemyAttackTemplate
     {
-        [ExportCategory("Areas")]
-        [Export] public NodePath DetectionAreaPath = new NodePath();
-        [Export] public NodePath OnePunchAttackAreaPath = new NodePath();
+        // 区域由基类统一提供：TriggerAreaPath（起手检测区；未配置 = 不做额外限制）、
+        // AttackAreaPath（命中判定带）、DamageAreaPath（伤害落点；未配置 = AttackArea）。
+        // 旧的 DetectionAreaPath / OnePunchAttackAreaPath 已并入基类。
 
         [ExportCategory("Dash")]
 		/// <summary>冲刺速度 = 基础 Speed × 倍率（倍率语义：基础速度调整时冲刺自动适配）。</summary>
@@ -37,7 +37,6 @@ namespace Kuros.Actors.Enemies.Attacks
 		private const float PostCooldownDuration = 0.5f;
 
         private Area2D? _detectionArea;
-		private Area2D? _onePunchArea;
         private EnemyAttackController? _controller;
 		private bool _playerInsideDetection;
 
@@ -62,7 +61,7 @@ namespace Kuros.Actors.Enemies.Attacks
             base.OnInitialized();
             _controller = GetParent() as EnemyAttackController;
 
-            _detectionArea = ResolveArea(DetectionAreaPath);
+            _detectionArea = TriggerArea;
             if (_detectionArea != null)
             {
 				_detectionArea.Monitoring = true;
@@ -72,12 +71,6 @@ namespace Kuros.Actors.Enemies.Attacks
 			else
 			{
 				GD.PushWarning($"[EnemySmashAttack] DetectionArea not found for {Enemy?.Name ?? Name}, fallback to DetectionRange.");
-            }
-
-            _onePunchArea = ResolveArea(OnePunchAttackAreaPath);
-            if (_onePunchArea == null)
-            {
-                _onePunchArea = AttackArea;
             }
 
 			SetPhysicsProcess(true);
@@ -324,8 +317,8 @@ namespace Kuros.Actors.Enemies.Attacks
 				return false;
 			}
 
-            ApplyAttackAreaMaskOverride(_onePunchArea);
-            DealDamage(_onePunchArea!);
+            ApplyAttackAreaMaskOverride(AttackArea);
+            DealDamage(DamageArea!);
 
             if (!IsPlayerInsideOnePunchZone(player))
             {
@@ -351,12 +344,7 @@ namespace Kuros.Actors.Enemies.Attacks
 
         private bool IsPlayerInsideOnePunchZone(SamplePlayer player)
         {
-            if (_onePunchArea != null)
-            {
-				return player.IsHitByArea(_onePunchArea);
-            }
-
-			return player.IsHitByArea(AttackArea);
+            return player.IsHitByArea(AttackArea);
         }
 
 		private void ApplyOnePunchKnockback(SamplePlayer player)
@@ -532,22 +520,6 @@ namespace Kuros.Actors.Enemies.Attacks
 				}
 			}
 		}
-
-        private Area2D? ResolveArea(NodePath path)
-        {
-            if (path.IsEmpty)
-            {
-                return null;
-            }
-
-            var area = GetNodeOrNull<Area2D>(path);
-            if (area != null)
-            {
-                return area;
-            }
-
-            return Enemy?.GetNodeOrNull<Area2D>(path);
-        }
 
         private void AlignFacingWithPlayer()
         {

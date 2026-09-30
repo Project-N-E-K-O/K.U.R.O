@@ -1,7 +1,33 @@
-[gd_scene load_steps=4 format=3 uid="uid://bso7mhhjbapey"]
+[gd_scene load_steps=8 format=3 uid="uid://bso7mhhjbapey"]
 
-[ext_resource type="Script" uid="uid://doablkcni0rw4" path="res://scripts/fx/LaserBeamUltimate.cs" id="1_ultimate"]
+[ext_resource type="Script" uid="uid://bpwi6obsuiui6" path="res://scripts/fx/LaserBeamUltimate.cs" id="1_ultimate"]
 [ext_resource type="Texture2D" uid="uid://cv6ol02rd852j" path="res://assets/effect/LightEffect/spotlight_1.png" id="2_rohui"]
+[ext_resource type="Shader" uid="uid://mgoi3nxo6p5p" path="res://shaders/materials/laser_blaster_glow.gdshader" id="2_rwrir"]
+[ext_resource type="Texture2D" uid="uid://dpaedwsaacise" path="res://assets/effect/noise/noise_combined.png" id="3_yj742"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_rohui"]
+shader = ExtResource("2_rwrir")
+shader_parameter/glow_intensity = 6.0
+shader_parameter/core_width = 0.50000002375
+shader_parameter/core_length = 0.5
+shader_parameter/core_start_length = 0.50000002375
+shader_parameter/fade = 1.0
+shader_parameter/flow_noise = ExtResource("3_yj742")
+shader_parameter/flow_speed = Vector2(10, 20)
+shader_parameter/flow_scale = 8.0
+shader_parameter/flow_strength = 0.30000001425
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_4tdut"]
+shader = ExtResource("2_rwrir")
+shader_parameter/glow_intensity = 4.00000019
+shader_parameter/core_width = 0.5
+shader_parameter/core_length = 0.50000002375
+shader_parameter/core_start_length = 0.50000002375
+shader_parameter/fade = 1.0
+shader_parameter/flow_noise = ExtResource("3_yj742")
+shader_parameter/flow_speed = Vector2(-10, -20)
+shader_parameter/flow_scale = 8.0
+shader_parameter/flow_strength = 0.30000001425
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_hgsvh"]
 radius = 30.0
@@ -15,13 +41,12 @@ DragFactor = 0.02
 Duration = 2.0
 TrailPoints = 0
 SpinSpritePath = NodePath("Visual/Sprite2D")
-SpinDegreesPerSecond = 1080.0
+SpinDegreesPerSecond = 0.0
 BeamColor = Color(1, 0, 0, 1)
 GlowColor = Color(1, 0, 0, 0.3137255)
 BeamWidth = 100.0
 GlowWidth = 200.0
 Damage = 20
-KnockbackSpeed = 0.0
 KnockbackDistance = 25.0
 KnockbackDuration = 0.08
 
@@ -29,24 +54,14 @@ KnockbackDuration = 0.08
 position = Vector2(0, -160)
 
 [node name="Sprite2D" type="Sprite2D" parent="Visual"]
-modulate = Color(1, 0.14117648, 0, 1)
-self_modulate = Color(0.92156863, 0.3764706, 0, 1)
+modulate = Color(1, 0, 0, 1)
+material = SubResource("ShaderMaterial_rohui")
 texture = ExtResource("2_rohui")
 
-[node name="Sprite2D" type="Sprite2D" parent="Visual/Sprite2D"]
-rotation = 1.0471976
-texture = ExtResource("2_rohui")
-
-[node name="Sprite2D2" type="Sprite2D" parent="Visual/Sprite2D"]
-rotation = 0.5235988
-texture = ExtResource("2_rohui")
-
-[node name="Sprite2D3" type="Sprite2D" parent="Visual/Sprite2D"]
-rotation = 0.87266463
-texture = ExtResource("2_rohui")
-
-[node name="Sprite2D4" type="Sprite2D" parent="Visual/Sprite2D"]
-rotation = 1.7453293
+[node name="Sprite2D2" type="Sprite2D" parent="Visual"]
+modulate = Color(1, 0.11764706, 0, 1)
+material = SubResource("ShaderMaterial_4tdut")
+scale = Vector2(0.33, 0.33)
 texture = ExtResource("2_rohui")
 
 [node name="GlowLine" type="Line2D" parent="Visual"]

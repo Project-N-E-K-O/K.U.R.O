@@ -43,14 +43,14 @@ shader = ExtResource("4_shader")
 shader_parameter/softness = 0.5
 shader_parameter/alpha = 0.4
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_attack"]
-size = Vector2(3000, 1000)
+[sub_resource type="CircleShape2D" id="CircleShape2D_controller_detect"]
+radius = 20000.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_attack_detect"]
-radius = 1024.0
+radius = 10000.0
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_controller_detect"]
-radius = 1024.0
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_attack"]
+size = Vector2(3000, 1000)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_hit"]
 size = Vector2(650, 300)
@@ -172,13 +172,14 @@ bone_name = "bone"
 modulate = Color(0.8, 0.6, 0.5, 1)
 z_index = 10
 
-[node name="AttackArea" type="Area2D" parent="Sprite2D"]
+[node name="ControllerDetectionArea" type="Area2D" parent="Sprite2D"]
+visible = false
 collision_layer = 0
+collision_mask = 4
 monitorable = false
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/AttackArea"]
-position = Vector2(1500, 0)
-shape = SubResource("RectangleShape2D_attack")
+[node name="ControllerDetectionShape" type="CollisionShape2D" parent="Sprite2D/ControllerDetectionArea"]
+shape = SubResource("CircleShape2D_controller_detect")
 
 [node name="AttackDetectionArea" type="Area2D" parent="Sprite2D"]
 visible = false
@@ -187,18 +188,15 @@ collision_mask = 4
 monitorable = false
 
 [node name="AttackDetectionShape" type="CollisionShape2D" parent="Sprite2D/AttackDetectionArea"]
-scale = Vector2(3, 3)
 shape = SubResource("CircleShape2D_attack_detect")
 
-[node name="ControllerDetectionArea" type="Area2D" parent="Sprite2D"]
-visible = false
+[node name="AttackArea" type="Area2D" parent="Sprite2D"]
 collision_layer = 0
-collision_mask = 4
 monitorable = false
 
-[node name="ControllerDetectionShape" type="CollisionShape2D" parent="Sprite2D/ControllerDetectionArea"]
-scale = Vector2(10, 10)
-shape = SubResource("CircleShape2D_controller_detect")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/AttackArea"]
+position = Vector2(1500, 0)
+shape = SubResource("RectangleShape2D_attack")
 
 [node name="HitArea" type="Area2D" parent="Sprite2D"]
 z_index = 10
@@ -254,13 +252,13 @@ PlayerDetectionAreaPath = NodePath("../../../Sprite2D/ControllerDetectionArea")
 
 [node name="Missile01Attack" type="Node" parent="StateMachine/Attack/AttackController"]
 script = ExtResource("13_throw")
-DetectionAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
 AttackName = "Missile01Attack"
 WarmupDuration = 1.0
 ActiveDuration = 0.45
 RecoveryDuration = 0.25
 CooldownDurationMultiplier = 2.0
 DamageMultiplier = 0.0
+TriggerAreaPath = NodePath("../../../../Sprite2D/ControllerDetectionArea")
 RequireAnimationHitTrigger = true
 AllowMultipleAnimationHits = true
 GrantedImmunities = 16
@@ -275,6 +273,7 @@ ActiveDuration = 0.4
 RecoveryDuration = 0.1
 DamageMultiplier = 0.0
 AttackAreaPath = NodePath("../../../../Sprite2D/AttackArea")
+TriggerAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
 RequireAnimationHitTrigger = true
 AllowMultipleAnimationHits = true
 GrantedImmunities = 16

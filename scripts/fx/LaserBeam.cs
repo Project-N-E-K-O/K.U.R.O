@@ -266,22 +266,16 @@ namespace Kuros.Fx
             // 命中
             if (_cachedPlayer is not GameActor actor) return;
 
-            // 在伤害判定前记录玩家当前无敌状态：
-            // TakeDamage 调用后第一击会触发无敌帧，后续同帧命中不应再覆写速度。
-            bool alreadyInvincible = actor is Kuros.Actors.Heroes.MainCharacter mc && mc.IsHitInvincible;
-
             _hasDamaged = true;
 
             bool dealt = DamageDispatcher.DealDamage(actor, Damage, GlobalPosition, _attacker,
                 DamageSource.DirectAttack, TargetableFactions, AllowSelfDamage);
             if (!dealt) return;
 
-            // 仅在命中前玩家尚未处于无敌帧时才施加击退，避免覆盖已有的击退。
-            if (!alreadyInvincible)
-            {
-                if (KnockbackDistance > 0f)
-                    actor.ApplyKnockbackDisplacement(beamDir, KnockbackDistance, KnockbackDuration);
-            }
+            // 玩家侧是否该被推由 GameActor.ApplyKnockbackDisplacement 内部统一判断
+            // （EFFECT_STANDARD 第四条）：无敌帧/护盾格挡/IgnoreHitStateOnDamage 时自动跳过。
+            if (KnockbackDistance > 0f)
+                actor.ApplyKnockbackDisplacement(beamDir, KnockbackDistance, KnockbackDuration);
         }
 
         private void ResolveAttacker()

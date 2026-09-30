@@ -44,6 +44,17 @@ namespace Kuros.Systems.Cutscene
                 return;
             }
 
+            // 解冻：别的系统会把本播放器的 SpeedScale 压到 0 —— 典型是 KillProgressAscendController
+            // （到站过场开始时把上升循环 up_loop 的速度置 0，让电梯停住）。SpeedScale=0 时 Play() 会
+            // "在播但时间不走"：画面永远停在第一帧，且 IsPlaying() 恒为真 → 下面 WaitForCompletion 的
+            // 等待循环永久挂起（跳过能用是因为 skip 走 Seek(末尾)，不受 SpeedScale 影响）。
+            // 本步骤是被显式要求播这个动画的，所以先把速度解开；播完怎么收尾由调用方决定。
+            if (animPlayer.SpeedScale <= 0f)
+            {
+                GD.Print($"[Cutscene] PlayAnimationStep: 播放器 SpeedScale={animPlayer.SpeedScale}（被外部置 0/负）→ 解冻为 1");
+                animPlayer.SpeedScale = 1f;
+            }
+
             animPlayer.Play(AnimationName);
             GD.Print($"[Cutscene] PlayAnimationStep: 已播放动画 {AnimationName}");
 

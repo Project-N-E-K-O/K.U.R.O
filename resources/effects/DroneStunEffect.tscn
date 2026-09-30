@@ -3,14 +3,10 @@
 [ext_resource type="Script" uid="uid://dgkbrnaywrqa0" path="res://scripts/effects/DroneStunEffect.cs" id="1_oydul"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_27qv0"]
-radius = 450.0
+radius = 400.0
 
-[node name="DroneStunEffect" type="Node"]
+[node name="DroneStunEffect" type="Node2D"]
 script = ExtResource("1_oydul")
-EffectId = "0d221c9c-e51e-4d64-9e6e-947c6eed874f"
-DisplayName = "无人机眩晕"
-Description = "仅对存在StunArea的敌人生效，当携带StunArea的敌人进入该范围则触发眩晕"
-Duration = 6.0
 
 [node name="Area2D" type="Area2D" parent="."]
 z_index = 10

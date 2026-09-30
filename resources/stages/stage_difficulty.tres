@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="StageDifficultyConfig" load_steps=2 format=3 uid="uid://bj4jgj656v1r0"]
+
+[ext_resource type="Script" uid="uid://bhn224ud0t0re" path="res://scripts/systems/stage/StageDifficultyConfig.cs" id="1_diff"]
+
+[resource]
+script = ExtResource("1_diff")
+HealthPerFloor = 0.12
+DamagePerFloor = 0.06
+BasementHealthPerFloor = 0.35
+BasementDamagePerFloor = 0.2

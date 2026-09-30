@@ -24,6 +24,9 @@ namespace Kuros.Systems.Stage
         /// <summary>起始关卡（null = AllConfigs[0]）。</summary>
         [Export] public StageConfig? StartStage { get; set; }
 
+        /// <summary>楼层难度系数（敌人血量/伤害随层数增长）。留空 = 一律 ×1。</summary>
+        [Export] public StageDifficultyConfig? Difficulty { get; set; }
+
         /// <summary>F1/F2 调试键在全部关卡间遍历（数字键已归电梯选关）。</summary>
         [Export] public bool DebugKeysEnabled { get; set; } = true;
 
@@ -43,6 +46,34 @@ namespace Kuros.Systems.Stage
         /// <summary>换关流程进行中（房间池后台预加载等待）——期间新请求排队，完成后自动应用最新。</summary>
         private bool _transitionInProgress;
         private StageConfig? _queuedConfig;
+
+        /// <summary>当前会话（同场景只有一个）。敌人生成时据此拿楼层系数；未就绪 = null。</summary>
+        public static StageSession? Current { get; private set; }
+
+        /// <summary>当前关卡配置（未就绪时为 null）。</summary>
+        public StageConfig? CurrentConfig => _currentConfig;
+
+        /// <summary>当前层数（未就绪时为 0 = 基准层）。</summary>
+        public int CurrentFloor => _currentConfig?.Floor ?? 0;
+
+        /// <summary>本层生效的难度配置：关卡自带覆盖（彩蛋关/Boss 层）优先，否则用会话级默认。
+        /// 两边都没有 = 一律 ×1。</summary>
+        private StageDifficultyConfig? ResolvedDifficulty => _currentConfig?.DifficultyOverride ?? Difficulty;
+
+        /// <summary>本层敌人血量系数（Floor 0 严格 ×1；地下层走另一套、更强）。</summary>
+        public float EnemyHealthMultiplier => ResolvedDifficulty?.HealthMultiplier(CurrentFloor) ?? 1f;
+
+        /// <summary>本层敌人伤害系数（Floor 0 严格 ×1；地下层走另一套、更强）。</summary>
+        public float EnemyDamageMultiplier => ResolvedDifficulty?.DamageMultiplier(CurrentFloor) ?? 1f;
+
+        public override void _EnterTree()
+        {
+            Current = this;
+
+            // 兜底：比本节点更早 _Ready 的敌人（关卡里预摆的）也要读得到层数——
+            // 先按 StartStage/第一关填上，_Ready 的正常流程随后覆盖。
+            _currentConfig ??= StartStage ?? (AllConfigs.Count > 0 ? AllConfigs[0] : null);
+        }
 
         public override void _Ready()
         {
@@ -68,6 +99,9 @@ namespace Kuros.Systems.Stage
 
         public override void _ExitTree()
         {
+            if (Current == this)
+                Current = null;
+
             if (_generator != null)
                 _generator.StageGenerated -= OnStageGenerated;
         }

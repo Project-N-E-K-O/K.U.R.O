@@ -20,6 +20,10 @@ public partial class RailChaseMovement : EnemyChaseMovement
 	private float _carriageHi;
 	private Vector2 _mountLocal;
 
+	/// <summary>外部接管移动：true 时本组件不再自行追击/减速/MoveAndSlide，只保留每帧硬钳（ClampToRail）。
+	/// 供"自己驱动位移"的技能使用（如 rogueAI 大招的蓄力/冲刺）；用完**必须复位**，否则永远不再追击。</summary>
+	public bool ExternalDrive { get; set; }
+
 	public override void _Ready()
 	{
 		base._Ready();
@@ -35,7 +39,8 @@ public partial class RailChaseMovement : EnemyChaseMovement
 		if (Engine.IsEditorHint() || Enemy == null) return;
 
 		ResolveRail();
-		base._PhysicsProcess(delta);
+		// 外部接管（技能自己在 _PhysicsProcess 写 Velocity）时让位，但限位兜底照旧——冲刺也出不了滑槽
+		if (!ExternalDrive) base._PhysicsProcess(delta);
 		ClampToRail();
 	}
 

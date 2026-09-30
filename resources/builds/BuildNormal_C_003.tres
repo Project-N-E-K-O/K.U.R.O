@@ -11,7 +11,7 @@ Scene = ExtResource("3_scene")
 EffectOffset = Vector2(nan, nan)
 PropertyOverrides = Dictionary[String, Variant]({
 "Duration": 0.0,
-"TierValues": Array[float]([30.0, 60.0])
+"TierValues": Array[float]([50.0, 100.0])
 })
 
 [resource]

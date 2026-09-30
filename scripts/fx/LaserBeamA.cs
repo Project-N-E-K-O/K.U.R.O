@@ -162,12 +162,35 @@ namespace Kuros.Fx
 
 		public override void _Process(double delta)
 		{
-			// 单次物理查询：候选目标 + 截断距离（须在基类之前——UpdateBeam 用本帧数据截断视觉）
-			RefreshTargets();
+			// 伤害窗口只在"生长完成 → 全亮结束"内：淡出阶段视觉已消失，不再判定。
+			// 同时停止 RefreshTargets —— 保留上一帧的截断距离，视觉不会因判定关闭而突然变长。
+			//
+			// 目标检索放在 base._Process 之前（UpdateBeam 要用本帧的截断距离）。因此这里一旦抛异常，
+			// 基类就整帧不执行：计时器不减、_beamPhaseElapsed 冻在 GrowDuration、窗口永远开着 —— 光束永生。
+			// 故两者都包住：异常只让本帧检索/结算失效，计时与销毁照常（异常只记录一次，避免刷屏）。
+			bool windowOpen = IsDamageWindowOpen;
+			if (windowOpen)
+			{
+				try { RefreshTargets(); }
+				catch (System.Exception ex) { LogTargetError("RefreshTargets", ex); }
+			}
+
 			base._Process(delta);
-			// Beam 持续阶段（生长完成后、淡出结束前）每帧结算——走进光束的目标也能造成伤害
-			if (_beamPhaseElapsed >= GrowDuration)
-				ApplyDamage();
+
+			if (windowOpen)
+			{
+				try { ApplyDamage(); }
+				catch (System.Exception ex) { LogTargetError("ApplyDamage", ex); }
+			}
+		}
+
+		/// <summary>目标检索/结算异常只记录一次（含堆栈），之后静默防刷屏。</summary>
+		private bool _targetErrorLogged;
+		private void LogTargetError(string phase, System.Exception ex)
+		{
+			if (_targetErrorLogged) return;
+			_targetErrorLogged = true;
+			GD.PushError($"[LaserBeamA {GetInstanceId()}] {phase} 抛异常（此后静默）: {ex}");
 		}
 
 		private void TryDamageReceiver(Node receiver, Vector2 beamDir)

@@ -23,6 +23,10 @@ namespace Kuros.Systems.Cutscene
     [GlobalClass]
     public partial class CutsceneManager : Node
     {
+        /// <summary>过场生成物根节点的组名（生成步骤自动加入）：供外部脚本/调试查看"这一段过场生成了什么"。
+        /// 销毁走 EffectDespawnStep（按 SpawnTag），不要自己遍历这个组去删——登记表要同步移除。</summary>
+        public const string SpawnedRootsGroup = "cutscene_spawned";
+
         // ── 信号 ──────────────────────────────────────────────────────────
         [Signal] public delegate void CutsceneStartedEventHandler(string sequenceId);
         [Signal] public delegate void CutsceneFinishedEventHandler(string sequenceId);
@@ -86,6 +90,10 @@ namespace Kuros.Systems.Cutscene
         /// <summary>本次过场被本管理器改成 ProcessMode.Disabled 的节点（含切换前就不可见的）——
         /// 恢复必须按这份清单走，否则"本来就不可见"的节点会永久停在 Disabled。</summary>
         private readonly System.Collections.Generic.List<CanvasItem> _processDisabledNodes = new();
+        /// <summary>过场生成步骤登记过的根节点（节点 + SpawnTag）。**不随序列结束清空**：
+        /// 关键生成（滑槽/机械臂/敌人）要活过生成它的那段过场；只有 EffectDespawnStep 会移除。
+        /// 已被别处销毁的项在 Collect 时顺手剔除。</summary>
+        private readonly System.Collections.Generic.List<(Node Node, string Tag)> _spawnedRoots = new();
         private Kuros.Scenes.BattleSceneManager? _battleSceneManager;
         private CameraZoneManager? _cameraZoneManager;
         // 长按跳过累加器（秒）与 HUD
@@ -362,6 +370,48 @@ namespace Kuros.Systems.Cutscene
 
         /// <summary>手动请求跳过当前过场（例如由 UI 按钮调用）。</summary>
         public void RequestSkip() => IsSkipRequested = true;
+
+        // ── 生成物登记（EffectSpawnStep / EffectGroupSpawnStep ↔ EffectDespawnStep）────────
+        /// <summary>登记一个过场生成物的**根节点**（生成步骤在 AddChild 之后调用）。
+        /// 只需要根：子树里的东西（如滑槽 Mount 下自动入驻的 CarriagePrefab）随父节点一起释放。
+        /// 标签供 <see cref="EffectDespawnStep"/> 按标签销毁；空标签 = 只参与"清全部"。</summary>
+        internal void RegisterSpawnedRoot(Node root, string? tag)
+        {
+            if (root == null || !GodotObject.IsInstanceValid(root)) return;
+
+            if (!root.IsInGroup(SpawnedRootsGroup))
+                root.AddToGroup(SpawnedRootsGroup);
+
+            var entry = (root, tag ?? string.Empty);
+            if (!_spawnedRoots.Contains(entry))
+                _spawnedRoots.Add(entry);
+        }
+
+        /// <summary>把根节点从登记表移除（销毁/自毁时调用）；不在表内时无操作。</summary>
+        internal void UnregisterSpawnedRoot(Node root)
+            => _spawnedRoots.RemoveAll(entry => entry.Node == root);
+
+        /// <summary>取出符合条件的生成物根；tag 为空 = 全部（含无标签项）。
+        /// 顺带剔除已被别处销毁的失效项（生成步骤的 DestroyAfterDuration 自毁等）。</summary>
+        internal System.Collections.Generic.List<Node> CollectSpawnedRoots(string? tag)
+        {
+            var result = new System.Collections.Generic.List<Node>();
+            for (int i = _spawnedRoots.Count - 1; i >= 0; i--)
+            {
+                var entry = _spawnedRoots[i];
+                if (!GodotObject.IsInstanceValid(entry.Node))
+                {
+                    _spawnedRoots.RemoveAt(i);
+                    continue;
+                }
+
+                if (!string.IsNullOrEmpty(tag) && !entry.Tag.Equals(tag, System.StringComparison.Ordinal))
+                    continue;
+
+                result.Add(entry.Node);
+            }
+            return result;
+        }
 
         // ── 摄像机接管 ────────────────────────────────────────────────────
         private void BeginCameraOverride()

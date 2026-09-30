@@ -11,9 +11,11 @@ namespace Kuros.Systems.Cutscene
     ///   - DialogueStep：显示对话文本
     ///   - FadeStep：全屏淡出/淡入效果
     ///   - CameraMoveStep：镜头平滑移动到目标
+    ///   - MovePlayerStep：把玩家移动到指定节点位置（同场景换房间/换站位；0 秒 = 瞬移）
     ///   - PlayAnimationStep：播放角色动画
     ///   - EffectSpawnStep：生成单个特效（支持延迟、自动销毁）
     ///   - EffectGroupSpawnStep：生成多个特效组合（并行/顺序执行）
+    ///   - EffectDespawnStep：销毁之前生成的场景/特效（按 SpawnTag，留空 = 清全部；根节点销毁 = 子树连坐）
     ///   - ChangeSceneStep：切换到目标场景（执行后当前场景销毁，后续步骤不执行）
     ///
     /// 使用示例：

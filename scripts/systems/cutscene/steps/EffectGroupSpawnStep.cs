@@ -163,12 +163,15 @@ namespace Kuros.Systems.Cutscene
                 // 属性覆盖必须在入树之前（节点 _Ready 里读取的配置必须已是覆盖后的值）
                 CutsceneSpawnUtil.ApplyPropertyOverrides(effectNode2D, config.PropertyOverrides, nameof(EffectGroupSpawnStep));
 
-                // 添加到场景树
+                // 添加到场景树（基准 = 管理器所在节点的父级）
                 var parent = ctx.Manager.GetParent() ?? ctx.Tree.Root;
                 parent.AddChild(effectNode2D);
                 effectNode2D.GlobalPosition = spawnPos;
 
-                GD.Print($"[Cutscene] EffectGroupSpawnStep: 特效已生成 {config.EffectScene} @ {spawnPos}");
+                // 登记生成物根（EffectDespawnStep 按 SpawnTag 回收；不登记就只能靠它自己的生命周期）
+                ctx.Manager.RegisterSpawnedRoot(effectNode2D, config.SpawnTag);
+
+                GD.Print($"[Cutscene] EffectGroupSpawnStep: 特效已生成 {config.EffectScene} @ {spawnPos}，标签: {(string.IsNullOrEmpty(config.SpawnTag) ? "(无)" : config.SpawnTag)}");
 
                 // 管理特效生命周期
                 if (config.DestroyAfterDuration > 0f)

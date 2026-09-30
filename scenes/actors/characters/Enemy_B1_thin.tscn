@@ -296,8 +296,6 @@ QueuedAttackTimeout = 1.5
 
 [node name="KickAttack" type="Node" parent="StateMachine/Attack/AttackController"]
 script = ExtResource("12_5i0uy")
-DetectionAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
-KickAttackAreaPath = NodePath("../../../../Sprite2D/KickArea")
 DashSpeedMultiplier = 3.75
 SnapshotDelaySeconds = 0.5
 DestroyFurnitureDuringDash = true
@@ -307,6 +305,8 @@ RecoveryDuration = 0.4
 CooldownDurationMultiplier = 5.0
 DamageMultiplier = 0.7
 AttackAreaPath = NodePath("../../../../Sprite2D/KickArea")
+DamageAreaPath = NodePath("../../../../Sprite2D/KickArea")
+TriggerAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
 KnockbackDistance = 800.0
 KnockbackDuration = 0.4
 RequireAnimationHitTrigger = true
@@ -326,6 +326,8 @@ WarmupDuration = 0.5
 RecoveryDuration = 0.28
 CooldownDurationMultiplier = 0.5
 AttackAreaPath = NodePath("../../../../Sprite2D/AttackArea")
+DamageAreaPath = NodePath("../../../../Sprite2D/AttackArea")
+TriggerAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
 KnockbackDistance = 250.0
 KnockbackDuration = 0.2
 RequireAnimationHitTrigger = true

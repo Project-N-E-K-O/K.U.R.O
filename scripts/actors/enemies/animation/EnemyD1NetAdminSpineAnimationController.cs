@@ -128,7 +128,7 @@ namespace Kuros.Actors.Enemies.Animation
 			var frozenState = Enemy?.StateMachine?.CurrentState as EnemyNetAdminFrozenState;
 			if (frozenState == null)
 			{
-				PlayLoopIfNeeded("Frozen", StunAnimation, HitMixDuration);
+				PlayLoopIfNeeded("Frozen", StunAnimation, AttackMixDuration);
 				return;
 			}
 

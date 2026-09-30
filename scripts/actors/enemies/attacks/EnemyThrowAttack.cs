@@ -15,8 +15,8 @@ namespace Kuros.Actors.Enemies.Attacks
     /// </summary>
     public partial class EnemyThrowAttack : EnemyAttackTemplate
     {
-        [ExportCategory("Areas")]
-        [Export] public NodePath DetectionAreaPath = new NodePath();
+        // 区域由基类统一提供：TriggerAreaPath（起手检测区；未配置 = 不做额外限制）。
+        // 旧的 DetectionAreaPath 已并入基类。本招不结算伤害（只生成投掷物），所以不涉及 AttackArea/DamageArea。
 
         [ExportCategory("Behaviour")]
         [Export] public bool FacePlayerOnAttack { get; set; } = true;
@@ -28,16 +28,12 @@ namespace Kuros.Actors.Enemies.Attacks
         {
             base.OnInitialized();
 
-            _detectionArea = ResolveArea(DetectionAreaPath);
+            _detectionArea = TriggerArea;
             if (_detectionArea != null)
             {
                 _detectionArea.Monitoring = true;
                 _detectionArea.BodyEntered += OnDetectionAreaBodyEntered;
                 _detectionArea.BodyExited  += OnDetectionAreaBodyExited;
-            }
-            else
-            {
-                GD.PushWarning($"[EnemyThrowAttack] DetectionArea not found for {Enemy?.Name ?? Name}.");
             }
 
             SetPhysicsProcess(true);
@@ -126,10 +122,5 @@ namespace Kuros.Actors.Enemies.Attacks
                 _playerInsideDetection = false;
         }
 
-        private Area2D? ResolveArea(NodePath path)
-        {
-            if (path.IsEmpty) return null;
-            return GetNodeOrNull<Area2D>(path) ?? Enemy?.GetNodeOrNull<Area2D>(path);
-        }
     }
 }

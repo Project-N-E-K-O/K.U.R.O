@@ -1,6 +1,8 @@
-[gd_scene load_steps=55 format=3 uid="uid://dstgcw0tto5oa"]
+[gd_scene load_steps=59 format=3 uid="uid://dstgcw0tto5oa"]
 
 [ext_resource type="Script" uid="uid://cra7y7mt0x1j8" path="res://scripts/managers/CameraZoneArea.cs" id="1_7ummj"]
+[ext_resource type="Script" uid="uid://cbui22isww64v" path="res://scripts/systems/cutscene/CutsceneTrigger.cs" id="2_o3k7i"]
+[ext_resource type="Resource" uid="uid://bicsmtly0y2kg" path="res://resources/cutscene/Text_begin_intro.tres" id="3_o3k7i"]
 [ext_resource type="Script" uid="uid://dmqu7phxi8gbi" path="res://scripts/managers/BattleArena.cs" id="4_bn434"]
 [ext_resource type="Script" uid="uid://orymlwdqv2xq" path="res://scripts/controllers/WaveSpawnManager.cs" id="5_p5xsj"]
 [ext_resource type="Texture2D" uid="uid://bkvy3th2vg6k4" path="res://assets/environments/scene_1_home/房间2墙壁.png" id="6_7ummj"]
@@ -36,10 +38,11 @@
 [ext_resource type="Script" uid="uid://b2ljc7aqvo6al" path="res://scripts/environments/ElevatorSceneLoader.cs" id="37_6h2kq"]
 [ext_resource type="PackedScene" uid="uid://dqb7hct2obgg5" path="res://scenes/items/Furniture_A_bedA.tscn" id="38_fdxhs"]
 [ext_resource type="PackedScene" uid="uid://xr3dxjuou057" path="res://scenes/items/Furniture_A_chairOfficeA.tscn" id="39_3yao7"]
-[ext_resource type="PackedScene" uid="uid://30w6ddbm18ga" path="res://scenes/actors/etc/SlideRail.tscn" id="40_2vmef"]
 [ext_resource type="PackedScene" uid="uid://daox4k6bu5oqt" path="res://scenes/items/Furniture_A_sofaB.tscn" id="40_7gqg0"]
 [ext_resource type="Texture2D" uid="uid://brjaqxel52a2o" path="res://assets/BuildIcon/icon.svg" id="40_21m0k"]
 [ext_resource type="PackedScene" uid="uid://dugfq8qy1okf1" path="res://scenes/items/Furniture_A_chairOfficeB.tscn" id="41_y44s2"]
+[ext_resource type="PackedScene" uid="uid://be30f0gopxel3" path="res://scenes/actors/etc/SlideRail_wheel.tscn" id="42_hxrfn"]
+[ext_resource type="PackedScene" uid="uid://cw42j1o501x83" path="res://scenes/actors/characters/Enemy_F1_rogueAI_MachineGun.tscn" id="43_hxrfn"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1mlw7"]
 size = Vector2(5800, 3050)
@@ -49,6 +52,9 @@ size = Vector2(5700, 3050)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_6ilfo"]
 size = Vector2(1950, 1200)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_mfk2f"]
+size = Vector2(1000, 3000)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_mxkb7"]
 size = Vector2(5200, 3000)
@@ -89,6 +95,7 @@ size = Vector2(200, 800)
 
 [node name="Test_begin" type="Node2D"]
 y_sort_enabled = true
+position = Vector2(1, 0)
 
 [node name="PlayerSpawnPoint" type="Node2D" parent="."]
 position = Vector2(-2246, 330)
@@ -127,6 +134,18 @@ ZoomLevel = 0.95
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CameraZone2"]
 shape = SubResource("RectangleShape2D_6ilfo")
+
+[node name="CutsceneTrigger" type="Area2D" parent="."]
+z_index = 10
+collision_layer = 0
+collision_mask = 4
+script = ExtResource("2_o3k7i")
+Sequence = ExtResource("3_o3k7i")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CutsceneTrigger"]
+position = Vector2(-2400, 0)
+shape = SubResource("RectangleShape2D_mfk2f")
+debug_color = Color(1, 0, 1, 0.41960785)
 
 [node name="BattleArena" type="Area2D" parent="."]
 visible = false
@@ -381,4 +400,6 @@ position = Vector2(793, -689)
 [node name="FurnitureChairOfficeB" parent="." instance=ExtResource("41_y44s2")]
 position = Vector2(-730, 746)
 
-[node name="SlideRail" parent="." instance=ExtResource("40_2vmef")]
+[node name="SlideRail_wheel" parent="." instance=ExtResource("42_hxrfn")]
+FlipCarriageEnds = true
+CarriagePrefab = ExtResource("43_hxrfn")

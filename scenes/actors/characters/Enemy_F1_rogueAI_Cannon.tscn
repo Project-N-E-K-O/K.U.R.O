@@ -1,30 +1,31 @@
-[gd_scene load_steps=33 format=3 uid="uid://duryvwia2gyyc"]
+[gd_scene load_steps=35 format=3 uid="uid://duryvwia2gyyc"]
 
-[ext_resource type="Script" uid="uid://dl48n86nqoplv" path="res://scripts/actors/enemies/EnemyD1Drone.cs" id="1_3cfw7"]
+[ext_resource type="Script" uid="uid://ccqcbk4merfnt" path="res://scripts/actors/enemies/EnemyF1RogueAICannon.cs" id="1_3cfw7"]
 [ext_resource type="Resource" uid="uid://05yoqk7rf6ax" path="res://resources/behavior/EnemyBehaviorConfig.tres" id="2_3eyky"]
-[ext_resource type="PackedScene" uid="uid://cvdv22giw51s8" path="res://scenes/items/Furniture_D_drone.tscn" id="3_86gp3"]
+[ext_resource type="Texture2D" uid="uid://brjaqxel52a2o" path="res://assets/BuildIcon/icon.svg" id="3_3eyky"]
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="4_by072"]
 [ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="5_r52tf"]
 [ext_resource type="Script" uid="uid://4dd56677a2aa" path="res://scripts/controllers/ShadowFollower.cs" id="6_hyfyo"]
 [ext_resource type="SpineSkeletonDataResource" uid="uid://cu63oa22oqlid" path="res://animations/spine/Enemy_F1_rogueAI_Cannon.tres" id="7_3cfw7"]
 [ext_resource type="Script" uid="uid://bbybuyitd10jr" path="res://scripts/controllers/SpineController.gd" id="8_6o35y"]
 [ext_resource type="Script" uid="uid://cenpuhlcgesin" path="res://scripts/systems/fsm/StateMachine.cs" id="9_b70sc"]
-[ext_resource type="Script" uid="uid://dy6nxg6ncc1dl" path="res://scripts/actors/enemies/states/EnemyWaiterAIdleState.cs" id="10_lu5qv"]
-[ext_resource type="Script" uid="uid://ca6my22csxkmt" path="res://scripts/actors/enemies/states/EnemyWaiterAWalkState.cs" id="11_7vabk"]
 [ext_resource type="Script" uid="uid://bo6uhkbqyxe6o" path="res://scripts/actors/enemies/states/EnemyAttackState.cs" id="12_5soab"]
-[ext_resource type="Script" uid="uid://04usu0butu18" path="res://scripts/actors/enemies/attacks/EnemyD1DroneAttackController.cs" id="13_cad0h"]
+[ext_resource type="Script" uid="uid://b3yljatiudox4" path="res://scripts/actors/enemies/attacks/EnemyAttackController.cs" id="13_cad0h"]
 [ext_resource type="Script" uid="uid://cu6enbmbcicac" path="res://scripts/actors/enemies/attacks/EnemySimpleMeleeAttack.cs" id="14_0xw7a"]
 [ext_resource type="Script" uid="uid://fd5076f50ca0" path="res://scripts/actors/enemies/attacks/AttackEffectEntry.cs" id="15_koqry"]
-[ext_resource type="PackedScene" uid="uid://ccnppsi6ofeip" path="res://resources/effects/CubeDataBoom.tscn" id="16_6rk3q"]
+[ext_resource type="PackedScene" uid="uid://1i57pudem5og" path="res://resources/effects/EnergyOrbCharge.tscn" id="15_x1ryc"]
 [ext_resource type="Script" uid="uid://cwnxfhj8ysc2f" path="res://scripts/actors/enemies/states/EnemyHitState.cs" id="17_4c6ck"]
 [ext_resource type="Script" uid="uid://cihawgv4js52w" path="res://scripts/actors/enemies/states/EnemyFrozenState.cs" id="18_dvfub"]
-[ext_resource type="Script" uid="uid://fpfidsmcwy6w" path="res://scripts/actors/enemies/states/EnemyCooldownFrozenState.cs" id="19_80jd2"]
-[ext_resource type="Script" uid="uid://c8wsdmavv5uk7" path="res://scripts/actors/enemies/states/EnemyKeepDistanceState.cs" id="20_x0dur"]
+[ext_resource type="Script" uid="uid://wdd3ghxdq7f6" path="res://scripts/actors/enemies/states/EnemyStationaryTurretState.cs" id="19_80jd2"]
 [ext_resource type="Script" uid="uid://cbmvuppulotha" path="res://scripts/actors/enemies/states/EnemyDyingState.cs" id="21_dym3s"]
 [ext_resource type="Script" uid="uid://bta6sixb7kee4" path="res://scripts/actors/enemies/states/EnemyDeadState.cs" id="22_vw8f5"]
 [ext_resource type="Script" uid="uid://d6ppl6a6djpr" path="res://scripts/core/effects/EffectController.cs" id="23_pxb7b"]
-[ext_resource type="Script" uid="uid://dasv6eyuks8yq" path="res://scripts/actors/enemies/movement/EnemyFreezeOnTurnMovement.cs" id="24_2601j"]
-[ext_resource type="Script" uid="uid://cmotujoew8bvf" path="res://scripts/actors/enemies/animation/EnemyD1DroneSpineAnimationController.cs" id="25_fjhpe"]
+[ext_resource type="Script" uid="uid://c4kxr10rsfmjv" path="res://scripts/actors/enemies/animation/EnemyF1RogueAITurretSpineAnimationController.cs" id="25_fjhpe"]
+[ext_resource type="Script" uid="uid://0pvilfowy86v" path="res://scripts/actors/enemies/EnemyF1RogueAITurretFacingController.cs" id="26_facing"]
+[ext_resource type="Script" uid="uid://beutwy4w43dgl" path="res://scripts/actors/enemies/movement/RailChaseMovement.cs" id="27_railchase"]
+[ext_resource type="Script" uid="uid://c6irorf7ei407" path="res://scripts/actors/enemies/movement/RailKeepDistanceBehavior.cs" id="28_keepdist"]
+[ext_resource type="Script" uid="uid://birre3ujsghmw" path="res://scripts/controllers/SpineBoneAnchor.cs" id="29_anchor"]
+[ext_resource type="PackedScene" uid="uid://c3a0j5lhckwlq" path="res://resources/effects/EnergyOrbShot.tscn" id="30_orbshot"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_shadow"]
 shader = ExtResource("4_by072")
@@ -35,10 +36,10 @@ shader_parameter/alpha = 0.4
 radius = 20000.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_attack_detect"]
-radius = 3072.0
+radius = 10000.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_attack"]
-size = Vector2(4000, 2000)
+size = Vector2(6000, 300)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_hit"]
 size = Vector2(500, 300)
@@ -49,10 +50,12 @@ height = 300.0
 
 [sub_resource type="Resource" id="Resource_v1b7h"]
 script = ExtResource("15_koqry")
-Scene = ExtResource("16_6rk3q")
+Scene = ExtResource("15_x1ryc")
 EffectOffset = Vector2(nan, nan)
-SpawnTiming = 1
-SpawnMarkerPaths = [NodePath("../../../../Node2D/Marker2D")]
+SpawnTiming = 0
+SpawnMarkerPaths = [NodePath("../../../../SpineSprite/SpineBoneNode2/Marker2D")]
+OffsetFlip = 2
+LifecycleBinding = 1
 PropertyOverrides = Dictionary[String, Variant]({
 "BaseDirection": Vector2(1, 0),
 "Damage": 10,
@@ -69,25 +72,36 @@ PropertyOverrides = Dictionary[String, Variant]({
 })
 metadata/_custom_type_script = "uid://fd5076f50ca0"
 
+[sub_resource type="Resource" id="Resource_shot"]
+script = ExtResource("15_koqry")
+Scene = ExtResource("30_orbshot")
+EffectOffset = Vector2(nan, nan)
+SpawnTiming = 1
+SpawnMarkerPaths = [NodePath("../../../../SpineSprite/SpineBoneNode2/Marker2D")]
+OffsetFlip = 2
+metadata/_custom_type_script = "uid://fd5076f50ca0"
+
 [node name="Enemy_F1_rogueAI_Cannon" type="CharacterBody2D" node_paths=PackedStringArray("DetectionArea", "AttackArea", "StateMachine", "EffectController")]
-z_index = 2
+z_index = 3
 y_sort_enabled = true
-scale = Vector2(0.66, 0.66)
+scale = Vector2(0.6, 0.6)
 collision_layer = 2
 collision_mask = 15
 motion_mode = 1
 script = ExtResource("1_3cfw7")
 BehaviorConfig = ExtResource("2_3eyky")
+IsBoss = true
+BossIcon = ExtResource("3_3eyky")
 DebugOverlayOffset = Vector2(-1500, 200)
 DebugOverlayFontSize = 128
 DetectionArea = NodePath("Sprite2D/ControllerDetectionArea")
 AttackArea = NodePath("Sprite2D/AttackArea")
-DeathEffect = ExtResource("3_86gp3")
 Speed = 400.0
 AttackDamage = 10.0
 AttackCooldown = 1.0
-MaxHealth = 80
-AiDescription = "无人机，普通敌人，由网络管理员召唤，会朝客户喷吐垃圾信息，被破坏后露出核心，注意需要使用核心才能让网络管理员冷静下来"
+MaxHealth = 10000
+AiDescription = "固定在机械桩（滑槽）上的炮台：不移动，按玩家位置用 turn/d_turn 转身，蓄力(preheat)→开火(attack)→收招(recover)；攻击期间会沿桩退开以保持距离"
+LockFacing = true
 StateMachine = NodePath("StateMachine")
 EffectController = NodePath("EffectController")
 DamageFlashColor = Color(18.892157, 18.892157, 18.892157, 1)
@@ -102,6 +116,7 @@ TargetBone = NodePath("../SpineSprite/SpineBoneNode")
 
 [node name="OutlineLayer" type="Node2D" parent="."]
 show_behind_parent = true
+position = Vector2(0, -500)
 
 [node name="OutlineSpineSprite_Left" type="SpineSprite" parent="OutlineLayer"]
 modulate = Color(0.02, 0.02, 0.02, 0.85)
@@ -148,18 +163,31 @@ preview_time = 0.0
 script = ExtResource("8_6o35y")
 
 [node name="SpineSprite" type="SpineSprite" parent="."]
+position = Vector2(0, -500)
 skeleton_data_res = ExtResource("7_3cfw7")
 preview_skin = "Default"
 preview_animation = "-- Empty --"
 preview_frame = true
-preview_time = 0.0
+preview_time = 0.5
 script = ExtResource("8_6o35y")
 
 [node name="SpineBoneNode" type="SpineBoneNode" parent="SpineSprite"]
 show_behind_parent = true
-position = Vector2(25.396597, -2326.8887)
-scale = Vector2(0.99999994, 0.99999994)
-bone_name = "bone"
+position = Vector2(-26.97395, -2051.0408)
+rotation = 1.5586017
+bone_name = "bone3"
+
+[node name="SpineBoneNode2" type="SpineBoneNode" parent="SpineSprite"]
+show_behind_parent = true
+position = Vector2(1066.2709, -145.85138)
+rotation = -0.73912066
+scale = Vector2(1.0000001, 1)
+bone_name = "bone12"
+thickness = 30.0
+
+[node name="Marker2D" type="Marker2D" parent="SpineSprite/SpineBoneNode2"]
+position = Vector2(4, 280)
+script = ExtResource("29_anchor")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 modulate = Color(0.8, 0.6, 0.5, 1)
@@ -176,12 +204,12 @@ monitorable = false
 shape = SubResource("CircleShape2D_controller_detect")
 
 [node name="AttackDetectionArea" type="Area2D" parent="Sprite2D"]
+visible = false
 collision_layer = 0
 collision_mask = 4
 monitorable = false
 
 [node name="AttackDetectionShape" type="CollisionShape2D" parent="Sprite2D/AttackDetectionArea"]
-visible = false
 shape = SubResource("CircleShape2D_attack_detect")
 
 [node name="AttackArea" type="Area2D" parent="Sprite2D"]
@@ -190,7 +218,7 @@ collision_layer = 0
 monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/AttackArea"]
-position = Vector2(2000, 0)
+position = Vector2(3000, 0)
 shape = SubResource("RectangleShape2D_attack")
 
 [node name="HitArea" type="Area2D" parent="Sprite2D"]
@@ -210,21 +238,22 @@ position = Vector2(0, -300)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 rotation = 1.5707964
 shape = SubResource("CapsuleShape2D_2csbb")
+disabled = true
 
 [node name="Node2D" type="Node2D" parent="."]
-
-[node name="Marker2D" type="Marker2D" parent="Node2D"]
-position = Vector2(620, 350)
+script = ExtResource("6_hyfyo")
+TargetBone = NodePath("../SpineSprite/SpineBoneNode2")
+FollowBoneY = true
 
 [node name="StateMachine" type="Node" parent="." node_paths=PackedStringArray("InitialState")]
 script = ExtResource("9_b70sc")
 InitialState = NodePath("Idle")
 
 [node name="Idle" type="Node" parent="StateMachine"]
-script = ExtResource("10_lu5qv")
+script = ExtResource("19_80jd2")
 
 [node name="Walk" type="Node" parent="StateMachine"]
-script = ExtResource("11_7vabk")
+script = ExtResource("19_80jd2")
 
 [node name="Attack" type="Node" parent="StateMachine"]
 script = ExtResource("12_5soab")
@@ -236,16 +265,16 @@ PlayerDetectionAreaPath = NodePath("../../../Sprite2D/ControllerDetectionArea")
 [node name="SimpleMeleeAttack" type="Node" parent="StateMachine/Attack/AttackController"]
 script = ExtResource("14_0xw7a")
 AttackName = "SimpleMeleeAttack"
-WarmupDuration = 0.5
-ActiveDuration = 0.3
-RecoveryDuration = 0.53
+WarmupDuration = 2.0
+ActiveDuration = 0.5
+RecoveryDuration = 0.333
 CooldownDurationMultiplier = 3.0
 DamageMultiplier = 0.0
 AttackAreaPath = NodePath("../../../../Sprite2D/AttackArea")
-RequireAnimationHitTrigger = true
+TriggerAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
 AllowMultipleAnimationHits = true
 GrantedImmunities = 16
-Effects = Array[ExtResource("15_koqry")]([SubResource("Resource_v1b7h")])
+Effects = Array[ExtResource("15_koqry")]([SubResource("Resource_v1b7h"), SubResource("Resource_shot")])
 metadata/attack_weight = 100.0
 
 [node name="Hit" type="Node" parent="StateMachine"]
@@ -258,9 +287,7 @@ script = ExtResource("18_dvfub")
 
 [node name="CooldownFrozen" type="Node" parent="StateMachine"]
 script = ExtResource("19_80jd2")
-
-[node name="KeepDistance" type="Node" parent="StateMachine"]
-script = ExtResource("20_x0dur")
+AllowAttack = false
 
 [node name="Dying" type="Node" parent="StateMachine"]
 script = ExtResource("21_dym3s")
@@ -272,13 +299,27 @@ script = ExtResource("22_vw8f5")
 [node name="EffectController" type="Node" parent="."]
 script = ExtResource("23_pxb7b")
 
-[node name="FreezeOnTurnMovement" type="Node" parent="."]
-script = ExtResource("24_2601j")
+[node name="RailChaseMovement" type="Node" parent="."]
+script = ExtResource("27_railchase")
+
+[node name="RailKeepDistanceBehavior" type="Node" parent="."]
+script = ExtResource("28_keepdist")
+Active = true
+KeepDistance = 1500.0
+Speed = 250.0
+Smoothing = 1.0
+
+[node name="FacingController" type="Node" parent="."]
+script = ExtResource("26_facing")
 
 [node name="AnimationController" type="Node" parent="."]
 script = ExtResource("25_fjhpe")
-AttackMixDuration = 0.2
-SkillMixDuration = 0.2
+IdleMixDuration = 0.0
+WalkMixDuration = 0.0
+HitMixDuration = 0.0
+DieMixDuration = 0.0
+AttackMixDuration = 0.0
+SkillMixDuration = 0.0
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
 target_desired_distance = 50.0
