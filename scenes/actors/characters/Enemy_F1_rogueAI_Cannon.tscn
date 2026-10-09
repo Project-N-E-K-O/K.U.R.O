@@ -167,26 +167,26 @@ position = Vector2(0, -500)
 skeleton_data_res = ExtResource("7_3cfw7")
 preview_skin = "Default"
 preview_animation = "-- Empty --"
-preview_frame = true
+preview_frame = false
 preview_time = 0.5
 script = ExtResource("8_6o35y")
 
 [node name="SpineBoneNode" type="SpineBoneNode" parent="SpineSprite"]
 show_behind_parent = true
-position = Vector2(-26.97395, -2051.0408)
+position = Vector2(-52.361004, -2051.0408)
 rotation = 1.5586017
 bone_name = "bone3"
 
 [node name="SpineBoneNode2" type="SpineBoneNode" parent="SpineSprite"]
 show_behind_parent = true
-position = Vector2(1066.2709, -145.85138)
-rotation = -0.73912066
+position = Vector2(863.01575, -280.07666)
+rotation = 0.8884798
 scale = Vector2(1.0000001, 1)
-bone_name = "bone12"
+bone_name = "bone8"
 thickness = 30.0
 
 [node name="Marker2D" type="Marker2D" parent="SpineSprite/SpineBoneNode2"]
-position = Vector2(4, 280)
+position = Vector2(550, -50)
 script = ExtResource("29_anchor")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]

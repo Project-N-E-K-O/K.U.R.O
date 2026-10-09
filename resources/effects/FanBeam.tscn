@@ -1,36 +1,39 @@
-[gd_scene load_steps=3 format=3 uid="uid://dn0xxip3a0jbb"]
+[gd_scene load_steps=4 format=3 uid="uid://dn0xxip3a0jbb"]
 
 [ext_resource type="Script" uid="uid://d2110gg02orle" path="res://scripts/fx/FanBeam.cs" id="1_fanbeam"]
-[ext_resource type="PackedScene" uid="uid://b1osuixafvh7g" path="res://resources/effects/RogueAIOverloadBeam.tscn" id="2_beam"]
+[ext_resource type="PackedScene" uid="uid://b6mns5wcqj5h3" path="res://resources/effects/RogueAIOverloadBeamSpin.tscn" id="2_beam"]
+[ext_resource type="PackedScene" uid="uid://bglvrbtokgdkb" path="res://resources/effects/LaserScorchTrail.tscn" id="3_trail"]
 
 [node name="FanBeam" type="Node2D"]
+z_as_relative = false
 y_sort_enabled = true
-position = Vector2(6, 0)
 script = ExtResource("1_fanbeam")
-SpreadDegrees = 10.0
-SpreadSpeed = 2000.0
-SpreadPauseAfter = 0.3
-SpreadPauseDuration = 1.0
-SpreadPauseDegrees = 25.0
-SpreadResumeSpeed = 6000.0
-BeamWidth = 50.0
-GlowWidth = 100.0
+SyncToAnchor = false
+Stage1Seconds = 0.2
+Stage1Distance = 900.0
+Stage1EndDegrees = 5.0
+Stage2Seconds = 0.3
+Stage2Distance = 1600.0
+Stage2EndDegrees = 15.0
+Pause2Seconds = 0.0
+Stage3Seconds = 0.5
+Stage3Distance = 6000.0
+Pseudo3DFovDegrees = 179.0
+BeamWidth = 150.0
+GlowWidth = 250.0
+Stage1WidthScale = 0.5
+Stage2WidthScale = 0.75
+Stage1ZIndex = 3
+Stage2ZIndex = 3
+Stage3ZIndex = 3
+ScorchTrailScene = ExtResource("3_trail")
 SpotlightDuration = 2.0
+DetectionRadius = 10.0
 TargetableFactions = 5
 Damage = 10
+TruncateOnHit = true
 
-[node name="BeamMinus" parent="." instance=ExtResource("2_beam")]
-z_index = 2
-AngleDegrees = 30.0
+[node name="Beam" parent="." instance=ExtResource("2_beam")]
+z_index = 0
+y_sort_enabled = false
 TargetableFactions = 5
-MaxLength = 8000.0
-
-[node name="BeamCenter" parent="." instance=ExtResource("2_beam")]
-z_index = 2
-TargetableFactions = 5
-
-[node name="BeamPlus" parent="." instance=ExtResource("2_beam")]
-z_index = 2
-AngleDegrees = 150.0
-TargetableFactions = 5
-MaxLength = 8000.0

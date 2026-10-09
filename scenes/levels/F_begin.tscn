@@ -40,6 +40,7 @@
 [sub_resource type="Resource" id="Resource_rqd1e"]
 script = ExtResource("2_82263")
 PhaseId = "stage_up"
+TotalKillsForFull = 1
 ArrivalTriggerPath = NodePath("CutsceneTrigger3")
 ArrivalTriggerDelay = 2.5
 MinSpeedScale = 0.5

@@ -1,0 +1,134 @@
+[gd_scene load_steps=13 format=3 uid="uid://b6mns5wcqj5h3"]
+
+[ext_resource type="Script" uid="uid://b7hrnixj07wgq" path="res://scripts/fx/RogueAIOverloadBeamSpin.cs" id="1_script"]
+[ext_resource type="Shader" uid="uid://cqwoevdxw0lai" path="res://shaders/materials/laser_blaster_glow_spin.gdshader" id="2_spinshader"]
+[ext_resource type="Texture2D" uid="uid://cv6ol02rd852j" path="res://assets/effect/LightEffect/spotlight_1.png" id="2_spot"]
+[ext_resource type="Shader" uid="uid://mgoi3nxo6p5p" path="res://shaders/materials/laser_blaster_glow.gdshader" id="2_vl6ap"]
+[ext_resource type="Texture2D" uid="uid://bdh5uuivcd50q" path="res://assets/effect/LightEffect/laserpointer.png" id="3_beam"]
+[ext_resource type="Texture2D" uid="uid://dpaedwsaacise" path="res://assets/effect/noise/noise_combined.png" id="3_hv1ib"]
+[ext_resource type="PackedScene" uid="uid://cw8lr2vtitamp" path="res://resources/effects/LaserTipSplash.tscn" id="4_splash"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_glowspin"]
+shader = ExtResource("2_spinshader")
+shader_parameter/glow_intensity = 50.0
+shader_parameter/core_width = 0.550000026125
+shader_parameter/core_length = 0.9600000456
+shader_parameter/core_start_length = 0.0
+shader_parameter/fade = 1.0
+shader_parameter/flow_noise = ExtResource("3_hv1ib")
+shader_parameter/flow_speed = Vector2(-10, 0)
+shader_parameter/flow_scale = 0.50000002049012
+shader_parameter/flow_strength = 0.50000002375
+shader_parameter/fov = 60.0000028025
+shader_parameter/tilt_deg = 35.0
+shader_parameter/spin_speed = 0.6
+shader_parameter/spin_width = 0.5
+shader_parameter/spin_strength = 0.7
+shader_parameter/depth_falloff = 0.3
+shader_parameter/far_tint = Color(1, 1, 1, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_beamspin"]
+shader = ExtResource("2_spinshader")
+shader_parameter/glow_intensity = 2.000000095
+shader_parameter/core_width = 0.6000000285
+shader_parameter/core_length = 0.930000044175
+shader_parameter/core_start_length = 0.0
+shader_parameter/fade = 1.0
+shader_parameter/flow_noise = ExtResource("3_hv1ib")
+shader_parameter/flow_speed = Vector2(-10, 0)
+shader_parameter/flow_scale = 0.50000002049012
+shader_parameter/flow_strength = 0.50000002375
+shader_parameter/fov = 60.0000028025
+shader_parameter/tilt_deg = 35.0
+shader_parameter/spin_speed = 0.6
+shader_parameter/spin_width = 0.5
+shader_parameter/spin_strength = 0.7
+shader_parameter/depth_falloff = 0.3
+shader_parameter/far_tint = Color(1, 1, 1, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_hv1ib"]
+shader = ExtResource("2_vl6ap")
+shader_parameter/glow_intensity = 6.0
+shader_parameter/core_width = 0.50000002375
+shader_parameter/core_length = 0.50000002375
+shader_parameter/core_start_length = 0.50000002375
+shader_parameter/fade = 1.0
+shader_parameter/flow_noise = ExtResource("3_hv1ib")
+shader_parameter/flow_speed = Vector2(10, 20)
+shader_parameter/flow_scale = 10.00000047174012
+shader_parameter/flow_strength = 0.2000000095
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_tw34n"]
+shader = ExtResource("2_vl6ap")
+shader_parameter/glow_intensity = 4.00000019
+shader_parameter/core_width = 0.50000002375
+shader_parameter/core_length = 0.50000002375
+shader_parameter/core_start_length = 0.50000002375
+shader_parameter/fade = 1.0
+shader_parameter/flow_noise = ExtResource("3_hv1ib")
+shader_parameter/flow_speed = Vector2(-10, -20)
+shader_parameter/flow_scale = 10.00000047174012
+shader_parameter/flow_strength = 0.2000000095
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_beamhit"]
+size = Vector2(1, 50)
+
+[node name="RogueAIOverloadBeamSpin" type="Node2D"]
+z_index = 3
+y_sort_enabled = true
+script = ExtResource("1_script")
+TargetableFactions = 7
+Damage = 50
+DamageTickInterval = 0.25
+KnockbackDistance = 100.0
+KnockbackDuration = 0.28
+GlowSpritePath = NodePath("Visual/GlowSprite")
+BeamSpritePath = NodePath("Visual/BeamSprite")
+SpotlightPath = NodePath("Visual/Spotlight")
+SpotGlowSpritePath = NodePath("Visual/SpotGlow")
+MaxLength = 4000.0
+BeamWidth = 220.0
+GlowWidth = 360.0
+GrowDuration = 0.25
+BeamDuration = 4.75
+SpotlightDuration = 4.6
+SpotlightFadeOut = 0.25
+Lifetime = 5.2
+
+[node name="Visual" type="Node2D" parent="."]
+
+[node name="GlowSprite" type="Sprite2D" parent="Visual"]
+modulate = Color(0, 1, 0, 1)
+material = SubResource("ShaderMaterial_glowspin")
+texture = ExtResource("3_beam")
+centered = false
+offset = Vector2(0, -10)
+
+[node name="BeamSprite" type="Sprite2D" parent="Visual"]
+modulate = Color(0.49019608, 1, 0, 1)
+material = SubResource("ShaderMaterial_beamspin")
+scale = Vector2(1, 0.3)
+texture = ExtResource("3_beam")
+centered = false
+offset = Vector2(0, -10)
+
+[node name="SpotGlow" type="Sprite2D" parent="Visual"]
+modulate = Color(0, 1, 0, 1)
+material = SubResource("ShaderMaterial_hv1ib")
+scale = Vector2(2, 2)
+texture = ExtResource("2_spot")
+
+[node name="Spotlight" type="Sprite2D" parent="Visual"]
+modulate = Color(1, 1, 0, 1)
+material = SubResource("ShaderMaterial_tw34n")
+texture = ExtResource("2_spot")
+
+[node name="BeamHitArea" type="Area2D" parent="."]
+z_index = 10
+collision_layer = 0
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="BeamHitArea"]
+shape = SubResource("RectangleShape2D_beamhit")
+
+[node name="TipSplash" parent="." instance=ExtResource("4_splash")]

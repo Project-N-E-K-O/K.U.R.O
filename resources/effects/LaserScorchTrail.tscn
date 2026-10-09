@@ -1,0 +1,24 @@
+[gd_scene load_steps=6 format=3 uid="uid://bglvrbtokgdkb"]
+
+[ext_resource type="Script" uid="uid://dxqilykvbojjx" path="res://scripts/fx/LaserScorchTrail.cs" id="1_trail"]
+[ext_resource type="Texture2D" uid="uid://dwwiqjggbgatc" path="res://assets/effect/noise/noise_lightning.png" id="2_e0uwh"]
+[ext_resource type="Texture2D" uid="uid://cv6ol02rd852j" path="res://assets/effect/LightEffect/spotlight_1.png" id="2_soft"]
+[ext_resource type="Shader" uid="uid://dweyu1pguwr2j" path="res://shaders/materials/laser_scorch_trail.gdshader" id="3_trailshader"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_trail"]
+shader = ExtResource("3_trailshader")
+shader_parameter/scorch_color = Color(0, 0.015686275, 0, 1)
+shader_parameter/edge_softness = 1.0
+shader_parameter/noise_texture = ExtResource("2_e0uwh")
+shader_parameter/noise_scale = 1.0
+shader_parameter/noise_break = 0.800000038
+
+[node name="LaserScorchTrail" type="Line2D"]
+top_level = true
+z_index = 1
+material = SubResource("ShaderMaterial_trail")
+width = 82.0
+texture = ExtResource("2_soft")
+texture_mode = 1
+script = ExtResource("1_trail")
+PointStepPx = 32.0

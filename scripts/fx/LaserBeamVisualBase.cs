@@ -358,9 +358,17 @@ namespace Kuros.Fx
 			_totalTimer = seconds;
 		}
 
+		/// <summary>当前视觉长度（像素）：基类每帧先算自由长度，子类截断（命中截断）后写回实际值——
+		/// "末端附属物"（溅射粒子等）据此定位，天然包含命中截断：打中目标时末端就停在目标上。</summary>
+		public float CurrentLength => _currentLength;
+
+		/// <summary>光束阶段时钟（秒，已扣除 <see cref="BeamDelay"/>）：前摇内为负，0 起开始生长。</summary>
+		public float BeamPhaseElapsed => _beamPhaseElapsed;
+
 		/// <summary>光束视觉截断（供子类"首个目标截断/不可穿透"共用）：把本帧光束长度（含 sprite 缩放）
 		/// 限制到给定距离内。须在 base.UpdateBeam() 之后调用——宽度/生长阶段由基类写好，这里只覆写长度轴。
-		/// 注意判定带仍保持全长：带随视觉一起截断会在下一帧丢失首个目标的遮挡 → 反复伸缩抖动。</summary>
+		/// 本方法只动视觉；判定带要一起截的子类自行处理（<see cref="RogueAIOverloadBeam"/> 连同判定带截到
+		/// 同一世界终点，带端多留一格容差防"丢目标 → 反复伸缩"）。</summary>
 		protected void TruncateBeamVisual(float stopDistance)
 		{
 			// 截断距离可为负（目标跨在发射点上，如贴脸重叠）→ 长度下限 0，防负缩放把光束翻向反侧

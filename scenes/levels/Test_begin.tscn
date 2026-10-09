@@ -41,8 +41,8 @@
 [ext_resource type="PackedScene" uid="uid://daox4k6bu5oqt" path="res://scenes/items/Furniture_A_sofaB.tscn" id="40_7gqg0"]
 [ext_resource type="Texture2D" uid="uid://brjaqxel52a2o" path="res://assets/BuildIcon/icon.svg" id="40_21m0k"]
 [ext_resource type="PackedScene" uid="uid://dugfq8qy1okf1" path="res://scenes/items/Furniture_A_chairOfficeB.tscn" id="41_y44s2"]
-[ext_resource type="PackedScene" uid="uid://be30f0gopxel3" path="res://scenes/actors/etc/SlideRail_wheel.tscn" id="42_hxrfn"]
-[ext_resource type="PackedScene" uid="uid://cw42j1o501x83" path="res://scenes/actors/characters/Enemy_F1_rogueAI_MachineGun.tscn" id="43_hxrfn"]
+[ext_resource type="PackedScene" uid="uid://30w6ddbm18ga" path="res://scenes/actors/etc/SlideRail.tscn" id="42_oobfl"]
+[ext_resource type="PackedScene" uid="uid://c08u473nbnuxg" path="res://scenes/actors/characters/Enemy_F1_rogueAI.tscn" id="43_4812a"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1mlw7"]
 size = Vector2(5800, 3050)
@@ -400,6 +400,6 @@ position = Vector2(793, -689)
 [node name="FurnitureChairOfficeB" parent="." instance=ExtResource("41_y44s2")]
 position = Vector2(-730, 746)
 
-[node name="SlideRail_wheel" parent="." instance=ExtResource("42_hxrfn")]
-FlipCarriageEnds = true
-CarriagePrefab = ExtResource("43_hxrfn")
+[node name="SlideRail" parent="." instance=ExtResource("42_oobfl")]
+CarriagePrefab = ExtResource("43_4812a")
+CarriageSpawn = 2

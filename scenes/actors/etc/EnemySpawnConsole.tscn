@@ -1,4 +1,4 @@
-[gd_scene load_steps=27 format=3 uid="uid://mwpdlx1yup0k"]
+[gd_scene load_steps=28 format=3 uid="uid://mwpdlx1yup0k"]
 
 [ext_resource type="Script" uid="uid://dlbrxuciurl4o" path="res://scripts/environments/EnemySpawnConsole.cs" id="1_2lj3c"]
 [ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="1_bllfa"]
@@ -10,6 +10,7 @@
 [ext_resource type="PackedScene" uid="uid://djio6ojcqw8yf" path="res://scenes/actors/characters/Enemy_Normal_guard2.tscn" id="5_njsr5"]
 [ext_resource type="PackedScene" uid="uid://wqcdwpyo1nji" path="res://scenes/actors/characters/Enemy_B1_thin.tscn" id="6_w5fa5"]
 [ext_resource type="PackedScene" uid="uid://bvps5t0s8owhw" path="res://scenes/actors/characters/Enemy_C1_waiterA.tscn" id="7_5vnba"]
+[ext_resource type="PackedScene" uid="uid://lymwepvi725w" path="res://scenes/actors/characters/Enemy_Normal_guard4.tscn" id="7_f5erk"]
 [ext_resource type="PackedScene" uid="uid://ba8fktvib2e1o" path="res://scenes/actors/characters/Enemy_C2_waiterA02.tscn" id="8_qj5ja"]
 [ext_resource type="PackedScene" uid="uid://8ce54l6083nt" path="res://scenes/actors/characters/Enemy_C1_waiterB.tscn" id="9_qnjvr"]
 [ext_resource type="PackedScene" uid="uid://cpcvmvf2n5ahe" path="res://scenes/actors/characters/Enemy_D1_printerMachine.tscn" id="11_gn3c5"]
@@ -48,7 +49,7 @@ size = Vector2(636, 266)
 z_index = 2
 y_sort_enabled = true
 script = ExtResource("1_2lj3c")
-EnemyScenes = Array[PackedScene]([ExtResource("4_bt2sr"), ExtResource("5_njsr5"), ExtResource("4_w5fa5"), ExtResource("2_bqlf7"), ExtResource("3_b7qyu"), ExtResource("6_w5fa5"), ExtResource("7_5vnba"), ExtResource("8_qj5ja"), ExtResource("9_qnjvr"), ExtResource("11_gn3c5"), ExtResource("12_jj8gp"), ExtResource("13_jj8gp"), ExtResource("14_8ri3c"), ExtResource("14_1kajl"), ExtResource("16_w4w1u")])
+EnemyScenes = Array[PackedScene]([ExtResource("4_bt2sr"), ExtResource("5_njsr5"), ExtResource("4_w5fa5"), ExtResource("2_bqlf7"), ExtResource("3_b7qyu"), ExtResource("7_f5erk"), ExtResource("6_w5fa5"), ExtResource("7_5vnba"), ExtResource("8_qj5ja"), ExtResource("9_qnjvr"), ExtResource("11_gn3c5"), ExtResource("12_jj8gp"), ExtResource("13_jj8gp"), ExtResource("14_8ri3c"), ExtResource("14_1kajl"), ExtResource("16_w4w1u")])
 EnemySpawnOffset = Vector2(0, 200)
 EnemyAppearDelay = 1.0
 AutoLowerFrontEffectAfterEnemySpawn = true
