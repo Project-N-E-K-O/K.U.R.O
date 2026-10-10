@@ -542,6 +542,16 @@ namespace Kuros.Actors.Enemies.Attacks
         private void AlignFacingWithPlayer()
         {
             if (Enemy == null) return;
+
+            // 与 KickAttack 同款：CanStart 的朝向对齐副作用在控制状态下跳过
+            // （调试面板 QueuedCanStart 等无条件调用会隔着眩晕翻朝向）。
+            var st = Enemy.StateMachine?.CurrentState?.Name;
+            if (st == "Frozen" || st == "CooldownFrozen"
+                || st == "Hit" || st == "Dying" || st == "Dead")
+            {
+                return;
+            }
+
             Vector2 toPlayer = Enemy.GetDirectionToPlayer();
             if (Mathf.Abs(toPlayer.X) > 0.01f)
             {

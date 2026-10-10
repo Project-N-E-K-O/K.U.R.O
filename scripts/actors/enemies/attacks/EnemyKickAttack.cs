@@ -349,6 +349,16 @@ namespace Kuros.Actors.Enemies.Attacks
 			if (Enemy.AttackTimer > 0) return;
 			if (_postAttackCooldown > 0f) return;
 
+			// 冻结/受击状态下不触发攻击（与 MoveAttack 同款守卫）：
+			// BodyEntered 信号直达本方法——眩晕/受击期间玩家跨入触发区会被强切回 Attack，
+			// 刚进入的眩晕/受击状态被立刻抽走（guard4 的反击破招眩晕复现过）。
+			var currentStateName = Enemy.StateMachine?.CurrentState?.Name;
+			if (currentStateName == "Frozen" || currentStateName == "CooldownFrozen"
+				|| currentStateName == "Hit" || currentStateName == "Dying" || currentStateName == "Dead")
+			{
+				return;
+			}
+
 			if (_controller != null && _controller.PeekQueuedAttack() != this)
 			{
 				return;
@@ -451,6 +461,17 @@ namespace Kuros.Actors.Enemies.Attacks
         private void AlignFacingWithPlayer()
         {
             if (Enemy == null) return;
+
+            // CanStart 本是"能不能起手"的查询，但这里带朝向对齐的副作用——
+            // 被调试面板（QueuedCanStart）等无条件调用时，会隔着眩晕/受击把敌人翻向玩家。
+            // 控制状态下直接跳过；真正的对齐在出手路径 PrepareDashTowardsPlayer 里会再做一次。
+            var st = Enemy.StateMachine?.CurrentState?.Name;
+            if (st == "Frozen" || st == "CooldownFrozen"
+                || st == "Hit" || st == "Dying" || st == "Dead")
+            {
+                return;
+            }
+
             Vector2 toPlayer = Enemy.GetDirectionToPlayer();
             if (Mathf.Abs(toPlayer.X) > 0.01f)
             {
