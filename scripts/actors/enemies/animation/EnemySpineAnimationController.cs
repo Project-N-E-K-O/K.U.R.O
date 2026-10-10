@@ -388,6 +388,60 @@ namespace Kuros.Actors.Enemies.Animation
 		}
 
 		/// <summary>
+		/// 播放动画的指定片段一次，段播完后**姿态停留在段尾帧**（不回弹到段首）——收招/起身类动作段用。
+		/// </summary>
+		protected bool PlayPartialOnceHoldEnd(string animationName, float partStart, float partEnd, float mixDuration = 0.5f, float timeScale = 1f)
+		{
+			if (string.IsNullOrEmpty(animationName) || _spineHelper == null || partEnd <= partStart)
+			{
+				return false;
+			}
+
+			Node targetRoot = Owner ?? (Node?)Enemy ?? this;
+			try
+			{
+				var result = _spineHelper.Call("play_partial_once_animation_hold_end", targetRoot, animationName, partStart, partEnd, mixDuration, timeScale);
+				return result.AsBool();
+			}
+			catch (Exception ex)
+			{
+				GD.PushWarning($"[{Name}] PlayPartialOnceHoldEnd Failed: {ex.Message}");
+				return false;
+			}
+		}
+
+		/// <summary>
+		/// 片段一次性播放并定格段尾，仅在 key 或片段参数变化时才重新发起播放（与 PlayPartOnceIfNeeded 同款去重）。
+		/// </summary>
+		protected void PlayPartOnceHoldEndIfNeeded(string key, string animationName, float partStart, float partEnd, float mixDuration, float timeScale = 1f)
+		{
+			if (string.IsNullOrEmpty(animationName))
+				return;
+
+			if (partEnd <= partStart)
+			{
+				PlayOnceIfNeeded(key, animationName, mixDuration, timeScale);
+				return;
+			}
+
+			bool samePartialOnce = _currentKey == key
+				&& _currentMode == SpineAnimationPlaybackMode.PartialOnce
+				&& Mathf.IsEqualApprox(_activeLoopStart, partStart)
+				&& Mathf.IsEqualApprox(_activeLoopEnd, partEnd);
+
+			if (samePartialOnce)
+				return;
+
+			if (PlayPartialOnceHoldEnd(animationName, partStart, partEnd, mixDuration, timeScale))
+			{
+				_currentKey = key;
+				_currentMode = SpineAnimationPlaybackMode.PartialOnce;
+				_activeLoopStart = partStart;
+				_activeLoopEnd = partEnd;
+			}
+		}
+
+		/// <summary>
 		/// 逐帧更新 PartialLoop 片段的循环边界。
 		/// </summary>
 		protected void TickPartialLoop()

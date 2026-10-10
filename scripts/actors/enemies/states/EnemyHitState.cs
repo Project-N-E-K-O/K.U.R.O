@@ -175,6 +175,15 @@ namespace Kuros.Actors.Enemies.States
             // 致死伤害：受击反馈（后仰 + 击退）已完整走完，直接转入死亡流程（Dying）
             if (Enemy.TryEnterDeferredDeath()) return;
 
+            // 挂起眩晕（反霸体中断等在命中时请求）：受击完整走完 → 进眩晕，时长从此刻起算
+            var pendingFrozen = Enemy.StateMachine?.GetNodeOrNull<EnemyFrozenState>("Frozen");
+            if (pendingFrozen != null && Enemy.TryConsumeStunAfterHit(out float stunSeconds))
+            {
+                pendingFrozen.FrozenDuration = Mathf.Max(stunSeconds, 0.1f);
+                ChangeState("Frozen");
+                return;
+            }
+
             // 若仍有活跃的 FreezeEffect，Hit 结束后转到该效果配置的目标状态
             var freezeEffect = Enemy.EffectController?.GetEffect<FreezeEffect>();
             if (freezeEffect != null)

@@ -2333,9 +2333,13 @@
 			}
 		},
 		"events": [
-			{ "time": 0.33, "name": "hit" },
-			{ "time": 0.38, "name": "hit" },			
-			{ "time": 0.43, "name": "hit" }
+
+			{ "time": 0.18, "name": "hit" },
+	
+			{ "time": 0.28, "name": "hit" },
+	
+			{ "time": 0.38, "name": "hit" }	
+	
 		]
 	},
 	"stun": {

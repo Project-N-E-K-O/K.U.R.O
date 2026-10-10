@@ -1,4 +1,4 @@
-[gd_scene load_steps=32 format=3 uid="uid://c7cs5rykiiay0"]
+[gd_scene load_steps=34 format=3 uid="uid://c7cs5rykiiay0"]
 
 [ext_resource type="Script" uid="uid://xpeu3h5p7n6t" path="res://scripts/actors/enemies/EnemyNormalGuard5.cs" id="1_podts"]
 [ext_resource type="Resource" uid="uid://biq1vqy017vmi" path="res://resources/loot/Enemy_NormalDrops.tres" id="2_w06kf"]
@@ -17,6 +17,7 @@
 [ext_resource type="Script" uid="uid://fd5076f50ca0" path="res://scripts/actors/enemies/attacks/AttackEffectEntry.cs" id="15_ygu6o"]
 [ext_resource type="PackedScene" uid="uid://o8811jaji330" path="res://scenes/actors/etc/WarmingA.tscn" id="16_avack"]
 [ext_resource type="Script" uid="uid://cwnxfhj8ysc2f" path="res://scripts/actors/enemies/states/EnemyHitState.cs" id="17_fdf1t"]
+[ext_resource type="PackedScene" uid="uid://ddi6xmmkbkex2" path="res://shaders/run_smoke.tscn" id="17_w06kf"]
 [ext_resource type="Script" uid="uid://cihawgv4js52w" path="res://scripts/actors/enemies/states/EnemyFrozenState.cs" id="18_qqpg6"]
 [ext_resource type="Script" uid="uid://fpfidsmcwy6w" path="res://scripts/actors/enemies/states/EnemyCooldownFrozenState.cs" id="19_0dmap"]
 [ext_resource type="Script" uid="uid://cbmvuppulotha" path="res://scripts/actors/enemies/states/EnemyDyingState.cs" id="20_m0j6e"]
@@ -57,6 +58,13 @@ LifecycleBinding = 1
 PropertyOverrides = Dictionary[String, Variant]({
 "Duration": 0.0
 })
+metadata/_custom_type_script = "uid://fd5076f50ca0"
+
+[sub_resource type="Resource" id="Resource_wb3gc"]
+script = ExtResource("15_ygu6o")
+Scene = ExtResource("17_w06kf")
+EffectOffset = Vector2(0, 200)
+SpawnTiming = 2
 metadata/_custom_type_script = "uid://fd5076f50ca0"
 
 [node name="Enemy_Normal_guard5" type="CharacterBody2D" node_paths=PackedStringArray("DetectionArea", "AttackArea", "StateMachine", "EffectController")]
@@ -142,7 +150,7 @@ skeleton_data_res = ExtResource("6_podts")
 preview_skin = "Default"
 preview_animation = "-- Empty --"
 preview_frame = true
-preview_time = 0.0
+preview_time = 0.17
 script = ExtResource("7_ubiro")
 
 [node name="SpineBoneNode" type="SpineBoneNode" parent="SpineSprite"]
@@ -247,19 +255,18 @@ KnockbackDistance = 400.0
 KnockbackDuration = 0.25
 RequireAnimationHitTrigger = true
 GrantedImmunities = 24
-metadata/attack_weight = 75.0
+metadata/attack_weight = 0.0
 
 [node name="ShieldStance" type="Node" parent="StateMachine/Attack/AttackController"]
 script = ExtResource("14_bthkv")
-DashSpeedMultiplier = 6.0
+DashSpeedMultiplier = 7.5
 DashDuration = 0.39999999999999997
 MissStunSeconds = 0.6
-PlayerStunSeconds = 0.0
+PlayerStunSeconds = 2.0
 AttackName = "ShieldStance"
 WarmupDuration = 3.0
 ActiveDuration = 0.53
 RecoveryDuration = 0.14
-CooldownDurationMultiplier = 15.0
 DamageMultiplier = 2.0
 AttackAreaPath = NodePath("../../../../Sprite2D/AttackArea")
 DamageAreaPath = NodePath("../../../../Sprite2D/AttackArea")
@@ -274,11 +281,13 @@ StunDuringRecovery = false
 DamageTakenFrozenDuration = 3.0
 EnableInterruptSlowMo = true
 IgnoreEnemyCollisionDuringAttack = true
-Effects = Array[ExtResource("15_ygu6o")]([SubResource("Resource_alqhx")])
+Effects = Array[ExtResource("15_ygu6o")]([SubResource("Resource_alqhx"), SubResource("Resource_wb3gc")])
 metadata/attack_weight = 25.0
 
 [node name="Hit" type="Node" parent="StateMachine"]
 script = ExtResource("17_fdf1t")
+HitImpactDuration = 0.16999999999999998
+RecoverDuration = 0.16
 
 [node name="Frozen" type="Node" parent="StateMachine"]
 script = ExtResource("18_qqpg6")

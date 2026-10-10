@@ -198,8 +198,10 @@ namespace Kuros.Actors.Heroes.States
                 case HitPhase.Recover:
                     // 受身：回正段可按 dash 打断恢复（与 Idle→Dash 同模式，无条件切；
                     // 能否冲刺由 Dash 状态自身的充能判定，此处不耦合）。此刻击退位移已结束，无冲突。
+                    // 例外：有挂起眩晕（攻方命中时请求）时眩晕优先——受身也逃不掉，直接进 Frozen。
                     if (IsActionJustPressed("dash"))
                     {
+                        if (TryEnterPendingStun()) return;
                         ChangeState("Dash");
                         return;
                     }
@@ -208,6 +210,9 @@ namespace Kuros.Actors.Heroes.States
                     {
                         // 致死伤害：受击反馈（后仰 + 击退）已完整走完，转入死亡流程（Dying）
                         if (Actor.TryEnterDeferredDeath()) return;
+
+                        // 挂起眩晕（攻击方在命中时请求）：受击完整走完 → 进眩晕，时长从此刻起算
+                        if (TryEnterPendingStun()) return;
 
                         ChangeState("Idle");
                         return;
@@ -231,6 +236,20 @@ namespace Kuros.Actors.Heroes.States
                 mainChar.SetSpineAnimationSpeed(0f);
                 _flyActive = false;
             }
+        }
+
+        /// <summary>消费挂起眩晕并转入 Frozen（时长从此刻起算）。返回是否成功进入眩晕。</summary>
+        private bool TryEnterPendingStun()
+        {
+            var sm = Actor.StateMachine;
+            var frozen = sm?.GetNodeOrNull<PlayerFrozenState>("Frozen");
+            if (frozen == null) return false;
+            if (!Actor.TryConsumeStunAfterHit(out float stunSeconds)) return false;
+
+            frozen.FrozenDuration = Mathf.Max(stunSeconds, 0.1f);
+            ChangeState("Frozen");
+            // 眩晕免疫（PlayerFrozenState.CanEnterFrom）拒绝时状态未变 → 返回 false，调用方按原流程继续
+            return sm?.CurrentState?.Name == "Frozen";
         }
 
         private void EnterRecover()

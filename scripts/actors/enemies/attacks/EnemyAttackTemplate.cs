@@ -364,12 +364,22 @@ namespace Kuros.Actors.Enemies.Attacks
             // 阶段细分开关：当前阶段不允许眩晕则忽略本次受伤
             if (!IsStunEnabledForCurrentPhase()) return;
 
-            // 中断当前攻击（进入冷却）并切入眩晕
+            // 中断当前攻击（进入冷却）：先走完整受击（后仰 + 击退，攻击方写入的击退请求也在此被消费），
+            // 眩晕挂起、由 Hit 状态在受击走完后进入（时长从 hit 结束起算）；无 Hit 状态的目标退回直接眩晕。
             Cancel();
-            var frozenState = Enemy.StateMachine?.GetNodeOrNull<EnemyFrozenState>("Frozen");
-            if (frozenState != null)
-                frozenState.FrozenDuration = Mathf.Max(DamageTakenFrozenDuration, 0.1f);
-            Enemy.StateMachine?.ChangeState("Frozen");
+            var sm = Enemy.StateMachine;
+            if (sm != null && sm.HasState("Hit"))
+            {
+                Enemy.RequestStunAfterHit(Mathf.Max(DamageTakenFrozenDuration, 0.1f));
+                sm.ChangeState("Hit");
+            }
+            else
+            {
+                var frozenState = sm?.GetNodeOrNull<EnemyFrozenState>("Frozen");
+                if (frozenState != null)
+                    frozenState.FrozenDuration = Mathf.Max(DamageTakenFrozenDuration, 0.1f);
+                sm?.ChangeState("Frozen");
+            }
 
             // 全场时间减缓 + 镜头聚焦被眩晕的敌人（真实秒窗口，结束自动恢复 TimeScale/Zoom/聚焦目标）
             if (EnableInterruptSlowMo)

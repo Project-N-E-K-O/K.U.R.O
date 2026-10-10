@@ -261,6 +261,39 @@ namespace Kuros.Core
 		private ulong _knockWriteMsec = 0;
 		private bool _hasKnockRequest = false;
 
+		// ── 受击后眩晕（PENDING STUN）────────────────────────────────────────────
+		// 眩晕与受击不再互斥：施加方在"目标刚进受击"时改用挂起（RequestStunAfterHit），
+		// 受击状态（含后仰 + 击退位移）完整走完后，由 Hit 状态出口消费并转入 Frozen——
+		// 眩晕时长从 hit 结束时刻起算（hit 期间不消耗眩晕时间）。
+		private float _stunAfterHitSeconds;
+		private ulong _stunAfterHitAtMsec;
+
+		/// <summary>挂起一次"受击结束后眩晕"：先播完整受击（含击退），Hit 结束时再进 Frozen。
+		/// 请求带时间戳，超过 <see cref="StunAfterHitLifetimeMsec"/> 未被消费则作废（防陈旧请求被后续受击误用）。
+		/// 多个来源重复请求取较大时长。</summary>
+		public void RequestStunAfterHit(float seconds)
+		{
+			if (seconds <= 0f) return;
+			_stunAfterHitSeconds = Mathf.Max(_stunAfterHitSeconds, seconds);
+			_stunAfterHitAtMsec = Time.GetTicksMsec();
+		}
+
+		/// <summary>Hit 状态出口消费挂起眩晕：有有效请求 → true 并给出时长（消费即清空）。</summary>
+		public bool TryConsumeStunAfterHit(out float seconds)
+		{
+			seconds = _stunAfterHitSeconds;
+			_stunAfterHitSeconds = 0f;
+			if (seconds <= 0f) return false;
+			return Time.GetTicksMsec() - _stunAfterHitAtMsec <= StunAfterHitLifetimeMsec;
+		}
+
+		/// <summary>丢弃挂起眩晕（死亡时）。</summary>
+		public void ClearStunAfterHit() => _stunAfterHitSeconds = 0f;
+
+		/// <summary>挂起眩晕有效期（毫秒）：受击链从"伤害结算"到"Hit 状态自然走出"约 0.5~1s，
+		/// 给足余量即可；超时的请求视为陈旧（例如目标死亡/被外部状态劫走），丢弃。</summary>
+		private const ulong StunAfterHitLifetimeMsec = 3000;
+
 		public float GetSecondsSinceLastDamageTaken()
 		{
 			if (_lastDamageTakenAtMs == 0)
@@ -750,6 +783,7 @@ namespace Kuros.Core
 			if (_deathStarted) return;
 
 			_deathStarted = true;
+			ClearStunAfterHit();   // 死亡后挂起眩晕不再生效（Hit 出口的死亡分支会先走）
 
 			// 致死伤害的受击反馈（Hit 状态）未走完：不立即切 Dying，等 Hit 结束时由
 			// TryEnterDeferredDeath 接手（Hit 期间 FSM 只放行 Dying/Dead，状态不会被其他状态抢走）

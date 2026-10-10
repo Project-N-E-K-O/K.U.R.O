@@ -83,7 +83,8 @@ namespace Kuros.Actors.Enemies.Attacks
 
         /// <summary>被打断的眩晕兜底（由控制器在打断回调里调用）：延迟一帧把敌人打入
         /// <see cref="InterruptStunSeconds"/> 秒 Frozen。延迟是为了避开外层状态切换的流程内部
-        /// （打断发生在状态机切换里，立即再 ChangeState 会被外层覆盖）。死亡/已死或时长为 0 时不处理。</summary>
+        /// （打断发生在状态机切换里，立即再 ChangeState 会被外层覆盖）。死亡/已死或时长为 0 时不处理。
+        /// 若敌人已在受击中（模板级反霸体中断刚打入 Hit）：改为挂起眩晕，受击完整走完后再进入，不顶掉受击。</summary>
         public void ApplyInterruptStun()
         {
             if (InterruptStunSeconds <= 0f) return;
@@ -98,6 +99,13 @@ namespace Kuros.Actors.Enemies.Attacks
 
             var sm = Enemy.StateMachine;
             if (sm == null) return;
+
+            // 已在受击中（模板级中断刚把敌人打入 Hit）：眩晕改为挂起，由 Hit 状态出口接管
+            if (sm.CurrentState?.Name == "Hit")
+            {
+                Enemy.RequestStunAfterHit(Mathf.Max(InterruptStunSeconds, 0.1f));
+                return;
+            }
 
             var frozen = sm.GetNodeOrNull<EnemyFrozenState>("Frozen");
             if (frozen == null) return;

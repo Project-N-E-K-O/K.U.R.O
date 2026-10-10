@@ -15,5 +15,17 @@ namespace Kuros.Actors.Enemies.Attacks
             MeleeAttackName = "SimpleMeleeAttack";
             SkillAttackName = "ShieldStance";
         }
+
+        /// <summary>子攻击被打断（受击/眩晕导致的状态切换）：控制器默认会清掉子攻击 CD（允许尽快重试），
+        /// 但盾反不同——跪地被打断就是"起手失败"：按普通 CD 结算（与 guard4 招架失败的语义一致）。
+        /// （Recovery 阶段打断时控制器本就保留 CD、也不触发本回调，不受影响。）</summary>
+        protected override void OnAttackInterrupted(EnemyAttackTemplate attack)
+        {
+            base.OnAttackInterrupted(attack);
+            if (attack is EnemyGuard5ShieldStanceAttack stance)
+            {
+                stance.ApplyInterruptedCooldown();
+            }
+        }
     }
 }
