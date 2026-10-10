@@ -561,7 +561,9 @@ namespace Kuros.Fx
 		/// （<see cref="LaserBeamVisualBase.CurrentLength"/>，**含命中截断**——束被目标截住时焦痕不再穿过目标）。
 		/// 该值由子束在各自 _Process 里写好、而扇束先于子束处理 → 扫射中最多滞后一帧；
 		/// 截断粘住目标时位置不动，无差异。
-		/// 拖尾挂到扇束的父节点且自带 top_level → 世界坐标定格（敌人/滑槽移动不会拖着它跑）。</summary>
+		/// 拖尾挂到扇束的父节点且自带 top_level → 世界坐标定格（敌人/滑槽移动不会拖着它跑）。
+		/// 尖端跟**视觉原点**对齐（束位置 + <see cref="LaserBeamVisualBase.VisualOriginOffset"/>）——
+		/// Visual 有偏移时焦痕才会烧在光束真正扫过的地方。</summary>
 		private void TickScorches()
 		{
 			if (ScorchStage <= 0 || ScorchTrailScene == null) return;
@@ -572,8 +574,8 @@ namespace Kuros.Fx
 				var beam = _beams[i].Beam;
 				if (!GodotObject.IsInstanceValid(beam)) continue;
 
-				Vector2 tip = beam.GlobalPosition + Vector2.FromAngle(Mathf.DegToRad(beam.AngleDegrees))
-					* beam.CurrentLength;
+				Vector2 tip = beam.GlobalPosition + beam.VisualOriginOffset
+					+ Vector2.FromAngle(Mathf.DegToRad(beam.AngleDegrees)) * beam.CurrentLength;
 
 				while (_trails.Count <= i) _trails.Add(null!);
 				var trail = _trails[i];

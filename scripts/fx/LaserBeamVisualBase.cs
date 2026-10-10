@@ -362,6 +362,10 @@ namespace Kuros.Fx
 		/// "末端附属物"（溅射粒子等）据此定位，天然包含命中截断：打中目标时末端就停在目标上。</summary>
 		public float CurrentLength => _currentLength;
 
+		/// <summary>视觉层原点（Visual 节点）相对束根的偏移：束根恒不旋转，所以这个局部偏移可直接当世界方向向量用。
+		/// "末端附属物"（拖尾尖端、溅射）要与视觉层对齐时必须加上它——否则会整条平移错位。</summary>
+		public Vector2 VisualOriginOffset => _visual?.Position ?? Vector2.Zero;
+
 		/// <summary>光束阶段时钟（秒，已扣除 <see cref="BeamDelay"/>）：前摇内为负，0 起开始生长。</summary>
 		public float BeamPhaseElapsed => _beamPhaseElapsed;
 

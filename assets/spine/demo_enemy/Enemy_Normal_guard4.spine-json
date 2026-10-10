@@ -550,6 +550,9 @@
 		}
 	}
 ],
+"events": {
+	"hit": {}
+},
 "animations": {
 	"attack": {
 		"slots": {
@@ -1345,6 +1348,9 @@
 					{ "slot": "001", "offset": -19 }
 				]
 			}
+		],
+		"events": [
+			{ "time": 0.7, "name": "hit" }
 		]
 	},
 	"death": {
@@ -3077,6 +3083,9 @@
 					{ "slot": "007", "offset": -3 }
 				]
 			}
+		],
+		"events": [
+			{ "time": 0.12, "name": "hit" }
 		]
 	},
 	"stun": {

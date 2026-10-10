@@ -4,10 +4,14 @@ shader_type canvas_item;
 //
 // **透视锥化（fov）**：宽度沿长度**线性**展开成直边梯形（同 pseudo_3d_card 的投影轮廓——投影保直线，
 // 加宽平摊在整条束上；双曲律 1/(1−k·x) 会把一半加宽挤进末端几个百分点，呈"末端喇叭"）——
-//   W(x) = W0 · (1 + (r − 1)·x)，  r = 1 / (1 − k)，  k = clamp(2·tan(fov/2)·sin(tilt), 0, 0.95)
-// 其中 x ∈ [0,1] 是沿光束（0 = 发射点、1 = 末端），r = 末端倍率（枪口恒 1×；k 封顶 0.95 → r ≤ 20）：
-//   · fov 越小越接近正交（1 ≈ 平面、几乎不锥化）；越大 r 越大（tilt 大时 fov ≥ ~79° 即到封顶，再调无变化）；
-//   · tilt_deg = 0 也是完全平面；越大远端越"冲向镜头"（脚本按伪体积权重下发，从 0 长起来）。
+//   W(x) = W0 · (1 + (r − 1)·x)，  r = 1 / (1 − k)
+//   k = 0.95 · raw/(raw + 1)，  raw = 2·tan(fov/2)·sin(tilt)
+// 其中 x ∈ [0,1] 是沿光束（0 = 发射点、1 = 末端），r = 末端倍率（枪口恒 1×、r < 20）：
+//   · raw 对 fov 与 tilt_deg 都单调；**软饱和**（raw/(raw+1)）代替旧的硬钳位——
+//     旧写法 clamp(raw, 0, 0.95) 在大 fov 下 tilt 一过零点几度就顶满，tilt 退化成开关（0/非0 两种效果）；
+//     软饱和后两者都是渐进的"越大越猛"（收益递减）；
+//   · fov / tilt_deg 决定**满强度**的形状；整条效果的过渡走 **volume**（0 = 平面 → 1 = 满强度，线性混合，
+//     由脚本按伪体积权重下发——权重不乘进 tilt：大 fov 下乘进去会前段猛、后段钝，起点还会跳变）。
 // 关键：**长度方向的 UV 取样完全不动**（不做投影、不做 x 压缩），所以流动速度、两端渐隐位置、
 // 芯的粗细都不受挤压——只把**宽度轴**按梯形重映射（顶点按最大倍率 r 预留高度、片元按 W(x) 缩放回去）。
 //
@@ -31,8 +35,10 @@ uniform float flow_strength : hint_range(0.0, 1.0) = 0.0;
 // ── 透视锥化 ──
 // 视场角（度）：透视强度；1 ≈ 正交（平面），30~60 是常用档
 uniform float fov : hint_range(1.0, 179.0) = 45.0;
-// 光束朝镜头的倾斜角（度）：0 = 平面；由脚本按伪体积权重下发（0 → tilt_deg 随权重从 0 涨到目标）
+// 光束朝镜头的倾斜角（度）：0 = 平面；fov 与 tilt_deg 共同决定"满强度"的锥化形状
 uniform float tilt_deg : hint_range(0.0, 89.0) = 0.0;
+// 伪体积整体强度（0 = 平面、1 = 满强度）：由脚本按权重下发，在两者之间**线性**过渡
+uniform float volume : hint_range(0.0, 1.0) = 1.0;
 
 // ── 转动高光 / 纵深 ──
 // 亮带位置 = fract(TIME × spin_speed)，沿宽度 0→1 循环（1.0 = 每秒扫一遍）
@@ -49,10 +55,14 @@ uniform vec4 far_tint : source_color = vec4(1.0, 1.0, 1.0, 1.0);
 varying float tip_ratio;      // 远端相对枪口的宽度倍率（顶点算好，片元复用）
 
 void vertex() {
-	// 透视强度：k = 2·tan(fov/2)·sin(tilt)，钳到 0.95 以内（避免相机平面穿越导致无穷宽）
+	// 满强度形状：raw = 2·tan(fov/2)·sin(tilt)，软饱和到 k（上界 0.95 → r < 20）。
+	// 用 raw/(raw+1) 而非硬钳位：避免大 fov 下 tilt 稍有值就顶到封顶（那样 tilt 等于开关）
 	float ps = tan(radians(fov) * 0.5);
-	float k = clamp(2.0 * ps * sin(radians(tilt_deg)), 0.0, 0.95);
-	tip_ratio = 1.0 / (1.0 - k);
+	float raw = 2.0 * ps * sin(radians(tilt_deg));
+	float k = 0.95 * raw / (raw + 1.0);
+	float tip_full = 1.0 / (1.0 - k);
+	// 整体过渡：volume 在"平面(1×)"与"满强度 tip_full"之间线性混合，整条效果均匀展开
+	tip_ratio = mix(1.0, tip_full, volume);
 
 	// 为锥化预留宽度：绘制面在 Y 上对称加高到 tip_ratio 倍（片元里再按曲线缩放回去）
 	if (tip_ratio > 1.0001) {

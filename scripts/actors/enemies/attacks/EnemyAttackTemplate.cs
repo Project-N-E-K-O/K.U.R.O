@@ -610,6 +610,23 @@ namespace Kuros.Actors.Enemies.Attacks
             }
         }
 
+        /// <summary>强制提前结束 Warmup 进入 Active（供"等待条件提前满足、不再等满 WarmupDuration"的攻击——
+        /// 如防御反击：招架到伤害立刻出手）。仅 Warmup 阶段生效，其余阶段忽略。</summary>
+        protected void ForceEnterActivePhase()
+        {
+            if (_phase == AttackPhase.Warmup)
+            {
+                SetPhase(AttackPhase.Active);
+            }
+        }
+
+        /// <summary>保证自身冷却至少为指定时长（只补不缩：与剩余冷却取较大值）——
+        /// 打断收尾等需要"按正常 CD 结算"的场景用（控制器默认打断会清子攻击 CD）。</summary>
+        protected void EnsureCooldown(float seconds)
+        {
+            _cooldownTimer = Mathf.Max(_cooldownTimer, seconds);
+        }
+
         private void SetPhase(AttackPhase phase)
         {
             _phase = phase;

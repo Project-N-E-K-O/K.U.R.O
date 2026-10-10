@@ -54,7 +54,7 @@ EffectOffset = Vector2(nan, nan)
 SpawnTiming = 1
 SpawnMarkerPaths = [NodePath("../../../../VisualEffectPosition/Marker2D")]
 PropertyOverrides = Dictionary[String, Variant]({
-"Stage1Distance": 300,
+"Stage1Distance": 450,
 "Stage1Seconds": 0.18
 })
 metadata/_custom_type_script = "uid://fd5076f50ca0"
@@ -332,7 +332,7 @@ QueuedAttackTimeout = 3.0
 script = ExtResource("22_melee")
 AttackName = "RogueAISlam"
 WarmupDuration = 0.1
-ActiveDuration = 2.0
+ActiveDuration = 1.6
 RecoveryDuration = 0.5
 CooldownDurationMultiplier = 3.0
 DamageMultiplier = 0.0

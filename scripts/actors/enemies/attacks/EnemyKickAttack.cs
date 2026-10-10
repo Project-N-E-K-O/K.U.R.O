@@ -182,6 +182,16 @@ namespace Kuros.Actors.Enemies.Attacks
 				return;
 			}
 
+			// frozen/受击状态下停止所有追踪与冲刺逻辑（与 MoveAttack 同款守卫）：
+			// 缺失时，触发区轮询会在玩家位于区内时把刚进入的眩晕/受击状态强行切回 Attack，
+			// 眩晕被立刻抽走（guard4 的反击破招眩晕复现过）。
+			var stateName = Enemy.StateMachine?.CurrentState?.Name;
+			if (stateName == "Frozen" || stateName == "CooldownFrozen"
+				|| stateName == "Hit" || stateName == "Dying" || stateName == "Dead")
+			{
+				return;
+			}
+
 			// 快照延迟计时
 			if (_waitingForSnapshot)
 			{

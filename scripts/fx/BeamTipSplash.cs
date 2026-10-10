@@ -42,9 +42,11 @@ namespace Kuros.Fx
 				return;
 			}
 
-			// 束根恒不旋转（旋转落在 Visual / 判定带上）→ 局部坐标即世界方向
+			// 束根恒不旋转（旋转落在 Visual / 判定带上）→ 局部坐标即世界方向；
+			// 位置 = 视觉层原点偏移 + 朝向 × 当前长度（跟视觉层的尖端对齐——不加偏移会整条平移错位）
 			float rad = Mathf.DegToRad(_beam.AngleDegrees);
-			Position = new Vector2(Mathf.Cos(rad), Mathf.Sin(rad)) * Mathf.Max(_beam.CurrentLength, 0f);
+			Position = _beam.VisualOriginOffset
+				+ new Vector2(Mathf.Cos(rad), Mathf.Sin(rad)) * Mathf.Max(_beam.CurrentLength, 0f);
 			Rotation = rad + Mathf.Pi;   // 局部 +X 指向束轴反向 = 向后溅射
 
 			bool hit = _beam.IsTruncated;
