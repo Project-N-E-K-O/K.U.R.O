@@ -75,6 +75,8 @@ namespace Kuros.Systems.Cutscene
             if (KeepPlayerY)
                 destination.Y = player.GlobalPosition.Y;
 
+            player.GetNodeOrNull<Kuros.Actors.Heroes.PlayerFallController>("FallController")?.ResetSafeHistory();
+
             // 瞬移（含"跳过的过场"：瞬时落终态）
             if (ctx.IsSkipping || Instant || Duration <= 0f)
             {

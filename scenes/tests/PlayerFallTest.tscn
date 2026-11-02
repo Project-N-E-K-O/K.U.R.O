@@ -1,0 +1,22 @@
+[gd_scene load_steps=3 format=3 uid="uid://1demsv0hoym1"]
+
+[ext_resource type="PackedScene" uid="uid://v6k338a22m4w" path="res://scenes/environments/FallRegionA.tscn" id="2_bla8w"]
+[ext_resource type="PackedScene" uid="uid://ufprfd4r8ijj" path="res://scenes/actors/characters/main_character.tscn" id="3"]
+
+[node name="PlayerFallTest" type="Node2D"]
+
+[node name="FixedFloor" type="Polygon2D" parent="."]
+color = Color(0.8, 0.8, 0.72, 1)
+polygon = PackedVector2Array(-2500, -2000, 2500, -2000, 2500, 2000, -2500, 2000)
+
+[node name="PitVisual" type="Polygon2D" parent="."]
+color = Color(0.15, 0.08, 0.08, 1)
+polygon = PackedVector2Array(-1500, -1500, 1500, -1500, 1500, 1500, -1500, 1500)
+
+[node name="MainCharacter" parent="." instance=ExtResource("3")]
+position = Vector2(-3071, -66.99999)
+
+[node name="Camera2D" type="Camera2D" parent="."]
+zoom = Vector2(0.4, 0.4)
+
+[node name="FallRegionA" parent="." instance=ExtResource("2_bla8w")]

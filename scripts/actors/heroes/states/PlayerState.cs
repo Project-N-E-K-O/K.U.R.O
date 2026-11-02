@@ -23,6 +23,7 @@ namespace Kuros.Actors.Heroes.States
         }
 
         private readonly List<BufferedInput> _inputBuffer = new();
+        public void ClearBufferedInputs() => _inputBuffer.Clear();
 
         protected SamplePlayer Player => (SamplePlayer)Actor;
 

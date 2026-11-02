@@ -1,0 +1,52 @@
+[gd_scene load_steps=8 format=3 uid="uid://v6k338a22m4w"]
+
+[ext_resource type="Script" uid="uid://bxk0txq4kyb38" path="res://scripts/environments/FallRegion.cs" id="1_lycp3"]
+[ext_resource type="PackedScene" uid="uid://dva26mfp5yohw" path="res://scenes/objects/Animation_character.tscn" id="2_i5433"]
+[ext_resource type="Script" uid="uid://dv6cc660xs2wu" path="res://scripts/environments/FallActivationArea.cs" id="3_jmdmq"]
+[ext_resource type="Script" uid="uid://dtlh7op6q4uex" path="res://scripts/environments/FallHazardArea.cs" id="4_bvb00"]
+[ext_resource type="PackedScene" uid="uid://dxpolkx35jbp" path="res://scenes/environments/FallMovingPlatformA.tscn" id="5_i5433"]
+
+[sub_resource type="RectangleShape2D" id="Yellow"]
+size = Vector2(5000, 4000)
+
+[sub_resource type="RectangleShape2D" id="Red"]
+size = Vector2(2950, 3000)
+
+[node name="FallRegionA" type="Node2D"]
+script = ExtResource("1_lycp3")
+FallEffectScene = ExtResource("2_i5433")
+FallbackMarkerPaths = Array[NodePath]([NodePath("FallbackLeft"), NodePath("FallbackRight")])
+
+[node name="ActivationArea" type="Area2D" parent="."]
+collision_layer = 131072
+collision_mask = 0
+monitoring = false
+script = ExtResource("3_jmdmq")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ActivationArea"]
+shape = SubResource("Yellow")
+debug_color = Color(1, 0.85, 0, 0.2)
+
+[node name="HazardArea" type="Area2D" parent="."]
+collision_layer = 262144
+collision_mask = 0
+monitoring = false
+script = ExtResource("4_bvb00")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HazardArea"]
+shape = SubResource("Red")
+debug_color = Color(1, 0.1, 0.1, 0.4)
+
+[node name="FallbackLeft" type="Marker2D" parent="."]
+position = Vector2(-2000, 0)
+
+[node name="FallbackRight" type="Marker2D" parent="."]
+position = Vector2(2000, 0)
+
+[node name="FallMovingPlatformA" parent="." instance=ExtResource("5_i5433")]
+position = Vector2(-700, 800)
+TravelOffset = Vector2(0, -1600)
+
+[node name="FallMovingPlatformA2" parent="." instance=ExtResource("5_i5433")]
+position = Vector2(700, -800)
+TravelOffset = Vector2(0, 1600)

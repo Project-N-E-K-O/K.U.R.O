@@ -1,13 +1,18 @@
-[gd_scene load_steps=20 format=3 uid="uid://baq1ujdk2e22i"]
+[gd_scene load_steps=25 format=3 uid="uid://baq1ujdk2e22i"]
 
 [ext_resource type="Script" uid="uid://cra7y7mt0x1j8" path="res://scripts/managers/CameraZoneArea.cs" id="1_h2apx"]
 [ext_resource type="Script" uid="uid://cbui22isww64v" path="res://scripts/systems/cutscene/CutsceneTrigger.cs" id="2_s4dnd"]
 [ext_resource type="Resource" uid="uid://cy43ghwhy0ams" path="res://resources/cutscene/F_c1_intro.tres" id="3_h2apx"]
 [ext_resource type="Texture2D" uid="uid://beckwcg3wjhwn" path="res://assets/environments/scene_6_hotel/地板完整.png" id="4_4vmrx"]
+[ext_resource type="Texture2D" uid="uid://kohvycrlmg3h" path="res://assets/environments/scene_6_hotel/地板前面遮挡升降机.png" id="4_7qbdi"]
+[ext_resource type="Texture2D" uid="uid://dt6kjqhtksjpi" path="res://assets/environments/scene_6_hotel/背景墙2.png" id="5_7c6k6"]
 [ext_resource type="Texture2D" uid="uid://dbn8b1atk6ngd" path="res://assets/environments/scene_6_hotel/背景墙.png" id="5_7qbdi"]
+[ext_resource type="Texture2D" uid="uid://cb4cka2jcljmq" path="res://assets/environments/scene_6_hotel/黑色遮蔽覆盖.png" id="6_7c6k6"]
+[ext_resource type="Texture2D" uid="uid://cfqcvbhy00mr1" path="res://assets/environments/scene_6_hotel/警戒条.png" id="6_8f36w"]
 [ext_resource type="Texture2D" uid="uid://dan0dd2p76nuk" path="res://assets/environments/scene_6_hotel/龙门吊右滑槽.png" id="6_h2apx"]
 [ext_resource type="Texture2D" uid="uid://dxrn8y2or0pgc" path="res://assets/environments/scene_6_hotel/右墙壁.png" id="7_h2apx"]
 [ext_resource type="PackedScene" uid="uid://da4f3288xy4h5" path="res://scenes/environments/Pipe180.tscn" id="9_8f36w"]
+[ext_resource type="PackedScene" uid="uid://v6k338a22m4w" path="res://scenes/environments/FallRegionA.tscn" id="13_t41q2"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1mlw7"]
 size = Vector2(7030, 4070)
@@ -101,26 +106,61 @@ debug_color = Color(1, 0, 0, 0.41960785)
 [node name="Environments" type="Node2D" parent="."]
 position = Vector2(0, 1060)
 
-[node name="Floor" type="Sprite2D" parent="Environments"]
-position = Vector2(-75, -295)
-texture = ExtResource("4_4vmrx")
+[node name="BG" type="Sprite2D" parent="Environments"]
+z_index = -10
+position = Vector2(-72, -1213)
+texture = ExtResource("4_7qbdi")
 
-[node name="Wall" type="Sprite2D" parent="Environments/Floor"]
+[node name="BG" type="Sprite2D" parent="Environments/BG"]
+z_index = -10
+position = Vector2(0, 927)
+texture = ExtResource("5_7c6k6")
+
+[node name="BlackRect" type="Sprite2D" parent="Environments"]
+z_index = -9
+position = Vector2(0, 1100)
+rotation = -1.5707964
+scale = Vector2(3, 2)
+texture = ExtResource("6_7c6k6")
+
+[node name="Wall" type="Sprite2D" parent="Environments"]
 z_index = 1
-position = Vector2(0, -2035)
+position = Vector2(-75, -2330)
 texture = ExtResource("5_7qbdi")
 
-[node name="LeftRail" type="Sprite2D" parent="Environments/Floor"]
-position = Vector2(3360, 400)
+[node name="Floor" type="Sprite2D" parent="Environments"]
+position = Vector2(-2570, -295)
+texture = ExtResource("4_4vmrx")
+region_enabled = true
+region_rect = Rect2(0, 0, 1800, 2722)
+
+[node name="Floor2" type="Sprite2D" parent="Environments/Floor"]
+position = Vector2(4930, 0)
+texture = ExtResource("4_4vmrx")
+region_enabled = true
+region_rect = Rect2(0, 0, 1800, 2722)
+
+[node name="WarmingBelt" type="Sprite2D" parent="Environments"]
+position = Vector2(-1650, 0)
+rotation = 1.5707964
+texture = ExtResource("6_8f36w")
+
+[node name="WarmingBelt2" type="Sprite2D" parent="Environments"]
+position = Vector2(1440, 0)
+rotation = 1.5707964
+texture = ExtResource("6_8f36w")
+
+[node name="LeftRail" type="Sprite2D" parent="Environments"]
+position = Vector2(3285, 105)
 texture = ExtResource("6_h2apx")
 
-[node name="LeftWall" type="Sprite2D" parent="Environments/Floor"]
+[node name="LeftWall" type="Sprite2D" parent="Environments"]
 z_index = 1
-position = Vector2(3570, -790)
+position = Vector2(3495, -1085)
 texture = ExtResource("7_h2apx")
 
-[node name="Pipe180" parent="Environments/Floor" instance=ExtResource("9_8f36w")]
-position = Vector2(-530, 290)
+[node name="Pipe180" parent="Environments" instance=ExtResource("9_8f36w")]
+position = Vector2(-605, -5)
 SpawnTag = "JarRight"
 
 [node name="AirWall" type="StaticBody2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
@@ -160,3 +200,7 @@ shape = SubResource("RectangleShape2D_ao0lv")
 visible = false
 position = Vector2(1334, 710)
 navigation_polygon = SubResource("NavigationPolygon_ka7vx")
+
+[node name="FallRegionA" parent="." instance=ExtResource("13_t41q2")]
+z_index = 1
+position = Vector2(-108, 975)

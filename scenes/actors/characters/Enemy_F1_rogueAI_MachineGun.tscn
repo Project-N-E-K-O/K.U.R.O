@@ -185,14 +185,14 @@ script = ExtResource("8_7asvr")
 position = Vector2(0, -500)
 skeleton_data_res = ExtResource("7_1mbwy")
 preview_skin = "Default"
-preview_animation = "attack"
+preview_animation = "-- Empty --"
 preview_frame = true
 preview_time = 0.0
 script = ExtResource("8_7asvr")
 
 [node name="SpineBoneNode" type="SpineBoneNode" parent="SpineSprite"]
 show_behind_parent = true
-position = Vector2(-51.958786, -1182.8511)
+position = Vector2(-52.361004, -2051.0408)
 rotation = 1.5586017
 bone_name = "bone3"
 thickness = 30.0
@@ -205,7 +205,7 @@ position = Vector2(1400, 0)
 [node name="SpineBoneNode2" type="SpineBoneNode" parent="SpineSprite"]
 show_behind_parent = true
 z_index = 10
-position = Vector2(835.8657, -211.31409)
+position = Vector2(-2210.9797, 916.888)
 rotation = 0.29481593
 scale = Vector2(0.99999994, 0.99999994)
 bone_name = "bone19"
@@ -218,7 +218,7 @@ script = ExtResource("8_ebcgc")
 [node name="SpineBoneNode3" type="SpineBoneNode" parent="SpineSprite"]
 show_behind_parent = true
 z_index = 10
-position = Vector2(331.59955, 40.342834)
+position = Vector2(331.19733, -827.8468)
 rotation = 0.85039544
 scale = Vector2(1.0000001, 1)
 bone_name = "bone7"
@@ -439,7 +439,6 @@ AttackIntervalMultiplier = 0.1
 MovementSpeedMultiplier = 2.0
 EffectScene = ExtResource("37_hitb")
 EffectAnchorPath = NodePath("VisualEffectPosition/VisualEffectMarker2D")
-EffectOffset = Vector2(0, 300)
 EffectScale = Vector2(2, 2)
 
 [node name="RailChaseMovement" type="Node" parent="."]

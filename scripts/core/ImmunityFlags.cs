@@ -26,6 +26,8 @@ namespace Kuros.Core
         ThrowableDamage      = 1 << 7,
         /// <summary>免疫所有非投掷伤害（仅 Throwable 来源可穿透）。若需免疫全部伤害，同时勾选此项与 ThrowableDamage。</summary>
         NonThrowableDamage   = 1 << 8,
+        /// <summary>独立的地形坠落免疫；Stun / ForcedMovement 不包含此能力。</summary>
+        Fall                 = 1 << 9,
 
     }
 }

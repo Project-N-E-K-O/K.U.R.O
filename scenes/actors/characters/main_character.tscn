@@ -1,4 +1,7 @@
-[gd_scene load_steps=49 format=3 uid="uid://ufprfd4r8ijj"]
+[gd_scene load_steps=51 format=3 uid="uid://ufprfd4r8ijj"]
+
+[ext_resource type="Script" path="res://scripts/actors/heroes/PlayerFallController.cs" id="fall_controller"]
+[ext_resource type="Script" path="res://scripts/actors/heroes/states/PlayerFallState.cs" id="fall_state"]
 
 [ext_resource type="Script" uid="uid://dj1eq3skmq5qf" path="res://scripts/actors/heroes/attacks/PlayerLaserPointerAttack.cs" id="0_laserptr"]
 [ext_resource type="Script" uid="uid://12wblt72y8xt" path="res://scripts/actors/heroes/MainCharacter.cs" id="1_om6pm"]
@@ -513,3 +516,11 @@ TrailColor = Color(1, 0, 0, 0.8)
 DotRadius = 20.0
 DotStep = 1
 LandingIndicatorScene = ExtResource("52_pplu2")
+
+[node name="GroundProbe" type="Marker2D" parent="."]
+
+[node name="FallController" type="Node" parent="."]
+script = ExtResource("fall_controller")
+
+[node name="Fall" type="Node" parent="StateMachine"]
+script = ExtResource("fall_state")

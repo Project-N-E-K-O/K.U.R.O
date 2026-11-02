@@ -1,4 +1,4 @@
-[gd_scene load_steps=49 format=3 uid="uid://duryvwia2gyyc"]
+[gd_scene load_steps=48 format=3 uid="uid://duryvwia2gyyc"]
 
 [ext_resource type="Script" uid="uid://ccqcbk4merfnt" path="res://scripts/actors/enemies/EnemyF1RogueAICannon.cs" id="1_3cfw7"]
 [ext_resource type="Resource" uid="uid://05yoqk7rf6ax" path="res://resources/behavior/EnemyBehaviorConfig.tres" id="2_3eyky"]
@@ -9,7 +9,6 @@
 [ext_resource type="Script" uid="uid://bbybuyitd10jr" path="res://scripts/controllers/SpineController.gd" id="8_6o35y"]
 [ext_resource type="Script" uid="uid://cenpuhlcgesin" path="res://scripts/systems/fsm/StateMachine.cs" id="9_b70sc"]
 [ext_resource type="Script" uid="uid://bo6uhkbqyxe6o" path="res://scripts/actors/enemies/states/EnemyAttackState.cs" id="12_5soab"]
-[ext_resource type="Script" uid="uid://cu6enbmbcicac" path="res://scripts/actors/enemies/attacks/EnemySimpleMeleeAttack.cs" id="14_0xw7a"]
 [ext_resource type="Script" uid="uid://fd5076f50ca0" path="res://scripts/actors/enemies/attacks/AttackEffectEntry.cs" id="15_koqry"]
 [ext_resource type="PackedScene" uid="uid://1i57pudem5og" path="res://resources/effects/EnergyOrbCharge.tscn" id="15_x1ryc"]
 [ext_resource type="Script" uid="uid://epf7i8hvjkoc" path="res://scripts/actors/enemies/states/EnemyF1RogueAITurretHitState.cs" id="17_4c6ck"]
@@ -34,7 +33,7 @@
 [ext_resource type="Script" uid="uid://dlhtrvdv6gwxn" path="res://scripts/actors/enemies/states/EnemyJarAssistStunState.cs" id="35_jarstun"]
 [ext_resource type="PackedScene" uid="uid://bwdwpiu2brmv6" path="res://scenes/environments/jar_mozhua_assist.tscn" id="36_jars"]
 [ext_resource type="Script" uid="uid://baq6luqv2ijwk" path="res://scripts/actors/enemies/EnemyEmpowerController.cs" id="37_empower"]
-[ext_resource type="Script" path="res://scripts/actors/enemies/attacks/EnemyF1RogueAITurretSimpleMeleeAttack.cs" id="38_turretsimple"]
+[ext_resource type="Script" uid="uid://ul0132m6aehw" path="res://scripts/actors/enemies/attacks/EnemyF1RogueAITurretSimpleMeleeAttack.cs" id="38_turretsimple"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_shadow"]
 shader = ExtResource("4_by072")
@@ -470,7 +469,6 @@ AttackIntervalMultiplier = 0.1
 MovementSpeedMultiplier = 2.0
 EffectScene = ExtResource("29_lu5qv")
 EffectAnchorPath = NodePath("VisualEffectPosition/VisualEffectMarker2D")
-EffectOffset = Vector2(0, -100)
 EffectScale = Vector2(2, 2)
 
 [node name="RailChaseMovement" type="Node" parent="."]

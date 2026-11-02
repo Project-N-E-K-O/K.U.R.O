@@ -303,6 +303,7 @@ namespace Kuros.Managers
             var player = world.GetNodeOrNull<Node2D>("MainCharacter");
             if (player != null)
             {
+                player.GetNodeOrNull<Kuros.Actors.Heroes.PlayerFallController>("FallController")?.ResetSafeHistory();
                 player.GlobalPosition = target;
                 GameLogger.Info(nameof(StageGeneratorManager), $"玩家重定位 → {target}");
             }

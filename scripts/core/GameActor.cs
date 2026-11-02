@@ -555,6 +555,22 @@ namespace Kuros.Core
 		protected bool DeliverKillDamage()
 			=> TakeDamage(9999, GlobalPosition, null);
 
+		/// <summary>进入地形控制前结清旧伤害，防止合并窗口在隐藏期间突然结算。</summary>
+		public void PrepareForTerrainFall()
+		{
+			FlushPendingDamage();
+			_hasKnockRequest = false;
+			Velocity = Vector2.Zero;
+		}
+
+		/// <summary>固定地形惩罚：保留通知与死亡，不走普通伤害修正、合并或 Hit。</summary>
+		protected void ApplyEnvironmentalFallDamage(int damage)
+		{
+			if (damage <= 0 || IsDead || IsDeathSequenceActive) return;
+			_lastDamageTakenAtMs = Time.GetTicksMsec();
+			ApplyPendingDamage(damage, null, null, Events.DamageSource.EnvironmentalFall, suppressHit: true);
+		}
+
 		public virtual bool TakeDamage(int damage, Vector2? attackOrigin = null, GameActor? attacker = null, Events.DamageSource damageSource = Events.DamageSource.DirectAttack, bool bypassMergeWindow = false)
 		{
 			if (!CanBeAffected(null)) return false;
@@ -657,7 +673,7 @@ namespace Kuros.Core
 		/// <summary>实际扣血与全部副作用（原 TakeDamage 扣血后的部分，合并窗口内仅执行一次）。
 		/// isMergedSettlement = 合并窗口到期结算：只扣血/通知/事件，不重复闪白与受击动画——
 		/// 首段伤害已即时反馈（否则区域伤害+流血首伤等窗口内多段会连续两次闪白/Hit）。</summary>
-		private void ApplyPendingDamage(int damage, Vector2? attackOrigin, GameActor? attacker, Events.DamageSource damageSource, bool isMergedSettlement = false)
+        private void ApplyPendingDamage(int damage, Vector2? attackOrigin, GameActor? attacker, Events.DamageSource damageSource, bool isMergedSettlement = false, bool suppressHit = false)
 		{
 			CurrentHealth -= damage;
 			CurrentHealth = Mathf.Max(CurrentHealth, 0);
@@ -672,8 +688,8 @@ namespace Kuros.Core
 				FlashDamageEffect();
 
 			// 受击反馈先行：致死伤害同样进入 Hit，由 Hit 状态播完后仰动画与击退位移，而不是被死亡跳过
-			if (!isMergedSettlement)
-				TryEnterHitState(damage);
+            if (!isMergedSettlement && !suppressHit)
+                TryEnterHitState(damage);
 
 			if (CurrentHealth <= 0)
 			{

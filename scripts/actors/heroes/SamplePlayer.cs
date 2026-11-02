@@ -519,6 +519,7 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource, IThrowableMod
 
 	public override void _UnhandledInput(InputEvent @event)
 	{
+		if (IsFalling) return; // 不吞掉暂停菜单等全局输入。
 		// 处理数字键 1-5 切换快捷栏物品（对应快捷栏槽位 0-4）
 		if (@event is InputEventKey keyEvent && keyEvent.Pressed)
 		{
@@ -645,6 +646,16 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource, IThrowableMod
 	/// 状态机的攻击触发/按住连击查询全部经 IsControlledActionPressed / ConsumeControlledActionJustPressed,
 	/// 置位期间这两处对 "attack" 一律返回 false;瞄准控制器自己用 Input 直读检测确认。</summary>
 	public bool SuppressAttackInput { get; set; }
+	public bool IsFalling => StateMachine?.CurrentState is PlayerFallState;
+	public void ClearFallInputBuffers()
+	{
+		_holdTracker.ResetTransientState();
+		_pendingQuickBarSlot = -1;
+		ClearAiControlCommands();
+		if (StateMachine != null)
+			foreach (Node state in StateMachine.GetChildren())
+				if (state is PlayerState playerState) playerState.ClearBufferedInputs();
+	}
 
 	/// <summary>拾取/放置输入屏蔽(A_010 瞄准模式:右键被征用为"取消")——
 	/// take_up/place 的全部消费点(Idle/RunHolding 短按拾取、ItemInteraction 长按放置/短按拾取)
@@ -653,6 +664,7 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource, IThrowableMod
 
 	public Vector2 GetControlledMovementInput()
 	{
+		if (IsFalling) return Vector2.Zero;
 		return AiInputOverrideEnabled
 			? _aiMovementInput
 			: Input.GetVector("move_left", "move_right", "move_forward", "move_back");
@@ -660,6 +672,7 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource, IThrowableMod
 
 	public bool IsControlledActionPressed(string actionName)
 	{
+		if (IsFalling) return false;
 		if (!AiInputOverrideEnabled)
 		{
 			if (actionName == "attack" && SuppressAttackInput)
@@ -679,6 +692,7 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource, IThrowableMod
 
 	public bool ConsumeControlledActionJustPressed(string actionName)
 	{
+		if (IsFalling) return false;
 		if (!AiInputOverrideEnabled)
 		{
 			if (actionName == "attack" && SuppressAttackInput)
@@ -726,6 +740,7 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource, IThrowableMod
 	/// <summary>非消耗的仲裁即时按下查询（攻击模板等每帧多调场景用；同键长按激活时短按动作返回 false）。</summary>
 	public bool IsActionJustPressedArbitrated(string actionName)
 	{
+		if (IsFalling) return false;
 		if (actionName == "attack" && UIManager.IsMouseOverUI && Input.IsMouseButtonPressed(MouseButton.Left))
 			return false;
 		return _holdTracker.WasActionJustPressed(actionName);
@@ -734,6 +749,7 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource, IThrowableMod
 	/// <summary>仲裁按住查询（长按激活时短按动作的 hold 被屏蔽，避免同键长按连击）。</summary>
 	public bool IsActionHeldArbitrated(string actionName)
 	{
+		if (IsFalling) return false;
 		return _holdTracker.IsActionHeld(actionName);
 	}
 
@@ -747,18 +763,20 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource, IThrowableMod
 		flag = false;
 		return true;
 	}
-	public bool IsActionLongPressHeld(string actionName) => _holdTracker.IsLongPressHeld(actionName);
+	public bool IsActionLongPressHeld(string actionName) => !IsFalling && _holdTracker.IsLongPressHeld(actionName);
 	public bool WasActionLongPressTriggered(string actionName)
 	{
+		if (IsFalling) return false;
 		if (SuppressInteractInput && (actionName == "take_up" || actionName == "place")) return false;
 		return _holdTracker.WasLongPressTriggered(actionName);
 	}
 	public bool WasActionShortPressed(string actionName)
 	{
+		if (IsFalling) return false;
 		if (SuppressInteractInput && (actionName == "take_up" || actionName == "place")) return false;
 		return _holdTracker.WasShortPressed(actionName);
 	}
-	public bool WasActionJustPressed(string actionName) => _holdTracker.WasActionJustPressed(actionName);
+	public bool WasActionJustPressed(string actionName) => !IsFalling && _holdTracker.WasActionJustPressed(actionName);
 	public float GetActionHoldDuration(string actionName) => _holdTracker.GetHoldDuration(actionName);
 
 	// private async System.Threading.Tasks.Task RequestAiDecisionTestAsync()
@@ -802,6 +820,7 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource, IThrowableMod
 	/// <param name="slotIndex">快捷栏槽位索引（0-4，对应数字键1-5）</param>
 	private bool IsWeaponSwitchLocked()
 	{
+		if (IsFalling) return true;
 		var currentState = StateMachine?.CurrentState;
 		string name = currentState?.Name ?? string.Empty;
 		if (name == "Throw") return true; // 投掷是单次动作，全程锁定
@@ -819,6 +838,7 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource, IThrowableMod
 	/// </summary>
 	public bool TrySwitchQuickBarSlot(int slotIndex)
 	{
+		if (IsFalling) return false;
 		if (slotIndex < 0 || slotIndex > 4) return false;
 		SwitchToQuickBarSlot(slotIndex);
 		return true;
@@ -1894,7 +1914,7 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource, IThrowableMod
 		_debugOverlayText = $"{Name} | State: {stateName} | HP: {CurrentHealth}/{MaxHealth} | Vel: {Velocity.Length():F0} | Speed: {CurrentMoveSpeed:F0}";
 	}
 
-	private void UpdateStatsUI()
+	protected void UpdateStatsUI()
 	{
 		NotifyStatsListeners();
 
