@@ -1,22 +1,32 @@
 using Godot;
 using Kuros.Actors.Heroes;
+using Kuros.Core;
 using System.Collections.Generic;
 
 namespace Kuros.Environments;
 
 /// <summary>
 /// 简单直线往返平台：在「起点（场景摆放位置）」与「起点 + TravelOffset」之间匀速往返。
-/// 先由平台承载玩家移动（物理优先级更早），再由玩家状态机处理主动移动。
+/// 按 player / enemies / world_items 组筛选乘客，再验证身体碰撞或物件生命周期。
+/// 平台先承载，角色状态机随后处理主动移动；重叠平台每帧只承载同一对象一次。
 /// </summary>
 [GlobalClass]
 public partial class FallMovingPlatform : Node2D
 {
-    /// <summary>终点相对起点的偏移（不是绝对坐标）：默认向右 900px；可做垂直/斜向移动。</summary>
+    /// <summary>终点相对起点的局部偏移，0 表示原地；可做水平、垂直或斜向移动。</summary>
     [Export] public Vector2 TravelOffset { get; set; } = new(0, 0);
     /// <summary>移动速度（px/秒）。0 = 原地不动；无加减速，到达端点立刻掉头。</summary>
     [Export(PropertyHint.Range, "1,2000,1,or_greater")] public float Speed { get; set; } = 200;
-    /// <summary>承载判定区：只有站在该 FallSupportArea 上（且 SupportEnabled）的玩家会被平台带着走。</summary>
+    /// <summary>承载判定区：合格乘客的脚底必须位于本 FallSupportArea，且 SupportEnabled。</summary>
     [Export] public NodePath SupportPath { get; set; } = new("SupportArea");
+    [ExportGroup("Passengers")]
+    [Export] public bool CarryPlayers { get; set; } = true;
+    [Export] public bool CarryEnemies { get; set; } = true;
+    [Export] public bool CarryWorldItems { get; set; } = true;
+    /// <summary>该组内对象始终不承载；身体形状全部禁用的角色也自动排除。</summary>
+    [Export] public string ExcludedGroup { get; set; } = "platform_carry_excluded";
+    /// <summary>家具位移扫掠阻挡层，默认 Environment + Enemy + Player。</summary>
+    [Export(PropertyHint.Layers2DPhysics)] public uint FurnitureObstacleMask { get; set; } = 7;
     /// <summary>起点（_Ready 时的 Position）；每次往返都回到这里。</summary>
     private Vector2 _start;
     /// <summary>当前方向：true = 驶向 TravelOffset 终点；false = 驶回起点。</summary>
@@ -42,27 +52,59 @@ public partial class FallMovingPlatform : Node2D
         Vector2 displacement = GetParent() is Node2D parent
             ? parent.GlobalTransform.BasisXform(next - Position) : next - Position;
 
-        // 收集本帧站在平台上的玩家。用点查询而不是 Area 重叠：脚下 GroundProbe 命中
-        // 本平台的 FallSupportArea 才算站稳（跳起/离台瞬间不再被带走）。
-        var riders = new List<MainCharacter>();
-        if (_support != null && _support.SupportEnabled)
+        var riders = new List<Node>();
+        if (_support != null && _support.SupportEnabled && !displacement.IsZeroApprox())
         {
-            foreach (Node node in GetTree().GetNodesInGroup("player"))
-            {
-                if (node is not MainCharacter player || player.IsFalling || player.IsDead || player.IsDeathSequenceActive || !player.CanProcess()) continue;
-                Vector2 foot = player.GetNodeOrNull<Node2D>("GroundProbe")?.GlobalPosition ?? player.GlobalPosition;
-                var hits = GetWorld2D().DirectSpaceState.IntersectPoint(new PhysicsPointQueryParameters2D
-                { Position = foot, CollisionMask = FallSupportArea.Layer, CollideWithAreas = true, CollideWithBodies = false }, 128);
-                foreach (var hit in hits)
-                    if (hit["collider"].AsGodotObject() == _support) { riders.Add(player); break; }
-            }
+            var seen = new HashSet<ulong>();
+            if (CarryPlayers) Collect("player", riders, seen);
+            if (CarryEnemies) Collect("enemies", riders, seen);
+            if (CarryWorldItems) Collect("world_items", riders, seen);
         }
 
         // 先移动平台，再把同样的位移施加给乘客（MoveAndCollide：撞墙会被挡，不会被硬推进墙里）。
         Position = next;
-        foreach (var player in riders) player.MoveAndCollide(displacement);
+        foreach (var rider in riders)
+        {
+            if (!IsInstanceValid(rider) || rider.IsQueuedForDeletion()) continue;
+            if (rider is IPlatformPassenger passenger)
+                passenger.ApplyPlatformDisplacement(displacement, FurnitureObstacleMask);
+            else if (rider is CharacterBody2D character)
+                character.MoveAndCollide(displacement);
+        }
 
         // 到端点后掉头（MoveToward 保证不会越过，所以近似相等即可）。
         if (Position.IsEqualApprox(target)) _outward = !_outward;
+    }
+
+    private void Collect(string group, List<Node> riders, HashSet<ulong> seen)
+    {
+        foreach (Node node in GetTree().GetNodesInGroup(group))
+        {
+            if (!seen.Add(node.GetInstanceId()) || node.IsQueuedForDeletion() || !node.CanProcess()
+                || (!string.IsNullOrEmpty(ExcludedGroup) && node.IsInGroup(ExcludedGroup))) continue;
+            Vector2 foot;
+            if (node is IPlatformPassenger passenger)
+            {
+                if (!passenger.CanRidePlatform) continue;
+                foot = passenger.PlatformGroundPosition;
+            }
+            else if (node is GameActor actor)
+            {
+                if (actor.IsDead || actor.IsDeathSequenceActive
+                    || (actor is SamplePlayer player && player.IsFalling)
+                    || !PlatformCarryPhysics.HasEnabledBodyShape(actor)) continue;
+                foot = actor.GetNodeOrNull<Node2D>("GroundProbe")?.GlobalPosition ?? actor.GlobalPosition;
+            }
+            else continue; // 不对未知 Node2D / 正在自由模拟的刚体强行修改坐标。
+
+            var hits = GetWorld2D().DirectSpaceState.IntersectPoint(new PhysicsPointQueryParameters2D
+            { Position = foot, CollisionMask = FallSupportArea.Layer, CollideWithAreas = true, CollideWithBodies = false }, 128);
+            foreach (var hit in hits)
+            {
+                if (hit["collider"].AsGodotObject() != _support) continue;
+                if (PlatformCarryPhysics.TryClaim(node)) riders.Add(node);
+                break;
+            }
+        }
     }
 }
