@@ -509,6 +509,27 @@ namespace Kuros.Actors.Heroes
 			// }
 		}
 
+	public override void ApplyKnockback(Vector2 direction, float speed)
+	{
+		if (!IsFalling) base.ApplyKnockback(direction, speed);
+	}
+
+	public override void ApplyKnockbackDisplacement(Vector2 direction, float distance, float duration)
+	{
+		if (!IsFalling) base.ApplyKnockbackDisplacement(direction, distance, duration);
+	}
+
+	public override bool CanBeAffected(Kuros.Core.Effects.ActorEffect? effect)
+		=> !IsFalling && base.CanBeAffected(effect);
+
+	/// <summary>仅 Fall 状态能结算，不触发普通受击反应。</summary>
+	public void ApplyFallDamage(float ratio)
+	{
+		if (!IsFalling || ratio <= 0) return;
+		ApplyEnvironmentalFallDamage(Mathf.Max(1, Mathf.CeilToInt(MaxHealth * Mathf.Clamp(ratio, 0, 1))));
+		UpdateStatsUI();
+	}
+
 	public override bool TakeDamage(int damage, Vector2? attackOrigin = null, GameActor? attacker = null, Kuros.Core.Events.DamageSource damageSource = Kuros.Core.Events.DamageSource.DirectAttack, bool bypassMergeWindow = false)
 	{
 		if (damage > 0 && IsHitInvincible && !IsDeathSequenceActive && !IsDead)

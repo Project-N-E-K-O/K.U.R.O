@@ -97,6 +97,14 @@ namespace Kuros.Systems.InputTracking
             return 0;
         }
 
+        /// <summary>清空临时按键状态，保留注册绑定。</summary>
+        public void ResetTransientState()
+        {
+            _pressTimes.Clear(); _justPressedThisFrame.Clear();
+            _longPressTriggeredThisFrame.Clear(); _shortPressDetectedThisFrame.Clear();
+            _arbitratedShortPressThisFrame.Clear(); _arbitratedPressTime.Clear(); _arbitratedLongFired.Clear();
+        }
+
         /// <summary>每帧调用一次。</summary>
         public void Process(float delta)
         {

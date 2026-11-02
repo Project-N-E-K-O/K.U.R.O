@@ -17,7 +17,7 @@ namespace Kuros.Items.World
 	/// 地图场景中的物品实体，与具体 <see cref="ItemDefinition"/> 一一对应，
 	/// 负责识别物品、暴露属性并在拾取/丢弃时与背包系统交互。
 	/// </summary>
-	public partial class WorldItemEntity : CharacterBody2D, IWorldItemEntity
+	public partial class WorldItemEntity : CharacterBody2D, IWorldItemEntity, Kuros.Environments.IPlatformPassenger
 	{
 		[Signal] public delegate void ItemTransferredEventHandler(WorldItemEntity entity, GameActor actor, ItemDefinition item, int amount);
 		[Signal] public delegate void ItemTransferFailedEventHandler(WorldItemEntity entity, GameActor actor);
@@ -44,6 +44,25 @@ namespace Kuros.Items.World
 		[Export] public uint BodyCollisionMask { get; set; } = 0;   // 禁用 body 碰撞
 		[Export] public uint TriggerCollisionLayer { get; set; } = 1u << 1;  // collision_layer = 2
 		[Export] public uint TriggerCollisionMask { get; set; } = 1u;        // collision_mask = 1
+
+		[ExportGroup("Platform Carry")]
+		/// <summary>允许静置世界物品随平台移动；不要求身体碰撞形状，散落/投掷滑行期间暂不承载。</summary>
+		[Export] public bool PlatformCarryEnabled { get; set; } = true;
+		/// <summary>相对于物品根节点的可选脚底 Marker；空时使用物品根节点世界位置。</summary>
+		[Export] public NodePath PlatformGroundProbePath { get; set; } = new();
+		public bool CanRidePlatform => PlatformCarryEnabled && !_isPicked && !IsQueuedForDeletion()
+			&& IsVisibleInTree() && CanProcess()
+			&& _pendingVelocity.LengthSquared() <= 0.0001f && Velocity.LengthSquared() <= 0.0001f;
+		public Vector2 PlatformGroundPosition => GetNodeOrNull<Node2D>(PlatformGroundProbePath)?.GlobalPosition ?? GlobalPosition;
+
+		public void ApplyPlatformDisplacement(Vector2 displacement, uint obstacleMask)
+		{
+			if (!CanRidePlatform || displacement.IsZeroApprox()) return;
+			if (Kuros.Environments.PlatformCarryPhysics.HasEnabledBodyShape(this))
+				MoveAndCollide(displacement); // 有身体形状时沿用物品原有 CollisionMask，不改变其物理规则。
+			else
+				GlobalPosition += displacement; // 普通地面武器无身体碰撞，整棵视觉与拾取区域一起移动。
+		}
 
 		public InventoryItemStack? CurrentStack { get; private set; }
 		public string ItemId => !string.IsNullOrWhiteSpace(ItemIdOverride)

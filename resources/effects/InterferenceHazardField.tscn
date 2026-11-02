@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://gt23mku18wgq"]
+
+[ext_resource type="Script" uid="uid://dpcebxvkc85k5" path="res://scripts/effects/InterferenceHazardField.cs" id="1_field"]
+[ext_resource type="PackedScene" uid="uid://c7y40fi765a3a" path="res://resources/effects/InterferenceZone.tscn" id="2_zone"]
+
+[node name="InterferenceHazardField" type="Node2D"]
+script = ExtResource("1_field")
+ZoneCount = 3
+ForwardOffset = 0.0
+SpawnLength = 2000.0
+SpawnWidth = 3000.0
+ZoneScene = ExtResource("2_zone")
+SpawnDebugDuration = 3.0

@@ -1,0 +1,8 @@
+[gd_resource type="SpineSkeletonDataResource" load_steps=3 format=3 uid="uid://b810nsvyq10p2"]
+
+[ext_resource type="SpineAtlasResource" uid="uid://mn88huept816" path="res://assets/spine/demo_enemy/Enemy_F1_RogueAI_NoBumper.atlas" id="1_lf7mk"]
+[ext_resource type="SpineSkeletonFileResource" uid="uid://b3gyukaavnif7" path="res://assets/spine/demo_enemy/Enemy_F1_RogueAI_NoBumper.spine-json" id="2_sk446"]
+
+[resource]
+atlas_res = ExtResource("1_lf7mk")
+skeleton_file_res = ExtResource("2_sk446")

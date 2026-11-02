@@ -1,4 +1,4 @@
-[gd_scene load_steps=79 format=3 uid="uid://b534tt4n3wr42"]
+[gd_scene load_steps=78 format=3 uid="uid://b534tt4n3wr42"]
 
 [ext_resource type="Script" uid="uid://cra7y7mt0x1j8" path="res://scripts/managers/CameraZoneArea.cs" id="1_mbxjs"]
 [ext_resource type="Shader" uid="uid://dwi65rioev5hr" path="res://shaders/materials/pseudo_3d_card.gdshader" id="1_xart7"]
@@ -6,7 +6,6 @@
 [ext_resource type="Script" uid="uid://vf5y6hhn28rq" path="res://scripts/environments/KillProgressPhase.cs" id="2_82263"]
 [ext_resource type="Script" uid="uid://cbui22isww64v" path="res://scripts/systems/cutscene/CutsceneTrigger.cs" id="2_neu0b"]
 [ext_resource type="Script" uid="uid://cnm33l1nmqohv" path="res://scripts/fx/DirectionalSceneEffect.cs" id="3_mbxjs"]
-[ext_resource type="Resource" uid="uid://xag881d6vxpv" path="res://resources/cutscene/F_begin_intro.tres" id="3_xart7"]
 [ext_resource type="PackedScene" uid="uid://cdrcs3qtqh8q4" path="res://scenes/actors/etc/HitA.tscn" id="4_mbxjs"]
 [ext_resource type="Resource" uid="uid://ttehlcct8cgr" path="res://resources/cutscene/F_begin_2_intro.tres" id="4_xart7"]
 [ext_resource type="Texture2D" uid="uid://roji77g8y3sp" path="res://assets/environments/scene_6_hotel/龙门吊左轮子.png" id="6_rqd1e"]
@@ -16,6 +15,7 @@
 [ext_resource type="Texture2D" uid="uid://b6i0r8cjy5m58" path="res://assets/environments/scene_6_hotel/升降滑槽.png" id="11_7rmla"]
 [ext_resource type="Texture2D" uid="uid://cb4cka2jcljmq" path="res://assets/environments/scene_6_hotel/黑色遮蔽覆盖.png" id="11_86bts"]
 [ext_resource type="Script" uid="uid://dprlx2bg0y3k5" path="res://scripts/environments/ParallaxBackground2D.cs" id="11_put05"]
+[ext_resource type="Resource" uid="uid://c2gqsuf7qen0f" path="res://resources/cutscene/F_begin_4_intro.tres" id="12_som2a"]
 [ext_resource type="PackedScene" uid="uid://bglx5f1707wuu" path="res://scenes/environments/elevatorGate_F_flip.tscn" id="12_x26y1"]
 [ext_resource type="Texture2D" uid="uid://b64luh0uw2mlb" path="res://assets/environments/scene_6_hotel/走廊.png" id="13_86bts"]
 [ext_resource type="Texture2D" uid="uid://5cvi3ej8m7r3" path="res://assets/effect/LightEffect/屏幕光晕.png" id="14_1d5w0"]
@@ -29,14 +29,12 @@
 [ext_resource type="Script" uid="uid://c0m3fgvcgwqj8" path="res://scripts/controllers/PlayerAxisRangeFollower.cs" id="24_signfollow"]
 [ext_resource type="Script" uid="uid://d1ji3o13n5eda" path="res://scripts/environments/KillProgressAscendController.cs" id="25_progress"]
 [ext_resource type="Texture2D" uid="uid://dbn8b1atk6ngd" path="res://assets/environments/scene_6_hotel/背景墙.png" id="25_rqd1e"]
-[ext_resource type="Resource" uid="uid://c7dnkxl20sbvy" path="res://resources/cutscene/F_begin_3_intro.tres" id="26_arrive"]
 [ext_resource type="Texture2D" uid="uid://b4poxbbpcwl0a" path="res://assets/environments/scene_6_hotel/龙门吊左滑槽.png" id="26_som2a"]
 [ext_resource type="Texture2D" uid="uid://cbwmqsqiivnqo" path="res://assets/environments/scene_6_hotel/左墙壁.png" id="27_npcwp"]
 [ext_resource type="Texture2D" uid="uid://dan0dd2p76nuk" path="res://assets/environments/scene_6_hotel/龙门吊右滑槽.png" id="28_pbecm"]
 [ext_resource type="Texture2D" uid="uid://dxrn8y2or0pgc" path="res://assets/environments/scene_6_hotel/右墙壁.png" id="29_0pejj"]
 [ext_resource type="Texture2D" uid="uid://kohvycrlmg3h" path="res://assets/environments/scene_6_hotel/地板前面遮挡升降机.png" id="31_dnirc"]
 [ext_resource type="Texture2D" uid="uid://bfca73pu7u6xc" path="res://assets/environments/scene_6_hotel/龙门吊右轮子.png" id="33_som2a"]
-[ext_resource type="PackedScene" uid="uid://dqgd0gotcsogg" path="res://scenes/environments/jar_mozhua_sprite.tscn" id="34_npcwp"]
 
 [sub_resource type="Resource" id="Resource_rqd1e"]
 script = ExtResource("2_82263")
@@ -633,30 +631,6 @@ tracks/37/keys = {
 "update": 1,
 "values": [true]
 }
-tracks/38/type = "value"
-tracks/38/imported = false
-tracks/38/enabled = true
-tracks/38/path = NodePath("Environments/FloorTop/Jar_mozhua_sprite:visible")
-tracks/38/interp = 1
-tracks/38/loop_wrap = true
-tracks/38/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [true]
-}
-tracks/39/type = "value"
-tracks/39/imported = false
-tracks/39/enabled = true
-tracks/39/path = NodePath("Environments/FloorTop/Jar_mozhua_sprite2:visible")
-tracks/39/interp = 1
-tracks/39/loop_wrap = true
-tracks/39/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [true]
-}
 
 [sub_resource type="Animation" id="Animation_xart7"]
 resource_name = "opening"
@@ -1206,30 +1180,6 @@ tracks/7/keys = {
 "update": 1,
 "values": [true, false]
 }
-tracks/8/type = "value"
-tracks/8/imported = false
-tracks/8/enabled = true
-tracks/8/path = NodePath("Environments/FloorTop/Jar_mozhua_sprite:visible")
-tracks/8/interp = 1
-tracks/8/loop_wrap = true
-tracks/8/keys = {
-"times": PackedFloat32Array(0, 0.1),
-"transitions": PackedFloat32Array(1, 1.035265),
-"update": 1,
-"values": [true, false]
-}
-tracks/9/type = "value"
-tracks/9/imported = false
-tracks/9/enabled = true
-tracks/9/path = NodePath("Environments/FloorTop/Jar_mozhua_sprite2:visible")
-tracks/9/interp = 1
-tracks/9/loop_wrap = true
-tracks/9/keys = {
-"times": PackedFloat32Array(0, 0.1),
-"transitions": PackedFloat32Array(1, 1),
-"update": 1,
-"values": [true, false]
-}
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_s4rg7"]
 _data = {
@@ -1339,6 +1289,30 @@ tracks/7/keys = {
 "update": 1,
 "values": [true]
 }
+tracks/8/type = "value"
+tracks/8/imported = false
+tracks/8/enabled = true
+tracks/8/path = NodePath("SlideRailSpawnPoint/LeftRial:position:y")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [-2000.0]
+}
+tracks/9/type = "value"
+tracks/9/imported = false
+tracks/9/enabled = true
+tracks/9/path = NodePath("SlideRailSpawnPoint2/RightRial:position:y")
+tracks/9/interp = 1
+tracks/9/loop_wrap = true
+tracks/9/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [-2000.0]
+}
 
 [sub_resource type="Animation" id="Animation_lbll7"]
 resource_name = "rail_move_in"
@@ -1440,6 +1414,130 @@ tracks/7/keys = {
 "values": [true, false]
 }
 
+[sub_resource type="Animation" id="Animation_npcwp"]
+resource_name = "rail_move_in"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("SlideRailSpawnPoint/LeftRial:position:x")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.33333334, 0.4),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [-6400.0, -1400.0, -1600.0, -1400.0]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("SlideRailSpawnPoint2/RightRial:position:x")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.33333334, 0.4),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [3000.0, -1400.0, -1200.0, -1400.0]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("SlideRailSpawnPoint/LeftRial/HitA:frame")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.2, 0.21, 0.22, 0.23, 0.24),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3, 4]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("SlideRailSpawnPoint/LeftRial/HitA:visible")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.25),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [false, true, false]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("SlideRailSpawnPoint2/RightRial/HitA:frame")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0.2, 0.21, 0.22, 0.23, 0.24),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3, 4]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("SlideRailSpawnPoint2/RightRial/HitA:visible")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.25),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [false, true, false]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("SlideRailSpawnPoint/LeftRial:position:y")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [-1800.0]
+}
+tracks/7/type = "value"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath("SlideRailSpawnPoint/LeftRial:visible")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+tracks/8/type = "value"
+tracks/8/imported = false
+tracks/8/enabled = true
+tracks/8/path = NodePath("SlideRailSpawnPoint2/RightRial:position:y")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [-1800.0]
+}
+tracks/9/type = "value"
+tracks/9/imported = false
+tracks/9/enabled = true
+tracks/9/path = NodePath("SlideRailSpawnPoint2/RightRial:visible")
+tracks/9/interp = 1
+tracks/9/loop_wrap = true
+tracks/9/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+
 [sub_resource type="Animation" id="Animation_kge03"]
 resource_name = "rail_move_out"
 length = 0.4
@@ -1450,10 +1548,10 @@ tracks/0/path = NodePath("SlideRailSpawnPoint/LeftRial:visible")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
+"times": PackedFloat32Array(0, 0.3),
+"transitions": PackedFloat32Array(1, 1),
 "update": 1,
-"values": [true]
+"values": [true, false]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -1462,10 +1560,10 @@ tracks/1/path = NodePath("SlideRailSpawnPoint2/RightRial:visible")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
+"times": PackedFloat32Array(0, 0.3),
+"transitions": PackedFloat32Array(1, 1),
 "update": 1,
-"values": [true]
+"values": [true, false]
 }
 tracks/2/type = "value"
 tracks/2/imported = false
@@ -1496,6 +1594,7 @@ tracks/3/keys = {
 _data = {
 &"RESET": SubResource("Animation_ri2xm"),
 &"rail_move_in": SubResource("Animation_lbll7"),
+&"rail_move_in_stage2": SubResource("Animation_npcwp"),
 &"rail_move_out": SubResource("Animation_kge03")
 }
 
@@ -1562,8 +1661,6 @@ texture = ExtResource("2_1d5w0")
 visible = false
 position = Vector2(6405, 20)
 scale = Vector2(0.75, 2)
-frame = 0
-frame_progress = 0.0
 
 [node name="SlideRailSpawnPoint2" type="Node2D" parent="."]
 position = Vector2(4095, 440)
@@ -1585,8 +1682,6 @@ texture = ExtResource("2_1d5w0")
 visible = false
 position = Vector2(-2045, 20)
 scale = Vector2(0.75, 2)
-frame = 0
-frame_progress = 0.0
 flip_h = false
 
 [node name="SlideRailSpawnPoint3" type="Node2D" parent="."]
@@ -1637,7 +1732,7 @@ collision_layer = 0
 collision_mask = 4
 script = ExtResource("1_mbxjs")
 ZoneName = "Room_Zone_F_Begin_3"
-CameraLimitTop = -2500
+CameraLimitTop = -2400
 ZoomLevel = 0.3
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CameraZone3"]
@@ -1653,7 +1748,7 @@ z_index = 10
 collision_layer = 0
 collision_mask = 4
 script = ExtResource("2_neu0b")
-Sequence = ExtResource("3_xart7")
+Sequence = ExtResource("12_som2a")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CutsceneTrigger"]
 position = Vector2(-2300, 763)
@@ -1679,7 +1774,7 @@ z_index = 10
 collision_layer = 0
 collision_mask = 4
 script = ExtResource("2_neu0b")
-Sequence = ExtResource("26_arrive")
+Sequence = ExtResource("12_som2a")
 StartsDisarmed = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CutsceneTrigger3"]
@@ -1789,6 +1884,7 @@ region_enabled = true
 region_rect = Rect2(0, 0, 278, 1219.5)
 
 [node name="Wall" type="Sprite2D" parent="Environments/FloorTop"]
+z_index = 1
 material = SubResource("ShaderMaterial_kge03")
 position = Vector2(0, -1990)
 texture = ExtResource("25_rqd1e")
@@ -1835,14 +1931,7 @@ position = Vector2(3380, -540)
 scale = Vector2(0.66, 0.8)
 texture = ExtResource("33_som2a")
 
-[node name="Jar_mozhua_sprite" parent="Environments/FloorTop" instance=ExtResource("34_npcwp")]
-position = Vector2(-2785, 285)
-
-[node name="Jar_mozhua_sprite2" parent="Environments/FloorTop" instance=ExtResource("34_npcwp")]
-position = Vector2(2915, 285)
-
 [node name="AirWall" type="StaticBody2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
-visible = false
 z_index = 10
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AirWall"]

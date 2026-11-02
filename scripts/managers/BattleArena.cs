@@ -186,10 +186,13 @@ namespace Kuros.Managers
 
             foreach (var body in overlappingBodies)
             {
-                if (body is GameActor actor && !_detectedScratch.Contains(actor))
+                // 尸体不算敌人：死亡对象即使碰撞体还在场（可破坏物留尸、碰撞不随死亡关闭）也不进跟踪表——
+                // 否则每轮开头被 RemoveAll 剔除、又被检测成"新进入"：日志每 CheckInterval 刷一条，
+                // 且 hasEnemies 恒真（空气墙拆不掉）。
+                if (body is GameActor actor && !actor.IsDeadOrDying && !_detectedScratch.Contains(actor))
                 {
                     _detectedScratch.Add(actor);
-                    
+
                     // 新进入的敌人
                     if (!_trackedEnemies.Contains(actor))
                     {

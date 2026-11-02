@@ -1,4 +1,4 @@
-[gd_scene load_steps=40 format=3 uid="uid://cw42j1o501x83"]
+[gd_scene load_steps=46 format=3 uid="uid://cw42j1o501x83"]
 
 [ext_resource type="Script" uid="uid://cw8xmc5jou66u" path="res://scripts/actors/enemies/EnemyF1RogueAIMachineGun.cs" id="1_1mbwy"]
 [ext_resource type="Resource" uid="uid://05yoqk7rf6ax" path="res://resources/behavior/EnemyBehaviorConfig.tres" id="2_vkvw7"]
@@ -10,11 +10,9 @@
 [ext_resource type="Script" uid="uid://birre3ujsghmw" path="res://scripts/controllers/SpineBoneAnchor.cs" id="8_ebcgc"]
 [ext_resource type="Script" uid="uid://cenpuhlcgesin" path="res://scripts/systems/fsm/StateMachine.cs" id="9_1bac6"]
 [ext_resource type="Script" uid="uid://bo6uhkbqyxe6o" path="res://scripts/actors/enemies/states/EnemyAttackState.cs" id="12_rw6o8"]
-[ext_resource type="Script" uid="uid://cu6enbmbcicac" path="res://scripts/actors/enemies/attacks/EnemySimpleMeleeAttack.cs" id="14_p8xmv"]
 [ext_resource type="PackedScene" uid="uid://cli6ontrytepf" path="res://resources/effects/EnergyBullet.tscn" id="15_ebcgc"]
 [ext_resource type="Script" uid="uid://fd5076f50ca0" path="res://scripts/actors/enemies/attacks/AttackEffectEntry.cs" id="15_n2jad"]
 [ext_resource type="PackedScene" uid="uid://bg35anmrs8jy5" path="res://scenes/actors/etc/WarmingB.tscn" id="17_32q6i"]
-[ext_resource type="Script" uid="uid://cwnxfhj8ysc2f" path="res://scripts/actors/enemies/states/EnemyHitState.cs" id="17_vn0nj"]
 [ext_resource type="Script" uid="uid://cihawgv4js52w" path="res://scripts/actors/enemies/states/EnemyFrozenState.cs" id="18_oskn3"]
 [ext_resource type="Script" uid="uid://wdd3ghxdq7f6" path="res://scripts/actors/enemies/states/EnemyStationaryTurretState.cs" id="19_yqp62"]
 [ext_resource type="Script" uid="uid://cbmvuppulotha" path="res://scripts/actors/enemies/states/EnemyDyingState.cs" id="21_aemok"]
@@ -28,6 +26,13 @@
 [ext_resource type="Script" uid="uid://dk5j51adwch8j" path="res://scripts/actors/enemies/attacks/EnemyF1RogueAITurretMeleeAttack.cs" id="29_melee"]
 [ext_resource type="Script" uid="uid://c2kmtjqv6x2tv" path="res://scripts/actors/enemies/attacks/EnemyF1RogueAITurretAttackController.cs" id="30_mgctrl"]
 [ext_resource type="Script" uid="uid://e0dhrl0rnkhv" path="res://scripts/actors/enemies/EnemyWeakpointWindow.cs" id="31_weakpoint"]
+[ext_resource type="Script" uid="uid://epf7i8hvjkoc" path="res://scripts/actors/enemies/states/EnemyF1RogueAITurretHitState.cs" id="32_turret_hit"]
+[ext_resource type="Script" uid="uid://baq6luqv2ijwk" path="res://scripts/actors/enemies/EnemyEmpowerController.cs" id="33_empower"]
+[ext_resource type="Script" uid="uid://b1sclw42kjvtq" path="res://scripts/actors/enemies/attacks/JarAssistAttack.cs" id="34_jarattack"]
+[ext_resource type="Script" uid="uid://dlhtrvdv6gwxn" path="res://scripts/actors/enemies/states/EnemyJarAssistStunState.cs" id="35_jarstun"]
+[ext_resource type="PackedScene" uid="uid://bwdwpiu2brmv6" path="res://scenes/environments/jar_mozhua_assist.tscn" id="36_jars"]
+[ext_resource type="PackedScene" uid="uid://d38pex7crmtju" path="res://scenes/actors/etc/HitB.tscn" id="37_hitb"]
+[ext_resource type="Script" uid="uid://ul0132m6aehw" path="res://scripts/actors/enemies/attacks/EnemyF1RogueAITurretSimpleMeleeAttack.cs" id="38_turretsimple"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_shadow"]
 shader = ExtResource("4_fda0u")
@@ -41,10 +46,10 @@ radius = 20000.0
 radius = 10000.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_attack"]
-size = Vector2(6000, 400)
+size = Vector2(6000, 2000)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_hit"]
-size = Vector2(500, 300)
+size = Vector2(600, 500)
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_vkvw7"]
 radius = 500.0
@@ -79,6 +84,15 @@ PropertyOverrides = Dictionary[String, Variant]({
 })
 metadata/_custom_type_script = "uid://fd5076f50ca0"
 
+[sub_resource type="Resource" id="Resource_jar_assist"]
+script = ExtResource("15_n2jad")
+Scene = ExtResource("36_jars")
+UniqueGroup = "Jar_mozhua_assist"
+EffectOffset = Vector2(nan, nan)
+SpawnTiming = 1
+BlockedByFxGroup = "Jar_mozhua_assist"
+metadata/_custom_type_script = "uid://fd5076f50ca0"
+
 [sub_resource type="Resource" id="Resource_str0p"]
 script = ExtResource("15_n2jad")
 Scene = ExtResource("21_fda0u")
@@ -96,15 +110,14 @@ collision_mask = 15
 motion_mode = 1
 script = ExtResource("1_1mbwy")
 BehaviorConfig = ExtResource("2_vkvw7")
-EnableStateDebugOverlay = true
 DebugOverlayOffset = Vector2(-1500, 200)
 DebugOverlayFontSize = 128
 DetectionArea = NodePath("Sprite2D/ControllerDetectionArea")
 AttackArea = NodePath("Sprite2D/AttackArea")
-Speed = 450.0
+Speed = 500.0
 AttackDamage = 10.0
 AttackCooldown = 1.0
-MaxHealth = 1000
+MaxHealth = 500
 AiDescription = "固定在机械桩（滑槽）上的机枪台：不移动，按玩家位置用 turn/d_turn 转身，蓄力(preheat)→扫射(attack)→收招(recover)；攻击期间会沿桩退开以保持距离"
 LockFacing = true
 StateMachine = NodePath("StateMachine")
@@ -120,6 +133,7 @@ script = ExtResource("6_o2s87")
 TargetBone = NodePath("../SpineSprite/SpineBoneNode")
 
 [node name="OutlineLayer" type="Node2D" parent="."]
+visible = false
 show_behind_parent = true
 position = Vector2(0, -500)
 
@@ -181,6 +195,7 @@ show_behind_parent = true
 position = Vector2(-52.361004, -2051.0408)
 rotation = 1.5586017
 bone_name = "bone3"
+thickness = 30.0
 
 [node name="Marker2D" type="Marker2D" parent="SpineSprite/SpineBoneNode"]
 position = Vector2(1400, 0)
@@ -189,23 +204,25 @@ position = Vector2(1400, 0)
 
 [node name="SpineBoneNode2" type="SpineBoneNode" parent="SpineSprite"]
 show_behind_parent = true
-position = Vector2(863.01575, -280.07666)
-rotation = 0.8884798
-scale = Vector2(1.0000001, 1)
-bone_name = "bone8"
-thickness = 50.0
+z_index = 10
+position = Vector2(-2210.9797, 916.888)
+rotation = 0.29481593
+scale = Vector2(0.99999994, 0.99999994)
+bone_name = "bone19"
+thickness = 30.0
 
 [node name="Marker2D" type="Marker2D" parent="SpineSprite/SpineBoneNode2"]
-position = Vector2(450, 0)
+position = Vector2(850, 400)
 script = ExtResource("8_ebcgc")
 
 [node name="SpineBoneNode3" type="SpineBoneNode" parent="SpineSprite"]
 show_behind_parent = true
+z_index = 10
 position = Vector2(331.19733, -827.8468)
 rotation = 0.85039544
 scale = Vector2(1.0000001, 1)
 bone_name = "bone7"
-thickness = 10.0
+thickness = 30.0
 
 [node name="Marker2D" type="Marker2D" parent="SpineSprite/SpineBoneNode3"]
 position = Vector2(500, 0)
@@ -214,6 +231,7 @@ position = Vector2(500, 0)
 position = Vector2(-300, 0)
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
+visible = false
 modulate = Color(0.8, 0.6, 0.5, 1)
 z_index = 10
 
@@ -260,12 +278,14 @@ monitorable = false
 [node name="MeleeDetectionShape" type="CollisionShape2D" parent="Sprite2D/MeleeAttackArea"]
 rotation = 1.5707964
 shape = SubResource("CapsuleShape2D_vkvw7")
+debug_color = Color(1, 1, 0, 0.41960785)
 
 [node name="MeleeDmgArea" type="Area2D" parent="Sprite2D"]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/MeleeDmgArea"]
 rotation = 1.5707964
 shape = SubResource("CapsuleShape2D_1mbwy")
+debug_color = Color(1, 0, 0, 0.41960785)
 
 [node name="VisualEffectPosition" type="Node2D" parent="."]
 script = ExtResource("6_o2s87")
@@ -295,17 +315,19 @@ script = ExtResource("12_rw6o8")
 
 [node name="AttackController" type="Node" parent="StateMachine/Attack"]
 script = ExtResource("30_mgctrl")
+NormalOnlyAttackNames = PackedStringArray("SimpleMeleeAttack", "MeleeAttack", "JarAssistAttack")
+EmpoweredOnlyAttackNames = PackedStringArray("SimpleMeleeAttackPro", "MeleeAttackPro")
+RequireMeleeReadyBeforeQueue = true
 PlayerDetectionAreaPath = NodePath("../../../Sprite2D/ControllerDetectionArea")
-MinInterAttackDelay = 1.0
+MinInterAttackDelay = 2.0
 QueuedAttackTimeout = 2.0
 
 [node name="SimpleMeleeAttack" type="Node" parent="StateMachine/Attack/AttackController"]
-script = ExtResource("14_p8xmv")
+script = ExtResource("38_turretsimple")
 AttackName = "SimpleMeleeAttack"
 WarmupDuration = 2.0
 ActiveDuration = 3.0
 RecoveryDuration = 0.53
-CooldownDurationMultiplier = 3.0
 DamageMultiplier = 0.0
 AttackAreaPath = NodePath("../../../../Sprite2D/AttackArea")
 TriggerAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
@@ -313,14 +335,13 @@ RequireAnimationHitTrigger = true
 AllowMultipleAnimationHits = true
 GrantedImmunities = 6
 Effects = Array[ExtResource("15_n2jad")]([SubResource("Resource_v1b7h")])
-metadata/attack_weight = 100.0
+metadata/attack_weight = 30.0
 
 [node name="MeleeAttack" type="Node" parent="StateMachine/Attack/AttackController"]
 script = ExtResource("29_melee")
 AttackName = "MeleeAttack"
 WarmupDuration = 0.8
 RecoveryDuration = 0.18
-CooldownDurationMultiplier = 6.0
 DamageMultiplier = 1.5
 AttackAreaPath = NodePath("../../../../Sprite2D/MeleeAttackArea")
 DamageAreaPath = NodePath("../../../../Sprite2D/MeleeDmgArea")
@@ -333,10 +354,59 @@ RequireAnimationHitTrigger = true
 AllowMultipleAnimationHits = true
 GrantedImmunities = 30
 Effects = Array[ExtResource("15_n2jad")]([SubResource("Resource_fda0u")])
-metadata/attack_weight = 100.0
+metadata/attack_weight = 50.0
+
+[node name="SimpleMeleeAttackPro" type="Node" parent="StateMachine/Attack/AttackController"]
+script = ExtResource("38_turretsimple")
+AttackName = "SimpleMeleeAttackPro"
+WarmupDuration = 2.0
+ActiveDuration = 10.0
+RecoveryDuration = 0.53
+CooldownDurationMultiplier = 0.0
+DamageMultiplier = 0.0
+AttackAreaPath = NodePath("../../../../Sprite2D/AttackArea")
+TriggerAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
+RequireAnimationHitTrigger = true
+AllowMultipleAnimationHits = true
+GrantedImmunities = 6
+Effects = Array[ExtResource("15_n2jad")]([SubResource("Resource_v1b7h")])
+metadata/attack_weight = 30.0
+
+[node name="MeleeAttackPro" type="Node" parent="StateMachine/Attack/AttackController"]
+script = ExtResource("29_melee")
+AttackName = "MeleeAttackPro"
+WarmupDuration = 0.8
+RecoveryDuration = 0.18
+CooldownDurationMultiplier = 0.0
+DamageMultiplier = 1.5
+AttackAreaPath = NodePath("../../../../Sprite2D/MeleeAttackArea")
+DamageAreaPath = NodePath("../../../../Sprite2D/MeleeDmgArea")
+TriggerAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
+KnockbackDistance = 1500.0
+KnockbackDuration = 0.6
+KnockbackFromHitPosition = true
+KnockbackAxes = 1
+RequireAnimationHitTrigger = true
+AllowMultipleAnimationHits = true
+GrantedImmunities = 30
+Effects = Array[ExtResource("15_n2jad")]([SubResource("Resource_fda0u")])
+metadata/attack_weight = 50.0
+
+[node name="JarAssistAttack" type="Node" parent="StateMachine/Attack/AttackController"]
+script = ExtResource("34_jarattack")
+StunSeconds = 5.0
+AttackName = "JarAssistAttack"
+WarmupDuration = 0.5
+ActiveDuration = 0.2
+RecoveryDuration = 0.3
+CooldownDurationMultiplier = 30.0
+DamageMultiplier = 0.0
+MaxAllowedAngleToPlayer = 180.0
+Effects = Array[ExtResource("15_n2jad")]([SubResource("Resource_jar_assist")])
+metadata/attack_weight = 20.0
 
 [node name="Hit" type="Node" parent="StateMachine"]
-script = ExtResource("17_vn0nj")
+script = ExtResource("32_turret_hit")
 HitImpactDuration = 0.1
 RecoverDuration = 0.23
 
@@ -347,9 +417,13 @@ script = ExtResource("18_oskn3")
 script = ExtResource("19_yqp62")
 AllowAttack = false
 
+[node name="JarAssistStun" type="Node" parent="StateMachine"]
+script = ExtResource("35_jarstun")
+Duration = 5.0
+
 [node name="Dying" type="Node" parent="StateMachine"]
 script = ExtResource("21_aemok")
-DeathDuration = 2.3
+DeathDuration = 0.0
 Effects = Array[ExtResource("15_n2jad")]([SubResource("Resource_str0p")])
 
 [node name="Dead" type="Node" parent="StateMachine"]
@@ -358,14 +432,22 @@ script = ExtResource("22_uapl1")
 [node name="EffectController" type="Node" parent="."]
 script = ExtResource("23_1rorw")
 
+[node name="EmpowerController" type="Node" parent="."]
+script = ExtResource("33_empower")
+Duration = 20.0
+AttackIntervalMultiplier = 0.1
+MovementSpeedMultiplier = 2.0
+EffectScene = ExtResource("37_hitb")
+EffectAnchorPath = NodePath("VisualEffectPosition/VisualEffectMarker2D")
+EffectScale = Vector2(2, 2)
+
 [node name="RailChaseMovement" type="Node" parent="."]
 script = ExtResource("27_railchase")
 
 [node name="RailKeepDistanceBehavior" type="Node" parent="."]
 script = ExtResource("28_keepdist")
 Active = true
-KeepDistance = 1250.0
-Speed = 300.0
+KeepDistance = 3000.0
 Smoothing = 1.0
 
 [node name="FacingController" type="Node" parent="."]
@@ -375,8 +457,14 @@ script = ExtResource("26_facing")
 script = ExtResource("31_weakpoint")
 WindowTable = Dictionary[String, Vector2]({
 "MeleeAttack": Vector2(0.3, 1),
-"SimpleMeleeAttack": Vector2(0.3, 5.1)
+"MeleeAttackPro": Vector2(0.3, 1),
+"SimpleMeleeAttack": Vector2(0.3, 5.1),
+"SimpleMeleeAttackPro": Vector2(0.3, 5.1)
 })
+StateWindowTable = Dictionary[String, Vector2]({
+"Hit": Vector2(0, 0.3)
+})
+ResetHitWindowOnReentry = true
 
 [node name="AnimationController" type="Node" parent="."]
 script = ExtResource("25_tqh7l")

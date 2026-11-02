@@ -30,6 +30,19 @@ namespace Kuros.Actors.Enemies.States
         /// <summary>阶段序号（每次 Enter 递增）——供动画控制器检测重入后重播受击段。</summary>
         public int PhaseTick { get; private set; }
 
+        /// <summary>本轮首次进入 Hit 后的累计秒数；连击重入不重置。</summary>
+        public double CycleElapsedSeconds { get; private set; }
+        /// <summary>距最近一次成功 Enter 的秒数；成功重入归零，被抑制的重入不改变它。</summary>
+        public double EntryElapsedSeconds { get; private set; }
+        private bool _enteringFromHit;
+
+        public override bool CanEnterFrom(string? currentStateName)
+        {
+            if (!base.CanEnterFrom(currentStateName)) return false;
+            _enteringFromHit = currentStateName == "Hit";
+            return true;
+        }
+
         /// <summary>动画需停帧：受击段动画已播完（A 尽）而位移未完（K>0）——控制器应将动画 time_scale 置 0 定格。</summary>
         public bool NeedsAnimHold => CurrentPhase == HitPhase.Impact && _animRemaining <= 0f && _hasKnock;
 
@@ -64,11 +77,17 @@ namespace Kuros.Actors.Enemies.States
         // Frozen 恢复
         private float _savedFrozenRemainingTime = 0f;
 
+        // 默认行为不变，专用敌人可按受击来源选择动画阶段时长。
+        protected virtual float ResolveImpactDuration() => HitImpactDuration;
+        protected virtual float ResolveRecoverDuration() => RecoverDuration;
+
         public override void Enter()
         {
+            if (!_enteringFromHit) CycleElapsedSeconds = 0.0;
+            EntryElapsedSeconds = 0.0;
             PhaseTick++;
             CurrentPhase = HitPhase.Impact;
-            _animRemaining = HitImpactDuration;
+            _animRemaining = ResolveImpactDuration();
             _recoverRemaining = 0f;
             _reentrySuppressed = false;
 
@@ -90,6 +109,8 @@ namespace Kuros.Actors.Enemies.States
 
         public override void PhysicsUpdate(double delta)
         {
+            CycleElapsedSeconds += delta;
+            EntryElapsedSeconds += delta;
             float dt = (float)delta;
 
             // 消费击退请求（攻击方在 Enter 前后写入；滞留过期请求自动丢弃）
@@ -109,7 +130,7 @@ namespace Kuros.Actors.Enemies.States
                 {
                     _reentrySuppressed = false;
                     CurrentPhase = HitPhase.Impact;
-                    _animRemaining = HitImpactDuration;
+                    _animRemaining = ResolveImpactDuration();
                     PhaseTick++;
                 }
             }
@@ -165,7 +186,7 @@ namespace Kuros.Actors.Enemies.States
         private void EnterRecover()
         {
             CurrentPhase = HitPhase.Recover;
-            _recoverRemaining = RecoverDuration;
+            _recoverRemaining = ResolveRecoverDuration();
         }
 
         private void ExitHitState()
@@ -174,6 +195,10 @@ namespace Kuros.Actors.Enemies.States
 
             // 致死伤害：受击反馈（后仰 + 击退）已完整走完，直接转入死亡流程（Dying）
             if (Enemy.TryEnterDeferredDeath()) return;
+
+            // 炮台罐子眩晕：Hit 期间倒计时照常流逝，有剩余才恢复眩晕。
+            var jarStun = Enemy.StateMachine?.GetNodeOrNull<EnemyJarAssistStunState>("JarAssistStun");
+            if (jarStun != null && jarStun.TryResumeAfterHit()) return;
 
             // 挂起眩晕（反霸体中断等在命中时请求）：受击完整走完 → 进眩晕，时长从此刻起算
             var pendingFrozen = Enemy.StateMachine?.GetNodeOrNull<EnemyFrozenState>("Frozen");

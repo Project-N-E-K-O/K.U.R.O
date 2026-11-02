@@ -16,7 +16,7 @@ namespace Kuros.Actors.Enemies.Attacks
     ///     <see cref="Duration"/> 到点自行淡出销毁。齐射想散开就开 <see cref="AimJitterPixels"/>。
     ///
     /// 视觉与伤害分离（沿用两个参考实现的做法）：
-    ///   · 视觉：只有 <c>Visual</c> 子节点跟着速度方向转（判定区不转，形状不随朝向变化）；
+    ///   · 视觉：旋转写入球体材质的 `rotation_angle`（shader 内绕贴图中心旋转，节点不动；判定区也不转）；
     ///   · 伤害：独立挂在子节点 <c>AttackArea</c> 上，靠 AreaEntered/BodyEntered 触发，
     ///     与移动/旋转完全无关——换视觉不用碰伤害参数，反之亦然。
     ///
@@ -35,7 +35,7 @@ namespace Kuros.Actors.Enemies.Attacks
         /// <summary>追踪强度（drag 模型，帧率无关）。0 = 纯直线；数值是"每帧朝目标插值的比例"，
         /// 一秒内的转向完成度 ≈ 1 − (1−值)^60：0.01 ≈ 45%/秒（弱，会绕大弧）、0.04 ≈ 91%/秒（很粘）、
         /// 0.08 以上基本一两个身位就咬死。想做"弱追踪"保持 0.01~0.02。</summary>
-        [Export(PropertyHint.Range, "0,1,0.005")] public float DragFactor { get; set; } = 0.015f;
+        [Export(PropertyHint.Range, "0,1,0.001")] public float DragFactor { get; set; } = 0.015f;
 
         /// <summary>发射角（度，**相对射手朝向**）：0 = 正前方，正 = 顺时针偏。出手时只按这个角给初速。</summary>
         [Export(PropertyHint.Range, "-180,180,1")] public float LaunchAngleDegrees { get; set; } = 0f;
@@ -49,15 +49,15 @@ namespace Kuros.Actors.Enemies.Attacks
         [Export(PropertyHint.Range, "0,2,0.05")] public float FadeOutDuration { get; set; } = 0.15f;
 
         [ExportCategory("Visual")]
-        /// <summary>只跟着**速度方向**旋转的视觉节点（判定区不转）。空 = 旋转根节点自身。</summary>
+        /// <summary>视觉根节点（淡出时按它做 Modulate）。旋转不靠节点，见 <see cref="SpinSpritePath"/>。</summary>
         [Export] public NodePath VisualPath { get; set; } = new("Visual");
 
-        /// <summary>需要**自旋**的装饰节点（相对根路径；一般放在 Visual 下，这样自旋叠加在"朝向"之上）。
-        /// 每帧按 <see cref="SpinDegreesPerSecond"/> 累加自身旋转。空 = 不启用。
-        /// 与 <see cref="VisualPath"/> 的分工：那个是"整体朝速度方向"，本节点是"在朝向前提下自己转"。</summary>
+        /// <summary>承载能量球 shader 的 Sprite2D（相对根路径；材质须有 `rotation_angle` uniform）。
+        /// 朝速度方向的旋转与自旋都写入该材质的 uniform，由 shader 在 UV 空间**绕贴图中心**旋转，
+        /// 节点本身不动——贴图带 offset 时也不会被甩离中心。空 = 回退 "Visual/bullet"。</summary>
         [Export] public NodePath SpinSpritePath { get; set; } = new();
 
-        /// <summary>自旋角速度（度/秒；正 = 顺时针）。</summary>
+        /// <summary>自旋角速度（度/秒；正 = 顺时针）。并入 shader 的 rotation_angle。</summary>
         [Export(PropertyHint.Range, "-1440,1440,1")] public float SpinDegreesPerSecond { get; set; } = 90f;
 
         [ExportCategory("Damage")]
@@ -72,7 +72,8 @@ namespace Kuros.Actors.Enemies.Attacks
 
         private Area2D? _attackArea;
         private Node2D? _visual;
-        private Node2D? _spinNode;
+        private ShaderMaterial? _orbMaterial;
+        private float _spinAngle;
         private Vector2 _velocity;
         private Vector2 _aimJitter;
         private float _timer;
@@ -84,16 +85,21 @@ namespace Kuros.Actors.Enemies.Attacks
 
         public override void _Ready()
         {
-            // 不继承父节点变换：生成方把特效挂在敌人的父节点下，而炮位/机枪台这类敌人的父节点是
+            // 默认不继承父节点变换：生成方把特效挂在敌人的父节点下，而炮位/机枪台这类敌人的父节点是
             // **滑槽的 Mount**（会随滑槽纵向滑动）——不设 TopLevel 的话弹会跟着滑槽一起漂。
-            // 与 EnergyOrbShot / PlayerAttackTemplate.HitEffectForceTopLevel 同一套处理。
-            TopLevel = true;
+            // 但 TopLevel 还会把绘制顺序强制放到所有普通 CanvasItem 之上、脱离 y-sort；
+            // 生成方若已把本弹挂到玩家父级（World，静止，如 EnemyF1RogueAITurretSimpleMeleeAttack），
+            // 就保持普通 CanvasItem，与玩家按 Y 排序。
+            if (!SharesPlayerParent()) TopLevel = true;
 
             _timer = Duration;
 
             _attackArea = GetNodeOrNull<Area2D>("AttackArea");
             _visual = VisualPath.IsEmpty ? null : GetNodeOrNull<Node2D>(VisualPath);
-            _spinNode = SpinSpritePath.IsEmpty ? null : GetNodeOrNull<Node2D>(SpinSpritePath);
+
+            Sprite2D? orbSprite = SpinSpritePath.IsEmpty ? null : GetNodeOrNull<Sprite2D>(SpinSpritePath);
+            orbSprite ??= GetNodeOrNull<Sprite2D>("Visual/bullet");
+            _orbMaterial = orbSprite?.Material as ShaderMaterial;
 
             if (_attackArea != null)
             {
@@ -111,6 +117,13 @@ namespace Kuros.Actors.Enemies.Attacks
                 float radius = (float)GD.RandRange(0.0, AimJitterPixels);
                 _aimJitter = Vector2.Right.Rotated(angle) * radius;
             }
+        }
+
+        /// <summary>当前父级是否就是玩家父级（World）：挂在那里时不需要 TopLevel（避免压过玩家、保留 y-sort）。</summary>
+        private bool SharesPlayerParent()
+        {
+            if (GetTree()?.GetFirstNodeInGroup("player") is not Node2D player) return false;
+            return player.GetParent() == GetParent();
         }
 
         public override void _ExitTree()
@@ -184,15 +197,15 @@ namespace Kuros.Actors.Enemies.Attacks
             GlobalPosition += _velocity * dt;
 
             // ─ 只转视觉：判定区不转，形状不随朝向变化（视觉/伤害分离）──
-            if (_velocity.LengthSquared() > 0.1f)
+            // 旋转在 shader 的 UV 空间完成（绕贴图中心），不转节点：弹体贴图带向上 offset，
+            // 转节点会把贴图甩到旋转中心之外（朝左时整个弹上下颠倒）。
+            // 默认 rotation_angle = 0（静止/朝右）；自旋并入同一个角度。
+            if (_orbMaterial != null)
             {
-                if (_visual != null) _visual.Rotation = _velocity.Angle();
-                else Rotation = _velocity.Angle();
+                float angle = _velocity.LengthSquared() > 0.1f ? _velocity.Angle() : 0f;
+                _spinAngle += Mathf.DegToRad(SpinDegreesPerSecond) * dt;
+                _orbMaterial.SetShaderParameter("rotation_angle", angle + _spinAngle);
             }
-
-            // 装饰自旋：叠加在节点自身旋转上（一般挂在 Visual 下 = 在"朝向前方"的基础上自转）
-            if (_spinNode != null && GodotObject.IsInstanceValid(_spinNode))
-                _spinNode.Rotation += Mathf.DegToRad(SpinDegreesPerSecond) * dt;
 
             _timer -= dt;
             if (_timer <= 0f) StartFade();

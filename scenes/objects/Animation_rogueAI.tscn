@@ -848,7 +848,7 @@ tracks/4/keys = {
 
 [sub_resource type="Animation" id="Animation_i5f6q"]
 resource_name = "move_down"
-length = 2.0
+length = 4.0
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -856,7 +856,7 @@ tracks/0/path = NodePath(".:visible")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 2),
+"times": PackedFloat32Array(0, 4),
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
 "values": [true, false]
@@ -904,7 +904,7 @@ tracks/4/path = NodePath("position/SpineSprite/SpineAnimationTrack/SpineSprite T
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
-"clips": PackedStringArray("idle_up"),
+"clips": PackedStringArray("idle_up_looped"),
 "times": PackedFloat32Array(0)
 }
 tracks/5/type = "value"
@@ -954,130 +954,6 @@ tracks/8/keys = {
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [0.0, 0.3]
-}
-
-[sub_resource type="Animation" id="Animation_t4vhn"]
-resource_name = "wake_up"
-length = 2.0
-tracks/0/type = "animation"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("position/SpineSprite/SpineAnimationTrack/SpineSprite Track 0")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"clips": PackedStringArray("idle_up"),
-"times": PackedFloat32Array(0)
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("position/Sprite2D:visible")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0, 1, 1.0666667, 1.2, 1.2666667, 1.4, 1.4666667),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
-"update": 1,
-"values": [true, true, false, true, false, true, false]
-}
-tracks/2/type = "value"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath("position:position:y")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
-"times": PackedFloat32Array(0.5, 1.4),
-"transitions": PackedFloat32Array(1, 1),
-"update": 0,
-"values": [0.0, -300.0]
-}
-tracks/3/type = "value"
-tracks/3/imported = false
-tracks/3/enabled = true
-tracks/3/path = NodePath(".:visible")
-tracks/3/interp = 1
-tracks/3/loop_wrap = true
-tracks/3/keys = {
-"times": PackedFloat32Array(0, 2),
-"transitions": PackedFloat32Array(1, 1),
-"update": 1,
-"values": [true, false]
-}
-tracks/4/type = "value"
-tracks/4/imported = false
-tracks/4/enabled = true
-tracks/4/path = NodePath("position/SpineSprite:modulate")
-tracks/4/interp = 1
-tracks/4/loop_wrap = true
-tracks/4/keys = {
-"times": PackedFloat32Array(0, 0.6, 2),
-"transitions": PackedFloat32Array(1, 1, 1),
-"update": 0,
-"values": [Color(0, 0, 0, 0), Color(0, 0, 0, 1), Color(0.54901963, 0.54901963, 0.54901963, 1)]
-}
-
-[sub_resource type="Animation" id="Animation_j8jq1"]
-resource_name = "slamB_leave"
-length = 1.5
-tracks/0/type = "animation"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("position/SpineSprite/SpineAnimationTrack/SpineSprite Track 0")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"clips": PackedStringArray("idle_up"),
-"times": PackedFloat32Array(0)
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("position/SpineSprite:modulate")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0, 1, 1.5),
-"transitions": PackedFloat32Array(1, 1, 1),
-"update": 0,
-"values": [Color(0.54901963, 0.54901963, 0.54901963, 1), Color(0, 0, 0, 1), Color(0, 0, 0, 0)]
-}
-tracks/2/type = "value"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath(".:visible")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [true]
-}
-tracks/3/type = "value"
-tracks/3/imported = false
-tracks/3/enabled = true
-tracks/3/path = NodePath("position/Sprite2D:visible")
-tracks/3/interp = 1
-tracks/3/loop_wrap = true
-tracks/3/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [false]
-}
-tracks/4/type = "value"
-tracks/4/imported = false
-tracks/4/enabled = true
-tracks/4/path = NodePath("position:position:y")
-tracks/4/interp = 1
-tracks/4/loop_wrap = true
-tracks/4/keys = {
-"times": PackedFloat32Array(0, 1, 1.5),
-"transitions": PackedFloat32Array(1, 1, 1),
-"update": 0,
-"values": [-990.0, -990.0, -1290.0]
 }
 
 [sub_resource type="Animation" id="Animation_8xwst"]
@@ -1142,6 +1018,130 @@ tracks/4/keys = {
 "values": [-1290.0, -890.0, -990.0]
 }
 
+[sub_resource type="Animation" id="Animation_j8jq1"]
+resource_name = "slamB_leave"
+length = 1.5
+tracks/0/type = "animation"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("position/SpineSprite/SpineAnimationTrack/SpineSprite Track 0")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"clips": PackedStringArray("idle_up"),
+"times": PackedFloat32Array(0)
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("position/SpineSprite:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 1, 1.5),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Color(0.54901963, 0.54901963, 0.54901963, 1), Color(0, 0, 0, 1), Color(0, 0, 0, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".:visible")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("position/Sprite2D:visible")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("position:position:y")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 1, 1.5),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [-990.0, -990.0, -1290.0]
+}
+
+[sub_resource type="Animation" id="Animation_t4vhn"]
+resource_name = "wake_up"
+length = 2.0
+tracks/0/type = "animation"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("position/SpineSprite/SpineAnimationTrack/SpineSprite Track 0")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"clips": PackedStringArray("idle_up"),
+"times": PackedFloat32Array(0)
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("position/Sprite2D:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 1, 1.0666667, 1.2, 1.2666667, 1.4, 1.4666667),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [true, true, false, true, false, true, false]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("position:position:y")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.5, 1.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, -300.0]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath(".:visible")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("position/SpineSprite:modulate")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 0.6, 2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Color(0, 0, 0, 0), Color(0, 0, 0, 1), Color(0.54901963, 0.54901963, 0.54901963, 1)]
+}
+
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_wtpwj"]
 _data = {
 &"RESET": SubResource("Animation_80asv"),
@@ -1174,7 +1174,7 @@ preview_time = 0.0
 
 [node name="SpineBoneNode" type="SpineBoneNode" parent="position/SpineSprite"]
 show_behind_parent = true
-position = Vector2(-27.368896, -558.8517)
+position = Vector2(-27.368887, -483.15295)
 rotation = 0.013512622
 scale = Vector2(0.9999998, 0.9999998)
 bone_name = "bone5"

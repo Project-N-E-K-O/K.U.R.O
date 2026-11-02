@@ -165,6 +165,25 @@ namespace Kuros.Companions
         /// <summary>玩家当前位置（供外部系统做距离判定）。</summary>
         public Vector2 PlayerPosition => _player?.GlobalPosition ?? GlobalPosition;
 
+        /// <summary>玩家瞬移/换房间后：把 P2 直接放到跟随点并清掉旧目标缓存。
+        /// 否则远距离瞬移会让 P2 切到 Follow 模式，以 FollowSpeed 从旧位置一路飞过去。</summary>
+        public void SnapToPlayer()
+        {
+            if (_player == null || !GodotObject.IsInstanceValid(_player)) return;
+
+            GlobalPosition = ComputeFollowPosition(_player.GlobalPosition);
+            _smoothTarget = null;
+            _moveTarget = null;
+            _pendingAction = false;
+            _wanderTimer = 0f;
+            _followElapsed = 0f;
+            Velocity = Vector2.Zero;
+
+            UpdateMotionState();
+            UpdateVisualFacing(GlobalPosition);
+            UpdateDynamicLayering();
+        }
+
         /// <summary>拾取/拖回武器期间忽略移动范围约束（由 P2WeaponCarrier 设置），
         /// 防止玩家移动导致 P2 被持续拉回打断拾取流程。</summary>
         public bool IgnoreMoveRange { get; set; }

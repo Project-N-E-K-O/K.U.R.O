@@ -21,6 +21,18 @@ namespace Kuros.Actors.Enemies.Attacks
         private bool _playerInside;
         /// <summary>两次攻击之间的全局呼吸窗（= MinInterAttackDelay）。各攻击独立 CD 由子模板的 CooldownDurationMultiplier 控制（只锁自己）。</summary>
         private float _interAttackDelay = 0f;
+        /// <summary>当前剩余的招间等待，与各子攻击独立 CD、排队超时区分。</summary>
+        public float InterAttackDelayRemaining => Mathf.Max(_interAttackDelay, 0f);
+
+        /// <summary>调整攻击间隔，并按比例换算正在等待的呼吸窗，避免配置变化延后一招才生效。</summary>
+        public void SetMinInterAttackDelay(float seconds)
+        {
+            float previous = MinInterAttackDelay;
+            MinInterAttackDelay = Mathf.Max(seconds, 0f);
+            if (_interAttackDelay > 0f)
+                _interAttackDelay = previous > 0f
+                    ? _interAttackDelay * MinInterAttackDelay / previous : MinInterAttackDelay;
+        }
 
 	    /// <summary>两次攻击之间的全局最小间隔（呼吸窗）：攻击结束后必须经过此间隔才能选下一招。
         /// 各技能仍由自身的 CooldownDurationMultiplier 独立 CD（只锁自己，不锁其他技能）。
@@ -127,7 +139,7 @@ namespace Kuros.Actors.Enemies.Attacks
 
             // 尚无排队攻击（全部CD中）或排队攻击仍在CD中，均视为不可开始
             if (_queuedAttack == null) return false;
-            if (!_queuedAttack.CanStart()) return false;
+            if (!IsAttackAllowed(_queuedAttack) || !_queuedAttack.CanStart()) return false;
 
             return true;
         }
@@ -158,7 +170,7 @@ namespace Kuros.Actors.Enemies.Attacks
                 return;
             }
 
-			if (!_currentAttack.CanStart())
+			if (!IsAttackAllowed(_currentAttack) || !_currentAttack.CanStart())
 			{
 				DebugLog($"Attack {_currentAttack.Name} cannot start (likely cooldown/range).");
 				FinishControllerAttack("AwaitingStart");
@@ -222,6 +234,13 @@ namespace Kuros.Actors.Enemies.Attacks
                 if (entry.Template == null || entry.Template == _currentAttack) continue;
                 if (!GodotObject.IsInstanceValid(entry.Template)) continue;
                 entry.Template.Tick(delta);
+            }
+
+            // 子类资格条件变化时淘汰排队项，不中断正在执行的攻击。
+            if (_queuedAttack != null && !IsAttackAllowed(_queuedAttack))
+            {
+                _queuedAttack = null;
+                _queuedElapsed = 0f;
             }
 
             // 排队攻击等待超时：间隔已过但选中的攻击仍无法启动（玩家距离/角度不符，CanStart 不满足）——
@@ -332,9 +351,13 @@ namespace Kuros.Actors.Enemies.Attacks
         }
 
         /// <summary>攻击可选中性：模板有效 + 非冷却 + 玩家在范围 + 无其他敌人执行同攻击 + 场上无同攻击特效。</summary>
+        /// <summary>子类扩展攻击资格；通用控制器不依赖强化、血量或关卡进度。</summary>
+        protected virtual bool IsAttackAllowed(EnemyAttackTemplate attack) => true;
+
         private bool IsAttackEligible(Entry entry)
         {
             if (entry.Template == null || !GodotObject.IsInstanceValid(entry.Template)) return false;
+            if (!IsAttackAllowed(entry.Template)) return false;
             if (entry.Template.IsOnCooldown) return false;
             if (!entry.Template.IsPlayerInDetectionRange()) return false;
 
@@ -683,6 +706,7 @@ namespace Kuros.Actors.Enemies.Attacks
             {
                 if (entry.Template == null) continue;
                 if (entry.GuaranteeInterval <= 0) continue;
+                if (!IsAttackAllowed(entry.Template)) continue;
                 if (entry.SinceLastUse < entry.GuaranteeInterval) continue;
 
                 if (forcedEntry == null || entry.GuaranteePriority < forcedEntry.GuaranteePriority)

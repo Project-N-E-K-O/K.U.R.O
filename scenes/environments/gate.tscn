@@ -20,6 +20,7 @@ Threshold = 30.0
 script = ExtResource("15_dstage")
 IdleAnimation = "gate_broken_idle"
 HitAnimation = "gate_broken_hit"
+BreakAnimation = "gate_knockback"
 Threshold = 60.0
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_7xwka"]
@@ -339,6 +340,30 @@ tracks/8/keys = {
 "update": 0,
 "values": [1.0]
 }
+tracks/9/type = "value"
+tracks/9/imported = false
+tracks/9/enabled = true
+tracks/9/path = NodePath("Broken:position:x")
+tracks/9/interp = 1
+tracks/9/loop_wrap = true
+tracks/9/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0.0]
+}
+tracks/10/type = "value"
+tracks/10/imported = false
+tracks/10/enabled = true
+tracks/10/path = NodePath("Sprite2D:position:x")
+tracks/10/interp = 1
+tracks/10/loop_wrap = true
+tracks/10/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0.0]
+}
 
 [sub_resource type="Animation" id="Animation_gxwh4"]
 resource_name = "gate_broken"
@@ -402,6 +427,30 @@ tracks/4/keys = {
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 0,
 "values": [1.0000000475, 10.0, 10.0, 1.0]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Broken:position:x")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0, 0.15, 0.2, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [0.0, 100.0, -25.0, 0.0]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("Sprite2D:position:x")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0, 0.033333335, 0.15),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [0.0, 100.0, 200.0]
 }
 
 [sub_resource type="Animation" id="Animation_xttcx"]
@@ -668,8 +717,8 @@ collision_layer = 2
 collision_mask = 7
 script = ExtResource("14_gatectrl")
 Stages = Array[ExtResource("15_dstage")]([SubResource("Resource_gate_stage1"), SubResource("Resource_gate_stage2")])
-DeathAnimation = "gate_knockback"
 DeclaredFaction = 1
+MaxHealth = 90
 
 [node name="Broken" type="Sprite2D" parent="."]
 visible = false

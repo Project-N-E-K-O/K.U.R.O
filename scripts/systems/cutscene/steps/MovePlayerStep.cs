@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Godot;
+using Kuros.Companions;
 using Kuros.Managers;
 
 namespace Kuros.Systems.Cutscene
@@ -74,11 +75,14 @@ namespace Kuros.Systems.Cutscene
             if (KeepPlayerY)
                 destination.Y = player.GlobalPosition.Y;
 
+            player.GetNodeOrNull<Kuros.Actors.Heroes.PlayerFallController>("FallController")?.ResetSafeHistory();
+
             // 瞬移（含"跳过的过场"：瞬时落终态）
             if (ctx.IsSkipping || Instant || Duration <= 0f)
             {
                 player.GlobalPosition = destination;
                 ZeroVelocity(player);
+                SnapCompanions(ctx);
                 SnapCameraIfNeeded(ctx);
                 GD.Print($"[Cutscene] MovePlayerStep 瞬移完成 → {destination}");
                 return;
@@ -104,7 +108,11 @@ namespace Kuros.Systems.Cutscene
                 {
                     player.GlobalPosition = destination;   // 正常结束或跳过：都落在终点
                     ZeroVelocity(player);
-                    if (ctx.IsSkipping) SnapCameraIfNeeded(ctx);   // 平滑途中被跳过 = 瞬移落点，镜头也要立刻对位
+                    if (ctx.IsSkipping)
+                    {
+                        SnapCompanions(ctx);                 // 平滑途中被跳过 = 瞬移，同伴也随之落位
+                        SnapCameraIfNeeded(ctx);             // 镜头也要立刻对位
+                    }
                 }
             }
             finally
@@ -114,6 +122,17 @@ namespace Kuros.Systems.Cutscene
             }
 
             GD.Print($"[Cutscene] MovePlayerStep 完成 → {destination}");
+        }
+
+        /// <summary>瞬移后同步把跟随型同伴放到玩家身边：否则远距离瞬移会让同伴切到 Follow，
+        /// 以 FollowSpeed 从旧位置一路飞向新位置。平滑移动不调用（让同伴自然跟随）。</summary>
+        private static void SnapCompanions(CutsceneContext ctx)
+        {
+            foreach (Node node in ctx.Tree.GetNodesInGroup("companions"))
+            {
+                if (node is P2CompanionController companion && GodotObject.IsInstanceValid(companion))
+                    companion.SnapToPlayer();
+            }
         }
 
         /// <summary>相机立即对位（无平滑、含地图边界钳制）：走 CameraFollow.SnapToTarget。

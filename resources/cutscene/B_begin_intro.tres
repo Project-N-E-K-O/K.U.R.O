@@ -10,14 +10,15 @@
 
 [sub_resource type="Resource" id="Resource_bcybp"]
 script = ExtResource("3_7qph7")
-Duration = 6.0
+Duration = 5.0
 TransitionDuration = 1.0
 metadata/_custom_type_script = "uid://cjl1hjmndwvcg"
 
 [sub_resource type="Resource" id="Resource_ref6e"]
 script = ExtResource("3_bcybp")
-TargetPath = NodePath("World/Camera2D")
-TargetZoom = 0.43
+TargetPath = NodePath("../World/Camera2D")
+TargetZoom = 0.6
+FollowDuration = 1.0
 metadata/_custom_type_script = "uid://b4pd4ynf4k04p"
 
 [sub_resource type="Resource" id="Resource_a6q5w"]
@@ -45,4 +46,5 @@ script = ExtResource("2_87567")
 SequenceId = "B_begin_intro"
 Steps = Array[ExtResource("1_ref6e")]([SubResource("Resource_bcybp"), SubResource("Resource_ref6e"), SubResource("Resource_a6q5w"), SubResource("Resource_w0u1a"), SubResource("Resource_7qph7")])
 HideNodePaths = Array[NodePath]([NodePath("../World/P2")])
+TakeOverCamera = true
 metadata/_custom_type_script = "uid://cgnajq1ykl2mn"

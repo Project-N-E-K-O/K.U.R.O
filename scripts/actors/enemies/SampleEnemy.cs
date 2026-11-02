@@ -417,15 +417,17 @@ public partial class SampleEnemy : GameActor
 			if (cdRemaining > 0f)
 			{
 				string nameHint = string.IsNullOrEmpty(cdName) ? "" : $"({cdName})";
-				cooldownInfo = $" | CD: {cdRemaining:F2}s/{cdDuration:F1}s {nameHint}";
+				cooldownInfo = $" | SkillCD: {cdRemaining:F2}s/{cdDuration:F1}s {nameHint}";
 			}
 			lines.Add($"Attack:{attackInfo}{cooldownInfo}");
+			lines.Add($"InterAttackDelay: {_cachedAttackController.MinInterAttackDelay:F2}s "
+				+ $"remaining={_cachedAttackController.InterAttackDelayRemaining:F2}s");
 
 			// 行3：排队攻击等待超时（queued 攻击名 / 已计时间 / 是否可启动）
 			if (_cachedAttackController.QueuedAttackTimeout > 0f && !string.IsNullOrEmpty(_cachedAttackController.QueuedAttackName))
 			{
 				lines.Add($"Queued: {_cachedAttackController.QueuedAttackName} "
-					+ $"{_cachedAttackController.QueuedElapsed:F1}s/{_cachedAttackController.QueuedAttackTimeout:F1}s "
+					+ $"wait={_cachedAttackController.QueuedElapsed:F1}s/timeout={_cachedAttackController.QueuedAttackTimeout:F1}s "
 					+ $"canStart={_cachedAttackController.QueuedCanStart}");
 			}
 

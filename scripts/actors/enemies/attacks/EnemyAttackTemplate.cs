@@ -86,10 +86,10 @@ namespace Kuros.Actors.Enemies.Attacks
         [Export] public string AttackName = "DefaultAttack";
 
         [ExportCategory("Timing (s)")]
-        [Export(PropertyHint.Range, "0,5,0.01")] public float WarmupDuration = 0.2f;
-        [Export(PropertyHint.Range, "0,5,0.01")] public float ActiveDuration = 0.15f;
-        [Export(PropertyHint.Range, "0,5,0.01")] public float RecoveryDuration = 0.35f;
-        [Export(PropertyHint.Range, "0,30,0.1")] public float CooldownDurationMultiplier = 1.0f;
+        [Export(PropertyHint.Range, "0,30,0.01")] public float WarmupDuration = 0.2f;
+        [Export(PropertyHint.Range, "0,30,0.01")] public float ActiveDuration = 0.15f;
+        [Export(PropertyHint.Range, "0,30,0.01")] public float RecoveryDuration = 0.35f;
+        [Export(PropertyHint.Range, "0,60,0.1")] public float CooldownDurationMultiplier = 1.0f;
 
         [ExportCategory("Combat")]
         [Export(PropertyHint.Range, "0,10,0.1")] public float DamageMultiplier = 1.0f;
@@ -964,6 +964,14 @@ namespace Kuros.Actors.Enemies.Attacks
             _boundEffects.Clear();
         }
 
+        /// <summary>特效生成完成后的钩子（已入树、已定位）。需要持有特效实例的攻击模板（如 JarAssistAttack）重写。</summary>
+        protected virtual void OnAttackEffectSpawned(Node2D effect, AttackEffectEntry? entry) { }
+
+        /// <summary>特效挂到哪个父节点（入树**之前**调用，决定特效的初始父级）。
+        /// 默认挂在敌人父级（世界层）；需要规避继承变换/层级（如不随滑轨漂移的特效）的攻击模板重写。
+        /// 注意：不要用 Reparent 事后搬——已 Ready 的节点 Reparent 不会重跑 _Ready，会丢订阅。</summary>
+        protected virtual Node? ResolveEffectParent(AttackEffectEntry? entry, Node2D effect) => Enemy?.GetParent();
+
         protected virtual void SpawnEffectAtEnemy(EffectSpawnTiming? timing = null)
         {
             if (Enemy == null) return;
@@ -1071,8 +1079,9 @@ namespace Kuros.Actors.Enemies.Attacks
                     if (node2D is Kuros.Fx.IAnchorDirectional anchorDirectional)
                         anchorDirectional.AnchorAngleDegrees = usedMarker != null ? Mathf.RadToDeg(usedMarker.Rotation) : 0f;
 
-                    Enemy.GetParent()?.AddChild(node2D);
+                    (ResolveEffectParent(entry, node2D) ?? Enemy.GetParent())?.AddChild(node2D);
                     node2D.GlobalPosition = spawnPos;
+                    OnAttackEffectSpawned(node2D, entry);
 
                     // 生命周期绑定：模板在对应阶段结束时销毁（替代固定 Duration——适配 Hold 挂起等时长不固定阶段）
                     if (entry != null && entry.LifecycleBinding != EffectLifecycleBinding.None)

@@ -1,0 +1,27 @@
+[gd_scene load_steps=5 format=3 uid="uid://dxpolkx35jbp"]
+
+[ext_resource type="Script" uid="uid://cd1adx61gikt1" path="res://scripts/environments/FallMovingPlatform.cs" id="1"]
+[ext_resource type="Script" uid="uid://l7gnrfed2nqh" path="res://scripts/environments/FallSupportArea.cs" id="2"]
+[ext_resource type="Texture2D" uid="uid://cofcrcna6lhif" path="res://assets/environments/scene_6_hotel/移动平台地板.png" id="2_svn7p"]
+
+[sub_resource type="ConvexPolygonShape2D" id="ConvexPolygonShape2D_svn7p"]
+points = PackedVector2Array(-515, -250, 515, -250, 625, -160, 625, 160, 515, 250, -525, 250, -625, 160, -625, -160)
+
+[node name="FallMovingPlatformA" type="Node2D"]
+script = ExtResource("1")
+Speed = 350.0
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.66, 0.66)
+texture = ExtResource("2_svn7p")
+
+[node name="SupportArea" type="Area2D" parent="."]
+collision_layer = 524288
+collision_mask = 0
+monitoring = false
+script = ExtResource("2")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="SupportArea"]
+position = Vector2(0, -75)
+shape = SubResource("ConvexPolygonShape2D_svn7p")
+debug_color = Color(0.1, 0.9, 0.3, 0.4)

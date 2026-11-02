@@ -31,6 +31,11 @@ namespace Kuros.Managers
         [Export] public Camera2D? TargetCamera { get; set; }
         [Export] public Node2D? Player { get; set; }
 
+        /// <summary>打印相机实时 Zoom（变化超过 0.001 才输出；排查过场/区域切换的缩放问题用）。</summary>
+        [Export] public bool DebugPrintZoom { get; set; } = true;
+
+        private float _lastPrintedZoom = float.NaN;
+
         private CameraZone? _currentZone;
         private readonly Dictionary<string, CameraZone> _registeredZones = new();
         private readonly Dictionary<string, CameraZone> _temporaryCameraZones = new();
@@ -43,9 +48,15 @@ namespace Kuros.Managers
         /// <summary>当前激活的相机区域名称。</summary>
         public string? CurrentZoneName => _currentZone?.Name;
 
+        /// <summary>区域目标缩放，不是 Tween 过渡中的相机实时值。</summary>
+        public float? CurrentTargetZoom => _currentZone?.ZoomLevel;
+
         /// <summary>锁定区域切换，过场动画接管摄像机时调用。</summary>
         public void LockZone()
         {
+            // CameraFollow 停止处理不会停止独立 Tween，必须显式取消区域缩放。
+            _zoomTween?.Kill();
+            _zoomTween = null;
             _zoneLocked = true;
             GameLogger.Debug(nameof(CameraZoneManager), $"区域锁定（当前: {_currentZone?.Name ?? "无"})，过场期间忽略区域进出");
         }
@@ -54,7 +65,31 @@ namespace Kuros.Managers
         public void UnlockZone()
         {
             _zoneLocked = false;
+            RestoreActiveZone();
             GameLogger.Debug(nameof(CameraZoneManager), "区域解锁");
+        }
+
+        /// <summary>接管结束后强制重应用区域，包含同名区域的缩放与边界。</summary>
+        private void RestoreActiveZone()
+        {
+            // 战斗临时区域仍存在时维持其优先级。
+            string? name = _currentZone != null && _temporaryCameraZones.ContainsKey(_currentZone.Name)
+                ? _currentZone.Name : null;
+            if (name == null && _currentZone != null
+                && _activeZoneStack.Contains(_currentZone.Name)
+                && _registeredZones.ContainsKey(_currentZone.Name))
+                name = _currentZone.Name;
+            if (name == null)
+            {
+                for (int i = _activeZoneStack.Count - 1; i >= 0; i--)
+                {
+                    if (!_registeredZones.ContainsKey(_activeZoneStack[i])) continue;
+                    name = _activeZoneStack[i];
+                    break;
+                }
+            }
+            if (name == null && _registeredZones.ContainsKey("Stage_Global")) name = "Stage_Global";
+            if (name != null) SwitchToZone(name, force: true, zoomDuration: 0f);
         }
 
         public override void _Ready()
@@ -74,6 +109,20 @@ namespace Kuros.Managers
 
             AddToGroup("camera_zone_manager");
             GameLogger.Info(nameof(CameraZoneManager), "相机区域管理器已初始化（动态区域注册模式）");
+        }
+
+        public override void _Process(double delta)
+        {
+            if (!DebugPrintZoom || TargetCamera == null) return;
+
+            // 读的是 Camera2D.Zoom 的实际值：CameraZoneManager 是普通 Node，过场接管把
+            // CameraFollow 的 _Process 关掉时这里仍每帧采样，补间中的中间值也能看到。
+            float zoom = TargetCamera.Zoom.X;
+            if (!float.IsNaN(_lastPrintedZoom) && Mathf.Abs(zoom - _lastPrintedZoom) < 0.001f) return;
+
+            _lastPrintedZoom = zoom;
+            GameLogger.Debug(nameof(CameraZoneManager),
+                $"[CameraZoom] {zoom:F3}  zone:{_currentZone?.Name ?? "无"}");
         }
 
         // ─── 区域注册 ──────────────────────────────────────────────────────────
@@ -147,9 +196,9 @@ namespace Kuros.Managers
         /// <summary>
         /// 切换到已注册的区域（含临时区域）。
         /// </summary>
-        public void SwitchToZone(string zoneName)
+        public void SwitchToZone(string zoneName, bool force = false, float zoomDuration = 0.25f)
         {
-            if (_currentZone?.Name == zoneName) return;
+            if (!force && _currentZone?.Name == zoneName) return;
 
             CameraZone? zone = null;
             if (!_registeredZones.TryGetValue(zoneName, out zone))
@@ -162,9 +211,9 @@ namespace Kuros.Managers
             }
 
             _currentZone = zone;
-            ApplyZoneToCamera(zone);
+            ApplyZoneToCamera(zone, zoomDuration);
             GameLogger.Info(nameof(CameraZoneManager),
-                $"✓ 切换到区域: {zoneName}  L:{zone.LimitLeft} R:{zone.LimitRight}  T:{zone.LimitTop} B:{zone.LimitBottom}");
+                $"✓ 切换到区域: {zoneName}  L:{zone.LimitLeft} R:{zone.LimitRight}  T:{zone.LimitTop} B:{zone.LimitBottom}  Zoom:{zone.ZoomLevel}");
         }
 
         // ─── 临时区域（战斗锁定）──────────────────────────────────────────────
@@ -228,14 +277,15 @@ namespace Kuros.Managers
             ZoomLevel   = zoomLevel,
         };
 
-        private void ApplyZoneToCamera(CameraZone zone)
+        private void ApplyZoneToCamera(CameraZone zone, float zoomDuration = 0.25f)
         {
-            if (TargetCamera == null) return;
+            // 锁定期间仍允许更新区域登记/选择，但相机只由过场写入。
+            if (TargetCamera == null || _zoneLocked) return;
             TargetCamera.LimitLeft   = zone.LimitLeft;
             TargetCamera.LimitTop    = zone.LimitTop;
             TargetCamera.LimitRight  = zone.LimitRight;
             TargetCamera.LimitBottom = zone.LimitBottom;
-            SetZoom(zone.ZoomLevel);
+            SetZoom(zone.ZoomLevel, zoomDuration);
         }
 
         // ─── 缩放 ──────────────────────────────────────────────────────────────
@@ -249,7 +299,7 @@ namespace Kuros.Managers
         /// </summary>
         public void SetZoom(float zoom, float duration = 0.25f)
         {
-            if (TargetCamera == null) return;
+            if (TargetCamera == null || _zoneLocked) return;
 
             _zoomTween?.Kill();
 

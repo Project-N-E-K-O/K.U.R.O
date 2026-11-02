@@ -41,9 +41,9 @@
 [ext_resource type="PackedScene" uid="uid://daox4k6bu5oqt" path="res://scenes/items/Furniture_A_sofaB.tscn" id="40_7gqg0"]
 [ext_resource type="Texture2D" uid="uid://brjaqxel52a2o" path="res://assets/BuildIcon/icon.svg" id="40_21m0k"]
 [ext_resource type="PackedScene" uid="uid://dugfq8qy1okf1" path="res://scenes/items/Furniture_A_chairOfficeB.tscn" id="41_y44s2"]
-[ext_resource type="PackedScene" uid="uid://30w6ddbm18ga" path="res://scenes/actors/etc/SlideRail.tscn" id="42_hxrfn"]
-[ext_resource type="PackedScene" uid="uid://b6dltrf0y1t38" path="res://scenes/actors/characters/Enemy_F1_rogueAI_part1.tscn" id="43_mfk2f"]
-[ext_resource type="PackedScene" uid="uid://d7oxw7fsq2i3" path="res://scenes/environments/jar_mozhua.tscn" id="45_4812a"]
+[ext_resource type="PackedScene" uid="uid://be30f0gopxel3" path="res://scenes/actors/etc/SlideRail_wheel.tscn" id="42_mfk2f"]
+[ext_resource type="PackedScene" uid="uid://cw42j1o501x83" path="res://scenes/actors/characters/Enemy_F1_rogueAI_MachineGun.tscn" id="43_hxrfn"]
+[ext_resource type="PackedScene" uid="uid://dxpolkx35jbp" path="res://scenes/environments/FallMovingPlatformA.tscn" id="44_mfk2f"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1mlw7"]
 size = Vector2(5800, 3050)
@@ -85,8 +85,8 @@ size = Vector2(300, 1803)
 size = Vector2(300, 943)
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_ka7vx"]
-vertices = PackedVector2Array(1914, 978, 754, 978, 660, 910, 660, 200, 2405.7734, -544, 1914, 1438, 2405.0781, 1546, -2709.3516, 1546, 754, 1438, -597, 1197, 50, 910, -1068, 1421, -597, 787, 50, 200, -2031, 37, -2698.1016, 37, -2693.7578, -544, -1107, 787, -1107, 1161, -1528, 1161, -2031, 463, -1068, 1197, -2701.2734, 463, -1528, 1421)
-polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3, 4), PackedInt32Array(5, 6, 7, 8), PackedInt32Array(9, 10, 2, 1, 8, 11), PackedInt32Array(10, 9, 12, 13), PackedInt32Array(4, 6, 5, 0), PackedInt32Array(14, 15, 16, 4), PackedInt32Array(17, 18, 19, 20, 14), PackedInt32Array(11, 21, 9), PackedInt32Array(7, 22, 20, 19, 23), PackedInt32Array(14, 4, 3, 13), PackedInt32Array(14, 13, 12, 17), PackedInt32Array(8, 7, 23, 11)])
+vertices = PackedVector2Array(1738, 777, 1914, 978, 754, 978, 660, 910, 1228, 777, 1914, 1438, 2405.0781, 1546, -2709.3516, 1546, 754, 1438, 1228, 367, 1196, 688, 1196, 428, 2405.7734, -544, 1738, 367, -2693.7578, -544, 660, 200, 736, 688, 736, 428, -2701.2734, 463, -2031, 463, -2031, 37, -2698.1016, 37, 50, 910, 50, 200)
+polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3, 4), PackedInt32Array(5, 6, 7, 8), PackedInt32Array(9, 4, 10, 11), PackedInt32Array(12, 6, 5, 1), PackedInt32Array(12, 1, 0, 13), PackedInt32Array(14, 12, 13, 15), PackedInt32Array(10, 4, 3, 16), PackedInt32Array(16, 3, 15, 17), PackedInt32Array(8, 7, 18, 19), PackedInt32Array(20, 21, 14), PackedInt32Array(11, 17, 15, 9), PackedInt32Array(8, 19, 20, 22), PackedInt32Array(3, 2, 8, 22), PackedInt32Array(23, 22, 20, 14), PackedInt32Array(13, 9, 15), PackedInt32Array(14, 15, 23)])
 outlines = Array[PackedVector2Array]([PackedVector2Array(-2769, -1183, 2486, -1224, 2485, 1762, -2791, 1767)])
 source_geometry_mode = 2
 agent_radius = 80.0
@@ -99,7 +99,19 @@ y_sort_enabled = true
 position = Vector2(1, 0)
 
 [node name="PlayerSpawnPoint" type="Node2D" parent="."]
-position = Vector2(-2246, 330)
+position = Vector2(-2246, 858)
+
+[node name="JarSpawnPoint1" type="Marker2D" parent="."]
+position = Vector2(-1507, 885)
+
+[node name="JarSpawnPoint2" type="Marker2D" parent="."]
+position = Vector2(-471, 885)
+
+[node name="JarSpawnPoint3" type="Marker2D" parent="."]
+position = Vector2(401, -380)
+
+[node name="JarSpawnPoint4" type="Marker2D" parent="."]
+position = Vector2(1303, -380)
 
 [node name="AreaSize" type="Area2D" parent="."]
 visible = false
@@ -115,6 +127,7 @@ collision_layer = 0
 collision_mask = 4
 script = ExtResource("1_7ummj")
 ZoneName = "Room_Zone_Test_begin"
+ZoomLevel = 0.35000000000000003
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CameraZone"]
 z_index = 10
@@ -137,6 +150,7 @@ ZoomLevel = 0.95
 shape = SubResource("RectangleShape2D_6ilfo")
 
 [node name="CutsceneTrigger" type="Area2D" parent="."]
+visible = false
 z_index = 10
 collision_layer = 0
 collision_mask = 4
@@ -295,6 +309,7 @@ position = Vector2(-2880, 1361.5)
 shape = SubResource("RectangleShape2D_jy3vb")
 
 [node name="NavigationRegion2D" type="NavigationRegion2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
+visible = false
 position = Vector2(122, -196)
 navigation_polygon = SubResource("NavigationPolygon_ka7vx")
 
@@ -390,7 +405,7 @@ position = Vector2(2208, -705)
 position = Vector2(477, 239)
 
 [node name="FurnitureChairOfficeA" parent="." instance=ExtResource("39_3yao7")]
-position = Vector2(-1176, 1085)
+position = Vector2(1088, 352)
 
 [node name="FurnitureSofaB" parent="." instance=ExtResource("40_7gqg0")]
 position = Vector2(1456, 1042)
@@ -399,11 +414,13 @@ position = Vector2(1456, 1042)
 position = Vector2(793, -689)
 
 [node name="FurnitureChairOfficeB" parent="." instance=ExtResource("41_y44s2")]
-position = Vector2(-730, 746)
+position = Vector2(1605, 326)
 
-[node name="SlideRail" parent="." instance=ExtResource("42_hxrfn")]
-CarriagePrefab = ExtResource("43_mfk2f")
-CarriageSpawn = 2
+[node name="SlideRail_wheel" parent="." instance=ExtResource("42_mfk2f")]
+position = Vector2(-1804, 367)
+CarriagePrefab = ExtResource("43_hxrfn")
 
-[node name="Jar_mozhua" parent="." instance=ExtResource("45_4812a")]
-position = Vector2(161, -341)
+[node name="FallMovingPlatformA" parent="." instance=ExtResource("44_mfk2f")]
+z_index = 1
+position = Vector2(-938, 942)
+TravelOffset = Vector2(0, -1600)

@@ -1,5 +1,6 @@
 using Godot;
 using Kuros.Actors.Enemies.Attacks;
+using Kuros.Actors.Enemies.States;
 
 namespace Kuros.Actors.Enemies
 {
@@ -7,7 +8,8 @@ namespace Kuros.Actors.Enemies
 	/// 机械桩族"弱点窗口"组件（cannon / machinegun 已挂，以后的 rogueAI 要窗口就同样挂一个）：
 	/// 常态免伤类敌人的**可受击窗口按"正在跑的招"细分**——攻击名 → (起, 止) 秒（从该招起手 TryStart 计），
 	/// 只有表内且落在窗口内时才开放受击；**表里没列出的招 = 整个攻击期间开放**（回退现状）。
-	/// 没有招在跑（招间空档 / 被打断后）→ 关闭。
+	/// 没有招在跑（招间空档 / 被打断后）→ 攻击窗口关闭。
+	/// Hit 纯伤害由独立 StateWindowTable / IsHitOpen 判断；不改变状态效果的原有规则。
 	///
 	/// 计时自包含：每帧观测 AttackController 下"在跑的招"（与动画控制器同款解析），换招即清零重计——
 	/// 攻击脚本零依赖、零改动。消费方：宿主敌人的 <c>CanBeAffected</c>
@@ -19,8 +21,32 @@ namespace Kuros.Actors.Enemies
 		/// 未列出的招 = 整个攻击期间开放；空表 = 所有招整个攻击期间开放（等价现状）。</summary>
 		[Export] public Godot.Collections.Dictionary<string, Vector2> WindowTable { get; set; } = new();
 
+		/// <summary>状态伤害窗口，目前支持 Hit。默认从本轮首次进入 Hit 计，可选择重入刷新。
+		/// 未配置 Hit 时，IsHitOpen 返回 true，保持 Cannon 原有全程可受伤行为。</summary>
+		[Export] public Godot.Collections.Dictionary<string, Vector2> StateWindowTable { get; set; } = new();
+		/// <summary>开启后，成功重入 Hit 会重置伤害窗口；被连击保护抑制的重入不刷新。</summary>
+		[Export] public bool ResetHitWindowOnReentry { get; set; } = false;
+		/// <summary>有剩余 JarAssist 眩晕时，Hit 不受状态窗口限制，保持打断罐子的输出奖励。</summary>
+		[Export] public bool BypassHitWindowWhileJarStunned { get; set; } = true;
+
+		/// <summary>Hit 纯伤害入口专用；实时读取状态计时，避免物理回调顺序造成一帧误判。</summary>
+		public bool IsHitOpen
+		{
+			get
+			{
+				if (_enemy?.StateMachine?.CurrentState is not EnemyHitState hit) return false;
+				if (BypassHitWindowWhileJarStunned
+					&& _enemy.StateMachine.GetNodeOrNull<EnemyJarAssistStunState>("JarAssistStun")?.IsActive == true)
+					return true;
+				if (StateWindowTable == null || !StateWindowTable.TryGetValue("Hit", out var window)) return true;
+				double elapsed = ResetHitWindowOnReentry ? hit.EntryElapsedSeconds : hit.CycleElapsedSeconds;
+				return elapsed >= window.X && elapsed < window.Y;
+			}
+		}
+
 		/// <summary>弱点是否开放（宿主 CanBeAffected 读这个）。首帧前为 false（常态免伤）。</summary>
-		public bool IsOpen { get; private set; }
+		public bool IsOpen => _enemy?.StateMachine?.CurrentState?.Name == "Attack" && _attackIsOpen;
+		private bool _attackIsOpen;
 
 		private SampleEnemy? _enemy;
 		private EnemyAttackController? _controller;
@@ -50,7 +76,7 @@ namespace Kuros.Actors.Enemies
 				_elapsed += (float)delta;
 			}
 
-			IsOpen = attack != null && IsWindowOpenFor(attack);
+			_attackIsOpen = attack != null && IsWindowOpenFor(attack);
 		}
 
 		private bool IsWindowOpenFor(EnemyAttackTemplate attack)

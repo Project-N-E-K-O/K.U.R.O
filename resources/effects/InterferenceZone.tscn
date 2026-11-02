@@ -1,0 +1,139 @@
+[gd_scene load_steps=12 format=3 uid="uid://c7y40fi765a3a"]
+
+[ext_resource type="Script" uid="uid://cfha2qo740vxf" path="res://scripts/effects/InterferenceZone.cs" id="1_zone"]
+[ext_resource type="Shader" uid="uid://ip5fvifw6kq" path="res://shaders/fx/interference_zone.gdshader" id="2_shader"]
+[ext_resource type="PackedScene" uid="uid://b058lbsrr5x7f" path="res://resources/effects/ScreenInterferenceEffect.tscn" id="3_fullscreen"]
+[ext_resource type="PackedScene" uid="uid://bg35anmrs8jy5" path="res://scenes/actors/etc/WarmingB.tscn" id="3_mot4g"]
+[ext_resource type="Shader" uid="uid://dsr7ys0k3xdno" path="res://shaders/fx/glitch_displacement.gdshader" id="4_wxtwo"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_zone"]
+size = Vector2(400, 400)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_zone_a"]
+resource_local_to_scene = true
+shader = ExtResource("2_shader")
+shader_parameter/cull_backface = true
+shader_parameter/fov = 10.0
+shader_parameter/rot_y_deg = 0.0
+shader_parameter/rot_x_deg = 25.0
+shader_parameter/inset = 0.0
+shader_parameter/quad_size = 2.0
+shader_parameter/strength = 0.750000035625
+shader_parameter/effect_time = 0.0
+shader_parameter/seed = 1.0
+shader_parameter/glitch_frequency = 10.0000004275
+shader_parameter/block_density = 0.250000011875
+shader_parameter/block_size = 0.17000000597945
+shader_parameter/rect_margin = 0.0
+shader_parameter/distort_distance = 0.04
+shader_parameter/rgb_shift = 0.002
+shader_parameter/rainbow_mix = 0.90000004275
+shader_parameter/rainbow_saturation = 0.750000035625
+shader_parameter/rainbow_hue_span = 0.10000000475
+shader_parameter/green_mix = 0.150000007125
+shader_parameter/green_tint = Color(0.05, 1, 0.3, 1)
+
+[sub_resource type="QuadMesh" id="QuadMesh_zone"]
+size = Vector2(2, 2)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_wxtwo"]
+resource_local_to_scene = true
+shader = ExtResource("2_shader")
+shader_parameter/cull_backface = true
+shader_parameter/fov = 10.0
+shader_parameter/rot_y_deg = 0.0
+shader_parameter/rot_x_deg = 25.0
+shader_parameter/inset = 0.0
+shader_parameter/quad_size = 2.0
+shader_parameter/strength = 0.70000003325
+shader_parameter/effect_time = 0.0
+shader_parameter/seed = 10.0
+shader_parameter/glitch_frequency = 15.000000665
+shader_parameter/block_density = 0.150000007125
+shader_parameter/block_size = 0.25000000977945
+shader_parameter/rect_margin = 0.0
+shader_parameter/distort_distance = 0.04
+shader_parameter/rgb_shift = 0.002
+shader_parameter/rainbow_mix = 1.0
+shader_parameter/rainbow_saturation = 0.50000002375
+shader_parameter/rainbow_hue_span = 0.150000007125
+shader_parameter/green_mix = 0.2000000095
+shader_parameter/green_tint = Color(0.05, 1, 0.3, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_pas08"]
+resource_local_to_scene = true
+shader = ExtResource("2_shader")
+shader_parameter/cull_backface = true
+shader_parameter/fov = 10.0
+shader_parameter/rot_y_deg = 0.0
+shader_parameter/rot_x_deg = 25.0
+shader_parameter/inset = 0.0
+shader_parameter/quad_size = 2.0
+shader_parameter/strength = 0.70000003325
+shader_parameter/effect_time = 0.0
+shader_parameter/seed = 2.0
+shader_parameter/glitch_frequency = 15.000000665
+shader_parameter/block_density = 0.150000007125
+shader_parameter/block_size = 0.15000000502945
+shader_parameter/rect_margin = 0.0
+shader_parameter/distort_distance = 0.04
+shader_parameter/rgb_shift = 0.002
+shader_parameter/rainbow_mix = 0.6000000285
+shader_parameter/rainbow_saturation = 0.50000002375
+shader_parameter/rainbow_hue_span = 0.30000001425
+shader_parameter/green_mix = 0.30000001425
+shader_parameter/green_tint = Color(0.05, 1, 0.3, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_zone_d"]
+resource_local_to_scene = true
+shader = ExtResource("4_wxtwo")
+shader_parameter/intensity = 1.0
+shader_parameter/strength = 1.0
+shader_parameter/effect_time = 0.0
+shader_parameter/update_rate = 24.0000010925
+shader_parameter/max_shift = 0.025
+shader_parameter/band_count = 56.0000026125
+shader_parameter/glitch_density = 0.4
+shader_parameter/seed = 1.0
+
+[node name="InterferenceZone" type="Node2D"]
+z_index = 1
+z_as_relative = false
+script = ExtResource("1_zone")
+HitBoxSize = Vector2(400, 300)
+Lifetime = 5.0
+FullScreenEffectScene = ExtResource("3_fullscreen")
+WarningDuration = 1.2
+WarningIndicatorScene = ExtResource("3_mot4g")
+WarningScale = Vector2(2, 2)
+WarningIndicatorDuration = 1.2
+WarningZIndex = 1
+
+[node name="Area2D" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 4
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("RectangleShape2D_zone")
+
+[node name="Visuals" type="Node2D" parent="."]
+position = Vector2(0, -100)
+
+[node name="LayerA" type="MeshInstance2D" parent="Visuals"]
+material = SubResource("ShaderMaterial_zone_a")
+mesh = SubResource("QuadMesh_zone")
+
+[node name="LayerB" type="MeshInstance2D" parent="Visuals"]
+material = SubResource("ShaderMaterial_wxtwo")
+position = Vector2(-50, 20)
+mesh = SubResource("QuadMesh_zone")
+
+[node name="LayerC" type="MeshInstance2D" parent="Visuals"]
+material = SubResource("ShaderMaterial_pas08")
+position = Vector2(30, -30)
+mesh = SubResource("QuadMesh_zone")
+
+[node name="LayerD" type="MeshInstance2D" parent="Visuals"]
+material = SubResource("ShaderMaterial_zone_d")
+mesh = SubResource("QuadMesh_zone")

@@ -1,4 +1,5 @@
 using Godot;
+using Kuros.Core.Effects;
 
 namespace Kuros.Actors.Enemies
 {
@@ -11,10 +12,16 @@ namespace Kuros.Actors.Enemies
 	[GlobalClass]
 	public partial class EnemyF1RogueAIMachineGun : EnemyF1RogueAITurret
 	{
+		/// <summary>Hit 纯伤害由弱点状态窗口控制，未配置时全程开放；状态效果遵循原判定。</summary>
+		public override bool CanBeAffected(ActorEffect? effect)
+		{
+			if (effect == null && StateMachine?.CurrentState?.Name == "Hit") return IsHitWeakpointOpen();
+			return base.CanBeAffected(effect);
+		}
 
-		/// <summary>近战招（MeleeAttack）期间站桩：不沿轨保持间距、也不推滑槽升降——贴脸出招时不该边退边打。
+		/// <summary>近战招（MeleeAttack / MeleeAttackPro）期间站桩：不沿轨保持间距、也不推滑槽升降——贴脸出招时不该边退边打。
 		/// 扫射（SimpleMeleeAttack）不受影响，保持原"攻击期间沿桩退开"的设计。</summary>
 		protected override bool ShouldSuppressSpacingForAttack()
-			=> IsAttackRunning("MeleeAttack");
+			=> IsAttackRunning("MeleeAttack") || IsAttackRunning("MeleeAttackPro");
 	}
 }

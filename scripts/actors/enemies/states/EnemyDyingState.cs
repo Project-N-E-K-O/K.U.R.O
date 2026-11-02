@@ -11,6 +11,9 @@ namespace Kuros.Actors.Enemies.States
     /// </summary>
     public partial class EnemyDyingState : EnemyState
     {
+        /// <summary>击倒动画停留时长（秒）：&gt;0 到时切 Dead（收尸特效 + FinalizeDeath 销毁）；
+        /// &lt;=0 = 持续尸体：**永不进入 Dead、不销毁**，death 动画是否循环由动画控制器决定
+        /// （RogueAI 控制器为循环播放，其余控制器播一次并保持末帧）。</summary>
         [Export(PropertyHint.Range, "0,10,0.01")] public float DeathDuration = 0.8f;
         [Export] public bool FreezeMotion = true;
 
@@ -20,7 +23,12 @@ namespace Kuros.Actors.Enemies.States
         /// 要按帧区分不同特效暂不支持（需要时再加过滤字段）。</summary>
         [Export] public Godot.Collections.Array<AttackEffectEntry> Effects { get; set; } = new();
 
+        /// <summary>本次 Dying 内帧事件最多生成几轮特效；0 = 不限制（默认，保持旧行为）。
+        /// 持续尸体（DeathDuration&lt;=0）循环播放 death 时事件会反复到达，可用它压成只生成 N 次。</summary>
+        [Export(PropertyHint.Range, "0,20,1")] public int MaxEffectTriggers = 0;
+
         private float _timer;
+        private int _effectTriggerCount;
         // 帧事件订阅：状态自己持有——进 Dying 连接、退出断开（与 PlayerRunState 的 effect_triggered 用法同款）
         private Node? _spineEventSource;
         private Callable _effectTriggeredCallable;
@@ -29,6 +37,7 @@ namespace Kuros.Actors.Enemies.States
         public override void Enter()
         {
             _timer = DeathDuration;
+            _effectTriggerCount = 0;
             Enemy.AttackTimer = 0f;
             _spawnMarkerIndex = 0;   // 多锚点轮换从头开始（语义同攻击模板 TryStart 归零）
 
@@ -60,6 +69,10 @@ namespace Kuros.Actors.Enemies.States
                 Enemy.MoveAndSlide();
             }
 
+            // DeathDuration <= 0：持续尸体模式，停留在 Dying，永不进入 Dead（因此不销毁）。
+            if (DeathDuration <= 0f)
+                return;
+
             _timer -= (float)delta;
             if (_timer <= 0f)
                 ChangeState("Dead");
@@ -71,6 +84,10 @@ namespace Kuros.Actors.Enemies.States
         /// 生成配置的全部条目。</summary>
         private void OnSpineEffectTriggered(string animationName, float eventTime)
         {
+            // 0 = 不限制；>0 时本次 Dying 累计触发到上限后不再生成（循环 death 防刷屏）
+            if (MaxEffectTriggers > 0 && _effectTriggerCount >= MaxEffectTriggers) return;
+            _effectTriggerCount++;
+
             foreach (var entry in Effects)
                 SpawnEffectEntry(entry);
         }

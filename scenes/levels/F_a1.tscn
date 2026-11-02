@@ -1,0 +1,168 @@
+[gd_scene load_steps=21 format=3 uid="uid://dolgkvguevepx"]
+
+[ext_resource type="Script" uid="uid://cra7y7mt0x1j8" path="res://scripts/managers/CameraZoneArea.cs" id="1_2b2oa"]
+[ext_resource type="Script" uid="uid://cbui22isww64v" path="res://scripts/systems/cutscene/CutsceneTrigger.cs" id="2_bkvq7"]
+[ext_resource type="Resource" uid="uid://cpqkacnu0mn6o" path="res://resources/cutscene/F_a1_intro.tres" id="3_kj57q"]
+[ext_resource type="Texture2D" uid="uid://beckwcg3wjhwn" path="res://assets/environments/scene_6_hotel/地板完整.png" id="4_kj57q"]
+[ext_resource type="Texture2D" uid="uid://bpthwlk18co4s" path="res://assets/environments/scene_6_hotel/mozhua/jar_sequence/时间轴 1_0017C.png" id="6_ypy4e"]
+[ext_resource type="Texture2D" uid="uid://dbn8b1atk6ngd" path="res://assets/environments/scene_6_hotel/背景墙.png" id="8_aolv4"]
+[ext_resource type="Texture2D" uid="uid://b4poxbbpcwl0a" path="res://assets/environments/scene_6_hotel/龙门吊左滑槽.png" id="8_bkvq7"]
+[ext_resource type="Texture2D" uid="uid://cbwmqsqiivnqo" path="res://assets/environments/scene_6_hotel/左墙壁.png" id="9_ao0lv"]
+[ext_resource type="PackedScene" uid="uid://da4f3288xy4h5" path="res://scenes/environments/Pipe180.tscn" id="9_ypy4e"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1mlw7"]
+size = Vector2(7030, 4070)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_5prnb"]
+size = Vector2(7030, 4070)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1d5w0"]
+size = Vector2(5000, 2000)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_kj57q"]
+size = Vector2(500, 4000)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_3k4vm"]
+size = Vector2(4000, 500)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ypy4e"]
+size = Vector2(1400, 500)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_dicvm"]
+size = Vector2(1400, 500)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_2b2oa"]
+size = Vector2(800, 500)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bkvq7"]
+size = Vector2(800, 500)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ao0lv"]
+size = Vector2(8000, 500)
+
+[sub_resource type="NavigationPolygon" id="NavigationPolygon_ka7vx"]
+vertices = PackedVector2Array(2015.1563, -639, 2021.5, 1350, -4721, 1350, 767.72656, -602.1797, -4721, -677, -3658.9219, -677, -3646.7031, -652, -3531, -677, -3531, -708.4297, -2980.3828, -977, 118.53906, -977, 788.96094, -639, -3595.4375, -677)
+polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3), PackedInt32Array(2, 4, 5, 6), PackedInt32Array(7, 8, 9, 10, 3), PackedInt32Array(3, 11, 0), PackedInt32Array(3, 2, 6, 12, 7)])
+outlines = Array[PackedVector2Array]([PackedVector2Array(-4863, -1275, 2093, -1319, 2102, 1505, -4856, 1532)])
+source_geometry_mode = 2
+agent_radius = 80.0
+
+[node name="F_a1" type="Node2D"]
+y_sort_enabled = true
+
+[node name="PlayerSpawnPoint" type="Node2D" parent="."]
+position = Vector2(0, 1060)
+
+[node name="SlideRailSpawnPoint" type="Node2D" parent="."]
+position = Vector2(-3420, 100)
+
+[node name="JarSpawnPoint" type="Node2D" parent="."]
+position = Vector2(-3000, 1000)
+
+[node name="SlideRailSpawnPoint3" type="Node2D" parent="."]
+position = Vector2(1245, 100)
+
+[node name="AreaSize" type="Area2D" parent="."]
+visible = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AreaSize"]
+z_index = 10
+position = Vector2(-205, 100)
+shape = SubResource("RectangleShape2D_1mlw7")
+debug_color = Color(0.6428762, 0.52304673, 0.06685588, 0.41960785)
+
+[node name="CameraZone" type="Area2D" parent="."]
+visible = false
+collision_layer = 0
+collision_mask = 4
+script = ExtResource("1_2b2oa")
+ZoneName = "Room_Zone_F_a1"
+CameraLimitTop = -2250
+CameraLimitBottom = 2100
+ZoomLevel = 0.35000000000000003
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CameraZone"]
+z_index = 10
+position = Vector2(-205, 100)
+shape = SubResource("RectangleShape2D_5prnb")
+debug_color = Color(0, 1, 0, 0.41960785)
+
+[node name="CutsceneTrigger" type="Area2D" parent="."]
+z_index = 10
+position = Vector2(6790, 850)
+collision_layer = 0
+collision_mask = 4
+script = ExtResource("2_bkvq7")
+Sequence = ExtResource("3_kj57q")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CutsceneTrigger"]
+shape = SubResource("RectangleShape2D_1d5w0")
+debug_color = Color(1, 0.6784314, 1, 0.41960785)
+
+[node name="Environments" type="Node2D" parent="."]
+position = Vector2(0, 1060)
+
+[node name="Floor" type="Sprite2D" parent="Environments"]
+position = Vector2(-75, -295)
+texture = ExtResource("4_kj57q")
+
+[node name="Wall" type="Sprite2D" parent="Environments/Floor"]
+z_index = 1
+position = Vector2(0, -2035)
+texture = ExtResource("8_aolv4")
+
+[node name="Wall" type="Sprite2D" parent="Environments/Floor/Wall"]
+z_index = 1
+position = Vector2(0, -2035)
+texture = ExtResource("6_ypy4e")
+
+[node name="LeftRail" type="Sprite2D" parent="Environments/Floor"]
+position = Vector2(-3355, 400)
+texture = ExtResource("8_bkvq7")
+
+[node name="LeftWall" type="Sprite2D" parent="Environments/Floor"]
+z_index = 1
+position = Vector2(-3512, -790)
+texture = ExtResource("9_ao0lv")
+
+[node name="Pipe180" parent="Environments/Floor" instance=ExtResource("9_ypy4e")]
+position = Vector2(0, 290)
+SpawnTag = "JarLeft"
+
+[node name="AirWall" type="StaticBody2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
+z_index = 10
+
+[node name="CollisionShape2D8" type="CollisionShape2D" parent="AirWall"]
+position = Vector2(-3717, 657)
+shape = SubResource("RectangleShape2D_kj57q")
+
+[node name="CollisionShape2D9" type="CollisionShape2D" parent="AirWall"]
+position = Vector2(-144, -597)
+shape = SubResource("RectangleShape2D_3k4vm")
+
+[node name="CollisionShape2D10" type="CollisionShape2D" parent="AirWall"]
+position = Vector2(-2977, -297)
+shape = SubResource("RectangleShape2D_ypy4e")
+
+[node name="CollisionShape2D11" type="CollisionShape2D" parent="AirWall"]
+position = Vector2(2765, -259)
+shape = SubResource("RectangleShape2D_dicvm")
+
+[node name="CollisionShape2D12" type="CollisionShape2D" parent="AirWall"]
+position = Vector2(-2026, -449)
+rotation = -0.4537856
+shape = SubResource("RectangleShape2D_2b2oa")
+
+[node name="CollisionShape2D13" type="CollisionShape2D" parent="AirWall"]
+position = Vector2(1850.9998, -417.99976)
+rotation = 0.5235988
+shape = SubResource("RectangleShape2D_bkvq7")
+
+[node name="CollisionShape2D15" type="CollisionShape2D" parent="AirWall"]
+position = Vector2(0, 2390)
+shape = SubResource("RectangleShape2D_ao0lv")
+
+[node name="NavigationRegion2D" type="NavigationRegion2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
+visible = false
+position = Vector2(1334, 710)
+navigation_polygon = SubResource("NavigationPolygon_ka7vx")

@@ -21,6 +21,9 @@ namespace Kuros.Actors.Heroes
         [Export(PropertyHint.Range, "0,5,0.05")] public float GhostHoldDuration { get; set; } = 0.6f;
         /// <summary>虚血下降速度（MaxHealth 比例/秒，等比随血量缩放）：0.6 = 每秒下降 60% 最大血量。</summary>
         [Export(PropertyHint.Range, "0.01,2,0.01")] public float GhostDescendRatio { get; set; } = 0.6f;
+        /// <summary>单次虚血回落的最短时长（秒）：剩余差值再小也至少用这么久走完，
+        /// 避免 MaxHealth 很大时 1 点虚血在第一帧就瞬移消失。0 = 关闭（纯按 GhostDescendRatio）。</summary>
+        [Export(PropertyHint.Range, "0,2,0.01")] public float GhostMinFallDuration { get; set; } = 0.25f;
 
         [ExportCategory("Heal (治疗恢复)")]
         /// <summary>治疗时红条/虚血条停留时长（秒），之后缓慢上升。</summary>
@@ -36,6 +39,8 @@ namespace Kuros.Actors.Heroes
 
         private float _ghostHoldTimer;      // 受伤后虚血停留计时
         private bool _ghostDescending;      // 虚血下降中
+        /// <summary>本次回落使用的固定速度（开始回落时按剩余差值算一次，避免逐帧重算导致长尾）。</summary>
+        private float _ghostFallSpeed;
         private float _hurtHoldTimer;       // 治疗时 HurtBar 停留计时
         private bool _hurtRising;           // HurtBar 治疗上升中
         private float _fillHoldTimer;       // 治疗时 HealthFillBar 停留计时
@@ -72,6 +77,7 @@ namespace Kuros.Actors.Heroes
             _previousHealth = _actor.CurrentHealth;
             _ghostHoldTimer = 0f;
             _ghostDescending = false;
+            _ghostFallSpeed = 0f;
             _hurtHoldTimer = 0f;
             _hurtRising = false;
             _fillHoldTimer = 0f;
@@ -100,6 +106,7 @@ namespace Kuros.Actors.Heroes
                 _fillHoldTimer = 0f;
                 _fillRising = false;
                 _ghostDescending = false;
+                _ghostFallSpeed = 0f;
                 _ghostHoldTimer = GhostHoldDuration;
                 _hurtLockedToGhost = true;
                 _hurtRising = false;
@@ -149,10 +156,21 @@ namespace Kuros.Actors.Heroes
             else if (!_ghostDescending && GhostValue > h + 0.01f)
             {
                 _ghostDescending = true;
+                // 回落开始：按当时的剩余差值算一次固定速度。
+                // 正常速度按 MaxHealth 缩放；但差值很小时用 remaining / 最短时长兜底，
+                // 保证 1 点虚血也不会在一帧内消失。两者取较小值（大差值仍走正常速度）。
+                float remaining = GhostValue - h;
+                float normalSpeed = Mathf.Max(0f, GhostDescendRatio * maxH);
+                float minDurationSpeed = GhostMinFallDuration > 0f
+                    ? remaining / GhostMinFallDuration
+                    : float.PositiveInfinity;
+                _ghostFallSpeed = Mathf.Min(normalSpeed, minDurationSpeed);
+                if (_ghostFallSpeed <= 0f)
+                    _ghostFallSpeed = normalSpeed > 0f ? normalSpeed : 0.01f;
             }
             if (_ghostDescending)
             {
-                GhostValue = Mathf.Max(h, GhostValue - GhostDescendRatio * maxH * dt);
+                GhostValue = Mathf.Max(h, GhostValue - _ghostFallSpeed * dt);
                 if (GhostValue <= h + 0.01f)
                 {
                     GhostValue = h;

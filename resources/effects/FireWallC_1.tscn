@@ -1,0 +1,90 @@
+[gd_scene load_steps=12 format=3 uid="uid://cbyomxyfgrnft"]
+
+[ext_resource type="Script" uid="uid://bpckujny6kucd" path="res://scripts/fx/ContactDamageBarrier.cs" id="1_tk1uy"]
+[ext_resource type="Shader" uid="uid://dlcwv014ja75" path="res://shaders/materials/meeting_barrier_core.gdshader" id="2_kmric"]
+[ext_resource type="Texture2D" uid="uid://0hsekby18rbw" path="res://assets/effect/WallEffect/lightwall_4_left.png" id="3_1t5pk"]
+[ext_resource type="Shader" uid="uid://11qcgk6hj7lt" path="res://shaders/materials/meeting_barrier_build.gdshader" id="4_vbepf"]
+[ext_resource type="Shader" uid="uid://6yurywigppwe" path="res://shaders/materials/meeting_barrier_glow.gdshader" id="5_rw4e2"]
+[ext_resource type="Shader" uid="uid://dcg17rve3o6x0" path="res://shaders/materials/meeting_barrier_scan.gdshader" id="6_i0o8l"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_rw4bx"]
+shader = ExtResource("2_kmric")
+shader_parameter/alpha = 0.8
+shader_parameter/damage_level = 0.0
+shader_parameter/core_color = Color(0, 0.78431374, 0, 1)
+shader_parameter/damage_color = Color(0.9, 0.15, 0.6, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_gouo6"]
+shader = ExtResource("4_vbepf")
+shader_parameter/build_progress = 0.0
+shader_parameter/scanline_width = 0.025
+shader_parameter/scanline_color = Color(0, 0.78431374, 0, 1)
+shader_parameter/edge_glow = 0.06
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_0i87u"]
+shader = ExtResource("5_rw4e2")
+shader_parameter/edge_width = 0.3
+shader_parameter/edge_power = 2.0
+shader_parameter/alpha = 1.0
+shader_parameter/glow_intensity = 1.0
+shader_parameter/breath_speed = 3.0
+shader_parameter/breath_amplitude = 0.2
+shader_parameter/glow_color = Color(0, 1, 0, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_tjiw8"]
+shader = ExtResource("6_i0o8l")
+shader_parameter/scan_speed = 0.5
+shader_parameter/scan_line_width = 0.01
+shader_parameter/digital_noise_amount = 0.15
+shader_parameter/glitch_amount = 0.008
+shader_parameter/glitch_frequency = 3.0
+shader_parameter/sparkle_density = 0.08
+shader_parameter/alpha = 1.0
+shader_parameter/scan_color = Color(0, 0.78431374, 0, 1)
+shader_parameter/damage_level = 0.0
+shader_parameter/damage_glitch_intensity = 0.04
+shader_parameter/damage_block_density = 0.2
+shader_parameter/damage_color = Color(0.9, 0.15, 0.6, 1)
+
+[sub_resource type="ConvexPolygonShape2D" id="ConvexPolygonShape2D_tk1uy"]
+points = PackedVector2Array(-53, -49.5, 2, 38, 73, 97.5, 73.5, 49.5, 17, 0.5, -17.5, -52, -36, -126, -62.5, -127)
+
+[node name="FireWallC_1" type="Node2D"]
+z_index = 2
+z_as_relative = false
+y_sort_enabled = true
+scale = Vector2(2, 2)
+script = ExtResource("1_tk1uy")
+ContactDamage = 20
+ContactTargetableFactions = 5
+ContactKnockbackDistance = 1000.0
+ContactKnockbackDuration = 0.5
+MaxHP = 80.0
+CollisionEnableDelay = 0.4
+HitFlashSpritePath = NodePath("CoreWall")
+HitShakeIntensity = 20.0
+ScanlineSpritePath = NodePath("CoreWall")
+ReceiveFromDirections = 9
+LifeTime = 20.0
+
+[node name="CoreWall" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_rw4bx")
+texture = ExtResource("3_1t5pk")
+
+[node name="BuildMask" type="Sprite2D" parent="."]
+visible = false
+material = SubResource("ShaderMaterial_gouo6")
+texture = ExtResource("3_1t5pk")
+
+[node name="GlowWall" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_0i87u")
+texture = ExtResource("3_1t5pk")
+
+[node name="ScanFX" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_tjiw8")
+texture = ExtResource("3_1t5pk")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="StaticBody2D"]
+shape = SubResource("ConvexPolygonShape2D_tk1uy")

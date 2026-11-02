@@ -1,0 +1,134 @@
+[gd_scene load_steps=8 format=3 uid="uid://b058lbsrr5x7f"]
+
+[ext_resource type="Script" uid="uid://dckubko0smumc" path="res://scripts/effects/ScreenInterferenceEffect.cs" id="1_script"]
+[ext_resource type="Shader" uid="uid://ip5fvifw6kq" path="res://shaders/fx/interference_zone.gdshader" id="2_shader"]
+[ext_resource type="Shader" uid="uid://dsr7ys0k3xdno" path="res://shaders/fx/glitch_displacement.gdshader" id="3_scan"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_fx_a"]
+resource_local_to_scene = true
+shader = ExtResource("2_shader")
+shader_parameter/cull_backface = true
+shader_parameter/fov = 1.0
+shader_parameter/rot_y_deg = 0.0
+shader_parameter/rot_x_deg = 0.0
+shader_parameter/inset = 0.0
+shader_parameter/quad_size = 2.0
+shader_parameter/strength = 1.0
+shader_parameter/effect_time = 0.0
+shader_parameter/seed = 7.0
+shader_parameter/glitch_frequency = 8.0
+shader_parameter/block_density = 0.4
+shader_parameter/block_size = 0.091
+shader_parameter/rect_margin = 0.0
+shader_parameter/distort_distance = 0.04
+shader_parameter/rgb_shift = 0.002
+shader_parameter/rainbow_mix = 0.5
+shader_parameter/rainbow_saturation = 0.50000002375
+shader_parameter/rainbow_hue_span = 0.1
+shader_parameter/green_mix = 0.2000000095
+shader_parameter/green_tint = Color(0.05, 1, 0.3, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_fx_b"]
+resource_local_to_scene = true
+shader = ExtResource("2_shader")
+shader_parameter/cull_backface = true
+shader_parameter/fov = 1.0
+shader_parameter/rot_y_deg = 0.0
+shader_parameter/rot_x_deg = 0.0
+shader_parameter/inset = 0.0
+shader_parameter/quad_size = 2.0
+shader_parameter/strength = 1.0
+shader_parameter/effect_time = 0.0
+shader_parameter/seed = 13.0
+shader_parameter/glitch_frequency = 17.526000784985
+shader_parameter/block_density = 0.35
+shader_parameter/block_size = 0.14
+shader_parameter/rect_margin = 0.0
+shader_parameter/distort_distance = 0.05
+shader_parameter/rgb_shift = 0.003
+shader_parameter/rainbow_mix = 1.0
+shader_parameter/rainbow_saturation = 0.5
+shader_parameter/rainbow_hue_span = 0.1350000064125
+shader_parameter/green_mix = 0.2
+shader_parameter/green_tint = Color(0.05, 1, 0.3, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_fx_c"]
+resource_local_to_scene = true
+shader = ExtResource("2_shader")
+shader_parameter/cull_backface = true
+shader_parameter/fov = 1.0
+shader_parameter/rot_y_deg = 0.0
+shader_parameter/rot_x_deg = 0.0
+shader_parameter/inset = 0.0
+shader_parameter/quad_size = 2.0
+shader_parameter/strength = 1.0
+shader_parameter/effect_time = 0.0
+shader_parameter/seed = 23.0
+shader_parameter/glitch_frequency = 6.5
+shader_parameter/block_density = 0.45
+shader_parameter/block_size = 0.06
+shader_parameter/rect_margin = 0.0
+shader_parameter/distort_distance = 0.03
+shader_parameter/rgb_shift = 0.0015
+shader_parameter/rainbow_mix = 0.55
+shader_parameter/rainbow_saturation = 1.0
+shader_parameter/rainbow_hue_span = 0.2000000095
+shader_parameter/green_mix = 0.30000001425
+shader_parameter/green_tint = Color(0.05, 1, 0.3, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_fx_scan"]
+resource_local_to_scene = true
+shader = ExtResource("3_scan")
+shader_parameter/intensity = 1.0
+shader_parameter/strength = 1.0
+shader_parameter/effect_time = 0.0
+shader_parameter/update_rate = 12.0
+shader_parameter/max_shift = 0.10000000149012
+shader_parameter/band_count = 20.0000009025
+shader_parameter/glitch_density = 0.400000019
+shader_parameter/seed = 1.0
+
+[node name="ScreenInterferenceEffect" type="Node2D"]
+script = ExtResource("1_script")
+
+[node name="InterferenceLayer" type="CanvasLayer" parent="."]
+layer = 100
+
+[node name="InterferenceRectA" type="ColorRect" parent="InterferenceLayer"]
+material = SubResource("ShaderMaterial_fx_a")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="InterferenceRectB" type="ColorRect" parent="InterferenceLayer"]
+material = SubResource("ShaderMaterial_fx_b")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="InterferenceRectC" type="ColorRect" parent="InterferenceLayer"]
+material = SubResource("ShaderMaterial_fx_c")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ScanlineLayer" type="CanvasLayer" parent="."]
+layer = 101
+
+[node name="InterferenceScanlines" type="ColorRect" parent="ScanlineLayer"]
+material = SubResource("ShaderMaterial_fx_scan")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2

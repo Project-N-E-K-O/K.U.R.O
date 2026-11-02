@@ -548,11 +548,11 @@ namespace Kuros.Managers
                 return;
             }
 
-            // victim 为 null 表示击中非 GameActor 对象（如 Gate），也应该触发特效
-            // 只需要检查 victim 属于敌人组或 victim 为 null
-            if (victim != null && !IsEnemyVictim(victim))
+            // 玩家攻击命中的对象都应触发震屏：敌人、世界物（如 WorldItem 阵营的 Gate）、以及非 GameActor 目标。
+            // 不要再按 enemies 组过滤——GameActor 化的受损物会以非 null victim 广播，旧版"只放行 null"会漏掉它们。
+            if (victim != null && victim.IsInGroup("player"))
             {
-                return;
+                return;   // 自伤 / 打到自己人不震
             }
 
             bool killedEnemy = victim != null && (victim.CurrentHealth <= 0 || victim.IsDeathSequenceActive || victim.IsDead);
@@ -580,16 +580,6 @@ namespace Kuros.Managers
             }
 
             Shake(strength);
-        }
-
-        private bool IsEnemyVictim(GameActor victim)
-        {
-            if (!GodotObject.IsInstanceValid(victim))
-            {
-                return false;
-            }
-
-            return string.IsNullOrWhiteSpace(EnemyGroupName) || victim.IsInGroup(EnemyGroupName);
         }
 
         private void TriggerPlayerAttackHitStop(bool killedEnemy)

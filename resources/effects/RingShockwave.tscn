@@ -1,0 +1,58 @@
+[gd_scene load_steps=5 format=3 uid="uid://dqvnmenbdi81"]
+
+[ext_resource type="Script" uid="uid://cymdq5irmxnq5" path="res://scripts/fx/ShockwaveController.cs" id="1_ctrl"]
+[ext_resource type="Shader" uid="uid://brij2vrkie5ot" path="res://shaders/materials/ring_shockwave.gdshader" id="2_shader"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_wave"]
+shader = ExtResource("2_shader")
+shader_parameter/cull_backface = true
+shader_parameter/fov = 10.0000004275
+shader_parameter/rot_y_deg = 0.0
+shader_parameter/rot_x_deg = 25.0
+shader_parameter/inset = 0.0
+shader_parameter/quad_size = 2.0
+shader_parameter/wave_radius = 0.7250000344375
+shader_parameter/fade_alpha = 1.0
+shader_parameter/ring_thickness = 0.30000001192093
+shader_parameter/edge_softness = 0.15000000596046
+shader_parameter/wave_irregularity = 0.01
+shader_parameter/wave_frequency = 3.000000095
+shader_parameter/wave_wobble_speed = 7.0
+shader_parameter/gap_feather = 0.1
+shader_parameter/gap_count = 0
+shader_parameter/gap0_center = 0.0
+shader_parameter/gap0_half = 0.0
+shader_parameter/gap1_center = 0.0
+shader_parameter/gap1_half = 0.0
+shader_parameter/gap2_center = 0.0
+shader_parameter/gap2_half = 0.0
+shader_parameter/gap3_center = 0.0
+shader_parameter/gap3_half = 0.0
+shader_parameter/gap4_center = 0.0
+shader_parameter/gap4_half = 0.0
+shader_parameter/gap5_center = 0.0
+shader_parameter/gap5_half = 0.0
+shader_parameter/edge_color = Color(0.050980393, 0.23529412, 0.078431375, 1)
+shader_parameter/body_color = Color(0.34901962, 1, 0.2509804, 1)
+shader_parameter/highlight_color = Color(0.9490196, 1, 0.92156863, 1)
+shader_parameter/glow_color = Color(0.04, 0.85, 0.25, 0.42)
+
+[sub_resource type="QuadMesh" id="QuadMesh_wave"]
+size = Vector2(2, 2)
+
+[node name="ShockwaveController" type="Node2D"]
+z_index = 1
+z_as_relative = false
+y_sort_enabled = true
+script = ExtResource("1_ctrl")
+MaxRadius = 6000.0
+KnockbackDistance = 1500.0
+KnockbackDuration = 0.5
+TargetableFactions = 5
+TargetCollisionMask = 12
+RingThickness = 60.0
+EdgeSoftness = 30.0
+
+[node name="ShockwaveSprite" type="MeshInstance2D" parent="."]
+material = SubResource("ShaderMaterial_wave")
+mesh = SubResource("QuadMesh_wave")

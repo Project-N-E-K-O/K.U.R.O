@@ -4,9 +4,10 @@ namespace Kuros.Actors.Enemies.Attacks
 {
 	/// <summary>
 	/// Enemy_F1_rogueAI 的大招「过载冲击」：蓄力滑向滑槽**随机一端** → 横扫到**另一端**。
-	///   · Charge（Warmup）：循环 attack_warming_up（动画控制器按 <see cref="Phase"/> 选），沿轨道滑到随机选中的一端；
+	///   · Charge（Warmup）：循环 attack_warming_up / attack_warming_down（动画控制器按 <see cref="Phase"/> +
+	///     形态选），沿轨道滑到随机选中的一端；
 	///     速度 = 该段距离 / <see cref="EnemyAttackTemplate.WarmupDuration"/>（蓄力结束刚好到位），可用 ChargeSpeed 覆盖。
-	///   · Dash（Active）：循环 attack_up，从该端横扫到另一端；
+	///   · Dash（Active）：循环 attack_up / attack_down（同上按形态），从该端横扫到另一端；
 	///     速度 = 两端距离 / <see cref="EnemyAttackTemplate.ActiveDuration"/>，可用 DashSpeed 覆盖。
 	///   · Settle（Recovery）：停在另一端，交给收招。
 	/// <see cref="ReturnOnActive"/> = true（强化版 RogueAIOverloadPro）：Active 段 A→B 后**折返 B→A**，

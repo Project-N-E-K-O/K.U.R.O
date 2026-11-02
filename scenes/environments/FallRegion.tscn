@@ -1,0 +1,43 @@
+[gd_scene load_steps=7 format=3 uid="uid://cbqp2nyeec5bb"]
+
+[ext_resource type="Script" uid="uid://bxk0txq4kyb38" path="res://scripts/environments/FallRegion.cs" id="1"]
+[ext_resource type="Script" uid="uid://dv6cc660xs2wu" path="res://scripts/environments/FallActivationArea.cs" id="2"]
+[ext_resource type="Script" uid="uid://dtlh7op6q4uex" path="res://scripts/environments/FallHazardArea.cs" id="3"]
+[ext_resource type="PackedScene" uid="uid://dva26mfp5yohw" path="res://scenes/objects/Animation_character.tscn" id="4"]
+
+[sub_resource type="RectangleShape2D" id="Yellow"]
+size = Vector2(3600, 1600)
+
+[sub_resource type="RectangleShape2D" id="Red"]
+size = Vector2(1400, 1200)
+
+[node name="FallRegion" type="Node2D"]
+script = ExtResource("1")
+FallEffectScene = ExtResource("4")
+FallbackMarkerPaths = Array[NodePath]([NodePath("FallbackLeft"), NodePath("FallbackRight")])
+
+[node name="ActivationArea" type="Area2D" parent="."]
+collision_layer = 131072
+collision_mask = 0
+monitoring = false
+script = ExtResource("2")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ActivationArea"]
+shape = SubResource("Yellow")
+debug_color = Color(1, 0.85, 0, 0.2)
+
+[node name="HazardArea" type="Area2D" parent="."]
+collision_layer = 262144
+collision_mask = 0
+monitoring = false
+script = ExtResource("3")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HazardArea"]
+shape = SubResource("Red")
+debug_color = Color(1, 0.1, 0.1, 0.4)
+
+[node name="FallbackLeft" type="Marker2D" parent="."]
+position = Vector2(-1100, 0)
+
+[node name="FallbackRight" type="Marker2D" parent="."]
+position = Vector2(1100, 0)

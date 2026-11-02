@@ -1,0 +1,49 @@
+[gd_resource type="Resource" script_class="CutsceneSequence" load_steps=11 format=3 uid="uid://cy43ghwhy0ams"]
+
+[ext_resource type="Script" uid="uid://ctrko7add3r5h" path="res://scripts/systems/cutscene/CutsceneStep.cs" id="1_nicjk"]
+[ext_resource type="Script" uid="uid://dhch281hkryms" path="res://scripts/systems/cutscene/steps/EffectConfig.cs" id="2_ei2c2"]
+[ext_resource type="PackedScene" uid="uid://be30f0gopxel3" path="res://scenes/actors/etc/SlideRail_wheel.tscn" id="3_aqpda"]
+[ext_resource type="PackedScene" uid="uid://cw42j1o501x83" path="res://scenes/actors/characters/Enemy_F1_rogueAI_MachineGun.tscn" id="4_ei2c2"]
+[ext_resource type="Script" uid="uid://bdni42t83syt8" path="res://scripts/systems/cutscene/steps/EffectGroupSpawnStep.cs" id="5_cloww"]
+[ext_resource type="PackedScene" uid="uid://d7oxw7fsq2i3" path="res://scenes/environments/jar_mozhua.tscn" id="5_ei2c2"]
+[ext_resource type="Script" uid="uid://cgnajq1ykl2mn" path="res://scripts/systems/cutscene/CutsceneSequence.cs" id="6_q2p7o"]
+
+[sub_resource type="Resource" id="Resource_untg7"]
+script = ExtResource("2_ei2c2")
+EffectScene = ExtResource("3_aqpda")
+SpawnType = 2
+TargetNodePath = NodePath("../World/F_c1/SlideRailSpawnPoint")
+SpawnDelay = 3.0
+SpawnTag = "SlideRailWheelLeft"
+PropertyOverrides = Dictionary[String, Variant]({
+"CarriageGroupToAdd": "rogueai_part2_part",
+"CarriagePrefab": ExtResource("4_ei2c2"),
+"CarriageSpawn": 3,
+"CarriageSpawnOffset": Vector2(6200, 0),
+"FlipCarriageEnds": true
+})
+metadata/_custom_type_script = "uid://dhch281hkryms"
+
+[sub_resource type="Resource" id="Resource_aqpda"]
+script = ExtResource("2_ei2c2")
+EffectScene = ExtResource("5_ei2c2")
+SpawnType = 2
+TargetNodePath = NodePath("../World/F_c1/JarSpawnPoint")
+SpawnDelay = 3.0
+SpawnTag = "JarRight"
+GroupToAdd = "rogueai_part2"
+metadata/_custom_type_script = "uid://dhch281hkryms"
+
+[sub_resource type="Resource" id="Resource_yqcfi"]
+script = ExtResource("5_cloww")
+Effects = Array[ExtResource("2_ei2c2")]([SubResource("Resource_untg7"), SubResource("Resource_aqpda")])
+WaitForCompletion = false
+metadata/_custom_type_script = "uid://bdni42t83syt8"
+
+[resource]
+script = ExtResource("6_q2p7o")
+SequenceId = "F_c1_intro"
+Steps = Array[ExtResource("1_nicjk")]([SubResource("Resource_yqcfi")])
+DisablePlayerInput = false
+HidePlayer = false
+metadata/_custom_type_script = "uid://cgnajq1ykl2mn"

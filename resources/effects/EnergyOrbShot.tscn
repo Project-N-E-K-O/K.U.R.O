@@ -23,7 +23,8 @@ shader_parameter/edge_softness = 0.2000000095
 shader_parameter/glow_strength = 3.0000001425
 
 [node name="EnergyOrbShot" type="Node2D"]
-z_index = 3
+z_index = 2
+z_as_relative = false
 script = ExtResource("1_shot")
 ImpactEffectScenes = [ExtResource("4_gkvu3"), ExtResource("5_orbimpact")]
 

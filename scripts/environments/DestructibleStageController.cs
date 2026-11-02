@@ -27,14 +27,18 @@ namespace Kuros.Environments
     ///
     /// 血条体系即阶段体系：MaxHealth = 最后一段阈值（_Ready 从 Stages 推导）；累计伤害 = MaxHealth − CurrentHealth。
     /// 规则（含防跳段保护）：
-    ///   · 受击（非锁定期）→ 累计伤害 + 播本段受击动画（空 = 不播不锁）、动画播完**自动回本段常态**；
-    ///   · 累计伤害 ≥ 本段阈值 → 播本段破壳动画（单次动画锁 = 免伤窗口）→ 进入下一段常态；
+    ///   · 受击（非破壳动画期）→ 累计伤害 + 播本段受击动画（空 = 不播）；**每次命中都从头重播受击动画**
+    ///     （高频伤害持续刷新反馈，受击动画不构成免伤窗口）、动画播完自动回本段常态；
+    ///   · 累计伤害 ≥ 本段阈值 → 播本段破壳动画（**破壳动画播放期间 = 免伤窗口**）→ 进入下一段常态；
     ///     **单次受击最多推进一段、溢出伤害作废**（钳制保证累计恰好落在阈值）——任何单次伤害都不可能
     ///     跳过中间段/动画，击杀所需累计恒等于最后一段阈值（即配置的"总血量"口径）；
+    ///   · **阈值 &lt;= 0 = 免命中自动推进**：进入本段（_Ready 首段 / 上一段动画结束）立即播本段
+    ///     BreakAnimation 并前进到下一段；末段 &lt;= 0 进入即走终态（Die → 播末段 BreakAnimation）；
     ///   · 达到最后一段阈值 → base 血量归零走 Die（IsDeadOrDying 全部生死门语义正常）→
-    ///     <see cref="OnDeathFinalized"/> 覆写接管：播 <see cref="DeathAnimation"/>、**关闭命中判定**
-    ///     （HitArea 全禁）、**尸体保留**（与旧 IBarrier 版行为一致；控制台 KillForced 可回收）；
-    ///   · **免伤窗口** = 一次性动画（受击/破壳）播放期间——期间新命中被拒绝（不累计、不结算）。
+    ///     <see cref="OnDeathFinalized"/> 覆写接管：播**最后一段的 <see cref="DestructibleStage.BreakAnimation"/>**
+    ///     （终态动画 = 最后一段的 break，不再有独立字段）、**关闭命中判定**（HitArea 全禁）、
+    ///     **尸体保留**（与旧 IBarrier 版行为一致；控制台 KillForced 可回收）；
+    ///   · **免伤窗口** = 仅破壳动画播放期间——期间新命中被拒绝（不累计、不结算）。
     ///
     /// 契约收窄：不吃任何 ActorEffect（<see cref="CanBeAffected"/> 只放行 null=纯伤害）、不吃击退
     /// （<see cref="AllowsKnockback"/>）、伤害**不走合并窗口**（保持逐击节奏，传 bypassMergeWindow=true）。
@@ -52,8 +56,6 @@ namespace Kuros.Environments
         /// <summary>阶段列表（**顺序 = 推进顺序**）：每段带自己的动画名与累计伤害阈值。
         /// 单段关卡就填 1 项（该项阈值 = 死亡线）。</summary>
         [Export] public Godot.Collections.Array<DestructibleStage> Stages { get; set; } = new();
-        /// <summary>终态动画（跨过最后一段阈值时播一次，之后不再响应任何命中）。</summary>
-        [Export] public string DeathAnimation { get; set; } = "";
         /// <summary>伤害阵营声明（组注册，见 <see cref="DamageFactionDeclaration"/>）：gate=WorldItem、
         /// jar=Enemy 在各自场景设置；不配置 = None（不加组，旧行为）。</summary>
         [Export] public DamageFactionDeclaration DeclaredFaction { get; set; } = DamageFactionDeclaration.None;
@@ -62,8 +64,9 @@ namespace Kuros.Environments
         /// <summary>权威累计伤害（int 计数，无浮点误差）；血量同步镜像为 MaxHealth − 本值。</summary>
         private int _cumulativeDamage;
         private int _stageIndex;
-        /// <summary>一次性动画播放中：拒绝新命中（= 免伤窗口）。</summary>
-        private bool _animLocked;
+        /// <summary>当前正在播的一次性动画：只有破壳动画锁伤害；受击动画每击重播、不锁。</summary>
+        private enum OneShotKind { None, Hit, Break }
+        private OneShotKind _oneShot;
         /// <summary>终态：不再响应任何命中（尸体保留直到 KillForced / 场景卸载）。</summary>
         private bool _dead;
         /// <summary>KillForced 强杀期间跳过防跳段钳制。</summary>
@@ -92,7 +95,7 @@ namespace Kuros.Environments
             }
 
             _animPlayer.AnimationFinished += OnAnimationFinished;
-            PlayAnim(Stages[0].IdleAnimation);
+            EnterCurrentStage();
         }
 
         public override void _ExitTree()
@@ -113,7 +116,7 @@ namespace Kuros.Environments
         public override bool TakeDamage(int damage, Vector2? attackOrigin = null, GameActor? attacker = null,
             DamageSource damageSource = DamageSource.DirectAttack, bool bypassMergeWindow = false)
         {
-            if (_dead || _animLocked || Stages == null || Stages.Count == 0) return false;
+            if (_dead || _oneShot == OneShotKind.Break || Stages == null || Stages.Count == 0) return false;
 
             int last = Stages.Count - 1;
             int cap = Mathf.RoundToInt(Stages[_stageIndex].Threshold) - _cumulativeDamage;
@@ -147,14 +150,16 @@ namespace Kuros.Environments
 
                 string breakAnim = Stages[_stageIndex].BreakAnimation;
                 _stageIndex++;
-                _animLocked = PlayAnim(breakAnim);
-                if (!_animLocked)
-                    PlayAnim(Stages[_stageIndex].IdleAnimation);   // 破壳动画缺省：直接落新段常态
+                _oneShot = OneShotKind.None;
+                if (PlayAnim(breakAnim))
+                    _oneShot = OneShotKind.Break;
+                else
+                    EnterCurrentStage();   // 破壳动画缺省：进入新段（Threshold<=0 会继续自动推进）
                 return true;
             }
 
-            // 同段受击：空受击动画 = 不播不锁
-            _animLocked = PlayAnim(Stages[_stageIndex].HitAnimation);
+            // 同段受击：每次都从头重播（PlayAnim 内部先 Stop 再 Play）；空受击动画 = 不播不锁
+            _oneShot = PlayAnim(Stages[_stageIndex].HitAnimation) ? OneShotKind.Hit : OneShotKind.None;
             return true;
         }
 
@@ -175,6 +180,15 @@ namespace Kuros.Environments
         /// <summary>受损物不吃击退/位移（击退写入会被 base 的静默门拦下）。</summary>
         protected override bool AllowsKnockback() => false;
 
+        /// <summary>供 AnimationPlayer 方法轨道调用：直接销毁自身（不做终态动画/掉落/事件）。
+        /// 与 <see cref="KillForced"/> 不同，不经过 Die/FinalizeDeath；适合临时生成物“演完即退场”。</summary>
+        public void DestroySelf()
+        {
+            _dead = true;
+            DisableHitDetection();
+            QueueFree();
+        }
+
         /// <summary>强制击杀（控制台清场）：跳过防跳段钳制直接打满；已死亡则回收尸体
         /// （尸体保留策略下，这是唯一的内存回收通道）。</summary>
         public override void KillForced()
@@ -194,26 +208,59 @@ namespace Kuros.Environments
 
         // ── 动画 ──────────────────────────────────────────────────
 
-        /// <summary>一次性动画播完：解锁并**自动回本段常态**（受击动画 → 本段 idle；破壳动画 → 新段 idle——
-        /// 跨段时 _stageIndex 已先行推进）。终态后不再路由（尸体停在死亡动画末帧）。</summary>
-        private void OnAnimationFinished(StringName animName)
+        /// <summary>进入当前段的常态：Threshold &gt; 0 → 播本段 idle；
+        /// Threshold &lt;= 0 → **无需命中自动推进**——非末段播本段 BreakAnimation 并前进一段
+        /// （动画结束后由 <see cref="OnAnimationFinished"/> 继续处理下一段；下一段若也是 0 会继续链式推进），
+        /// 末段则视为进入即达死亡线，直接走终态（Die → <see cref="OnDeathFinalized"/> 播末段 BreakAnimation）。</summary>
+        private void EnterCurrentStage()
         {
-            if (_dead) return;
-            if (!_animLocked) return;
+            if (_dead || Stages == null || Stages.Count == 0) return;
 
-            _animLocked = false;
-            PlayAnim(Stages[_stageIndex].IdleAnimation);
+            int last = Stages.Count - 1;
+            if (Stages[_stageIndex].Threshold > 0f)
+            {
+                PlayAnim(Stages[_stageIndex].IdleAnimation);
+                return;
+            }
+
+            if (_stageIndex >= last)
+            {
+                GD.PushWarning($"[{nameof(DestructibleStageController)}] {Name}: 最后一段 Threshold<=0，进入即走终态");
+                Die();
+                return;
+            }
+
+            // 免命中自动破壳：播本段 BreakAnimation 并推进；缺省动画则直接落到下一段（可能连续推进）
+            string breakAnim = Stages[_stageIndex].BreakAnimation;
+            _stageIndex++;
+            _oneShot = OneShotKind.None;
+            if (PlayAnim(breakAnim))
+                _oneShot = OneShotKind.Break;
+            else
+                EnterCurrentStage();
         }
 
-        /// <summary>终态：**不复用 base**（base 会立刻 QueueFree + 掉落 + 清效果）——播终态动画、
-        /// 关闭命中判定、尸体保留（与旧 IBarrier 版行为一致：gate 停在 knockback 末帧、罐子留残骸）。
+        /// <summary>一次性动画播完：解锁并**自动回本段常态**（受击动画 → 本段 idle；破壳动画 → 新段 idle——
+        /// 跨段时 _stageIndex 已先行推进）。idle 自身播完不处理。终态后不再路由（尸体停在终态动画末帧）。</summary>
+        private void OnAnimationFinished(StringName animName)
+        {
+            if (_dead || _oneShot == OneShotKind.None) return;
+
+            _oneShot = OneShotKind.None;
+            EnterCurrentStage();
+        }
+
+        /// <summary>终态：**不复用 base**（base 会立刻 QueueFree + 掉落 + 清效果）——播最后一段的
+        /// BreakAnimation（= 终态动画）、关闭命中判定、尸体保留（与旧 IBarrier 版行为一致：
+        /// gate 停在 knockback 末帧、罐子留残骸）。
         /// 死亡旗标（IsDeadOrDying 等）已由 base 的 Die/FinalizeDeath 在进入本方法前置位。</summary>
         protected override void OnDeathFinalized()
         {
             _dead = true;
             DisableHitDetection();
-            if (!PlayAnim(DeathAnimation))
-                GD.PushWarning($"[{nameof(DestructibleStageController)}] 终态动画 \"{DeathAnimation}\" 不存在，保持锁死");
+            string deathAnim = Stages is { Count: > 0 } ? Stages[Stages.Count - 1].BreakAnimation : "";
+            if (!PlayAnim(deathAnim))
+                GD.PushWarning($"[{nameof(DestructibleStageController)}] 终态动画（最后一段 BreakAnimation）\"{deathAnim}\" 不存在，保持锁死");
         }
 
         /// <summary>终态：关闭命中判定——HitArea 的形状/监听全禁（玩家攻击再也找不到它）。

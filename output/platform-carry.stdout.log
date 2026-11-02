@@ -1,0 +1,59 @@
+Godot Engine v4.5.1.stable.mono.custom_build.f62fdbde1 (2025-10-13 19:05:40 UTC) - https://godotengine.org
+
+[ItemInteraction] Actor 初始化成功: MainCharacter
+[ItemInteraction] InventoryComponent 初始化成功: Inventory
+[2026-11-02 15:58:57.723] [Info] [PlayerItemInteractionComponent] ItemInteraction: InteractionArea 已解析: /root/PlatformCarryRuntimeCheck/MainCharacter/GrabArea
+[MainCharacter] StateMachine 初始化成功，当前状态: Idle
+[CarryCheck] PASS enemies 组的启用身体对象随平台移动
+[CarryCheck] PASS 原有 MainCharacter 玩家承载仍然有效
+[CarryCheck] PASS 身体禁用但 AttackArea 启用的对象不承载
+[CarryCheck] PASS 排除组对象不承载
+[CarryCheck] PASS 真实家具按 world_items 组与地面生命周期承载
+[CarryCheck] PASS 家具使用实际 StaticBody 形状位置作为脚底
+[CarryCheck] PASS 没有刚体直接身体形状的家具也能移动
+[CarryCheck] PASS 迪斯科球地面武器接入 world_items 承载
+[CarryCheck] PASS 无身体碰撞形状的 WorldItemEntity 仍随平台移动
+[CarryCheck] PASS 地面武器与拾取区域同步移动
+[CarryCheck] PASS 单件地面武器可关闭承载
+[CarryCheck] PASS 家具根、冻结刚体和阻挡形状同步且不重复位移
+[CarryCheck] PASS 平台保持家具冻结且不进入投掷生命周期
+[CarryCheck] PASS 平台分类开关可分别禁止承载
+[CarryCheck] PASS CarryWorldItems 同时控制普通地面武器
+[CarryCheck] PASS 玩家承载开关独立生效
+[CarryCheck] PASS 两个重叠平台每帧只携带同一对象一次
+[CarryCheck] PASS 真实投掷后的实例仍属于 world_items
+[CarryCheck] PASS world_items 标签不会让飞行家具被平台携带
+[CarryCheck] PASS 飞行期间包装根节点不被平台额外移动
+[CarryCheck] PASS 移除物件后平台继续运行，无悬空引用
+[CarryCheck] PASS 散落滑行中的地面武器暂不承载
+[CarryCheck] PASS 物品滑行期间承载接口不叠加位移
+[CarryCheck] PASS 地面武器停稳后自动恢复承载
+[CarryCheck] PASS 恢复承载后继续随平台移动
+GetLeftHandAttachment: Found attachment point via editor path: SpineSprite/SpineBoneNode
+[CarryCheck] PASS 真实地面武器可正常拾取
+[CarryCheck] PASS 拾取后立即退出承载资格并排队释放
+[CarryCheck] PASS 拾取后世界物品本体实际释放
+[CarryCheck] PASS 地面武器释放后平台继续运行
+[CarryCheck] PASS 投掷武器 briefcase 地面静置时可承载
+[CarryCheck] PASS 投掷武器 briefcase 根节点与内部刚体同步
+[CarryCheck] PASS 投掷武器 briefcase 出手后立即停止承载
+[CarryCheck] PASS 投掷武器 boomerang 地面静置时可承载
+[CarryCheck] PASS 投掷武器 boomerang 根节点与内部刚体同步
+[CarryCheck] PASS 投掷武器 boomerang 出手后立即停止承载
+[CarryCheck] PASS 投掷武器 smokeGrenade 地面静置时可承载
+[CarryCheck] PASS 投掷武器 smokeGrenade 根节点与内部刚体同步
+[CarryCheck] PASS 投掷武器 smokeGrenade 出手后立即停止承载
+[CarryCheck] PASS 投掷武器 emojiBomb 地面静置时可承载
+[CarryCheck] PASS 投掷武器 emojiBomb 根节点与内部刚体同步
+[CarryCheck] PASS 投掷武器 emojiBomb 出手后立即停止承载
+[CarryCheck] PASS 投掷武器 eCore 地面静置时可承载
+[CarryCheck] PASS 投掷武器 eCore 根节点与内部刚体同步
+[CarryCheck] PASS 投掷武器 eCore 出手后立即停止承载
+[CarryCheck] PASS 投掷武器 gravityGrenade 地面静置时可承载
+[CarryCheck] PASS 投掷武器 gravityGrenade 根节点与内部刚体同步
+[CarryCheck] PASS 投掷武器 gravityGrenade 出手后立即停止承载
+[CarryCheck] PASS 投掷武器 metalSpike 地面静置时可承载
+[CarryCheck] PASS 投掷武器 metalSpike 根节点与内部刚体同步
+[CarryCheck] PASS 投掷武器 metalSpike 出手后立即停止承载
+[CarryCheck] PASS 家具位移遇墙被身体形状扫掠截断
+[CarryCheck] ALL PASSED (51)

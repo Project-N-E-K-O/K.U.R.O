@@ -1,0 +1,291 @@
+[gd_scene load_steps=12 format=3 uid="uid://dt851ky7kfg2m"]
+
+[ext_resource type="Shader" uid="uid://dgoug3p1bi8ns" path="res://shaders/materials/pipe.gdshader" id="1_ja012"]
+[ext_resource type="Texture2D" uid="uid://cwf6h2uaxxpxc" path="res://assets/environments/scene_6_hotel/pipe/嵌地玻璃槽_90A.png" id="2_wfc8k"]
+[ext_resource type="Texture2D" uid="uid://bvnmsraa1ku0" path="res://assets/environments/scene_6_hotel/pipe/嵌地玻璃槽_180A.png" id="3_uwyig"]
+[ext_resource type="Script" uid="uid://bkv02fngl1ruo" path="res://scripts/environments/PipeLifecycleController.cs" id="4_lifecycle"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ja012"]
+shader = ExtResource("1_ja012")
+shader_parameter/shape = 0
+shader_parameter/quarter_turns = 0
+shader_parameter/center_uv = Vector2(0.5, 0.5)
+shader_parameter/pipe_width = 96.0
+shader_parameter/radius = 60.0
+shader_parameter/thickness = 24.0
+shader_parameter/color = Color(0.23, 1, 0.08, 1)
+shader_parameter/dash_count = 10.0
+shader_parameter/dash_ratio = 0.5
+shader_parameter/speed = 0.8
+shader_parameter/brightness = 1.0
+shader_parameter/phase_offset = 0.0
+shader_parameter/contour_loop = true
+shader_parameter/dash_period_px = 0.0
+shader_parameter/path_point_count = 4
+shader_parameter/path_0 = Vector2(0, 0.75)
+shader_parameter/path_1 = Vector2(0.25, 0.75)
+shader_parameter/path_2 = Vector2(0.25, 0.25)
+shader_parameter/path_3 = Vector2(1, 0.25)
+shader_parameter/path_4 = Vector2(1, 0.25)
+shader_parameter/path_5 = Vector2(1, 0.25)
+shader_parameter/path_6 = Vector2(1, 0.25)
+shader_parameter/path_7 = Vector2(1, 0.25)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_wfc8k"]
+shader = ExtResource("1_ja012")
+shader_parameter/shape = 1
+shader_parameter/quarter_turns = 0
+shader_parameter/center_uv = Vector2(0.5, 0.5)
+shader_parameter/pipe_width = 96.0
+shader_parameter/radius = 60.0
+shader_parameter/thickness = 24.0
+shader_parameter/color = Color(0.23, 1, 0.08, 1)
+shader_parameter/dash_count = 10.0
+shader_parameter/dash_ratio = 0.5
+shader_parameter/speed = 0.8
+shader_parameter/brightness = 1.0
+shader_parameter/phase_offset = 0.0
+shader_parameter/contour_loop = true
+shader_parameter/dash_period_px = 0.0
+shader_parameter/path_point_count = 4
+shader_parameter/path_0 = Vector2(0, 0.75)
+shader_parameter/path_1 = Vector2(0.25, 0.75)
+shader_parameter/path_2 = Vector2(0.25, 0.25)
+shader_parameter/path_3 = Vector2(1, 0.25)
+shader_parameter/path_4 = Vector2(1, 0.25)
+shader_parameter/path_5 = Vector2(1, 0.25)
+shader_parameter/path_6 = Vector2(1, 0.25)
+shader_parameter/path_7 = Vector2(1, 0.25)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_uwyig"]
+shader = ExtResource("1_ja012")
+shader_parameter/shape = 0
+shader_parameter/quarter_turns = 0
+shader_parameter/center_uv = Vector2(0.5, 0.5)
+shader_parameter/pipe_width = 96.0
+shader_parameter/radius = 60.0
+shader_parameter/thickness = 24.0
+shader_parameter/color = Color(0.23, 1, 0.08, 1)
+shader_parameter/dash_count = 10.0
+shader_parameter/dash_ratio = 0.5
+shader_parameter/speed = 0.8
+shader_parameter/brightness = 1.0
+shader_parameter/phase_offset = 0.0
+shader_parameter/contour_loop = true
+shader_parameter/dash_period_px = 0.0
+shader_parameter/path_point_count = 4
+shader_parameter/path_0 = Vector2(0, 0.75)
+shader_parameter/path_1 = Vector2(0.25, 0.75)
+shader_parameter/path_2 = Vector2(0.25, 0.25)
+shader_parameter/path_3 = Vector2(1, 0.25)
+shader_parameter/path_4 = Vector2(1, 0.25)
+shader_parameter/path_5 = Vector2(1, 0.25)
+shader_parameter/path_6 = Vector2(1, 0.25)
+shader_parameter/path_7 = Vector2(1, 0.25)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_qtxwv"]
+shader = ExtResource("1_ja012")
+shader_parameter/shape = 1
+shader_parameter/quarter_turns = 0
+shader_parameter/center_uv = Vector2(0.5, 0.5)
+shader_parameter/pipe_width = 96.0
+shader_parameter/radius = 60.0
+shader_parameter/thickness = 24.0
+shader_parameter/color = Color(0.23, 1, 0.08, 1)
+shader_parameter/dash_count = 10.0
+shader_parameter/dash_ratio = 0.5
+shader_parameter/speed = 0.8
+shader_parameter/brightness = 1.0
+shader_parameter/phase_offset = 0.0
+shader_parameter/contour_loop = true
+shader_parameter/dash_period_px = 0.0
+shader_parameter/path_point_count = 4
+shader_parameter/path_0 = Vector2(0, 0.75)
+shader_parameter/path_1 = Vector2(0.25, 0.75)
+shader_parameter/path_2 = Vector2(0.25, 0.25)
+shader_parameter/path_3 = Vector2(1, 0.25)
+shader_parameter/path_4 = Vector2(1, 0.25)
+shader_parameter/path_5 = Vector2(1, 0.25)
+shader_parameter/path_6 = Vector2(1, 0.25)
+shader_parameter/path_7 = Vector2(1, 0.25)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_j7h33"]
+shader = ExtResource("1_ja012")
+shader_parameter/shape = 1
+shader_parameter/quarter_turns = 0
+shader_parameter/center_uv = Vector2(0.5, 0.5)
+shader_parameter/pipe_width = 96.0
+shader_parameter/radius = 60.0
+shader_parameter/thickness = 24.0
+shader_parameter/color = Color(0.23, 1, 0.08, 1)
+shader_parameter/dash_count = 10.0
+shader_parameter/dash_ratio = 0.5
+shader_parameter/speed = 0.8
+shader_parameter/brightness = 1.0
+shader_parameter/phase_offset = 0.0
+shader_parameter/contour_loop = true
+shader_parameter/dash_period_px = 0.0
+shader_parameter/path_point_count = 4
+shader_parameter/path_0 = Vector2(0, 0.75)
+shader_parameter/path_1 = Vector2(0.25, 0.75)
+shader_parameter/path_2 = Vector2(0.25, 0.25)
+shader_parameter/path_3 = Vector2(1, 0.25)
+shader_parameter/path_4 = Vector2(1, 0.25)
+shader_parameter/path_5 = Vector2(1, 0.25)
+shader_parameter/path_6 = Vector2(1, 0.25)
+shader_parameter/path_7 = Vector2(1, 0.25)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_4ykh0"]
+shader = ExtResource("1_ja012")
+shader_parameter/shape = 0
+shader_parameter/quarter_turns = 0
+shader_parameter/center_uv = Vector2(0.5, 0.5)
+shader_parameter/pipe_width = 96.0
+shader_parameter/radius = 60.0
+shader_parameter/thickness = 24.0
+shader_parameter/color = Color(0.23, 1, 0.08, 1)
+shader_parameter/dash_count = 10.0
+shader_parameter/dash_ratio = 0.5
+shader_parameter/speed = -0.8
+shader_parameter/brightness = 1.0
+shader_parameter/phase_offset = 0.0
+shader_parameter/contour_loop = true
+shader_parameter/dash_period_px = 0.0
+shader_parameter/path_point_count = 4
+shader_parameter/path_0 = Vector2(0, 0.75)
+shader_parameter/path_1 = Vector2(0.25, 0.75)
+shader_parameter/path_2 = Vector2(0.25, 0.25)
+shader_parameter/path_3 = Vector2(1, 0.25)
+shader_parameter/path_4 = Vector2(1, 0.25)
+shader_parameter/path_5 = Vector2(1, 0.25)
+shader_parameter/path_6 = Vector2(1, 0.25)
+shader_parameter/path_7 = Vector2(1, 0.25)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_wvia6"]
+shader = ExtResource("1_ja012")
+shader_parameter/shape = 0
+shader_parameter/quarter_turns = 0
+shader_parameter/center_uv = Vector2(0.5, 0.5)
+shader_parameter/pipe_width = 96.0
+shader_parameter/radius = 60.0
+shader_parameter/thickness = 24.0
+shader_parameter/color = Color(0.23, 1, 0.08, 1)
+shader_parameter/dash_count = 10.0
+shader_parameter/dash_ratio = 0.5
+shader_parameter/speed = -0.8
+shader_parameter/brightness = 1.0
+shader_parameter/phase_offset = 0.0
+shader_parameter/contour_loop = true
+shader_parameter/dash_period_px = 0.0
+shader_parameter/path_point_count = 4
+shader_parameter/path_0 = Vector2(0, 0.75)
+shader_parameter/path_1 = Vector2(0.25, 0.75)
+shader_parameter/path_2 = Vector2(0.25, 0.25)
+shader_parameter/path_3 = Vector2(1, 0.25)
+shader_parameter/path_4 = Vector2(1, 0.25)
+shader_parameter/path_5 = Vector2(1, 0.25)
+shader_parameter/path_6 = Vector2(1, 0.25)
+shader_parameter/path_7 = Vector2(1, 0.25)
+
+[node name="PipeRight" type="Node2D"]
+script = ExtResource("4_lifecycle")
+SpawnTag = "JarRight"
+
+[node name="Pipe1" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_ja012")
+position = Vector2(3230, 0)
+rotation = 3.1415927
+scale = Vector2(1, -1)
+texture = ExtResource("3_uwyig")
+
+[node name="Pipe2" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_wfc8k")
+position = Vector2(2718, 0)
+rotation = 3.1415927
+scale = Vector2(1, -1)
+texture = ExtResource("2_wfc8k")
+
+[node name="Pipe3" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_uwyig")
+position = Vector2(2718, -512)
+rotation = 1.5707963
+scale = Vector2(1, -1)
+texture = ExtResource("3_uwyig")
+
+[node name="Pipe4" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_qtxwv")
+position = Vector2(2718, -982)
+scale = Vector2(1, -1)
+texture = ExtResource("2_wfc8k")
+region_enabled = true
+region_rect = Rect2(0, 84, 512, 428)
+
+[node name="Pipe5" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_uwyig")
+position = Vector2(2206, -940)
+rotation = 3.1415927
+scale = Vector2(1, -1)
+texture = ExtResource("3_uwyig")
+
+[node name="Pipe6" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_uwyig")
+position = Vector2(1694, -940)
+rotation = 3.1415927
+scale = Vector2(1, -1)
+texture = ExtResource("3_uwyig")
+
+[node name="Pipe7" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_uwyig")
+position = Vector2(1182, -940)
+rotation = 3.1415927
+scale = Vector2(1, -1)
+texture = ExtResource("3_uwyig")
+
+[node name="Pipe8" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_uwyig")
+position = Vector2(670, -940)
+rotation = 3.1415927
+scale = Vector2(1, -1)
+texture = ExtResource("3_uwyig")
+
+[node name="Pipe9" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_j7h33")
+position = Vector2(158, -940)
+rotation = 3.1415927
+scale = Vector2(1, -1)
+texture = ExtResource("2_wfc8k")
+
+[node name="Pipe11" type="Sprite2D" parent="."]
+z_index = 1
+material = SubResource("ShaderMaterial_4ykh0")
+position = Vector2(157, -1452)
+rotation = 1.5707964
+texture = ExtResource("3_uwyig")
+
+[node name="Pipe12" type="Sprite2D" parent="."]
+z_index = 1
+material = SubResource("ShaderMaterial_wvia6")
+position = Vector2(157, -1964)
+rotation = 1.5707964
+texture = ExtResource("3_uwyig")
+
+[node name="Pipe13" type="Sprite2D" parent="."]
+z_index = 1
+material = SubResource("ShaderMaterial_wvia6")
+position = Vector2(157, -2476)
+rotation = 1.5707964
+texture = ExtResource("3_uwyig")
+
+[node name="Pipe14" type="Sprite2D" parent="."]
+z_index = 1
+material = SubResource("ShaderMaterial_wvia6")
+position = Vector2(157, -2988)
+rotation = 1.5707964
+texture = ExtResource("3_uwyig")
+
+[node name="Pipe15" type="Sprite2D" parent="."]
+z_index = 1
+material = SubResource("ShaderMaterial_wvia6")
+position = Vector2(157, -3500)
+rotation = 1.5707964
+texture = ExtResource("3_uwyig")

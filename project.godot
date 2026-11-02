@@ -227,6 +227,9 @@ logging/enable_file_logging=true
 2d_physics/layer_2="Enemy"
 2d_physics/layer_3="Player"
 2d_physics/layer_4="WorldItem"
+2d_physics/layer_18="FallActivation"
+2d_physics/layer_19="FallHazard"
+2d_physics/layer_20="FallSupport"
 
 [navigation]
 

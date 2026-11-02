@@ -31,6 +31,4 @@ animations = [{
 
 [node name="HitA" type="AnimatedSprite2D"]
 sprite_frames = SubResource("SpriteFrames_to6ee")
-frame = 4
-frame_progress = 1.0
 flip_h = true

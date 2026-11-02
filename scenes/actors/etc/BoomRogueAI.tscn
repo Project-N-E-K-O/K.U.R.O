@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=3 uid="uid://d0tu3fq7uceqx"]
+[gd_scene load_steps=31 format=3 uid="uid://d0tu3fq7uceqx"]
 
 [ext_resource type="Texture2D" uid="uid://bg2s5x5d7xf3p" path="res://assets/effect/AttackEffect/boom_b/boom_b0001.png" id="1_d2hg0"]
 [ext_resource type="Texture2D" uid="uid://5bxnffs14fs5" path="res://assets/effect/AttackEffect/boom_b/boom_b0002.png" id="2_f1qtf"]
@@ -22,6 +22,7 @@
 [ext_resource type="Texture2D" uid="uid://dsl8gqxvftd13" path="res://assets/effect/AttackEffect/boom_b/boom_b0020.png" id="20_hk8f4"]
 [ext_resource type="Script" uid="uid://5tqak7y4n1s0" path="res://scripts/effects/EffectAutoDestroy.cs" id="21_w1le6"]
 [ext_resource type="PackedScene" uid="uid://ciwlpetibguab" path="res://shaders/destroy_somke.tscn" id="22_d2hg0"]
+[ext_resource type="Texture2D" uid="uid://dx40t86586dxk" path="res://assets/effect/EnergyOrb/liquid.png" id="22_f1qtf"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_5tm4x"]
 animations = [{
@@ -91,12 +92,63 @@ animations = [{
 "speed": 30.0
 }]
 
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_dhrom"]
+particles_animation = true
+particles_anim_h_frames = 3
+particles_anim_v_frames = 3
+particles_anim_loop = false
+
+[sub_resource type="Gradient" id="Gradient_g6qq7"]
+offsets = PackedFloat32Array(0, 0.2, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 0.9, 0, 0, 0, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTex_small"]
+gradient = SubResource("Gradient_g6qq7")
+
+[sub_resource type="Curve" id="Curve_o0pir"]
+_data = [Vector2(0, 0.99999994), 0.0, 0.0, 0, 0, Vector2(0.49841273, 1), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTex_small_scale"]
+curve = SubResource("Curve_o0pir")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_6cabj"]
+particle_flag_disable_z = true
+angle_min = -44.99999
+angle_max = 45.00001
+direction = Vector3(0, -1, 0)
+spread = 30.0
+initial_velocity_min = 500.0
+initial_velocity_max = 1500.0
+gravity = Vector3(0, 3000, 0)
+damping_min = 30.0
+damping_max = 50.0
+scale_max = 5.0
+scale_curve = SubResource("CurveTex_small_scale")
+color_ramp = SubResource("GradientTex_small")
+anim_speed_min = 1.0
+anim_speed_max = 1.0
+
 [node name="BoomRogueAI" type="AnimatedSprite2D"]
 z_index = 4
 z_as_relative = false
 scale = Vector2(1.5, 1.5)
 sprite_frames = SubResource("SpriteFrames_5tm4x")
 script = ExtResource("21_w1le6")
+
+[node name="Liquid" type="GPUParticles2D" parent="."]
+modulate = Color(0.48235294, 0.8627451, 0, 1)
+z_index = 2
+texture_filter = 1
+material = SubResource("CanvasItemMaterial_dhrom")
+amount = 16
+texture = ExtResource("22_f1qtf")
+one_shot = true
+speed_scale = 1.5
+explosiveness = 0.95
+randomness = 0.25
+visibility_rect = Rect2(-300, -300, 600, 600)
+process_material = SubResource("ParticleProcessMaterial_6cabj")
 
 [node name="DestroySomke" parent="." node_paths=PackedStringArray("SelectedLitterParts") instance=ExtResource("22_d2hg0")]
 z_as_relative = false

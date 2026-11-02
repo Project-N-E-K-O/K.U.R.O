@@ -1,6 +1,7 @@
 using System;
 using Godot;
 using Kuros.Actors.Enemies.Attacks;
+using Kuros.Actors.Enemies.States;
 
 namespace Kuros.Actors.Enemies.Animation
 {
@@ -16,7 +17,7 @@ namespace Kuros.Actors.Enemies.Animation
 	///
 	/// 状态映射（键取动画名本身，朝向变化会自然重播）：
 	///   Idle/Walk → idle；Hit → hit（走基类的双时间轴管线）；
-	///   Attack → 按攻击模板阶段 preheat/attack/recover（炮台族近战 = skill 整段）；
+	///   Attack → 按攻击模板阶段 preheat/attack/recover（炮台族近战 = skill 整段，罐子协助 = idle 整段）；
 	///   Dying → death（两骨架已有 death/d_death，镜像缺失回退基名）；Dead → 空动画；Frozen/CooldownFrozen → 保持当前姿势。
 	/// </summary>
 	public partial class EnemyF1RogueAITurretSpineAnimationController : EnemySpineAnimationController
@@ -32,6 +33,11 @@ namespace Kuros.Actors.Enemies.Animation
 		[Export] public string SkillAnimation { get; set; } = "skill";
 		/// <summary>阵亡片：Dying 状态播一次并保持末帧（两骨架已有 death/d_death；镜像缺失时回退基名）。</summary>
 		[Export] public string DieAnimation { get; set; } = "death";
+
+		[ExportCategory("Jar Assist Stun")]
+		[Export] public string StunDownAnimation { get; set; } = "stun_1";
+		[Export] public string StunLoopAnimation { get; set; } = "stun";
+		[Export] public string StunUpAnimation { get; set; } = "stun_2";
 
 		/// <summary>朝向 → 动画名：朝左取 `d_` 前缀（这套骨架的 `d_*` 是手绘镜像，引擎不做缩放翻转）。</summary>
 		public static string ResolveName(bool facingRight, string baseName)
@@ -135,6 +141,7 @@ namespace Kuros.Actors.Enemies.Animation
 		{
 			base._Process(delta);
 			UpdateAnimation();
+			TickPartialLoop();   // PlayPartLoopIfNeeded 需要每帧回绕片段时间
 		}
 
 		private void UpdateAnimation()
@@ -164,7 +171,7 @@ namespace Kuros.Actors.Enemies.Animation
 					PlayIdleLoop();
 					break;
 				case "Hit":
-					DriveHitPhaseAnimation(ResolveName(right, HitAnimation), HitMixDuration);
+					PlayHitAnimation(right);
 					break;
 				case "Dying":           // 阵亡片播一次并保持末帧（death/d_death，按朝向取、镜像缺失回退基名）
 					PlayOnceIfNeeded("die", ResolveFacingName(right, DieAnimation), DieMixDuration);
@@ -175,6 +182,9 @@ namespace Kuros.Actors.Enemies.Animation
 				case "Attack":
 					PlayAttackPhaseAnimation(right);
 					break;
+				case "JarAssistStun":
+					PlayJarAssistStunAnimation(right);
+					break;
 				case "Frozen":
 				case "CooldownFrozen":  // 冻结/眩晕：保持当前姿势，不切换
 					break;
@@ -184,11 +194,51 @@ namespace Kuros.Actors.Enemies.Animation
 			}
 		}
 
+		private void PlayHitAnimation(bool right)
+		{
+			if (Enemy?.StateMachine?.CurrentState is EnemyF1RogueAITurretHitState hit
+				&& hit.UseStunRecovery && hit.CurrentPhase == EnemyHitState.HitPhase.Recover)
+			{
+				string animation = ResolveFacingName(right, StunUpAnimation);
+				PlayOnceIfNeeded($"TurretHitRecover:{hit.PhaseTick}:{animation}", animation, HitMixDuration);
+				return;
+			}
+			// 眩晕来源仍由原 Hit 双阶段管线驱动，播完按剩余时间恢复眩晕。
+			DriveHitPhaseAnimation(ResolveFacingName(right, HitAnimation), HitMixDuration);
+		}
+
+		private void PlayJarAssistStunAnimation(bool right)
+		{
+			if (Enemy?.StateMachine?.CurrentState is not EnemyJarAssistStunState stun) return;
+			string baseName = stun.CurrentPhase switch
+			{
+				EnemyJarAssistStunState.StunPhase.Down => StunDownAnimation,
+				EnemyJarAssistStunState.StunPhase.Up => StunUpAnimation,
+				_ => StunLoopAnimation
+			};
+			string animation = ResolveFacingName(right, baseName);
+			string key = $"JarAssistStun:{stun.CycleId}:{animation}";
+			if (stun.CurrentPhase == EnemyJarAssistStunState.StunPhase.Loop)
+				PlayLoopIfNeeded(key, animation, AttackMixDuration);
+			else
+				PlayOnceIfNeeded(key, animation, AttackMixDuration,
+					stun.CurrentPhase == EnemyJarAssistStunState.StunPhase.Down
+						? stun.DownTimeScale : stun.UpTimeScale);
+		}
+
 		/// <summary>攻击阶段 → 片子：warmup=preheat、active=attack、recovery=recover（阶段直接读模板的 CurrentPhase）。</summary>
 		private void PlayAttackPhaseAnimation(bool right)
 		{
 			var template = ResolveRunningTemplate();
 			if (template == null)
+			{
+				PlayIdleLoop();
+				return;
+			}
+
+			// 罐子协助：整招期间保持待机片（起手/出手/回收不做表演），朝左取 d_idle——
+			// 罐子生成后计数 7.5s 里的动作主体本来就是 idle，避免只在前 1s 闪 preheat/attack/recover。
+			if (template is JarAssistAttack)
 			{
 				PlayIdleLoop();
 				return;

@@ -84,6 +84,12 @@ namespace Kuros.Systems.Cutscene
 
         // ── 私有字段 ──────────────────────────────────────────────────────
         private bool    _cameraWasTopLevel = false;
+
+        private bool _cameraOverrideActive;
+        private Vector2 _normalCameraZoom;
+        /// <summary>接管前正常区域的目标缩放，供镜头返回；无接管时使用实时值。</summary>
+        public Vector2 NormalCameraZoom => _cameraOverrideActive
+            ? _normalCameraZoom : Camera?.Zoom ?? Vector2.One;
         private bool    _playerWasVisible  = false;
         private bool    _playerProcessDisabled = false;
         private readonly System.Collections.Generic.List<CanvasItem> _hiddenNodes = new();
@@ -418,6 +424,13 @@ namespace Kuros.Systems.Cutscene
         {
             if (Camera == null) return;
 
+            _cameraZoneManager ??= GetTree().GetFirstNodeInGroup("camera_zone_manager") as CameraZoneManager;
+            float? zoneZoom = _cameraZoneManager?.CurrentTargetZoom;
+            _normalCameraZoom = zoneZoom is > 0f ? new Vector2(zoneZoom.Value, zoneZoom.Value) : Camera.Zoom;
+            _cameraOverrideActive = true;
+            // 先取消区域 Tween，再让过场修改 Zoom，避免双方同时写入。
+            _cameraZoneManager?.LockZone();
+
             // 禁用 CameraFollow 脚本的 _Process / _PhysicsProcess
             Camera.SetProcess(false);
             Camera.SetPhysicsProcess(false);
@@ -428,22 +441,21 @@ namespace Kuros.Systems.Cutscene
             Camera.TopLevel        = true;
             Camera.GlobalPosition  = gpos;
 
-            // 锁定 CameraZoneManager，防止玩家 ProcessMode.Disabled 导致区域误退出
-            _cameraZoneManager ??= GetTree().GetFirstNodeInGroup("camera_zone_manager") as CameraZoneManager;
-            _cameraZoneManager?.LockZone();
         }
 
         private void EndCameraOverride()
         {
             if (Camera == null) return;
 
+            Camera.Zoom = _normalCameraZoom;
+            // Unlock 会按锁定期间持续维护的区域栈重应用边界/缩放。
+            _cameraZoneManager?.UnlockZone();
+            _cameraOverrideActive = false;
+
             Camera.TopLevel = _cameraWasTopLevel;
             Camera.SetProcess(true);
             Camera.SetPhysicsProcess(true);
             // CameraFollow 恢复后会通过 position_smoothing 平滑归位
-
-            // 解锁 CameraZoneManager
-            _cameraZoneManager?.UnlockZone();
         }
     }
 }

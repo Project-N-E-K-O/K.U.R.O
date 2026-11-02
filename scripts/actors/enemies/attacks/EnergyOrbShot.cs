@@ -46,16 +46,25 @@ namespace Kuros.Actors.Enemies.Attacks
 
         public override void _Ready()
         {
-            // 不继承父节点变换：生成方把特效挂在敌人的父节点下，而炮台/磁铁臂这类敌人的父节点是
+            // 默认不继承父节点变换：生成方把特效挂在敌人的父节点下，而炮台/磁铁臂这类敌人的父节点是
             // **滑槽的 Mount**（会随滑槽纵向滑动）——不设 TopLevel 的话落点与落地特效会跟着滑槽一起漂。
-            // （与 PlayerAttackTemplate.HitEffectForceTopLevel 同一套处理。）
-            TopLevel = true;
+            // 但 TopLevel 还会把绘制顺序强制放到所有普通 CanvasItem 之上、脱离 y-sort；
+            // 生成方若已把本弹挂到玩家父级（World，静止，如 EnemyF1RogueAITurretSimpleMeleeAttack），
+            // 就保持普通 CanvasItem，与玩家按 Y 排序。
+            if (!SharesPlayerParent()) TopLevel = true;
 
             // 快照玩家当前位置作为落点（此刻自身的 GlobalPosition 还没被生成方写入，不要用它）
             var player = GetTree().GetFirstNodeInGroup("player") as Node2D;
             _targetPos = player?.GlobalPosition ?? GlobalPosition;
 
             SetPhysicsProcess(true);
+        }
+
+        /// <summary>当前父级是否就是玩家父级（World）：挂在那里时不需要 TopLevel（避免压过玩家、保留 y-sort）。</summary>
+        private bool SharesPlayerParent()
+        {
+            if (GetTree()?.GetFirstNodeInGroup("player") is not Node2D player) return false;
+            return player.GetParent() == GetParent();
         }
 
         public override void _PhysicsProcess(double delta)

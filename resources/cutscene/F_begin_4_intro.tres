@@ -1,0 +1,58 @@
+[gd_resource type="Resource" script_class="CutsceneSequence" load_steps=14 format=3 uid="uid://c2gqsuf7qen0f"]
+
+[ext_resource type="Script" uid="uid://ctrko7add3r5h" path="res://scripts/systems/cutscene/CutsceneStep.cs" id="1_lyi2i"]
+[ext_resource type="Script" uid="uid://cjl1hjmndwvcg" path="res://scripts/systems/cutscene/steps/FadeStep.cs" id="2_jrvuc"]
+[ext_resource type="Script" uid="uid://dfa1ahl1vdlc1" path="res://scripts/systems/cutscene/steps/EffectDespawnStep.cs" id="3_5umap"]
+[ext_resource type="Script" uid="uid://5xu2sir0yhv1" path="res://scripts/systems/cutscene/steps/PlayAnimationStep.cs" id="4_4rv1c"]
+[ext_resource type="Script" uid="uid://1551srxqrxye" path="res://scripts/systems/cutscene/steps/MovePlayerStep.cs" id="5_fxw2n"]
+[ext_resource type="Script" uid="uid://cgnajq1ykl2mn" path="res://scripts/systems/cutscene/CutsceneSequence.cs" id="14_d3oyc"]
+
+[sub_resource type="Resource" id="Resource_62k4c"]
+script = ExtResource("2_jrvuc")
+Duration = 1.5
+TransitionDuration = 1.0
+UseMovieBlackBars = false
+metadata/_custom_type_script = "uid://cjl1hjmndwvcg"
+
+[sub_resource type="Resource" id="Resource_2si8d"]
+script = ExtResource("3_5umap")
+metadata/_custom_type_script = "uid://dfa1ahl1vdlc1"
+
+[sub_resource type="Resource" id="Resource_pn8jt"]
+script = ExtResource("4_4rv1c")
+AnimationPlayerPath = NodePath("../World/FBegin/AnimationPlayer")
+AnimationName = "up_loop"
+metadata/_custom_type_script = "uid://5xu2sir0yhv1"
+
+[sub_resource type="Resource" id="Resource_xm0fp"]
+script = ExtResource("4_4rv1c")
+AnimationPlayerPath = NodePath("../World/FBegin/AnimationPlayer2")
+AnimationName = "rail_move_out"
+metadata/_custom_type_script = "uid://5xu2sir0yhv1"
+
+[sub_resource type="Resource" id="Resource_b6ijc"]
+script = ExtResource("4_4rv1c")
+AnimationPlayerPath = NodePath("../World/FBegin/Animation_rogueAI/AnimationPlayer")
+AnimationName = "leave"
+WaitForCompletion = true
+metadata/_custom_type_script = "uid://5xu2sir0yhv1"
+
+[sub_resource type="Resource" id="Resource_krxc6"]
+script = ExtResource("4_4rv1c")
+AnimationPlayerPath = NodePath("../World/FBegin/AnimationPlayer")
+AnimationName = "up_to_top"
+WaitForCompletion = true
+metadata/_custom_type_script = "uid://5xu2sir0yhv1"
+
+[sub_resource type="Resource" id="Resource_xpp4e"]
+script = ExtResource("5_fxw2n")
+TargetPath = NodePath("../World/F_b1/PlayerSpawnPoint")
+metadata/_custom_type_script = "uid://1551srxqrxye"
+
+[resource]
+script = ExtResource("14_d3oyc")
+SequenceId = "F_begin_4_intro"
+Steps = Array[ExtResource("1_lyi2i")]([SubResource("Resource_62k4c"), SubResource("Resource_2si8d"), SubResource("Resource_pn8jt"), SubResource("Resource_xm0fp"), SubResource("Resource_b6ijc"), SubResource("Resource_krxc6"), SubResource("Resource_xpp4e")])
+DisablePlayerInput = false
+HidePlayer = false
+metadata/_custom_type_script = "uid://cgnajq1ykl2mn"

@@ -37,7 +37,7 @@ namespace Kuros.Actors.Enemies
 		/// <summary>这些状态下拒绝起转（正在出招/受击/冻结/死亡时不转）。</summary>
 		[Export] public Godot.Collections.Array<string> BlockingStates { get; set; } = new()
 		{
-			"Attack", "Hit", "Frozen", "CooldownFrozen", "Dying", "Dead",
+			"Attack", "Hit", "Frozen", "CooldownFrozen", "JarAssistStun", "Dying", "Dead",
 		};
 		[Export] public bool EnableDebugLogs { get; set; } = false;
 
@@ -75,6 +75,17 @@ namespace Kuros.Actors.Enemies
 
 			if (_enemy == null || !GodotObject.IsInstanceValid(_enemy)) return;
 			if (_enemy.IsDead || _enemy.IsDeathSequenceActive) return;
+
+			// 眩晕期间朝向锁定：连正在播放的转身也立即取消，避免眩晕中继续检测玩家并反转。
+			if ((_enemy.StateMachine?.CurrentState?.Name ?? string.Empty) == "JarAssistStun")
+			{
+				if (_turning)
+				{
+					_turning = false;
+					_cooldown = TurnCooldown;
+				}
+				return;
+			}
 
 			var player = ResolvePlayer();
 			if (player == null) return;

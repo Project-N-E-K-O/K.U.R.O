@@ -13,8 +13,9 @@ public partial class SlideRailMount : Node2D
 {
 	public enum RailAxis { X, Y }
 
-	/// <summary>机械出生锚点：Far/Near 是**角色语义**（勾了 FlipCarriageEnds 时跟着端点一起镜像到另一侧）。</summary>
-	public enum SpawnAnchor { Far, Near, Origin }
+	/// <summary>机械出生锚点：Far/Near 是**角色语义**（勾了 FlipCarriageEnds 时跟着端点一起镜像到另一侧）；
+	/// Origin = Mount 原点；Custom = 使用 <see cref="CarriageSpawnOffset"/> 自定义点位。</summary>
+	public enum SpawnAnchor { Far, Near, Origin, Custom }
 
 	[ExportCategory("Rail")]
 	/// <summary>滑槽自身滑动的轴（默认 Y = 纵向升降；设 X 则为横向滑槽）。</summary>
@@ -23,7 +24,8 @@ public partial class SlideRailMount : Node2D
 	/// 两端相等（含 0/0）= 无行程 → 滑槽静止（<see cref="HasSlotLimits"/> = false）。</summary>
 	[Export] public float SlotStartOffset { get; set; } = -1000f;
 	[Export] public float SlotEndOffset { get; set; } = 500f;
-	/// <summary>机械行程的两个端点：沿 <see cref="CarriageAxis"/> 的**带符号局部偏移**（相对本节点的摆放位置）。
+	/// <summary>机械行程的两个端点：沿 <see cref="CarriageAxis"/> 的**带符号局部偏移**（相对 **Mount 挂载点**；
+	/// Mount 未自定义位置时与滑槽根节点重合）。
 	/// Near = 贴玩家侧（场内/内侧）端，Far = 场外端；勾了 <see cref="FlipCarriageEnds"/> 时两个偏移**一起取负**（沿轴镜像）。
 	/// 两端相等（含 0/0）= 机械锁死在该偏移处。</summary>
 	[Export] public float CarriageNearOffset { get; set; } = 2600f;
@@ -48,10 +50,15 @@ public partial class SlideRailMount : Node2D
 	/// <summary>机械入驻时给它加的组（空 = 不加，旧行为不变）。供按组识别"这台滑槽上的机械"的联动系统用
 	/// （如 rogueAI 二阶段本体统计被摧毁的部件）——过场生成时用 PropertyOverrides 覆盖。</summary>
 	[Export] public string CarriageGroupToAdd { get; set; } = "";
-	/// <summary>机械出生锚点：Far = 场外/待命端（默认）、Near = 贴玩家端、Origin = 滑槽原点（关卡摆放点/轨道中点）。
+	/// <summary>机械出生锚点：Far = 场外/待命端（默认）、Near = 贴玩家端、Origin = Mount 原点、
+	/// Custom = 使用 <see cref="CarriageSpawnOffset"/>。
 	/// Far/Near 与行程端点同源，勾了 <see cref="FlipCarriageEnds"/> 时跟着一起镜像到另一侧。
 	/// 过场生成的 PropertyOverrides 会在入树前写好这个值，正好赶得上 <see cref="_Ready"/> 里的摆位。</summary>
 	[Export] public SpawnAnchor CarriageSpawn { get; set; } = SpawnAnchor.Far;
+	/// <summary>自定义出生点（Mount 局部坐标）：仅 <see cref="CarriageSpawn"/> = Custom 时使用。
+	/// 勾了 <see cref="FlipCarriageEnds"/> 时机械轴分量取负（与 Near/Far 的镜像规则一致）。
+	/// 机械轴分量建议落在 [CarriageFar, CarriageNear] 行程内，否则首物理帧会被钳回区间。</summary>
+	[Export] public Vector2 CarriageSpawnOffset { get; set; } = Vector2.Zero;
 	/// <summary>滑槽自身滑动速度（px/s），也是匀速上限。</summary>
 	[Export(PropertyHint.Range, "10,2000,1")] public float Speed { get; set; } = 200f;
 	[Export(PropertyHint.Range, "0,64,1")] public float ArriveDeadzone { get; set; } = 4f;
@@ -65,6 +72,7 @@ public partial class SlideRailMount : Node2D
 	[Export(PropertyHint.Range, "0,30,0.1")] public float FollowSmoothing { get; set; } = 8.5f;
 
 	private bool _resolved;
+	private Node2D? _mount;
 	private float _slotStart;
 	private float _slotEnd;
 	private float _carriageNear;
@@ -194,6 +202,17 @@ public partial class SlideRailMount : Node2D
 	/// 角色解释与 <see cref="ResolveNow"/> 同源：FlipCarriageEnds 对"出生点"和"行程端点"同时生效。</summary>
 	private Vector2 ResolveSpawnPosition()
 	{
+		if (CarriageSpawn == SpawnAnchor.Custom)
+		{
+			var custom = CarriageSpawnOffset;
+			if (FlipCarriageEnds)
+			{
+				if (CarriageAxis == RailAxis.X) custom.X = -custom.X;
+				else custom.Y = -custom.Y;
+			}
+			return custom;
+		}
+
 		if (CarriageSpawn == SpawnAnchor.Origin) return Vector2.Zero;
 
 		// 角色 → 偏移一一对应（不再对调）；镜像只体现在符号上
@@ -277,9 +296,11 @@ public partial class SlideRailMount : Node2D
 			_slotStart = _slotEnd = CurrentRailCoordinate;
 		}
 
-		// 机械行程（沿 CarriageAxis）：角色约定（Near = 玩家侧、Far = 场外）不变；FlipCarriageEnds = 沿轴镜像
-		// （两个偏移一起取负，不是对调角色——不对称偏移时两者结果完全不同）
-		float carriageOrigin = GetCarriageCoordinate(GlobalPosition);
+		// 机械行程（沿 CarriageAxis）：以 **Mount 挂载点** 为原点——Mount 允许自定义位置
+		// （默认在滑槽根节点即 (0,0)）；角色约定（Near = 玩家侧、Far = 场外）不变，
+		// FlipCarriageEnds = 沿轴镜像（两个偏移一起取负，不是对调角色）。
+		var mount = EnsureMount();
+		float carriageOrigin = GetCarriageCoordinate(mount.GlobalPosition);
 		float mirror = FlipCarriageEnds ? -1f : 1f;
 		_carriageNear = carriageOrigin + CarriageNearOffset * mirror;
 		_carriageFar = carriageOrigin + CarriageFarOffset * mirror;
@@ -307,13 +328,16 @@ public partial class SlideRailMount : Node2D
 
 	private Node2D EnsureMount()
 	{
-		var mount = GetNodeOrNull<Node2D>("Mount");
-		if (mount == null)
+		if (_mount != null && GodotObject.IsInstanceValid(_mount))
+			return _mount;
+
+		_mount = GetNodeOrNull<Node2D>("Mount");
+		if (_mount == null)
 		{
-			mount = new Node2D { Name = "Mount" };
-			AddChild(mount);
+			_mount = new Node2D { Name = "Mount" };
+			AddChild(_mount);
 		}
-		return mount;
+		return _mount;
 	}
 
 	private void SetCoordinate(float coordinate)

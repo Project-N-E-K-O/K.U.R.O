@@ -79,12 +79,12 @@ metadata/_custom_type_script = "uid://fd5076f50ca0"
 [sub_resource type="Resource" id="Resource_oluqs"]
 script = ExtResource("14_fm7ty")
 Scene = ExtResource("14_3o8by")
-UniqueGroup = "corpdone_firewall_fx"
+UniqueGroup = "firewall_fx"
 EffectOffset = Vector2(nan, nan)
 SpawnTiming = 1
 SpawnMarkerPaths = [NodePath("../../../../Node2D/Marker2D2")]
 FlipMode = 1
-BlockedByFxGroup = "corpdone_firewall_fx"
+BlockedByFxGroup = "firewall_fx"
 metadata/_custom_type_script = "uid://fd5076f50ca0"
 
 [node name="Enemy_D1_corpDoneB" type="CharacterBody2D" node_paths=PackedStringArray("DetectionArea", "AttackArea", "StateMachine", "EffectController")]

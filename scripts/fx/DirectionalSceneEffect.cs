@@ -18,8 +18,10 @@ namespace Kuros.Fx
 	/// 3. 轨道路径改为 .:SpawnAtMarker / .:DestroySelf（不再需要 ..）
 	/// 4. 根 AnimationPlayer 加入 AnimationPlayers 数组，_Ready 自动同步播放
 	/// </summary>
-	public partial class DirectionalSceneEffect : Node2D, IFacingDirectional
+	public partial class DirectionalSceneEffect : Node2D, IFacingDirectional, IAttackerProvider
 	{
+		/// <summary>攻击来源（AttackEffectEntry 生成链自动注入）：转发给子级 ContactDamageBarrier 墙体的接触伤害。</summary>
+		public GameActor? Attacker { get; set; }
 		[ExportGroup("Animation")]
 		/// <summary>单条指定动画：**非空则无视朝向固定播这一条**，优先于 AnimLeft/AnimRight。
 		/// 适合"只有一段表演"的场景（如 rogueAI 表演体的 leave / move_down / wake_up）——
@@ -52,6 +54,11 @@ namespace Kuros.Fx
 				if (ap != null && IsInstanceValid(ap) && ap.HasAnimation(anim))
 					ap.Play(anim);
 			}
+
+			// 接触伤害来源：转发给子级 ContactDamageBarrier（FireWallC 的六面墙）
+			foreach (Node child in GetChildren())
+				if (child is ContactDamageBarrier wall)
+					wall.Attacker = Attacker;
 		}
 
 		public void DestroySelf()

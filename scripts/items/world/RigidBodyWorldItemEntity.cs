@@ -19,7 +19,7 @@ namespace Kuros.Items.World
 	/// 适配 RigidBody2D 物品场景的包装类
 	/// 将 RigidBody2D 作为子节点，提供 WorldItemEntity 的功能
 	/// </summary>
-	public partial class RigidBodyWorldItemEntity : Node2D, IWorldItemEntity
+	public partial class RigidBodyWorldItemEntity : Node2D, IWorldItemEntity, Kuros.Environments.IPlatformPassenger
 	{
 		/// <summary>世界物走 Destroy 链销毁完成(被打碎/外部 RequestDestroy;OnThrowDestroy 特效已生成)。
 		/// 供 BuildThrow_A_004 等订阅并按来源组过滤;静态事件,订阅方 OnRemoved 需退订。</summary>
@@ -168,6 +168,9 @@ namespace Kuros.Items.World
 		private double _refreezeTimer = 0.0;
 		private const double RefreezeTimeThreshold = 0.25; // seconds below speed threshold to refreeze
 		private const float RefreezeSpeedThreshold = 8.0f; // speed below which we consider the body at rest
+		/// <summary>WorldItem 物理层（layer 4）：伤害效果把 TargetCollisionMask 配成该层即可
+		/// 通过物理查询发现家具的可破坏 StaticBody2D；Environment 位保留，移动碰撞不变。</summary>
+		private const uint WorldItemDamageLayer = 1u << 3;
 		private float _initialGravityScale = 0.0f;
 		private bool _inFlight = false;
 		private double _flightTimer = 0.0;
@@ -621,6 +624,45 @@ namespace Kuros.Items.World
 		/// 与 TryPickupByActor 的门控同源：候选筛选用这个，真正拾取仍由 TryPickupByActor 兜底。
 		/// </summary>
 		internal bool IsPickupAvailable => !_isPicked && !_isDestroying && !IsInThrowLifecycle;
+
+		[ExportGroup("Platform Carry")]
+		/// <summary>允许地面静置物品（家具或投掷武器）随平台移动；投掷、回弹、散落未停稳及拾取期间不承载。</summary>
+		[Export] public bool PlatformCarryEnabled { get; set; } = true;
+		/// <summary>可选脚底节点，相对于物品根节点；空时优先使用实际身体形状原点，无身体形状时使用内部刚体位置。</summary>
+		[Export] public NodePath PlatformGroundProbePath { get; set; } = new();
+		private PhysicsBody2D? PlatformCollisionBody
+		{
+			get
+			{
+				var staticBody = _rigidBody?.GetNodeOrNull<StaticBody2D>("StaticBody2D");
+				if (staticBody != null && Kuros.Environments.PlatformCarryPhysics.HasEnabledBodyShape(staticBody)) return staticBody;
+				return _rigidBody != null && Kuros.Environments.PlatformCarryPhysics.HasEnabledBodyShape(_rigidBody) ? _rigidBody : null;
+			}
+		}
+		public bool CanRidePlatform => PlatformCarryEnabled && IsPickupAvailable && !_isDropping && !_refreezePending
+			&& IsVisibleInTree() && CanProcess() && !IsQueuedForDeletion()
+			&& _rigidBody != null && _rigidBody.Freeze;
+
+		public Vector2 PlatformGroundPosition => GetNodeOrNull<Node2D>(PlatformGroundProbePath)?.GlobalPosition
+			?? (PlatformCollisionBody is { } body ? Kuros.Environments.PlatformCarryPhysics.BodyGroundPosition(body)
+				: _rigidBody?.GlobalPosition ?? GlobalPosition);
+
+		public void ApplyPlatformDisplacement(Vector2 displacement, uint obstacleMask)
+		{
+			if (!CanRidePlatform || displacement.IsZeroApprox()) return;
+			Vector2 motion = displacement;
+			if (PlatformCollisionBody is { } body)
+			{
+				var exclude = new Godot.Collections.Array<Rid>();
+				Kuros.Environments.PlatformCarryPhysics.CollectBodyRids(this, exclude);
+				motion = Kuros.Environments.PlatformCarryPhysics.ClipMotion(body, displacement, obstacleMask, exclude);
+			}
+			Vector2 rigidTarget = _rigidBody!.GlobalPosition + motion;
+			GlobalPosition += motion;
+			// 显式同步冻结的刚体，保留它与包装根节点原有偏移，防止物理同步覆盖父级移动。
+			_rigidBody.GlobalPosition = rigidTarget;
+			// 均为地面静置状态；不改线速度、冻结状态、投掷计时及局部影子/Hitbox 偏移。
+		}
 
 		/// <summary>
 		/// 判断此实例是否有资格参与高亮候选（供 PlayerItemInteractionComponent 调用）
@@ -1236,7 +1278,10 @@ namespace Kuros.Items.World
 			else
 			{
 				try { _initialGravityScale = _rigidBody.GravityScale; } catch { _initialGravityScale = 0.0f; }
-				
+
+				if (_rigidBody.GetNodeOrNull<StaticBody2D>("StaticBody2D") is StaticBody2D staticBody)
+					staticBody.CollisionLayer |= WorldItemDamageLayer;
+
 				// 保存 RigidBody2D 的原始碰撞设置
 				try
 				{

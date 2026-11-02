@@ -9,7 +9,7 @@ namespace Kuros.Actors.Enemies.Attacks
 	/// 判据来源不是自身血量（本体常态免伤、血量恒定，血量阈值那套在这里永远不会跨过），
 	/// 而是 <see cref="KillProgressAscendController.Progress"/>（0..1）——与其它敌人的
 	/// `UltimateHealthThresholds` 同形，只把"血量降序比较"换成"进度升序比较"：
-	///   · <see cref="UltimateProgressThresholds"/> 升序排列，**指针即已放次数**（_consumedUltimates）；
+	///   · <see cref="TriggerThresholds"/> 升序排列，**指针即已放次数**（_consumedUltimates）；
 	///   · "已跨过但没放"= 进度 ≥ 指针所指阈值 → 大招权重拉满、普攻清零（_pendingWeightRestore 记账）；
 	///   · 大招**真正起手**才前进指针（避免被别的攻击抢走这一发）；
 	///   · Warmup/Active 被打断 = 没放出来 → 指针回退一格（Recovery 打断视为已释放，不退）；
@@ -27,19 +27,22 @@ namespace Kuros.Actors.Enemies.Attacks
 		/// EnemyAttackController.IsOtherEnemyAttacking 按攻击名在全体敌人间去重，
 		/// 用通用名（如 netAdmin 已占用的 "UltimateAttack"）会和那台敌人互相阻断出招。</summary>
 		[Export] public string UltimateAttackName { get; set; } = "RogueAIOverload";
-		/// <summary>强化版大招攻击名（进度升级后**取代**上面那个，不额外多一发）。
+		/// <summary>强化版大招攻击名（升级后**取代**上面那个，不额外多一发）。
 		/// **必须与节点名一致，且全项目唯一**（理由同 UltimateAttackName）。</summary>
 		[Export] public string UltimateProAttackName { get; set; } = "RogueAIOverloadPro";
-		/// <summary>进度 ≥ 此值时原版大招被 Pro 取代（0 = 开场即 Pro）。与阈值同源：关卡只提供进度，判据在敌人侧。</summary>
-		[Export(PropertyHint.Range, "0,1,0.01")] public float UltimateUpgradeProgress { get; set; } = 0.75f;
-		/// <summary>进度百分比阈值（0~1，升序检测）：进度每跨过一个允许放一次大招；
-		/// **数组长度 = 这场最多几发**。与其它敌人的 `UltimateHealthThresholds` 同形，判据换成关卡进度。</summary>
-		[Export] public float[] UltimateProgressThresholds { get; set; } = { 0.5f, 1.0f };
+
+		/// <summary>大招触发阈值数组（0~1，升序检测）：每跨过一个允许放一次大招；长度 = 本场最多几发。
+		/// **导出在子类**：part1 的判据是关卡进度（ProgressThresholds），part2 是血量比值（HealthThresholds）——
+		/// 基类不定义"进度/血量"字样，避免另一侧 inspector 出现误导字段。</summary>
+		protected virtual float[] TriggerThresholds => System.Array.Empty<float>();
+		/// <summary>大招 Pro 升级阈值（0~1）。导出在子类，判据源同 <see cref="TriggerThresholds"/>。</summary>
+		protected virtual float UpgradeThreshold => 1f;
 		/// <summary>两次大招之间的最小间隔（秒）：到点后若还有"已跨过未释放"的阈值就重新武装。</summary>
 		[Export(PropertyHint.Range, "0,20,0.1")] public float UltimateRetriggerDelay { get; set; } = 4f;
 
 		/// <summary>第二个普攻名（与基类 MeleeAttackName 并列、同权重随机，如 RogueAISlamB）。空 = 无。
-		/// 大招武装时**两个普攻都要清零**、结束后都要还原——没写进来的那个会在武装窗口被随机选中。</summary>
+		/// 大招武装时**所有普攻都要清零**、结束后都要还原——没写进来的那个会在武装窗口被随机选中
+		/// （子类可重写 <see cref="EnumerateMeleeNames"/> 追加更多普攻）。</summary>
 		[Export] public string MeleeAttackNameSecond { get; set; } = "";
 		// 调试开关用基类 EnemyAttackController.EnableDebugLogs（此前子类又声明了一份同名导出：CS0108 + 编辑器只显示一个）
 
@@ -83,7 +86,7 @@ namespace Kuros.Actors.Enemies.Attacks
 			if (_ultRetriggerTimer > 0f)
 				_ultRetriggerTimer -= (float)delta;
 
-			// 进度升级（与阈值同源的轮询）：跨过 UltimateUpgradeProgress 后原版大招换成 Pro
+			// 升级（与阈值同源的轮询）：跨过 UpgradeThreshold 后原版大招换成 Pro
 			bool upgraded = ShouldUpgradeUltimate();
 			if (upgraded != _ultUpgraded)
 			{
@@ -224,10 +227,10 @@ namespace Kuros.Actors.Enemies.Attacks
 		/// <summary>当前生效的大招名：未升级 = 原版；升级后 = Pro（两者互斥，权重只给这一个）。</summary>
 		private string ActiveUltimateName => _ultUpgraded ? UltimateProAttackName : UltimateAttackName;
 
-		/// <summary>进度是否已到"换强化版"的值（与阈值同源，轮询读取）。protected virtual：同上，子类可换判据源。</summary>
+		/// <summary>是否已到"换强化版"的值（与阈值同源，轮询读取）。protected virtual：子类可换判据源。</summary>
 		protected virtual bool ShouldUpgradeUltimate()
 			=> _progress != null && GodotObject.IsInstanceValid(_progress)
-			   && _progress.Progress >= UltimateUpgradeProgress;
+			   && _progress.Progress >= UpgradeThreshold;
 
 		private void ConfigureNextAttack()
 		{
@@ -274,9 +277,9 @@ namespace Kuros.Actors.Enemies.Attacks
 		protected virtual void RefreshThresholdCache()
 		{
 			var list = new List<float>();
-			if (UltimateProgressThresholds != null)
+			if (TriggerThresholds != null)
 			{
-				foreach (float t in UltimateProgressThresholds)
+				foreach (float t in TriggerThresholds)
 				{
 					float clamped = Mathf.Clamp(t, 0f, 1f);
 					if (!list.Contains(clamped)) list.Add(clamped);
@@ -286,8 +289,9 @@ namespace Kuros.Actors.Enemies.Attacks
 			_sortedThresholds = list.ToArray();
 		}
 
-		/// <summary>普攻名集合（第二个可选）：大招武装时全部清零、结束后全部还原——并列普攻都写进来。</summary>
-		private IEnumerable<string> EnumerateMeleeNames()
+		/// <summary>普攻名集合（第二个可选）：大招武装时全部清零、结束后全部还原——并列普攻都写进来。
+		/// protected virtual：子类可追加自己的普攻（如 part1 的近身下砸），无需改共用导出。</summary>
+		protected virtual IEnumerable<string> EnumerateMeleeNames()
 		{
 			if (!string.IsNullOrEmpty(MeleeAttackName)) yield return MeleeAttackName;
 			if (!string.IsNullOrEmpty(MeleeAttackNameSecond)) yield return MeleeAttackNameSecond;

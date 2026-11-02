@@ -22,6 +22,8 @@ namespace Kuros.Core.Events
         CritBonus,
         /// <summary>效果/构筑追加伤害（如 BuildMachineLevel3），不触发武器主动词条如暴击</summary>
         EffectBonus,
+        /// <summary>深坑固定比例惩罚，不经过普通攻击免伤与伤害拦截。</summary>
+        EnvironmentalFall,
     }
 
     /// <summary>
