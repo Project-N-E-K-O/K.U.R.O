@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=3 uid="uid://byi2utn347fwu"]
+[gd_scene load_steps=36 format=3 uid="uid://byi2utn347fwu"]
 
 [ext_resource type="Script" uid="uid://dk2iwmam78oa5" path="res://scripts/actors/enemies/EnemyNormalGuard1.cs" id="1_75dbm"]
 [ext_resource type="Resource" uid="uid://biq1vqy017vmi" path="res://resources/loot/Enemy_NormalDrops.tres" id="2_77ewr"]
@@ -24,6 +24,9 @@
 [ext_resource type="Script" uid="uid://dasv6eyuks8yq" path="res://scripts/actors/enemies/movement/EnemyFreezeOnTurnMovement.cs" id="18_u8fiq"]
 [ext_resource type="Script" uid="uid://266uyrs4q4pa" path="res://scripts/actors/enemies/animation/EnemyNormalGuard1SpineAnimationController.cs" id="19_lxpom"]
 [ext_resource type="Script" uid="uid://bbybuyitd10jr" path="res://scripts/controllers/SpineController.gd" id="20_0ugu3"]
+[ext_resource type="Script" uid="uid://dsbna0napv0bt" path="res://scripts/actors/enemies/EnemyFallController.cs" id="fall_controller"]
+[ext_resource type="PackedScene" uid="uid://dva26mfp5yohw" path="res://scenes/objects/Animation_character.tscn" id="fall_effect"]
+[ext_resource type="Script" uid="uid://isk4s1w8ixcu" path="res://scripts/actors/enemies/states/EnemyFallState.cs" id="fall_state"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_b5vhy"]
 shader = ExtResource("4_f6qhq")
@@ -222,6 +225,8 @@ shape = SubResource("CapsuleShape2D_77ewr")
 [node name="Marker2D" type="Marker2D" parent="Node2D"]
 position = Vector2(0, -1700)
 
+[node name="GroundProbe" type="Marker2D" parent="."]
+
 [node name="StateMachine" type="Node" parent="." node_paths=PackedStringArray("InitialState")]
 script = ExtResource("6_a0ggd")
 InitialState = NodePath("Idle")
@@ -258,7 +263,7 @@ DamageAreaPath = NodePath("../../../../Sprite2D/OnePunchAttackArea")
 TriggerAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
 KnockbackDistance = 600.0
 KnockbackDuration = 0.4
-GrantedImmunities = 24
+GrantedImmunities = 2072
 StunInterruptOnDamage = true
 DamageTakenFrozenDuration = 3.0
 InterruptDamageSources = 2
@@ -285,6 +290,9 @@ metadata/attack_weight = 70.0
 [node name="Hit" type="Node" parent="StateMachine"]
 script = ExtResource("13_vr7xr")
 
+[node name="Fall" type="Node" parent="StateMachine"]
+script = ExtResource("fall_state")
+
 [node name="Frozen" type="Node" parent="StateMachine"]
 script = ExtResource("14_e7577")
 
@@ -300,6 +308,11 @@ script = ExtResource("17_lt3oi")
 
 [node name="EffectController" type="Node" parent="."]
 script = ExtResource("3_it0yr")
+
+[node name="FallController" type="Node" parent="."]
+script = ExtResource("fall_controller")
+FallEnabled = true
+FallEffectScene = ExtResource("fall_effect")
 
 [node name="FreezeOnTurnMovement" type="Node" parent="."]
 script = ExtResource("18_u8fiq")

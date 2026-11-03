@@ -1,7 +1,8 @@
-[gd_scene load_steps=51 format=3 uid="uid://ufprfd4r8ijj"]
+[gd_scene load_steps=52 format=3 uid="uid://ufprfd4r8ijj"]
 
 [ext_resource type="Script" path="res://scripts/actors/heroes/PlayerFallController.cs" id="fall_controller"]
 [ext_resource type="Script" path="res://scripts/actors/heroes/states/PlayerFallState.cs" id="fall_state"]
+[ext_resource type="PackedScene" uid="uid://dva26mfp5yohw" path="res://scenes/objects/Animation_character.tscn" id="fall_effect"]
 
 [ext_resource type="Script" uid="uid://dj1eq3skmq5qf" path="res://scripts/actors/heroes/attacks/PlayerLaserPointerAttack.cs" id="0_laserptr"]
 [ext_resource type="Script" uid="uid://12wblt72y8xt" path="res://scripts/actors/heroes/MainCharacter.cs" id="1_om6pm"]
@@ -521,6 +522,7 @@ LandingIndicatorScene = ExtResource("52_pplu2")
 
 [node name="FallController" type="Node" parent="."]
 script = ExtResource("fall_controller")
+FallEffectScene = ExtResource("fall_effect")
 
 [node name="Fall" type="Node" parent="StateMachine"]
 script = ExtResource("fall_state")

@@ -53,7 +53,7 @@ namespace Kuros.Items.World
 		public bool CanRidePlatform => PlatformCarryEnabled && !_isPicked && !IsQueuedForDeletion()
 			&& IsVisibleInTree() && CanProcess()
 			&& _pendingVelocity.LengthSquared() <= 0.0001f && Velocity.LengthSquared() <= 0.0001f;
-		public Vector2 PlatformGroundPosition => GetNodeOrNull<Node2D>(PlatformGroundProbePath)?.GlobalPosition ?? GlobalPosition;
+		public Vector2 PlatformGroundPosition => Kuros.Environments.PlatformCarryPhysics.GroundPosition(this, PlatformGroundProbePath);
 
 		public void ApplyPlatformDisplacement(Vector2 displacement, uint obstacleMask)
 		{

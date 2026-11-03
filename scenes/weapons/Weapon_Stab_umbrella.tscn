@@ -1,12 +1,12 @@
 [gd_scene load_steps=13 format=3 uid="uid://6ghjqyjkk37w"]
 
 [ext_resource type="Script" uid="uid://dtgdjgrqgype7" path="res://scripts/items/world/WorldItemEntity.cs" id="1_inoct"]
-[ext_resource type="Resource" uid="uid://c01sltuo7404y" path="res://resources/items/Weapon_Stab_umbrella.tres" id="2_inoct"]
-[ext_resource type="Shader" uid="uid://8m1dqcvm2y7u" path="res://shaders/materials/sprite_outline.gdshader" id="3_o27ch"]
+[ext_resource type="Resource" uid="uid://c85bfuwu0x3m8" path="res://resources/items/Weapon_Stab_umbrella.tres" id="2_inoct"]
+[ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="3_o27ch"]
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="3_u83q7"]
 [ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="4_0qmq6"]
 [ext_resource type="Texture2D" uid="uid://boj3u1fybi1od" path="res://assets/weapons/护盾伞.png" id="6_0qmq6"]
-[ext_resource type="Shader" uid="uid://cxc1fus7qqfu6" path="res://shaders/materials/sparkling.gdshader" id="7_0qmq6"]
+[ext_resource type="Shader" uid="uid://caxdo713k5kug" path="res://shaders/materials/sparkling.gdshader" id="7_0qmq6"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_m4rsl"]
 shader = ExtResource("3_u83q7")
@@ -15,7 +15,7 @@ shader_parameter/alpha = 0.2
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_4lmql"]
 shader = ExtResource("3_o27ch")
-shader_parameter/outline_color = Color(0, 0, 0, 1)
+shader_parameter/outline_color = Color(0, 0, 0, 0)
 shader_parameter/outline_size = 32.0
 shader_parameter/alpha_threshold = 0.56999998725936
 shader_parameter/edge_softness = 0.12
@@ -27,6 +27,8 @@ shader_parameter/highlight_width = 0.08
 shader_parameter/highlight_speed = 2.0
 shader_parameter/highlight_intensity = 1.2
 shader_parameter/highlight_interval = 1.00000002375
+shader_parameter/brightness = 1.0
+shader_parameter/alpha_factor = 1.0
 
 [sub_resource type="RectangleShape2D" id="BodyShape_rr6vl"]
 size = Vector2(340, 100)

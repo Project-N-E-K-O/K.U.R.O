@@ -17,6 +17,7 @@ namespace Kuros.Actors.Enemies.Attacks
         private EnemyAttackTemplate? _currentAttack;
         private EnemyAttackTemplate? _queuedAttack;
         private Area2D? _playerDetectionArea;
+        private bool _detectionSignalsConnected;
         private string? _pendingQueueReason;
         private bool _playerInside;
         /// <summary>两次攻击之间的全局呼吸窗（= MinInterAttackDelay）。各攻击独立 CD 由子模板的 CooldownDurationMultiplier 控制（只锁自己）。</summary>
@@ -79,11 +80,13 @@ namespace Kuros.Actors.Enemies.Attacks
         {
             base.Initialize(enemy);
             _entries.Clear();
+            DisconnectDetectionSignals();
             _playerDetectionArea = ResolveArea(PlayerDetectionAreaPath, AttackArea);
             if (_playerDetectionArea != null)
             {
                 _playerDetectionArea.BodyEntered += OnDetectionAreaBodyEntered;
                 _playerDetectionArea.BodyExited += OnDetectionAreaBodyExited;
+                _detectionSignalsConnected = true;
             }
             else
             {
@@ -546,25 +549,23 @@ namespace Kuros.Actors.Enemies.Attacks
 
         public override void _ExitTree()
         {
-            if (_playerDetectionArea != null)
-            {
-                var entered = new Callable(this, MethodName.OnDetectionAreaBodyEntered);
-                var exited = new Callable(this, MethodName.OnDetectionAreaBodyExited);
-                if (_playerDetectionArea.IsConnected(Area2D.SignalName.BodyEntered, entered))
-                {
-                    _playerDetectionArea.BodyEntered -= OnDetectionAreaBodyEntered;
-                }
-
-                if (_playerDetectionArea.IsConnected(Area2D.SignalName.BodyExited, exited))
-                {
-                    _playerDetectionArea.BodyExited -= OnDetectionAreaBodyExited;
-                }
-            }
+            DisconnectDetectionSignals();
             base._ExitTree();
+        }
+
+        private void DisconnectDetectionSignals()
+        {
+            if (_detectionSignalsConnected && GodotObject.IsInstanceValid(_playerDetectionArea))
+            {
+                _playerDetectionArea!.BodyEntered -= OnDetectionAreaBodyEntered;
+                _playerDetectionArea.BodyExited -= OnDetectionAreaBodyExited;
+            }
+            _detectionSignalsConnected = false;
         }
 
         private void OnDetectionAreaBodyEntered(Node body)
         {
+            if (!IsInsideTree() || IsQueuedForDeletion() || !IsEnemyAlive()) return;
             if (Enemy?.PlayerTarget == null || body != Enemy.PlayerTarget)
             {
                 return;
@@ -586,6 +587,7 @@ namespace Kuros.Actors.Enemies.Attacks
 
         private void OnDetectionAreaBodyExited(Node body)
         {
+            if (!IsInsideTree() || IsQueuedForDeletion() || !IsEnemyAlive()) return;
             if (Enemy?.PlayerTarget == null || body != Enemy.PlayerTarget)
             {
                 return;
@@ -628,7 +630,8 @@ namespace Kuros.Actors.Enemies.Attacks
 
         private bool IsEnemyAlive()
         {
-            return Enemy != null && !Enemy.IsDeathSequenceActive && !Enemy.IsDead;
+            return GodotObject.IsInstanceValid(Enemy) && Enemy!.IsInsideTree() && !Enemy.IsQueuedForDeletion()
+                && !Enemy.IsDeathSequenceActive && !Enemy.IsDead;
         }
 
         /// <summary>

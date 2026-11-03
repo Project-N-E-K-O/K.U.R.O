@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=3 uid="uid://bfy7edlq83jl6"]
+[gd_scene load_steps=27 format=3 uid="uid://bfy7edlq83jl6"]
 
 [ext_resource type="Script" uid="uid://dk8rm2u1hw8kf" path="res://scripts/effects/BriefcaseOpenEffect.cs" id="1_script"]
 [ext_resource type="PackedScene" uid="uid://b73y4fylkvq5o" path="res://resources/effects/CubeData.tscn" id="2_ipc2i"]
@@ -22,6 +22,7 @@
 [ext_resource type="Texture2D" uid="uid://3ffh1mw1hddm" path="res://assets/objects/briefcase/open/时间轴 1_0015.png" id="19_u5sl8"]
 [ext_resource type="Texture2D" uid="uid://coanvm1j2rwo8" path="res://assets/objects/briefcase/open/时间轴 1_0016.png" id="20_lyrr8"]
 [ext_resource type="Texture2D" uid="uid://26arr86mqbgj" path="res://assets/objects/briefcase/open/时间轴 1_0017.png" id="21_nl2nt"]
+[ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/PlatformEffectFollower.cs" id="23_iw1w1"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_gi6bh"]
 shader = ExtResource("3_l6vw5")
@@ -164,7 +165,6 @@ EffectOverrides = Dictionary[String, Variant]({
 })
 SpawnInterval = 1.0
 SpawnMarkers = [NodePath("Node2D/Marker2D")]
-Duration = 10.0
 
 [node name="Shadow" type="Sprite2D" parent="."]
 material = SubResource("ShaderMaterial_gi6bh")
@@ -190,3 +190,6 @@ shape = SubResource("RectangleShape2D_l6vw5")
 
 [node name="Marker2D" type="Marker2D" parent="Node2D"]
 position = Vector2(0, -100)
+
+[node name="PlatformEffectFollower" type="Node" parent="."]
+script = ExtResource("23_iw1w1")

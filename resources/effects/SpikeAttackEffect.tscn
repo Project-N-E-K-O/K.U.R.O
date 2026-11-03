@@ -1,4 +1,6 @@
-[gd_scene load_steps=9 format=3 uid="uid://blaa7le84meul"]
+[gd_scene load_steps=10 format=3 uid="uid://blaa7le84meul"]
+
+[ext_resource type="Script" path="res://scripts/environments/PlatformEffectFollower.cs" id="platform_follower"]
 
 [ext_resource type="Script" uid="uid://b67nukmuom1nm" path="res://scripts/effects/SpikeAttackEffect.cs" id="1_container"]
 [ext_resource type="Texture2D" uid="uid://b1awmq0je57lj" path="res://assets/weapons/金属地刺.png" id="2_dmpqe"]
@@ -34,3 +36,6 @@ SpeedSlowPercent = 50.0
 script = ExtResource("3_bleed")
 Source = NodePath("../SlowHitArea")
 DotBleedEffectScene = ExtResource("4_bleedfx")
+
+[node name="PlatformEffectFollower" type="Node" parent="."]
+script = ExtResource("platform_follower")

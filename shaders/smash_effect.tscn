@@ -1,8 +1,9 @@
-[gd_scene load_steps=9 format=3 uid="uid://3o6u0oms7vm6"]
+[gd_scene load_steps=10 format=3 uid="uid://3o6u0oms7vm6"]
 
 [ext_resource type="Texture2D" uid="uid://dpq3xah0g344a" path="res://assets/effect/AttackEffect/item_broken_effect/SmashEffect.png" id="1_a1x33"]
 [ext_resource type="Texture2D" uid="uid://bk0ipufx3kn76" path="res://assets/environments/26.3.17 烟.png" id="2_bwnci"]
 [ext_resource type="Script" uid="uid://bekgm7cl4mt1h" path="res://scripts/effects/SmashEffectFadeOut.cs" id="3_fadeout"]
+[ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/PlatformEffectFollower.cs" id="4_cfqno"]
 
 [sub_resource type="Gradient" id="Gradient_h3hvx"]
 offsets = PackedFloat32Array(0, 0.2, 1)
@@ -63,3 +64,6 @@ one_shot = true
 explosiveness = 0.95
 randomness = 0.2
 process_material = SubResource("ParticleProcessMaterial_g00l8")
+
+[node name="PlatformEffectFollower" type="Node" parent="."]
+script = ExtResource("4_cfqno")

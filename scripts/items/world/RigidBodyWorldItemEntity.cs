@@ -643,9 +643,8 @@ namespace Kuros.Items.World
 			&& IsVisibleInTree() && CanProcess() && !IsQueuedForDeletion()
 			&& _rigidBody != null && _rigidBody.Freeze;
 
-		public Vector2 PlatformGroundPosition => GetNodeOrNull<Node2D>(PlatformGroundProbePath)?.GlobalPosition
-			?? (PlatformCollisionBody is { } body ? Kuros.Environments.PlatformCarryPhysics.BodyGroundPosition(body)
-				: _rigidBody?.GlobalPosition ?? GlobalPosition);
+		public Vector2 PlatformGroundPosition => Kuros.Environments.PlatformCarryPhysics.GroundPosition(
+			this, PlatformGroundProbePath, PlatformCollisionBody, _rigidBody);
 
 		public void ApplyPlatformDisplacement(Vector2 displacement, uint obstacleMask)
 		{

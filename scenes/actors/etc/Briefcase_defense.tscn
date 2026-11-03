@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=3 uid="uid://dly4tcnl66v70"]
+[gd_scene load_steps=27 format=3 uid="uid://dly4tcnl66v70"]
 
 [ext_resource type="Script" uid="uid://dk8rm2u1hw8kf" path="res://scripts/effects/BriefcaseOpenEffect.cs" id="1_script"]
 [ext_resource type="PackedScene" uid="uid://c08uxmi4ffstu" path="res://resources/effects/FireWall.tscn" id="2_q5omx"]
@@ -22,6 +22,7 @@
 [ext_resource type="Texture2D" uid="uid://3ffh1mw1hddm" path="res://assets/objects/briefcase/open/时间轴 1_0015.png" id="18_3dm6n"]
 [ext_resource type="Texture2D" uid="uid://coanvm1j2rwo8" path="res://assets/objects/briefcase/open/时间轴 1_0016.png" id="19_7llrt"]
 [ext_resource type="Texture2D" uid="uid://26arr86mqbgj" path="res://assets/objects/briefcase/open/时间轴 1_0017.png" id="20_ui0jb"]
+[ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/PlatformEffectFollower.cs" id="23_ru4aa"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_eiwn1"]
 shader = ExtResource("3_l0ns3")
@@ -101,7 +102,6 @@ script = ExtResource("1_script")
 EffectScene = ExtResource("2_q5omx")
 DelaySeconds = 0.5
 SpawnMarkers = [NodePath("Node2D/Marker2D")]
-Duration = 10.0
 
 [node name="Shadow" type="Sprite2D" parent="."]
 material = SubResource("ShaderMaterial_eiwn1")
@@ -125,3 +125,6 @@ shape = SubResource("RectangleShape2D_l0ns3")
 [node name="Marker2D" type="Marker2D" parent="Node2D"]
 position = Vector2(-130, 0)
 scale = Vector2(0.99999994, 0.99999994)
+
+[node name="PlatformEffectFollower" type="Node" parent="."]
+script = ExtResource("23_ru4aa")

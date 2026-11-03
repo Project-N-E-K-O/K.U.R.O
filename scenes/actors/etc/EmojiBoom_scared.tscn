@@ -1,4 +1,4 @@
-[gd_scene load_steps=30 format=3 uid="uid://c5kj5kfho7gcf"]
+[gd_scene load_steps=31 format=3 uid="uid://c5kj5kfho7gcf"]
 
 [ext_resource type="Script" uid="uid://cmg8g6kgr8yqd" path="res://scripts/effects/EmojiBoomEffect.cs" id="1_pyffd"]
 [ext_resource type="PackedScene" uid="uid://cmxuejgw41osm" path="res://scenes/actors/etc/BoomB.tscn" id="2_6p3fn"]
@@ -22,6 +22,7 @@
 [ext_resource type="Texture2D" uid="uid://c3rs8rf0ylgg1" path="res://assets/objects/emoji_boom/时间轴 1_0022.png" id="26_ewmny"]
 [ext_resource type="Texture2D" uid="uid://brgc6t0kb4jo3" path="res://assets/objects/emoji_boom/时间轴 1_0023.png" id="27_5tkun"]
 [ext_resource type="Texture2D" uid="uid://ck2nckhietay5" path="res://assets/objects/emoji_boom/时间轴 1_0024.png" id="28_npjfb"]
+[ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/PlatformEffectFollower.cs" id="28_y7kjy"]
 [ext_resource type="Texture2D" uid="uid://ct1auxmuplppd" path="res://assets/objects/emoji_boom/时间轴 1_0025.png" id="29_ty1eb"]
 [ext_resource type="Texture2D" uid="uid://dy3cbk0jvlt0a" path="res://assets/objects/emoji_boom/时间轴 1_0026.png" id="30_0mihb"]
 [ext_resource type="Texture2D" uid="uid://ch02xd1jd0mfd" path="res://assets/objects/emoji_boom/时间轴 1_0027.png" id="31_ojn0a"]
@@ -135,7 +136,6 @@ BoomDmgOverrides = Dictionary[String, Variant]({
 "KnockbackDuration": 0.1,
 "Radius": 150.0
 })
-EffectId = "7478a223-d900-494d-9460-8c061431b5e8"
 Duration = 1.0
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
@@ -147,3 +147,6 @@ offset = Vector2(4, 20)
 [node name="Sprite" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_3r03d")
 autoplay = "default"
+
+[node name="PlatformEffectFollower" type="Node" parent="."]
+script = ExtResource("28_y7kjy")

@@ -6,7 +6,7 @@
 
 ## 1. 目标与已确定规则
 
-玩家失去移动平台承托并处于深坑时，进入独立 Fall 状态：隐藏真实玩家、禁止角色操作，在指定位置生成动画替身，播放 `Animation_character.tscn` 的 `fall` 动画。持续 N 秒后，将真实玩家放回最近验证安全的位置，恢复显示，并结算默认最大生命值 20% 的坠落伤害。
+玩家失去移动平台承托并处于深坑时，进入独立 Fall 状态：隐藏真实玩家、禁止角色操作，在指定位置生成动画替身，播放 `Animation_character.tscn` 的 `fall` 动画。持续 N 秒后，将隐藏本体放回最近验证安全的位置，结算默认最大生命值 20% 的坠落伤害；存活才恢复原可见性，致死则保持隐藏并继续正常死亡流程。
 
 已确定的范围方案：
 
@@ -165,8 +165,12 @@ Fall 中普通 Hit、Frozen、移动和攻击请求不能打断流程；允许�
 4. 在独立世界节点下生成动画替身，设置朝向、位置及指定动画。
 5. 以游戏时间推进 N 秒；暂停菜单正常使用，暂停期间不消耗坠落时长。
 6. 到期重新验证回退候选，必要时改用同 Region 的有效记录或固定兜底点。
-7. 在仍受 Fall 控制时传送本体并清零速度，恢复可见，结算一次坠落伤害。
-8. 致死则进入正常死亡流程，不再切回 Idle；存活则恢复碰撞与本流程持有的控制锁，切入 Idle。
+7. 在仍受 Fall 控制时传送隐藏本体并清零速度，结算一次坠落伤害；同步进入死亡状态时，EndFall 清理也必须保持本体隐藏。
+8. 致死则保持隐藏并进入正常死亡流程，不再切回 Idle；存活则恢复原可见性、碰撞与本流程持有的控制锁，切入 Idle。取消流程恢复原可见性。
+
+伤害飘字管理器在接收伤害事件时，对仍处于 Fall 且生命值已归零的玩家跳过生成与合并飘字，避免隐藏本体的回退位置暴露伤害数字。伤害事件先于死亡状态切换，因此不能只依赖 Dying 标记判断；存活坠落仍正常显示伤害飘字，实际扣血及其他伤害事件不受影响。
+
+坠落致死会单独保留坠落前的可见性，不随 EndFall 的普通清理丢弃。未来统一复活流程在确认复活成功、恢复生命与死亡标记并退出死亡状态后，应调用 `PlayerFallController.RestoreVisibilityAfterRevive()`。该接口只恢复坠落留下的显示状态，不负责复活，也不应作为死亡期间直接显示玩家的方法；无记录或重复调用不会修改可见性，原本隐藏的玩家恢复后仍隐藏。当前仅预留接口，尚未实现续命 Build、统一致死拦截或完整复活流程。
 9. 清理替身和临时引用，结束本次坠落。
 
 不关闭整个玩家节点处理，不暂停整个 SceneTree。控制锁应使用所有权或令牌方式释放，避免坠落结束误解锁仍在生效的过场或对话控制。
@@ -175,11 +179,10 @@ Fall 中普通 Hit、Frozen、移动和攻击请求不能打断流程；允许�
 
 ## 8. 动画替身与相机
 
-- 场景默认使用 `res://scenes/objects/Animation_character.tscn`。
-- 加入场景树前设置 `DirectionalSceneEffect.AnimationName = "fall"`，避免 Ready 自动播放其他动画。
+- 玩家 `FallController` 通过导出属性 `FallEffectScene` 配置替身，`main_character.tscn` 已指定 `res://scenes/objects/Animation_character.tscn`。FallRegion 不再配置角色动画场景、生成点或特效偏移，仅负责区域规则、时长、伤害和安全回退。
+- 玩家控制器通过 `FallAnimationName` 配置动画名（默认 `fall`）；加入场景树前设置 `DirectionalSceneEffect.AnimationName`，避免 Ready 自动播放其他动画。
 - 根节点必须主动显示。核对根动画及子级 Spine 轨道，不盲目缩放所有子 AnimationPlayer 的速度。
-- 无指定 Marker 时：生成坐标为触发时玩家世界坐标 + 世界空间 EffectOffset。
-- 有指定 Marker 时：生成坐标为 Marker 世界坐标 + 世界空间 EffectOffset。
+- 生成坐标固定为触发时玩家世界坐标 + 玩家控制器的 `FallEffectOffset`（默认零）。偏移以世界单位计算，不随玩家缩放、旋转或朝向变化，不影响真实本体与回退坐标。已删除区域的 `EffectMarkerPath`、`EffectOffset` 和 `EffectPosition()`，不再将不同踩空位置的替身集中到固定演出点。
 - 当前动画长 5 秒，若要求整个动作覆盖 N 秒，则控制根动画播放器速度为 `5 / N`；N 必须为正数。
 - 替身只负责视觉，没有玩家输入、受击、碰撞或安全记录逻辑。
 - 真实玩家不跟随替身动画下沉，相机继续按原玩家逻辑运行；恢复传送时核对 CameraZone 和镜头平滑。
@@ -234,9 +237,9 @@ FallRegion
 | SafeDistance | 按角色脚底大小、地图比例与坑边验证调节 |
 | MinRecordDistance | 可选，避免原地重复提交 |
 | FallDuration | N，必须大于 0，与动画同步 |
-| FallEffectScene | Animation_character.tscn |
-| FallEffectMarkerPath | 可空；空时取玩家触发点 |
-| FallEffectOffset | 世界空间偏移 |
+| FallEffectScene（玩家 FallController） | Animation_character.tscn |
+| FallAnimationName（玩家 FallController） | fall |
+| FallEffectOffset（玩家 FallController） | 世界空间偏移，默认 (0, 0) |
 | DamageRatio | 0.2 |
 | ImmuneStates | 默认 Dash |
 | FallbackMarker | 每组深坑至少配置一个 |
@@ -291,7 +294,7 @@ FallRegion
 
 ### 步骤 6：接入动画替身
 
-- 设置 fall、朝向、Marker / Offset 与可见性。
+- 设置玩家控制器的动画名、朝向、FallEffectOffset 与可见性。
 - 同步 5 秒原动画与 N 秒流程，检查实际轨道播放效果。
 - 处理动画资源缺失，确认相机不追随替身下沉。
 

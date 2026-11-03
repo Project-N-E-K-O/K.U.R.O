@@ -15,7 +15,7 @@ script = ExtResource("2_entry_script")
 Scene = ExtResource("4_b")
 Position = Vector2(0, 640)
 
-[node name="FIreWall" type="Node2D"]
+[node name="FireWall" type="Node2D"]
 z_as_relative = false
 script = ExtResource("1_script")
 Segments = Array[ExtResource("2_entry_script")]([SubResource("SegmentA"), SubResource("SegmentB")])

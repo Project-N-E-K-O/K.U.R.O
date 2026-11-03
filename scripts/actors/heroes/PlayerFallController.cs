@@ -15,6 +15,12 @@ public partial class PlayerFallController : Node
     [Export(PropertyHint.Range, "0.01,1,0.01")] public float SampleInterval { get; set; } = 0.1f;
     [Export] public string[] ImmuneStates { get; set; } = { "Dash" };
     [Export(PropertyHint.Layers2DPhysics)] public uint ObstacleMask { get; set; } = 3;
+    /// <summary>玩家自身的坠落替身场景，根节点需为 Node2D；为空仍完成回退与伤害结算。</summary>
+    [Export] public PackedScene? FallEffectScene { get; set; }
+    /// <summary>替身播放的动画名；根 AnimationPlayer 按本次区域坠落时长调整速度。</summary>
+    [Export] public string FallAnimationName { get; set; } = "fall";
+    /// <summary>替身相对踩空时玩家世界位置的偏移（世界单位），不随玩家缩放或朝向变化，不影响本体及回退位置。</summary>
+    [Export] public Vector2 FallEffectOffset { get; set; } = Vector2.Zero;
     public bool IsFalling { get; private set; }
     public bool HasPendingFall => _pending != null;
     public bool Completing { get; private set; }
@@ -30,6 +36,9 @@ public partial class PlayerFallController : Node
     private float _sampleTimer, _remaining;
     private Vector2 _returnPoint, _entryPoint;
     private bool _wasVisible;
+    private bool _settlingFallDamage;
+    private bool _hiddenByLethalFall;
+    private bool _visibilityBeforeLethalFall;
     private float _damageRatio;
     private bool _warned;
     private float _duration;
@@ -160,7 +169,7 @@ public partial class PlayerFallController : Node
     public void BeginFall()
     {
         if (_pending == null) return;
-        IsFalling = true; Completing = false;
+        IsFalling = true; Completing = false; _settlingFallDamage = false;
         _duration = Mathf.Max(0.1f, _pending.FallDuration);
         _remaining = _duration; _damageRatio = Mathf.Clamp(_pending.DamageRatio, 0, 1);
         _wasVisible = _player.Visible;
@@ -168,7 +177,7 @@ public partial class PlayerFallController : Node
         _player.ConsumePendingHitKnockback();
         _player.ClearFallInputBuffers();
         CacheCollisions(_player);
-        SpawnVisual(_pending);
+        SpawnVisual();
     }
 
     private void CacheCollisions(Node node)
@@ -181,22 +190,23 @@ public partial class PlayerFallController : Node
         foreach (Node child in node.GetChildren()) CacheCollisions(child);
     }
 
-    private void SpawnVisual(FallRegion region)
+    private void SpawnVisual()
     {
-        var scene = region.FallEffectScene;
+        var scene = FallEffectScene;
         if (scene == null) { GD.PushWarning("[Fall] 未配置动画替身，恢复流程仍会运行。"); return; }
         _visual = scene.Instantiate<Node2D>();
         if (_visual is DirectionalSceneEffect effect)
-        { effect.AnimationName = "fall"; effect.FacingRight = _player.FacingRight; }
-        _visual.Position = region.EffectPosition(_entryPoint);
+        { effect.AnimationName = FallAnimationName; effect.FacingRight = _player.FacingRight; }
+        Vector2 visualPosition = _entryPoint + FallEffectOffset;
+        _visual.Position = visualPosition;
         _visual.Visible = true;
         // 顶层世界坐标，不继承玩家隐藏或动画下沉。
         _visual.TopLevel = true;
         _player.GetTree().CurrentScene.AddChild(_visual);
-        _visual.GlobalPosition = region.EffectPosition(_entryPoint);
+        _visual.GlobalPosition = visualPosition;
         var animator = _visual.GetNodeOrNull<AnimationPlayer>("AnimationPlayer");
-        if (animator != null && animator.HasAnimation("fall"))
-        { animator.SpeedScale = (float)animator.GetAnimation("fall").Length / _duration; animator.Play("fall"); }
+        if (animator != null && animator.HasAnimation(FallAnimationName))
+        { animator.SpeedScale = (float)animator.GetAnimation(FallAnimationName).Length / _duration; animator.Play(FallAnimationName); }
     }
 
     public void TickFall(float delta)
@@ -216,23 +226,44 @@ public partial class PlayerFallController : Node
             _warned = true; _remaining = 0.1f; return;
         }
         _player.GlobalPosition = _returnPoint; _player.Velocity = Vector2.Zero;
-        _player.Visible = _wasVisible;
         Completing = true;
+        // 扣血可能同步进入 Dying 并调用 EndFall，整个结算期间保持本体隐藏。
+        _settlingFallDamage = true;
         _player.ApplyFallDamage(_damageRatio);
+        _settlingFallDamage = false;
         if (IsFalling && !_player.IsDead && !_player.IsDeathSequenceActive) _player.StateMachine.ChangeState("Idle");
     }
 
     public void EndFall()
     {
         if (!IsFalling) return;
-        _player.Visible = _wasVisible;
+        bool lethalFall = _settlingFallDamage
+            && (_player.CurrentHealth <= 0 || _player.IsDead || _player.IsDeathSequenceActive);
+        if (lethalFall)
+        {
+            _hiddenByLethalFall = true;
+            _visibilityBeforeLethalFall = _wasVisible;
+        }
+        _player.Visible = _wasVisible && !lethalFall;
         foreach (var entry in _collisions)
             if (IsInstanceValid(entry.Node)) { entry.Node.CollisionLayer = entry.Layer; entry.Node.CollisionMask = entry.Mask; }
         _collisions.Clear();
         if (IsInstanceValid(_visual)) _visual!.QueueFree();
         _visual = null; _pending = null; IsFalling = false; Completing = false;
+        _settlingFallDamage = false;
         _player.ConsumePendingHitKnockback();
         _player.Velocity = Vector2.Zero; _player.ClearFallInputBuffers();
+    }
+
+    /// <summary>
+    /// 统一复活流程确认成功、恢复生命与死亡标记并退出死亡状态后调用。
+    /// 仅恢复坠落致死保留的可见性；不负责复活、切换状态或恢复生命。
+    /// </summary>
+    public void RestoreVisibilityAfterRevive()
+    {
+        if (!_hiddenByLethalFall || IsFalling || !IsInstanceValid(_player)) return;
+        _hiddenByLethalFall = false;
+        _player.Visible = _visibilityBeforeLethalFall;
     }
 
     /// <summary>外部传送/重生前调用。取消当前流程，不扣血，不解锁其他系统。</summary>

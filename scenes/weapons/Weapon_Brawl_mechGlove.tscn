@@ -1,7 +1,7 @@
 [gd_scene load_steps=18 format=3 uid="uid://ctpw5uqly3yu5"]
 
 [ext_resource type="Script" uid="uid://dtgdjgrqgype7" path="res://scripts/items/world/WorldItemEntity.cs" id="1_f06cv"]
-[ext_resource type="Resource" uid="uid://dsmyr3iwkk7n5" path="res://resources/items/Weapon_Brawl_MechGlove.tres" id="2_f06cv"]
+[ext_resource type="Resource" uid="uid://dvmwhy07qnerd" path="res://resources/items/Weapon_Brawl_MechGlove.tres" id="2_f06cv"]
 [ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="3_15lfw"]
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="3_f1ntn"]
 [ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="4_5you7"]
@@ -17,7 +17,7 @@ shader_parameter/alpha = 0.4
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_2q28g"]
 shader = ExtResource("3_15lfw")
-shader_parameter/outline_color = Color(0.02, 0.02, 0.02, 1)
+shader_parameter/outline_color = Color(0.019607844, 0.019607844, 0.019607844, 0)
 shader_parameter/outline_size = 32.0
 shader_parameter/alpha_threshold = 0.5
 shader_parameter/edge_softness = 0.12
@@ -29,6 +29,8 @@ shader_parameter/highlight_width = 0.08
 shader_parameter/highlight_speed = 2.0
 shader_parameter/highlight_intensity = 1.2
 shader_parameter/highlight_interval = 1.00000002375
+shader_parameter/brightness = 1.0
+shader_parameter/alpha_factor = 1.0
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_3fqtj"]
 shader = ExtResource("8_5you7")

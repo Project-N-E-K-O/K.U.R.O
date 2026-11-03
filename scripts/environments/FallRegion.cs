@@ -14,7 +14,7 @@ namespace Kuros.Environments;
 public partial class FallRegion : Node2D
 {
     /// <summary>
-    /// 坠落持续时间（秒，运行时至少 0.1 秒）：期间隐藏玩家，替身根 AnimationPlayer 的 fall 动画按此时长播放。
+    /// 坠落持续时间（秒，运行时至少 0.1 秒）：期间隐藏玩家，玩家控制器配置的替身动画按此时长播放。
     /// 到期后验证回退点并结算伤害；若所有回退点失效，则保持保护并每 0.1 秒重试，实际恢复可能延后。
     /// </summary>
     [Export(PropertyHint.Range, "0.1,20,0.1,or_greater")] public float FallDuration { get; set; } = 3f;
@@ -25,12 +25,6 @@ public partial class FallRegion : Node2D
     /// 禁止保存或使用该位置；历史安全点和兜底点均执行此验证。此参数不改变坠落触发边界，也不提供踩空容错。
     /// </summary>
     [Export(PropertyHint.Range, "1,1000,1,or_greater")] public float SafeDistance { get; set; } = 80f;
-    /// <summary>坠落视觉替身，需为 Node2D 场景，通常使用 Animation_character.tscn 的 fall 动画；为空仍执行隐藏、恢复与伤害流程。</summary>
-    [Export] public PackedScene? FallEffectScene { get; set; }
-    /// <summary>相对于本 FallRegion 解析的替身基准节点路径，支持任意 Node2D（建议 Marker2D）；空或找不到时使用玩家踩空时的世界位置。</summary>
-    [Export] public NodePath EffectMarkerPath { get; set; } = new();
-    /// <summary>替身基准世界位置的额外偏移（世界单位），不随本区域的旋转或缩放变换，也不影响真实玩家回退位置。</summary>
-    [Export] public Vector2 EffectOffset { get; set; }
     /// <summary>
     /// 兜底节点路径列表，相对于本 FallRegion 解析，支持 Node2D（建议 Marker2D）；节点世界位置作为玩家根节点回退坐标。
     /// 无有效历史安全点时，从通过安全验证的节点中选择最接近旧记录的位置；从未记录时按踩空位置选最近点。
@@ -38,10 +32,6 @@ public partial class FallRegion : Node2D
     /// 开始前全部无效则拒绝启动坠落；坠落到期时全部失效则保持保护并重试。
     /// </summary>
     [Export] public Array<NodePath> FallbackMarkerPaths { get; set; } = new();
-
-    /// <summary>返回替身世界坐标：优先使用指定 Node2D 的世界位置，否则使用传入玩家位置，最后叠加世界空间 EffectOffset。</summary>
-    public Vector2 EffectPosition(Vector2 playerPosition)
-        => (GetNodeOrNull<Node2D>(EffectMarkerPath)?.GlobalPosition ?? playerPosition) + EffectOffset;
 
     /// <summary>从指定节点的父节点开始，返回最近的 FallRegion 祖先；黄区与红区通过此方法归属区域，绿色承托区不依赖此方法。</summary>
     public static FallRegion? FindRegion(Node node)

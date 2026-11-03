@@ -1,4 +1,4 @@
-[gd_scene load_steps=95 format=3 uid="uid://bwdwpiu2brmv6"]
+[gd_scene load_steps=102 format=3 uid="uid://bwdwpiu2brmv6"]
 
 [ext_resource type="Script" uid="uid://b2sqtcg0odsrt" path="res://scripts/environments/DestructibleStageController.cs" id="1_81nyd"]
 [ext_resource type="Script" uid="uid://elxwhcec5gcr" path="res://scripts/environments/DestructibleStage.cs" id="2_7tgv8"]
@@ -53,6 +53,12 @@
 [ext_resource type="Texture2D" uid="uid://cwj6jichh4rwv" path="res://assets/environments/scene_6_hotel/mozhua/jar_sequence/时间轴 1_0002.png" id="37_nabst"]
 [ext_resource type="Texture2D" uid="uid://cxw8fk06y24b4" path="res://assets/environments/scene_6_hotel/mozhua/jar_sequence/时间轴 1_0001.png" id="38_341wr"]
 [ext_resource type="Texture2D" uid="uid://gl0oqbrmxxai" path="res://assets/environments/scene_6_hotel/mozhua/jar_sequence/时间轴 1_0000.png" id="39_kq0nn"]
+[ext_resource type="Texture2D" uid="uid://tsqqkjy1fw7g" path="res://assets/effect/WarmingA/warning_000.png" id="46_nce0n"]
+[ext_resource type="Texture2D" uid="uid://cymmlne2tgmj4" path="res://assets/effect/WarmingA/warning_001.png" id="47_38mwi"]
+[ext_resource type="Texture2D" uid="uid://brkdryfdqw6ty" path="res://assets/effect/WarmingA/warning_002.png" id="48_3dimn"]
+[ext_resource type="Texture2D" uid="uid://bw8lyipvk2lod" path="res://assets/effect/WarmingA/warning_003.png" id="49_rim5y"]
+[ext_resource type="Texture2D" uid="uid://bv54ac2co224k" path="res://assets/effect/WarmingA/warning_004.png" id="50_c5use"]
+[ext_resource type="Texture2D" uid="uid://dp4w7kyipubes" path="res://assets/effect/WarmingA/warning_005.png" id="51_nabst"]
 
 [sub_resource type="Resource" id="Resource_bio6l"]
 script = ExtResource("2_7tgv8")
@@ -86,7 +92,7 @@ shader_parameter/highlight_speed = 2.0
 shader_parameter/highlight_intensity = 1.2
 shader_parameter/highlight_interval = 2.0
 shader_parameter/brightness = 1.0
-shader_parameter/alpha_factor = 1.0
+shader_parameter/alpha_factor = 0.0
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_y57o0"]
 animations = [{
@@ -260,6 +266,77 @@ animations = [{
 "loop": false,
 "name": &"default",
 "speed": 25.0
+}]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_341wr"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("46_nce0n")
+}, {
+"duration": 1.0,
+"texture": ExtResource("47_38mwi")
+}, {
+"duration": 1.0,
+"texture": ExtResource("48_3dimn")
+}, {
+"duration": 1.0,
+"texture": ExtResource("49_rim5y")
+}, {
+"duration": 1.0,
+"texture": ExtResource("50_c5use")
+}, {
+"duration": 1.0,
+"texture": ExtResource("51_nabst")
+}, {
+"duration": 1.0,
+"texture": ExtResource("51_nabst")
+}, {
+"duration": 1.0,
+"texture": ExtResource("51_nabst")
+}, {
+"duration": 1.0,
+"texture": ExtResource("51_nabst")
+}, {
+"duration": 1.0,
+"texture": ExtResource("51_nabst")
+}, {
+"duration": 1.0,
+"texture": ExtResource("51_nabst")
+}, {
+"duration": 1.0,
+"texture": ExtResource("51_nabst")
+}, {
+"duration": 1.0,
+"texture": ExtResource("51_nabst")
+}, {
+"duration": 1.0,
+"texture": ExtResource("51_nabst")
+}, {
+"duration": 1.0,
+"texture": ExtResource("51_nabst")
+}, {
+"duration": 1.0,
+"texture": ExtResource("51_nabst")
+}, {
+"duration": 1.0,
+"texture": ExtResource("50_c5use")
+}, {
+"duration": 1.0,
+"texture": ExtResource("49_rim5y")
+}, {
+"duration": 1.0,
+"texture": ExtResource("48_3dimn")
+}, {
+"duration": 1.0,
+"texture": ExtResource("47_38mwi")
+}, {
+"duration": 1.0,
+"texture": ExtResource("46_nce0n")
+}],
+"loop": true,
+"name": &"default",
+"speed": 30.0
 }]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_c1mng"]
@@ -1201,6 +1278,30 @@ tracks/60/keys = {
 "update": 1,
 "values": [true]
 }
+tracks/61/type = "value"
+tracks/61/imported = false
+tracks/61/enabled = true
+tracks/61/path = NodePath("warmingA:visible")
+tracks/61/interp = 1
+tracks/61/loop_wrap = true
+tracks/61/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/62/type = "value"
+tracks/62/imported = false
+tracks/62/enabled = true
+tracks/62/path = NodePath("warmingA:frame")
+tracks/62/interp = 1
+tracks/62/loop_wrap = true
+tracks/62/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
 
 [sub_resource type="Animation" id="Animation_o0pir"]
 resource_name = "Jar_broken"
@@ -1987,6 +2088,30 @@ tracks/16/keys = {
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
 "values": [true, false]
+}
+tracks/17/type = "value"
+tracks/17/imported = false
+tracks/17/enabled = true
+tracks/17/path = NodePath("warmingA:visible")
+tracks/17/interp = 1
+tracks/17/loop_wrap = true
+tracks/17/keys = {
+"times": PackedFloat32Array(0, 6),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+tracks/18/type = "value"
+tracks/18/imported = false
+tracks/18/enabled = true
+tracks/18/path = NodePath("warmingA:frame")
+tracks/18/interp = 1
+tracks/18/loop_wrap = true
+tracks/18/keys = {
+"times": PackedFloat32Array(0, 0.03333333, 0.06666667, 0.1, 0.13333334, 0.16666667, 0.2, 0.23333333, 0.26666668, 0.3, 0.33333334, 0.36666667, 0.4, 0.43333334, 0.46666667, 0.5, 0.53333336, 0.56666666, 0.6, 0.6333333, 0.6666667, 0.7, 0.73333335, 0.7666667, 0.8, 0.8333334, 0.8666667, 0.90000004, 0.93333334, 0.96666664, 1, 1.0333333, 1.0666666, 1.1000001, 1.1333334, 1.1666667, 1.2, 1.2333333, 1.2666667, 1.3, 1.3333334, 1.3666667, 1.4000001, 1.4333334, 1.4666667, 1.5, 1.5333334, 1.5666667, 1.6, 1.6333334, 1.6666667, 1.7, 1.7333333, 1.7666667, 1.8000001, 1.8333334, 1.8666668, 1.9000001, 1.9333334, 1.9666667, 2.0333333, 2.0666666, 2.1, 2.1333332, 2.1666667, 2.2, 2.2333333, 2.2666667, 2.3, 2.3333333, 2.3666666, 2.3999999, 2.4333334, 2.4666667, 2.5, 2.5333333, 2.5666666, 2.6, 2.6333334, 2.6666667, 2.7, 2.7333333, 2.7666667, 2.8, 2.8333333, 2.8666666, 2.8999999, 2.9333334, 2.9666667, 3, 3.0333333, 3.0666666, 3.1, 3.1333334, 3.1666667, 3.2, 3.2333333, 3.2666667, 3.3, 3.3333333, 3.3666666, 3.3999999, 3.4333334, 3.4666667, 3.5, 3.5333333, 3.5666668, 3.6000001, 3.6333334, 3.6666667, 3.7, 3.7333333, 3.7666667, 3.8, 3.8333333, 3.8666666, 3.8999999, 3.9333336, 3.9666665, 4, 4.0666666, 4.1, 4.133333, 4.1666665, 4.2, 4.233333, 4.2666664, 4.2999997, 4.3333335, 4.366667, 4.4, 4.4333334, 4.4666667, 4.5, 4.5333333, 4.5666666, 4.6, 4.633333, 4.6666665, 4.7, 4.733333, 4.7666664, 4.8, 4.8333335, 4.866667, 4.9, 4.9333334, 4.9666667, 5, 5.0333333, 5.0666666, 5.1, 5.133333, 5.166667, 5.2, 5.2333336, 5.2666664, 5.3, 5.333333, 5.366667, 5.4, 5.4333334, 5.4666667, 5.5, 5.5333333, 5.5666666, 5.6, 5.633333, 5.6666665, 5.7, 5.7333336, 5.7666664, 5.8, 5.833333, 5.866667, 5.9, 5.9333334, 5.9666667),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 4, 3, 2, 1, 0, 0, 1, 2, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 4, 3, 2, 1, 0, 0, 1, 2, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 4, 3, 2, 1, 0, 0, 1, 2, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 4, 3, 2, 1, 0, 0, 1, 2, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 4, 3, 2, 1, 0, 0, 1, 2, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 4, 3, 2, 1, 0, 0, 1, 2, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 4, 3, 2, 1, 0, 0, 1, 2, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 4, 3, 2, 1, 0, 0, 1, 2, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 4, 3, 2]
 }
 
 [sub_resource type="Animation" id="Animation_01e4h"]
@@ -2862,6 +2987,12 @@ offset = Vector2(0, -385)
 visible = false
 sprite_frames = SubResource("SpriteFrames_81nyd")
 offset = Vector2(0, -385)
+
+[node name="warmingA" type="AnimatedSprite2D" parent="."]
+visible = false
+z_index = 1
+position = Vector2(0, -275)
+sprite_frames = SubResource("SpriteFrames_341wr")
 
 [node name="Shell" type="Node2D" parent="."]
 

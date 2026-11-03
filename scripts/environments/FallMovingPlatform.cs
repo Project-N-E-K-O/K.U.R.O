@@ -2,6 +2,7 @@ using Godot;
 using Kuros.Actors.Heroes;
 using Kuros.Core;
 using System.Collections.Generic;
+using System;
 
 namespace Kuros.Environments;
 
@@ -32,6 +33,11 @@ public partial class FallMovingPlatform : Node2D
     /// <summary>当前方向：true = 驶向 TravelOffset 终点；false = 驶回起点。</summary>
     private bool _outward = true;
     private FallSupportArea? _support;
+    /// <summary>平台本帧完成平移后的实际世界位移，供显式附着的地面效果使用。</summary>
+    public event Action<Vector2>? WorldDisplaced;
+    public FallSupportArea? SupportArea => _support;
+    public bool CanAttachEffects => IsInsideTree() && !IsQueuedForDeletion() && CanProcess()
+        && PlatformCarryPhysics.IsSupportEnabled(_support);
 
     public override void _Ready()
     {
@@ -53,7 +59,7 @@ public partial class FallMovingPlatform : Node2D
             ? parent.GlobalTransform.BasisXform(next - Position) : next - Position;
 
         var riders = new List<Node>();
-        if (_support != null && _support.SupportEnabled && !displacement.IsZeroApprox())
+        if (PlatformCarryPhysics.IsSupportEnabled(_support) && !displacement.IsZeroApprox())
         {
             var seen = new HashSet<ulong>();
             if (CarryPlayers) Collect("player", riders, seen);
@@ -62,6 +68,7 @@ public partial class FallMovingPlatform : Node2D
         }
 
         // 先移动平台，再把同样的位移施加给乘客（MoveAndCollide：撞墙会被挡，不会被硬推进墙里）。
+        Vector2 previousWorldPosition = GlobalPosition;
         Position = next;
         foreach (var rider in riders)
         {
@@ -71,6 +78,8 @@ public partial class FallMovingPlatform : Node2D
             else if (rider is CharacterBody2D character)
                 character.MoveAndCollide(displacement);
         }
+        Vector2 actualDisplacement = GlobalPosition - previousWorldPosition;
+        if (!actualDisplacement.IsZeroApprox()) WorldDisplaced?.Invoke(actualDisplacement);
 
         // 到端点后掉头（MoveToward 保证不会越过，所以近似相等即可）。
         if (Position.IsEqualApprox(target)) _outward = !_outward;
@@ -93,18 +102,12 @@ public partial class FallMovingPlatform : Node2D
                 if (actor.IsDead || actor.IsDeathSequenceActive
                     || (actor is SamplePlayer player && player.IsFalling)
                     || !PlatformCarryPhysics.HasEnabledBodyShape(actor)) continue;
-                foot = actor.GetNodeOrNull<Node2D>("GroundProbe")?.GlobalPosition ?? actor.GlobalPosition;
+                foot = PlatformCarryPhysics.CharacterGroundPosition(actor);
             }
             else continue; // 不对未知 Node2D / 正在自由模拟的刚体强行修改坐标。
 
-            var hits = GetWorld2D().DirectSpaceState.IntersectPoint(new PhysicsPointQueryParameters2D
-            { Position = foot, CollisionMask = FallSupportArea.Layer, CollideWithAreas = true, CollideWithBodies = false }, 128);
-            foreach (var hit in hits)
-            {
-                if (hit["collider"].AsGodotObject() != _support) continue;
-                if (PlatformCarryPhysics.TryClaim(node)) riders.Add(node);
-                break;
-            }
+            if (PlatformCarryPhysics.IsOnPlatform(GetWorld2D(), foot, this) && PlatformCarryPhysics.TryClaim(node))
+                riders.Add(node);
         }
     }
 }

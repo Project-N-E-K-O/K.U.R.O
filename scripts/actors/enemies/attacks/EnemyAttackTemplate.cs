@@ -128,10 +128,20 @@ namespace Kuros.Actors.Enemies.Attacks
         [ExportCategory("Effect Resistance")]
         /// <summary>
         /// 攻击期间赋予敌人的免疫集合。<br/>
-        /// 新增免疫类型只需在 <see cref="ImmunityFlags"/> 枚举追加值，无需修改此模板。
+        /// 阶段霸体与阶段坠落免疫按当前阶段读取，不作为全程免疫写入 ActiveImmunities。
+        /// 不提供整招 Fall 选项；Flags 显式指定位值，以保留枚举中的空缺位。
         /// </summary>
-        [Export(PropertyHint.Flags, "Stun,ForcedMovement,SpeedSlow,WarmupSuperArmor,ActiveSuperArmor,RecoverySuperArmor,ThrowableDamage,NonThrowableDamage")]
+        [Export(PropertyHint.Flags, "Stun:1,ForcedMovement:2,SpeedSlow:4,WarmupSuperArmor:8,ActiveSuperArmor:16,RecoverySuperArmor:32,ThrowableDamage:128,NonThrowableDamage:256,WarmupFallImmunity:1024,ActiveFallImmunity:2048,RecoveryFallImmunity:4096")]
         public ImmunityFlags GrantedImmunities = ImmunityFlags.None;
+
+        /// <summary>供坠落控制器只读查询；排队、结束和取消后的 Idle 均不提供阶段免疫。</summary>
+        public virtual bool ProvidesFallImmunity => _phase switch
+        {
+            AttackPhase.Warmup => (GrantedImmunities & ImmunityFlags.WarmupFallImmunity) != 0,
+            AttackPhase.Active => (GrantedImmunities & ImmunityFlags.ActiveFallImmunity) != 0,
+            AttackPhase.Recovery => (GrantedImmunities & ImmunityFlags.RecoveryFallImmunity) != 0,
+            _ => false
+        };
 
         [ExportCategory("Damage Interrupt")]
         /// <summary>
@@ -441,9 +451,12 @@ namespace Kuros.Actors.Enemies.Attacks
             ApplyAttackAreaMaskOverride();
             SubscribeDamageInterrupt();
 
-            // 将非霸体类免疫写入 ActiveImmunities（霸体按阶段独立管理）
+            // 仅全程攻击免疫写入 ActiveImmunities；阶段类标记留给实时查询。
+            // Fall 是角色/Build 的独立能力，不由 GrantedImmunities 赋予整招免疫。
             var nonSuperFlags = GrantedImmunities
-                & ~(ImmunityFlags.WarmupSuperArmor | ImmunityFlags.ActiveSuperArmor | ImmunityFlags.RecoverySuperArmor);
+                & ~(ImmunityFlags.WarmupSuperArmor | ImmunityFlags.ActiveSuperArmor | ImmunityFlags.RecoverySuperArmor
+                    | ImmunityFlags.WarmupFallImmunity | ImmunityFlags.ActiveFallImmunity | ImmunityFlags.RecoveryFallImmunity
+                    | ImmunityFlags.Fall);
             if (nonSuperFlags != ImmunityFlags.None && Enemy != null)
             {
                 _previousImmunities = Enemy.ActiveImmunities;

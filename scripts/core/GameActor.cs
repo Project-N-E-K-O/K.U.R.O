@@ -808,6 +808,18 @@ namespace Kuros.Core
 			EnterDyingState();
 		}
 
+		/// <summary>敌人地形坠落终结：绕过伤害免疫、Hit/Dying 和伤害飘字，保留统一死亡结算及事件。</summary>
+		protected void FinalizeEnvironmentalFallDeath()
+		{
+			if (_deathStarted || _deathFinalized) return;
+			_deathStarted = true;
+			_dyingDeferred = false;
+			CurrentHealth = 0;
+			ClearStunAfterHit();
+			NotifyHealthChanged();
+			FinalizeDeath();
+		}
+
 		/// <summary>进入死亡流程：有 Dying 状态则切入（死亡动画），否则直接结算。</summary>
 		private void EnterDyingState()
 		{

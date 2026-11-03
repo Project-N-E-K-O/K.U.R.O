@@ -1,9 +1,8 @@
-[gd_scene load_steps=7 format=3 uid="uid://cbqp2nyeec5bb"]
+[gd_scene load_steps=6 format=3 uid="uid://cbqp2nyeec5bb"]
 
 [ext_resource type="Script" uid="uid://bxk0txq4kyb38" path="res://scripts/environments/FallRegion.cs" id="1"]
 [ext_resource type="Script" uid="uid://dv6cc660xs2wu" path="res://scripts/environments/FallActivationArea.cs" id="2"]
 [ext_resource type="Script" uid="uid://dtlh7op6q4uex" path="res://scripts/environments/FallHazardArea.cs" id="3"]
-[ext_resource type="PackedScene" uid="uid://dva26mfp5yohw" path="res://scenes/objects/Animation_character.tscn" id="4"]
 
 [sub_resource type="RectangleShape2D" id="Yellow"]
 size = Vector2(3600, 1600)
@@ -13,7 +12,6 @@ size = Vector2(1400, 1200)
 
 [node name="FallRegion" type="Node2D"]
 script = ExtResource("1")
-FallEffectScene = ExtResource("4")
 FallbackMarkerPaths = Array[NodePath]([NodePath("FallbackLeft"), NodePath("FallbackRight")])
 
 [node name="ActivationArea" type="Area2D" parent="."]

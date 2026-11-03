@@ -1,12 +1,12 @@
 [gd_scene load_steps=18 format=3 uid="uid://3d7hnjx31f45"]
 
 [ext_resource type="Script" uid="uid://dtgdjgrqgype7" path="res://scripts/items/world/WorldItemEntity.cs" id="1_rlv6v"]
-[ext_resource type="Resource" uid="uid://deh2q01buwkpa" path="res://resources/items/Weapon_Slash_ViolinBow.tres" id="2_rlv6v"]
+[ext_resource type="Resource" uid="uid://cc08x8n7rmhjb" path="res://resources/items/Weapon_Slash_ViolinBow.tres" id="2_rlv6v"]
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="3_huuy5"]
-[ext_resource type="Shader" uid="uid://8m1dqcvm2y7u" path="res://shaders/materials/sprite_outline.gdshader" id="4_2yapo"]
-[ext_resource type="Shader" uid="uid://cxc1fus7qqfu6" path="res://shaders/materials/sparkling.gdshader" id="5_fg7c5"]
-[ext_resource type="Shader" uid="uid://dohrihv500dkc" path="res://shaders/materials/sparkling_star.gdshader" id="6_8ydt5"]
-[ext_resource type="Texture2D" uid="uid://cte5bwtt7ps1d" path="res://assets/art/godot_icon.png" id="7_huuy5"]
+[ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="4_2yapo"]
+[ext_resource type="Shader" uid="uid://caxdo713k5kug" path="res://shaders/materials/sparkling.gdshader" id="5_fg7c5"]
+[ext_resource type="Shader" uid="uid://b4jsv7id6l412" path="res://shaders/materials/sparkling_star.gdshader" id="6_8ydt5"]
+[ext_resource type="Texture2D" uid="uid://dabxdflvss2xs" path="res://assets/art/godot_icon.png" id="7_huuy5"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_nqlfu"]
 shader = ExtResource("3_huuy5")
@@ -18,7 +18,7 @@ load_path = "res://.godot/imported/影子.png-ff14a7a2861f691fc06fc4544603034d.c
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_waoek"]
 shader = ExtResource("4_2yapo")
-shader_parameter/outline_color = Color(0.02, 0.02, 0.02, 1)
+shader_parameter/outline_color = Color(0.019607844, 0.019607844, 0.019607844, 0)
 shader_parameter/outline_size = 32.0
 shader_parameter/alpha_threshold = 0.5
 shader_parameter/edge_softness = 0.12
@@ -33,6 +33,8 @@ shader_parameter/highlight_width = 0.08
 shader_parameter/highlight_speed = 2.0
 shader_parameter/highlight_intensity = 1.2
 shader_parameter/highlight_interval = 1.00000002375
+shader_parameter/brightness = 1.0
+shader_parameter/alpha_factor = 1.0
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_huuy5"]
 shader = ExtResource("6_8ydt5")
