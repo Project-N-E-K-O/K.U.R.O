@@ -33,6 +33,9 @@ public partial class FallMovingPlatform : Node2D
     /// <summary>当前方向：true = 驶向 TravelOffset 终点；false = 驶回起点。</summary>
     private bool _outward = true;
     private FallSupportArea? _support;
+    private readonly HashSet<IPlatformPassenger> _attached = new();
+    public void RegisterAttachedPassenger(IPlatformPassenger passenger) => _attached.Add(passenger);
+    public void UnregisterAttachedPassenger(IPlatformPassenger passenger) => _attached.Remove(passenger);
     /// <summary>平台本帧完成平移后的实际世界位移，供显式附着的地面效果使用。</summary>
     public event Action<Vector2>? WorldDisplaced;
     public FallSupportArea? SupportArea => _support;
@@ -73,12 +76,15 @@ public partial class FallMovingPlatform : Node2D
         foreach (var rider in riders)
         {
             if (!IsInstanceValid(rider) || rider.IsQueuedForDeletion()) continue;
-            if (rider is IPlatformPassenger passenger)
-                passenger.ApplyPlatformDisplacement(displacement, FurnitureObstacleMask);
-            else if (rider is CharacterBody2D character)
-                character.MoveAndCollide(displacement);
+            ApplyMotion(rider as IPlatformPassenger, rider as Node2D, displacement);
         }
         Vector2 actualDisplacement = GlobalPosition - previousWorldPosition;
+        if (CanAttachEffects && !actualDisplacement.IsZeroApprox())
+            foreach (var attached in new List<IPlatformPassenger>(_attached))
+            {
+                if (attached is GodotObject obj && !IsInstanceValid(obj)) { _attached.Remove(attached); continue; }
+                ApplyMotion(attached, attached.PlatformTarget, actualDisplacement);
+            }
         if (!actualDisplacement.IsZeroApprox()) WorldDisplaced?.Invoke(actualDisplacement);
 
         // 到端点后掉头（MoveToward 保证不会越过，所以近似相等即可）。
@@ -92,9 +98,12 @@ public partial class FallMovingPlatform : Node2D
             if (!seen.Add(node.GetInstanceId()) || node.IsQueuedForDeletion() || !node.CanProcess()
                 || (!string.IsNullOrEmpty(ExcludedGroup) && node.IsInGroup(ExcludedGroup))) continue;
             Vector2 foot;
+            var sensor = GroundContactSensor.For(node);
             if (node is IPlatformPassenger passenger)
             {
                 if (!passenger.CanRidePlatform) continue;
+                var controller = sensor?.GetParent() as GroundObjectController;
+                if (controller != null && (!controller.FollowPlatformEnabled || !controller.Grounded || controller.IsFalling)) continue;
                 foot = passenger.PlatformGroundPosition;
             }
             else if (node is GameActor actor)
@@ -106,8 +115,22 @@ public partial class FallMovingPlatform : Node2D
             }
             else continue; // 不对未知 Node2D / 正在自由模拟的刚体强行修改坐标。
 
-            if (PlatformCarryPhysics.IsOnPlatform(GetWorld2D(), foot, this) && PlatformCarryPhysics.TryClaim(node))
+            bool supported = sensor != null ? sensor.SampleNow().Platform == this
+                : PlatformCarryPhysics.IsOnPlatform(GetWorld2D(), foot, this);
+            if (supported)
                 riders.Add(node);
         }
+    }
+
+    private void ApplyMotion(IPlatformPassenger? passenger, Node2D? target, Vector2 motion)
+    {
+        if (!IsInstanceValid(target) || !target!.IsInsideTree() || target.IsQueuedForDeletion() || !target.CanProcess()
+            || !string.IsNullOrEmpty(ExcludedGroup) && target.IsInGroup(ExcludedGroup)
+            || target.IsInGroup("world_items") && !CarryWorldItems
+            || target.IsInGroup("player") && !CarryPlayers || target.IsInGroup("enemies") && !CarryEnemies) return;
+        if (passenger != null && !passenger.CanRidePlatform) return;
+        if (!PlatformCarryPhysics.TryClaim(target)) return;
+        if (passenger != null) passenger.ApplyPlatformDisplacement(motion, FurnitureObstacleMask);
+        else if (target is CharacterBody2D character) character.MoveAndCollide(motion);
     }
 }

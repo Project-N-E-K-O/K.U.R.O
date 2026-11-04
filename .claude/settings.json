@@ -1,7 +1,13 @@
 {
   "permissions": {
     "allow": [
-      "Bash(xargs -n1 basename)"
+      "Bash(xargs -n1 basename)",
+      "Bash(\"C:/Users/STG-PC-TC/Desktop/KURO_Project/godot-editor-windows-mono/godot-4.2-4.5.1-stable-mono.exe\" --headless --fixed-fps 60 --path . res://probe_enemy_fall.tscn)",
+      "Bash(\"C:/Users/STG-PC-TC/Desktop/KURO_Project/godot-editor-windows-mono/godot-4.2-4.5.1-stable-mono.exe\" --headless --fixed-fps 60 --path . res://probe_enemy_fall2.tscn)",
+      "Bash(\"C:/Users/STG-PC-TC/Desktop/KURO_Project/godot-editor-windows-mono/godot-4.2-4.5.1-stable-mono.exe\" --headless --fixed-fps 60 --path . res://probe_enemy_fall3.tscn)",
+      "Bash(\"C:/Users/STG-PC-TC/Desktop/KURO_Project/godot-editor-windows-mono/godot-4.2-4.5.1-stable-mono.exe\" --headless --fixed-fps 60 --path . res://probe_item_spawn.tscn)",
+      "Bash(\"C:/Users/STG-PC-TC/Desktop/KURO_Project/godot-editor-windows-mono/godot-4.2-4.5.1-stable-mono.exe\" --headless --fixed-fps 60 --path . res://probe_item_weapons.tscn)",
+      "Bash(\"C:/Users/STG-PC-TC/Desktop/KURO_Project/godot-editor-windows-mono/godot-4.2-4.5.1-stable-mono.exe\" --headless --fixed-fps 60 --path . res://probe_item_hide.tscn)"
     ]
   }
 }

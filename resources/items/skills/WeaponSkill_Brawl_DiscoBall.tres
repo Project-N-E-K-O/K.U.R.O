@@ -47,6 +47,7 @@ ShowHitboxDebug = false
 Description = "每次攻击到敌人时都15%概率触发闪光眩晕范围敌人，冲刺攻击时效果翻倍"
 Effects = Array[ExtResource("1_gwghm")]([SubResource("Resource_dis_stun")])
 DashEffects = Array[ExtResource("1_gwghm")]([SubResource("Resource_ph7n4"), SubResource("Resource_k3bem")])
+DashAttackFallImmunities = 3
 AttackTimingNote = ""
 WarmupDuration = 0.19
 ActiveDuration = 0.3

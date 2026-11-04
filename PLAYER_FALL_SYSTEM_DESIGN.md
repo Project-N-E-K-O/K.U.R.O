@@ -1,5 +1,7 @@
 # 玩家深坑坠落系统设计与实施步骤
 
+> 2026-11-04 架构更新：地面检测统一至 GroundContactSensor，玩家和敌人继承 FallController；物品、武器、特效统一接入 GroundObjectController。平台统一执行承载位移，ItemFallController 中间实现已移除。当前配置与职责以 [地面系统架构](GROUND_SYSTEM_ARCHITECTURE.md) 为准；下文较早的验证记录及实现描述保留作历史参考。
+
 日期：2026-11-02  
 状态：基础系统已实施；具体使用与当前边界见 `res://PLAYER_FALL_SYSTEM_USAGE.md`。  
 适用场景：F_begin 系列 Boss 房间，以及后续存在深坑、移动平台的俯视关卡。
@@ -12,7 +14,7 @@
 
 | 范围 | 建议名称 | 职责 |
 | --- | --- | --- |
-| 黄色 | ActivationArea | 启用附近安全记录；进入时立即尝试记录，此后每 0.1 秒更新 |
+| 黄色 | ActivationArea | 通过进入/离开信号启停附近精确检测；玩家进入时立即尝试记录，此后每 0.1 秒更新 |
 | 红色 | HazardArea | 表示深坑实际危险范围 |
 | 绿色 | SupportArea | 随移动平台移动，提供承托，阻止坠落 |
 
@@ -21,6 +23,16 @@
 简单场景中，一个黄色范围、一个红色范围、两个移动平台承托范围，共 4 个 Area2D。每组深坑另设固定兜底 Marker2D，不属于 Area。
 
 黄色范围必须比红色范围更大，并在所有可接近方向留下足够缓冲。当前方案假定这些缓冲地带确实为固定可行走地面；不能把墙后、地图外空白或其他悬空地形包含为合法回退地面。
+
+### 区域激活与查询开销
+
+FallActivationArea 开启 Monitoring，默认监听敌人身体层 2 与玩家身体层 4（CollisionMask=6）。进入/离开信号由共享 FallDetectionGate 按对象分发，维护重叠黄色区域集合；只在离开全部区域后停止精确检测。远处的 PlayerFallController、EnemyFallController 及门控自身均停止物理回调，不再持续查询黄色范围。附近仍每个物理帧检查脚底，SampleInterval 仅限制玩家安全点验证频率。
+
+控制器自动创建 DetectionGate 子节点，无需手动挂载。首次生成、动态黄色区域加载及显式传送刷新时，等待两个物理帧完成定位/注册，再补查已有身体重叠与脚底红黄区域；直接生成在坑内也会触发，绿色承托仍优先。未被黄色覆盖的红区直接生成补查可进入临时兜底检测，但正常关卡必须让黄色完整覆盖红区并留足高速接近缓冲，避免对象从外侧直接进入未激活的红区。
+
+玩家原 ResetSafeHistory 传送入口同时请求门控刷新；坠落结束恢复碰撞后也重新同步，因隐藏关闭碰撞而产生的离开信号不会清除安全历史。敌人外部传送后可调用 RefreshDetectionAfterTeleport，正常碰撞有效的进出由信号自动处理。新增身体碰撞层时须同步黄色区域监听掩码。
+
+已通过 19 项运行检查，覆盖远处休眠、进入激活、重叠与卸载、玩家/敌人直接出生深坑、动态区域、承托失效、回岸及坠落中卸载；验证后清理临时自动检测场景、脚本和日志。此处验证的是查询启停行为，未将其宣称为已测得的帧率提升。
 
 ## 2. 当前项目接入依据
 
@@ -178,6 +190,14 @@ Fall 中普通 Hit、Frozen、移动和攻击请求不能打断流程；允许�
 整个流程只有一个权威计时来源；建议由 Fall 状态推进，Controller 提供开始、结束和清理操作。不能状态、Area 和替身各维护一个会重复恢复或扣血的计时器。
 
 ## 8. 动画替身与相机
+
+### 武器攻击阶段坠落免疫
+
+每个 `WeaponSkill_*.tres` 在 Fall Immunity 分组配置 `AttackFallImmunities`（普通攻击）与 `DashAttackFallImmunities`（冲刺攻击）。两项均默认 None/0，冲刺空配置不继承普通攻击。玩家资源使用独立 `WeaponAttackFallPhases`：Warmup=1、Active=2、Recovery=4；多选按位组合（3=预热+生效、6=生效+恢复、7=全部阶段），不使用敌人 ImmunityFlags 的高位数值。
+
+PlayerAttackTemplate 在 TryStart 中沿用本次 `_resolvedDashAttack` 判定，锁定本次免疫配置；装备或资源在攻击中改变不会追溯改变当前一招。ProvidesFallImmunity 读取实际阶段，Idle/取消后无效，由 PlayerAttackState 只转发当前运行模组，再由 PlayerFallController 在触发坠落前查询。免疫结束仍在红区且无承托时触发 Fall。原有独立 Dash 状态免疫保留，不把冲刺攻击整个状态加入白名单。
+
+CSV 在 `data/skills.csv` 末尾追加同名两列，ExportCsv 导出未配置值为 0，ImportCsv 按整数写回；旧 CSV 缺列或空值不覆盖配置，明确填 0 会清除配置。当前全部技能默认无免疫。已通过 14 项玩家运行检查，并验证技能 CSV 的 14 条默认零值导出；临时检测场景、脚本及日志在验证后删除。
 
 - 玩家 `FallController` 通过导出属性 `FallEffectScene` 配置替身，`main_character.tscn` 已指定 `res://scenes/objects/Animation_character.tscn`。FallRegion 不再配置角色动画场景、生成点或特效偏移，仅负责区域规则、时长、伤害和安全回退。
 - 玩家控制器通过 `FallAnimationName` 配置动画名（默认 `fall`）；加入场景树前设置 `DirectionalSceneEffect.AnimationName`，避免 Ready 自动播放其他动画。

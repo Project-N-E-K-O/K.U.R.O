@@ -6,7 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://b676hx3037rv4" path="res://assets/effect/WallEffect/firewallA_2.png" id="3_lhwsv"]
 [ext_resource type="Shader" uid="uid://6yurywigppwe" path="res://shaders/materials/meeting_barrier_glow.gdshader" id="4_18yl4"]
 [ext_resource type="Shader" uid="uid://dcg17rve3o6x0" path="res://shaders/materials/meeting_barrier_scan.gdshader" id="5_333ig"]
-[ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/PlatformEffectFollower.cs" id="7_jxfbj"]
+[ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/GroundObjectController.cs" id="7_jxfbj"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_rw4bx"]
 shader = ExtResource("1_48whl")
@@ -101,6 +101,6 @@ shape = SubResource("RectangleShape2D_jxfbj")
 [node name="Marker2D" type="Marker2D" parent="."]
 position = Vector2(0, -300)
 
-[node name="PlatformEffectFollower" type="Node" parent="." node_paths=PackedStringArray("GroundAnchor")]
+[node name="GroundObjectController" type="Node" parent="." node_paths=PackedStringArray("GroundAnchor")]
 script = ExtResource("7_jxfbj")
 GroundAnchor = NodePath("../Marker2D")

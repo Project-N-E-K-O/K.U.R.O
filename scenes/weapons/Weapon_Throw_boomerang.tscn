@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://dbp28lqhfd5dq"]
+[gd_scene load_steps=20 format=3 uid="uid://dbp28lqhfd5dq"]
 
 [ext_resource type="Script" uid="uid://dhfq2rrha0awm" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_mf4mw"]
 [ext_resource type="Resource" uid="uid://b06fjiu5600l5" path="res://resources/items/Weapon_Throw_Boomerang.tres" id="2_uw0va"]
@@ -9,6 +9,8 @@
 [ext_resource type="Texture2D" uid="uid://5pju5slfrs77" path="res://assets/weapons/回旋镖.png" id="6_uw0va"]
 [ext_resource type="Shader" uid="uid://b4jsv7id6l412" path="res://shaders/materials/sparkling_star.gdshader" id="8_40wuc"]
 [ext_resource type="Texture2D" uid="uid://dabxdflvss2xs" path="res://assets/art/godot_icon.png" id="9_mt23t"]
+[ext_resource type="Script" path="res://scripts/environments/GroundObjectController.cs" id="ground_object_ctrl"]
+[ext_resource type="PackedScene" uid="uid://dby51i7slqvd5" path="res://scenes/objects/Animation_item.tscn" id="fall_anim_item"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_idk0v"]
 shader = ExtResource("3_uahcy")
@@ -130,3 +132,8 @@ shape = SubResource("RectangleShape2D_idk0v")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/AttackArea"]
 shape = SubResource("RectangleShape2D_w57jh")
+
+[node name="GroundObjectController" type="Node" parent="."]
+script = ExtResource("ground_object_ctrl")
+FallEffectScene = ExtResource("fall_anim_item")
+FallAnimationName = "fall_boomerang"

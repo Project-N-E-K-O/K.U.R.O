@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=3 uid="uid://cofm45kotvgto"]
+[gd_scene load_steps=36 format=3 uid="uid://cofm45kotvgto"]
 
 [ext_resource type="Script" uid="uid://b8q1vhuc5h8vx" path="res://scripts/actors/enemies/EnemyB1Fat.cs" id="1"]
 [ext_resource type="Script" uid="uid://cenpuhlcgesin" path="res://scripts/systems/fsm/StateMachine.cs" id="2"]
@@ -24,6 +24,9 @@
 [ext_resource type="PackedScene" uid="uid://o8811jaji330" path="res://scenes/actors/etc/WarmingA.tscn" id="16_vcbie"]
 [ext_resource type="Script" uid="uid://b46a7dixq64qm" path="res://scripts/actors/enemies/animation/EnemyB1FatSpineAnimationController.cs" id="17"]
 [ext_resource type="Script" uid="uid://bbybuyitd10jr" path="res://scripts/controllers/SpineController.gd" id="20_2sv5o"]
+[ext_resource type="Script" uid="uid://dsbna0napv0bt" path="res://scripts/actors/enemies/EnemyFallController.cs" id="fall_controller"]
+[ext_resource type="PackedScene" uid="uid://bxymkx3ekrxh0" path="res://scenes/objects/Animation_enemy.tscn" id="fall_effect"]
+[ext_resource type="Script" uid="uid://isk4s1w8ixcu" path="res://scripts/actors/enemies/states/EnemyFallState.cs" id="fall_state"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_b5vhy"]
 shader = ExtResource("4_otg7e")
@@ -216,9 +219,14 @@ shape = SubResource("CapsuleShape2D_ao33d")
 [node name="Marker2D" type="Marker2D" parent="Node2D"]
 position = Vector2(0, -2200)
 
+[node name="GroundProbe" type="Marker2D" parent="."]
+
 [node name="StateMachine" type="Node" parent="." node_paths=PackedStringArray("InitialState")]
 script = ExtResource("2")
 InitialState = NodePath("Idle")
+
+[node name="Fall" type="Node" parent="StateMachine"]
+script = ExtResource("fall_state")
 
 [node name="Idle" type="Node" parent="StateMachine"]
 script = ExtResource("3")
@@ -253,7 +261,7 @@ TriggerAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
 KnockbackDuration = 0.01
 RequireAnimationHitTrigger = true
 AllowMultipleAnimationHits = true
-GrantedImmunities = 24
+GrantedImmunities = 2072
 StunInterruptOnDamage = true
 DamageTakenFrozenDuration = 5.0
 InterruptDamageSources = 2
@@ -295,6 +303,12 @@ script = ExtResource("16")
 
 [node name="EffectController" type="Node" parent="."]
 script = ExtResource("12")
+
+[node name="FallController" type="Node" parent="."]
+script = ExtResource("fall_controller")
+FallEnabled = true
+FallEffectScene = ExtResource("fall_effect")
+FallAnimationName = "fall_fat"
 
 [node name="FreezeOnTurnMovement" type="Node" parent="."]
 script = ExtResource("11")

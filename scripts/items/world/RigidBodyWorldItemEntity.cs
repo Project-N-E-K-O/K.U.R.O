@@ -19,7 +19,7 @@ namespace Kuros.Items.World
 	/// 适配 RigidBody2D 物品场景的包装类
 	/// 将 RigidBody2D 作为子节点，提供 WorldItemEntity 的功能
 	/// </summary>
-	public partial class RigidBodyWorldItemEntity : Node2D, IWorldItemEntity, Kuros.Environments.IPlatformPassenger
+	public partial class RigidBodyWorldItemEntity : Node2D, IWorldItemEntity, Kuros.Environments.IPlatformPassenger, Kuros.Environments.IGroundFallReceiver
 	{
 		/// <summary>世界物走 Destroy 链销毁完成(被打碎/外部 RequestDestroy;OnThrowDestroy 特效已生成)。
 		/// 供 BuildThrow_A_004 等订阅并按来源组过滤;静态事件,订阅方 OnRemoved 需退订。</summary>
@@ -374,6 +374,7 @@ namespace Kuros.Items.World
 			// Godot 4 首次实例化含 ParticleProcessMaterial 的场景时会同步编译 Shader（卡帧）。
 			// 在 _Ready 阶段提前实例化一次（invisible，立刻销毁），使 Shader 在此时完成编译。
 			WarmUpThrowDestroyEffectShaders();
+			Kuros.Environments.GroundObjectController.AttachTo(this);
 		}
 
 		public override void _ExitTree()
@@ -639,12 +640,30 @@ namespace Kuros.Items.World
 				return _rigidBody != null && Kuros.Environments.PlatformCarryPhysics.HasEnabledBodyShape(_rigidBody) ? _rigidBody : null;
 			}
 		}
+		public Node2D PlatformTarget => this;
 		public bool CanRidePlatform => PlatformCarryEnabled && IsPickupAvailable && !_isDropping && !_refreezePending
 			&& IsVisibleInTree() && CanProcess() && !IsQueuedForDeletion()
 			&& _rigidBody != null && _rigidBody.Freeze;
 
 		public Vector2 PlatformGroundPosition => Kuros.Environments.PlatformCarryPhysics.GroundPosition(
 			this, PlatformGroundProbePath, PlatformCollisionBody, _rigidBody);
+		/// <summary>排除飞行、回弹、散落空中与归还阶段；不要求静止或开启平台承载。</summary>
+		public bool CanFall => IsPickupAvailable && !_isDropping && !_refreezePending
+			&& _rigidBody != null && IsVisibleInTree() && CanProcess() && !IsQueuedForDeletion();
+		public Vector2 FallGroundPosition => PlatformGroundPosition;
+		public void PrepareForFall()
+		{
+			_isDestroying = true;
+			_isPicked = true;
+			_impactArmed = false;
+			if (_rigidBody != null)
+			{
+				_rigidBody.LinearVelocity = Vector2.Zero;
+				_rigidBody.AngularVelocity = 0;
+				_rigidBody.Freeze = true;
+			}
+			// 不走 Destroy/RequestDestroy：掉入深坑不触发 OnThrowDestroy 或爆炸，也不归还背包。
+		}
 
 		public void ApplyPlatformDisplacement(Vector2 displacement, uint obstacleMask)
 		{

@@ -1,4 +1,4 @@
-[gd_scene load_steps=36 format=3 uid="uid://cea0a3niswxg1"]
+[gd_scene load_steps=37 format=3 uid="uid://cea0a3niswxg1"]
 
 [ext_resource type="Texture2D" uid="uid://cd24tjl6wpw4i" path="res://assets/objects/emoji_boom/时间轴 1_0000.png" id="1_3r03d"]
 [ext_resource type="Texture2D" uid="uid://cjgenixkf7n4e" path="res://assets/objects/emoji_boom/时间轴 1_0001.png" id="2_xcitj"]
@@ -33,7 +33,8 @@
 [ext_resource type="Script" uid="uid://cmg8g6kgr8yqd" path="res://scripts/effects/EmojiBoomEffect.cs" id="31_script"]
 [ext_resource type="PackedScene" uid="uid://cmxuejgw41osm" path="res://scenes/actors/etc/BoomB.tscn" id="32_boom_b"]
 [ext_resource type="PackedScene" uid="uid://yyltmrdqmlo8" path="res://resources/effects/BoomDmgEffect.tscn" id="33_boom_dmg"]
-[ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/PlatformEffectFollower.cs" id="34_ioiya"]
+[ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/GroundObjectController.cs" id="34_ioiya"]
+[ext_resource type="PackedScene" uid="uid://dby51i7slqvd5" path="res://scenes/objects/Animation_item.tscn" id="35_04wd5"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_3r03d"]
 animations = [{
@@ -158,5 +159,7 @@ Duration = 1.3
 sprite_frames = SubResource("SpriteFrames_3r03d")
 autoplay = "default"
 
-[node name="PlatformEffectFollower" type="Node" parent="."]
+[node name="GroundObjectController" type="Node" parent="."]
 script = ExtResource("34_ioiya")
+FallEffectScene = ExtResource("35_04wd5")
+FallAnimationName = "fall_emoji_bomb"

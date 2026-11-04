@@ -34,7 +34,7 @@
 [ext_resource type="Texture2D" uid="uid://dv3ro6dgupy3n" path="res://assets/effect/AttackEffect/burn_b/BurnB_23.png" id="32_8ysv1"]
 [ext_resource type="Texture2D" uid="uid://dvm38cy86g2ij" path="res://assets/effect/AttackEffect/burn_b/BurnB_24.png" id="33_td06n"]
 [ext_resource type="Texture2D" uid="uid://dv0yy7bmcjoke" path="res://assets/effect/AttackEffect/burn_b/BurnB_25.png" id="34_8ru48"]
-[ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/PlatformEffectFollower.cs" id="35_8auex"]
+[ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/GroundObjectController.cs" id="35_8auex"]
 
 [sub_resource type="Resource" id="BurnEntry_Ring"]
 script = ExtResource("2_entry")
@@ -379,5 +379,5 @@ scale = Vector2(0.7, 0.7)
 sprite_frames = SubResource("SpriteFrames_3gppx")
 autoplay = "default"
 
-[node name="PlatformEffectFollower" type="Node" parent="."]
+[node name="GroundObjectController" type="Node" parent="."]
 script = ExtResource("35_8auex")

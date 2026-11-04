@@ -25,8 +25,7 @@ public static class PlatformCarryPhysics
     /// <summary>一次脚底点查询，统一过滤无效或停用承托；不要求承托属于移动平台。</summary>
     public static IEnumerable<FallSupportArea> SupportsAt(World2D world, Vector2 foot)
     {
-        var hits = world.DirectSpaceState.IntersectPoint(new PhysicsPointQueryParameters2D
-        { Position = foot, CollisionMask = FallSupportArea.Layer, CollideWithAreas = true, CollideWithBodies = false }, 128);
+        var hits = FallPhysics.At(world, foot, FallSupportArea.Layer);
         foreach (var hit in hits)
             if (hit["collider"].AsGodotObject() is FallSupportArea support && IsSupportEnabled(support)) yield return support;
     }
@@ -46,15 +45,18 @@ public static class PlatformCarryPhysics
         FallMovingPlatform? selected = null;
         foreach (var support in SupportsAt(world, foot))
         {
-            for (Node? ancestor = support.GetParent(); ancestor != null; ancestor = ancestor.GetParent())
-            {
-                if (ancestor is not FallMovingPlatform platform) continue;
-                if (platform.SupportArea == support && platform.CanAttachEffects
-                    && (selected == null || platform.GetInstanceId() < selected.GetInstanceId())) selected = platform;
-                break;
-            }
+            var platform = PlatformForSupport(support);
+            if (platform != null && (selected == null || platform.GetInstanceId() < selected.GetInstanceId())) selected = platform;
         }
         return selected;
+    }
+
+    public static FallMovingPlatform? PlatformForSupport(FallSupportArea support)
+    {
+        for (Node? node = support.GetParent(); node != null; node = node.GetParent())
+            if (node is FallMovingPlatform platform)
+                return platform.SupportArea == support && platform.CanAttachEffects ? platform : null;
+        return null;
     }
 
     // ShapeOwner 只包含该 PhysicsBody 的实际身体形状，不包含子级 AttackArea / HitArea。

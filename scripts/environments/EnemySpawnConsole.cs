@@ -113,6 +113,12 @@ namespace Kuros.Environments
         /// <summary>是否同时生成所有敌人（true 时并行生成，false 时顺序生成）。</summary>
         [Export] public bool SimultaneousSpawn { get; set; } = false;
 
+        [ExportCategory("Spawn Rewards")]
+        /// <summary>开发者选项：控制台生成的敌人死亡时是否加分。默认 false = 不加分。</summary>
+        [Export] public bool SpawnedEnemiesGrantScore { get; set; } = false;
+        /// <summary>开发者选项：控制台生成的敌人死亡时是否掉落物品。默认 false = 不掉落。</summary>
+        [Export] public bool SpawnedEnemiesDropLoot { get; set; } = false;
+
         [ExportCategory("Test Area Boundary")]
         /// <summary>是否为 TestArea 创建空气墙边界（阻挡敌人离开）。</summary>
         [Export] public bool CreateTestAreaBoundary { get; set; } = true;
@@ -594,17 +600,14 @@ namespace Kuros.Environments
             var enemy = SpawnEnemyDirect(enemyScene, enemySpawnPos, spawnIndex);
             if (enemy != null)
             {
-                // 应用生成配置
-                if (_currentSpawnConfig != null)
+                // 掉落/加分是开发者选项（默认关闭），不受生成窗口配置影响
+                if (!SpawnedEnemiesDropLoot)
                 {
-                    if (_currentSpawnConfig.DisableAI)
-                    {
-                        DisableEnemyAI(enemy);
-                    }
-                    if (_currentSpawnConfig.DisableLoot)
-                    {
-                        DisableEnemyLoot(enemy);
-                    }
+                    DisableEnemyLoot(enemy);
+                }
+                if (_currentSpawnConfig != null && _currentSpawnConfig.DisableAI)
+                {
+                    DisableEnemyAI(enemy);
                 }
 
                 EmitSignal(SignalName.EnemySpawned, enemy, spawnIndex);
@@ -1034,9 +1037,9 @@ namespace Kuros.Environments
                 actor.FlipFacing(false);
             }
 
-            // 测试控制台生成的敌人不授予分数（死亡/清场均不加分）
+            // 加分是开发者选项，默认关闭（控制台生成的敌人死亡/清场都不加分）
             if (instance is SampleEnemy sampleEnemy)
-                sampleEnemy.GrantsScore = false;
+                sampleEnemy.GrantsScore = SpawnedEnemiesGrantScore;
 
             if (instance is Node node)
             {

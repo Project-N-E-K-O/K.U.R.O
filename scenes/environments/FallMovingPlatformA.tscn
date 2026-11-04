@@ -5,7 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://cofcrcna6lhif" path="res://assets/environments/scene_6_hotel/移动平台地板.png" id="2_svn7p"]
 
 [sub_resource type="ConvexPolygonShape2D" id="ConvexPolygonShape2D_svn7p"]
-points = PackedVector2Array(-515, -250, 515, -250, 625, -160, 625, 160, 515, 250, -525, 250, -625, 160, -625, -160)
+points = PackedVector2Array(-515, -240, 515, -240, 625, -160, 625, 160, 515, 260, -525, 260, -625, 160, -627, -150)
 
 [node name="FallMovingPlatformA" type="Node2D"]
 script = ExtResource("1")

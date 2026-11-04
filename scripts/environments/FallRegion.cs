@@ -8,7 +8,7 @@ namespace Kuros.Environments;
 /// FallHazardArea（红色坑面）通过 <see cref="FindRegion"/> 向上查找所属区域，
 /// 由玩家侧 PlayerFallController 使用这里的参数。绿色 FallSupportArea 独立提供承托资格，不查找所属区域。
 /// 黄色范围内的非坑面必须是已知固定可行走地面，并留出安全记录所需的坑边缓冲；
-/// 坠落判定不要求玩家同时位于黄色范围内。
+/// 黄色外围完整覆盖红区以激活附近检测；生成/传送补查也识别直接落在红区的对象。
 /// </summary>
 [GlobalClass]
 public partial class FallRegion : Node2D

@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://daek68pd4nvyr"]
+[gd_scene load_steps=20 format=3 uid="uid://daek68pd4nvyr"]
 
 [ext_resource type="Script" uid="uid://dtgdjgrqgype7" path="res://scripts/items/world/WorldItemEntity.cs" id="1_fj6ww"]
 [ext_resource type="Resource" uid="uid://c01fpln7toyki" path="res://resources/items/Weapon_Stab_LaserPointer.tres" id="2_fj6ww"]
@@ -9,6 +9,8 @@
 [ext_resource type="Shader" uid="uid://caxdo713k5kug" path="res://shaders/materials/sparkling.gdshader" id="7_quj7s"]
 [ext_resource type="Shader" uid="uid://b4jsv7id6l412" path="res://shaders/materials/sparkling_star.gdshader" id="8_kv6fx"]
 [ext_resource type="Texture2D" uid="uid://dabxdflvss2xs" path="res://assets/art/godot_icon.png" id="9_4pbix"]
+[ext_resource type="Script" path="res://scripts/environments/GroundObjectController.cs" id="ground_object_ctrl"]
+[ext_resource type="PackedScene" uid="uid://dby51i7slqvd5" path="res://scenes/objects/Animation_item.tscn" id="fall_anim_item"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_m4rsl"]
 shader = ExtResource("3_kv6fx")
@@ -123,3 +125,8 @@ collision_layer = 0
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AttackArea"]
 rotation = 1.5707964
 shape = SubResource("CapsuleShape2D_kv6fx")
+
+[node name="GroundObjectController" type="Node" parent="."]
+script = ExtResource("ground_object_ctrl")
+FallEffectScene = ExtResource("fall_anim_item")
+FallAnimationName = "fall_laser_pointer"

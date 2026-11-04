@@ -46,7 +46,7 @@ GenerateOnReady = false
 [node name="StageSession" type="Node" parent="."]
 script = ExtResource("16_sess")
 AllConfigs = Array[ExtResource("17_scfg")]([ExtResource("8_83iw7"), ExtResource("9_5g8wj"), ExtResource("10_axi2i"), ExtResource("11_i2bjf"), ExtResource("12_axi2i"), ExtResource("13_i2bjf"), ExtResource("13_ohqcc"), ExtResource("14_i2bjf")])
-StartStage = ExtResource("14_i2bjf")
+StartStage = ExtResource("13_ohqcc")
 Difficulty = ExtResource("18_diff")
 
 [node name="BuildSelectionManager" parent="." instance=ExtResource("14_pvxkr")]
@@ -55,6 +55,7 @@ Difficulty = ExtResource("18_diff")
 y_sort_enabled = true
 
 [node name="MainCharacter" parent="World" instance=ExtResource("2_s0pgc")]
+AttackDamage = 100.0
 MaxHealth = 12000
 
 [node name="Camera2D" type="Camera2D" parent="World" node_paths=PackedStringArray("Target")]

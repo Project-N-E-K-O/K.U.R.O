@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://dpq3xah0g344a" path="res://assets/effect/AttackEffect/item_broken_effect/SmashEffect.png" id="1_2nodp"]
 [ext_resource type="Script" uid="uid://bekgm7cl4mt1h" path="res://scripts/effects/SmashEffectFadeOut.cs" id="2_ua7bf"]
-[ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/PlatformEffectFollower.cs" id="3_8dtku"]
+[ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/GroundObjectController.cs" id="3_8dtku"]
 
 [node name="Node2D" type="Node2D"]
 z_index = 1
@@ -14,5 +14,5 @@ FadeOutDuration = 1.5
 scale = Vector2(0.5, 0.4)
 texture = ExtResource("1_2nodp")
 
-[node name="PlatformEffectFollower" type="Node" parent="."]
+[node name="GroundObjectController" type="Node" parent="."]
 script = ExtResource("3_8dtku")

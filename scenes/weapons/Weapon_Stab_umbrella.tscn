@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://6ghjqyjkk37w"]
+[gd_scene load_steps=15 format=3 uid="uid://6ghjqyjkk37w"]
 
 [ext_resource type="Script" uid="uid://dtgdjgrqgype7" path="res://scripts/items/world/WorldItemEntity.cs" id="1_inoct"]
 [ext_resource type="Resource" uid="uid://c85bfuwu0x3m8" path="res://resources/items/Weapon_Stab_umbrella.tres" id="2_inoct"]
@@ -7,6 +7,8 @@
 [ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="4_0qmq6"]
 [ext_resource type="Texture2D" uid="uid://boj3u1fybi1od" path="res://assets/weapons/护盾伞.png" id="6_0qmq6"]
 [ext_resource type="Shader" uid="uid://caxdo713k5kug" path="res://shaders/materials/sparkling.gdshader" id="7_0qmq6"]
+[ext_resource type="Script" path="res://scripts/environments/GroundObjectController.cs" id="ground_object_ctrl"]
+[ext_resource type="PackedScene" uid="uid://dby51i7slqvd5" path="res://scenes/objects/Animation_item.tscn" id="fall_anim_item"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_m4rsl"]
 shader = ExtResource("3_u83q7")
@@ -73,3 +75,8 @@ collision_layer = 0
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AttackArea"]
 rotation = 1.5707964
 shape = SubResource("CapsuleShape2D_0qmq6")
+
+[node name="GroundObjectController" type="Node" parent="."]
+script = ExtResource("ground_object_ctrl")
+FallEffectScene = ExtResource("fall_anim_item")
+FallAnimationName = "fall_umbrella"

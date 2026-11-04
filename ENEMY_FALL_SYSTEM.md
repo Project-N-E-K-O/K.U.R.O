@@ -1,12 +1,29 @@
-# 敌人坠落：guard1 首次接入
+# 敌人坠落系统
+
+> 2026-11-04 架构更新：地面检测统一至 GroundContactSensor，玩家和敌人继承 FallController；物品、武器、特效统一接入 GroundObjectController。平台统一执行承载位移，ItemFallController 中间实现已移除。当前配置与职责以 [地面系统架构](GROUND_SYSTEM_ARCHITECTURE.md) 为准；下文较早的验证记录及实现描述保留作历史参考。
 
 ## 当前接入范围
 
-仅 `scenes/actors/characters/Enemy_Normal_guard1.tscn` 已启用。玩家坠落逻辑不变，其他敌人不会自动获得坠落能力。
+`scenes/actors/characters/Enemy_Normal_guard1.tscn` 至 `Enemy_Normal_guard5.tscn` 已启用。其他敌人不会自动获得坠落能力。
 
-guard1 根节点新增 `GroundProbe`、`FallController`，状态机新增 `Fall`。通用脚本分别为 `EnemyFallController.cs` 与 `EnemyFallState.cs`。目前替身暂用玩家的 `Animation_character.tscn`，以后替换控制器导出的场景即可，不需要修改深坑。
+另已接入以下六类敌人，均将 FallController 挂在敌人根节点，在 StateMachine 下添加 Fall，攻击模板暂不配置阶段坠落免疫：
+
+| 场景 | Animation_enemy.tscn 中的动画 |
+| --- | --- |
+| Enemy_B1_fat | fall_fat |
+| Enemy_B2_fat02 | fall_fat02 |
+| Enemy_C1_waiterA | fall_waiterA |
+| Enemy_C2_waiterA02 | fall_waiterA02 |
+| Enemy_D1_corpDoneA | fall_corpDoneA |
+| Enemy_D1_corpDoneB | fall_corpDoneB |
+
+这六类敌人已通过 74 项实际场景检查，覆盖各自动画播放、绿色承托、眩晕中断、死亡只结算一次及替身独立回收；验证后删除临时自动检测场景、脚本和日志。验证中修复 EnemyPinballAttack 在攻击结束与退出场景时重复断开接触信号的问题。
+
+guard1–5 根节点配置 `GroundProbe`、`FallController`，状态机配置 `Fall`。通用脚本分别为 `EnemyFallController.cs` 与 `EnemyFallState.cs`。当前统一使用敌人 `Animation_enemy.tscn` 的 `fall_guard1` 动画，guard2–5 暂时复用该演出，以后替换各控制器的场景和动画名即可。guard2–5 所有攻击模板暂不勾选任何坠落免疫，保留原霸体和其他免疫配置。
 
 ## 参数
+
+`FallController` 必须是敌人根节点的直接子节点，不能放进 `StateMachine`；`EnemyFallState` 放在 `StateMachine/Fall`。控制器用直接父节点解析 SampleEnemy，Fall 状态也从敌人根节点查找 FallController。已修正 guard2–5 的错误父节点，并以正常自动物理帧复验全部 11 个已接入敌人，通过承托、入坑死亡及替身回收检查。测试先等待地形完成物理注册，再生成敌人。
 
 | 参数 | 说明 |
 | --- | --- |
@@ -28,7 +45,7 @@ Active 阶段免疫不等于严格的实际冲刺窗口。当前使用通用三�
 
 ## 流程与时序
 
-1. 每个物理帧在常规运动之后（优先级 100）按脚底点一次查询红色 FallHazardArea 和绿色 FallSupportArea。绿色有效承托优先；红区向上查找 FallRegion。敌人不使用黄色区域或玩家安全历史。
+1. 黄色 FallActivationArea 通过身体进入/离开信号激活共享 FallDetectionGate，远处停止检测。附近每个物理帧在常规运动之后（优先级 100）按脚底点一次查询红色 FallHazardArea 和绿色 FallSupportArea。绿色有效承托优先；红区向上查找 FallRegion。敌人使用黄色外围激活，不记录玩家安全历史。首次生成或动态区域加载会补查已有重叠，外部传送可调用 RefreshDetectionAfterTeleport；黄色必须覆盖完整红区并留有缓冲。门控由控制器自动创建，无需手动挂载。
 2. 验证启用、存活、未坠落及免疫条件。结清旧合并伤害；旧伤害已致死时保留原死亡流程。
 3. 通过已验证请求进入高优先级 Fall，仍执行原状态 Exit。guard1 的 Attack.Exit 会取消控制器与子攻击；Frozen 等退出守卫不能挡住有效 Fall。
 4. 隐藏本体、清零速度、清空整棵子树 CollisionObject2D 的碰撞层与掩码；生成独立替身，然后停用敌人子树。
@@ -51,6 +68,6 @@ Active 阶段免疫不等于严格的实际冲刺窗口。当前使用通用三�
 
 ## 验证入口
 
-`scenes/tests/EnemyFallRuntimeCheck.tscn` 使用真实 guard1，手动推进敌人控制器以隔离自主寻路，覆盖承托、白名单、免疫、眩晕与攻击中断、死亡事件、分数、替身独立回收和安全掉落。
+自动运行验证使用真实敌人场景，手动推进敌人控制器以隔离自主寻路，覆盖承托、白名单、免疫、眩晕与攻击中断、死亡事件、分数、替身独立回收和安全掉落。根据项目约定，自动检测场景在验证完成后删除，不保留为长期测试关卡；手动测试关卡保留。guard2–5 接入验证共通过 44 项检查，相关自动检测场景及本次专用脚本已清理。
 
 阶段免疫合并到 GrantedImmunities 后已通过 32 项运行检查，覆盖配置迁移、Warmup/Active/Recovery 切换、取消后无残留、阶段标记及全局 Fall 位未被起手写入，以及免疫结束后留在红区立即坠落。同步修复攻击控制器在退出场景树后仍收到检测区信号的问题：按实际 C# 事件订阅断开连接，并拒绝已死亡或离树对象的选招回调。无窗口测试加载掉落武器时仍有现有资源的着色器 custom_samplers 报错；测试断言通过，未修改该着色器。

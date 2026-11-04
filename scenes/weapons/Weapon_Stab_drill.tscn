@@ -1,10 +1,12 @@
-[gd_scene load_steps=14 format=3 uid="uid://cdnitqquebaw6"]
+[gd_scene load_steps=16 format=3 uid="uid://cdnitqquebaw6"]
 
 [ext_resource type="Script" uid="uid://dtgdjgrqgype7" path="res://scripts/items/world/WorldItemEntity.cs" id="1_0qove"]
 [ext_resource type="Resource" uid="uid://dtqlsroybctj5" path="res://resources/items/Weapon_Stab_drill.tres" id="2_0qove"]
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="3_1l2vw"]
 [ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="3_emqd7"]
 [ext_resource type="Shader" uid="uid://caxdo713k5kug" path="res://shaders/materials/sparkling.gdshader" id="7_ie112"]
+[ext_resource type="Script" path="res://scripts/environments/GroundObjectController.cs" id="ground_object_ctrl"]
+[ext_resource type="PackedScene" uid="uid://dby51i7slqvd5" path="res://scenes/objects/Animation_item.tscn" id="fall_anim_item"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_g0q5t"]
 shader = ExtResource("3_1l2vw")
@@ -80,3 +82,8 @@ visible = false
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AttackArea"]
 rotation = 1.5707964
 shape = SubResource("CapsuleShape2D_ywkyd")
+
+[node name="GroundObjectController" type="Node" parent="."]
+script = ExtResource("ground_object_ctrl")
+FallEffectScene = ExtResource("fall_anim_item")
+FallAnimationName = "fall_drill"

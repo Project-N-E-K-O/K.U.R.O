@@ -9,24 +9,15 @@ namespace Kuros.Actors.Heroes;
 
 /// <summary>按脚底查询区域，低频保存固定地面安全点，管理一次完整坠落。</summary>
 [GlobalClass]
-public partial class PlayerFallController : Node
+public partial class PlayerFallController : FallController
 {
-    [Export] public NodePath GroundProbePath { get; set; } = new("GroundProbe");
     [Export(PropertyHint.Range, "0.01,1,0.01")] public float SampleInterval { get; set; } = 0.1f;
     [Export] public string[] ImmuneStates { get; set; } = { "Dash" };
     [Export(PropertyHint.Layers2DPhysics)] public uint ObstacleMask { get; set; } = 3;
-    /// <summary>玩家自身的坠落替身场景，根节点需为 Node2D；为空仍完成回退与伤害结算。</summary>
-    [Export] public PackedScene? FallEffectScene { get; set; }
-    /// <summary>替身播放的动画名；根 AnimationPlayer 按本次区域坠落时长调整速度。</summary>
-    [Export] public string FallAnimationName { get; set; } = "fall";
-    /// <summary>替身相对踩空时玩家世界位置的偏移（世界单位），不随玩家缩放或朝向变化，不影响本体及回退位置。</summary>
-    [Export] public Vector2 FallEffectOffset { get; set; } = Vector2.Zero;
-    public bool IsFalling { get; private set; }
     public bool HasPendingFall => _pending != null;
     public bool Completing { get; private set; }
     public Vector2? LastSafePosition => _tracking != null && _safe.TryGetValue(_tracking, out var point) ? point : null;
 
-    private const uint RegionMask = FallActivationArea.Layer | FallHazardArea.Layer | FallSupportArea.Layer;
     private MainCharacter _player = null!;
     private readonly Dictionary<FallRegion, Vector2> _safe = new();
     private readonly List<(CollisionObject2D Node, uint Layer, uint Mask)> _collisions = new();
@@ -42,47 +33,33 @@ public partial class PlayerFallController : Node
     private float _damageRatio;
     private bool _warned;
     private float _duration;
-
+    public PlayerFallController() { FallEnabled = true; }
+    protected override bool IncludeActivation => true;
     public override void _Ready()
     {
         _player = GetParent<MainCharacter>();
-        ProcessPhysicsPriority = 100; // 在状态机本帧移动后统一判断。
+        InitializeDetection(_player);
     }
-
+    protected override bool CanCheckFall() => base.CanCheckFall() && !_player.IsDead && !_player.IsDeathSequenceActive;
+    protected override void OnActivationChanged(bool active)
+    { if (!active) { _tracking = null; _sampleTimer = 0; } }
     private Vector2 FootOffset => _player.GetNodeOrNull<Node2D>(GroundProbePath)?.GlobalPosition - _player.GlobalPosition ?? Vector2.Zero;
     private PhysicsDirectSpaceState2D Space => _player.GetWorld2D().DirectSpaceState;
 
     private Godot.Collections.Array<Godot.Collections.Dictionary> At(Vector2 foot, uint mask)
-        => Space.IntersectPoint(new PhysicsPointQueryParameters2D
-        { Position = foot, CollisionMask = mask, CollideWithAreas = true, CollideWithBodies = false }, 128);
+        => FallPhysics.At(_player.GetWorld2D(), foot, mask);
 
     private bool HasSupport(Vector2 foot)
     {
         foreach (var hit in At(foot, FallSupportArea.Layer))
-            if (hit["collider"].AsGodotObject() is FallSupportArea support && support.SupportEnabled) return true;
+            if (hit["collider"].AsGodotObject() is FallSupportArea support && PlatformCarryPhysics.IsSupportEnabled(support)) return true;
         return false;
     }
 
-    public override void _PhysicsProcess(double delta)
+    protected override void OnGroundChecked(FallPhysics.GroundResult result, float delta)
     {
-        if (IsFalling || _player.IsDead || _player.IsDeathSequenceActive) return;
-        var foot = _player.GlobalPosition + FootOffset;
-        FallRegion? activation = null, hazard = null;
-        bool supported = false;
-        // 一次查询汇总重叠，不依赖进入/离开信号的调用顺序。
-        foreach (var hit in At(foot, RegionMask))
-        {
-            switch (hit["collider"].AsGodotObject())
-            {
-                case FallActivationArea yellow when yellow.Region != null:
-                    if (activation == null || yellow.Region.GetInstanceId() < activation.GetInstanceId()) activation = yellow.Region;
-                    break;
-                case FallHazardArea red when red.Region != null:
-                    if (hazard == null || red.Region.GetInstanceId() < hazard.GetInstanceId()) hazard = red.Region;
-                    break;
-                case FallSupportArea green when green.SupportEnabled: supported = true; break;
-            }
-        }
+        var activation = result.Activation;
+        bool supported = result.Supported;
         bool entered = activation != _tracking;
         _tracking = activation;
         if (entered)
@@ -95,12 +72,15 @@ public partial class PlayerFallController : Node
             if (!supported && IsSafe(activation, _player.GlobalPosition))
                 _safe[activation] = _player.GlobalPosition;
         }
-        if (hazard == null || supported || _player.ActiveImmunities.HasFlag(ImmunityFlags.Fall)) return;
-        string state = _player.StateMachine.CurrentState?.Name.ToString() ?? "";
-        foreach (string immune in ImmuneStates) if (state == immune) return;
-        TryStartFall(hazard);
     }
 
+    protected override bool IsFallImmune()
+    {
+        if (_player.ActiveImmunities.HasFlag(ImmunityFlags.Fall)) return true;
+        string state = _player.StateMachine.CurrentState?.Name.ToString() ?? "";
+        foreach (string immune in ImmuneStates) if (state == immune) return true;
+        return _player.StateMachine.CurrentState is PlayerAttackState attack && attack.ProvidesFallImmunity;
+    }
     public bool IsSafe(FallRegion region, Vector2 rootPosition)
     {
         if (!IsInstanceValid(region) || !region.IsInsideTree()) return false;
@@ -150,7 +130,7 @@ public partial class PlayerFallController : Node
         return found;
     }
 
-    private void TryStartFall(FallRegion region)
+    protected override void TryStartFall(FallRegion region)
     {
         _entryPoint = _player.GlobalPosition;
         if (!ResolveReturn(region, out _returnPoint))
@@ -192,23 +172,10 @@ public partial class PlayerFallController : Node
 
     private void SpawnVisual()
     {
-        var scene = FallEffectScene;
-        if (scene == null) { GD.PushWarning("[Fall] 未配置动画替身，恢复流程仍会运行。"); return; }
-        _visual = scene.Instantiate<Node2D>();
-        if (_visual is DirectionalSceneEffect effect)
-        { effect.AnimationName = FallAnimationName; effect.FacingRight = _player.FacingRight; }
-        Vector2 visualPosition = _entryPoint + FallEffectOffset;
-        _visual.Position = visualPosition;
-        _visual.Visible = true;
-        // 顶层世界坐标，不继承玩家隐藏或动画下沉。
-        _visual.TopLevel = true;
-        _player.GetTree().CurrentScene.AddChild(_visual);
-        _visual.GlobalPosition = visualPosition;
-        var animator = _visual.GetNodeOrNull<AnimationPlayer>("AnimationPlayer");
-        if (animator != null && animator.HasAnimation(FallAnimationName))
-        { animator.SpeedScale = (float)animator.GetAnimation(FallAnimationName).Length / _duration; animator.Play(FallAnimationName); }
+        if (FallEffectScene == null) GD.PushWarning("[Fall] 未配置动画替身，恢复流程仍会运行。");
+        _visual = FallPhysics.SpawnVisual(this, FallEffectScene, FallAnimationName,
+            _entryPoint + FallEffectOffset, _duration, _player.FacingRight, autoCleanup: false);
     }
-
     public void TickFall(float delta)
     {
         if (!IsFalling || Completing) return;
@@ -253,6 +220,7 @@ public partial class PlayerFallController : Node
         _settlingFallDamage = false;
         _player.ConsumePendingHitKnockback();
         _player.Velocity = Vector2.Zero; _player.ClearFallInputBuffers();
+        RefreshDetectionAfterTeleport();
     }
 
     /// <summary>
@@ -269,6 +237,7 @@ public partial class PlayerFallController : Node
     /// <summary>外部传送/重生前调用。取消当前流程，不扣血，不解锁其他系统。</summary>
     public void ResetSafeHistory()
     {
+        RefreshDetectionAfterTeleport();
         _safe.Clear(); _tracking = null; _sampleTimer = 0;
         if (IsFalling) { Completing = true; _player.StateMachine.ChangeState("Idle"); }
     }

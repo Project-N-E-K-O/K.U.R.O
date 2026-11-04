@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://1demsv0hoym1"]
 
-[ext_resource type="PackedScene" uid="uid://v6k338a22m4w" path="res://scenes/environments/FallRegionA.tscn" id="2_bla8w"]
+[ext_resource type="PackedScene" uid="uid://v6k338a22m4w" path="res://scenes/environments/FallRegion_F_c1.tscn" id="2_bla8w"]
 [ext_resource type="PackedScene" uid="uid://ufprfd4r8ijj" path="res://scenes/actors/characters/main_character.tscn" id="3"]
 
 [node name="PlayerFallTest" type="Node2D"]

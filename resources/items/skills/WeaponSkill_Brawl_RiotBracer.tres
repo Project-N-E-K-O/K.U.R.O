@@ -12,7 +12,7 @@ EffectScene = ExtResource("2_i83jg")
 Notes = "击退"
 PropertyOverrides = Dictionary[String, Variant]({
 "EnableKnockbackY": false,
-"KnockbackDistance": 300.0,
+"KnockbackDistance": 350.0,
 "KnockbackDuration": 0.3,
 "TriggerHitStep": 1
 })
@@ -27,6 +27,7 @@ DashDamageMultiplier = 1.5
 ShowHitboxDebug = false
 Description = "每次攻击到敌人时击退该敌人"
 Effects = Array[ExtResource("1_vwwsf")]([SubResource("Resource_2o5f0")])
+DashAttackFallImmunities = 3
 WarmupDuration = 0.19
 ActiveDuration = 0.3
 RecoveryDuration = 0.18

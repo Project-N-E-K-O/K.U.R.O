@@ -1,6 +1,7 @@
-[gd_scene load_steps=3 format=3 uid="uid://dv6nbmv1yc02i"]
+[gd_scene load_steps=4 format=3 uid="uid://dv6nbmv1yc02i"]
 
 [ext_resource type="Texture2D" uid="uid://bdm27yiqdm8df" path="res://assets/effect/AttackEffect/traces/TracesOfBoom.png" id="2_c7upr"]
+[ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/GroundObjectController.cs" id="3_c7upr"]
 [ext_resource type="Script" uid="uid://mbol0v4le42t" path="res://scripts/effects/FadeInOutDestroy.cs" id="3_x8fl3"]
 
 [node name="Traces" type="Sprite2D"]
@@ -12,3 +13,11 @@ script = ExtResource("3_x8fl3")
 FadeInDuration = 0.0
 HoldDuration = 3.0
 FadeOutDuration = 1.0
+
+[node name="Marker2D" type="Marker2D" parent="."]
+position = Vector2(-85, 0)
+
+[node name="GroundObjectController" type="Node" parent="." node_paths=PackedStringArray("GroundAnchor")]
+script = ExtResource("3_c7upr")
+GroundAnchor = NodePath("../Marker2D")
+FallEnabled = false

@@ -6,7 +6,7 @@
 [ext_resource type="Shader" uid="uid://11qcgk6hj7lt" path="res://shaders/materials/meeting_barrier_build.gdshader" id="3_jdtr2"]
 [ext_resource type="Shader" uid="uid://6yurywigppwe" path="res://shaders/materials/meeting_barrier_glow.gdshader" id="4_6najf"]
 [ext_resource type="Shader" uid="uid://dcg17rve3o6x0" path="res://shaders/materials/meeting_barrier_scan.gdshader" id="5_6wneh"]
-[ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/PlatformEffectFollower.cs" id="7_jdtr2"]
+[ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/GroundObjectController.cs" id="7_jdtr2"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_rw4bx"]
 shader = ExtResource("1_tbjep")
@@ -97,6 +97,6 @@ shape = SubResource("RectangleShape2D_jdtr2")
 [node name="Marker2D" type="Marker2D" parent="."]
 position = Vector2(0, 350)
 
-[node name="PlatformEffectFollower" type="Node" parent="." node_paths=PackedStringArray("GroundAnchor")]
+[node name="GroundObjectController" type="Node" parent="." node_paths=PackedStringArray("GroundAnchor")]
 script = ExtResource("7_jdtr2")
 GroundAnchor = NodePath("../Marker2D")

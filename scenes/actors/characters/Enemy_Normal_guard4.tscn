@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=3 uid="uid://lymwepvi725w"]
+[gd_scene load_steps=36 format=3 uid="uid://lymwepvi725w"]
 
 [ext_resource type="Script" uid="uid://dun24iq70cbac" path="res://scripts/actors/enemies/EnemyNormalGuard4.cs" id="1_logtj"]
 [ext_resource type="Resource" uid="uid://biq1vqy017vmi" path="res://resources/loot/Enemy_NormalDrops.tres" id="2_2hp7b"]
@@ -24,6 +24,9 @@
 [ext_resource type="Script" uid="uid://dasv6eyuks8yq" path="res://scripts/actors/enemies/movement/EnemyFreezeOnTurnMovement.cs" id="23_fx1wq"]
 [ext_resource type="Script" uid="uid://cfje1u3vu8lyi" path="res://scripts/actors/enemies/animation/EnemyNormalGuard4SpineAnimationController.cs" id="24_bd01o"]
 [ext_resource type="Script" uid="uid://dxy4f56vkxbdb" path="res://scripts/actors/enemies/attacks/EnemyGuard4CounterAttack.cs" id="25_counter"]
+[ext_resource type="Script" uid="uid://dsbna0napv0bt" path="res://scripts/actors/enemies/EnemyFallController.cs" id="fall_controller"]
+[ext_resource type="PackedScene" uid="uid://bxymkx3ekrxh0" path="res://scenes/objects/Animation_enemy.tscn" id="fall_effect"]
+[ext_resource type="Script" uid="uid://isk4s1w8ixcu" path="res://scripts/actors/enemies/states/EnemyFallState.cs" id="fall_state"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_b5vhy"]
 shader = ExtResource("3_alqhx")
@@ -221,9 +224,14 @@ scale = Vector2(0.99999994, 0.99999994)
 rotation = 1.5707964
 shape = SubResource("CapsuleShape2D_bo3lt")
 
+[node name="GroundProbe" type="Marker2D" parent="."]
+
 [node name="StateMachine" type="Node" parent="." node_paths=PackedStringArray("InitialState")]
 script = ExtResource("8_ge2hu")
 InitialState = NodePath("Idle")
+
+[node name="Fall" type="Node" parent="StateMachine"]
+script = ExtResource("fall_state")
 
 [node name="Idle" type="Node" parent="StateMachine"]
 script = ExtResource("9_7o7js")
@@ -254,7 +262,7 @@ TriggerAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
 KnockbackDistance = 400.0
 KnockbackDuration = 0.25
 RequireAnimationHitTrigger = true
-GrantedImmunities = 24
+GrantedImmunities = 2072
 metadata/attack_weight = 75.0
 
 [node name="CounterAttack" type="Node" parent="StateMachine/Attack/AttackController"]
@@ -274,7 +282,7 @@ KnockbackDistance = 300.0
 KnockbackDuration = 0.2
 RequireAnimationHitTrigger = true
 AllowMultipleAnimationHits = true
-GrantedImmunities = 24
+GrantedImmunities = 2072
 StunInterruptOnDamage = true
 StunDuringRecovery = false
 DamageTakenFrozenDuration = 3.0
@@ -288,6 +296,12 @@ script = ExtResource("17_q2oox")
 
 [node name="Frozen" type="Node" parent="StateMachine"]
 script = ExtResource("18_dtvpj")
+
+[node name="FallController" type="Node" parent="."]
+script = ExtResource("fall_controller")
+FallEnabled = true
+FallEffectScene = ExtResource("fall_effect")
+FallAnimationName = "fall_guard4"
 
 [node name="CooldownFrozen" type="Node" parent="StateMachine"]
 script = ExtResource("19_j8m83")

@@ -1,4 +1,4 @@
-[gd_scene load_steps=78 format=3 uid="uid://b534tt4n3wr42"]
+[gd_scene load_steps=80 format=3 uid="uid://b534tt4n3wr42"]
 
 [ext_resource type="Script" uid="uid://cra7y7mt0x1j8" path="res://scripts/managers/CameraZoneArea.cs" id="1_mbxjs"]
 [ext_resource type="Shader" uid="uid://dwi65rioev5hr" path="res://shaders/materials/pseudo_3d_card.gdshader" id="1_xart7"]
@@ -11,6 +11,7 @@
 [ext_resource type="Texture2D" uid="uid://roji77g8y3sp" path="res://assets/environments/scene_6_hotel/龙门吊左轮子.png" id="6_rqd1e"]
 [ext_resource type="Texture2D" uid="uid://752sqoqmoavc" path="res://addons/dialogic/Modules/Signal/sign/exit_sign.png" id="9_anorx"]
 [ext_resource type="SpineSkeletonDataResource" uid="uid://cu7dh3atg6s4d" path="res://animations/spine/Enemy_F1_rogueAI.tres" id="10_1yie0"]
+[ext_resource type="Resource" uid="uid://xag881d6vxpv" path="res://resources/cutscene/F_begin_intro.tres" id="10_som2a"]
 [ext_resource type="Texture2D" uid="uid://t6lil4dopg4b" path="res://assets/environments/scene_6_hotel/升降机背景培养皿.png" id="10_x26y1"]
 [ext_resource type="Texture2D" uid="uid://b6i0r8cjy5m58" path="res://assets/environments/scene_6_hotel/升降滑槽.png" id="11_7rmla"]
 [ext_resource type="Texture2D" uid="uid://cb4cka2jcljmq" path="res://assets/environments/scene_6_hotel/黑色遮蔽覆盖.png" id="11_86bts"]
@@ -35,6 +36,7 @@
 [ext_resource type="Texture2D" uid="uid://dxrn8y2or0pgc" path="res://assets/environments/scene_6_hotel/右墙壁.png" id="29_0pejj"]
 [ext_resource type="Texture2D" uid="uid://kohvycrlmg3h" path="res://assets/environments/scene_6_hotel/地板前面遮挡升降机.png" id="31_dnirc"]
 [ext_resource type="Texture2D" uid="uid://bfca73pu7u6xc" path="res://assets/environments/scene_6_hotel/龙门吊右轮子.png" id="33_som2a"]
+[ext_resource type="PackedScene" uid="uid://cgiphulgcow8x" path="res://scenes/environments/FallRegion_F_begin.tscn" id="34_npcwp"]
 
 [sub_resource type="Resource" id="Resource_rqd1e"]
 script = ExtResource("2_82263")
@@ -631,6 +633,18 @@ tracks/37/keys = {
 "update": 1,
 "values": [true]
 }
+tracks/38/type = "value"
+tracks/38/imported = false
+tracks/38/enabled = true
+tracks/38/path = NodePath("Environments/BG3:visible")
+tracks/38/interp = 1
+tracks/38/loop_wrap = true
+tracks/38/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
 
 [sub_resource type="Animation" id="Animation_xart7"]
 resource_name = "opening"
@@ -1079,6 +1093,18 @@ tracks/13/keys = {
 "transitions": PackedFloat32Array(1),
 "update": 1,
 "values": [4]
+}
+tracks/14/type = "value"
+tracks/14/imported = false
+tracks/14/enabled = true
+tracks/14/path = NodePath("Environments/BG3:visible")
+tracks/14/interp = 1
+tracks/14/loop_wrap = true
+tracks/14/keys = {
+"times": PackedFloat32Array(0, 3),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
 }
 
 [sub_resource type="Animation" id="Animation_82263"]
@@ -1748,7 +1774,7 @@ z_index = 10
 collision_layer = 0
 collision_mask = 4
 script = ExtResource("2_neu0b")
-Sequence = ExtResource("12_som2a")
+Sequence = ExtResource("10_som2a")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CutsceneTrigger"]
 position = Vector2(-2300, 763)
@@ -2017,6 +2043,8 @@ disabled = true
 visible = false
 position = Vector2(1297, 31)
 navigation_polygon = SubResource("NavigationPolygon_ka7vx")
+
+[node name="FallRegion" parent="." instance=ExtResource("34_npcwp")]
 
 [node name="AnimationCharacter" parent="." instance=ExtResource("23_5ka2g")]
 position = Vector2(-3050, 900)

@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://cipwjj7xx121y"]
+[gd_scene load_steps=16 format=3 uid="uid://cipwjj7xx121y"]
 
 [ext_resource type="Script" uid="uid://dhfq2rrha0awm" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_26ux8"]
 [ext_resource type="Resource" uid="uid://h3sll18tay3c" path="res://resources/items/Weapon_Throw_SmokeGrenade.tres" id="2_0nltr"]
@@ -6,6 +6,8 @@
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="3_ai6mm"]
 [ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="4_26ux8"]
 [ext_resource type="Shader" uid="uid://caxdo713k5kug" path="res://shaders/materials/sparkling.gdshader" id="7_26ux8"]
+[ext_resource type="PackedScene" uid="uid://dby51i7slqvd5" path="res://scenes/objects/Animation_item.tscn" id="fall_anim_item"]
+[ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/GroundObjectController.cs" id="ground_object_ctrl"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_idk0v"]
 shader = ExtResource("3_ai6mm")
@@ -29,6 +31,7 @@ shader_parameter/highlight_width = 0.08
 shader_parameter/highlight_speed = 2.0
 shader_parameter/highlight_intensity = 1.2
 shader_parameter/highlight_interval = 1.00000002375
+shader_parameter/brightness = 1.0
 shader_parameter/alpha_factor = 1.0
 
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_26ux8"]
@@ -53,7 +56,7 @@ BounceSpeed = 650.0
 BounceHorizontalRatio = 0.2
 BounceElasticity = 0.25
 DestructionAnimationDuration = 0.0
-LandingHideDelay = 0.25
+LandingHideDelay = 0.15000000000000002
 RigidBodyPath = NodePath("RigidBody2D")
 HitboxAreaPath = NodePath("RigidBody2D/AttackArea")
 ShadowPath = NodePath("RigidBody2D/Shadow")
@@ -90,3 +93,8 @@ shape = SubResource("RectangleShape2D_idk0v")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/AttackArea"]
 shape = SubResource("RectangleShape2D_w57jh")
+
+[node name="GroundObjectController" type="Node" parent="."]
+script = ExtResource("ground_object_ctrl")
+FallEffectScene = ExtResource("fall_anim_item")
+FallAnimationName = "fall_smoke_grenade"

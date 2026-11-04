@@ -32,7 +32,7 @@ public partial class PlatformEffectRuntimeCheck : Node2D
     private Node2D Effect(Node parent, Vector2 position, bool destroyOnLost = false)
     {
         var effect = new Node2D();
-        effect.AddChild(new PlatformEffectFollower { Name = "Follower", DestroyOnPlatformLost = destroyOnLost });
+        effect.AddChild(new GroundObjectController { Name = "Follower", DestroyOnPlatformLost = destroyOnLost });
         parent.AddChild(effect); effect.GlobalPosition = position; return effect;
     }
     public override async void _Ready()
@@ -46,7 +46,7 @@ public partial class PlatformEffectRuntimeCheck : Node2D
             var slow = spike.GetNode<SlowHitAreaEffect>("SlowHitArea"); slow.Duration = 0; slow.DamageInterval = 0.05f;
             AddChild(spike); // 特意先 AddChild 再定位，复现实际投掷生成顺序。
             spike.GlobalPosition = platform.GlobalPosition;
-            var follower = spike.GetNode<PlatformEffectFollower>("PlatformEffectFollower");
+            var follower = spike.GetNode<GroundObjectController>("GroundObjectController");
             await Frames();
             Check(follower.BoundPlatform == platform, "首次物理帧使用生成后的最终世界坐标绑定");
             Vector2 before = spike.GlobalPosition, platformBefore = platform.GlobalPosition;
@@ -76,7 +76,7 @@ public partial class PlatformEffectRuntimeCheck : Node2D
 
             var ground = Effect(this, new Vector2(0, 1000));
             await Frames();
-            var groundFollower = ground.GetNode<PlatformEffectFollower>("Follower");
+            var groundFollower = ground.GetNode<GroundObjectController>("Follower");
             Check(groundFollower.BoundPlatform == null, "固定地面特效不绑定平台");
             var passingPlatform = Platform(ground.GlobalPosition);
             before = ground.GlobalPosition;
@@ -93,7 +93,7 @@ public partial class PlatformEffectRuntimeCheck : Node2D
             {
                 var wall = GD.Load<PackedScene>($"res://resources/effects/{sceneName}.tscn").Instantiate<Node2D>();
                 var marker = wall.GetNode<Marker2D>("Marker2D");
-                var wallFollower = wall.GetNode<PlatformEffectFollower>("PlatformEffectFollower");
+                var wallFollower = wall.GetNode<GroundObjectController>("GroundObjectController");
                 AddChild(wall);
                 wall.GlobalPosition += platform.GlobalPosition - marker.GlobalPosition;
                 await Frames();
@@ -113,7 +113,7 @@ public partial class PlatformEffectRuntimeCheck : Node2D
             Check((inherited.GlobalPosition - before).DistanceTo(platform.GlobalPosition - platformBefore) < 0.1f,
                 "作为平台子节点的效果不重复叠加父级位移");
             var duplicate = Effect(this, platform.GlobalPosition);
-            duplicate.AddChild(new PlatformEffectFollower());
+            duplicate.AddChild(new GroundObjectController());
             await Frames(); before = duplicate.GlobalPosition; platformBefore = platform.GlobalPosition;
             await Frames();
             Check((duplicate.GlobalPosition - before).DistanceTo(platform.GlobalPosition - platformBefore) < 0.1f,

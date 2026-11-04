@@ -1,4 +1,4 @@
-[gd_scene load_steps=27 format=3 uid="uid://b81xhi3r08vha"]
+[gd_scene load_steps=29 format=3 uid="uid://b81xhi3r08vha"]
 
 [ext_resource type="Script" uid="uid://dhfq2rrha0awm" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_1d0of"]
 [ext_resource type="Resource" uid="uid://dtv412g1klamn" path="res://resources/items/Weapon_Throw_EmojiBomb.tres" id="2_vfp1h"]
@@ -17,6 +17,8 @@
 [ext_resource type="Texture2D" uid="uid://frs87ufjfuoy" path="res://assets/objects/emoji_boom/时间轴 1_0009.png" id="14_uelip"]
 [ext_resource type="Texture2D" uid="uid://cg7aibnohxiqi" path="res://assets/objects/emoji_boom/时间轴 1_0010.png" id="15_3ncya"]
 [ext_resource type="Texture2D" uid="uid://dabxdflvss2xs" path="res://assets/art/godot_icon.png" id="17_sql12"]
+[ext_resource type="PackedScene" uid="uid://dby51i7slqvd5" path="res://scenes/objects/Animation_item.tscn" id="fall_anim_item"]
+[ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/GroundObjectController.cs" id="ground_object_ctrl"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_idk0v"]
 shader = ExtResource("3_n0uqx")
@@ -37,6 +39,7 @@ shader_parameter/highlight_width = 0.08
 shader_parameter/highlight_speed = 2.0
 shader_parameter/highlight_intensity = 1.2
 shader_parameter/highlight_interval = 1.00000002375
+shader_parameter/brightness = 1.0
 shader_parameter/alpha_factor = 1.0
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_2aaj6"]
@@ -132,7 +135,7 @@ BounceSpeed = 650.0
 BounceHorizontalRatio = 0.2
 BounceElasticity = 0.25
 DestructionAnimationDuration = 0.0
-LandingHideDelay = 0.1
+LandingHideDelay = 0.01
 RigidBodyPath = NodePath("RigidBody2D")
 HitboxAreaPath = NodePath("RigidBody2D/AttackArea")
 ShadowPath = NodePath("RigidBody2D/Shadow")
@@ -188,3 +191,8 @@ shape = SubResource("RectangleShape2D_idk0v")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/AttackArea"]
 shape = SubResource("RectangleShape2D_w57jh")
+
+[node name="GroundObjectController" type="Node" parent="."]
+script = ExtResource("ground_object_ctrl")
+FallEffectScene = ExtResource("fall_anim_item")
+FallAnimationName = "fall_emoji_bomb"

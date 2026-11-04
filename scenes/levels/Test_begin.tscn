@@ -43,7 +43,7 @@
 [ext_resource type="PackedScene" uid="uid://dugfq8qy1okf1" path="res://scenes/items/Furniture_A_chairOfficeB.tscn" id="41_y44s2"]
 [ext_resource type="PackedScene" uid="uid://be30f0gopxel3" path="res://scenes/actors/etc/SlideRail_wheel.tscn" id="42_mfk2f"]
 [ext_resource type="PackedScene" uid="uid://cw42j1o501x83" path="res://scenes/actors/characters/Enemy_F1_rogueAI_MachineGun.tscn" id="43_hxrfn"]
-[ext_resource type="PackedScene" uid="uid://v6k338a22m4w" path="res://scenes/environments/FallRegionA.tscn" id="44_mfk2f"]
+[ext_resource type="PackedScene" uid="uid://v6k338a22m4w" path="res://scenes/environments/FallRegion_F_c1.tscn" id="44_mfk2f"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1mlw7"]
 size = Vector2(5800, 3050)
@@ -318,6 +318,8 @@ navigation_polygon = SubResource("NavigationPolygon_ka7vx")
 position = Vector2(-1972, 347)
 SpawnParentPath = NodePath("..")
 PlayerRespawnPointPath = NodePath("../PlayerSpawnPoint")
+SpawnedEnemiesGrantScore = true
+SpawnedEnemiesDropLoot = true
 
 [node name="CorePickupZone" type="Area2D" parent="."]
 position = Vector2(0, 344)
@@ -422,4 +424,4 @@ position = Vector2(-1804, 367)
 CarriagePrefab = ExtResource("43_hxrfn")
 
 [node name="FallRegionA" parent="." instance=ExtResource("44_mfk2f")]
-position = Vector2(2047, 320)
+position = Vector2(2047, 1099)

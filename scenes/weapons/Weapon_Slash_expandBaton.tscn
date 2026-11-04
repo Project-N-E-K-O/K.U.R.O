@@ -1,10 +1,12 @@
-[gd_scene load_steps=14 format=3 uid="uid://csjvahh6hev8k"]
+[gd_scene load_steps=16 format=3 uid="uid://csjvahh6hev8k"]
 
 [ext_resource type="Script" uid="uid://dtgdjgrqgype7" path="res://scripts/items/world/WorldItemEntity.cs" id="1_hnhuv"]
 [ext_resource type="Resource" uid="uid://cfnhsq5a0dwp4" path="res://resources/items/Weapon_Slash_ExpandBaton.tres" id="2_hnhuv"]
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="3_o1fls"]
 [ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="5_6dn8i"]
 [ext_resource type="Shader" uid="uid://caxdo713k5kug" path="res://shaders/materials/sparkling.gdshader" id="7_32rtd"]
+[ext_resource type="Script" path="res://scripts/environments/GroundObjectController.cs" id="ground_object_ctrl"]
+[ext_resource type="PackedScene" uid="uid://dby51i7slqvd5" path="res://scenes/objects/Animation_item.tscn" id="fall_anim_item"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_nqlfu"]
 shader = ExtResource("3_o1fls")
@@ -81,3 +83,8 @@ collision_layer = 0
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AttackArea"]
 rotation = 1.5707964
 shape = SubResource("CapsuleShape2D_mhf4g")
+
+[node name="GroundObjectController" type="Node" parent="."]
+script = ExtResource("ground_object_ctrl")
+FallEffectScene = ExtResource("fall_anim_item")
+FallAnimationName = "fall_expand_baton"

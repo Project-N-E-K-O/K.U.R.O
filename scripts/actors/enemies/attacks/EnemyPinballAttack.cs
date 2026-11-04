@@ -278,19 +278,24 @@ namespace Kuros.Actors.Enemies.Attacks
 		}
 
 		// 连接接触判定带（基类 AttackAreaPath 解析结果）的 BodyEntered/AreaEntered 信号
+		private bool _attackAreaSignalsConnected;
 		private void ConnectAttackAreaSignals()
 		{
-			if (AttackArea == null) return;
+			if (_attackAreaSignalsConnected || AttackArea == null || !IsInstanceValid(AttackArea)) return;
 			AttackArea.BodyEntered += OnAttackAreaBodyEntered;
 			AttackArea.AreaEntered += OnAttackAreaAreaEntered;
+			_attackAreaSignalsConnected = true;
 		}
 
 		// 断开 PinballArea 的 BodyEntered/AreaEntered 信号
 		private void DisconnectAttackAreaSignals()
 		{
-			if (AttackArea == null) return;
-			AttackArea.BodyEntered -= OnAttackAreaBodyEntered;
-			AttackArea.AreaEntered -= OnAttackAreaAreaEntered;
+			if (_attackAreaSignalsConnected && IsInstanceValid(AttackArea))
+			{
+				AttackArea!.BodyEntered -= OnAttackAreaBodyEntered;
+				AttackArea.AreaEntered -= OnAttackAreaAreaEntered;
+			}
+			_attackAreaSignalsConnected = false;
 		}
 
 		// 节点退出时清理信号连接与事件订阅

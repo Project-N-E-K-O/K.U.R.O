@@ -11,14 +11,13 @@ size = Vector2(5000, 4000)
 [sub_resource type="RectangleShape2D" id="Red"]
 size = Vector2(2950, 3000)
 
-[node name="FallRegionA" type="Node2D"]
+[node name="FallRegion_F_c1" type="Node2D"]
 script = ExtResource("1_lycp3")
 FallbackMarkerPaths = Array[NodePath]([NodePath("FallbackLeft"), NodePath("FallbackRight")])
 
 [node name="ActivationArea" type="Area2D" parent="."]
 collision_layer = 131072
-collision_mask = 0
-monitoring = false
+collision_mask = 6
 script = ExtResource("3_jmdmq")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="ActivationArea"]
