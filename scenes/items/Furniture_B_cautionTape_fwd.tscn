@@ -1,10 +1,13 @@
-[gd_scene load_steps=13 format=3 uid="uid://c0oyd0psq7fe1"]
+[gd_scene load_steps=15 format=3 uid="uid://c0oyd0psq7fe1"]
+
+[ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/GroundObjectController.cs" id="ground_object_ctrl"]
 
 [ext_resource type="Script" uid="uid://dhfq2rrha0awm" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_kw1ju"]
 [ext_resource type="Resource" uid="uid://csb5yy1f5vrux" path="res://resources/items/Furniture_B_CautionTape_fwd.tres" id="2_kw1ju"]
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="3_kaxmn"]
 [ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="5_jstfe"]
 [ext_resource type="Texture2D" uid="uid://djwqphcob6hvw" path="res://assets/furnitures/hotel_scene2/CautionTape_fwd.png" id="6_kw1ju"]
+[ext_resource type="PackedScene" uid="uid://dby51i7slqvd5" path="res://scenes/objects/Animation_item.tscn" id="fall_anim_item"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_aa7cv"]
 shader = ExtResource("3_kaxmn")
@@ -91,3 +94,8 @@ shape = SubResource("RectangleShape2D_gy46y")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/StaticBody2D"]
 position = Vector2(-30, 125)
 shape = SubResource("RectangleShape2D_jyvv2")
+
+[node name="GroundObjectController" type="Node" parent="."]
+script = ExtResource("ground_object_ctrl")
+FallEffectScene = ExtResource("fall_anim_item")
+FallAnimationName = "fall_caution_tape"

@@ -17,9 +17,6 @@ namespace Kuros.Systems.Cutscene
     ///   1. 并行执行：所有特效同时按配置生成
     ///   2. 顺序执行：特效依次生成（下一个等前一个完成后）
     /// 
-    /// 示例：
-    ///   - 创建一个登场特效组：2个身影特效 + 1个冲击波
-    ///   - 创建一个爆炸特效组：中心爆炸 + 周围碎片
     /// </summary>
     [GlobalClass]
     public partial class EffectGroupSpawnStep : CutsceneStep

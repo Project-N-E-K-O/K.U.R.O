@@ -132,7 +132,6 @@ namespace Kuros.Items.World
 			UpdateSprite(); // 更新精灵贴图
 			ResolveOutlineHighlight();
 			UpdateOutlineHighlight(force: true);
-			Kuros.Environments.GroundObjectController.AttachTo(this);
 			SetProcess(true);
 			SetPhysicsProcess(true);
 

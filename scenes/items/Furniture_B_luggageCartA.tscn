@@ -1,4 +1,6 @@
-[gd_scene load_steps=12 format=3 uid="uid://0anrcfm2pnsd"]
+[gd_scene load_steps=14 format=3 uid="uid://0anrcfm2pnsd"]
+
+[ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/GroundObjectController.cs" id="ground_object_ctrl"]
 
 [ext_resource type="Script" uid="uid://dhfq2rrha0awm" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_ukya5"]
 [ext_resource type="Resource" uid="uid://c0o7plfrhkkqn" path="res://resources/items/Furniture_B_LuggageCartA.tres" id="2_u2caw"]
@@ -6,6 +8,7 @@
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="6_kbhgj"]
 [ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="7_ii2vh"]
 [ext_resource type="Texture2D" uid="uid://j5yfe8op7l0j" path="res://assets/furnitures/hotel_scene2/LuggageCartA.png" id="7_qa1uh"]
+[ext_resource type="PackedScene" uid="uid://dby51i7slqvd5" path="res://scenes/objects/Animation_item.tscn" id="fall_anim_item"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ukya5"]
 shader = ExtResource("6_kbhgj")
@@ -81,3 +84,8 @@ shape = SubResource("RectangleShape2D_ukya5")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/StaticBody2D"]
 position = Vector2(0, 60)
 shape = SubResource("RectangleShape2D_jyvv2")
+
+[node name="GroundObjectController" type="Node" parent="."]
+script = ExtResource("ground_object_ctrl")
+FallEffectScene = ExtResource("fall_anim_item")
+FallAnimationName = "fall_luggage_cart_a"

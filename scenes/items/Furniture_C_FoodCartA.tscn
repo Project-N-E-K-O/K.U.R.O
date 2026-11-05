@@ -1,4 +1,6 @@
-[gd_scene load_steps=12 format=3 uid="uid://ddorhljtetljs"]
+[gd_scene load_steps=14 format=3 uid="uid://ddorhljtetljs"]
+
+[ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/GroundObjectController.cs" id="ground_object_ctrl"]
 
 [ext_resource type="Script" uid="uid://dhfq2rrha0awm" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_p5wfd"]
 [ext_resource type="Resource" uid="uid://cpm7ew2qthkkj" path="res://resources/items/Furniture_C_FoodCartA.tres" id="2_p5wfd"]
@@ -6,6 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="4_gyrfd"]
 [ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="5_yr5q1"]
 [ext_resource type="Texture2D" uid="uid://b3ipocumrfmc3" path="res://assets/furnitures/hotel_scene3/FoodCartA.png" id="6_p5wfd"]
+[ext_resource type="PackedScene" uid="uid://dby51i7slqvd5" path="res://scenes/objects/Animation_item.tscn" id="fall_anim_item"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ukya5"]
 shader = ExtResource("3_ii6l3")
@@ -81,3 +84,8 @@ shape = SubResource("RectangleShape2D_ukya5")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/StaticBody2D"]
 position = Vector2(0, 85)
 shape = SubResource("RectangleShape2D_jyvv2")
+
+[node name="GroundObjectController" type="Node" parent="."]
+script = ExtResource("ground_object_ctrl")
+FallEffectScene = ExtResource("fall_anim_item")
+FallAnimationName = "fall_food_cart_a"

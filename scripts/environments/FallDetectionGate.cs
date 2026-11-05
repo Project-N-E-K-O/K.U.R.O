@@ -16,19 +16,24 @@ public partial class FallDetectionGate : Node
     private bool _initialized;
     private bool _fallbackHazard;
     private ulong _actorId;
-    private bool _useAreaProbe;
     private Area2D? _probe;
     public bool Active { get; private set; }
 
-    public void Configure(Node2D actor, Func<Vector2> foot, Action<bool> changed, bool useAreaProbe = false)
-    { _actor = actor; _foot = foot; _changed = changed; _useAreaProbe = useAreaProbe; }
+    public void Configure(Node2D actor, Func<Vector2> foot, Action<bool> changed)
+    { _actor = actor; _foot = foot; _changed = changed; }
 
     public override void _Ready()
     {
         ProcessPhysicsPriority = 99;
         _actorId = _actor.GetInstanceId();
         Gates[_actorId] = this;
-        if (_useAreaProbe)
+        CreateProbe();
+        RequestRefresh();
+    }
+
+    private void CreateProbe()
+    {
+        if (_probe == null)
         {
             // 只监听黄区，不占用身体层；也适用于内部刚体移动而根节点不动的家具。
             _probe = new Area2D { Name = "ActivationProbe", TopLevel = true, CollisionLayer = 0,
@@ -39,19 +44,11 @@ public partial class FallDetectionGate : Node
             AddChild(_probe);
             _probe.GlobalPosition = _foot();
         }
-        RequestRefresh();
     }
 
     /// <summary>等待最终定位与物理注册完成后补查；不是周期轮询。</summary>
     public void RequestRefresh()
     { _refreshFrames = 2; SetPhysicsProcess(true); }
-
-    internal static void BodyChanged(FallActivationArea area, Node2D body, bool entered)
-    {
-        if (!Gates.TryGetValue(body.GetInstanceId(), out var gate) || gate._useAreaProbe) return;
-        if (entered) gate._areas.Add(area); else gate._areas.Remove(area);
-        if (gate._initialized) gate.Publish();
-    }
 
     internal static void AreaAdded(FallActivationArea area)
     {
@@ -82,17 +79,17 @@ public partial class FallDetectionGate : Node
     public override void _PhysicsProcess(double delta)
     {
         if (!IsInstanceValid(_actor) || !_actor.IsInsideTree() || _actor.IsQueuedForDeletion()) return;
-        // 物品仅同步一个坐标；远离黄区时不进行任何空间查询。
+        // 所有对象统一只同步脚底坐标；远离黄区时不进行精确空间查询。
         if (_probe != null) _probe.GlobalPosition = _foot();
         if (_refreshFrames > 0) { _refreshFrames--; return; }
         if (_refreshFrames < 0 && !_fallbackHazard) return;
         _refreshFrames = -1;
         _areas.Clear();
-        // 首次/传送/新区域加载时补查已有身体重叠，保留“身体已进入、脚底尚未进入”的外围缓冲。
+        // 首次/传送/新区域加载时补查已有探针重叠，不依赖目标身体碰撞。
         foreach (var area in FallActivationArea.LiveAreas)
             if (IsInstanceValid(area) && area.IsInsideTree() && !area.IsQueuedForDeletion()
                 && area.GetWorld2D() == _actor.GetWorld2D()
-                && (_probe != null ? _probe.OverlapsArea(area) : area.OverlapsBody(_actor))) _areas.Add(area);
+                && _probe != null && _probe.OverlapsArea(area)) _areas.Add(area);
         bool hazard = false;
         foreach (var hit in _actor.GetWorld2D().DirectSpaceState.IntersectPoint(new PhysicsPointQueryParameters2D
         {

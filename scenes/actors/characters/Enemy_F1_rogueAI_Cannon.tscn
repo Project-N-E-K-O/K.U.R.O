@@ -1,4 +1,4 @@
-[gd_scene load_steps=48 format=3 uid="uid://duryvwia2gyyc"]
+[gd_scene load_steps=49 format=3 uid="uid://duryvwia2gyyc"]
 
 [ext_resource type="Script" uid="uid://ccqcbk4merfnt" path="res://scripts/actors/enemies/EnemyF1RogueAICannon.cs" id="1_3cfw7"]
 [ext_resource type="Resource" uid="uid://05yoqk7rf6ax" path="res://resources/behavior/EnemyBehaviorConfig.tres" id="2_3eyky"]
@@ -34,6 +34,7 @@
 [ext_resource type="PackedScene" uid="uid://bwdwpiu2brmv6" path="res://scenes/environments/jar_mozhua_assist.tscn" id="36_jars"]
 [ext_resource type="Script" uid="uid://baq6luqv2ijwk" path="res://scripts/actors/enemies/EnemyEmpowerController.cs" id="37_empower"]
 [ext_resource type="Script" uid="uid://ul0132m6aehw" path="res://scripts/actors/enemies/attacks/EnemyF1RogueAITurretSimpleMeleeAttack.cs" id="38_turretsimple"]
+[ext_resource type="Script" uid="uid://bp7k64w3rc75b" path="res://scripts/controllers/ShadowGroundController.cs" id="shadow_ground"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_shadow"]
 shader = ExtResource("4_by072")
@@ -164,6 +165,9 @@ texture = ExtResource("5_r52tf")
 script = ExtResource("6_hyfyo")
 TargetBone = NodePath("../SpineSprite/SpineBoneNode")
 
+[node name="ShadowGroundController" type="Node" parent="Shadow"]
+script = ExtResource("shadow_ground")
+
 [node name="OutlineLayer" type="Node2D" parent="."]
 visible = false
 show_behind_parent = true
@@ -263,12 +267,10 @@ position = Vector2(500, 0)
 position = Vector2(-300, 0)
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-visible = false
 modulate = Color(0.8, 0.6, 0.5, 1)
 z_index = 10
 
 [node name="ControllerDetectionArea" type="Area2D" parent="Sprite2D"]
-visible = false
 scale = Vector2(0.99999994, 0.99999994)
 collision_layer = 0
 collision_mask = 4
@@ -278,7 +280,6 @@ monitorable = false
 shape = SubResource("CircleShape2D_controller_detect")
 
 [node name="AttackDetectionArea" type="Area2D" parent="Sprite2D"]
-visible = false
 collision_layer = 0
 collision_mask = 4
 monitorable = false

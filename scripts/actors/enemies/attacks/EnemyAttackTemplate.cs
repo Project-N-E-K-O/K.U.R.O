@@ -980,6 +980,10 @@ namespace Kuros.Actors.Enemies.Attacks
         /// <summary>特效生成完成后的钩子（已入树、已定位）。需要持有特效实例的攻击模板（如 JarAssistAttack）重写。</summary>
         protected virtual void OnAttackEffectSpawned(Node2D effect, AttackEffectEntry? entry) { }
 
+        /// <summary>入树前验证/调整最终生成坐标。返回 false 时直接释放未入树实例，不触发生成回调。</summary>
+        protected virtual bool TryResolveEffectSpawnPosition(Node2D effect, AttackEffectEntry? entry,
+            ref Vector2 position, ref Node2D? marker) => true;
+
         /// <summary>特效挂到哪个父节点（入树**之前**调用，决定特效的初始父级）。
         /// 默认挂在敌人父级（世界层）；需要规避继承变换/层级（如不随滑轨漂移的特效）的攻击模板重写。
         /// 注意：不要用 Reparent 事后搬——已 Ready 的节点 Reparent 不会重跑 _Ready，会丢订阅。</summary>
@@ -1072,6 +1076,8 @@ namespace Kuros.Actors.Enemies.Attacks
 
                 if (effect is Node2D node2D)
                 {
+                    if (!TryResolveEffectSpawnPosition(node2D, entry, ref spawnPos, ref usedMarker))
+                    { node2D.Free(); return; }
                     if (node2D is Kuros.Fx.IFacingDirectional facing)
                         facing.FacingRight = Enemy.FacingRight;
 

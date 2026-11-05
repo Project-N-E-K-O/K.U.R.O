@@ -40,7 +40,8 @@ public partial class PlayerFallController : FallController
         _player = GetParent<MainCharacter>();
         InitializeDetection(_player);
     }
-    protected override bool CanCheckFall() => base.CanCheckFall() && !_player.IsDead && !_player.IsDeathSequenceActive;
+    protected override bool CanCheckFall() => base.CanCheckFall() && !_player.IsDead
+        && (!_player.IsDeathSequenceActive || CanCarryCorpse && _player.Visible);
     protected override void OnActivationChanged(bool active)
     { if (!active) { _tracking = null; _sampleTimer = 0; } }
     private Vector2 FootOffset => _player.GetNodeOrNull<Node2D>(GroundProbePath)?.GlobalPosition - _player.GlobalPosition ?? Vector2.Zero;
@@ -58,6 +59,7 @@ public partial class PlayerFallController : FallController
 
     protected override void OnGroundChecked(FallPhysics.GroundResult result, float delta)
     {
+        if (_player.IsDeathSequenceActive) return;
         var activation = result.Activation;
         bool supported = result.Supported;
         bool entered = activation != _tracking;
@@ -76,6 +78,7 @@ public partial class PlayerFallController : FallController
 
     protected override bool IsFallImmune()
     {
+        if (_player.IsDeathSequenceActive) return false;
         if (_player.ActiveImmunities.HasFlag(ImmunityFlags.Fall)) return true;
         string state = _player.StateMachine.CurrentState?.Name.ToString() ?? "";
         foreach (string immune in ImmuneStates) if (state == immune) return true;
@@ -132,6 +135,18 @@ public partial class PlayerFallController : FallController
 
     protected override void TryStartFall(FallRegion region)
     {
+        if (_player.IsDeathSequenceActive)
+        {
+            bool wasVisible = _player.Visible;
+            if (BeginCorpseFall(_player, region))
+            {
+                _hiddenByLethalFall = true;
+                _visibilityBeforeLethalFall = wasVisible;
+                CacheCollisions(_player);
+                _player.ConsumePendingHitKnockback();
+            }
+            return; // 不扣血、不回岸、不打断 Dying / Dead。
+        }
         _entryPoint = _player.GlobalPosition;
         if (!ResolveReturn(region, out _returnPoint))
         {
@@ -231,7 +246,12 @@ public partial class PlayerFallController : FallController
     {
         if (!_hiddenByLethalFall || IsFalling || !IsInstanceValid(_player)) return;
         _hiddenByLethalFall = false;
+        ResetCorpseFall();
+        foreach (var entry in _collisions)
+            if (IsInstanceValid(entry.Node)) { entry.Node.CollisionLayer = entry.Layer; entry.Node.CollisionMask = entry.Mask; }
+        _collisions.Clear();
         _player.Visible = _visibilityBeforeLethalFall;
+        RefreshDetectionAfterTeleport();
     }
 
     /// <summary>外部传送/重生前调用。取消当前流程，不扣血，不解锁其他系统。</summary>

@@ -42,12 +42,16 @@ public static class FallPhysics
     }
 
     public static Node2D? SpawnVisual(Node context, PackedScene? scene, string animation, Vector2 position,
-        float duration, bool? facingRight = null, bool autoCleanup = true)
+        float duration, bool? facingRight = null, bool autoCleanup = true, ItemFallVisualProfile? visualProfile = null)
     {
         if (scene == null) return null;
         var instance = scene.Instantiate();
         if (instance is not Node2D visual)
         { instance.Free(); GD.PushWarning("[Fall] 坠落替身根节点必须是 Node2D。"); return null; }
+        if (visual is ItemFallVisual item)
+        { item.ConfigureForKey(animation, visualProfile); animation = "fall"; }
+        else if (visual is EnemyFallVisual enemyFall)
+        { enemyFall.ConfigureForKey(animation); animation = "fall"; }
         if (visual is DirectionalSceneEffect effect)
         { effect.AnimationName = animation; if (facingRight.HasValue) effect.FacingRight = facingRight.Value; }
         visual.TopLevel = true;

@@ -374,7 +374,6 @@ namespace Kuros.Items.World
 			// Godot 4 首次实例化含 ParticleProcessMaterial 的场景时会同步编译 Shader（卡帧）。
 			// 在 _Ready 阶段提前实例化一次（invisible，立刻销毁），使 Shader 在此时完成编译。
 			WarmUpThrowDestroyEffectShaders();
-			Kuros.Environments.GroundObjectController.AttachTo(this);
 		}
 
 		public override void _ExitTree()
@@ -647,12 +646,18 @@ namespace Kuros.Items.World
 
 		public Vector2 PlatformGroundPosition => Kuros.Environments.PlatformCarryPhysics.GroundPosition(
 			this, PlatformGroundProbePath, PlatformCollisionBody, _rigidBody);
-		/// <summary>排除飞行、回弹、散落空中与归还阶段；不要求静止或开启平台承载。</summary>
-		public bool CanFall => IsPickupAvailable && !_isDropping && !_refreezePending
+		private bool _throwLanded;
+		private bool _fallWaitingForReturn;
+		/// <summary>排除飞行、回弹及空中散落；落地等待隐藏期间仍可坠落，不要求静止或开启平台承载。</summary>
+		public bool CanFall => !_isPicked && !_isDestroying && !_inFlight && !_bouncing
+			&& (IsPickupAvailable || _throwLanded) && !_isDropping && !_refreezePending
 			&& _rigidBody != null && IsVisibleInTree() && CanProcess() && !IsQueuedForDeletion();
 		public Vector2 FallGroundPosition => PlatformGroundPosition;
 		public void PrepareForFall()
 		{
+			_fallWaitingForReturn = _throwLanded && !IsDisposableCopy && IsThrowWeapon;
+			_landingHideTimer = 0;
+			_isThrown = false;
 			_isDestroying = true;
 			_isPicked = true;
 			_impactArmed = false;
@@ -662,7 +667,26 @@ namespace Kuros.Items.World
 				_rigidBody.AngularVelocity = 0;
 				_rigidBody.Freeze = true;
 			}
-			// 不走 Destroy/RequestDestroy：掉入深坑不触发 OnThrowDestroy 或爆炸，也不归还背包。
+			// 不触发正常打碎/落地特效；已落地的归还型投掷武器独立保留归还倒计时。
+		}
+		public bool CompleteFall()
+		{
+			if (!_fallWaitingForReturn) return false;
+			Visible = false;
+			foreach (Node child in GetChildren()) Kuros.Environments.FallPhysics.DisableCollisions(child, stopProcessing: true);
+			SetProcess(false);
+			SetPhysicsProcess(true); // 根仅运行下面的归还专用分支，子树全部停用。
+			return true;
+		}
+
+		private bool TryHandleLandingFall()
+		{
+			_throwLanded = true;
+			if (_flightProjectionActive) RestoreFlightProjection();
+			if (!IsDisposableCopy && IsThrowWeapon) _inventoryReturnTimer = ThrowWeaponCooldown;
+			foreach (Node child in GetChildren())
+				if (child is Kuros.Environments.GroundObjectController controller) return controller.TryFallNow();
+			return false;
 		}
 
 		public void ApplyPlatformDisplacement(Vector2 displacement, uint obstacleMask)
@@ -733,6 +757,7 @@ namespace Kuros.Items.World
 
 		public virtual void ApplyThrowImpulse(Vector2 velocity)
 		{
+			_throwLanded = false;
 			// 投掷即效果：不进入飞行，投掷瞬间销毁武器本体并生成 OnThrowDestroy 效果（回旋镖等）
 			if (ItemDefinition?.SpawnEffectOnThrow == true)
 			{
@@ -860,6 +885,13 @@ namespace Kuros.Items.World
 		public override void _PhysicsProcess(double delta)
 		{
 			base._PhysicsProcess(delta);
+			if (_fallWaitingForReturn)
+			{
+				_inventoryReturnTimer = Math.Max(0, _inventoryReturnTimer - delta);
+				if (_inventoryReturnTimer <= 0)
+				{ _fallWaitingForReturn = false; ReturnToInventory(); QueueFree(); }
+				return;
+			}
 
 			if (_rigidBody == null) return;
 
@@ -1025,6 +1057,7 @@ namespace Kuros.Items.World
 					// [临时诊断] A_008 分裂落点对质:实体实际落地 Y 与判定行关系
 					if (LandingOffsetYDelta != 0f)
 						GD.Print($"[A_008实体] {Name}: 落地Y={landingY:F0}, 判定行={_throwJudgmentY:F0}, delta={LandingOffsetYDelta}");
+					if (TryHandleLandingFall()) return;
 
 					// 落点砸地 AoE（仅一次性投掷物）：飞尽未中敌时按碰撞体积结算一次范围伤害，
 					// 必须在关闭判定臂之前执行（命中过的敌人已在 _hitActors,不会重复结算）
@@ -1108,6 +1141,7 @@ namespace Kuros.Items.World
 					_bounceVelX = 0f;
 					_bounceVelY = 0f;
 					_rigidBody.LinearVelocity = Vector2.Zero;
+					if (TryHandleLandingFall()) return;
 					if (ShouldKeepAfterLanding)
 					{
 						FinalizeKeptAfterLanding();
@@ -1977,6 +2011,7 @@ namespace Kuros.Items.World
 			// 直接销毁：走 LandingHideDelay 计时（隐藏/归还由 _PhysicsProcess 处理）
 			if (!_isDestroying)
 			{
+				if (TryHandleLandingFall()) return;
 				if (ShouldKeepAfterLanding)
 				{
 					FinalizeKeptAfterLanding();

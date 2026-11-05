@@ -1,4 +1,6 @@
-[gd_scene load_steps=12 format=3 uid="uid://b8twfkaisp0mt"]
+[gd_scene load_steps=14 format=3 uid="uid://b8twfkaisp0mt"]
+
+[ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/GroundObjectController.cs" id="ground_object_ctrl"]
 
 [ext_resource type="Script" uid="uid://dhfq2rrha0awm" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_bfy1o"]
 [ext_resource type="Resource" uid="uid://ujei4j2ea008" path="res://resources/items/Furniture_C_TableRoundC.tres" id="2_bfy1o"]
@@ -6,6 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="4_ryo6w"]
 [ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="5_3lwoa"]
 [ext_resource type="Texture2D" uid="uid://de3t5lmrkvv0c" path="res://assets/furnitures/hotel_scene3/TableRoundC_Cake.png" id="6_bfy1o"]
+[ext_resource type="PackedScene" uid="uid://dby51i7slqvd5" path="res://scenes/objects/Animation_item.tscn" id="fall_anim_item"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_aa7cv"]
 shader = ExtResource("3_022c0")
@@ -85,3 +88,8 @@ shape = SubResource("RectangleShape2D_2jhlq")
 position = Vector2(0, 140)
 rotation = 1.5707964
 shape = SubResource("CapsuleShape2D_bfy1o")
+
+[node name="GroundObjectController" type="Node" parent="."]
+script = ExtResource("ground_object_ctrl")
+FallEffectScene = ExtResource("fall_anim_item")
+FallAnimationName = "fall_table_round_c"

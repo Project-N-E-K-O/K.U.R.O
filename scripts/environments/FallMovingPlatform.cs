@@ -103,14 +103,19 @@ public partial class FallMovingPlatform : Node2D
             {
                 if (!passenger.CanRidePlatform) continue;
                 var controller = sensor?.GetParent() as GroundObjectController;
-                if (controller != null && (!controller.FollowPlatformEnabled || !controller.Grounded || controller.IsFalling)) continue;
+                if (controller == null || !controller.IsInsideTree() || controller.IsQueuedForDeletion()
+                    || !controller.FollowPlatformEnabled || !controller.Grounded || controller.IsFalling) continue;
                 foot = passenger.PlatformGroundPosition;
             }
             else if (node is GameActor actor)
             {
-                if (actor.IsDead || actor.IsDeathSequenceActive
-                    || (actor is SamplePlayer player && player.IsFalling)
-                    || !PlatformCarryPhysics.HasEnabledBodyShape(actor)) continue;
+                if (actor.IsDead || !actor.Visible || actor is SamplePlayer player && player.IsFalling) continue;
+                if (actor.IsDeathSequenceActive)
+                {
+                    // Dying 禁用身体碰撞；仅原本可落坑的实体尸体继续承载，悬浮 Boss 不纳入。
+                    if (sensor?.GetParent() is not FallController fall || !fall.CanCarryCorpse) continue;
+                }
+                else if (!PlatformCarryPhysics.HasEnabledBodyShape(actor)) continue;
                 foot = PlatformCarryPhysics.CharacterGroundPosition(actor);
             }
             else continue; // 不对未知 Node2D / 正在自由模拟的刚体强行修改坐标。
@@ -131,6 +136,11 @@ public partial class FallMovingPlatform : Node2D
         if (passenger != null && !passenger.CanRidePlatform) return;
         if (!PlatformCarryPhysics.TryClaim(target)) return;
         if (passenger != null) passenger.ApplyPlatformDisplacement(motion, FurnitureObstacleMask);
-        else if (target is CharacterBody2D character) character.MoveAndCollide(motion);
+        else if (target is CharacterBody2D character)
+        {
+            if (target is GameActor actor && actor.IsDeathSequenceActive)
+                character.GlobalPosition += motion; // 尸体碰撞已停用，仍需保留相对平台位置。
+            else character.MoveAndCollide(motion);
+        }
     }
 }

@@ -7,7 +7,13 @@
       "Bash(\"C:/Users/STG-PC-TC/Desktop/KURO_Project/godot-editor-windows-mono/godot-4.2-4.5.1-stable-mono.exe\" --headless --fixed-fps 60 --path . res://probe_enemy_fall3.tscn)",
       "Bash(\"C:/Users/STG-PC-TC/Desktop/KURO_Project/godot-editor-windows-mono/godot-4.2-4.5.1-stable-mono.exe\" --headless --fixed-fps 60 --path . res://probe_item_spawn.tscn)",
       "Bash(\"C:/Users/STG-PC-TC/Desktop/KURO_Project/godot-editor-windows-mono/godot-4.2-4.5.1-stable-mono.exe\" --headless --fixed-fps 60 --path . res://probe_item_weapons.tscn)",
-      "Bash(\"C:/Users/STG-PC-TC/Desktop/KURO_Project/godot-editor-windows-mono/godot-4.2-4.5.1-stable-mono.exe\" --headless --fixed-fps 60 --path . res://probe_item_hide.tscn)"
+      "Bash(\"C:/Users/STG-PC-TC/Desktop/KURO_Project/godot-editor-windows-mono/godot-4.2-4.5.1-stable-mono.exe\" --headless --fixed-fps 60 --path . res://probe_item_hide.tscn)",
+      "Bash(PYTHONIOENCODING=utf-8 python tmp_add_furniture.py)",
+      "Bash(\"C:/Users/STG-PC-TC/Desktop/KURO_Project/godot-editor-windows-mono/godot-4.2-4.5.1-stable-mono.exe\" --headless --fixed-fps 60 --path . res://probe_item_furniture.tscn)",
+      "Bash(\"C:/Users/STG-PC-TC/Desktop/KURO_Project/godot-editor-windows-mono/godot-4.2-4.5.1-stable-mono.exe\" --headless --fixed-fps 60 --path . res://probe_caution_fall.tscn)",
+      "Bash(python -)",
+      "Bash(\"C:/Users/STG-PC-TC/Desktop/KURO_Project/godot-editor-windows-mono/godot-4.2-4.5.1-stable-mono.exe\" --headless --fixed-fps 60 --path . res://probe_empower_anchor.tscn)",
+      "Bash(\"C:/Users/STG-PC-TC/Desktop/KURO_Project/godot-editor-windows-mono/godot-4.2-4.5.1-stable-mono.exe\" --headless --fixed-fps 60 --path . res://probe_empower_anchor.tscn -- right)"
     ]
   }
 }

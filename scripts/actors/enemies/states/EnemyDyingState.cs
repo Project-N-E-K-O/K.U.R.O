@@ -71,7 +71,12 @@ namespace Kuros.Actors.Enemies.States
 
             // DeathDuration <= 0：持续尸体模式，停留在 Dying，永不进入 Dead（因此不销毁）。
             if (DeathDuration <= 0f)
+            {
+                // 致死 Hit 期间已落坑的尸体，随后才进入 Dying 时也必须完成收尾。
+                if (Enemy.GetNodeOrNull<EnemyFallController>("FallController")?.HasCorpseFallen == true)
+                    Enemy.FinalizeDeath();
                 return;
+            }
 
             _timer -= (float)delta;
             if (_timer <= 0f)
@@ -84,6 +89,7 @@ namespace Kuros.Actors.Enemies.States
         /// 生成配置的全部条目。</summary>
         private void OnSpineEffectTriggered(string animationName, float eventTime)
         {
+            if (Enemy.GetNodeOrNull<EnemyFallController>("FallController")?.HasCorpseFallen == true) return;
             // 0 = 不限制；>0 时本次 Dying 累计触发到上限后不再生成（循环 death 防刷屏）
             if (MaxEffectTriggers > 0 && _effectTriggerCount >= MaxEffectTriggers) return;
             _effectTriggerCount++;

@@ -30,6 +30,8 @@ public partial class GroundObjectController : Node, IPlatformPassenger
     /// <summary>可选独立替身；为空直接释放本体，不播放动画。</summary>
     [Export] public PackedScene? FallEffectScene { get; set; }
     [Export] public string FallAnimationName { get; set; } = "fall";
+    /// <summary>通用 Animation_item 的可选显式外观；为空时按旧 fall_xxx 配置键查表。</summary>
+    [Export] public ItemFallVisualProfile? FallVisualProfile { get; set; }
     /// <summary>相对于地面检测点的世界偏移，不继承目标缩放或旋转。</summary>
     [Export] public Vector2 FallEffectOffset { get; set; }
 
@@ -47,13 +49,6 @@ public partial class GroundObjectController : Node, IPlatformPassenger
     public bool CanRidePlatform => HasTarget && !IsFalling && Grounded && FollowPlatformEnabled && _target!.CanProcess()
         && (_target is not IPlatformPassenger passenger || passenger.CanRidePlatform);
 
-    public static void AttachTo(Node2D target)
-    {
-        foreach (Node child in target.GetChildren())
-            if (child is GroundObjectController) return;
-        target.AddChild(new GroundObjectController { Name = "GroundObjectController" });
-    }
-
     public override void _Ready()
     {
         _target = GetNodeOrNull<Node2D>(TargetPath);
@@ -61,7 +56,7 @@ public partial class GroundObjectController : Node, IPlatformPassenger
         if (_target == null)
         { GD.PushWarning($"[GroundObject] {GetPath()}: TargetPath 未指向 Node2D。"); SetPhysicsProcess(false); return; }
         _sensor = new GroundContactSensor { Name = "GroundSensor" };
-        _sensor.Configure(_target, () => PlatformGroundPosition, _ => UpdateProcessing(), useProbe: true);
+        _sensor.Configure(_target, () => PlatformGroundPosition, _ => UpdateProcessing());
         AddChild(_sensor);
         UpdateProcessing();
     }
@@ -147,9 +142,23 @@ public partial class GroundObjectController : Node, IPlatformPassenger
         Detach();
         if (_target is IGroundFallReceiver receiver) receiver.PrepareForFall();
         EmitSignal(SignalName.FallStarted);
-        FallPhysics.SpawnVisual(this, FallEffectScene, FallAnimationName, position, region.FallDuration);
+        FallPhysics.SpawnVisual(this, FallEffectScene, FallAnimationName, position, region.FallDuration, visualProfile: FallVisualProfile);
         if (HasTarget)
-        { _target!.Visible = false; FallPhysics.DisableCollisions(_target, stopProcessing: true); _target.QueueFree(); }
+        {
+            _target!.Visible = false;
+            if (_target is IGroundFallReceiver owner && owner.CompleteFall()) return;
+            FallPhysics.DisableCollisions(_target, stopProcessing: true); _target.QueueFree();
+        }
+    }
+    /// <summary>已确定落地时同步判定，不等待黄区进入信号或普通隐藏延迟。</summary>
+    public bool TryFallNow()
+    {
+        if (!HasTarget || IsFalling || !FallEnabled || !Grounded
+            || _target is IGroundFallReceiver receiver && !receiver.CanFall) return false;
+        var result = _sensor.SampleNow();
+        if (result.Supported || result.Hazard == null) return false;
+        BeginFall(result.Hazard);
+        return true;
     }
     public override void _ExitTree() { Detach(); SetPhysicsProcess(false); }
 }

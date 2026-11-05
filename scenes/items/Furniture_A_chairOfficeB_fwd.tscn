@@ -1,4 +1,6 @@
-[gd_scene load_steps=12 format=3 uid="uid://diism2n4xtftt"]
+[gd_scene load_steps=14 format=3 uid="uid://diism2n4xtftt"]
+
+[ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/GroundObjectController.cs" id="ground_object_ctrl"]
 
 [ext_resource type="Script" uid="uid://dhfq2rrha0awm" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_hl1qu"]
 [ext_resource type="Resource" uid="uid://cotwvw5qsl8qy" path="res://resources/items/Furniture_A_ChairOfficeB_fwd.tres" id="2_hl1qu"]
@@ -6,6 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="4_bymlb"]
 [ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="5_logl8"]
 [ext_resource type="Texture2D" uid="uid://bs16blbpfo71j" path="res://assets/furnitures/home_scene1/ChairOfficeB_fwd.png" id="6_hl1qu"]
+[ext_resource type="PackedScene" uid="uid://dby51i7slqvd5" path="res://scenes/objects/Animation_item.tscn" id="fall_anim_item"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_aa7cv"]
 shader = ExtResource("3_eomtn")
@@ -82,3 +85,8 @@ shape = SubResource("RectangleShape2D_gy46y")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/StaticBody2D"]
 position = Vector2(0, 50)
 shape = SubResource("RectangleShape2D_jyvv2")
+
+[node name="GroundObjectController" type="Node" parent="."]
+script = ExtResource("ground_object_ctrl")
+FallEffectScene = ExtResource("fall_anim_item")
+FallAnimationName = "fall_chair_office_b"

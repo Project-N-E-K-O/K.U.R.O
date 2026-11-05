@@ -1051,7 +1051,7 @@ public void ApplyEffect(ActorEffect effect)
 		}
 
 		/// <summary>
-		/// 禁用自身及所有子节点的 CollisionShape2D。
+		/// 禁用身体与攻击等子节点的 CollisionShape2D；独立地面探针保留，用于尸体承托与坠落。
 		/// </summary>
 		public void DisableCollisionShape()
 		{
@@ -1062,6 +1062,7 @@ public void ApplyEffect(ActorEffect effect)
 		{
 			foreach (Node child in node.GetChildren())
 			{
+				if (child is Kuros.Environments.GroundContactSensor) continue;
 				if (child is CollisionShape2D shape)
 				{	
 					//shape.Disabled = true;

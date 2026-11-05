@@ -17,11 +17,11 @@ public partial class GroundContactSensor : Node
     public bool Active => IsInstanceValid(_gate) && _gate.Active;
     public Vector2 GroundPosition => _position();
 
-    public void Configure(Node2D target, Func<Vector2> position, Action<bool> changed, bool useProbe, bool includeActivation = false)
+    public void Configure(Node2D target, Func<Vector2> position, Action<bool> changed, bool includeActivation = false)
     {
         _target = target; _position = position; _includeActivation = includeActivation;
         _gate = new FallDetectionGate { Name = "DetectionGate" };
-        _gate.Configure(target, position, changed, useProbe);
+        _gate.Configure(target, position, changed);
     }
     public override void _Ready()
     {

@@ -45,7 +45,7 @@ Active 阶段免疫不等于严格的实际冲刺窗口。当前使用通用三�
 
 ## 流程与时序
 
-1. 黄色 FallActivationArea 通过身体进入/离开信号激活共享 FallDetectionGate，远处停止检测。附近每个物理帧在常规运动之后（优先级 100）按脚底点一次查询红色 FallHazardArea 和绿色 FallSupportArea。绿色有效承托优先；红区向上查找 FallRegion。敌人使用黄色外围激活，不记录玩家安全历史。首次生成或动态区域加载会补查已有重叠，外部传送可调用 RefreshDetectionAfterTeleport；黄色必须覆盖完整红区并留有缓冲。门控由控制器自动创建，无需手动挂载。
+1. FallDetectionGate 自动创建独立 Area2D 脚底探针，通过黄色 FallActivationArea 的进入/离开激活检测，不再依赖身体碰撞，远处只同步探针坐标。附近每个物理帧在常规运动之后（优先级 100）按脚底点一次查询红色 FallHazardArea 和绿色 FallSupportArea。绿色有效承托优先；红区向上查找 FallRegion。敌人使用黄色外围激活，不记录玩家安全历史。首次生成或动态区域加载会补查已有重叠，外部传送可调用 RefreshDetectionAfterTeleport；黄色必须覆盖完整红区并留有缓冲。门控和探针均自动创建，无需手动挂载。
 2. 验证启用、存活、未坠落及免疫条件。结清旧合并伤害；旧伤害已致死时保留原死亡流程。
 3. 通过已验证请求进入高优先级 Fall，仍执行原状态 Exit。guard1 的 Attack.Exit 会取消控制器与子攻击；Frozen 等退出守卫不能挡住有效 Fall。
 4. 隐藏本体、清零速度、清空整棵子树 CollisionObject2D 的碰撞层与掩码；生成独立替身，然后停用敌人子树。
@@ -53,6 +53,10 @@ Active 阶段免疫不等于严格的实际冲刺窗口。当前使用通用三�
 6. 本体当帧排队释放，替身留在当前世界场景，根动画按 FallRegion.FallDuration（至少 0.1 秒）同步速度。独立绑定于替身的 Tween 到期回收，敌人释放不会取消它；缺少动画也能回收。切场景时替身随场景释放。
 
 ## 掉落与击杀归属
+
+### Dying 尸体
+
+开启 FallEnabled 且初始化时有有效身体形状的角色，Dying 期间继续随平台移动并检测深坑。死亡停用碰撞时保留传感器探针。落坑后隐藏尸体、生成当前敌人的坠落替身，不再切活体 Fall、不重新结算伤害；既有 Dying 计时结束后统一 FinalizeDeath，DeathDuration<=0 的持续尸体落坑后也完成收尾。停止死亡帧特效和 Dead 收尸特效，岸边掉落校验沿用下述规则。已经完成死亡结算、隐藏或坠落的对象不会重复参与。
 
 坠落死亡使用所属 FallRegion 的 FallbackMarkerPaths 选择距离踩空点最近的可用固定掉落点。候选点周围 SafeDistance 内不能有红区或承托区，且候选点不能被 LootObstacleMask 中的身体占据；无有效点时仍死亡、仍统计击杀，但不在坑内生成掉落物，并在配置有掉落表时警告。
 

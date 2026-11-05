@@ -1,4 +1,6 @@
-[gd_scene load_steps=12 format=3 uid="uid://daox4k6bu5oqt"]
+[gd_scene load_steps=14 format=3 uid="uid://daox4k6bu5oqt"]
+
+[ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/GroundObjectController.cs" id="ground_object_ctrl"]
 
 [ext_resource type="Script" uid="uid://dhfq2rrha0awm" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_eisny"]
 [ext_resource type="Resource" uid="uid://c62fo5327fvj0" path="res://resources/items/Furniture_A_SofaB.tres" id="2_eisny"]
@@ -6,6 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="4_ym6rm"]
 [ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="5_grr3h"]
 [ext_resource type="Texture2D" uid="uid://jmm74ttculrj" path="res://assets/furnitures/home_scene1/SofaB.png" id="6_x6e03"]
+[ext_resource type="PackedScene" uid="uid://dby51i7slqvd5" path="res://scenes/objects/Animation_item.tscn" id="fall_anim_item"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_aa7cv"]
 shader = ExtResource("3_gkqfo")
@@ -80,3 +83,8 @@ shape = SubResource("RectangleShape2D_or1aa")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/StaticBody2D"]
 position = Vector2(0, -30)
 shape = SubResource("RectangleShape2D_jyvv2")
+
+[node name="GroundObjectController" type="Node" parent="."]
+script = ExtResource("ground_object_ctrl")
+FallEffectScene = ExtResource("fall_anim_item")
+FallAnimationName = "fall_sofa_b"

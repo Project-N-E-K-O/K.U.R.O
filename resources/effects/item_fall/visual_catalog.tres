@@ -1,0 +1,435 @@
+[gd_resource type="Resource" script_class="ItemFallVisualCatalog" load_steps=110 format=3 uid="uid://c0wwelcirnk"]
+
+[ext_resource type="Script" uid="uid://yfxox63peucx" path="res://scripts/fx/ItemFallVisualProfile.cs" id="1_kv8yj"]
+[ext_resource type="Texture2D" uid="uid://xcu3hnecxemh" path="res://assets/weapons/法棍.png" id="2_l8tcl"]
+[ext_resource type="Texture2D" uid="uid://dgvv4023kntq7" path="res://assets/weapons/闸门刀.png" id="3_h8581"]
+[ext_resource type="Texture2D" uid="uid://vtyxgh8jhdyx" path="res://assets/furnitures/home_scene1/BedA.png" id="4_0w3gg"]
+[ext_resource type="Texture2D" uid="uid://5pju5slfrs77" path="res://assets/weapons/回旋镖.png" id="5_8pyhc"]
+[ext_resource type="Texture2D" uid="uid://d4gf51jsvksgd" path="res://assets/objects/briefcase/open/时间轴 1_0000.png" id="6_hoiup"]
+[ext_resource type="Texture2D" uid="uid://s6eufjdhipuu" path="res://assets/weapons/光剑.png" id="7_x4qan"]
+[ext_resource type="Texture2D" uid="uid://jn6r63btcuq0" path="res://assets/furnitures/hotel_scene2/ChairA.png" id="8_dmt6d"]
+[ext_resource type="Texture2D" uid="uid://cwmnj5bhrnrsv" path="res://assets/furnitures/hotel_scene3/ChairB.png" id="9_4obm7"]
+[ext_resource type="Texture2D" uid="uid://rrdy7mkpomkv" path="res://assets/furnitures/home_scene1/ChairOfficeA.png" id="10_tr0ty"]
+[ext_resource type="Texture2D" uid="uid://xkeffr06drcu" path="res://assets/furnitures/home_scene1/ChairOfficeB.png" id="11_ti3an"]
+[ext_resource type="Texture2D" uid="uid://dtv7b6jn1ekb5" path="res://assets/furnitures/hotel_scene4/ChairOfficeC.png" id="12_qbhu3"]
+[ext_resource type="Texture2D" uid="uid://b73hcxi424y4n" path="res://assets/furnitures/hotel_scene2/CoffeeMachineA.png" id="13_rnxat"]
+[ext_resource type="Texture2D" uid="uid://c5sebjgcu2ugl" path="res://assets/weapons/开瓶器.png" id="14_285ys"]
+[ext_resource type="Texture2D" uid="uid://dwo8i8epusdsy" path="res://assets/furnitures/hotel_scene2/CounterA.png" id="15_kjmw8"]
+[ext_resource type="Texture2D" uid="uid://c0ao8pdrenk5f" path="res://assets/furnitures/hotel_scene2/CounterB.png" id="16_8c4dl"]
+[ext_resource type="Texture2D" uid="uid://b4a6sqs5wpj40" path="res://assets/ui/throw_bar/方块.png" id="17_m5b3h"]
+[ext_resource type="Texture2D" uid="uid://c8ydht4pq6k32" path="res://assets/ui/throw_bar/方块+.png" id="18_kgjqy"]
+[ext_resource type="Texture2D" uid="uid://c401qf6kvcjbn" path="res://assets/ui/throw_bar/方块++.png" id="19_cn40q"]
+[ext_resource type="Texture2D" uid="uid://xnx60hboixpd" path="res://assets/weapons/迪斯科闪光球.png" id="20_tsl2m"]
+[ext_resource type="Texture2D" uid="uid://dkgk5xhiddujd" path="res://assets/weapons/钻头.png" id="21_fnw8v"]
+[ext_resource type="Texture2D" uid="uid://bifkxv7ctwotp" path="res://assets/objects/drone/drone_base/时间轴 1_0000.png" id="22_7grg2"]
+[ext_resource type="Texture2D" uid="uid://cjdlmm44l3ndf" path="res://assets/weapons/滚雷.png" id="23_8hpim"]
+[ext_resource type="Texture2D" uid="uid://cd24tjl6wpw4i" path="res://assets/objects/emoji_boom/时间轴 1_0000.png" id="24_ckhwq"]
+[ext_resource type="Texture2D" uid="uid://cedvgcxm5d1ef" path="res://assets/weapons/甩棍.png" id="25_hasbt"]
+[ext_resource type="Texture2D" uid="uid://b3ipocumrfmc3" path="res://assets/furnitures/hotel_scene3/FoodCartA.png" id="26_4x3on"]
+[ext_resource type="Texture2D" uid="uid://ducw8p67xys6v" path="res://assets/furnitures/hotel_scene2/GarbageCan.png" id="27_0k5u5"]
+[ext_resource type="Texture2D" uid="uid://cmkskjonm6883" path="res://assets/environments/scene_2_hotel/破损的酒店大门口_侧.png" id="28_xvpeu"]
+[ext_resource type="Texture2D" uid="uid://cbs8s6snkb78b" path="res://assets/weapons/引力手雷.png" id="29_7cc0l"]
+[ext_resource type="Texture2D" uid="uid://ds7ocaaa1mxul" path="res://assets/furnitures/home_scene1/LampFloorA.png" id="30_50t23"]
+[ext_resource type="Texture2D" uid="uid://bqyt30qieseuf" path="res://assets/weapons/激光笔.png" id="31_rvw8x"]
+[ext_resource type="Texture2D" uid="uid://j5yfe8op7l0j" path="res://assets/furnitures/hotel_scene2/LuggageCartA.png" id="32_gyql0"]
+[ext_resource type="Texture2D" uid="uid://cvlce2kc8uucx" path="res://assets/weapons/机械冲撞臂.png" id="33_ihxqb"]
+[ext_resource type="Texture2D" uid="uid://b1awmq0je57lj" path="res://assets/weapons/金属地刺.png" id="34_or7e0"]
+[ext_resource type="Texture2D" uid="uid://b2ayj5n4oq8xr" path="res://assets/furnitures/hotel_scene2/PlantA.png" id="35_gbxhb"]
+[ext_resource type="Texture2D" uid="uid://ciqgfdqwxs36h" path="res://assets/furnitures/hotel_scene4/PrinterMachineA.png" id="36_kfvhp"]
+[ext_resource type="Texture2D" uid="uid://crfbiiitqgkjb" path="res://assets/weapons/镇暴护腕.png" id="37_itbh4"]
+[ext_resource type="Texture2D" uid="uid://bed1scn5awxdv" path="res://assets/weapons/镇暴拳套.png" id="38_g7xmc"]
+[ext_resource type="Texture2D" uid="uid://n0ciynpx53jh" path="res://assets/weapons/镇暴烟雾弹.png" id="39_r6unm"]
+[ext_resource type="Texture2D" uid="uid://ky3ykwe70g0f" path="res://assets/furnitures/hotel_scene2/SofaA.png" id="40_hx4vc"]
+[ext_resource type="Texture2D" uid="uid://jmm74ttculrj" path="res://assets/furnitures/home_scene1/SofaB.png" id="41_mwpax"]
+[ext_resource type="Texture2D" uid="uid://cg6kyn7331fer" path="res://assets/furnitures/home_scene1/TableBedsideA.png" id="42_mc8mc"]
+[ext_resource type="Texture2D" uid="uid://i4w7if53bbog" path="res://assets/furnitures/hotel_scene4/TableOfficeB.png" id="43_oqefp"]
+[ext_resource type="Texture2D" uid="uid://o26hv4moeu57" path="res://assets/furnitures/hotel_scene2/TableRoundA.png" id="44_i44dy"]
+[ext_resource type="Texture2D" uid="uid://71014jgtkruj" path="res://assets/furnitures/hotel_scene2/TableRoundB.png" id="45_cvccs"]
+[ext_resource type="Texture2D" uid="uid://de3t5lmrkvv0c" path="res://assets/furnitures/hotel_scene3/TableRoundC_Cake.png" id="46_6ticl"]
+[ext_resource type="Texture2D" uid="uid://d354srmumtbja" path="res://assets/furnitures/hotel_scene3/TableSquareA.png" id="47_dlvsu"]
+[ext_resource type="Texture2D" uid="uid://byqyfie3s5yex" path="res://assets/furnitures/home_scene1/TableSquareB.png" id="48_28kqe"]
+[ext_resource type="Texture2D" uid="uid://boj3u1fybi1od" path="res://assets/weapons/护盾伞.png" id="49_aqv5q"]
+[ext_resource type="Texture2D" uid="uid://bym32pjqic2yd" path="res://assets/furnitures/hotel_scene2/VendingMachineA.png" id="50_ntwde"]
+[ext_resource type="Texture2D" uid="uid://y8dbeoijxbbg" path="res://assets/weapons/琴弓.png" id="51_ohgp0"]
+[ext_resource type="Texture2D" uid="uid://bni7br7sgi3v" path="res://assets/furnitures/hotel_scene4/WaterMachineA.png" id="52_js4q0"]
+[ext_resource type="Texture2D" uid="uid://bix6nbba2r1c7" path="res://assets/furnitures/hotel_scene4/WhiteBoardA.png" id="53_iq5yv"]
+[ext_resource type="Script" uid="uid://br2cfemhns16t" path="res://scripts/fx/ItemFallVisualCatalog.cs" id="54_hx0v3"]
+[ext_resource type="Texture2D" uid="uid://bvamstti2ja0f" path="res://assets/effect/WallEffect/firewallA_1.png" id="54_l8tcl"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_cb4t2"]
+
+[sub_resource type="Resource" id="Resource_plod5"]
+script = ExtResource("1_kv8yj")
+Key = "fall_baguette"
+Texture = ExtResource("2_l8tcl")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_7ug3o"]
+script = ExtResource("1_kv8yj")
+Key = "fall_barrier_gate"
+Texture = ExtResource("3_h8581")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_lbp7s"]
+script = ExtResource("1_kv8yj")
+Key = "fall_bed_a"
+Texture = ExtResource("4_0w3gg")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_drr8g"]
+script = ExtResource("1_kv8yj")
+Key = "fall_boomerang"
+Texture = ExtResource("5_8pyhc")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_a7m45"]
+script = ExtResource("1_kv8yj")
+Key = "fall_briefcase"
+Texture = ExtResource("6_hoiup")
+Scale = Vector2(0.33, 0.33)
+Offset = Vector2(-230, -230)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_3miex"]
+script = ExtResource("1_kv8yj")
+Key = "fall_bunny_sword"
+Texture = ExtResource("7_x4qan")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_sub0f"]
+script = ExtResource("1_kv8yj")
+Key = "fall_chair_a"
+Texture = ExtResource("8_dmt6d")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_8plhd"]
+script = ExtResource("1_kv8yj")
+Key = "fall_chair_b"
+Texture = ExtResource("9_4obm7")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_na5ia"]
+script = ExtResource("1_kv8yj")
+Key = "fall_chair_office_a"
+Texture = ExtResource("10_tr0ty")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_ojvas"]
+script = ExtResource("1_kv8yj")
+Key = "fall_chair_office_b"
+Texture = ExtResource("11_ti3an")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_8hkcg"]
+script = ExtResource("1_kv8yj")
+Key = "fall_chair_office_c"
+Texture = ExtResource("12_qbhu3")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_qd2iq"]
+script = ExtResource("1_kv8yj")
+Key = "fall_coffee_machine_a"
+Texture = ExtResource("13_rnxat")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_p8a7s"]
+script = ExtResource("1_kv8yj")
+Key = "fall_corkscrew"
+Texture = ExtResource("14_285ys")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_fqjev"]
+script = ExtResource("1_kv8yj")
+Key = "fall_counter_a"
+Texture = ExtResource("15_kjmw8")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_2lv2h"]
+script = ExtResource("1_kv8yj")
+Key = "fall_counter_b"
+Texture = ExtResource("16_8c4dl")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_4h4wq"]
+script = ExtResource("1_kv8yj")
+Key = "fall_cube_a"
+Texture = ExtResource("17_m5b3h")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_j78vs"]
+script = ExtResource("1_kv8yj")
+Key = "fall_cube_b"
+Texture = ExtResource("18_kgjqy")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_27lbn"]
+script = ExtResource("1_kv8yj")
+Key = "fall_cube_c"
+Texture = ExtResource("19_cn40q")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_6xumb"]
+script = ExtResource("1_kv8yj")
+Key = "fall_disco_ball"
+Texture = ExtResource("20_tsl2m")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_bt4y5"]
+script = ExtResource("1_kv8yj")
+Key = "fall_drill"
+Texture = ExtResource("21_fnw8v")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_4p5b6"]
+script = ExtResource("1_kv8yj")
+Key = "fall_drone"
+Texture = ExtResource("22_7grg2")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_rq4f3"]
+script = ExtResource("1_kv8yj")
+Key = "fall_e_core"
+Texture = ExtResource("23_8hpim")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_au4we"]
+script = ExtResource("1_kv8yj")
+Key = "fall_emoji_bomb"
+Texture = ExtResource("24_ckhwq")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_3korv"]
+script = ExtResource("1_kv8yj")
+Key = "fall_expand_baton"
+Texture = ExtResource("25_hasbt")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_cg34c"]
+script = ExtResource("1_kv8yj")
+Key = "fall_food_cart_a"
+Texture = ExtResource("26_4x3on")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_472vw"]
+script = ExtResource("1_kv8yj")
+Key = "fall_garbage_can_a"
+Texture = ExtResource("27_0k5u5")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_pweho"]
+script = ExtResource("1_kv8yj")
+Key = "fall_gate"
+Texture = ExtResource("28_xvpeu")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_gd3j4"]
+script = ExtResource("1_kv8yj")
+Key = "fall_gravity_grenade"
+Texture = ExtResource("29_7cc0l")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_q3bul"]
+script = ExtResource("1_kv8yj")
+Key = "fall_lamp_floor_a"
+Texture = ExtResource("30_50t23")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_v1h42"]
+script = ExtResource("1_kv8yj")
+Key = "fall_laser_pointer"
+Texture = ExtResource("31_rvw8x")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_88813"]
+script = ExtResource("1_kv8yj")
+Key = "fall_luggage_cart_a"
+Texture = ExtResource("32_gyql0")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_v2nt4"]
+script = ExtResource("1_kv8yj")
+Key = "fall_mech_glove"
+Texture = ExtResource("33_ihxqb")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_4xpt2"]
+script = ExtResource("1_kv8yj")
+Key = "fall_metal_spike"
+Texture = ExtResource("34_or7e0")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_5ceq3"]
+script = ExtResource("1_kv8yj")
+Key = "fall_plant_a"
+Texture = ExtResource("35_gbxhb")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_tvd2w"]
+script = ExtResource("1_kv8yj")
+Key = "fall_printer_machine_a"
+Texture = ExtResource("36_kfvhp")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_5xuvb"]
+script = ExtResource("1_kv8yj")
+Key = "fall_riot_bracer"
+Texture = ExtResource("37_itbh4")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_m7iht"]
+script = ExtResource("1_kv8yj")
+Key = "fall_riot_glove"
+Texture = ExtResource("38_g7xmc")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_lbl54"]
+script = ExtResource("1_kv8yj")
+Key = "fall_smoke_grenade"
+Texture = ExtResource("39_r6unm")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_8rgdk"]
+script = ExtResource("1_kv8yj")
+Key = "fall_sofa_a"
+Texture = ExtResource("40_hx4vc")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_vbpqj"]
+script = ExtResource("1_kv8yj")
+Key = "fall_sofa_b"
+Texture = ExtResource("41_mwpax")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_3fhhr"]
+script = ExtResource("1_kv8yj")
+Key = "fall_table_bedside_a"
+Texture = ExtResource("42_mc8mc")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_8s84a"]
+script = ExtResource("1_kv8yj")
+Key = "fall_table_office_b"
+Texture = ExtResource("43_oqefp")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_151bi"]
+script = ExtResource("1_kv8yj")
+Key = "fall_table_round_a"
+Texture = ExtResource("44_i44dy")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_pg7vp"]
+script = ExtResource("1_kv8yj")
+Key = "fall_table_round_b"
+Texture = ExtResource("45_cvccs")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_2ck4t"]
+script = ExtResource("1_kv8yj")
+Key = "fall_table_round_c"
+Texture = ExtResource("46_6ticl")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_m7w0t"]
+script = ExtResource("1_kv8yj")
+Key = "fall_table_square_a"
+Texture = ExtResource("47_dlvsu")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_hi61p"]
+script = ExtResource("1_kv8yj")
+Key = "fall_table_square_b"
+Texture = ExtResource("48_28kqe")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_1jrvi"]
+script = ExtResource("1_kv8yj")
+Key = "fall_umbrella"
+Texture = ExtResource("49_aqv5q")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_cntnw"]
+script = ExtResource("1_kv8yj")
+Key = "fall_vending_machine_a"
+Texture = ExtResource("50_ntwde")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_dthg1"]
+script = ExtResource("1_kv8yj")
+Key = "fall_violin_bow"
+Texture = ExtResource("51_ohgp0")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_yweoc"]
+script = ExtResource("1_kv8yj")
+Key = "fall_water_machine_a"
+Texture = ExtResource("52_js4q0")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_i1k0d"]
+script = ExtResource("1_kv8yj")
+Key = "fall_white_board_a"
+Texture = ExtResource("53_iq5yv")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[sub_resource type="Resource" id="Resource_cw6kv"]
+script = ExtResource("1_kv8yj")
+Key = "fall_firewall"
+Texture = ExtResource("54_l8tcl")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
+[resource]
+script = ExtResource("54_hx0v3")
+Profiles = Array[ExtResource("1_kv8yj")]([SubResource("Resource_plod5"), SubResource("Resource_7ug3o"), SubResource("Resource_lbp7s"), SubResource("Resource_drr8g"), SubResource("Resource_a7m45"), SubResource("Resource_3miex"), SubResource("Resource_sub0f"), SubResource("Resource_8plhd"), SubResource("Resource_na5ia"), SubResource("Resource_ojvas"), SubResource("Resource_8hkcg"), SubResource("Resource_qd2iq"), SubResource("Resource_p8a7s"), SubResource("Resource_fqjev"), SubResource("Resource_2lv2h"), SubResource("Resource_4h4wq"), SubResource("Resource_j78vs"), SubResource("Resource_27lbn"), SubResource("Resource_6xumb"), SubResource("Resource_bt4y5"), SubResource("Resource_4p5b6"), SubResource("Resource_rq4f3"), SubResource("Resource_au4we"), SubResource("Resource_3korv"), SubResource("Resource_cg34c"), SubResource("Resource_472vw"), SubResource("Resource_pweho"), SubResource("Resource_gd3j4"), SubResource("Resource_q3bul"), SubResource("Resource_v1h42"), SubResource("Resource_88813"), SubResource("Resource_v2nt4"), SubResource("Resource_4xpt2"), SubResource("Resource_5ceq3"), SubResource("Resource_tvd2w"), SubResource("Resource_5xuvb"), SubResource("Resource_m7iht"), SubResource("Resource_lbl54"), SubResource("Resource_8rgdk"), SubResource("Resource_vbpqj"), SubResource("Resource_3fhhr"), SubResource("Resource_8s84a"), SubResource("Resource_151bi"), SubResource("Resource_pg7vp"), SubResource("Resource_2ck4t"), SubResource("Resource_m7w0t"), SubResource("Resource_hi61p"), SubResource("Resource_1jrvi"), SubResource("Resource_cntnw"), SubResource("Resource_dthg1"), SubResource("Resource_yweoc"), SubResource("Resource_i1k0d"), SubResource("Resource_cw6kv")])

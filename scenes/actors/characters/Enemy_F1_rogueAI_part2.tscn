@@ -1,10 +1,12 @@
-[gd_scene load_steps=55 format=3 uid="uid://xloj3kvnvpo2"]
+[gd_scene load_steps=56 format=3 uid="uid://xloj3kvnvpo2"]
 
 [ext_resource type="Script" uid="uid://dacchy18dovd" path="res://scripts/actors/enemies/EnemyF1RogueAIPart2.cs" id="1_rogue"]
 [ext_resource type="Texture2D" uid="uid://binvuyk5j65a2" path="res://assets/ui/hp&exp_bar/boss图标.png" id="2_04486"]
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="4_shadow"]
 [ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="5_shadowtex"]
 [ext_resource type="SpineSkeletonDataResource" uid="uid://b810nsvyq10p2" path="res://animations/spine/Enemy_F1_rogueAI_NoBumper.tres" id="6_aal8m"]
+[ext_resource type="Script" path="res://scripts/controllers/ShadowGroundController.cs" id="shadow_ground"]
+
 [ext_resource type="Script" uid="uid://4dd56677a2aa" path="res://scripts/controllers/ShadowFollower.cs" id="6_follower"]
 [ext_resource type="PackedScene" uid="uid://c530nvmm8rfd" path="res://scenes/environments/rogueAI_bumper.tscn" id="8_nrern"]
 [ext_resource type="Script" uid="uid://bbybuyitd10jr" path="res://scripts/controllers/SpineController.gd" id="8_spinectrl"]
@@ -515,3 +517,6 @@ script = ExtResource("99_ghost")
 GhostHoldDuration = 0.3
 GhostDescendRatio = 0.2
 HealHoldDuration = 0.3
+
+[node name="ShadowGroundController" type="Node" parent="SpineSprite/Shadow"]
+script = ExtResource("shadow_ground")

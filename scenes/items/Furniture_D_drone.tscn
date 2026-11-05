@@ -1,4 +1,6 @@
-[gd_scene load_steps=40 format=3 uid="uid://cvdv22giw51s8"]
+[gd_scene load_steps=42 format=3 uid="uid://cvdv22giw51s8"]
+
+[ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/GroundObjectController.cs" id="ground_object_ctrl"]
 
 [ext_resource type="Script" uid="uid://dhfq2rrha0awm" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_cu1mk"]
 [ext_resource type="Resource" uid="uid://crov3gukwsnca" path="res://resources/items/Furniture_D_Drone.tres" id="2_cu1mk"]
@@ -32,6 +34,7 @@
 [ext_resource type="Texture2D" uid="uid://re425yu1yrte" path="res://assets/objects/drone/drone_effect/时间轴 1_0011.png" id="29_0b6bu"]
 [ext_resource type="Texture2D" uid="uid://dj7mt3uqtpoyo" path="res://assets/objects/drone/drone_effect/时间轴 1_0012.png" id="30_7cdr8"]
 [ext_resource type="Texture2D" uid="uid://lr2ixu1faoti" path="res://assets/objects/drone/drone_effect/时间轴 1_0013.png" id="31_24s6a"]
+[ext_resource type="PackedScene" uid="uid://dby51i7slqvd5" path="res://scenes/objects/Animation_item.tscn" id="fall_anim_item"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_aa7cv"]
 shader = ExtResource("3_2s53g")
@@ -213,3 +216,8 @@ script = ExtResource("8_handler")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/StaticBody2D"]
 position = Vector2(-20, 10)
 shape = SubResource("RectangleShape2D_vps3s")
+
+[node name="GroundObjectController" type="Node" parent="."]
+script = ExtResource("ground_object_ctrl")
+FallEffectScene = ExtResource("fall_anim_item")
+FallAnimationName = "fall_drone"

@@ -1,4 +1,6 @@
-[gd_scene load_steps=15 format=3 uid="uid://dixwca6u7ayek"]
+[gd_scene load_steps=17 format=3 uid="uid://dixwca6u7ayek"]
+
+[ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/GroundObjectController.cs" id="ground_object_ctrl"]
 
 [ext_resource type="Script" uid="uid://dhfq2rrha0awm" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_jpdnd"]
 [ext_resource type="Resource" uid="uid://u16qxn0w84mh" path="res://resources/items/Furniture_D_PrinterMachineA.tres" id="2_jpdnd"]
@@ -8,6 +10,7 @@
 [ext_resource type="PackedScene" uid="uid://co3v8arpy4d2" path="res://scenes/objects/Transforming_PrinterMachine.tscn" id="4_h03tv"]
 [ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="5_h03tv"]
 [ext_resource type="Texture2D" uid="uid://ciqgfdqwxs36h" path="res://assets/furnitures/hotel_scene4/PrinterMachineA.png" id="6_jpdnd"]
+[ext_resource type="PackedScene" uid="uid://dby51i7slqvd5" path="res://scenes/objects/Animation_item.tscn" id="fall_anim_item"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ukya5"]
 shader = ExtResource("3_u3qi6")
@@ -103,3 +106,8 @@ collision_mask = 4
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="TiggerArea"]
 shape = SubResource("RectangleShape2D_u3qi6")
+
+[node name="GroundObjectController" type="Node" parent="."]
+script = ExtResource("ground_object_ctrl")
+FallEffectScene = ExtResource("fall_anim_item")
+FallAnimationName = "fall_printer_machine_a"

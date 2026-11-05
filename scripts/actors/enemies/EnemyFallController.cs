@@ -49,9 +49,11 @@ public partial class EnemyFallController : FallController
         return false;
     }
 
-    protected override bool CanCheckFall() => base.CanCheckFall() && !_enemy.IsDeadOrDying && !_enemy.IsDead;
+    protected override bool CanCheckFall() => base.CanCheckFall() && !_enemy.IsDead
+        && (!_enemy.IsDeadOrDying || CanCarryCorpse && _enemy.Visible);
     protected override bool IsFallImmune()
     {
+        if (_enemy.IsDeathSequenceActive) return false;
         if ((_enemy.ActiveImmunities & ImmunityFlags.Fall) != 0) return true;
         string? state = _enemy.StateMachine?.CurrentState?.Name;
         return System.Array.IndexOf(ImmuneStates, state) >= 0 || HasAttackFallImmunity();
@@ -59,6 +61,18 @@ public partial class EnemyFallController : FallController
 
     protected override void TryStartFall(FallRegion region)
     {
+        if (_enemy.IsDeathSequenceActive)
+        {
+            if (BeginCorpseFall(_enemy, region))
+            {
+                _enemy.ConfigureCorpseFallLoot(FindLootPosition(region));
+                FallPhysics.DisableCollisions(_enemy);
+                // 普通尸体继续 Dying 计时；持续尸体也必须完成一次统一结算。
+                if (_enemy.StateMachine?.CurrentState is States.EnemyDyingState dying && dying.DeathDuration <= 0)
+                    _enemy.FinalizeDeath();
+            }
+            return;
+        }
         if (_enemy.StateMachine == null || !_enemy.StateMachine.HasState("Fall"))
         {
             if (!_warnedMissingState) GD.PushWarning($"[EnemyFall] {_enemy.Name}: 启用了坠落但未配置 Fall 状态。");

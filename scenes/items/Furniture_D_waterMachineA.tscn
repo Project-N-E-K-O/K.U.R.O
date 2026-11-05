@@ -1,4 +1,6 @@
-[gd_scene load_steps=12 format=3 uid="uid://de5p3deu3oubn"]
+[gd_scene load_steps=14 format=3 uid="uid://de5p3deu3oubn"]
+
+[ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/GroundObjectController.cs" id="ground_object_ctrl"]
 
 [ext_resource type="Script" uid="uid://dhfq2rrha0awm" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_kd6m3"]
 [ext_resource type="Resource" uid="uid://bi2hceu27x35e" path="res://resources/items/Furniture_D_WaterMachineA.tres" id="2_kd6m3"]
@@ -6,6 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="4_ggfh1"]
 [ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="5_bwbxs"]
 [ext_resource type="Texture2D" uid="uid://bni7br7sgi3v" path="res://assets/furnitures/hotel_scene4/WaterMachineA.png" id="6_kd6m3"]
+[ext_resource type="PackedScene" uid="uid://dby51i7slqvd5" path="res://scenes/objects/Animation_item.tscn" id="fall_anim_item"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_aa7cv"]
 shader = ExtResource("3_ctife")
@@ -81,3 +84,8 @@ shape = SubResource("RectangleShape2D_gy46y")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/StaticBody2D"]
 position = Vector2(0, 65)
 shape = SubResource("RectangleShape2D_jyvv2")
+
+[node name="GroundObjectController" type="Node" parent="."]
+script = ExtResource("ground_object_ctrl")
+FallEffectScene = ExtResource("fall_anim_item")
+FallAnimationName = "fall_water_machine_a"

@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://b4qqpgiusbp7l"]
+[gd_scene load_steps=15 format=3 uid="uid://b4qqpgiusbp7l"]
 
 [ext_resource type="Script" uid="uid://dxqwo2iruswpp" path="res://scripts/fx/MeetingBarrier.cs" id="1_55rvv"]
 [ext_resource type="Shader" uid="uid://dlcwv014ja75" path="res://shaders/materials/meeting_barrier_core.gdshader" id="1_tbjep"]
@@ -7,6 +7,7 @@
 [ext_resource type="Shader" uid="uid://6yurywigppwe" path="res://shaders/materials/meeting_barrier_glow.gdshader" id="4_6najf"]
 [ext_resource type="Shader" uid="uid://dcg17rve3o6x0" path="res://shaders/materials/meeting_barrier_scan.gdshader" id="5_6wneh"]
 [ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/GroundObjectController.cs" id="7_jdtr2"]
+[ext_resource type="PackedScene" uid="uid://dby51i7slqvd5" path="res://scenes/objects/Animation_item.tscn" id="8_6najf"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_rw4bx"]
 shader = ExtResource("1_tbjep")
@@ -95,8 +96,10 @@ position = Vector2(44, 195)
 shape = SubResource("RectangleShape2D_jdtr2")
 
 [node name="Marker2D" type="Marker2D" parent="."]
-position = Vector2(0, 350)
+position = Vector2(0, 300)
 
 [node name="GroundObjectController" type="Node" parent="." node_paths=PackedStringArray("GroundAnchor")]
 script = ExtResource("7_jdtr2")
 GroundAnchor = NodePath("../Marker2D")
+FallEffectScene = ExtResource("8_6najf")
+FallAnimationName = "fall_firewall"

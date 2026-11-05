@@ -14,13 +14,13 @@ FallMovingPlatform 在起点和 TravelOffset 之间平移。所有承载位移�
 | ExcludedGroup | 默认 platform_carry_excluded，明确排除指定对象 |
 | FurnitureObstacleMask | 家具身体扫掠阻挡层，默认 7 |
 
-player / enemies 需要存活、可处理且实际身体形状有效，使用 MoveAndCollide。不把 AttackArea / HitArea 的形状当作身体，禁用身体的 Boss 不会被平台携带。
+player / enemies 的活体需要可处理且实际身体形状有效，使用 MoveAndCollide。不把 AttackArea / HitArea 的形状当作身体，禁用身体的 Boss 不会被平台携带。Dying 尸体使用已启用 FallController 缓存的初始身体资格，允许死亡阶段关闭碰撞后继续随平台平移；已隐藏、已坠落或死亡结算完成者不承载。
 
 world_items 通过 IPlatformPassenger 提供 CanRidePlatform、PlatformGroundPosition、PlatformTarget 和 ApplyPlatformDisplacement。分组本身不足以判断飞行状态。
 
 ## 物品和武器
 
-WorldItemEntity 与 RigidBodyWorldItemEntity 自动添加 GroundObjectController；预先挂载组件可以覆盖配置，不会重复添加。无需逐个修改家具或武器场景。
+WorldItemEntity 与 RigidBodyWorldItemEntity 不再自动添加 GroundObjectController。现有 64 个物品/武器场景已显式挂载，已有武器动画配置保留。新场景需要自行添加该 Node 组件；无组件时既不参与坠落，也不参与平台携带。家具暂未配置专属替身，可按场景补充。
 
 - PlatformCarryEnabled：默认 true，控制物品自身承载资格。
 - PlatformGroundProbePath：可选地面节点，同时作为默认坠落地面位置。
@@ -53,7 +53,7 @@ Grounded=false 时暂停承载与坠落；落地设置 true 并调用 RefreshGro
 
 ## 检测与坠落
 
-GroundContactSensor / FallDetectionGate 通过黄色范围激活精确检测；物品与特效使用仅监听黄色层的无身体探针，远处只同步坐标。出生、传送和动态黄区加载会补查。相同帧、相同脚底坐标复用查询结果。
+GroundContactSensor / FallDetectionGate 通过黄色范围激活精确检测；所有对象统一自动创建仅监听黄色层的脚底探针，远处只同步坐标，身体停用不影响探针。无需手动添加 Area2D，原有 GroundProbePath / GroundAnchor 仍决定检测位置。出生、传送和动态黄区加载会补查。相同帧、相同脚底坐标复用查询结果。
 
 无有效绿色承托且脚底在红区时，组件请求坠落。物品通过 IGroundFallReceiver 拒绝飞行、回弹、等待归还等阶段；普通特效由 Grounded 控制。坠落停用本体处理与碰撞并释放，配置替身时在世界独立播放并按区域 FallDuration 回收。
 
@@ -62,6 +62,14 @@ FallStarted 信号可用于取消外部任务。物品掉坑不触发普通爆�
 仅支持平台平移。目标若另有绝对位置 Tween、TopLevel 子节点或世界空间粒子，需要协调自身位移方式。
 
 ## 验证
+
+### 平台独立导航面
+
+`FallMovingPlatformA/NavigationRegion2D` 加入 `navigation_rebake_excluded` 组，家具生成或销毁触发的 `NavigationRebakeCoordinator` 全场重烘焙会跳过它，普通关卡导航仍正常更新。该组应加在导航区域节点上。
+
+平台的 NavigationPolygon 使用本节点子树作为几何来源（Source Geometry Mode = Root Node Children），不收集全场的深坑导航障碍。平台移动依靠子节点变换同步导航位置，无需反复烘焙。修改平台轮廓时仍可手动烘焙。
+
+2026-11-05 在 Test_begin 复现：旧配置进入场景后导航多边形从 1 个变为 0 个，节点仍存在。修复后验证重复全场烘焙保持 1 个多边形、普通区域仍重烘焙、平台移动后导航位置更新、局部手动烘焙有效。测试实例单独指定行程，未更改关卡的平台行程配置。
 
 2026-11-04：平台承载 51 项、特效跟随 20 项、玩家 Fall 44 项、敌人 Fall 32 项、统一对象接入 45 项断言通过，共 192 项。覆盖全部 11 种已接入敌人和 7 种投掷武器。
 

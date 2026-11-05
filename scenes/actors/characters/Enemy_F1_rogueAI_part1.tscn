@@ -1,8 +1,10 @@
-[gd_scene load_steps=46 format=3 uid="uid://b6dltrf0y1t38"]
+[gd_scene load_steps=47 format=3 uid="uid://b6dltrf0y1t38"]
 
 [ext_resource type="Script" uid="uid://dwrfftyk78q7q" path="res://scripts/actors/enemies/EnemyF1RogueAI.cs" id="1_rogue"]
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="4_shadow"]
 [ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="5_shadowtex"]
+[ext_resource type="Script" path="res://scripts/controllers/ShadowGroundController.cs" id="shadow_ground"]
+
 [ext_resource type="Script" uid="uid://4dd56677a2aa" path="res://scripts/controllers/ShadowFollower.cs" id="6_follower"]
 [ext_resource type="SpineSkeletonDataResource" uid="uid://cu7dh3atg6s4d" path="res://animations/spine/Enemy_F1_rogueAI.tres" id="7_spine"]
 [ext_resource type="Script" uid="uid://bbybuyitd10jr" path="res://scripts/controllers/SpineController.gd" id="8_spinectrl"]
@@ -461,3 +463,6 @@ script = ExtResource("20_anim")
 IdleMixDuration = 0.1
 WalkMixDuration = 0.1
 DieMixDuration = 0.1
+
+[node name="ShadowGroundController" type="Node" parent="Shadow"]
+script = ExtResource("shadow_ground")

@@ -7,4 +7,6 @@ public interface IGroundFallReceiver
     bool CanFall { get; }
     Vector2 FallGroundPosition { get; }
     void PrepareForFall();
+    /// <summary>返回 true 表示对象自行管理隐藏后的生命周期，例如投掷武器等待归还。</summary>
+    bool CompleteFall() => false;
 }

@@ -137,7 +137,7 @@ script = ExtResource("1_6wtu5")
 ZoneName = "Room_Zone_F_b1"
 CameraLimitTop = -2250
 CameraLimitBottom = 2300
-ZoomLevel = 0.35000000000000003
+ZoomLevel = 0.09999999999999999
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CameraZone"]
 z_index = 10

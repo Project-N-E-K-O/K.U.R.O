@@ -1,4 +1,4 @@
-[gd_scene load_steps=80 format=3 uid="uid://b534tt4n3wr42"]
+[gd_scene load_steps=79 format=3 uid="uid://b534tt4n3wr42"]
 
 [ext_resource type="Script" uid="uid://cra7y7mt0x1j8" path="res://scripts/managers/CameraZoneArea.cs" id="1_mbxjs"]
 [ext_resource type="Shader" uid="uid://dwi65rioev5hr" path="res://shaders/materials/pseudo_3d_card.gdshader" id="1_xart7"]
@@ -36,7 +36,6 @@
 [ext_resource type="Texture2D" uid="uid://dxrn8y2or0pgc" path="res://assets/environments/scene_6_hotel/右墙壁.png" id="29_0pejj"]
 [ext_resource type="Texture2D" uid="uid://kohvycrlmg3h" path="res://assets/environments/scene_6_hotel/地板前面遮挡升降机.png" id="31_dnirc"]
 [ext_resource type="Texture2D" uid="uid://bfca73pu7u6xc" path="res://assets/environments/scene_6_hotel/龙门吊右轮子.png" id="33_som2a"]
-[ext_resource type="PackedScene" uid="uid://cgiphulgcow8x" path="res://scenes/environments/FallRegion_F_begin.tscn" id="34_npcwp"]
 
 [sub_resource type="Resource" id="Resource_rqd1e"]
 script = ExtResource("2_82263")
@@ -2043,8 +2042,6 @@ disabled = true
 visible = false
 position = Vector2(1297, 31)
 navigation_polygon = SubResource("NavigationPolygon_ka7vx")
-
-[node name="FallRegion" parent="." instance=ExtResource("34_npcwp")]
 
 [node name="AnimationCharacter" parent="." instance=ExtResource("23_5ka2g")]
 position = Vector2(-3050, 900)
