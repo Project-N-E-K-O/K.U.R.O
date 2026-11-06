@@ -1,8 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://u42x4nuqgi3b"]
+[gd_scene load_steps=7 format=3 uid="uid://u42x4nuqgi3b"]
 
 [ext_resource type="Script" uid="uid://8vnf13a4rcon" path="res://scripts/effects/ECoreAttackEffect.cs" id="1_xleon"]
 [ext_resource type="PackedScene" uid="uid://dxjijjaojsunw" path="res://shaders/lightning_beam.tscn" id="2_4m7pg"]
 [ext_resource type="Texture2D" uid="uid://cjdlmm44l3ndf" path="res://assets/weapons/滚雷.png" id="3_xleon"]
+[ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/GroundObjectController.cs" id="4_jyt8n"]
+[ext_resource type="PackedScene" uid="uid://dby51i7slqvd5" path="res://scenes/objects/Animation_item.tscn" id="5_4m7pg"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_xleon"]
 radius = 250.0
@@ -56,3 +58,8 @@ z_index = 10
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AttackArea"]
 rotation = 1.5707964
 shape = SubResource("CapsuleShape2D_xleon")
+
+[node name="GroundObjectController" type="Node" parent="."]
+script = ExtResource("4_jyt8n")
+FallEffectScene = ExtResource("5_4m7pg")
+FallAnimationName = "fall_e_core"

@@ -1,8 +1,8 @@
-[gd_scene load_steps=60 format=3 uid="uid://dstgcw0tto5oa"]
+[gd_scene load_steps=59 format=3 uid="uid://dstgcw0tto5oa"]
 
 [ext_resource type="Script" uid="uid://cra7y7mt0x1j8" path="res://scripts/managers/CameraZoneArea.cs" id="1_7ummj"]
 [ext_resource type="Script" uid="uid://cbui22isww64v" path="res://scripts/systems/cutscene/CutsceneTrigger.cs" id="2_o3k7i"]
-[ext_resource type="Resource" uid="uid://bicsmtly0y2kg" path="res://resources/cutscene/Text_begin_intro.tres" id="3_o3k7i"]
+[ext_resource type="Resource" uid="uid://bicsmtly0y2kg" path="res://resources/cutscene/Text_begin_intro.tres" id="3_hxrfn"]
 [ext_resource type="Script" uid="uid://dmqu7phxi8gbi" path="res://scripts/managers/BattleArena.cs" id="4_bn434"]
 [ext_resource type="Script" uid="uid://orymlwdqv2xq" path="res://scripts/controllers/WaveSpawnManager.cs" id="5_p5xsj"]
 [ext_resource type="Texture2D" uid="uid://bkvy3th2vg6k4" path="res://assets/environments/scene_1_home/房间2墙壁.png" id="6_7ummj"]
@@ -42,8 +42,7 @@
 [ext_resource type="Texture2D" uid="uid://brjaqxel52a2o" path="res://assets/BuildIcon/icon.svg" id="40_21m0k"]
 [ext_resource type="PackedScene" uid="uid://dugfq8qy1okf1" path="res://scenes/items/Furniture_A_chairOfficeB.tscn" id="41_y44s2"]
 [ext_resource type="PackedScene" uid="uid://be30f0gopxel3" path="res://scenes/actors/etc/SlideRail_wheel.tscn" id="42_mfk2f"]
-[ext_resource type="PackedScene" uid="uid://cw42j1o501x83" path="res://scenes/actors/characters/Enemy_F1_rogueAI_MachineGun.tscn" id="43_hxrfn"]
-[ext_resource type="PackedScene" uid="uid://dxpolkx35jbp" path="res://scenes/environments/FallMovingPlatformA.tscn" id="44_mfk2f"]
+[ext_resource type="PackedScene" uid="uid://cbqp2nyeec5bb" path="res://scenes/environments/FallRegion.tscn" id="44_mfk2f"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1mlw7"]
 size = Vector2(5800, 3050)
@@ -85,8 +84,8 @@ size = Vector2(300, 1803)
 size = Vector2(300, 943)
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_ka7vx"]
-vertices = PackedVector2Array(1738, 777, 1914, 978, 754, 978, 660, 910, 1228, 777, 1914, 1438, 2405.0781, 1546, -2709.3516, 1546, 754, 1438, 1228, 367, 1196, 688, 1196, 428, 2405.7734, -544, 1738, 367, -2693.7578, -544, 660, 200, 736, 688, 736, 428, -2701.2734, 463, -2031, 463, -2031, 37, -2698.1016, 37, 50, 910, 50, 200)
-polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3, 4), PackedInt32Array(5, 6, 7, 8), PackedInt32Array(9, 4, 10, 11), PackedInt32Array(12, 6, 5, 1), PackedInt32Array(12, 1, 0, 13), PackedInt32Array(14, 12, 13, 15), PackedInt32Array(10, 4, 3, 16), PackedInt32Array(16, 3, 15, 17), PackedInt32Array(8, 7, 18, 19), PackedInt32Array(20, 21, 14), PackedInt32Array(11, 17, 15, 9), PackedInt32Array(8, 19, 20, 22), PackedInt32Array(3, 2, 8, 22), PackedInt32Array(23, 22, 20, 14), PackedInt32Array(13, 9, 15), PackedInt32Array(14, 15, 23)])
+vertices = PackedVector2Array(-1492, 1522, -51, 1546, -2063, 1546, -2002, 1522, -128, -20, -128, -480, -51, -472, -1288, -480, -1288, -20, -1320, -82, -1320, -342, -2063, 933, -2002, 1112, -1492, 1112, -1780, -82, -2031, 37, -2698.1016, 37, -2693.7578, -544, -1780, -342, -2673, 1546, -2709.3516, 1546, -2701.2734, 463, -2673, 933, -2031, 463, 2405.0781, 1546, 2109, 1546, 2109, -472, 2405.7734, -544)
+polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3), PackedInt32Array(4, 5, 6, 1), PackedInt32Array(7, 8, 9, 10), PackedInt32Array(3, 2, 11, 12), PackedInt32Array(4, 1, 0, 13, 8), PackedInt32Array(14, 15, 16, 17, 18), PackedInt32Array(19, 20, 21, 22), PackedInt32Array(22, 21, 23, 11), PackedInt32Array(24, 25, 26, 27), PackedInt32Array(17, 27, 26, 5), PackedInt32Array(8, 13, 12, 11, 23), PackedInt32Array(9, 8, 23, 15, 14), PackedInt32Array(7, 10, 18, 17), PackedInt32Array(26, 6, 5), PackedInt32Array(17, 5, 7)])
 outlines = Array[PackedVector2Array]([PackedVector2Array(-2769, -1183, 2486, -1224, 2485, 1762, -2791, 1767)])
 source_geometry_mode = 2
 agent_radius = 80.0
@@ -155,7 +154,7 @@ z_index = 10
 collision_layer = 0
 collision_mask = 4
 script = ExtResource("2_o3k7i")
-Sequence = ExtResource("3_o3k7i")
+Sequence = ExtResource("3_hxrfn")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CutsceneTrigger"]
 position = Vector2(-2400, 0)
@@ -243,6 +242,7 @@ LoadDistance = 2000.0
 position = Vector2(0, 340)
 
 [node name="floor" type="Sprite2D" parent="Environments"]
+visible = false
 texture = SubResource("CompressedTexture2D_k6rem")
 
 [node name="wall1" type="Sprite2D" parent="Environments"]
@@ -309,7 +309,6 @@ position = Vector2(-2880, 1361.5)
 shape = SubResource("RectangleShape2D_jy3vb")
 
 [node name="NavigationRegion2D" type="NavigationRegion2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
-visible = false
 position = Vector2(122, -196)
 navigation_polygon = SubResource("NavigationPolygon_ka7vx")
 
@@ -317,6 +316,8 @@ navigation_polygon = SubResource("NavigationPolygon_ka7vx")
 position = Vector2(-1972, 347)
 SpawnParentPath = NodePath("..")
 PlayerRespawnPointPath = NodePath("../PlayerSpawnPoint")
+SpawnedEnemiesGrantScore = true
+SpawnedEnemiesDropLoot = true
 
 [node name="CorePickupZone" type="Area2D" parent="."]
 position = Vector2(0, 344)
@@ -402,25 +403,22 @@ position = Vector2(2205, -940)
 position = Vector2(2208, -705)
 
 [node name="FurnitureBedA" parent="." instance=ExtResource("38_fdxhs")]
-position = Vector2(477, 239)
+position = Vector2(-2246, 972)
 
 [node name="FurnitureChairOfficeA" parent="." instance=ExtResource("39_3yao7")]
-position = Vector2(1088, 352)
+position = Vector2(-1428, -418)
 
 [node name="FurnitureSofaB" parent="." instance=ExtResource("40_7gqg0")]
-position = Vector2(1456, 1042)
+position = Vector2(-586, -416)
 
 [node name="WeaponThrowEmojiBomb2" parent="." instance=ExtResource("33_l6k0d")]
 position = Vector2(793, -689)
 
 [node name="FurnitureChairOfficeB" parent="." instance=ExtResource("41_y44s2")]
-position = Vector2(1605, 326)
+position = Vector2(-1625, 1071)
 
 [node name="SlideRail_wheel" parent="." instance=ExtResource("42_mfk2f")]
 position = Vector2(-1804, 367)
-CarriagePrefab = ExtResource("43_hxrfn")
 
-[node name="FallMovingPlatformA" parent="." instance=ExtResource("44_mfk2f")]
-z_index = 1
-position = Vector2(-938, 942)
-TravelOffset = Vector2(0, -1600)
+[node name="FallRegion" parent="." instance=ExtResource("44_mfk2f")]
+position = Vector2(1151, 412)

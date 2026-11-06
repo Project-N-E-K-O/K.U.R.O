@@ -1,18 +1,20 @@
 # 玩家深坑坠落系统设计与实施步骤
 
+> 2026-11-04 架构更新：地面检测统一至 GroundContactSensor，玩家和敌人继承 FallController；物品、武器、特效统一接入 GroundObjectController。平台统一执行承载位移，ItemFallController 中间实现已移除。当前配置与职责以 [地面系统架构](GROUND_SYSTEM_ARCHITECTURE.md) 为准；下文较早的验证记录及实现描述保留作历史参考。
+
 日期：2026-11-02  
 状态：基础系统已实施；具体使用与当前边界见 `res://PLAYER_FALL_SYSTEM_USAGE.md`。  
 适用场景：F_begin 系列 Boss 房间，以及后续存在深坑、移动平台的俯视关卡。
 
 ## 1. 目标与已确定规则
 
-玩家失去移动平台承托并处于深坑时，进入独立 Fall 状态：隐藏真实玩家、禁止角色操作，在指定位置生成动画替身，播放 `Animation_character.tscn` 的 `fall` 动画。持续 N 秒后，将真实玩家放回最近验证安全的位置，恢复显示，并结算默认最大生命值 20% 的坠落伤害。
+玩家失去移动平台承托并处于深坑时，进入独立 Fall 状态：隐藏真实玩家、禁止角色操作，在指定位置生成动画替身，播放 `Animation_character.tscn` 的 `fall` 动画。持续 N 秒后，将隐藏本体放回最近验证安全的位置，结算默认最大生命值 20% 的坠落伤害；存活才恢复原可见性，致死则保持隐藏并继续正常死亡流程。
 
 已确定的范围方案：
 
 | 范围 | 建议名称 | 职责 |
 | --- | --- | --- |
-| 黄色 | ActivationArea | 启用附近安全记录；进入时立即尝试记录，此后每 0.1 秒更新 |
+| 黄色 | ActivationArea | 通过进入/离开信号启停附近精确检测；玩家进入时立即尝试记录，此后每 0.1 秒更新 |
 | 红色 | HazardArea | 表示深坑实际危险范围 |
 | 绿色 | SupportArea | 随移动平台移动，提供承托，阻止坠落 |
 
@@ -21,6 +23,16 @@
 简单场景中，一个黄色范围、一个红色范围、两个移动平台承托范围，共 4 个 Area2D。每组深坑另设固定兜底 Marker2D，不属于 Area。
 
 黄色范围必须比红色范围更大，并在所有可接近方向留下足够缓冲。当前方案假定这些缓冲地带确实为固定可行走地面；不能把墙后、地图外空白或其他悬空地形包含为合法回退地面。
+
+### 区域激活与查询开销
+
+FallActivationArea 开启 Monitoring，默认监听敌人身体层 2 与玩家身体层 4（CollisionMask=6）。进入/离开信号由共享 FallDetectionGate 按对象分发，维护重叠黄色区域集合；只在离开全部区域后停止精确检测。远处的 PlayerFallController、EnemyFallController 及门控自身均停止物理回调，不再持续查询黄色范围。附近仍每个物理帧检查脚底，SampleInterval 仅限制玩家安全点验证频率。
+
+控制器自动创建 DetectionGate 子节点，无需手动挂载。首次生成、动态黄色区域加载及显式传送刷新时，等待两个物理帧完成定位/注册，再补查已有身体重叠与脚底红黄区域；直接生成在坑内也会触发，绿色承托仍优先。未被黄色覆盖的红区直接生成补查可进入临时兜底检测，但正常关卡必须让黄色完整覆盖红区并留足高速接近缓冲，避免对象从外侧直接进入未激活的红区。
+
+玩家原 ResetSafeHistory 传送入口同时请求门控刷新；坠落结束恢复碰撞后也重新同步，因隐藏关闭碰撞而产生的离开信号不会清除安全历史。敌人外部传送后可调用 RefreshDetectionAfterTeleport，正常碰撞有效的进出由信号自动处理。新增身体碰撞层时须同步黄色区域监听掩码。
+
+已通过 19 项运行检查，覆盖远处休眠、进入激活、重叠与卸载、玩家/敌人直接出生深坑、动态区域、承托失效、回岸及坠落中卸载；验证后清理临时自动检测场景、脚本和日志。此处验证的是查询启停行为，未将其宣称为已测得的帧率提升。
 
 ## 2. 当前项目接入依据
 
@@ -165,8 +177,12 @@ Fall 中普通 Hit、Frozen、移动和攻击请求不能打断流程；允许�
 4. 在独立世界节点下生成动画替身，设置朝向、位置及指定动画。
 5. 以游戏时间推进 N 秒；暂停菜单正常使用，暂停期间不消耗坠落时长。
 6. 到期重新验证回退候选，必要时改用同 Region 的有效记录或固定兜底点。
-7. 在仍受 Fall 控制时传送本体并清零速度，恢复可见，结算一次坠落伤害。
-8. 致死则进入正常死亡流程，不再切回 Idle；存活则恢复碰撞与本流程持有的控制锁，切入 Idle。
+7. 在仍受 Fall 控制时传送隐藏本体并清零速度，结算一次坠落伤害；同步进入死亡状态时，EndFall 清理也必须保持本体隐藏。
+8. 致死则保持隐藏并进入正常死亡流程，不再切回 Idle；存活则恢复原可见性、碰撞与本流程持有的控制锁，切入 Idle。取消流程恢复原可见性。
+
+伤害飘字管理器在接收伤害事件时，对仍处于 Fall 且生命值已归零的玩家跳过生成与合并飘字，避免隐藏本体的回退位置暴露伤害数字。伤害事件先于死亡状态切换，因此不能只依赖 Dying 标记判断；存活坠落仍正常显示伤害飘字，实际扣血及其他伤害事件不受影响。
+
+坠落致死会单独保留坠落前的可见性，不随 EndFall 的普通清理丢弃。未来统一复活流程在确认复活成功、恢复生命与死亡标记并退出死亡状态后，应调用 `PlayerFallController.RestoreVisibilityAfterRevive()`。该接口只恢复坠落留下的显示状态，不负责复活，也不应作为死亡期间直接显示玩家的方法；无记录或重复调用不会修改可见性，原本隐藏的玩家恢复后仍隐藏。当前仅预留接口，尚未实现续命 Build、统一致死拦截或完整复活流程。
 9. 清理替身和临时引用，结束本次坠落。
 
 不关闭整个玩家节点处理，不暂停整个 SceneTree。控制锁应使用所有权或令牌方式释放，避免坠落结束误解锁仍在生效的过场或对话控制。
@@ -175,11 +191,18 @@ Fall 中普通 Hit、Frozen、移动和攻击请求不能打断流程；允许�
 
 ## 8. 动画替身与相机
 
-- 场景默认使用 `res://scenes/objects/Animation_character.tscn`。
-- 加入场景树前设置 `DirectionalSceneEffect.AnimationName = "fall"`，避免 Ready 自动播放其他动画。
+### 武器攻击阶段坠落免疫
+
+每个 `WeaponSkill_*.tres` 在 Fall Immunity 分组配置 `AttackFallImmunities`（普通攻击）与 `DashAttackFallImmunities`（冲刺攻击）。两项均默认 None/0，冲刺空配置不继承普通攻击。玩家资源使用独立 `WeaponAttackFallPhases`：Warmup=1、Active=2、Recovery=4；多选按位组合（3=预热+生效、6=生效+恢复、7=全部阶段），不使用敌人 ImmunityFlags 的高位数值。
+
+PlayerAttackTemplate 在 TryStart 中沿用本次 `_resolvedDashAttack` 判定，锁定本次免疫配置；装备或资源在攻击中改变不会追溯改变当前一招。ProvidesFallImmunity 读取实际阶段，Idle/取消后无效，由 PlayerAttackState 只转发当前运行模组，再由 PlayerFallController 在触发坠落前查询。免疫结束仍在红区且无承托时触发 Fall。原有独立 Dash 状态免疫保留，不把冲刺攻击整个状态加入白名单。
+
+CSV 在 `data/skills.csv` 末尾追加同名两列，ExportCsv 导出未配置值为 0，ImportCsv 按整数写回；旧 CSV 缺列或空值不覆盖配置，明确填 0 会清除配置。当前全部技能默认无免疫。已通过 14 项玩家运行检查，并验证技能 CSV 的 14 条默认零值导出；临时检测场景、脚本及日志在验证后删除。
+
+- 玩家 `FallController` 通过导出属性 `FallEffectScene` 配置替身，`main_character.tscn` 已指定 `res://scenes/objects/Animation_character.tscn`。FallRegion 不再配置角色动画场景、生成点或特效偏移，仅负责区域规则、时长、伤害和安全回退。
+- 玩家控制器通过 `FallAnimationName` 配置动画名（默认 `fall`）；加入场景树前设置 `DirectionalSceneEffect.AnimationName`，避免 Ready 自动播放其他动画。
 - 根节点必须主动显示。核对根动画及子级 Spine 轨道，不盲目缩放所有子 AnimationPlayer 的速度。
-- 无指定 Marker 时：生成坐标为触发时玩家世界坐标 + 世界空间 EffectOffset。
-- 有指定 Marker 时：生成坐标为 Marker 世界坐标 + 世界空间 EffectOffset。
+- 生成坐标固定为触发时玩家世界坐标 + 玩家控制器的 `FallEffectOffset`（默认零）。偏移以世界单位计算，不随玩家缩放、旋转或朝向变化，不影响真实本体与回退坐标。已删除区域的 `EffectMarkerPath`、`EffectOffset` 和 `EffectPosition()`，不再将不同踩空位置的替身集中到固定演出点。
 - 当前动画长 5 秒，若要求整个动作覆盖 N 秒，则控制根动画播放器速度为 `5 / N`；N 必须为正数。
 - 替身只负责视觉，没有玩家输入、受击、碰撞或安全记录逻辑。
 - 真实玩家不跟随替身动画下沉，相机继续按原玩家逻辑运行；恢复传送时核对 CameraZone 和镜头平滑。
@@ -234,9 +257,9 @@ FallRegion
 | SafeDistance | 按角色脚底大小、地图比例与坑边验证调节 |
 | MinRecordDistance | 可选，避免原地重复提交 |
 | FallDuration | N，必须大于 0，与动画同步 |
-| FallEffectScene | Animation_character.tscn |
-| FallEffectMarkerPath | 可空；空时取玩家触发点 |
-| FallEffectOffset | 世界空间偏移 |
+| FallEffectScene（玩家 FallController） | Animation_character.tscn |
+| FallAnimationName（玩家 FallController） | fall |
+| FallEffectOffset（玩家 FallController） | 世界空间偏移，默认 (0, 0) |
 | DamageRatio | 0.2 |
 | ImmuneStates | 默认 Dash |
 | FallbackMarker | 每组深坑至少配置一个 |
@@ -291,7 +314,7 @@ FallRegion
 
 ### 步骤 6：接入动画替身
 
-- 设置 fall、朝向、Marker / Offset 与可见性。
+- 设置玩家控制器的动画名、朝向、FallEffectOffset 与可见性。
 - 同步 5 秒原动画与 N 秒流程，检查实际轨道播放效果。
 - 处理动画资源缺失，确认相机不追随替身下沉。
 

@@ -14,21 +14,13 @@ namespace Kuros.Actors.Enemies.Attacks
         public float IntervalBetweenStrikes = 0.4f;
 
         // 区域由基类统一提供：TriggerAreaPath（起手检测区；未配置 = 不做额外限制）、
-        // DamageAreaPath（伤害落点；未配置 = AttackArea）。旧的 DetectionAreaPath 已并入基类。
+        // DamageAreaPath（伤害落点；未配置不执行区域伤害）。旧的 DetectionAreaPath 已并入基类。
 
         private int _strikesDone = 0;
         private float _strikeTimer = 0f;
         private bool _comboActive = false;
 
-        public override bool CanStart()
-        {
-            if (!base.CanStart()) return false;
 
-            if (TriggerArea == null) return true;
-
-            var player = Enemy.PlayerTarget;
-            return player != null && TriggerArea.OverlapsBody(player);
-        }
 
         protected override void OnAttackStarted()
         {

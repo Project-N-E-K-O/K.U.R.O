@@ -1,4 +1,6 @@
-[gd_scene load_steps=14 format=3 uid="uid://cdh355cck8c0d"]
+[gd_scene load_steps=17 format=3 uid="uid://cdh355cck8c0d"]
+
+[ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/GroundObjectController.cs" id="ground_object_ctrl"]
 
 [ext_resource type="Script" uid="uid://dhfq2rrha0awm" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_77wsk"]
 [ext_resource type="Resource" uid="uid://gk8m663xkqb8" path="res://resources/items/Furniture_A_CubeB.tres" id="2_77wsk"]
@@ -7,6 +9,8 @@
 [ext_resource type="Texture2D" uid="uid://dabxdflvss2xs" path="res://assets/art/godot_icon.png" id="6_77wsk"]
 [ext_resource type="Shader" uid="uid://cxhuo3fwakaig" path="res://shaders/materials/canvas_cube_faces_persp.gdshader" id="6_rw6o6"]
 [ext_resource type="Shader" uid="uid://cbbgx5r50eimb" path="res://shaders/materials/canvas_cube_glowing_persp.gdshader" id="7_77wsk"]
+[ext_resource type="PackedScene" uid="uid://dby51i7slqvd5" path="res://scenes/objects/Animation_item.tscn" id="fall_anim_item"]
+[ext_resource type="Script" uid="uid://bp7k64w3rc75b" path="res://scripts/controllers/ShadowGroundController.cs" id="shadow_ground_ctrl"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_aa7cv"]
 shader = ExtResource("3_6w62b")
@@ -126,3 +130,11 @@ visible = false
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/StaticBody2D"]
 position = Vector2(0, 50)
 shape = SubResource("RectangleShape2D_jyvv2")
+
+[node name="GroundObjectController" type="Node" parent="."]
+script = ExtResource("ground_object_ctrl")
+FallEffectScene = ExtResource("fall_anim_item")
+FallAnimationName = "fall_cube_b"
+
+[node name="ShadowGroundController" type="Node" parent="RigidBody2D/Shadow"]
+script = ExtResource("shadow_ground_ctrl")

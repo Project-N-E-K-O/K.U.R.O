@@ -17,9 +17,6 @@ namespace Kuros.Systems.Cutscene
     ///   1. 并行执行：所有特效同时按配置生成
     ///   2. 顺序执行：特效依次生成（下一个等前一个完成后）
     /// 
-    /// 示例：
-    ///   - 创建一个登场特效组：2个身影特效 + 1个冲击波
-    ///   - 创建一个爆炸特效组：中心爆炸 + 周围碎片
     /// </summary>
     [GlobalClass]
     public partial class EffectGroupSpawnStep : CutsceneStep
@@ -89,7 +86,9 @@ namespace Kuros.Systems.Cutscene
                 }
 
                 // 创建异步任务生成和管理这个特效
-                effectTasks.Add(SpawnEffectAsync(ctx, config));
+                var task = SpawnEffectAsync(ctx, config);
+                effectTasks.Add(task);
+                ctx.TrackTask(task);
             }
 
             if (!WaitForCompletion)
@@ -110,6 +109,7 @@ namespace Kuros.Systems.Cutscene
             // 跳过时不再中断剩余条目：由每条 config.GenerateOnSkip 决定是否生成（生成后不等待时长）
             for (int i = 0; i < Effects.Count; i++)
             {
+                if (ctx.IsCancelled) return;
                 var config = Effects[i];
                 if (config == null || config.EffectScene == null)
                 {
@@ -133,9 +133,11 @@ namespace Kuros.Systems.Cutscene
                 if (config.SpawnDelay > 0f)
                 {
                     var delayTimer = ctx.Tree.CreateTimer(config.SpawnDelay);
-                    while (!ctx.IsSkipping && delayTimer.TimeLeft > 0f)
+                    while (!ctx.IsCancelled && !ctx.IsSkipping && delayTimer.TimeLeft > 0f)
                         await ctx.NextFrame();
                 }
+
+                if (ctx.IsCancelled) return;
 
                 if (ctx.IsSkipping && !config.GenerateOnSkip)
                 {
@@ -181,8 +183,10 @@ namespace Kuros.Systems.Cutscene
                 if (config.DestroyAfterDuration > 0f)
                 {
                     var destroyTimer = ctx.Tree.CreateTimer(config.DestroyAfterDuration);
-                    while (!ctx.IsSkipping && destroyTimer.TimeLeft > 0f && GodotObject.IsInstanceValid(effectNode2D))
+                    while (!ctx.IsCancelled && !ctx.IsSkipping && destroyTimer.TimeLeft > 0f && GodotObject.IsInstanceValid(effectNode2D))
                         await ctx.NextFrame();
+
+                    if (ctx.IsCancelled) return;
 
                     if (GodotObject.IsInstanceValid(effectNode2D))
                         effectNode2D.QueueFree();

@@ -1,4 +1,8 @@
-[gd_scene load_steps=38 format=3 uid="uid://ba8fktvib2e1o"]
+[gd_scene load_steps=41 format=3 uid="uid://ba8fktvib2e1o"]
+
+[ext_resource type="Script" path="res://scripts/actors/enemies/EnemyFallController.cs" id="fall_controller"]
+[ext_resource type="Script" path="res://scripts/actors/enemies/states/EnemyFallState.cs" id="fall_state"]
+[ext_resource type="PackedScene" path="res://scenes/objects/Animation_enemy.tscn" id="fall_effect"]
 
 [ext_resource type="Script" uid="uid://e0dl460gdllx" path="res://scripts/actors/enemies/EnemyC2WaiterA02.cs" id="1_n7wqi"]
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="2_4msjm"]
@@ -242,9 +246,20 @@ position = Vector2(220, -1000)
 [node name="Marker2D3" type="Marker2D" parent="Node2D"]
 position = Vector2(0, -1900)
 
+[node name="GroundProbe" type="Marker2D" parent="."]
+
+[node name="FallController" type="Node" parent="."]
+script = ExtResource("fall_controller")
+FallEnabled = true
+FallEffectScene = ExtResource("fall_effect")
+FallAnimationName = "fall_waiterA02"
+
 [node name="StateMachine" type="Node" parent="." node_paths=PackedStringArray("InitialState")]
 script = ExtResource("6_ugem5")
 InitialState = NodePath("Idle")
+
+[node name="Fall" type="Node" parent="StateMachine"]
+script = ExtResource("fall_state")
 
 [node name="Idle" type="Node" parent="StateMachine"]
 script = ExtResource("7_h32j6")

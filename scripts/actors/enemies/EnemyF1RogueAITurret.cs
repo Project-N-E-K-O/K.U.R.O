@@ -1,6 +1,7 @@
 using Godot;
 using Kuros.Actors.Enemies.States;
 using Kuros.Core.Effects;
+using Kuros.Actors.Enemies.Attacks;
 
 namespace Kuros.Actors.Enemies
 {
@@ -44,6 +45,34 @@ namespace Kuros.Actors.Enemies
 		private RailKeepDistanceBehavior? _keepDistance;
 		private RailChaseMovement? _railChase;
 		private EnemyWeakpointWindow? _weakpoint;
+		public bool IsAIShutdown { get; private set; }
+
+		/// <summary>永久关闭本炮位 AI，保留 Idle 动画和实体，不产生死亡/击杀结算。</summary>
+		public void ShutdownAI()
+		{
+			if (IsAIShutdown || IsDeadOrDying || IsDead) return;
+			IsAIShutdown = true;
+			ResolveNodesForShutdown(this);
+			GetNodeOrNull<EnemyJarAssistStunState>("StateMachine/JarAssistStun")?.StopForShutdown();
+			StateMachine?.ChangeState("Idle");
+			var controller = StateMachine?.GetNodeOrNull<EnemyAttackController>("Attack/AttackController");
+			controller?.Cancel(clearCooldown: true);
+			controller?.SetPhysicsProcess(false);
+			GetNodeOrNull<EnemyEmpowerController>("EmpowerController")?.Clear();
+			if (_keepDistance != null) _keepDistance.Active = false;
+			_facing?.StopForShutdown();
+			Velocity = Vector2.Zero;
+			FreezeRailSlide();
+		}
+
+		private static void ResolveNodesForShutdown(Node node)
+		{
+			foreach (Node child in node.GetChildren())
+			{
+				if (child is Kuros.Actors.Enemies.Attacks.JarAssistAttack assist) assist.CancelAssist();
+				ResolveNodesForShutdown(child);
+			}
+		}
 
 		public override void _Ready()
 		{
@@ -75,6 +104,13 @@ namespace Kuros.Actors.Enemies
 		public override void _PhysicsProcess(double delta)
 		{
 			base._PhysicsProcess(delta);
+			if (IsAIShutdown)
+			{
+				Velocity = Vector2.Zero;
+				if (_keepDistance != null) _keepDistance.Active = false;
+				FreezeRailSlide();
+				return;
+			}
 
 			// 刷新基类的玩家引用：它只在"检测范围查询"里更新，而炮位把 RailChaseMovement 的追击关掉了
 			// （ExternalDrive=true，只留硬钳）→ 没有别的系统会去查 → 不在这里查一次，攻击控制器/
@@ -122,13 +158,14 @@ namespace Kuros.Actors.Enemies
 		/// <summary>罐子协助成功：有强化组件时激活；未接入的炮位维持原行为。</summary>
 		public virtual void OnJarAssistCompleted()
 		{
+			if (IsAIShutdown || IsDeadOrDying) return;
 			GetNodeOrNull<EnemyEmpowerController>("EmpowerController")?.Activate();
 		}
 
 		/// <summary>罐子协助失败：进入指定总时长的 JarAssistStun（起步、循环、恢复）。</summary>
 		public void EnterJarAssistStun(float seconds)
 		{
-			if (IsDeadOrDying) return;
+			if (IsAIShutdown || IsDeadOrDying) return;
 
 			var stun = StateMachine?.GetNodeOrNull<EnemyJarAssistStunState>("JarAssistStun");
 			if (stun == null)
@@ -145,7 +182,7 @@ namespace Kuros.Actors.Enemies
 
 		/// <summary>转身期间不起新招（纵深防御；真正的主闸是"玩家不在前向矩形里"）。</summary>
 		public override bool CanStartAttack()
-			=> !(_facing?.IsTurning ?? false) && base.CanStartAttack();
+			=> !IsAIShutdown && !(_facing?.IsTurning ?? false) && base.CanStartAttack();
 
 		/// <summary>钉在机械桩上：击退/吸附等一切强制位移都推不动它。</summary>
 		public override void ApplyKnockbackDisplacement(Vector2 direction, float distance, float duration)
@@ -161,6 +198,7 @@ namespace Kuros.Actors.Enemies
 		/// 想让它挨打时不被硬直，给攻击配 GrantImmunities 霸体即可，那是招式的既有开关）。</summary>
 		public override bool CanBeAffected(ActorEffect? effect)
 		{
+			if (IsAIShutdown) return false;
 			// 罐子眩晕期间是明确的输出窗口：允许纯伤害进入判定（效果仍按原弱点规则）。
 			if (effect == null && StateMachine?.CurrentState?.Name == "JarAssistStun")
 				return true;

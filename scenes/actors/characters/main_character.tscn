@@ -1,7 +1,4 @@
-[gd_scene load_steps=51 format=3 uid="uid://ufprfd4r8ijj"]
-
-[ext_resource type="Script" path="res://scripts/actors/heroes/PlayerFallController.cs" id="fall_controller"]
-[ext_resource type="Script" path="res://scripts/actors/heroes/states/PlayerFallState.cs" id="fall_state"]
+[gd_scene load_steps=52 format=3 uid="uid://ufprfd4r8ijj"]
 
 [ext_resource type="Script" uid="uid://dj1eq3skmq5qf" path="res://scripts/actors/heroes/attacks/PlayerLaserPointerAttack.cs" id="0_laserptr"]
 [ext_resource type="Script" uid="uid://12wblt72y8xt" path="res://scripts/actors/heroes/MainCharacter.cs" id="1_om6pm"]
@@ -46,6 +43,9 @@
 [ext_resource type="Script" uid="uid://cdtsfiymrq0nx" path="res://scripts/core/effects/AfterimageController.gd" id="45_afterimage"]
 [ext_resource type="PackedScene" uid="uid://bl2nwvbijnwtd" path="res://scenes/actors/etc/LandingIndicatorA.tscn" id="52_pplu2"]
 [ext_resource type="Script" uid="uid://e84825ehiw7v" path="res://scripts/actors/heroes/GhostHealthComponent.cs" id="53_ghost"]
+[ext_resource type="Script" uid="uid://b738yjxxsn8to" path="res://scripts/actors/heroes/PlayerFallController.cs" id="fall_controller"]
+[ext_resource type="PackedScene" uid="uid://dva26mfp5yohw" path="res://scenes/objects/Animation_character.tscn" id="fall_effect"]
+[ext_resource type="Script" uid="uid://25fh1q2hxwa0" path="res://scripts/actors/heroes/states/PlayerFallState.cs" id="fall_state"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_0y2r2"]
 shader = ExtResource("2_4ht1x")
@@ -446,6 +446,9 @@ BurstAnimationSpeed = 1.5
 RecoverySpeed = 100.0
 RecoveryDuration = 0.47
 
+[node name="Fall" type="Node" parent="StateMachine"]
+script = ExtResource("fall_state")
+
 [node name="GhostHealthComponent" type="Node" parent="."]
 script = ExtResource("53_ghost")
 GhostHoldDuration = 1.0
@@ -484,6 +487,10 @@ BoneIconOffset = Vector2(1024, 0)
 RotateBoneOffsetWithBone = true
 IconRotationDegrees = 90.0
 
+[node name="FallController" type="Node" parent="."]
+script = ExtResource("fall_controller")
+FallEffectScene = ExtResource("fall_effect")
+
 [node name="EffectController" type="Node" parent="."]
 script = ExtResource("21_utqjm")
 
@@ -518,9 +525,3 @@ DotStep = 1
 LandingIndicatorScene = ExtResource("52_pplu2")
 
 [node name="GroundProbe" type="Marker2D" parent="."]
-
-[node name="FallController" type="Node" parent="."]
-script = ExtResource("fall_controller")
-
-[node name="Fall" type="Node" parent="StateMachine"]
-script = ExtResource("fall_state")

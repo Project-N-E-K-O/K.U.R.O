@@ -1,4 +1,7 @@
 using Godot;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Kuros.Systems.Cutscene
 {
@@ -10,6 +13,9 @@ namespace Kuros.Systems.Cutscene
     public partial class CutsceneTrigger : Area2D
     {
         [Export] public CutsceneSequence? Sequence { get; set; }
+        public enum ExecutionModeEnum { ExclusiveCutscene, BackgroundSteps }
+        /// <summary>后台仅执行生成/等待步骤，不接管相机、UI、输入或共享跳过状态。</summary>
+        [Export] public ExecutionModeEnum ExecutionMode { get; set; } = ExecutionModeEnum.ExclusiveCutscene;
 
         /// <summary>只触发一次。</summary>
         [Export] public bool TriggerOnce { get; set; } = true;
@@ -22,6 +28,8 @@ namespace Kuros.Systems.Cutscene
 
         private bool _triggered = false;
         private bool _armed = true;
+        private bool _running;
+        private readonly CancellationTokenSource _lifetime = new();
 
         public override void _Ready()
         {
@@ -61,7 +69,7 @@ namespace Kuros.Systems.Cutscene
 
             GD.Print($"[Cutscene] BodyEntered — body: {body.Name}");
 
-            if (TriggerOnce && _triggered)
+            if (_running || TriggerOnce && _triggered)
             {
                 GD.Print("[Cutscene] 已触发过，跳过");
                 return;
@@ -87,15 +95,77 @@ namespace Kuros.Systems.Cutscene
                 GD.PrintErr("[Cutscene] 未找到 CutsceneManager！确认 Stage_2 中已添加该节点。");
                 return;
             }
-            if (manager.IsPlaying)
+            if (ExecutionMode == ExecutionModeEnum.BackgroundSteps)
             {
-                GD.Print("[Cutscene] CutsceneManager 正在播放中，忽略");
-                return;
+                foreach (var step in Sequence.Steps)
+                    if (step != null && step is not EffectGroupSpawnStep && step is not EffectSpawnStep && step is not WaitStep)
+                    {
+                        GD.PushWarning($"[Cutscene] {Sequence.SequenceId}: 后台模式不支持 {step.GetType().Name}，未启动。");
+                        return;
+                    }
             }
 
             _triggered = true;
-            GD.Print($"[Cutscene] 开始播放过场: {Sequence.SequenceId}");
-            _ = manager.PlayCutscene(Sequence);
+            _running = true;
+            var sequence = Sequence;
+            var mode = ExecutionMode;
+            // 避开物理 Area 信号回调中的建树/碰撞修改。
+            Callable.From(() => { _ = ExecuteRequest(manager, sequence, mode); }).CallDeferred();
+        }
+
+        private async Task ExecuteRequest(CutsceneManager manager, CutsceneSequence sequence, ExecutionModeEnum mode)
+        {
+            try
+            {
+                if (_lifetime.IsCancellationRequested || !IsInsideTree() || IsQueuedForDeletion()
+                    || !GodotObject.IsInstanceValid(manager) || !manager.IsInsideTree()) return;
+                if (mode == ExecutionModeEnum.BackgroundSteps)
+                {
+                    var ctx = new CutsceneContext(manager, sequence, this);
+                    foreach (var step in sequence.Steps)
+                    {
+                        if (ctx.IsCancelled) return;
+                        if (step != null) await step.Execute(ctx);
+                    }
+                    await ctx.FinishBackgroundTasks();
+                }
+                else
+                {
+                    // 多个等待者被同一完成信号唤醒时，每个都重新检查，仍只会独占播放。
+                    while (manager.IsPlaying)
+                        if (!await WaitForManager(manager)) return;
+                    if (_lifetime.IsCancellationRequested || IsQueuedForDeletion() || !IsInsideTree()
+                        || !GodotObject.IsInstanceValid(manager) || !manager.IsInsideTree()) return;
+                    await manager.PlayCutscene(sequence);
+                }
+            }
+            catch (Exception ex) { GD.PushError($"[Cutscene] {sequence.SequenceId} 执行失败: {ex.Message}"); }
+            finally { _running = false; }
+        }
+
+        private async Task<bool> WaitForManager(CutsceneManager manager)
+        {
+            var wake = new TaskCompletionSource<bool>();
+            void Finished(string id) => wake.TrySetResult(true);
+            void ManagerExited() => wake.TrySetResult(false);
+            manager.CutsceneFinished += Finished;
+            manager.TreeExiting += ManagerExited;
+            using var cancel = _lifetime.Token.Register(() => wake.TrySetResult(false));
+            try { return await wake.Task; }
+            finally
+            {
+                if (GodotObject.IsInstanceValid(manager))
+                {
+                    manager.CutsceneFinished -= Finished;
+                    manager.TreeExiting -= ManagerExited;
+                }
+            }
+        }
+
+        public override void _ExitTree()
+        {
+            BodyEntered -= OnBodyEntered;
+            _lifetime.Cancel();
         }
     }
 }

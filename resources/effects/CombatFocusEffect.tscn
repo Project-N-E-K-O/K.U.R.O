@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://do3573f70er3a"]
+
+[ext_resource type="Script" uid="uid://ckxugls8rw8yn" path="res://scripts/effects/CombatFocusEffect.cs" id="1"]
+
+[node name="CombatFocusEffect" type="Node2D"]
+script = ExtResource("1")

@@ -12859,7 +12859,7 @@ tracks/3/keys = {
 tracks/4/type = "animation"
 tracks/4/imported = false
 tracks/4/enabled = true
-tracks/4/path = NodePath("position/SpineSprite/OutlineSpineSpriteAnimationTrack/SpineSprite Track 0")
+tracks/4/path = NodePath("position/SpineSprite/SpineSpriteAnimationTrack/SpineSprite Track 0")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
@@ -13084,7 +13084,7 @@ tracks/3/keys = {
 tracks/4/type = "animation"
 tracks/4/imported = false
 tracks/4/enabled = true
-tracks/4/path = NodePath("position/SpineSprite/OutlineSpineSpriteAnimationTrack/SpineSprite Track 0")
+tracks/4/path = NodePath("position/SpineSprite/SpineSpriteAnimationTrack/SpineSprite Track 0")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
@@ -13260,25 +13260,10 @@ preview_animation = "run"
 preview_frame = true
 preview_time = 0.53
 
-[node name="SpineBoneNode" type="SpineBoneNode" parent="position/SpineSprite"]
-show_behind_parent = true
-z_index = -1
-position = Vector2(-8.901458, -468.65417)
-rotation = -1.7461728
-scale = Vector2(0.9999999, 0.9999999)
-bone_name = "Upper Body"
-
-[node name="SpineHoldingBoneNode" type="SpineBoneNode" parent="position/SpineSprite"]
-show_behind_parent = true
-position = Vector2(-8.901458, -468.65417)
-rotation = -1.7461728
-scale = Vector2(0.9999999, 0.9999999)
-bone_name = "Upper Body"
-
-[node name="OutlineSpineSpriteAnimationTrack" type="SpineAnimationTrack" parent="position/SpineSprite"]
+[node name="SpineSpriteAnimationTrack" type="SpineAnimationTrack" parent="position/SpineSprite"]
 track_index = 0
 
-[node name="SpineSprite Track 0" type="AnimationPlayer" parent="position/SpineSprite/OutlineSpineSpriteAnimationTrack"]
+[node name="SpineSprite Track 0" type="AnimationPlayer" parent="position/SpineSprite/SpineSpriteAnimationTrack"]
 libraries = {
 &"": SubResource("AnimationLibrary_bfp1j")
 }

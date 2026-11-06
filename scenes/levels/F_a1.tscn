@@ -1,14 +1,17 @@
-[gd_scene load_steps=21 format=3 uid="uid://dolgkvguevepx"]
+[gd_scene load_steps=24 format=3 uid="uid://dolgkvguevepx"]
 
 [ext_resource type="Script" uid="uid://cra7y7mt0x1j8" path="res://scripts/managers/CameraZoneArea.cs" id="1_2b2oa"]
 [ext_resource type="Script" uid="uid://cbui22isww64v" path="res://scripts/systems/cutscene/CutsceneTrigger.cs" id="2_bkvq7"]
 [ext_resource type="Resource" uid="uid://cpqkacnu0mn6o" path="res://resources/cutscene/F_a1_intro.tres" id="3_kj57q"]
+[ext_resource type="Texture2D" uid="uid://dt6kjqhtksjpi" path="res://assets/environments/scene_6_hotel/背景墙2.png" id="4_dicvm"]
 [ext_resource type="Texture2D" uid="uid://beckwcg3wjhwn" path="res://assets/environments/scene_6_hotel/地板完整.png" id="4_kj57q"]
-[ext_resource type="Texture2D" uid="uid://bpthwlk18co4s" path="res://assets/environments/scene_6_hotel/mozhua/jar_sequence/时间轴 1_0017C.png" id="6_ypy4e"]
+[ext_resource type="Texture2D" uid="uid://cfqcvbhy00mr1" path="res://assets/environments/scene_6_hotel/警戒条.png" id="6_2b2oa"]
+[ext_resource type="Texture2D" uid="uid://cb4cka2jcljmq" path="res://assets/environments/scene_6_hotel/黑色遮蔽覆盖.png" id="6_bkvq7"]
 [ext_resource type="Texture2D" uid="uid://dbn8b1atk6ngd" path="res://assets/environments/scene_6_hotel/背景墙.png" id="8_aolv4"]
 [ext_resource type="Texture2D" uid="uid://b4poxbbpcwl0a" path="res://assets/environments/scene_6_hotel/龙门吊左滑槽.png" id="8_bkvq7"]
 [ext_resource type="Texture2D" uid="uid://cbwmqsqiivnqo" path="res://assets/environments/scene_6_hotel/左墙壁.png" id="9_ao0lv"]
 [ext_resource type="PackedScene" uid="uid://da4f3288xy4h5" path="res://scenes/environments/Pipe180.tscn" id="9_ypy4e"]
+[ext_resource type="PackedScene" uid="uid://6mbhrffm1412" path="res://scenes/environments/FallRegion_F_a1.tscn" id="12_bkvq7"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1mlw7"]
 size = Vector2(7030, 4070)
@@ -41,7 +44,7 @@ size = Vector2(800, 500)
 size = Vector2(8000, 500)
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_ka7vx"]
-vertices = PackedVector2Array(2015.1563, -639, 2021.5, 1350, -4721, 1350, 767.72656, -602.1797, -4721, -677, -3658.9219, -677, -3646.7031, -652, -3531, -677, -3531, -708.4297, -2980.3828, -977, 118.53906, -977, 788.96094, -639, -3595.4375, -677)
+vertices = PackedVector2Array(2015.1563, -639, 2021.5, 1350, -4721, 1350, 767.72656, -602.1875, -4721, -677, -3658.9219, -677, -3646.7031, -652, -3531, -677, -3531, -708.4297, -3517.539, -715, 572.3203, -715, 788.96094, -639, -3595.4531, -677)
 polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3), PackedInt32Array(2, 4, 5, 6), PackedInt32Array(7, 8, 9, 10, 3), PackedInt32Array(3, 11, 0), PackedInt32Array(3, 2, 6, 12, 7)])
 outlines = Array[PackedVector2Array]([PackedVector2Array(-4863, -1275, 2093, -1319, 2102, 1505, -4856, 1532)])
 source_geometry_mode = 2
@@ -93,6 +96,7 @@ position = Vector2(6790, 850)
 collision_layer = 0
 collision_mask = 4
 script = ExtResource("2_bkvq7")
+ExecutionMode = 1
 Sequence = ExtResource("3_kj57q")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CutsceneTrigger"]
@@ -102,31 +106,67 @@ debug_color = Color(1, 0.6784314, 1, 0.41960785)
 [node name="Environments" type="Node2D" parent="."]
 position = Vector2(0, 1060)
 
-[node name="Floor" type="Sprite2D" parent="Environments"]
-position = Vector2(-75, -295)
-texture = ExtResource("4_kj57q")
+[node name="BG" type="Sprite2D" parent="Environments"]
+modulate = Color(0.50928634, 0.50928617, 0.509286, 1)
+z_index = -10
+position = Vector2(-75, -1906)
+texture = ExtResource("4_dicvm")
 
-[node name="Wall" type="Sprite2D" parent="Environments/Floor"]
+[node name="Floor" type="Sprite2D" parent="Environments"]
+position = Vector2(-75, 0)
+texture = ExtResource("4_kj57q")
+region_enabled = true
+region_rect = Rect2(0, 600, 6772, 2225)
+
+[node name="BlackRect" type="Sprite2D" parent="Environments"]
+z_index = -3
+position = Vector2(150, -1400)
+rotation = -1.5707964
+scale = Vector2(2, 2)
+texture = ExtResource("6_bkvq7")
+region_enabled = true
+region_rect = Rect2(1124, 0, 1358, 2984)
+
+[node name="BlackRect2" type="Sprite2D" parent="Environments/BlackRect"]
+position = Vector2(-237.49998, -382.5)
+rotation = 0.7853982
+scale = Vector2(1.5, 2)
+texture = ExtResource("6_bkvq7")
+region_enabled = true
+region_rect = Rect2(1124, 1884, 1368, 1100)
+
+[node name="BlackRect3" type="Sprite2D" parent="Environments/BlackRect"]
+position = Vector2(-200, 110)
+rotation = -0.7853982
+scale = Vector2(1.5, 2)
+texture = ExtResource("6_bkvq7")
+region_enabled = true
+region_rect = Rect2(1124, 1884, 1368, 1100)
+
+[node name="WarmingBelt" type="Sprite2D" parent="Environments"]
+position = Vector2(-1560, -1095)
+texture = ExtResource("6_2b2oa")
+
+[node name="WarmingBelt" type="Sprite2D" parent="Environments/WarmingBelt"]
+position = Vector2(2930, 0)
+texture = ExtResource("6_2b2oa")
+
+[node name="Wall" type="Sprite2D" parent="Environments"]
 z_index = 1
-position = Vector2(0, -2035)
+position = Vector2(-75, -2330)
 texture = ExtResource("8_aolv4")
 
-[node name="Wall" type="Sprite2D" parent="Environments/Floor/Wall"]
-z_index = 1
-position = Vector2(0, -2035)
-texture = ExtResource("6_ypy4e")
-
-[node name="LeftRail" type="Sprite2D" parent="Environments/Floor"]
-position = Vector2(-3355, 400)
+[node name="LeftRail" type="Sprite2D" parent="Environments"]
+position = Vector2(-3430, 105)
 texture = ExtResource("8_bkvq7")
 
-[node name="LeftWall" type="Sprite2D" parent="Environments/Floor"]
+[node name="LeftWall" type="Sprite2D" parent="Environments"]
 z_index = 1
-position = Vector2(-3512, -790)
+position = Vector2(-3587, -1085)
 texture = ExtResource("9_ao0lv")
 
-[node name="Pipe180" parent="Environments/Floor" instance=ExtResource("9_ypy4e")]
-position = Vector2(0, 290)
+[node name="Pipe180" parent="Environments" instance=ExtResource("9_ypy4e")]
+position = Vector2(-75, -5)
 SpawnTag = "JarLeft"
 
 [node name="AirWall" type="StaticBody2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
@@ -163,6 +203,9 @@ position = Vector2(0, 2390)
 shape = SubResource("RectangleShape2D_ao0lv")
 
 [node name="NavigationRegion2D" type="NavigationRegion2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
-visible = false
 position = Vector2(1334, 710)
 navigation_polygon = SubResource("NavigationPolygon_ka7vx")
+
+[node name="FallRegion_F_a1" parent="." instance=ExtResource("12_bkvq7")]
+z_index = 10
+position = Vector2(-130, -235)

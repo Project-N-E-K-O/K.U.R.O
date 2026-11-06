@@ -60,6 +60,7 @@ namespace Kuros.Effects
         private Sprite2D? _sprite;
         private float _speedMultiplier;
         private bool _initialized;
+        private bool _areaSignalsConnected;
 
         private readonly Dictionary<GameActor, float> _actorTimers = new();
         private readonly Dictionary<GameActor, float> _appliedMultipliers = new();
@@ -114,6 +115,7 @@ namespace Kuros.Effects
             _area.Monitoring = true;
             _area.BodyEntered += OnBodyEntered;
             _area.BodyExited += OnBodyExited;
+            _areaSignalsConnected = true;
         }
 
         // ── 碰撞回调 ─────────────────────────────────────────────────────────
@@ -203,11 +205,12 @@ namespace Kuros.Effects
         // ── 清理 ─────────────────────────────────────────────────────────────
         private void Cleanup()
         {
-            if (_area != null && IsInstanceValid(_area))
+            if (_areaSignalsConnected && _area != null && IsInstanceValid(_area))
             {
                 _area.BodyEntered -= OnBodyEntered;
                 _area.BodyExited -= OnBodyExited;
             }
+            _areaSignalsConnected = false; // 到期与 ExitTree 都会调用，重复清理不能再次断开信号。
 
             foreach (var actor in _appliedMultipliers.Keys.ToList())
             {

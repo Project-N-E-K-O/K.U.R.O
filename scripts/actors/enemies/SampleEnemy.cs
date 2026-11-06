@@ -354,6 +354,38 @@ public partial class SampleEnemy : GameActor
 		base.Die();
 	}
 
+	private bool _fallDeath;
+	private Vector2? _fallLootPosition;
+
+	/// <summary>死亡已经开始的尸体仅重定向掉落位置，保留既有死亡结算与去重。</summary>
+	public void ConfigureCorpseFallLoot(Vector2? lootPosition)
+	{
+		_fallDeath = true;
+		_fallLootPosition = lootPosition;
+	}
+
+	/// <summary>由 EnemyFallController 在接管后调用；无安全掉落点时不在深坑内生成掉落物。</summary>
+	public void FinalizeFallDeath(Vector2? lootPosition)
+	{
+		if (IsDeadOrDying || IsDead) return;
+		_fallDeath = true;
+		_fallLootPosition = lootPosition;
+		FinalizeEnvironmentalFallDeath();
+	}
+
+	protected override void HandleLootDrops()
+	{
+		if (!_fallDeath) { base.HandleLootDrops(); return; }
+		if (!_fallLootPosition.HasValue) return;
+		Vector2 position = GlobalPosition;
+		try
+		{
+			GlobalPosition = _fallLootPosition.Value;
+			base.HandleLootDrops();
+		}
+		finally { GlobalPosition = position; }
+	}
+
 		protected override void OnDeathFinalized()
 		{
 			RefreshPlayerReference();

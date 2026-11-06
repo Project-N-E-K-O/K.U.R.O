@@ -72,6 +72,7 @@ Description = "攻击到敌人时生成一道对敌人造成伤害和减速的�
 Effects = Array[ExtResource("1_0yij6")]([SubResource("Resource_1tcmq")])
 DashEffects = Array[ExtResource("1_0yij6")]([SubResource("Resource_vk1sm"), SubResource("Resource_mm4j5")])
 DashAttackFxEntries = Array[ExtResource("1_1tcmq")]([SubResource("Resource_3cyqu"), SubResource("Resource_3x4ab"), SubResource("Resource_eee0m")])
+DashAttackFallImmunities = 3
 WarmupDuration = 0.17
 ActiveDuration = 0.2
 RecoveryDuration = 0.16

@@ -1,4 +1,6 @@
-[gd_scene load_steps=12 format=3 uid="uid://o3wponugixfj"]
+[gd_scene load_steps=15 format=3 uid="uid://o3wponugixfj"]
+
+[ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/GroundObjectController.cs" id="ground_object_ctrl"]
 
 [ext_resource type="Script" uid="uid://dhfq2rrha0awm" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_urea6"]
 [ext_resource type="Resource" uid="uid://cdnf6n4vveo1d" path="res://resources/items/Furniture_B_ChairA_fwd.tres" id="2_urea6"]
@@ -6,6 +8,8 @@
 [ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="4_cfvwo"]
 [ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="5_l6usn"]
 [ext_resource type="Texture2D" uid="uid://ba11fgricl2ku" path="res://assets/furnitures/hotel_scene2/ChairA_fwd.png" id="6_urea6"]
+[ext_resource type="PackedScene" uid="uid://dby51i7slqvd5" path="res://scenes/objects/Animation_item.tscn" id="fall_anim_item"]
+[ext_resource type="Script" uid="uid://bp7k64w3rc75b" path="res://scripts/controllers/ShadowGroundController.cs" id="shadow_ground_ctrl"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_aa7cv"]
 shader = ExtResource("3_wh5bu")
@@ -81,3 +85,11 @@ shape = SubResource("RectangleShape2D_gy46y")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/StaticBody2D"]
 position = Vector2(0, 60)
 shape = SubResource("RectangleShape2D_jyvv2")
+
+[node name="GroundObjectController" type="Node" parent="."]
+script = ExtResource("ground_object_ctrl")
+FallEffectScene = ExtResource("fall_anim_item")
+FallAnimationName = "fall_chair_a"
+
+[node name="ShadowGroundController" type="Node" parent="RigidBody2D/Shadow"]
+script = ExtResource("shadow_ground_ctrl")

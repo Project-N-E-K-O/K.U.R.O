@@ -13,8 +13,9 @@ namespace Kuros.Actors.Enemies.Attacks
     /// </summary>
     public partial class EnemySmashAttack : EnemyAttackTemplate
     {
+        protected override bool RequiresAttackArea => true;
         // 区域由基类统一提供：TriggerAreaPath（触发判定区；未配置 = 不做额外位置限制）
-        // 与 DamageAreaPath（伤害区；未配置 = AttackArea）。旧的 DetectionAreaPath / SmashAreaPath 已并入基类。
+        // 与 DamageAreaPath（伤害区；未配置不执行区域伤害）。旧的 DetectionAreaPath / SmashAreaPath 已并入基类。
 
         [ExportCategory("Dash")]
 		/// <summary>冲刺速度 = 基础 Speed × 倍率（倍率语义：基础速度调整时冲刺自动适配）。</summary>
@@ -96,7 +97,7 @@ namespace Kuros.Actors.Enemies.Attacks
             base._ExitTree();
         }
 
-        public override bool CanStart()
+        protected override bool CanStartCore()
         {
 			if (Enemy == null || Enemy.PlayerTarget == null) return false;
 			if (IsRunning || IsOnCooldown) return false;
@@ -106,14 +107,7 @@ namespace Kuros.Actors.Enemies.Attacks
 				return false;
 			}
 
-			bool detectionSatisfied = _detectionArea != null
-				? _playerInsideDetection || _detectionArea.OverlapsBody(Enemy.PlayerTarget)
-				: Enemy.IsPlayerWithinDetectionRange();
-
-			if (!detectionSatisfied)
-			{
-				return false;
-			}
+			// TriggerArea 的选招和起手限制由非虚公共入口统一检查。
 
             AlignFacingWithPlayer();
 
@@ -287,7 +281,7 @@ namespace Kuros.Actors.Enemies.Attacks
 
 		private void ApplySmashDamage(SamplePlayer player)
 		{
-			var area = DamageArea ?? AttackArea;
+            var area = DamageArea;
 			if (area == null || Enemy == null) return;
 
 			ApplyAttackAreaMaskOverride(area);
@@ -296,6 +290,7 @@ namespace Kuros.Actors.Enemies.Attacks
 
 		private void ApplySmashEffects(SamplePlayer player)
 		{
+            if (DamageArea == null || !player.IsHitByArea(DamageArea)) return;
 			ApplySmashDamage(player);
 
 			TryApplyPlayerKnockback(

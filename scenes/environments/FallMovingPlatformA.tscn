@@ -1,11 +1,17 @@
-[gd_scene load_steps=5 format=3 uid="uid://dxpolkx35jbp"]
+[gd_scene load_steps=6 format=3 uid="uid://dxpolkx35jbp"]
 
 [ext_resource type="Script" uid="uid://cd1adx61gikt1" path="res://scripts/environments/FallMovingPlatform.cs" id="1"]
 [ext_resource type="Script" uid="uid://l7gnrfed2nqh" path="res://scripts/environments/FallSupportArea.cs" id="2"]
 [ext_resource type="Texture2D" uid="uid://cofcrcna6lhif" path="res://assets/environments/scene_6_hotel/移动平台地板.png" id="2_svn7p"]
 
 [sub_resource type="ConvexPolygonShape2D" id="ConvexPolygonShape2D_svn7p"]
-points = PackedVector2Array(-515, -250, 515, -250, 625, -160, 625, 160, 515, 250, -525, 250, -625, 160, -625, -160)
+points = PackedVector2Array(-515, -240, 515, -240, 625, -160, 625, 160, 515, 260, -525, 260, -625, 160, -627, -150)
+
+[sub_resource type="NavigationPolygon" id="NavigationPolygon_svn7p"]
+vertices = PackedVector2Array(592.10156, -213.15625, 592.89844, 77.75, 500.17188, 165.88281, -505.1172, 162.11719, -587.25, 74.171875, -589.6719, -216.11719, -489.5078, -294.02344, 484.14063, -294.96875)
+polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3, 4, 5, 6, 7)])
+outlines = Array[PackedVector2Array]([PackedVector2Array(-517, -374, 511, -375, 672, -253, 673, 112, 532, 246, -540, 242, -667, 106, -670, -255)])
+agent_radius = 80.0
 
 [node name="FallMovingPlatformA" type="Node2D"]
 script = ExtResource("1")
@@ -25,3 +31,7 @@ script = ExtResource("2")
 position = Vector2(0, -75)
 shape = SubResource("ConvexPolygonShape2D_svn7p")
 debug_color = Color(0.1, 0.9, 0.3, 0.4)
+
+[node name="NavigationRegion2D" type="NavigationRegion2D" parent="." groups=["navigation_rebake_excluded"]]
+z_index = 10
+navigation_polygon = SubResource("NavigationPolygon_svn7p")

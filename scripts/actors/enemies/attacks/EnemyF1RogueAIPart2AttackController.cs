@@ -16,6 +16,7 @@ namespace Kuros.Actors.Enemies.Attacks
 	///     phase-2 恒 ≥1，父类的进度判据会让全部大招出场即连放。part1 不受影响（仍用父类进度判据）。
 	///   · 指针/消费/打断退还/重触发间隔/清陈旧队列/Pro 切换等机械**全部继承父类**，只换判据源。
 	///   · 近身下砸：普通/Pro 两个节点都登记进普攻名单（大招武装时一并清零/还原）；可起手时绕过 10s 呼吸窗。
+	///   · 普攻 B 的 Pro（RogueAISlamBPro）同样登记进普攻名单，大招武装时一起清零/还原。
 	/// </summary>
 	[GlobalClass]
 	public partial class EnemyF1RogueAIPart2AttackController : EnemyF1RogueAIAttackController
@@ -27,8 +28,11 @@ namespace Kuros.Actors.Enemies.Attacks
 		/// <summary>血量阈值数组（0~1，升序配置、内部降序消费）：每跨过一个允许放一次大招；
 		/// 长度 = 本场最多几发。</summary>
 		[Export] public float[] HealthThresholds { get; set; } = { 0.25f, 0.5f, 0.75f };
+		/// <summary>第二个普攻的 Pro 攻击名（血量跌破 <see cref="HealthUpgradeThreshold"/> 后替换
+		/// <c>MeleeAttackNameSecond</c>；节点名必须与攻击名一致）。空 = 无。</summary>
+		[Export] public string MeleeAttackNameSecondPro { get; set; } = "";
 		/// <summary>通用 Pro 升级血量阈值（0~1）：血量比值 ≤ 本值时，所有 Pro 版本解锁
-		/// （大招 Pro、下砸 Pro 共用）。</summary>
+		/// （大招 Pro、下砸 Pro、普攻 B Pro 共用）。</summary>
 		[Export(PropertyHint.Range, "0,1,0.01")] public float HealthUpgradeThreshold { get; set; } = 0.5f;
 
 		protected override float[] TriggerThresholds => HealthThresholds;
@@ -76,6 +80,8 @@ namespace Kuros.Actors.Enemies.Attacks
 			foreach (string name in base.EnumerateMeleeNames())
 				yield return name;
 
+			if (!string.IsNullOrEmpty(MeleeAttackNameSecondPro))
+				yield return MeleeAttackNameSecondPro;
 			if (!string.IsNullOrEmpty(ProximityAttackName))
 				yield return ProximityAttackName;
 			if (!string.IsNullOrEmpty(ProximityProAttackName))

@@ -229,6 +229,15 @@ namespace Kuros.Actors.Heroes.Attacks
         private float ResolveDashOrSkillSpeed(float dashSpeed, float skillSpeed)
             => _resolvedDashAttack && dashSpeed >= 0f ? dashSpeed : skillSpeed;
         private WeaponSkillDefinition? _activeWeaponSkill;
+        private WeaponAttackFallPhases _activeFallImmunities;
+        /// <summary>本次攻击起手时锁定的配置，只对当前实际阶段生效。</summary>
+        public bool ProvidesFallImmunity => _phase switch
+        {
+            AttackPhase.Warmup => (_activeFallImmunities & WeaponAttackFallPhases.Warmup) != 0,
+            AttackPhase.Active => (_activeFallImmunities & WeaponAttackFallPhases.Active) != 0,
+            AttackPhase.Recovery => (_activeFallImmunities & WeaponAttackFallPhases.Recovery) != 0,
+            _ => false
+        };
         private AttackHitboxDebugDrawer? _hitboxDebugDrawer;
         private int _currentHitStep = 1;  // 记录当前 Spine 动画段数（1-based）
         private readonly HashSet<int> _resolvedHitSteps = new();  // 本次攻击已结算的 hit 段（同段不重复结算——方向切换动画变体不产生额外伤害）
@@ -718,6 +727,9 @@ namespace Kuros.Actors.Heroes.Attacks
 
             // 提前解析当前武器技能，以便应用 timing 覆盖（冲刺攻击优先技能 Dash 阶段配置）
             _activeWeaponSkill = Player.WeaponSkillController?.GetPrimarySkillDefinition();
+            _activeFallImmunities = (_resolvedDashAttack
+                ? _activeWeaponSkill?.DashAttackFallImmunities
+                : _activeWeaponSkill?.AttackFallImmunities) ?? WeaponAttackFallPhases.None;
             _effectiveWarmup   = ResolveDashOrSkillDuration(_activeWeaponSkill?.DashWarmupDuration, _activeWeaponSkill?.WarmupDuration, WarmupDuration);
             _effectiveActive   = ResolveDashOrSkillDuration(_activeWeaponSkill?.DashActiveDuration, _activeWeaponSkill?.ActiveDuration, ActiveDuration);
             _effectiveRecovery = ResolveDashOrSkillDuration(_activeWeaponSkill?.DashRecoveryDuration, _activeWeaponSkill?.RecoveryDuration, RecoveryDuration);
@@ -752,6 +764,7 @@ namespace Kuros.Actors.Heroes.Attacks
             _spineHitWindowActive = false;
             _spineAttackAnimationName = string.Empty;
             _activeWeaponSkill = null;
+            _activeFallImmunities = WeaponAttackFallPhases.None;
             _pendingSkipWarmupStart = -1f;
 
             if (clearCooldown)

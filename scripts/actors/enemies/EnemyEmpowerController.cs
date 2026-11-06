@@ -1,3 +1,4 @@
+using System;
 using Godot;
 using Kuros.Actors.Enemies.Attacks;
 
@@ -17,9 +18,12 @@ public partial class EnemyEmpowerController : Node
     [Export(PropertyHint.Range, "0.1,5,0.05,or_greater")]
     public float MovementSpeedMultiplier { get; set; } = 1.5f;
     [Export] public PackedScene? EffectScene { get; set; }
-    /// <summary>相对敌人根节点。留空跟随敌人；特效保持世界朝向。</summary>
+    /// <summary>相对敌人根节点。留空跟随敌人；特效保持世界朝向。
+    /// 锚点不是骨架的一部分，会随朝向镜像（特效默认朝左：敌人朝右时镜像 X）。</summary>
     [Export] public NodePath EffectAnchorPath { get; set; } = new();
+    /// <summary>特效偏移；特效默认朝左，敌人朝右（非 d_ 动画）时自动镜像 X。</summary>
     [Export] public Vector2 EffectOffset { get; set; } = Vector2.Zero;
+    /// <summary>特效缩放；X 的符号由朝向决定——特效默认朝左，敌人朝右时自动水平反转。</summary>
     [Export] public Vector2 EffectScale { get; set; } = Vector2.One;
     [Export] public int EffectZOffset { get; set; } = -1;
     /// <summary>0 = 只生成一次（循环特效）；正数 = 每隔 N 秒替换一次，适配一次性素材。</summary>
@@ -29,6 +33,7 @@ public partial class EnemyEmpowerController : Node
     public double RemainingSeconds { get; private set; }
     private SampleEnemy? _enemy;
     private Node2D? _visual;
+    private Node? _spineHelper;
     private double _repeatElapsed;
     private EnemyF1RogueAITurretAttackController? _attackController;
     private RailKeepDistanceBehavior? _keepDistance;
@@ -40,12 +45,21 @@ public partial class EnemyEmpowerController : Node
     public override void _Ready()
     {
         _enemy = GetParent() as SampleEnemy;
+
+        // Spine 的 C# 绑定不全：借 GDScript 桥读取"当前实际播放的动画名"（判断 d_ 前缀朝向）。
+        var spineScript = GD.Load<GDScript>("res://scripts/utils/SpineWrapper.gd");
+        if (spineScript != null)
+        {
+            _spineHelper = (Node)spineScript.New();
+            AddChild(_spineHelper);
+        }
+
         SetProcess(false);
     }
 
     public void Activate()
     {
-        if (_enemy == null || _enemy.IsDeadOrDying) return;
+        if (_enemy == null || _enemy.IsDeadOrDying || _enemy is EnemyF1RogueAITurret { IsAIShutdown: true }) return;
         if (IsEmpowered)
         {
             if (RefreshOnReapply) RemainingSeconds = Mathf.Max(Duration, 0.1f);
@@ -146,10 +160,38 @@ public partial class EnemyEmpowerController : Node
     {
         if (_enemy == null || _visual == null || !IsInstanceValid(_visual)) return;
         var anchor = EffectAnchorPath.IsEmpty ? null : _enemy.GetNodeOrNull<Node2D>(EffectAnchorPath);
-        _visual.GlobalPosition = (anchor ?? _enemy).GlobalPosition + EffectOffset;
+
+        // 约定：特效素材默认**朝左**；敌人 base（非 d_）动画朝右，d_ 动画朝左。
+        // 所以敌人朝右时才是需要镜像的一侧——锚点（非骨架的一部分）、偏移与缩放一起镜像。
+        bool faceRight = ResolveFaceRight();
+        Vector2 offset = EffectOffset;
+        if (faceRight) offset.X = -offset.X;
+
+        Vector2 anchorPosition = _enemy.GlobalPosition;
+        if (anchor != null)
+        {
+            Vector2 rel = anchor.GlobalPosition - _enemy.GlobalPosition;
+            if (faceRight) rel.X = -rel.X;
+            anchorPosition = _enemy.GlobalPosition + rel;
+        }
+
+        _visual.GlobalPosition = anchorPosition + offset;
         _visual.GlobalRotation = 0;
-        _visual.GlobalScale = EffectScale;
+        _visual.GlobalScale = new Vector2(Mathf.Abs(EffectScale.X) * (faceRight ? -1f : 1f), EffectScale.Y);
         _visual.ZIndex = Mathf.Clamp(_enemy.ZIndex + EffectZOffset, -4096, 4096);
+    }
+
+    /// <summary>按 Spine 当前实际播放的动画名判断朝向：`d_` 前缀 = 朝左。
+    /// 读不到 Spine 状态（无骨架/尚未播放）时回退到敌人的 FacingRight。</summary>
+    private bool ResolveFaceRight()
+    {
+        if (_spineHelper != null && _enemy != null)
+        {
+            string animName = _spineHelper.Call("get_current_animation_name", _enemy).AsString();
+            if (!string.IsNullOrEmpty(animName))
+                return !animName.StartsWith("d_", StringComparison.Ordinal);
+        }
+        return _enemy?.FacingRight ?? true;
     }
 
     public override void _ExitTree() => Clear();

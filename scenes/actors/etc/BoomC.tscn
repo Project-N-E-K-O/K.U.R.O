@@ -1,4 +1,4 @@
-[gd_scene load_steps=28 format=3 uid="uid://dilq7kawig2v"]
+[gd_scene load_steps=29 format=3 uid="uid://dilq7kawig2v"]
 
 [ext_resource type="Texture2D" uid="uid://bg2s5x5d7xf3p" path="res://assets/effect/AttackEffect/boom_b/boom_b0001.png" id="1_53pmk"]
 [ext_resource type="Texture2D" uid="uid://5bxnffs14fs5" path="res://assets/effect/AttackEffect/boom_b/boom_b0002.png" id="2_rsncq"]
@@ -22,6 +22,7 @@
 [ext_resource type="Texture2D" uid="uid://dsl8gqxvftd13" path="res://assets/effect/AttackEffect/boom_b/boom_b0020.png" id="20_uxm80"]
 [ext_resource type="Script" uid="uid://5tqak7y4n1s0" path="res://scripts/effects/EffectAutoDestroy.cs" id="21_uo0qt"]
 [ext_resource type="PackedScene" uid="uid://dv6nbmv1yc02i" path="res://scenes/actors/etc/BoomTraces.tscn" id="22_rsncq"]
+[ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/GroundObjectController.cs" id="23_ke6yj"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_rnm45"]
 animations = [{
@@ -393,3 +394,7 @@ autoplay = "default"
 position = Vector2(0, -100)
 sprite_frames = SubResource("SpriteFrames_0oo64")
 autoplay = "default"
+
+[node name="GroundObjectController" type="Node" parent="."]
+script = ExtResource("23_ke6yj")
+FallEnabled = false

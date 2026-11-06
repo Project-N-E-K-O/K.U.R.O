@@ -73,6 +73,7 @@ Description = "手持该武器攻击敌人后，有20%概率生成面包碎块�
 Effects = Array[ExtResource("1_8bkkx")]([SubResource("Resource_axkj6")])
 DashEffects = Array[ExtResource("1_8bkkx")]([SubResource("Resource_dmijq"), SubResource("Resource_itwdm")])
 DashAttackFxEntries = Array[ExtResource("1_itwdm")]([SubResource("Resource_05c8l"), SubResource("Resource_6i2y8"), SubResource("Resource_j3myv")])
+DashAttackFallImmunities = 3
 WarmupDuration = 0.3
 ActiveDuration = 0.2
 RecoveryDuration = 0.17

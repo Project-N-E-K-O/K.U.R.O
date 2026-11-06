@@ -13,7 +13,7 @@ script = ExtResource("5_y35ol")
 EffectScene = ExtResource("6_p0ecy")
 SpawnType = 2
 TargetNodePath = NodePath("../World/F_a1/SlideRailSpawnPoint")
-SpawnDelay = 3.0
+SpawnDelay = 3.5
 SpawnTag = "SlideRailWheelLeft"
 PropertyOverrides = Dictionary[String, Variant]({
 "CarriageGroupToAdd": "rogueai_part2_part",
@@ -28,7 +28,7 @@ script = ExtResource("5_y35ol")
 EffectScene = ExtResource("11_y1wgi")
 SpawnType = 2
 TargetNodePath = NodePath("../World/F_a1/JarSpawnPoint")
-SpawnDelay = 3.0
+SpawnDelay = 3.5
 SpawnTag = "JarLeft"
 GroupToAdd = "rogueai_part2"
 metadata/_custom_type_script = "uid://dhch281hkryms"

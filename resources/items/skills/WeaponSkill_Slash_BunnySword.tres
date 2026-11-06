@@ -63,6 +63,7 @@ ShowHitboxDebug = false
 Description = "攻击时召唤浮游炮，冷却10秒，浮游炮每秒对目标的敌人发射激光造成伤害，持续5秒。每次攻击消耗电量，电量不足无法攻击"
 Effects = Array[ExtResource("1_2po5m")]([SubResource("Resource_2po5m"), SubResource("Resource_battery")])
 DashAttackFxEntries = Array[ExtResource("1_sh13i")]([SubResource("Resource_ushmn"), SubResource("Resource_sb5cf"), SubResource("Resource_14em4")])
+DashAttackFallImmunities = 3
 WarmupDuration = 0.2
 ActiveDuration = 0.47
 RecoveryDuration = 0.16

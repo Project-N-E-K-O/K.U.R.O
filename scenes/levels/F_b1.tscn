@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=3 uid="uid://b4c4bopss6lxo"]
+[gd_scene load_steps=26 format=3 uid="uid://b4c4bopss6lxo"]
 
 [ext_resource type="Script" uid="uid://cra7y7mt0x1j8" path="res://scripts/managers/CameraZoneArea.cs" id="1_6wtu5"]
 [ext_resource type="Script" uid="uid://cbui22isww64v" path="res://scripts/systems/cutscene/CutsceneTrigger.cs" id="2_vwccj"]
@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://bqtr5w7g5wpmq" path="res://scenes/environments/PipeLeft.tscn" id="7_6wtu5"]
 [ext_resource type="Texture2D" uid="uid://vvb74vgvevxu" path="res://assets/environments/scene_6_hotel/地板厚度.png" id="7_vqtu6"]
 [ext_resource type="Texture2D" uid="uid://dbn8b1atk6ngd" path="res://assets/environments/scene_6_hotel/背景墙.png" id="8_6k5yh"]
+[ext_resource type="PackedScene" uid="uid://da4f3288xy4h5" path="res://scenes/environments/Pipe180.tscn" id="8_rw3xf"]
 [ext_resource type="PackedScene" uid="uid://dt851ky7kfg2m" path="res://scenes/environments/PipeRight.tscn" id="8_vwccj"]
 [ext_resource type="PackedScene" uid="uid://dw1xkbpfrwstb" path="res://scenes/environments/lifting_platform.tscn" id="9_ej6he"]
 [ext_resource type="Texture2D" uid="uid://kohvycrlmg3h" path="res://assets/environments/scene_6_hotel/地板前面遮挡升降机.png" id="10_t4ekr"]
@@ -98,7 +99,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.099999994),
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
-"values": [3, 1]
+"values": [3, 0]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_u3tfy"]
@@ -116,14 +117,8 @@ position = Vector2(200, -1200)
 [node name="PlayerSpawnPoint" type="Node2D" parent="."]
 position = Vector2(0, 1060)
 
-[node name="SlideRailSpawnPoint" type="Node2D" parent="."]
-position = Vector2(-1605, 440)
-
-[node name="SlideRailSpawnPoint2" type="Node2D" parent="."]
-position = Vector2(4095, 440)
-
-[node name="SlideRailSpawnPoint3" type="Node2D" parent="."]
-position = Vector2(1245, 100)
+[node name="JarSpawnPoint" type="Node2D" parent="."]
+position = Vector2(0, 1900)
 
 [node name="AreaSize" type="Area2D" parent="."]
 visible = false
@@ -141,8 +136,8 @@ collision_mask = 4
 script = ExtResource("1_6wtu5")
 ZoneName = "Room_Zone_F_b1"
 CameraLimitTop = -2250
-CameraLimitBottom = 2100
-ZoomLevel = 0.3
+CameraLimitBottom = 2300
+ZoomLevel = 0.35000000000000003
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CameraZone"]
 z_index = 10
@@ -185,6 +180,12 @@ position = Vector2(81, -107)
 texture = ExtResource("7_vqtu6")
 
 [node name="PipeLeft" parent="Environments" instance=ExtResource("7_6wtu5")]
+
+[node name="Pipe180" parent="Environments" instance=ExtResource("8_rw3xf")]
+z_index = 1
+position = Vector2(0, -2500)
+rotation = 1.5707964
+SpawnTag = "JarMiddle"
 
 [node name="PipeRight" parent="Environments" instance=ExtResource("8_vwccj")]
 

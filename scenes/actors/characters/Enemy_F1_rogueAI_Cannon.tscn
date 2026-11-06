@@ -1,4 +1,4 @@
-[gd_scene load_steps=48 format=3 uid="uid://duryvwia2gyyc"]
+[gd_scene load_steps=50 format=3 uid="uid://duryvwia2gyyc"]
 
 [ext_resource type="Script" uid="uid://ccqcbk4merfnt" path="res://scripts/actors/enemies/EnemyF1RogueAICannon.cs" id="1_3cfw7"]
 [ext_resource type="Resource" uid="uid://05yoqk7rf6ax" path="res://resources/behavior/EnemyBehaviorConfig.tres" id="2_3eyky"]
@@ -34,6 +34,9 @@
 [ext_resource type="PackedScene" uid="uid://bwdwpiu2brmv6" path="res://scenes/environments/jar_mozhua_assist.tscn" id="36_jars"]
 [ext_resource type="Script" uid="uid://baq6luqv2ijwk" path="res://scripts/actors/enemies/EnemyEmpowerController.cs" id="37_empower"]
 [ext_resource type="Script" uid="uid://ul0132m6aehw" path="res://scripts/actors/enemies/attacks/EnemyF1RogueAITurretSimpleMeleeAttack.cs" id="38_turretsimple"]
+[ext_resource type="Script" uid="uid://bp7k64w3rc75b" path="res://scripts/controllers/ShadowGroundController.cs" id="shadow_ground"]
+
+[ext_resource type="Script" path="res://scripts/core/effects/StateEffectEntry.cs" id="99_state_fx"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_shadow"]
 shader = ExtResource("4_by072")
@@ -41,10 +44,10 @@ shader_parameter/softness = 0.5
 shader_parameter/alpha = 0.4
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_controller_detect"]
-radius = 20000.0
+radius = 6000.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_attack_detect"]
-radius = 10000.0
+radius = 6000.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_attack"]
 size = Vector2(6000, 2000)
@@ -123,13 +126,11 @@ BlockedByFxGroup = "Jar_mozhua_assist"
 metadata/_custom_type_script = "uid://fd5076f50ca0"
 
 [sub_resource type="Resource" id="Resource_boom_dying"]
-script = ExtResource("15_koqry")
+script = ExtResource("99_state_fx")
 Scene = ExtResource("22_r52tf")
 EffectOffset = Vector2(nan, nan)
-SpawnTiming = 2
 SpawnMarkerPaths = [NodePath("../../SpineSprite/SpineBoneNode3/Marker2D"), NodePath("../../SpineSprite/SpineBoneNode3/Marker2D2"), NodePath("../../SpineSprite/SpineBoneNode/Marker2D"), NodePath("../../SpineSprite/SpineBoneNode/Marker2D2")]
 OffsetFlip = 2
-metadata/_custom_type_script = "uid://fd5076f50ca0"
 
 [node name="Enemy_F1_rogueAI_Cannon" type="CharacterBody2D" node_paths=PackedStringArray("DetectionArea", "AttackArea", "StateMachine", "EffectController")]
 z_index = 4
@@ -140,7 +141,6 @@ collision_mask = 15
 motion_mode = 1
 script = ExtResource("1_3cfw7")
 BehaviorConfig = ExtResource("2_3eyky")
-EnableStateDebugOverlay = true
 DebugOverlayOffset = Vector2(-1500, 200)
 DebugOverlayFontSize = 128
 DetectionArea = NodePath("Sprite2D/ControllerDetectionArea")
@@ -150,7 +150,7 @@ Speed = 400.0
 AttackDamage = 10.0
 AttackCooldown = 1.0
 MaxHealth = 500
-AiDescription = "固定在机械桩（滑槽）上的炮台：不移动，按玩家位置用 turn/d_turn 转身，蓄力(preheat)→开火(attack)→收招(recover)；攻击期间会沿桩退开以保持距离"
+AiDescription = "错乱AI的的炮台：普通敌人，错乱AI的测试用攻击道具一号，悬挂在房顶上沿轨道滑行，朝实验对象喷射神秘绿色液体，通过随机生成的绿色液体容器强化自身 ，需要优先打断"
 LockFacing = true
 StateMachine = NodePath("StateMachine")
 EffectController = NodePath("EffectController")
@@ -158,14 +158,17 @@ DamageFlashColor = Color(18.892157, 18.892157, 18.892157, 1)
 
 [node name="Shadow" type="Sprite2D" parent="."]
 show_behind_parent = true
+z_index = -1
 material = SubResource("ShaderMaterial_shadow")
 scale = Vector2(12, 6)
 texture = ExtResource("5_r52tf")
 script = ExtResource("6_hyfyo")
 TargetBone = NodePath("../SpineSprite/SpineBoneNode")
 
+[node name="ShadowGroundController" type="Node" parent="Shadow"]
+script = ExtResource("shadow_ground")
+
 [node name="OutlineLayer" type="Node2D" parent="."]
-visible = false
 show_behind_parent = true
 position = Vector2(0, -500)
 
@@ -219,7 +222,7 @@ skeleton_data_res = ExtResource("7_3cfw7")
 preview_skin = "Default"
 preview_animation = "-- Empty --"
 preview_frame = true
-preview_time = 0.75
+preview_time = 1.27
 script = ExtResource("8_6o35y")
 
 [node name="SpineBoneNode" type="SpineBoneNode" parent="SpineSprite"]
@@ -432,6 +435,7 @@ RecoveryDuration = 0.3
 CooldownDurationMultiplier = 30.0
 DamageMultiplier = 0.0
 MaxAllowedAngleToPlayer = 180.0
+TriggerAreaPath = NodePath("../../../../Sprite2D/AttackDetectionArea")
 Effects = Array[ExtResource("15_koqry")]([SubResource("Resource_jar_assist")])
 metadata/attack_weight = 20.0
 
@@ -454,7 +458,7 @@ Duration = 5.0
 [node name="Dying" type="Node" parent="StateMachine"]
 script = ExtResource("21_dym3s")
 DeathDuration = 0.0
-Effects = Array[ExtResource("15_koqry")]([SubResource("Resource_boom_dying")])
+Effects = Array[ExtResource("99_state_fx")]([SubResource("Resource_boom_dying")])
 
 [node name="Dead" type="Node" parent="StateMachine"]
 script = ExtResource("22_vw8f5")

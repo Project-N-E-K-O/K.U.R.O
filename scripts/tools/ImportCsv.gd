@@ -41,7 +41,7 @@ func import_skills_from_csv() -> void:
 		var path = "%s%s.tres" % [SKILLS_DIR, fname]
 		var res = _load(path)
 		if res == null: continue
-		# 顺序与 ExportCsv skills 列一致（对齐 WeaponSkillDefinition.cs 字段声明顺序）
+		# 按列名映射，缺失列/空值跳过；新增字段与 ExportCsv 的技能列同步。
 		_s_str(res, "SkillId",          row, hm, "SkillId")
 		_s_str(res, "DisplayName",      row, hm, "DisplayName")
 		_s_int(res, "SkillType",        row, hm, "SkillType")
@@ -70,6 +70,8 @@ func import_skills_from_csv() -> void:
 		_s_float_neg1(res, "DashAttackFixedSpeed",       row, hm)
 		_s_float_neg1(res, "DashAttackSpeedMultiplier",  row, hm)
 		_s_int(res,   "DashAttackDecayWindow",       row, hm, "DashAttackDecayWindow")
+		_s_int(res,   "AttackFallImmunities", row, hm, "AttackFallImmunities")
+		_s_int(res,   "DashAttackFallImmunities", row, hm, "DashAttackFallImmunities")
 		if _save(res, path): count += 1
 	_log.info("  → 更新 %d 个" % count)
 

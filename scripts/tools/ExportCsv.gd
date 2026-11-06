@@ -119,7 +119,7 @@ func _export_skills() -> void:
 		push_warning("[ExportCsv] No .tres found in " + SKILLS_DIR)
 		return
 
-	# 列顺序与 WeaponSkillDefinition.cs 字段声明顺序一致（跳过注释 Note 与效果数组字段）
+	# 保留现有列顺序；新增字段追加到末尾，跳过注释 Note 与效果数组字段。
 	var headers := [
 		"file", "SkillId", "DisplayName", "SkillType", "AnimationName",
 		"DamageMultiplier", "DashDamageMultiplier", "CooldownSeconds", "ShowHitboxDebug",
@@ -129,7 +129,8 @@ func _export_skills() -> void:
 		"DashAnimationName",
 		"DashWarmupDuration", "DashActiveDuration", "DashRecoveryDuration",
 		"DashWarmupAnimationSpeed", "DashActiveAnimationSpeed", "DashRecoveryAnimationSpeed",
-		"DashAttackSpeedSource", "DashAttackFixedSpeed", "DashAttackSpeedMultiplier", "DashAttackDecayWindow"
+		"DashAttackSpeedSource", "DashAttackFixedSpeed", "DashAttackSpeedMultiplier", "DashAttackDecayWindow",
+		"AttackFallImmunities", "DashAttackFallImmunities"
 	]
 	var rows: Array = [headers]
 
@@ -168,7 +169,9 @@ func _export_skills() -> void:
 			str(r.get("DashAttackSpeedSource", "-1")),
 			str(r.get("DashAttackFixedSpeed", "-1")),
 			str(r.get("DashAttackSpeedMultiplier", "-1")),
-			str(r.get("DashAttackDecayWindow", "-1"))
+			str(r.get("DashAttackDecayWindow", "-1")),
+			str(r.get("AttackFallImmunities", "0")),
+			str(r.get("DashAttackFallImmunities", "0"))
 		])
 
 	_write_csv(OUT_SKILLS, rows)

@@ -10,6 +10,7 @@ namespace Kuros.Actors.Enemies.Attacks
 	/// </summary>
 	public partial class EnemyPinballAttack : EnemyAttackTemplate
 	{
+        protected override bool RequiresAttackArea => true;
 		// 区域由基类统一提供：TriggerAreaPath（起手检测区，供选招钩子用；未配置 = 不限制）、
 		// AttackAreaPath（弹球接触判定带）。旧的 DetectionAreaPath / PinballAreaPath 已并入基类。
 		// 本招伤害按接触逐个结算（不按区域），所以不涉及 DamageArea。
@@ -40,7 +41,7 @@ namespace Kuros.Actors.Enemies.Attacks
 		}
 
 		/// <summary>选招用的检测：玩家在 TriggerAreaPath 指定的区内（未配置 = 不限制）。</summary>
-		public override bool IsPlayerInDetectionRange() => IsPlayerInTriggerArea();
+		protected override bool IsPlayerInDetectionRangeCore() => IsPlayerInTriggerArea();
 
 		protected override void OnAttackStarted()
 		{
@@ -278,19 +279,24 @@ namespace Kuros.Actors.Enemies.Attacks
 		}
 
 		// 连接接触判定带（基类 AttackAreaPath 解析结果）的 BodyEntered/AreaEntered 信号
+		private bool _attackAreaSignalsConnected;
 		private void ConnectAttackAreaSignals()
 		{
-			if (AttackArea == null) return;
+			if (_attackAreaSignalsConnected || AttackArea == null || !IsInstanceValid(AttackArea)) return;
 			AttackArea.BodyEntered += OnAttackAreaBodyEntered;
 			AttackArea.AreaEntered += OnAttackAreaAreaEntered;
+			_attackAreaSignalsConnected = true;
 		}
 
 		// 断开 PinballArea 的 BodyEntered/AreaEntered 信号
 		private void DisconnectAttackAreaSignals()
 		{
-			if (AttackArea == null) return;
-			AttackArea.BodyEntered -= OnAttackAreaBodyEntered;
-			AttackArea.AreaEntered -= OnAttackAreaAreaEntered;
+			if (_attackAreaSignalsConnected && IsInstanceValid(AttackArea))
+			{
+				AttackArea!.BodyEntered -= OnAttackAreaBodyEntered;
+				AttackArea.AreaEntered -= OnAttackAreaAreaEntered;
+			}
+			_attackAreaSignalsConnected = false;
 		}
 
 		// 节点退出时清理信号连接与事件订阅

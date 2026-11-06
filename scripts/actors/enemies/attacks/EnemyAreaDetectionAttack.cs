@@ -14,6 +14,6 @@ namespace Kuros.Actors.Enemies.Attacks
         /// 覆写检测逻辑：用 TriggerArea 是否与玩家重叠替代默认的距离判定。
         /// 未配置 TriggerAreaPath 时返回 true（不限制触发范围）。
         /// </summary>
-        public override bool IsPlayerInDetectionRange() => IsPlayerInTriggerArea();
+        protected override bool IsPlayerInDetectionRangeCore() => IsPlayerInTriggerArea();
     }
 }

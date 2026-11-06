@@ -1,10 +1,11 @@
-[gd_scene load_steps=8 format=3 uid="uid://bpr5kqjkwkh5w"]
+[gd_scene load_steps=9 format=3 uid="uid://bpr5kqjkwkh5w"]
 
 [ext_resource type="Script" uid="uid://bh8spu8pbecfg" path="res://scripts/effects/BoomerangAttackEffect.cs" id="1_qrffi"]
 [ext_resource type="Script" uid="uid://cdtsfiymrq0nx" path="res://scripts/core/effects/AfterimageController.gd" id="2_6aiag"]
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="2_tuh6y"]
 [ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="3_mqbjc"]
 [ext_resource type="Texture2D" uid="uid://5pju5slfrs77" path="res://assets/weapons/回旋镖.png" id="3_yeyl0"]
+[ext_resource type="Script" uid="uid://bp7k64w3rc75b" path="res://scripts/controllers/ShadowGroundController.cs" id="6_mqbjc"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_3jbe6"]
 shader = ExtResource("2_tuh6y")
@@ -55,6 +56,9 @@ lifetime = 0.1
 material = SubResource("ShaderMaterial_3jbe6")
 scale = Vector2(6, 3)
 texture = ExtResource("3_mqbjc")
+
+[node name="ShadowGroundController" type="Node" parent="AttackArea/Shadow"]
+script = ExtResource("6_mqbjc")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AttackArea"]
 shape = SubResource("RectangleShape2D_yeyl0")

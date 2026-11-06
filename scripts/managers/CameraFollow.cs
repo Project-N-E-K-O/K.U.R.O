@@ -118,6 +118,7 @@ namespace Kuros.Managers
 
         public override void _ExitTree()
         {
+            EndFocus();
             UnsubscribeDamageTaken();
             GameActor.AnyDamageTaken -= OnAnyDamageTaken;
             base._ExitTree();
@@ -125,6 +126,13 @@ namespace Kuros.Managers
 
         public override void _Process(double delta)
         {
+            // 即使跟随被临时关闭或目标已销毁，也要结束聚焦并恢复缩放。
+            if (_focusTarget != null)
+            {
+                _focusRemaining -= (float)delta / Mathf.Max((float)Engine.TimeScale, 0.05f);
+                if (!IsInstanceValid(_focusTarget) || _focusRemaining <= 0f)
+                    EndFocus();
+            }
             if (!FollowEnabled || Target == null || _viewport == null)
                 return;
 
@@ -132,17 +140,6 @@ namespace Kuros.Managers
             UpdateViewportSizeIfNeeded();
 
             bool focusing = _focusTarget != null && IsInstanceValid(_focusTarget);
-            if (focusing && _focusRemaining > 0f)
-            {
-                // 聚焦期间按真实时间倒计时（时间减缓下不拖长聚焦窗口）
-                _focusRemaining -= (float)delta / Mathf.Max((float)Engine.TimeScale, 0.05f);
-            }
-            else if (focusing)
-            {
-                // 到期：瞬时恢复 zoom + 立即切回玩家
-                EndFocus();
-                focusing = false;
-            }
 
             // 计算目标位置（聚焦敌人 / 玩家 + 偏移量）
             Vector2 targetPosition = (focusing ? _focusTarget!.GlobalPosition : Target.GlobalPosition) + Offset;
@@ -456,12 +453,20 @@ namespace Kuros.Managers
 
             if (focusZoom > 0f)
             {
-                _preFocusZoom = Zoom;
+                // 连续聚焦共用最初的恢复值，不能把上一次聚焦中的 Zoom 当作原值。
+                if (!_focusZoomActive) _preFocusZoom = Zoom;
                 _focusZoomActive = true;
                 _focusZoomTween?.Kill();
                 _focusZoomTween = CreateTween();
                 _focusZoomTween.SetIgnoreTimeScale(true);   // 拉近按真实时间（减缓期间快速就位）
                 _focusZoomTween.TweenProperty(this, "zoom", new Vector2(focusZoom, focusZoom), FocusZoomDuration);
+            }
+            else if (_focusZoomActive)
+            {
+                _focusZoomTween?.Kill();
+                _focusZoomTween = null;
+                Zoom = _preFocusZoom;
+                _focusZoomActive = false;
             }
         }
 

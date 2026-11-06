@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=3 uid="uid://cmxuejgw41osm"]
+[gd_scene load_steps=25 format=3 uid="uid://cmxuejgw41osm"]
 
 [ext_resource type="Texture2D" uid="uid://bg2s5x5d7xf3p" path="res://assets/effect/AttackEffect/boom_b/boom_b0001.png" id="1_wt30w"]
 [ext_resource type="Texture2D" uid="uid://5bxnffs14fs5" path="res://assets/effect/AttackEffect/boom_b/boom_b0002.png" id="2_4jlpf"]
@@ -22,6 +22,7 @@
 [ext_resource type="Texture2D" uid="uid://dsl8gqxvftd13" path="res://assets/effect/AttackEffect/boom_b/boom_b0020.png" id="20_cyxpg"]
 [ext_resource type="Script" uid="uid://5tqak7y4n1s0" path="res://scripts/effects/EffectAutoDestroy.cs" id="21_4jlpf"]
 [ext_resource type="PackedScene" uid="uid://dv6nbmv1yc02i" path="res://scenes/actors/etc/BoomTraces.tscn" id="22_tme0f"]
+[ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/GroundObjectController.cs" id="23_3givm"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_rnm45"]
 animations = [{
@@ -101,3 +102,7 @@ script = ExtResource("21_4jlpf")
 SpawnOnDestroyScenes = [ExtResource("22_tme0f")]
 ScaleSpawnWithSelf = true
 SpawnDelay = 0.2
+
+[node name="GroundObjectController" type="Node" parent="."]
+script = ExtResource("23_3givm")
+FallEnabled = false

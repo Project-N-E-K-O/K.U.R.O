@@ -1,11 +1,14 @@
-[gd_scene load_steps=13 format=3 uid="uid://d0x0oxhsokka0"]
+[gd_scene load_steps=16 format=3 uid="uid://d0x0oxhsokka0"]
 
 [ext_resource type="Script" uid="uid://dtgdjgrqgype7" path="res://scripts/items/world/WorldItemEntity.cs" id="1_q4fla"]
-[ext_resource type="Resource" uid="uid://cxxnxtyv1yqw6" path="res://resources/items/Weapon_Stab_Corkscrew.tres" id="2_gccxh"]
+[ext_resource type="Resource" uid="uid://b7ehmydlvlir3" path="res://resources/items/Weapon_Stab_Corkscrew.tres" id="2_gccxh"]
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="3_ckqsu"]
-[ext_resource type="Shader" uid="uid://8m1dqcvm2y7u" path="res://shaders/materials/sprite_outline.gdshader" id="4_alhvj"]
+[ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="4_alhvj"]
 [ext_resource type="Texture2D" uid="uid://c5sebjgcu2ugl" path="res://assets/weapons/开瓶器.png" id="5_gccxh"]
-[ext_resource type="Shader" uid="uid://cxc1fus7qqfu6" path="res://shaders/materials/sparkling.gdshader" id="5_k0yrj"]
+[ext_resource type="Shader" uid="uid://caxdo713k5kug" path="res://shaders/materials/sparkling.gdshader" id="5_k0yrj"]
+[ext_resource type="Script" path="res://scripts/environments/GroundObjectController.cs" id="ground_object_ctrl"]
+[ext_resource type="PackedScene" uid="uid://dby51i7slqvd5" path="res://scenes/objects/Animation_item.tscn" id="fall_anim_item"]
+[ext_resource type="Script" uid="uid://bp7k64w3rc75b" path="res://scripts/controllers/ShadowGroundController.cs" id="shadow_ground_ctrl"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_g0q5t"]
 shader = ExtResource("3_ckqsu")
@@ -17,7 +20,7 @@ load_path = "res://.godot/imported/影子.png-ff14a7a2861f691fc06fc4544603034d.c
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ywkyd"]
 shader = ExtResource("4_alhvj")
-shader_parameter/outline_color = Color(0.02, 0.02, 0.02, 1)
+shader_parameter/outline_color = Color(0.019607844, 0.019607844, 0.019607844, 0)
 shader_parameter/outline_size = 32.0
 shader_parameter/alpha_threshold = 0.5
 shader_parameter/edge_softness = 0.12
@@ -29,6 +32,8 @@ shader_parameter/highlight_width = 0.08
 shader_parameter/highlight_speed = 2.0
 shader_parameter/highlight_intensity = 1.2
 shader_parameter/highlight_interval = 1.00000002375
+shader_parameter/brightness = 1.0
+shader_parameter/alpha_factor = 1.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_g0q5t"]
 size = Vector2(210, 150)
@@ -73,3 +78,11 @@ visible = false
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AttackArea"]
 rotation = 1.5707964
 shape = SubResource("CapsuleShape2D_gccxh")
+
+[node name="GroundObjectController" type="Node" parent="."]
+script = ExtResource("ground_object_ctrl")
+FallEffectScene = ExtResource("fall_anim_item")
+FallAnimationName = "fall_corkscrew"
+
+[node name="ShadowGroundController" type="Node" parent="Shadow"]
+script = ExtResource("shadow_ground_ctrl")

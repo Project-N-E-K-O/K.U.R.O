@@ -64,6 +64,7 @@ Description = "攻击到敌人时使该敌人移动速度减少50%，持续1秒�
 Effects = Array[ExtResource("1_joilt")]([SubResource("Resource_nfyj5")])
 DashEffects = Array[ExtResource("1_joilt")]([SubResource("Resource_w1ai1"), SubResource("Resource_u4dse")])
 DashAttackFxEntries = Array[ExtResource("1_hrrjb")]([SubResource("Resource_gprf2"), SubResource("Resource_bp688")])
+DashAttackFallImmunities = 3
 WarmupDuration = 0.53
 ActiveDuration = 0.31
 RecoveryDuration = 0.16

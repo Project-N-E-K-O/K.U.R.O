@@ -1,0 +1,74 @@
+[gd_resource type="Resource" script_class="EnemyFallVisualCatalog" load_steps=25 format=3 uid="uid://db0yx7vj0e0g7"]
+
+[ext_resource type="Script" uid="uid://xhx43pieb4ld" path="res://scripts/fx/EnemyFallVisualProfile.cs" id="1_profile"]
+[ext_resource type="Script" uid="uid://cqmg45e2wbn0d" path="res://scripts/fx/EnemyFallVisualCatalog.cs" id="2_catalog"]
+[ext_resource type="SpineSkeletonDataResource" uid="uid://bkpmrpkt4puta" path="res://animations/spine/Enemy_Normal_guard1.tres" id="3_guard1"]
+[ext_resource type="SpineSkeletonDataResource" uid="uid://j3gshglhdold" path="res://animations/spine/Enemy_Normal_guard2.tres" id="4_guard2"]
+[ext_resource type="SpineSkeletonDataResource" uid="uid://c0t06u0ancnf8" path="res://animations/spine/Enemy_Normal_guard3.tres" id="5_guard3"]
+[ext_resource type="SpineSkeletonDataResource" uid="uid://6ova7gkdw4gf" path="res://animations/spine/Enemy_Normal_guard4.tres" id="6_guard4"]
+[ext_resource type="SpineSkeletonDataResource" uid="uid://w3jy3fx7ytb1" path="res://animations/spine/Enemy_Normal_guard5.tres" id="7_guard5"]
+[ext_resource type="SpineSkeletonDataResource" uid="uid://b4v5ybpg1m84k" path="res://animations/spine/Enemy_B1_fat01.tres" id="8_fat"]
+[ext_resource type="SpineSkeletonDataResource" uid="uid://dekq4qj6eyk0j" path="res://animations/spine/Enemy_B2_fat02.tres" id="9_fat02"]
+[ext_resource type="SpineSkeletonDataResource" uid="uid://d2mipn3j22njv" path="res://animations/spine/Enemy_C1_waiterA.tres" id="10_waiterA"]
+[ext_resource type="SpineSkeletonDataResource" uid="uid://2l1ucaortb0b" path="res://animations/spine/Enemy_C2_waiterA02.tres" id="11_waiterA02"]
+[ext_resource type="SpineSkeletonDataResource" uid="uid://bt6sfk2an8qv7" path="res://animations/spine/Enemy_D1_CorpDoneA.tres" id="12_corpDoneA"]
+[ext_resource type="SpineSkeletonDataResource" uid="uid://dcg4m1wi6q31o" path="res://animations/spine/Enemy_D1_CorpDoneB.tres" id="13_corpDoneB"]
+
+[sub_resource type="Resource" id="Resource_guard1"]
+script = ExtResource("1_profile")
+Key = "fall_guard1"
+SkeletonDataResource = ExtResource("3_guard1")
+
+[sub_resource type="Resource" id="Resource_guard2"]
+script = ExtResource("1_profile")
+Key = "fall_guard2"
+SkeletonDataResource = ExtResource("4_guard2")
+
+[sub_resource type="Resource" id="Resource_guard3"]
+script = ExtResource("1_profile")
+Key = "fall_guard3"
+SkeletonDataResource = ExtResource("5_guard3")
+
+[sub_resource type="Resource" id="Resource_guard4"]
+script = ExtResource("1_profile")
+Key = "fall_guard4"
+SkeletonDataResource = ExtResource("6_guard4")
+
+[sub_resource type="Resource" id="Resource_guard5"]
+script = ExtResource("1_profile")
+Key = "fall_guard5"
+SkeletonDataResource = ExtResource("7_guard5")
+
+[sub_resource type="Resource" id="Resource_fat"]
+script = ExtResource("1_profile")
+Key = "fall_fat"
+SkeletonDataResource = ExtResource("8_fat")
+
+[sub_resource type="Resource" id="Resource_fat02"]
+script = ExtResource("1_profile")
+Key = "fall_fat02"
+SkeletonDataResource = ExtResource("9_fat02")
+
+[sub_resource type="Resource" id="Resource_waiterA"]
+script = ExtResource("1_profile")
+Key = "fall_waiterA"
+SkeletonDataResource = ExtResource("10_waiterA")
+
+[sub_resource type="Resource" id="Resource_waiterA02"]
+script = ExtResource("1_profile")
+Key = "fall_waiterA02"
+SkeletonDataResource = ExtResource("11_waiterA02")
+
+[sub_resource type="Resource" id="Resource_corpDoneA"]
+script = ExtResource("1_profile")
+Key = "fall_corpDoneA"
+SkeletonDataResource = ExtResource("12_corpDoneA")
+
+[sub_resource type="Resource" id="Resource_corpDoneB"]
+script = ExtResource("1_profile")
+Key = "fall_corpDoneB"
+SkeletonDataResource = ExtResource("13_corpDoneB")
+
+[resource]
+script = ExtResource("2_catalog")
+Profiles = Array[ExtResource("1_profile")]([SubResource("Resource_guard1"), SubResource("Resource_guard2"), SubResource("Resource_guard3"), SubResource("Resource_guard4"), SubResource("Resource_guard5"), SubResource("Resource_fat"), SubResource("Resource_fat02"), SubResource("Resource_waiterA"), SubResource("Resource_waiterA02"), SubResource("Resource_corpDoneA"), SubResource("Resource_corpDoneB")])

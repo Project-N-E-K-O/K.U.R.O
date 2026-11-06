@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=3 uid="uid://d2iyp7mlm7ap"]
+[gd_scene load_steps=27 format=3 uid="uid://d2iyp7mlm7ap"]
 
 [ext_resource type="Script" uid="uid://cmg8g6kgr8yqd" path="res://scripts/effects/EmojiBoomEffect.cs" id="1_s0pwd"]
 [ext_resource type="PackedScene" uid="uid://dilq7kawig2v" path="res://scenes/actors/etc/BoomC.tscn" id="2_1umhh"]
@@ -11,7 +11,9 @@
 [ext_resource type="Texture2D" uid="uid://bxl8nmokock1q" path="res://assets/objects/emoji_boom/时间轴 1_0003.png" id="7_dmffa"]
 [ext_resource type="Texture2D" uid="uid://s3uy5tc6o2g2" path="res://assets/objects/emoji_boom/时间轴 1_0017.png" id="21_g341m"]
 [ext_resource type="Texture2D" uid="uid://ceawnepcowvu2" path="res://assets/objects/emoji_boom/时间轴 1_0018.png" id="22_ehc38"]
+[ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/GroundObjectController.cs" id="23_olwmf"]
 [ext_resource type="Texture2D" uid="uid://dcejgf55qig04" path="res://assets/objects/emoji_boom/时间轴 1_0019.png" id="23_yyqj8"]
+[ext_resource type="PackedScene" uid="uid://dby51i7slqvd5" path="res://scenes/objects/Animation_item.tscn" id="24_48cow"]
 [ext_resource type="Texture2D" uid="uid://dvhwxr77r35hw" path="res://assets/objects/emoji_boom/时间轴 1_0020.png" id="24_ktgo6"]
 [ext_resource type="Texture2D" uid="uid://d306gkkompxnj" path="res://assets/objects/emoji_boom/时间轴 1_0021.png" id="25_y74yw"]
 [ext_resource type="Texture2D" uid="uid://c3rs8rf0ylgg1" path="res://assets/objects/emoji_boom/时间轴 1_0022.png" id="26_podt8"]
@@ -141,3 +143,8 @@ offset = Vector2(4, 20)
 [node name="Sprite" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_aomo2")
 autoplay = "default"
+
+[node name="GroundObjectController" type="Node" parent="."]
+script = ExtResource("23_olwmf")
+FallEffectScene = ExtResource("24_48cow")
+FallAnimationName = "fall_emoji_bomb"

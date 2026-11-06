@@ -23,15 +23,21 @@ namespace Kuros.Actors.Enemies
 	[GlobalClass]
 	public partial class EnemyF1RogueAIPart2 : EnemyF1RogueAI
 	{
-		[ExportCategory("Part Link 部件联动")]
+		[ExportCategory("Part Link")]
 		/// <summary>部件标记组：本次战斗的罐子/机械臂由生成方打入此组——滑槽机械用
 		/// <c>SlideRailMount.CarriageGroupToAdd</c>、过场直生用 <c>EffectConfig.GroupToAdd</c>、
 		/// 手工摆放用 tscn 的 groups。部件死亡即扣本体血量。</summary>
 		[Export] public string PartGroup { get; set; } = "rogueai_part2_part";
+		/// <summary>本体死亡时永久停机的炮台组；独立于部件扣血组。须与滑槽 CarriageGroupToAdd 一致，留空禁用联动。</summary>
+		[Export] public string ShutdownTurretGroup { get; set; } = "rogueai_part2_part";
 		/// <summary>每碎一件部件扣的血量（血量口径 = 场景 MaxHealth，建议配成部件总数）。</summary>
 		[Export(PropertyHint.Range, "0,100,1")] public int DamagePerPart { get; set; } = 1;
 
-		[ExportCategory("Armor 护甲")]
+		[ExportCategory("Lethal Hit")]
+		/// <summary>首次确认死亡时生成；早于致死 Hit 结束，不等待 Dying。留空不生成。</summary>
+		[Export] public EffectSpawnConfig? LethalHitEffect { get; set; }
+
+		[ExportCategory("Armor")]
 		/// <summary>down 阶段护甲（rogueAI_bumper）：场景里用导出引用指定，可随骨骼挂点重排重新绑定；
 		/// 为空 = 视为已破（down 直接可伤）并警告。</summary>
 		[Export] public RogueAIBumper? Armor { get; private set; }
@@ -39,7 +45,7 @@ namespace Kuros.Actors.Enemies
 		/// （护甲的死亡是同步的，同帧会把本体伤害门打开），也充当破甲演出的保护窗。0 = 不保护。</summary>
 		[Export(PropertyHint.Range, "0,3,0.05")] public float ArmorBreakInvincibility { get; set; } = 0.3f;
 
-		[ExportCategory("Form up/down 形态")]
+		[ExportCategory("Form up/down")]
 		/// <summary>down 形态血量阈值：血量 ≤ 本值时**先进入 DownTransition 过渡**（播 up_to_down、
 		/// 锁移动/出招、期间仍免伤），过渡结束进入 down（放行直接伤害、动画切 ldle_down）；
 		/// **0（默认）= 恒 up**（恒免伤 = 旧行为）。up 形态免疫直接伤害，但部件联动链照常生效。</summary>
@@ -80,6 +86,44 @@ namespace Kuros.Actors.Enemies
 		/// 护甲先被处理时本体会在同一击里立刻转为可伤，可能被同一个 50 伤害同时打死。
 		/// 计时器还覆盖跨帧多段攻击（激光/持续判定）的后续段。</summary>
 		private float _armorBreakInvincibilityRemaining;
+
+		protected override void Die()
+		{
+			if (IsDeadOrDying || IsDead) return;
+			base.Die();
+			SpawnLethalHitEffect();
+			if (string.IsNullOrEmpty(ShutdownTurretGroup) || !IsInsideTree()) return;
+			// 只关闭本场部件组里的炮台，罐子与其他组的敌人不受影响。
+			foreach (Node node in GetTree().GetNodesInGroup(ShutdownTurretGroup))
+				if (node is EnemyF1RogueAITurret turret && IsInstanceValid(turret)
+					&& !turret.IsQueuedForDeletion() && turret.GetWorld2D() == GetWorld2D()) turret.ShutdownAI();
+		}
+
+		private void SpawnLethalHitEffect()
+		{
+			var entry = LethalHitEffect;
+			if (entry?.Scene == null || !IsInsideTree() || GetParent() is not Node parent) return;
+			Vector2 position = GlobalPosition;
+			bool offsetFlip = entry.ResolveOffsetFlip(true);
+			var markers = entry.ResolveMarkers(this, this, System.Array.Empty<Marker2D>());
+			int index = entry.PickMarkerIndex(markers, 0);
+			if (index >= 0 && markers[index] is Marker2D marker && IsInstanceValid(marker))
+			{
+				Vector2 relative = marker.GlobalPosition - GlobalPosition;
+				if (!FacingRight && offsetFlip) relative.X = -relative.X;
+				position += relative;
+			}
+			Vector2 offset = entry.ResolveOffset(Vector2.Zero);
+			if (!FacingRight && offsetFlip) offset.X = -offset.X;
+			var effect = entry.InstantiateNode();
+			if (effect == null) return;
+			if (effect is Kuros.Fx.IFacingDirectional facing) facing.FacingRight = FacingRight;
+			if (effect is Node2D visual && entry.ResolveFlip(false) && !FacingRight)
+				visual.Scale = new Vector2(-visual.Scale.X, visual.Scale.Y);
+			// 覆盖参数在入树前应用，世界层持有，后续本体销毁不会中止演出。
+			parent.AddChild(effect);
+			if (effect is Node2D node2D) node2D.GlobalPosition = position + offset;
+		}
 
 		public override void _Ready()
 		{

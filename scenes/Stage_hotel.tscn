@@ -31,6 +31,7 @@ LevelName = "KURO酒店"
 script = ExtResource("4_camera")
 TargetCamera = NodePath("../World/Camera2D")
 Player = NodePath("../World/MainCharacter")
+DebugPrintZoom = false
 
 [node name="CutsceneManager" type="Node" parent="."]
 script = ExtResource("1_csmgr")
@@ -55,6 +56,7 @@ Difficulty = ExtResource("18_diff")
 y_sort_enabled = true
 
 [node name="MainCharacter" parent="World" instance=ExtResource("2_s0pgc")]
+AttackDamage = 100.0
 MaxHealth = 12000
 
 [node name="Camera2D" type="Camera2D" parent="World" node_paths=PackedStringArray("Target")]

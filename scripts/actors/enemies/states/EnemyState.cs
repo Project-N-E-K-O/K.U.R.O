@@ -1,5 +1,5 @@
 using Godot;
-using Kuros.Actors.Enemies.Attacks;
+using Kuros.Core.Effects;
 using Kuros.Systems.FSM;
 
 namespace Kuros.Actors.Enemies.States
@@ -34,18 +34,17 @@ namespace Kuros.Actors.Enemies.States
         /// 取模轮换）。由消费状态在合适的时点清零（如 Dying.Enter）——一次"阶段"内多次生成依次取不同锚点。</summary>
         protected int _spawnMarkerIndex;
 
-        /// <summary>按 <see cref="AttackEffectEntry"/> 生成一次性特效（状态侧专用，语义与攻击生成对齐）：
+        /// <summary>按 <see cref="EffectSpawnConfig"/> 生成一次性特效（状态侧专用，语义与攻击生成对齐）：
         /// PropertyOverrides / 锚点 <c>SpawnMarkerPaths</c>（**先按本状态节点解析、再按敌人根兜底**——与攻击模板
         /// 的"模板节点优先"同款，两种路径写法都吃；含骨骼 marker；**多锚点按顺序轮换**）/
         /// <c>EffectOffset</c> 与偏移镜像（OffsetFlip，默认随朝向翻；**骨骼自镜像锚点——如 SpineBoneAnchor——
         /// 把 OffsetFlip 设为 NoFlip，否则位置会被翻两次落回未镜像的一侧**）/ 条目翻转（FlipMode）/
         /// <see cref="Kuros.Fx.IFacingDirectional"/> 朝向注入。挂敌人父级（世界层）。</summary>
-        protected void SpawnEffectEntry(AttackEffectEntry? entry)
+        protected void SpawnEffectEntry(EffectSpawnConfig? entry)
         {
             if (entry?.Scene == null) return;
-            var effect = entry.Scene.Instantiate();
+            var effect = entry.InstantiateNode();
             if (effect == null) return;
-            entry.ApplyOverrides(effect);
 
             if (effect is not Node2D node2D)
             {
@@ -62,7 +61,8 @@ namespace Kuros.Actors.Enemies.States
             var markers = entry.ResolveMarkers(this, Enemy, System.Array.Empty<Marker2D>());
             if (markers.Length > 0)
             {
-                var marker = markers[_spawnMarkerIndex % markers.Length];
+                int index = entry.PickMarkerIndex(markers, _spawnMarkerIndex);
+                var marker = index >= 0 ? markers[index] : null;
                 _spawnMarkerIndex++;
                 if (marker != null && GodotObject.IsInstanceValid(marker))
                 {

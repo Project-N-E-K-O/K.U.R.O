@@ -70,7 +70,7 @@ namespace Kuros.Actors.Enemies.Attacks
 		}
 
 		/// <summary>不看距离与朝向角度（本体在玩家正上方，默认角度门会把大招判死）：能不能放由控制器的权重决定。</summary>
-		public override bool CanStart()
+		protected override bool CanStartCore()
 		{
 			if (Enemy == null) return false;
 			if (Enemy.IsDeathSequenceActive || Enemy.IsDead) return false;
