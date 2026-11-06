@@ -1,12 +1,12 @@
 using Godot;
-using Kuros.Actors.Enemies.Attacks;
+using Kuros.Core.Effects;
 
 namespace Kuros.Actors.Enemies.States
 {
     /// <summary>
-    /// 敌人死亡过渡状态：**进入时**播放击倒动画（倒地特效由 `effect` 帧事件驱动，见 <see cref="Effects"/>），
+    /// 敌人死亡过渡状态：**进入时**播放击倒动画（特效可在进入时或 `effect` 帧事件生成，见 <see cref="Effects"/>），
     /// 计时结束后切换到 Dead 状态（收尸特效在 <see cref="EnemyDeadState.DeadEffect"/>，两个时点分开）。
-    /// **帧事件特效**：death 动画里的 spine `effect` 事件到达时逐一生成列表条目
+    /// **帧事件特效**：death 动画里的 spine `effect` 事件到达时只生成事件帧类型的条目
     /// （信号链 SpineController.gd → effect_triggered → 本状态自订阅，与 PlayerRunState 同款模式）。
     /// </summary>
     public partial class EnemyDyingState : EnemyState
@@ -17,11 +17,9 @@ namespace Kuros.Actors.Enemies.States
         [Export(PropertyHint.Range, "0,10,0.01")] public float DeathDuration = 0.8f;
         [Export] public bool FreezeMotion = true;
 
-        /// <summary>帧事件特效（可多项）：death 动画的 `effect` 事件到达时逐一生成——复用攻击侧
-        /// <see cref="AttackEffectEntry"/>（Scene / PropertyOverrides / EffectOffset /
-        /// SpawnMarkerPaths（含骨骼 marker）/ FlipMode）。每次 `effect` 事件都会生成列表里的全部条目；
-        /// 要按帧区分不同特效暂不支持（需要时再加过滤字段）。</summary>
-        [Export] public Godot.Collections.Array<AttackEffectEntry> Effects { get; set; } = new();
+        /// <summary>状态特效：每条独立选择进入状态立即生成，或 death 动画 effect 事件生成。
+        /// 事件次数限制仅作用于动画事件条目；进入状态条目每次 Enter 生成一次。</summary>
+        [Export] public Godot.Collections.Array<StateEffectEntry> Effects { get; set; } = new();
 
         /// <summary>本次 Dying 内帧事件最多生成几轮特效；0 = 不限制（默认，保持旧行为）。
         /// 持续尸体（DeathDuration&lt;=0）循环播放 death 时事件会反复到达，可用它压成只生成 N 次。</summary>
@@ -46,7 +44,7 @@ namespace Kuros.Actors.Enemies.States
 
             // 帧事件特效：订阅 death 动画的 `effect` 事件。连接先于播放——death 动画由动画控制器
             // 在发现 Dying 状态后的下一帧才切换，本处 Enter 先执行，事件不会错过
-            if (Effects != null && Effects.Count > 0)
+            if (HasAnimationEffects())
                 ConnectSpineEffectSignal();
 
             if (FreezeMotion)
@@ -54,6 +52,9 @@ namespace Kuros.Actors.Enemies.States
                 Enemy.Velocity = Vector2.Zero;
                 Enemy.MoveAndSlide();
             }
+
+            if (Enemy.GetNodeOrNull<EnemyFallController>("FallController")?.HasCorpseFallen != true)
+                SpawnEffects(StateEffectTiming.OnStateEnter);
         }
 
         public override void Exit()
@@ -86,7 +87,7 @@ namespace Kuros.Actors.Enemies.States
         // ── 帧事件特效 ────────────────────────────────────────────────────
 
         /// <summary>spine `effect` 帧事件到达（SpineController.gd 对骨架里命名 `effect` 的事件发出）：
-        /// 生成配置的全部条目。</summary>
+        /// 只生成配置为 OnAnimationEffect 的条目。</summary>
         private void OnSpineEffectTriggered(string animationName, float eventTime)
         {
             if (Enemy.GetNodeOrNull<EnemyFallController>("FallController")?.HasCorpseFallen == true) return;
@@ -94,8 +95,24 @@ namespace Kuros.Actors.Enemies.States
             if (MaxEffectTriggers > 0 && _effectTriggerCount >= MaxEffectTriggers) return;
             _effectTriggerCount++;
 
+            SpawnEffects(StateEffectTiming.OnAnimationEffect);
+        }
+
+        private bool HasAnimationEffects()
+        {
+            if (Effects == null) return false;
             foreach (var entry in Effects)
-                SpawnEffectEntry(entry);
+                if (entry?.Scene != null && entry.SpawnTiming == StateEffectTiming.OnAnimationEffect)
+                    return true;
+            return false;
+        }
+
+        private void SpawnEffects(StateEffectTiming timing)
+        {
+            if (Effects == null) return;
+            foreach (var entry in Effects)
+                if (entry != null && entry.SpawnTiming == timing)
+                    SpawnEffectEntry(entry);
         }
 
         private void ConnectSpineEffectSignal()

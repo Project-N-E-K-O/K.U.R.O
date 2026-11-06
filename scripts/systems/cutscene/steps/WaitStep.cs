@@ -33,13 +33,13 @@ namespace Kuros.Systems.Cutscene
             // 若不等待完成，立即返回，但后台仍监听skip事件
             if (!WaitForCompletion)
             {
-                _ = MonitorSkipAndFinishAsync(ctx, timer);
+                ctx.TrackTask(MonitorSkipAndFinishAsync(ctx, timer));
                 GD.Print($"[Cutscene] WaitStep 异步执行（WaitForCompletion=false），总耗时约 {Duration} 秒");
                 return;
             }
 
             // 否则阻塞等待
-            while (!ctx.IsSkipping && timer.TimeLeft > 0f)
+            while (!ctx.IsCancelled && !ctx.IsSkipping && timer.TimeLeft > 0f)
                 await ctx.NextFrame();
 
             GD.Print("[Cutscene] WaitStep 完成");
@@ -50,7 +50,7 @@ namespace Kuros.Systems.Cutscene
         /// </summary>
         private async Task MonitorSkipAndFinishAsync(CutsceneContext ctx, SceneTreeTimer timer)
         {
-            while (!ctx.IsSkipping && timer.TimeLeft > 0f)
+            while (!ctx.IsCancelled && !ctx.IsSkipping && timer.TimeLeft > 0f)
                 await ctx.NextFrame();
 
             if (ctx.IsSkipping)

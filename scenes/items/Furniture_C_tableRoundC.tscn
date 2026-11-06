@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://b8twfkaisp0mt"]
+[gd_scene load_steps=15 format=3 uid="uid://b8twfkaisp0mt"]
 
 [ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/GroundObjectController.cs" id="ground_object_ctrl"]
 
@@ -9,6 +9,7 @@
 [ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="5_3lwoa"]
 [ext_resource type="Texture2D" uid="uid://de3t5lmrkvv0c" path="res://assets/furnitures/hotel_scene3/TableRoundC_Cake.png" id="6_bfy1o"]
 [ext_resource type="PackedScene" uid="uid://dby51i7slqvd5" path="res://scenes/objects/Animation_item.tscn" id="fall_anim_item"]
+[ext_resource type="Script" uid="uid://bp7k64w3rc75b" path="res://scripts/controllers/ShadowGroundController.cs" id="shadow_ground_ctrl"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_aa7cv"]
 shader = ExtResource("3_022c0")
@@ -93,3 +94,6 @@ shape = SubResource("CapsuleShape2D_bfy1o")
 script = ExtResource("ground_object_ctrl")
 FallEffectScene = ExtResource("fall_anim_item")
 FallAnimationName = "fall_table_round_c"
+
+[node name="ShadowGroundController" type="Node" parent="RigidBody2D/Shadow"]
+script = ExtResource("shadow_ground_ctrl")

@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://6ghjqyjkk37w"]
+[gd_scene load_steps=16 format=3 uid="uid://6ghjqyjkk37w"]
 
 [ext_resource type="Script" uid="uid://dtgdjgrqgype7" path="res://scripts/items/world/WorldItemEntity.cs" id="1_inoct"]
 [ext_resource type="Resource" uid="uid://c85bfuwu0x3m8" path="res://resources/items/Weapon_Stab_umbrella.tres" id="2_inoct"]
@@ -9,6 +9,7 @@
 [ext_resource type="Shader" uid="uid://caxdo713k5kug" path="res://shaders/materials/sparkling.gdshader" id="7_0qmq6"]
 [ext_resource type="Script" path="res://scripts/environments/GroundObjectController.cs" id="ground_object_ctrl"]
 [ext_resource type="PackedScene" uid="uid://dby51i7slqvd5" path="res://scenes/objects/Animation_item.tscn" id="fall_anim_item"]
+[ext_resource type="Script" uid="uid://bp7k64w3rc75b" path="res://scripts/controllers/ShadowGroundController.cs" id="shadow_ground_ctrl"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_m4rsl"]
 shader = ExtResource("3_u83q7")
@@ -80,3 +81,6 @@ shape = SubResource("CapsuleShape2D_0qmq6")
 script = ExtResource("ground_object_ctrl")
 FallEffectScene = ExtResource("fall_anim_item")
 FallAnimationName = "fall_umbrella"
+
+[node name="ShadowGroundController" type="Node" parent="Shadow"]
+script = ExtResource("shadow_ground_ctrl")

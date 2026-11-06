@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://d0x0oxhsokka0"]
+[gd_scene load_steps=16 format=3 uid="uid://d0x0oxhsokka0"]
 
 [ext_resource type="Script" uid="uid://dtgdjgrqgype7" path="res://scripts/items/world/WorldItemEntity.cs" id="1_q4fla"]
 [ext_resource type="Resource" uid="uid://b7ehmydlvlir3" path="res://resources/items/Weapon_Stab_Corkscrew.tres" id="2_gccxh"]
@@ -8,6 +8,7 @@
 [ext_resource type="Shader" uid="uid://caxdo713k5kug" path="res://shaders/materials/sparkling.gdshader" id="5_k0yrj"]
 [ext_resource type="Script" path="res://scripts/environments/GroundObjectController.cs" id="ground_object_ctrl"]
 [ext_resource type="PackedScene" uid="uid://dby51i7slqvd5" path="res://scenes/objects/Animation_item.tscn" id="fall_anim_item"]
+[ext_resource type="Script" uid="uid://bp7k64w3rc75b" path="res://scripts/controllers/ShadowGroundController.cs" id="shadow_ground_ctrl"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_g0q5t"]
 shader = ExtResource("3_ckqsu")
@@ -82,3 +83,6 @@ shape = SubResource("CapsuleShape2D_gccxh")
 script = ExtResource("ground_object_ctrl")
 FallEffectScene = ExtResource("fall_anim_item")
 FallAnimationName = "fall_corkscrew"
+
+[node name="ShadowGroundController" type="Node" parent="Shadow"]
+script = ExtResource("shadow_ground_ctrl")

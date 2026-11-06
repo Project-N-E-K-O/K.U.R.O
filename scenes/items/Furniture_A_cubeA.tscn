@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://bmk5chuwaohte"]
+[gd_scene load_steps=17 format=3 uid="uid://bmk5chuwaohte"]
 
 [ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/GroundObjectController.cs" id="ground_object_ctrl"]
 
@@ -10,6 +10,7 @@
 [ext_resource type="Texture2D" uid="uid://dabxdflvss2xs" path="res://assets/art/godot_icon.png" id="6_tu5df"]
 [ext_resource type="Shader" uid="uid://cbbgx5r50eimb" path="res://shaders/materials/canvas_cube_glowing_persp.gdshader" id="7_oepov"]
 [ext_resource type="PackedScene" uid="uid://dby51i7slqvd5" path="res://scenes/objects/Animation_item.tscn" id="fall_anim_item"]
+[ext_resource type="Script" uid="uid://bp7k64w3rc75b" path="res://scripts/controllers/ShadowGroundController.cs" id="shadow_ground_ctrl"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_aa7cv"]
 shader = ExtResource("3_oepov")
@@ -132,3 +133,6 @@ shape = SubResource("RectangleShape2D_jyvv2")
 script = ExtResource("ground_object_ctrl")
 FallEffectScene = ExtResource("fall_anim_item")
 FallAnimationName = "fall_cube_a"
+
+[node name="ShadowGroundController" type="Node" parent="RigidBody2D/Shadow"]
+script = ExtResource("shadow_ground_ctrl")

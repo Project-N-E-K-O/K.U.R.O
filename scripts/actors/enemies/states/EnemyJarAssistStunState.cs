@@ -8,8 +8,8 @@ namespace Kuros.Actors.Enemies.States
 	public partial class EnemyJarAssistStunState : EnemyState
 	{
 		[Export(PropertyHint.Range, "0,20,0.1")] public float Duration { get; set; } = 7.5f;
-		[Export(PropertyHint.Range, "0,5,0.01")] public float DownDuration { get; set; } = 0.6666667f;
-		[Export(PropertyHint.Range, "0,5,0.01")] public float UpDuration { get; set; } = 0.6666667f;
+		[Export(PropertyHint.Range, "0,5,0.01")] public float DownDuration { get; set; } = 0.67f;
+		[Export(PropertyHint.Range, "0,5,0.01")] public float UpDuration { get; set; } = 0.67f;
 
 		public enum StunPhase { Down, Loop, Up }
 		public StunPhase CurrentPhase { get; private set; }
@@ -85,6 +85,7 @@ namespace Kuros.Actors.Enemies.States
 				_controller.SetPhysicsProcess(true);
 			_controller = null;
 		}
+		public void StopForShutdown() => FinishCycle();
 
 		public override void PhysicsUpdate(double delta)
 		{

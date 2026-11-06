@@ -43,6 +43,11 @@ namespace Kuros.Actors.Enemies
 
 		/// <summary>正在转身（动画控制器据此优先播 turn 片）。</summary>
 		public bool IsTurning => _turning;
+		public void StopForShutdown()
+		{
+			_turning = false;
+			SetPhysicsProcess(false);
+		}
 		/// <summary>本次转身起飞时的朝向（选 `turn` / `d_turn` 用）。</summary>
 		public bool TurnOriginFacing { get; private set; } = true;
 
@@ -74,7 +79,7 @@ namespace Kuros.Actors.Enemies
 			if (_cooldown > 0f) _cooldown -= dt;
 
 			if (_enemy == null || !GodotObject.IsInstanceValid(_enemy)) return;
-			if (_enemy.IsDead || _enemy.IsDeathSequenceActive) return;
+			if (_enemy is EnemyF1RogueAITurret { IsAIShutdown: true } || _enemy.IsDead || _enemy.IsDeathSequenceActive) return;
 
 			// 眩晕期间朝向锁定：连正在播放的转身也立即取消，避免眩晕中继续检测玩家并反转。
 			if ((_enemy.StateMachine?.CurrentState?.Name ?? string.Empty) == "JarAssistStun")

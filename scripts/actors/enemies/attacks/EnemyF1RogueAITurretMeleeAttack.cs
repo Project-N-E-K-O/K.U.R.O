@@ -26,17 +26,17 @@ namespace Kuros.Actors.Enemies.Attacks
     {
         /// <summary>起手条件：基类（检测圈 + 朝向角）之上再要求玩家在**攻击盒**（AttackAreaPath）内——
         /// 与常规近战同款判定；攻击盒未解析到时回退根节点攻击区。</summary>
-        public override bool CanStart()
+        protected override bool CanStartCore()
         {
-            if (!base.CanStart()) return false;
+            if (!base.CanStartCore()) return false;
             return IsPlayerInsideAttackArea();
         }
 
         /// <summary>选招资格绑触发区（追踪/预备圈）：玩家不在圈内时本招不参与加权随机
         /// （防止排队在远处永远起不了手）。</summary>
-        public override bool IsPlayerInDetectionRange()
+        protected override bool IsPlayerInDetectionRangeCore()
         {
-            if (!base.IsPlayerInDetectionRange()) return false;
+            if (!base.IsPlayerInDetectionRangeCore()) return false;
             return IsPlayerInTriggerArea();
         }
 
@@ -44,7 +44,7 @@ namespace Kuros.Actors.Enemies.Attacks
         private bool IsPlayerInsideAttackArea()
         {
             if (Player == null) return false;
-            if (AttackArea == null) return Enemy.IsPlayerInAttackRange();
+            if (AttackArea == null) return true;
             return IsPlayerInsideArea(Player, AttackArea);
         }
 
@@ -84,7 +84,7 @@ namespace Kuros.Actors.Enemies.Attacks
             if (distance <= 0f) return;
             if (Enemy?.PlayerTarget is not SamplePlayer player) return;
 
-            var hitArea = DamageArea ?? AttackArea;
+            var hitArea = DamageArea;
             if (!IsPlayerInsideArea(player, hitArea)) return;
 
             TryApplyPlayerKnockback(player, distance, Mathf.Max(KnockbackDuration, 0.01f),

@@ -21,9 +21,7 @@ namespace Kuros.Actors.Enemies.Attacks
         {
             if (Player == null) return;
 
-            bool inRange = AttackArea != null
-                ? Player.IsHitByArea(AttackArea)
-                : Enemy.IsPlayerInAttackRange();
+            bool inRange = DamageArea != null && Player.IsHitByArea(DamageArea);
 
             if (!inRange) return;
 

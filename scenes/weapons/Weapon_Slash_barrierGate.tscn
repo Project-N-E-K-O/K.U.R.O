@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://2pny8f8vuu3j"]
+[gd_scene load_steps=17 format=3 uid="uid://2pny8f8vuu3j"]
 
 [ext_resource type="Script" uid="uid://dtgdjgrqgype7" path="res://scripts/items/world/WorldItemEntity.cs" id="1_64hvb"]
 [ext_resource type="Resource" uid="uid://bht5edc6ccmuc" path="res://resources/items/Weapon_Slash_BarrierGate.tres" id="2_64hvb"]
@@ -7,6 +7,7 @@
 [ext_resource type="Shader" uid="uid://caxdo713k5kug" path="res://shaders/materials/sparkling.gdshader" id="7_ofv0e"]
 [ext_resource type="Script" path="res://scripts/environments/GroundObjectController.cs" id="ground_object_ctrl"]
 [ext_resource type="PackedScene" uid="uid://dby51i7slqvd5" path="res://scenes/objects/Animation_item.tscn" id="fall_anim_item"]
+[ext_resource type="Script" uid="uid://bp7k64w3rc75b" path="res://scripts/controllers/ShadowGroundController.cs" id="shadow_ground_ctrl"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_nqlfu"]
 shader = ExtResource("3_aybeu")
@@ -90,3 +91,6 @@ shape = SubResource("CapsuleShape2D_waoek")
 script = ExtResource("ground_object_ctrl")
 FallEffectScene = ExtResource("fall_anim_item")
 FallAnimationName = "fall_barrier_gate"
+
+[node name="ShadowGroundController" type="Node" parent="Shadow"]
+script = ExtResource("shadow_ground_ctrl")

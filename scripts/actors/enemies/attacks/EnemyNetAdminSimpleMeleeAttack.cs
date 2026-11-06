@@ -10,7 +10,7 @@ namespace Kuros.Actors.Enemies.Attacks
     public partial class EnemyNetAdminSimpleMeleeAttack : EnemySimpleMeleeAttack
     {
         // 起手检测区由基类提供：TriggerAreaPath（未配置 = 不做额外限制）。
-        // 旧的 DetectionAreaPath 已并入基类；伤害区走基类 DamageAreaPath（未配置 = AttackArea）。
+        // 旧的 DetectionAreaPath 已并入基类；伤害区走基类 DamageAreaPath（未配置不执行区域伤害）。
         [Export] public bool TrackTargetDuringWarmup = false;
 
         private CollisionShape2D? _damageShape;
@@ -18,15 +18,11 @@ namespace Kuros.Actors.Enemies.Attacks
         protected override void OnInitialized()
         {
             base.OnInitialized();
-            // 伤害区走基类统一解析：DamageAreaPath → 回退 AttackArea（等价于原来的 `?? AttackArea`）
+            // 伤害区走基类统一解析：DamageAreaPath 显式指定（等价于原来的 `?? AttackArea`）
             _damageShape = DamageArea?.GetNodeOrNull<CollisionShape2D>("CollisionShape2D");
         }
 
-        public override bool CanStart()
-        {
-            if (!base.CanStart()) return false;
-            return IsPlayerInTriggerArea();   // 未配置 TriggerAreaPath = 不做额外限制
-        }
+
 
         public override void _PhysicsProcess(double delta)
         {
@@ -71,7 +67,7 @@ namespace Kuros.Actors.Enemies.Attacks
             if (Enemy == null || Player == null) return;
             float distance = Mathf.Max(0f, KnockbackDistance);
             if (distance <= 0f) return;
-            if (area != null && !Player.IsHitByArea(area)) return;
+            if (area == null || !Player.IsHitByArea(area)) return;
 
             TryApplyPlayerKnockback(
                 Player,

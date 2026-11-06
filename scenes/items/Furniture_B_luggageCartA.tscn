@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://0anrcfm2pnsd"]
+[gd_scene load_steps=15 format=3 uid="uid://0anrcfm2pnsd"]
 
 [ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/GroundObjectController.cs" id="ground_object_ctrl"]
 
@@ -9,6 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="7_ii2vh"]
 [ext_resource type="Texture2D" uid="uid://j5yfe8op7l0j" path="res://assets/furnitures/hotel_scene2/LuggageCartA.png" id="7_qa1uh"]
 [ext_resource type="PackedScene" uid="uid://dby51i7slqvd5" path="res://scenes/objects/Animation_item.tscn" id="fall_anim_item"]
+[ext_resource type="Script" uid="uid://bp7k64w3rc75b" path="res://scripts/controllers/ShadowGroundController.cs" id="shadow_ground_ctrl"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ukya5"]
 shader = ExtResource("6_kbhgj")
@@ -89,3 +90,6 @@ shape = SubResource("RectangleShape2D_jyvv2")
 script = ExtResource("ground_object_ctrl")
 FallEffectScene = ExtResource("fall_anim_item")
 FallAnimationName = "fall_luggage_cart_a"
+
+[node name="ShadowGroundController" type="Node" parent="RigidBody2D/Shadow"]
+script = ExtResource("shadow_ground_ctrl")

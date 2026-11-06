@@ -95,12 +95,12 @@ namespace Kuros.Actors.Enemies.Attacks
         [Export(PropertyHint.Range, "0,10,0.1")] public float DamageMultiplier = 1.0f;
         [Export(PropertyHint.Range, "0,180,1")] public float MaxAllowedAngleToPlayer = 135.0f;
         [Export] public string AnimationName = "animations/attack";
+        /// <summary>可选接触/攻击盒；留空不使用，不回退敌人根区域。</summary>
         [Export] public NodePath AttackAreaPath = new NodePath();
         /// <summary>伤害结算区（可选）：本招伤害落在这块 Area2D 上。
-        /// 未配置 = 沿用 <see cref="AttackArea"/>（= AttackAreaPath → 未配置再回退敌人根节点 Sprite2D/AttackArea）。</summary>
+        /// 未配置 = 不执行本体区域伤害；投射物/接触伤害由各自逻辑处理。</summary>
         [Export] public NodePath DamageAreaPath = new NodePath();
-        /// <summary>触发判定区（可选）：配了就要求玩家在该区内本招才可起手（子类用 <see cref="IsPlayerInTriggerArea"/> 判）。
-        /// 未配置 = 不做额外位置限制（现状：基类 CanStart 只要求玩家在敌人根节点 DetectionArea 内）。</summary>
+        /// <summary>可选触发区：配置后统一限制选招和起手，留空不限制。无效路径禁止起手。</summary>
         [Export] public NodePath TriggerAreaPath = new NodePath();
         [Export(PropertyHint.Flags, "Player,Enemy,WorldItem")]
         public TargetableFactions TargetableFactions = TargetableFactions.Player | TargetableFactions.WorldItem;
@@ -190,7 +190,7 @@ namespace Kuros.Actors.Enemies.Attacks
         protected SampleEnemy Enemy { get; private set; } = null!;
         protected SamplePlayer? Player => Enemy.PlayerTarget;
         protected Area2D? AttackArea { get; private set; }
-        /// <summary>伤害结算区：DamageAreaPath 配了用它，未配置 = <see cref="AttackArea"/>（现状：最终落到敌人根节点 AttackArea）。</summary>
+        /// <summary>显式伤害结算区，未配置为 null，不产生本体区域伤害。</summary>
         protected Area2D? DamageArea { get; private set; }
         /// <summary>触发判定区：**仅在 TriggerAreaPath 配置时非空**（未配置 = 不额外限制，见 <see cref="IsPlayerInTriggerArea"/>）。</summary>
         protected Area2D? TriggerArea { get; private set; }
@@ -235,24 +235,25 @@ namespace Kuros.Actors.Enemies.Attacks
         {
             Enemy = enemy;
 
-            // 与 DamageAreaPath / TriggerAreaPath 同一套解析：先按模板节点、再按敌人根节点。
-            // （历史实现只从根节点解析，于是按模板写的 ../../../../Sprite2D/Xxx 全部静默失效、回退根区）
-            AttackArea = ResolveArea(AttackAreaPath, Enemy.AttackArea);
+            // 三个可选区域独立解析，留空即不使用。
+            AttackArea = ResolveArea(AttackAreaPath);
 
-            DamageArea = ResolveArea(DamageAreaPath) ?? AttackArea;
+            DamageArea = ResolveArea(DamageAreaPath);
             TriggerArea = ResolveArea(TriggerAreaPath);
             WarnIfAreaMismatch();
+            if (RequiresAttackArea && AttackArea == null)
+                GD.PushWarning($"[{Name}] 本接触攻击需要显式 AttackAreaPath，缺失时禁止起手。");
 
             OnInitialized();
         }
 
         /// <summary>按路径取 Area2D：先在模板自身下找，再在敌人根节点下找（兼容两种配置习惯）。
-        /// 路径为空或找不到 → 返回 <paramref name="fallback"/>（默认 null）。</summary>
-        protected Area2D? ResolveArea(NodePath? path, Area2D? fallback = null)
+        /// 路径为空或找不到均返回 null，不借用其他区域。</summary>
+        protected Area2D? ResolveArea(NodePath? path)
         {
-            if (path == null || path.IsEmpty) return fallback;
+            if (path == null || path.IsEmpty) return null;
             var area = GetNodeOrNull<Area2D>(path) ?? Enemy?.GetNodeOrNull<Area2D>(path);
-            return area ?? fallback;
+            return area;
         }
 
         /// <summary>玩家是否在"触发判定区"内：未配置 TriggerAreaPath → 恒 true（不额外限制）。
@@ -261,11 +262,11 @@ namespace Kuros.Actors.Enemies.Attacks
         /// ②**受击/攻击区**（mask 指向玩家 **HitArea** 层）→ <see cref="GameActor.IsHitByArea"/>。<br/>
         /// 只判前者会漏掉后者的配置，只判后者会漏掉前者（GameActor 有 HitArea 时 IsHitByArea 只看 HitArea 重叠，
         /// 检测区的 body 层掩码对它无效）——两边都试才不会出现"配置正确却永远不触发"。
-        /// 只提供能力，**不接进 <see cref="CanStart"/>**：那会让远程/召唤类攻击被迫贴脸；
-        /// 选招用的 <see cref="IsPlayerInDetectionRange"/> 与保底大招是另外两套语义，别混。</summary>
+        /// 公共选招和起手入口统一调用；远程/召唤可留空以取消此限制。</summary>
         protected bool IsPlayerInTriggerArea()
         {
-            if (TriggerArea == null) return true;
+            if (TriggerAreaPath == null || TriggerAreaPath.IsEmpty) return true;
+            if (!GodotObject.IsInstanceValid(TriggerArea)) return false;
             if (Player == null) return false;
             return TriggerArea.OverlapsBody(Player) || Player.IsHitByArea(TriggerArea);
         }
@@ -278,14 +279,9 @@ namespace Kuros.Actors.Enemies.Attacks
             WarnIfPathUnresolved(DamageAreaPath, nameof(DamageAreaPath));
             WarnIfPathUnresolved(TriggerAreaPath, nameof(TriggerAreaPath));
 
-            var rootArea = Enemy?.AttackArea;
-            if (rootArea == null) return;
-            if (AttackArea == rootArea && DamageArea == rootArea && TriggerArea == null) return;
-            GD.PushWarning($"[{Name}] 区域与根节点 AttackArea 不同：触发区={TriggerArea?.Name ?? "未配置"} "
-                + $"攻击区={AttackArea?.Name ?? "无"} 伤害区={DamageArea?.Name ?? "无"} 根区={rootArea.Name}（伤害落在伤害区）");
         }
 
-        /// <summary>路径配了却解析不到 Area2D → 已静默回退（看着像"配置没生效"）。
+        /// <summary>路径配了却解析不到 Area2D：警告并禁止选招/起手。
         /// 三个区域字段统一走 <see cref="ResolveArea"/>：先按模板节点、再按敌人根节点，所以
         /// `../../../../Sprite2D/Xxx`（相对模板）与 `Sprite2D/Xxx`（相对敌人根）两种写法都吃。</summary>
         private void WarnIfPathUnresolved(NodePath? path, string label)
@@ -293,15 +289,35 @@ namespace Kuros.Actors.Enemies.Attacks
             if (path == null || path.IsEmpty || Enemy == null) return;
             if (ResolveArea(path) != null) return;
 
-            GD.PushWarning($"[{Name}] {label}=\"{path}\" 解析不到 Area2D → 已回退"
+            GD.PushWarning($"[{Name}] {label}=\"{path}\" 解析不到 Area2D，禁止选招和起手，不使用兜底区域"
                 + "（该字段先按模板节点、再按敌人根节点解析；确认路径真的指向某个区域节点）");
         }
 
         protected virtual void OnInitialized() { }
 
-        public virtual bool IsPlayerInDetectionRange() => true;
+        protected virtual bool RequiresAttackArea => false;
+        /// <summary>仅对已经运行的攻击生效：外层 Attack 状态是否忽略玩家离开检测/攻击区。</summary>
+        public virtual bool ContinueOutsidePlayerRange => false;
+        private bool AreasValid() => (!RequiresAttackArea || GodotObject.IsInstanceValid(AttackArea)) && AreaValid(AttackAreaPath, AttackArea)
+            && AreaValid(DamageAreaPath, DamageArea) && AreaValid(TriggerAreaPath, TriggerArea);
+        private static bool AreaValid(NodePath? path, Area2D? area)
+            => path == null || path.IsEmpty || GodotObject.IsInstanceValid(area) && !area!.IsQueuedForDeletion();
 
-        public virtual bool CanStart()
+        // 非虚入口：子类只能扩展 Core，不能跳过公共区域规则。
+        public bool IsPlayerInDetectionRange() => Enemy != null && !Enemy.IsDeadOrDying && !Enemy.IsDead
+            && Enemy is not EnemyF1RogueAITurret { IsAIShutdown: true }
+            && AreasValid() && IsPlayerInTriggerArea() && IsPlayerInDetectionRangeCore();
+        protected virtual bool IsPlayerInDetectionRangeCore() => true;
+
+        public bool CanStart()
+        {
+            if (Enemy is EnemyF1RogueAITurret { IsAIShutdown: true }) return false;
+            if (Enemy == null || Enemy.IsDeadOrDying || Enemy.IsDead || IsRunning || IsOnCooldown) return false;
+            if (!AreasValid() || !IsPlayerInTriggerArea()) return false;
+            return CanStartCore();
+        }
+
+        protected virtual bool CanStartCore()
         {
             if (Enemy == null || Player == null) return false;
             if (Enemy.IsDeathSequenceActive || Enemy.IsDead) return false;
@@ -625,16 +641,18 @@ namespace Kuros.Actors.Enemies.Attacks
         /// 对指定区域造成伤害（统一入口）。
         /// 子类调用此方法而非直接调 DamageDispatcher，确保阵营筛选和自伤开关始终生效。
         /// </summary>
-        protected void DealDamage(Area2D area)
+        protected void DealDamage(Area2D? area)
         {
+            if (!GodotObject.IsInstanceValid(area)) return;
             DamageDispatcher.DealDamageFromArea(area, GetDamage(), Enemy, TargetableFactions, AllowSelfDamage);
         }
 
         /// <summary>
         /// 对指定区域造成指定伤害（覆盖默认伤害值）。
         /// </summary>
-        protected void DealDamage(Area2D area, int damageOverride)
+        protected void DealDamage(Area2D? area, int damageOverride)
         {
+            if (!GodotObject.IsInstanceValid(area)) return;
             DamageDispatcher.DealDamageFromArea(area, damageOverride, Enemy, TargetableFactions, AllowSelfDamage);
         }
 
@@ -789,11 +807,11 @@ namespace Kuros.Actors.Enemies.Attacks
 
         protected void PerformAttackNow()
         {
+            if (!GodotObject.IsInstanceValid(DamageArea)) return;
             float originalDamage = Enemy.AttackDamage;
             Enemy.AttackDamage = GetDamage();
-            // 伤害落在本模板解析出的伤害区（DamageAreaPath → 回退 AttackArea → 回退根节点 AttackArea）。
-            // 旧行为是写死敌人根节点的 AttackArea：配了 AttackAreaPath 指向别的区就会出现"触发换区了、伤害还在根区"。
-            Enemy.PerformAttack(DamageArea ?? Enemy.AttackArea, TargetableFactions);
+            // 仅使用本模板显式配置的伤害区。
+            Enemy.PerformAttack(DamageArea, TargetableFactions);
             Enemy.AttackDamage = originalDamage;
         }
 
@@ -884,7 +902,7 @@ namespace Kuros.Actors.Enemies.Attacks
             Vector2 direction;
             if (KnockbackFromHitPosition)
             {
-                var area = attackArea ?? AttackArea;
+                var area = attackArea ?? DamageArea;
                 var hitArea = player.HitArea;
                 Vector2 attackPos = GetShapeCenter(area) ?? area?.GlobalPosition ?? Enemy.GlobalPosition;
                 Vector2 hitPos = GetShapeCenter(hitArea) ?? hitArea?.GlobalPosition ?? player.GlobalPosition;
@@ -1016,11 +1034,10 @@ namespace Kuros.Actors.Enemies.Attacks
 
             try
             {
-                var effect = scene.Instantiate();
+                var effect = entry != null ? entry.InstantiateNode()! : scene.Instantiate();
 
                 if (entry != null)
                 {
-                    entry.ApplyOverrides(effect);
                     // 唯一性组标记：供"场上是否已有该特效"检测（全局，跨敌人共享）
                     if (!string.IsNullOrEmpty(entry.UniqueGroup))
                         effect.AddToGroup(entry.UniqueGroup);

@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=3 uid="uid://bvvyo3wubh12j"]
+[gd_scene load_steps=30 format=3 uid="uid://bvvyo3wubh12j"]
 
 [ext_resource type="Script" uid="uid://dhfq2rrha0awm" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_eecfu"]
 [ext_resource type="Resource" uid="uid://c8qn8ms3d0ddq" path="res://resources/items/Weapon_Throw_GravityGrenade.tres" id="2_v5ky2"]
@@ -19,6 +19,7 @@
 [ext_resource type="Texture2D" uid="uid://dabxdflvss2xs" path="res://assets/art/godot_icon.png" id="17_dj1qy"]
 [ext_resource type="Script" path="res://scripts/environments/GroundObjectController.cs" id="ground_object_ctrl"]
 [ext_resource type="PackedScene" uid="uid://dby51i7slqvd5" path="res://scenes/objects/Animation_item.tscn" id="fall_anim_item"]
+[ext_resource type="Script" uid="uid://bp7k64w3rc75b" path="res://scripts/controllers/ShadowGroundController.cs" id="shadow_ground_ctrl"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_swc0d"]
 shader = ExtResource("3_eecfu")
@@ -181,3 +182,6 @@ shape = SubResource("RectangleShape2D_eecfu")
 script = ExtResource("ground_object_ctrl")
 FallEffectScene = ExtResource("fall_anim_item")
 FallAnimationName = "fall_gravity_grenade"
+
+[node name="ShadowGroundController" type="Node" parent="RigidBody2D/Shadow"]
+script = ExtResource("shadow_ground_ctrl")

@@ -1,9 +1,10 @@
-[gd_scene load_steps=29 format=3 uid="uid://b81xhi3r08vha"]
+[gd_scene load_steps=30 format=3 uid="uid://b81xhi3r08vha"]
 
 [ext_resource type="Script" uid="uid://dhfq2rrha0awm" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_1d0of"]
 [ext_resource type="Resource" uid="uid://dtv412g1klamn" path="res://resources/items/Weapon_Throw_EmojiBomb.tres" id="2_vfp1h"]
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="3_n0uqx"]
 [ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="4_g5wk3"]
+[ext_resource type="Script" uid="uid://bp7k64w3rc75b" path="res://scripts/controllers/ShadowGroundController.cs" id="5_njwgo"]
 [ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="5_uc5id"]
 [ext_resource type="Shader" uid="uid://caxdo713k5kug" path="res://shaders/materials/sparkling.gdshader" id="6_ahq4c"]
 [ext_resource type="Texture2D" uid="uid://cd24tjl6wpw4i" path="res://assets/objects/emoji_boom/时间轴 1_0000.png" id="6_vfp1h"]
@@ -135,7 +136,7 @@ BounceSpeed = 650.0
 BounceHorizontalRatio = 0.2
 BounceElasticity = 0.25
 DestructionAnimationDuration = 0.0
-LandingHideDelay = 0.09999999999999999
+LandingHideDelay = 0.1
 RigidBodyPath = NodePath("RigidBody2D")
 HitboxAreaPath = NodePath("RigidBody2D/AttackArea")
 ShadowPath = NodePath("RigidBody2D/Shadow")
@@ -151,6 +152,9 @@ material = SubResource("ShaderMaterial_idk0v")
 position = Vector2(10, 20)
 scale = Vector2(3.5, 2)
 texture = ExtResource("4_g5wk3")
+
+[node name="ShadowGroundController" type="Node" parent="RigidBody2D/Shadow"]
+script = ExtResource("5_njwgo")
 
 [node name="Outline" type="Sprite2D" parent="RigidBody2D"]
 material = SubResource("ShaderMaterial_0nltr")

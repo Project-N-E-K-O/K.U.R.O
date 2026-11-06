@@ -1,7 +1,8 @@
-[gd_scene load_steps=58 format=3 uid="uid://dstgcw0tto5oa"]
+[gd_scene load_steps=59 format=3 uid="uid://dstgcw0tto5oa"]
 
 [ext_resource type="Script" uid="uid://cra7y7mt0x1j8" path="res://scripts/managers/CameraZoneArea.cs" id="1_7ummj"]
 [ext_resource type="Script" uid="uid://cbui22isww64v" path="res://scripts/systems/cutscene/CutsceneTrigger.cs" id="2_o3k7i"]
+[ext_resource type="Resource" uid="uid://bicsmtly0y2kg" path="res://resources/cutscene/Text_begin_intro.tres" id="3_hxrfn"]
 [ext_resource type="Script" uid="uid://dmqu7phxi8gbi" path="res://scripts/managers/BattleArena.cs" id="4_bn434"]
 [ext_resource type="Script" uid="uid://orymlwdqv2xq" path="res://scripts/controllers/WaveSpawnManager.cs" id="5_p5xsj"]
 [ext_resource type="Texture2D" uid="uid://bkvy3th2vg6k4" path="res://assets/environments/scene_1_home/房间2墙壁.png" id="6_7ummj"]
@@ -153,6 +154,7 @@ z_index = 10
 collision_layer = 0
 collision_mask = 4
 script = ExtResource("2_o3k7i")
+Sequence = ExtResource("3_hxrfn")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CutsceneTrigger"]
 position = Vector2(-2400, 0)

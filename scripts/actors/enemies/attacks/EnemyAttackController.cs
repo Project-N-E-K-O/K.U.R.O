@@ -81,7 +81,7 @@ namespace Kuros.Actors.Enemies.Attacks
             base.Initialize(enemy);
             _entries.Clear();
             DisconnectDetectionSignals();
-            _playerDetectionArea = ResolveArea(PlayerDetectionAreaPath, AttackArea);
+            _playerDetectionArea = ResolveArea(PlayerDetectionAreaPath);
             if (_playerDetectionArea != null)
             {
                 _playerDetectionArea.BodyEntered += OnDetectionAreaBodyEntered;
@@ -124,10 +124,10 @@ namespace Kuros.Actors.Enemies.Attacks
             QueueNextAttack();
         }
 
-        public override bool CanStart()
+        protected override bool CanStartCore()
         {
             if (_entries.Count == 0) return false;
-            if (!base.CanStart()) return false;
+            if (!base.CanStartCore()) return false;
 
             // 全局呼吸窗（MinInterAttackDelay）尚未结束，禁止立即发起下一次攻击
             if (_interAttackDelay > 0f) return false;
@@ -612,6 +612,7 @@ namespace Kuros.Actors.Enemies.Attacks
         /// 子类可重写此方法，对需要持续到底的攻击（如终极技）返回 false。
         /// </summary>
         protected virtual bool ShouldInterruptOnPlayerExit() => true;
+        public override bool ContinueOutsidePlayerRange => !ShouldInterruptOnPlayerExit();
 
         /// <summary>
         /// 是否绕过 <see cref="MinInterAttackDelay"/> 呼吸窗选招（默认 false）。子类在"必须立刻发"的状态

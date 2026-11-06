@@ -112,6 +112,8 @@ namespace Kuros.Systems.FSM
         {
             if (_actor is GameActor actor)
             {
+                if (actor is Kuros.Actors.Enemies.EnemyF1RogueAITurret { IsAIShutdown: true })
+                    return stateName is "Idle" or "Dying" or "Dead";
                 bool isDeathState = stateName == "Dying" || stateName == "Dead";
                 if ((actor.IsDeathSequenceActive || actor.IsDead) && !isDeathState)
                 {

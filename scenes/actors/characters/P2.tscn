@@ -1,4 +1,4 @@
-[gd_scene load_steps=28 format=3 uid="uid://cgjrdwkemgrcy"]
+[gd_scene load_steps=29 format=3 uid="uid://cgjrdwkemgrcy"]
 
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="2_87y7c"]
 [ext_resource type="Script" uid="uid://csll5ffp7awd5" path="res://scripts/companions/P2CompanionController.cs" id="2_p2follow"]
@@ -8,6 +8,7 @@
 [ext_resource type="SpineSkeletonDataResource" uid="uid://c5bqnijir2ye0" path="res://animations/spine/Enemy_A1_yui.tres" id="4_87y7c"]
 [ext_resource type="Script" uid="uid://d0pebgaq6o2wu" path="res://scripts/companions/P2SupportBrain.cs" id="4_p2brain"]
 [ext_resource type="Script" uid="uid://bbybuyitd10jr" path="res://scripts/controllers/SpineController.gd" id="5_74bjo"]
+[ext_resource type="Script" uid="uid://bp7k64w3rc75b" path="res://scripts/controllers/ShadowGroundController.cs" id="5_iwx1h"]
 [ext_resource type="Script" uid="uid://djnyhimlasmm7" path="res://scripts/companions/P2SupportExecutor.cs" id="5_p2executor"]
 [ext_resource type="Script" uid="uid://blw2gqa3746s4" path="res://scripts/companions/P2SupportDecisionBridge.cs" id="6_p2bridge"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hud/P2DebugPanel.tscn" id="7_p2debug_scene"]
@@ -60,6 +61,9 @@ material = SubResource("ShaderMaterial_v2uuc")
 position = Vector2(0, 50)
 scale = Vector2(7, 3)
 texture = ExtResource("3_74bjo")
+
+[node name="ShadowGroundController" type="Node" parent="Shadow"]
+script = ExtResource("5_iwx1h")
 
 [node name="OutlineLayer" type="Node2D" parent="."]
 show_behind_parent = true

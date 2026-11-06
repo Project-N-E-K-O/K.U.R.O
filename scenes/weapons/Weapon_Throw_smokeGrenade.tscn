@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://cipwjj7xx121y"]
+[gd_scene load_steps=17 format=3 uid="uid://cipwjj7xx121y"]
 
 [ext_resource type="Script" uid="uid://dhfq2rrha0awm" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_26ux8"]
 [ext_resource type="Resource" uid="uid://h3sll18tay3c" path="res://resources/items/Weapon_Throw_SmokeGrenade.tres" id="2_0nltr"]
@@ -8,6 +8,7 @@
 [ext_resource type="Shader" uid="uid://caxdo713k5kug" path="res://shaders/materials/sparkling.gdshader" id="7_26ux8"]
 [ext_resource type="PackedScene" uid="uid://dby51i7slqvd5" path="res://scenes/objects/Animation_item.tscn" id="fall_anim_item"]
 [ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/GroundObjectController.cs" id="ground_object_ctrl"]
+[ext_resource type="Script" uid="uid://bp7k64w3rc75b" path="res://scripts/controllers/ShadowGroundController.cs" id="shadow_ground_ctrl"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_idk0v"]
 shader = ExtResource("3_ai6mm")
@@ -98,3 +99,6 @@ shape = SubResource("RectangleShape2D_w57jh")
 script = ExtResource("ground_object_ctrl")
 FallEffectScene = ExtResource("fall_anim_item")
 FallAnimationName = "fall_smoke_grenade"
+
+[node name="ShadowGroundController" type="Node" parent="RigidBody2D/Shadow"]
+script = ExtResource("shadow_ground_ctrl")

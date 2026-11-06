@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://xr3dxjuou057"]
+[gd_scene load_steps=15 format=3 uid="uid://xr3dxjuou057"]
 
 [ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/GroundObjectController.cs" id="ground_object_ctrl"]
 
@@ -9,6 +9,7 @@
 [ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="5_cv0vn"]
 [ext_resource type="Texture2D" uid="uid://rrdy7mkpomkv" path="res://assets/furnitures/home_scene1/ChairOfficeA.png" id="6_f6xom"]
 [ext_resource type="PackedScene" uid="uid://dby51i7slqvd5" path="res://scenes/objects/Animation_item.tscn" id="fall_anim_item"]
+[ext_resource type="Script" uid="uid://bp7k64w3rc75b" path="res://scripts/controllers/ShadowGroundController.cs" id="shadow_ground_ctrl"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_aa7cv"]
 shader = ExtResource("3_n73ds")
@@ -90,3 +91,6 @@ shape = SubResource("RectangleShape2D_jyvv2")
 script = ExtResource("ground_object_ctrl")
 FallEffectScene = ExtResource("fall_anim_item")
 FallAnimationName = "fall_chair_office_a"
+
+[node name="ShadowGroundController" type="Node" parent="RigidBody2D/Shadow"]
+script = ExtResource("shadow_ground_ctrl")

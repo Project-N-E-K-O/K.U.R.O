@@ -10,6 +10,7 @@ namespace Kuros.Actors.Enemies.Attacks
 	/// </summary>
 	public partial class EnemyPinballAttack : EnemyAttackTemplate
 	{
+        protected override bool RequiresAttackArea => true;
 		// 区域由基类统一提供：TriggerAreaPath（起手检测区，供选招钩子用；未配置 = 不限制）、
 		// AttackAreaPath（弹球接触判定带）。旧的 DetectionAreaPath / PinballAreaPath 已并入基类。
 		// 本招伤害按接触逐个结算（不按区域），所以不涉及 DamageArea。
@@ -40,7 +41,7 @@ namespace Kuros.Actors.Enemies.Attacks
 		}
 
 		/// <summary>选招用的检测：玩家在 TriggerAreaPath 指定的区内（未配置 = 不限制）。</summary>
-		public override bool IsPlayerInDetectionRange() => IsPlayerInTriggerArea();
+		protected override bool IsPlayerInDetectionRangeCore() => IsPlayerInTriggerArea();
 
 		protected override void OnAttackStarted()
 		{

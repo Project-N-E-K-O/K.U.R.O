@@ -16,7 +16,7 @@ namespace Kuros.Actors.Enemies.Attacks
     /// </summary>
     public partial class EnemyMagnetJarAttack : EnemySimpleMeleeAttack
     {
-        public override bool CanStart()
+        protected override bool CanStartCore()
         {
             // 不检查玩家引用/朝向角度/攻击盒：投送只由机械臂相位驱动，
             // 玩家引用缺失（生成早于玩家解析）也不该让循环停摆。

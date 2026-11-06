@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://cnh6afaayr0iy"]
+[gd_scene load_steps=21 format=3 uid="uid://cnh6afaayr0iy"]
 
 [ext_resource type="Script" uid="uid://dtgdjgrqgype7" path="res://scripts/items/world/WorldItemEntity.cs" id="1_0inps"]
 [ext_resource type="Resource" uid="uid://c3c8q3a085j6m" path="res://resources/items/Weapon_Slash_BunnySword.tres" id="2_0inps"]
@@ -10,6 +10,7 @@
 [ext_resource type="Texture2D" uid="uid://dabxdflvss2xs" path="res://assets/art/godot_icon.png" id="8_mvfc7"]
 [ext_resource type="Script" path="res://scripts/environments/GroundObjectController.cs" id="ground_object_ctrl"]
 [ext_resource type="PackedScene" uid="uid://dby51i7slqvd5" path="res://scenes/objects/Animation_item.tscn" id="fall_anim_item"]
+[ext_resource type="Script" uid="uid://bp7k64w3rc75b" path="res://scripts/controllers/ShadowGroundController.cs" id="shadow_ground_ctrl"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_nqlfu"]
 shader = ExtResource("3_e5tjt")
@@ -133,3 +134,6 @@ shape = SubResource("CapsuleShape2D_mvfc7")
 script = ExtResource("ground_object_ctrl")
 FallEffectScene = ExtResource("fall_anim_item")
 FallAnimationName = "fall_bunny_sword"
+
+[node name="ShadowGroundController" type="Node" parent="Shadow"]
+script = ExtResource("shadow_ground_ctrl")

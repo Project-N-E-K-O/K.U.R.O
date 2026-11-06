@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="ItemFallVisualCatalog" load_steps=110 format=3 uid="uid://c0wwelcirnk"]
+[gd_resource type="Resource" script_class="ItemFallVisualCatalog" load_steps=112 format=3 uid="uid://c0wwelcirnk"]
 
 [ext_resource type="Script" uid="uid://yfxox63peucx" path="res://scripts/fx/ItemFallVisualProfile.cs" id="1_kv8yj"]
 [ext_resource type="Texture2D" uid="uid://xcu3hnecxemh" path="res://assets/weapons/法棍.png" id="2_l8tcl"]
@@ -55,6 +55,7 @@
 [ext_resource type="Texture2D" uid="uid://bix6nbba2r1c7" path="res://assets/furnitures/hotel_scene4/WhiteBoardA.png" id="53_iq5yv"]
 [ext_resource type="Script" uid="uid://br2cfemhns16t" path="res://scripts/fx/ItemFallVisualCatalog.cs" id="54_hx0v3"]
 [ext_resource type="Texture2D" uid="uid://bvamstti2ja0f" path="res://assets/effect/WallEffect/firewallA_1.png" id="54_l8tcl"]
+[ext_resource type="Texture2D" uid="uid://ch7oqqlpm2ubj" path="res://assets/furnitures/hotel_scene2/CautionTape_holding.png" id="55_caution"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_cb4t2"]
 
@@ -430,6 +431,13 @@ Texture = ExtResource("54_l8tcl")
 Scale = Vector2(0.33, 0.33)
 Material = SubResource("ShaderMaterial_cb4t2")
 
+[sub_resource type="Resource" id="Resource_caution"]
+script = ExtResource("1_kv8yj")
+Key = "fall_caution_tape"
+Texture = ExtResource("55_caution")
+Scale = Vector2(0.33, 0.33)
+Material = SubResource("ShaderMaterial_cb4t2")
+
 [resource]
 script = ExtResource("54_hx0v3")
-Profiles = Array[ExtResource("1_kv8yj")]([SubResource("Resource_plod5"), SubResource("Resource_7ug3o"), SubResource("Resource_lbp7s"), SubResource("Resource_drr8g"), SubResource("Resource_a7m45"), SubResource("Resource_3miex"), SubResource("Resource_sub0f"), SubResource("Resource_8plhd"), SubResource("Resource_na5ia"), SubResource("Resource_ojvas"), SubResource("Resource_8hkcg"), SubResource("Resource_qd2iq"), SubResource("Resource_p8a7s"), SubResource("Resource_fqjev"), SubResource("Resource_2lv2h"), SubResource("Resource_4h4wq"), SubResource("Resource_j78vs"), SubResource("Resource_27lbn"), SubResource("Resource_6xumb"), SubResource("Resource_bt4y5"), SubResource("Resource_4p5b6"), SubResource("Resource_rq4f3"), SubResource("Resource_au4we"), SubResource("Resource_3korv"), SubResource("Resource_cg34c"), SubResource("Resource_472vw"), SubResource("Resource_pweho"), SubResource("Resource_gd3j4"), SubResource("Resource_q3bul"), SubResource("Resource_v1h42"), SubResource("Resource_88813"), SubResource("Resource_v2nt4"), SubResource("Resource_4xpt2"), SubResource("Resource_5ceq3"), SubResource("Resource_tvd2w"), SubResource("Resource_5xuvb"), SubResource("Resource_m7iht"), SubResource("Resource_lbl54"), SubResource("Resource_8rgdk"), SubResource("Resource_vbpqj"), SubResource("Resource_3fhhr"), SubResource("Resource_8s84a"), SubResource("Resource_151bi"), SubResource("Resource_pg7vp"), SubResource("Resource_2ck4t"), SubResource("Resource_m7w0t"), SubResource("Resource_hi61p"), SubResource("Resource_1jrvi"), SubResource("Resource_cntnw"), SubResource("Resource_dthg1"), SubResource("Resource_yweoc"), SubResource("Resource_i1k0d"), SubResource("Resource_cw6kv")])
+Profiles = Array[ExtResource("1_kv8yj")]([SubResource("Resource_plod5"), SubResource("Resource_7ug3o"), SubResource("Resource_lbp7s"), SubResource("Resource_drr8g"), SubResource("Resource_a7m45"), SubResource("Resource_3miex"), SubResource("Resource_sub0f"), SubResource("Resource_8plhd"), SubResource("Resource_na5ia"), SubResource("Resource_ojvas"), SubResource("Resource_8hkcg"), SubResource("Resource_qd2iq"), SubResource("Resource_p8a7s"), SubResource("Resource_fqjev"), SubResource("Resource_2lv2h"), SubResource("Resource_4h4wq"), SubResource("Resource_j78vs"), SubResource("Resource_27lbn"), SubResource("Resource_6xumb"), SubResource("Resource_bt4y5"), SubResource("Resource_4p5b6"), SubResource("Resource_rq4f3"), SubResource("Resource_au4we"), SubResource("Resource_3korv"), SubResource("Resource_cg34c"), SubResource("Resource_472vw"), SubResource("Resource_pweho"), SubResource("Resource_gd3j4"), SubResource("Resource_q3bul"), SubResource("Resource_v1h42"), SubResource("Resource_88813"), SubResource("Resource_v2nt4"), SubResource("Resource_4xpt2"), SubResource("Resource_5ceq3"), SubResource("Resource_tvd2w"), SubResource("Resource_5xuvb"), SubResource("Resource_m7iht"), SubResource("Resource_lbl54"), SubResource("Resource_8rgdk"), SubResource("Resource_vbpqj"), SubResource("Resource_3fhhr"), SubResource("Resource_8s84a"), SubResource("Resource_151bi"), SubResource("Resource_pg7vp"), SubResource("Resource_2ck4t"), SubResource("Resource_m7w0t"), SubResource("Resource_hi61p"), SubResource("Resource_1jrvi"), SubResource("Resource_cntnw"), SubResource("Resource_dthg1"), SubResource("Resource_yweoc"), SubResource("Resource_i1k0d"), SubResource("Resource_cw6kv"), SubResource("Resource_caution")])

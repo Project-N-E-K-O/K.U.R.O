@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://dmqi6co8gtn0l"]
+[gd_scene load_steps=16 format=3 uid="uid://dmqi6co8gtn0l"]
 
 [ext_resource type="Script" uid="uid://dtgdjgrqgype7" path="res://scripts/items/world/WorldItemEntity.cs" id="1_odxds"]
 [ext_resource type="Resource" uid="uid://dyyaj1hkexdcv" path="res://resources/items/Weapon_Brawl_DiscoBall.tres" id="2_odxds"]
@@ -8,6 +8,7 @@
 [ext_resource type="Shader" uid="uid://caxdo713k5kug" path="res://shaders/materials/sparkling.gdshader" id="7_crgrq"]
 [ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/GroundObjectController.cs" id="7_odxds"]
 [ext_resource type="PackedScene" uid="uid://dby51i7slqvd5" path="res://scenes/objects/Animation_item.tscn" id="8_odbs7"]
+[ext_resource type="Script" uid="uid://bp7k64w3rc75b" path="res://scripts/controllers/ShadowGroundController.cs" id="shadow_ground_ctrl"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_rrc52"]
 shader = ExtResource("3_3jtwq")
@@ -89,3 +90,6 @@ script = ExtResource("7_odxds")
 GroundAnchor = NodePath("../Marker2D")
 FallEffectScene = ExtResource("8_odbs7")
 FallAnimationName = "fall_disco_ball"
+
+[node name="ShadowGroundController" type="Node" parent="Shadow"]
+script = ExtResource("shadow_ground_ctrl")

@@ -96,6 +96,7 @@ position = Vector2(6790, 850)
 collision_layer = 0
 collision_mask = 4
 script = ExtResource("2_bkvq7")
+ExecutionMode = 1
 Sequence = ExtResource("3_kj57q")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CutsceneTrigger"]

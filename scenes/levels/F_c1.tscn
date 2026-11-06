@@ -102,6 +102,7 @@ collision_layer = 0
 collision_mask = 4
 script = ExtResource("2_s4dnd")
 Sequence = ExtResource("3_h2apx")
+ExecutionMode = 1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CutsceneTrigger"]
 shape = SubResource("RectangleShape2D_1d5w0")
@@ -216,6 +217,7 @@ position = Vector2(0, 2390)
 shape = SubResource("RectangleShape2D_ao0lv")
 
 [node name="NavigationRegion2D" type="NavigationRegion2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
+visible = false
 position = Vector2(1334, 710)
 navigation_polygon = SubResource("NavigationPolygon_ka7vx")
 

@@ -1,4 +1,4 @@
-[gd_scene load_steps=42 format=3 uid="uid://cvdv22giw51s8"]
+[gd_scene load_steps=43 format=3 uid="uid://cvdv22giw51s8"]
 
 [ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/GroundObjectController.cs" id="ground_object_ctrl"]
 
@@ -35,6 +35,7 @@
 [ext_resource type="Texture2D" uid="uid://dj7mt3uqtpoyo" path="res://assets/objects/drone/drone_effect/时间轴 1_0012.png" id="30_7cdr8"]
 [ext_resource type="Texture2D" uid="uid://lr2ixu1faoti" path="res://assets/objects/drone/drone_effect/时间轴 1_0013.png" id="31_24s6a"]
 [ext_resource type="PackedScene" uid="uid://dby51i7slqvd5" path="res://scenes/objects/Animation_item.tscn" id="fall_anim_item"]
+[ext_resource type="Script" uid="uid://bp7k64w3rc75b" path="res://scripts/controllers/ShadowGroundController.cs" id="shadow_ground_ctrl"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_aa7cv"]
 shader = ExtResource("3_2s53g")
@@ -221,3 +222,6 @@ shape = SubResource("RectangleShape2D_vps3s")
 script = ExtResource("ground_object_ctrl")
 FallEffectScene = ExtResource("fall_anim_item")
 FallAnimationName = "fall_drone"
+
+[node name="ShadowGroundController" type="Node" parent="RigidBody2D/Shadow"]
+script = ExtResource("shadow_ground_ctrl")

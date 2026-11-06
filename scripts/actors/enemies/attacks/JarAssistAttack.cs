@@ -35,11 +35,11 @@ namespace Kuros.Actors.Enemies.Attacks
 			SetProcess(true);
 		}
 
-		public override bool CanStart()
+		protected override bool CanStartCore()
 		{
 			if (_tracking) return false;
 			if (Enemy is not EnemyF1RogueAITurret) return false;
-			return base.CanStart();
+			return base.CanStartCore();
 		}
 
 		protected override void OnAttackStarted()
@@ -225,6 +225,14 @@ namespace Kuros.Actors.Enemies.Attacks
 			_resolved = true;
 			_activeJar = null;
 			UnsubscribeDeath();
+		}
+
+		/// <summary>停机时取消独立协助计时，清理罐子，不触发其死亡结算。</summary>
+		public void CancelAssist()
+		{
+			var jar = _activeJar;
+			StopTracking();
+			if (GodotObject.IsInstanceValid(jar) && !jar!.IsQueuedForDeletion()) jar.QueueFree();
 		}
 
 		private void UnsubscribeDeath()

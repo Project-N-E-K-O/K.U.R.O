@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://bkbhucnxqiys2"]
+[gd_scene load_steps=15 format=3 uid="uid://bkbhucnxqiys2"]
 
 [ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/GroundObjectController.cs" id="ground_object_ctrl"]
 
@@ -9,6 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://c0ao8pdrenk5f" path="res://assets/furnitures/hotel_scene2/CounterB.png" id="6_l3q27"]
 [ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="7_uemcc"]
 [ext_resource type="PackedScene" uid="uid://dby51i7slqvd5" path="res://scenes/objects/Animation_item.tscn" id="fall_anim_item"]
+[ext_resource type="Script" uid="uid://bp7k64w3rc75b" path="res://scripts/controllers/ShadowGroundController.cs" id="shadow_ground_ctrl"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_k7rl8"]
 shader = ExtResource("6_2if1i")
@@ -89,3 +90,6 @@ shape = SubResource("RectangleShape2D_jyvv2")
 script = ExtResource("ground_object_ctrl")
 FallEffectScene = ExtResource("fall_anim_item")
 FallAnimationName = "fall_counter_b"
+
+[node name="ShadowGroundController" type="Node" parent="RigidBody2D/Shadow"]
+script = ExtResource("shadow_ground_ctrl")

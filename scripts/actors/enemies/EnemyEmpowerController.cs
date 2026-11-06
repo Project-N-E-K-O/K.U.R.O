@@ -59,7 +59,7 @@ public partial class EnemyEmpowerController : Node
 
     public void Activate()
     {
-        if (_enemy == null || _enemy.IsDeadOrDying) return;
+        if (_enemy == null || _enemy.IsDeadOrDying || _enemy is EnemyF1RogueAITurret { IsAIShutdown: true }) return;
         if (IsEmpowered)
         {
             if (RefreshOnReapply) RemainingSeconds = Mathf.Max(Duration, 0.1f);

@@ -47,11 +47,7 @@ namespace Kuros.Actors.Enemies.Attacks
         public bool IsStandingUp => _standingUp;
 
         /// <summary>起手条件：基类（检测圈 + 朝向角）之上再要求玩家在自配触发区里。</summary>
-        public override bool CanStart()
-        {
-            if (!base.CanStart()) return false;
-            return IsPlayerInTriggerArea();
-        }
+
 
         protected override void OnAttackStarted()
         {
@@ -157,7 +153,7 @@ namespace Kuros.Actors.Enemies.Attacks
         {
             base.OnAnimationHit();
             if (Enemy?.PlayerTarget is not SamplePlayer player) return;
-            if (AttackArea == null || !player.IsHitByArea(AttackArea)) return;
+            if (DamageArea == null || !player.IsHitByArea(DamageArea)) return;
 
             _hitPlayer = true;
             TryApplyPlayerKnockback(player, KnockbackDistance, KnockbackDuration, _chargeDirection);

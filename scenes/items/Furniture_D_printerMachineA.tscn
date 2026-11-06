@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://dixwca6u7ayek"]
+[gd_scene load_steps=18 format=3 uid="uid://dixwca6u7ayek"]
 
 [ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/GroundObjectController.cs" id="ground_object_ctrl"]
 
@@ -11,6 +11,7 @@
 [ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="5_h03tv"]
 [ext_resource type="Texture2D" uid="uid://ciqgfdqwxs36h" path="res://assets/furnitures/hotel_scene4/PrinterMachineA.png" id="6_jpdnd"]
 [ext_resource type="PackedScene" uid="uid://dby51i7slqvd5" path="res://scenes/objects/Animation_item.tscn" id="fall_anim_item"]
+[ext_resource type="Script" uid="uid://bp7k64w3rc75b" path="res://scripts/controllers/ShadowGroundController.cs" id="shadow_ground_ctrl"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ukya5"]
 shader = ExtResource("3_u3qi6")
@@ -111,3 +112,6 @@ shape = SubResource("RectangleShape2D_u3qi6")
 script = ExtResource("ground_object_ctrl")
 FallEffectScene = ExtResource("fall_anim_item")
 FallAnimationName = "fall_printer_machine_a"
+
+[node name="ShadowGroundController" type="Node" parent="RigidBody2D/Shadow"]
+script = ExtResource("shadow_ground_ctrl")

@@ -43,17 +43,18 @@ namespace Kuros.Actors.Enemies.States
         {
             bool playerDetected = Enemy.IsPlayerWithinDetectionRange();
             bool playerInAttackRange = Enemy.IsPlayerInAttackRange();
+            bool keepRunning = _activeTemplate is { IsRunning: true, ContinueOutsidePlayerRange: true };
 
             //使用 IsPlayerWithinDetectionRange 检查玩家，这会刷新玩家引用
             // 如果玩家不在检测范围内且不在攻击范围内，直接切换到 Idle 状态
-            if (!playerDetected && !playerInAttackRange)
+            if (!keepRunning && !playerDetected && !playerInAttackRange)
             {
                 ChangeState("Idle");
                 return;
             }
 
             // 如果玩家在攻击范围外但在检测范围内，并且设置了 ExitToWalkWhenOutOfAttackRange，则切换到 Walk 状态
-            if (ExitToWalkWhenOutOfAttackRange && playerDetected && !playerInAttackRange)
+            if (!keepRunning && ExitToWalkWhenOutOfAttackRange && playerDetected && !playerInAttackRange)
             {
                 ChangeState("Walk");
                 return;
