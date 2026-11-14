@@ -90,6 +90,7 @@ namespace Kuros.Managers
         private int _lastKnownScore;
         private int _triggerCount;
         private bool _isSelectionActive;
+        private BuildSelectionWindow? _activeWindow;
         private int _pendingScore;
         /// <summary>构筑选择主数据源（时间序,含被反向取代的废卡）。</summary>
         private readonly List<BuildPickRecord> _pickRecords = new();
@@ -178,6 +179,9 @@ namespace Kuros.Managers
         /// </summary>
         public void ResetForNewRun()
         {
+            if (_activeWindow != null && IsInstanceValid(_activeWindow))
+                _activeWindow.CloseWindow(immediate: true);
+            _activeWindow = null;
             UnbindPlayer();
             _triggerCount = 0;
             _coreSelected = false;
@@ -220,13 +224,12 @@ namespace Kuros.Managers
 
         private PackedScene? _coreWindowScene;
 
-        public void TriggerCoreSelection()
+        public bool TryTriggerCoreSelection()
         {
-            if (_coreSelected) return;
-            if (_boundPlayer == null) TryBindPlayer();
-            if (_boundPlayer == null || !IsInstanceValid(_boundPlayer)) return;
-            if (CorePool.Count == 0) return;
-            _isSelectionActive = true;
+            if (_coreSelected || _isSelectionActive) return false;
+            if (_boundPlayer == null || !IsInstanceValid(_boundPlayer)) TryBindPlayer();
+            if (_boundPlayer == null || !IsInstanceValid(_boundPlayer)) return false;
+            if (CorePool.Count == 0) return false;
 
             // 将 CoreDefinition 包装为 BuildEffectDefinition 以复用现有窗口
             var options = new List<BuildEffectDefinition>();
@@ -244,13 +247,12 @@ namespace Kuros.Managers
                 });
             }
 
+            if (options.Count == 0) return false;
             _coreWindowScene ??= GD.Load<PackedScene>("res://scenes/ui/windows/BuildSelectionWindow.tscn");
-            if (_coreWindowScene == null)
-            {
-                _isSelectionActive = false;
-                return;
-            }
+            if (_coreWindowScene == null) return false;
             var window = _coreWindowScene.Instantiate<BuildSelectionWindow>();
+            _isSelectionActive = true;
+            _activeWindow = window;
 
             var canvasLayer = new CanvasLayer { Layer = 2 };
             GetTree().Root.AddChild(canvasLayer);
@@ -299,6 +301,7 @@ namespace Kuros.Managers
                 if (_boundPlayer != null && IsInstanceValid(_boundPlayer))
                     CheckAndTriggerSelection(_boundPlayer.Score);
             });
+            return true;
         }
 
         private BuildCoreDefinition? FindCoreById(string coreId)
@@ -342,6 +345,7 @@ namespace Kuros.Managers
 
             _windowScene ??= GD.Load<PackedScene>("res://scenes/ui/windows/BuildSelectionWindow.tscn");
             var window = _windowScene.Instantiate<BuildSelectionWindow>();
+            _activeWindow = window;
 
             var canvasLayer = new CanvasLayer { Layer = 2 };
             GetTree().Root.AddChild(canvasLayer);
@@ -570,10 +574,7 @@ namespace Kuros.Managers
         /// <summary>清除构筑选择状态（返回主菜单/退出战斗时调用）——清空已选记录，重进存档后重新选择构筑，避免旧构筑效果跨主菜单残留。</summary>
         public void ClearBuildState()
         {
-            _pickRecords.Clear();
-            RebuildPickedSnapshot();
-            _selectedCoreId = null;
-            _playerCoreClass = null;
+            ResetForNewRun();
             PickedEffectsChanged?.Invoke();
         }
 

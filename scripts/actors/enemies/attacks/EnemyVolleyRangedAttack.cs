@@ -122,7 +122,7 @@ namespace Kuros.Actors.Enemies.Attacks
             }
 
             direction = direction.Normalized();
-            DealDamage((DamageArea ?? AttackArea)!);   // 伤害落点走基类 DamageAreaPath
+            DealDamage(DamageArea); // 无本体伤害区时只生成投射物。
             if (ProjectileItem != null)
             {
                 SpawnProjectile(direction);

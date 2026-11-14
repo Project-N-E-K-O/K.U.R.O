@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/ItemDefinition.cs" id="item"]
+
+[ext_resource type="Texture2D" path="res://assets/ui/room_key_hidden_a.svg" id="icon"]
+
+[resource]
+script = ExtResource("item")
+ItemId = "room_key_hidden_a"
+DisplayName = "隐藏楼层房卡"
+Description = "持有时可以从电梯前往对应的隐藏楼层。"
+Icon = ExtResource("icon")
+MaxStackSize = 1

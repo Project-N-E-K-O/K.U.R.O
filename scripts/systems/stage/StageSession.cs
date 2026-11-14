@@ -1,15 +1,20 @@
+using System.Threading.Tasks;
 using System;
 using Godot;
 using Godot.Collections;
 using System.Collections.Generic;
 using Kuros.Managers;
+using Kuros.Actors.Heroes;
+using Kuros.Scenes;
+using Kuros.Systems.Cutscene;
+using System.Linq;
 using Kuros.Utils;
 
 namespace Kuros.Systems.Stage
 {
     /// <summary>
     /// 关卡会话：持有全部注册的 StageConfig，跟踪当前关卡与所在层（Floor）。
-    /// 电梯选关选项 = 下一层（Floor+1）的所有分支 + 已解锁彩蛋关；出舱时应用所选配置（world 内换关）。
+    /// 电梯选关选项 = 下一层的所有分支 + 已解锁隐藏楼层；出舱时应用所选配置（world 内换关）。
     /// </summary>
     [GlobalClass]
     public partial class StageSession : Node
@@ -33,19 +38,16 @@ namespace Kuros.Systems.Stage
         private StageGeneratorManager? _generator;
         private StageConfig? _currentConfig;
         private int _debugIndex = 0;
-        private int _pendingIndex = -1;
-
-        /// <summary>已激活的彩蛋关（条件触发后出现在电梯面板）。</summary>
-        private readonly HashSet<StageConfig> _activatedEggs = new();
-        /// <summary>已进入过的彩蛋关（一次性：消费后不再出现，防重复触发）。</summary>
-        private readonly HashSet<StageConfig> _consumedEggs = new();
-
-        /// <summary>进入彩蛋前的所在层（彩蛋是两层间的隐藏停靠站——离开彩蛋后继续入口层的行程）。</summary>
-        private StageConfig? _eggEntryStage;
-
-        /// <summary>换关流程进行中（房间池后台预加载等待）——期间新请求排队，完成后自动应用最新。</summary>
+        private StagePlan? _pendingPlan;
+        private Task<IReadOnlyList<PackedScene>?>? _pendingLoad;
+        private readonly System.Collections.Generic.Dictionary<string, Task<PackedScene?>> _roomLoads = new();
+        public bool PendingReady => _pendingLoad?.IsCompletedSuccessfully == true && _pendingLoad.Result != null;
+        public bool PendingFailed => _pendingLoad?.IsCompleted == true && !PendingReady;
+        private readonly System.Collections.Generic.Dictionary<StageConfig, StagePlan?> _candidatePlans = new();
+        private List<StagePlan> _displayedPlans = new();
+        private readonly HashSet<StageConfig> _unlockedHiddenFloors = new();
+        private StageConfig? _hiddenEntryStage;
         private bool _transitionInProgress;
-        private StageConfig? _queuedConfig;
 
         /// <summary>当前会话（同场景只有一个）。敌人生成时据此拿楼层系数；未就绪 = null。</summary>
         public static StageSession? Current { get; private set; }
@@ -86,12 +88,14 @@ namespace Kuros.Systems.Stage
                 return;
             }
             _generator.StageGenerated += OnStageGenerated;
+            _generator.StageGenerationFailed += OnStageGenerationFailed;
 
-            // 首关（配合 StageGeneratorManager.GenerateOnReady=false）——房间池预加载后生成
+            // 酒店首层由会话规划，加载路线中的房间后生成。
             var first = StartStage ?? (AllConfigs.Count > 0 ? AllConfigs[0] : null);
             if (first != null)
             {
                 _currentConfig = first;
+                _debugIndex = AllConfigs.IndexOf(first);
                 GameLogger.Info(nameof(StageSession), $"首关：{first.StageId}（Floor {first.Floor}）");
                 ApplyStageAsync(first);
             }
@@ -103,7 +107,10 @@ namespace Kuros.Systems.Stage
                 Current = null;
 
             if (_generator != null)
+            {
                 _generator.StageGenerated -= OnStageGenerated;
+                _generator.StageGenerationFailed -= OnStageGenerationFailed;
+            }
         }
 
         public override void _UnhandledInput(InputEvent @event)
@@ -114,260 +121,202 @@ namespace Kuros.Systems.Stage
             if (key.Keycode == Key.F1 || key.Keycode == Key.F2)
                 CycleDebugConfig();
             if (key.Keycode == Key.F3)
-                ActivateAllEasterEggsDebug();
+                ActivateAllHiddenFloorsDebug();
         }
 
-        /// <summary>调试：激活全部已注册彩蛋（替代机关/剧情激活入口，验证彩蛋流程用）。</summary>
-        private void ActivateAllEasterEggsDebug()
+        private void ActivateAllHiddenFloorsDebug()
         {
-            int count = 0;
             foreach (var config in AllConfigs)
-            {
-                if (config?.EasterEgg == true && _activatedEggs.Add(config))
-                    count++;
-            }
-            GameLogger.Info(nameof(StageSession), $"调试激活 {count} 个彩蛋关");
+                if (config?.IsHiddenFloor == true)
+                    UnlockHiddenFloor(config);
         }
 
-        // ── 电梯会话接口（ElevatorController 调用）─────────────────
-
-        /// <summary>当前电梯可选关卡数（下一层分支 + 已解锁彩蛋）。</summary>
-        public int GetOptionCount() => GetOptions().Count;
-
-        /// <summary>拼装选关提示："1=餐厅a区  2=餐厅b区"。</summary>
-        public string DescribeOptions()
+        public int PrepareElevatorOptions()
         {
-            var options = GetOptions();
-            if (options.Count == 0) return "前方没有可前往的楼层";
-            var parts = new List<string>();
-            for (int i = 0; i < options.Count; i++)
-            {
-                var config = options[i];
-                string label = !string.IsNullOrEmpty(config?.DisplayName)
-                    ? config.DisplayName
-                    : config?.StageId ?? "?";
-                parts.Add($"{i + 1}={label}");
-            }
-            return string.Join("  ", parts);
+            _pendingPlan = null;
+            _pendingLoad = null;
+            _displayedPlans = GetOptions().Select(GetCandidatePlan).OfType<StagePlan>().ToList();
+            return _displayedPlans.Count;
         }
 
-        /// <summary>玩家在电梯里选定目标关卡（出舱时才真正生效）。</summary>
-        public void SelectStage(int index)
+        private StagePlan? GetCandidatePlan(StageConfig config)
         {
-            var options = GetOptions();
-            if (index < 0 || index >= options.Count) return;
-            _pendingIndex = index;
-            GameLogger.Info(nameof(StageSession), $"电梯选定：{options[index]?.StageId ?? "(null)"}");
+            if (!_candidatePlans.TryGetValue(config, out var plan))
+                _candidatePlans[config] = plan = _generator?.CreatePlan(config);
+            return plan;
         }
 
-        /// <summary>当前电梯选定目标（_pendingIndex）的房间池是否已预加载就绪（门可开）。</summary>
-        public bool IsPendingReady { get; private set; } = true;
+        public IReadOnlyList<StagePlan> DisplayedPlans => _displayedPlans;
 
-        /// <summary>立即后台预加载电梯选中的目标 config 房间池（ElevatorController.BeginLoading 时调用）。
-        /// 无有效选择/无生成器时直接视为就绪（不卡门）。完成后 IsPendingReady=true（含失败路径）。</summary>
-        public void PreloadPending()
+        public string DescribeOptions() => _displayedPlans.Count == 0
+            ? "前方没有可前往的楼层"
+            : string.Join("\n", _displayedPlans.Select((plan, index) =>
+                $"{index + 1}. {plan.Config.DepartureLabel}　{plan.DescribeRoute()}"));
+
+        public bool SelectStage(int index)
         {
-            IsPendingReady = false;
-            if (_generator == null) { IsPendingReady = true; return; }
-
-            var options = GetOptions();
-            if (_pendingIndex < 0 || _pendingIndex >= options.Count)
-            {
-                IsPendingReady = true;
-                return;
-            }
-            _ = PreloadPendingAsync(options[_pendingIndex]);
+            if (_transitionInProgress || index < 0 || index >= _displayedPlans.Count) return false;
+            var plan = _displayedPlans[index];
+            if (!GetOptions().Contains(plan.Config)) return false;
+            _pendingPlan = plan;
+            _pendingLoad = LoadPlanAsync(plan);
+            return true;
         }
 
-        private async System.Threading.Tasks.Task PreloadPendingAsync(StageConfig config)
-        {
-            try { await PreloadStageRoomsAsync(config); }
-            catch (Exception ex)
-            {
-                GameLogger.Warn(nameof(StageSession), $"预加载异常：{ex.Message}");
-            }
-            if (GodotObject.IsInstanceValid(this))
-                IsPendingReady = true; // 含 Failed 路径（PreloadStageRoomsAsync 已把 Failed 当完成）——不卡门
-        }
-
-        /// <summary>出舱动作：应用选中的关卡配置（world 内换关，房间池预加载后生成）。</summary>
         public void CommitPending()
         {
-            var options = GetOptions();
-            if (_generator == null || _pendingIndex < 0 || _pendingIndex >= options.Count)
-                return;
-
-            var config = options[_pendingIndex];
-            _pendingIndex = -1;
-            ApplyStageAsync(config);
+            if (_pendingPlan is { } plan && PendingReady) QueueTransition(plan, _pendingLoad!.Result!);
         }
 
-        /// <summary>直接跳转指定关卡（隐藏入口/机关/剧情切关）：不经电梯骑行，房间池预加载后生成。
-        /// landingPosition = 玩家落点（世界坐标，密道出口用）；null = 新关起点。</summary>
         public void GoToStage(StageConfig config, Vector2? landingPosition = null)
+            => ApplyStageAsync(config, landingPosition);
+
+        public void UnlockHiddenFloor(StageConfig config)
         {
-            if (config == null || _generator == null) return;
-            ApplyStageAsync(config, landingPosition);
+            if (config.IsHiddenFloor) _unlockedHiddenFloors.Add(config);
         }
 
-        /// <summary>激活彩蛋关（隐藏机关/剧情事件等条件达成时调用）——此后出现在电梯面板尾部。
-        /// 进入该彩蛋关后自动消费（一次性，不再出现）。</summary>
-        public void ActivateEasterEgg(StageConfig config)
+        public StagePlan? ChooseHiddenFloor(IEnumerable<StageConfig> destinations)
         {
-            if (config?.EasterEgg != true) return;
-            if (_activatedEggs.Add(config))
-                GameLogger.Info(nameof(StageSession), $"彩蛋已激活：{config.StageId}");
+            if (_transitionInProgress || _currentConfig?.IsHiddenFloor != false) return null;
+            var plans = destinations.Where(config => config?.IsHiddenFloor == true)
+                .Distinct().Select(GetCandidatePlan).OfType<StagePlan>().ToArray();
+            return plans.Length == 0 ? null : plans[GD.RandRange(0, plans.Length - 1)];
         }
 
-        // ── 调试/内部 ─────────────────────────────────────────────
+        public async Task<IReadOnlyList<PackedScene>?> LoadPlanAsync(StagePlan plan)
+        {
+            try
+            {
+                var rooms = await Task.WhenAll(plan.RoomPaths.Select(GetRoomLoad));
+                return rooms.All(room => room?.CanInstantiate() == true)
+                    ? rooms.Select(room => room!).ToArray() : null;
+            }
+            catch (Exception ex)
+            {
+                GD.PushWarning($"[StageSession] {plan.Config.StageId}: {ex.Message}");
+                return null;
+            }
+        }
+
+        private Task<PackedScene?> GetRoomLoad(string path)
+        {
+            if (!_roomLoads.TryGetValue(path, out var load))
+                _roomLoads[path] = load = LoadRoomAsync(path);
+            return load;
+        }
+
+        private async Task<PackedScene?> LoadRoomAsync(string path)
+        {
+            try
+            {
+                // 首次等待后才进入 finally，确保并行请求能先登记。
+                await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+                if (!GodotObject.IsInstanceValid(this) || !IsInsideTree()) return null;
+                if (ResourceLoader.LoadThreadedRequest(path, "PackedScene") != Error.Ok) return null;
+                while (true)
+                {
+                    switch (ResourceLoader.LoadThreadedGetStatus(path))
+                    {
+                        case ResourceLoader.ThreadLoadStatus.Loaded:
+                            return ResourceLoader.LoadThreadedGet(path) as PackedScene;
+                        case ResourceLoader.ThreadLoadStatus.InProgress:
+                            await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+                            if (!GodotObject.IsInstanceValid(this) || !IsInsideTree()) return null;
+                            break;
+                        default:
+                            GD.PushWarning($"[StageSession] 房间加载失败：{path}");
+                            return null;
+                    }
+                }
+            }
+            finally { _roomLoads.Remove(path); }
+        }
 
         private void CycleDebugConfig()
         {
-            if (_generator == null || AllConfigs.Count == 0) return;
+            if (_generator == null || AllConfigs.Count == 0 || _transitionInProgress) return;
             _debugIndex = (_debugIndex + 1) % AllConfigs.Count;
             ApplyStageAsync(AllConfigs[_debugIndex]);
         }
 
-        // ── 换关流程（方案 B：房间池后台预加载 → 完成才 Regenerate）──
-
-        /// <summary>异步换关入口：先后台预加载 config 的房间池，完成后才清空/重生成。
-        /// 切换进行中时新请求排队（_queuedConfig），完成后自动应用最新——等待期旧关完整保留。</summary>
-        private void ApplyStageAsync(StageConfig config, Vector2? landingPosition = null)
+        private async void ApplyStageAsync(StageConfig config, Vector2? landingPosition = null)
         {
-            if (config == null || _generator == null) return;
-
-            if (_transitionInProgress)
-            {
-                _queuedConfig = config;
-                GameLogger.Info(nameof(StageSession), $"换关进行中，排队：{config.StageId}");
-                return;
-            }
-
+            if (_transitionInProgress || GetCandidatePlan(config) is not { } plan) return;
+            var source = _currentConfig;
             _transitionInProgress = true;
-            GameLogger.Info(nameof(StageSession), $"预加载房间池：{config.StageId}…");
-            _ = RunTransitionAsync(config, landingPosition);
-        }
-
-        private async System.Threading.Tasks.Task RunTransitionAsync(StageConfig config, Vector2? landingPosition)
-        {
-            try
-            {
-                await PreloadStageRoomsAsync(config);
-            }
-            catch (Exception ex)
-            {
-                GameLogger.Warn(nameof(StageSession), $"房间池预加载异常：{ex.Message}");
-            }
-
-            // 节点可能已被释放（场景卸载/壳销毁）——后续访问前检查
-            if (!GodotObject.IsInstanceValid(this) || _generator == null)
-                return;
-
-            if (_queuedConfig != null)
-            {
-                var queued = _queuedConfig;
-                _queuedConfig = null;
-                _transitionInProgress = false;
-                ApplyStageAsync(queued);
-                return;
-            }
-
+            var rooms = await LoadPlanAsync(plan);
+            if (!GodotObject.IsInstanceValid(this) || !IsInsideTree()) return;
             _transitionInProgress = false;
-            GameLogger.Info(nameof(StageSession), $"房间就绪，生成 {config.StageId}");
-            ApplyStage(config, landingPosition);
+            if (rooms != null && source == _currentConfig)
+                QueueTransition(plan, rooms, landingPosition);
         }
 
-        /// <summary>后台加载 config 全部房间池（五池去重），每帧轮询等待完成——主线程不阻塞。
-        /// 参考 EnemySpawnManager.LoadSpawnEffectScenesAsync 的异步等待范式。</summary>
-        private async System.Threading.Tasks.Task PreloadStageRoomsAsync(StageConfig config)
+        public bool QueueTransition(StagePlan plan, IReadOnlyList<PackedScene> rooms,
+            Vector2? landingPosition = null, Func<bool>? stillValid = null)
         {
-            var paths = new List<string>();
-            CollectPoolPaths(paths, config.BeginPool);
-            CollectPoolPaths(paths, config.EndPool);
-            CollectPoolPaths(paths, config.EasyMiddlePool);
-            CollectPoolPaths(paths, config.NormalMiddlePool);
-            CollectPoolPaths(paths, config.HardMiddlePool);
-            if (paths.Count == 0) return;
-
-            foreach (var path in paths)
-            {
-                // 已缓存/正在加载的资源重复请求引擎幂等处理（缓存命中立即 Loaded）
-                ResourceLoader.LoadThreadedRequest(path);
-            }
-
-            while (true)
-            {
-                if (!GodotObject.IsInstanceValid(this)) return;
-
-                bool allDone = true;
-                foreach (var path in paths)
-                {
-                    var status = ResourceLoader.LoadThreadedGetStatus(path);
-                    if (status == ResourceLoader.ThreadLoadStatus.InProgress)
-                    {
-                        allDone = false;
-                        break;
-                    }
-                    if (status == ResourceLoader.ThreadLoadStatus.Failed)
-                        GameLogger.Warn(nameof(StageSession), $"房间加载失败：{path}");
-                }
-                if (allDone) break;
-
-                await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
-            }
+            if (_transitionInProgress || _generator == null
+                || _generator.GetNodeOrNull<Node2D>(_generator.WorldNodePath) == null
+                || rooms.Count != plan.RoomPaths.Count || !rooms.All(room => room.CanInstantiate()))
+                return false;
+            _transitionInProgress = true;
+            Callable.From(() => ApplyStage(plan, rooms, landingPosition, stillValid)).CallDeferred();
+            return true;
         }
 
-        private static void CollectPoolPaths(List<string> paths, Array<PackedScene> pool)
+        private void ApplyStage(StagePlan plan, IReadOnlyList<PackedScene> rooms,
+            Vector2? landingPosition, Func<bool>? stillValid)
         {
-            foreach (var scene in pool)
+            if (stillValid?.Invoke() == false)
             {
-                if (scene == null) continue;
-                string path = scene.ResourcePath;
-                if (!string.IsNullOrEmpty(path) && !paths.Contains(path))
-                    paths.Add(path);
+                _transitionInProgress = false;
+                return;
             }
-        }
+            var cutscene = GetParent()?.GetNodeOrNull<CutsceneManager>("CutsceneManager");
+            if (cutscene?.IsPlaying == true)
+            {
+                _ = WaitForCutsceneAsync(cutscene, plan, rooms, landingPosition, stillValid);
+                return;
+            }
 
-        /// <summary>应用关卡配置：记录当前关并重新生成（玩家传送到新关起点或指定落点）。
-        /// 进入彩蛋关即消费（_consumedEggs，防重复）并记录入口层（_eggEntryStage，供彩蛋层电梯推导行程）。</summary>
-        private void ApplyStage(StageConfig config, Vector2? landingPosition = null)
-        {
-            if (config.EasterEgg)
-            {
-                _eggEntryStage = _currentConfig;
-                _consumedEggs.Add(config);
-            }
+            var config = plan.Config;
+            if (config.IsHiddenFloor)
+                _hiddenEntryStage ??= _currentConfig;
             else
-            {
-                _eggEntryStage = null;
-            }
+                _hiddenEntryStage = null;
             _currentConfig = config;
-            GameLogger.Info(nameof(StageSession), $"前往：{config.StageId}（Floor {config.Floor}）");
+            _pendingPlan = null;
+            _pendingLoad = null;
+            _candidatePlans.Clear();
+            _displayedPlans.Clear();
 
-            // 换关清场（Regenerate 重排前）:整场白名单清理 World 直属残留——覆盖所有直连生成
-            // 的残留物(place 家具/掉落/OnThrowDestroy 效果物 HealItemA/破坏产物/敌人死亡家具体),
-            // 玩家资产不回收,语义 = 关卡重置即清场。房间由 Regenerate 自行释放。
+            foreach (var root in GetTree().GetNodesInGroup(CutsceneManager.SpawnedRootsGroup))
+                if (GodotObject.IsInstanceValid(root)) root.QueueFree();
+
             _generator!.ClearWorldRemnants();
-            // 兜底:组追踪清理(覆盖挂在非 World 容器的动态道具)
             Kuros.Items.World.WorldItemSpawner.ClearStageWorldItems(this);
-
-            _generator!.Regenerate(config, relocateActors: true, landingPosition: landingPosition);
+            _generator.Regenerate(plan, rooms, landingPosition);
         }
 
-        /// <summary>
-        /// 可选关卡：
-        ///   推导基准 = 当前层；若当前在彩蛋层则用**入口层**（彩蛋是两层间的隐藏停靠站——离开后继续入口层的行程）；
-        ///   普通分支 = 上行目标层（UpFloorTarget，0 时默认 Floor+1）+ 下行目标层（DownFloorTarget，0=无）；
-        ///   彩蛋分支只出现在非彩蛋层的电梯（彩蛋层不再显示彩蛋）；
-        ///   排除当前关自身。
-        /// </summary>
+        private async System.Threading.Tasks.Task WaitForCutsceneAsync(
+            CutsceneManager cutscene, StagePlan plan, IReadOnlyList<PackedScene> rooms,
+            Vector2? landingPosition, Func<bool>? stillValid)
+        {
+            while (GodotObject.IsInstanceValid(cutscene) && cutscene.IsPlaying)
+            {
+                await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+                if (!GodotObject.IsInstanceValid(this) || !IsInsideTree()) return;
+            }
+            Callable.From(() => ApplyStage(plan, rooms, landingPosition, stillValid)).CallDeferred();
+        }
+
         private List<StageConfig> GetOptions()
         {
             var list = new List<StageConfig>();
             var current = _currentConfig;
             if (current == null) return list;
 
-            var baseConfig = current.EasterEgg && _eggEntryStage != null ? _eggEntryStage : current;
+            var baseConfig = current.IsHiddenFloor && _hiddenEntryStage != null ? _hiddenEntryStage : current;
             int upFloor = baseConfig.UpFloorTarget != 0 ? baseConfig.UpFloorTarget : baseConfig.Floor + 1;
             int downFloor = baseConfig.DownFloorTarget;
 
@@ -375,12 +324,12 @@ namespace Kuros.Systems.Stage
             {
                 if (config == null || config == current) continue;
 
-                if (!config.EasterEgg)
+                if (!config.IsHiddenFloor)
                 {
                     if (config.Floor == upFloor || (downFloor != 0 && config.Floor == downFloor))
                         list.Add(config);
                 }
-                else if (!current.EasterEgg && IsEggVisible(config))
+                else if (!current.IsHiddenFloor && IsHiddenFloorAccessible(config))
                 {
                     list.Add(config);
                 }
@@ -388,24 +337,30 @@ namespace Kuros.Systems.Stage
             return list;
         }
 
-        /// <summary>
-        /// 彩蛋可见条件（运行时三态）：
-        ///   ① 已消费（进入过）→ 永不可见（防重复触发）
-        ///   ② ActivateEasterEgg 显式激活 → 可见
-        ///   ③ RequiredStoryFlag 非空且存档旗标满足 → 可见
-        ///   未激活且无旗标 → 不可见（彩蛋默认关闭，不再"始终可选"）
-        /// </summary>
-        private bool IsEggVisible(StageConfig config)
+        private bool IsHiddenFloorAccessible(StageConfig config)
         {
-            if (!config.EasterEgg || _consumedEggs.Contains(config)) return false;
-            if (_activatedEggs.Contains(config)) return true;
-            if (string.IsNullOrEmpty(config.RequiredStoryFlag)) return false;
-            var flags = SaveManager.Instance?.CurrentGameData?.StoryFlags;
-            return flags != null && flags.Contains(config.RequiredStoryFlag);
+            if (_unlockedHiddenFloors.Contains(config)) return true;
+            if (!string.IsNullOrWhiteSpace(config.RequiredStoryFlag)
+                && SaveManager.Instance?.CurrentGameData?.StoryFlags?.Contains(config.RequiredStoryFlag) == true)
+                return true;
+
+            string key = config.RequiredRoomKeyItemId;
+            if (string.IsNullOrWhiteSpace(key)) return false;
+            var inventory = (GetTree().GetFirstNodeInGroup("player") as SamplePlayer)?.InventoryComponent;
+            if (inventory == null) return false;
+            return inventory.Backpack?.Slots.Any(stack => stack?.Item.ItemId == key) == true
+                || inventory.QuickBar?.Slots.Any(stack => stack?.Item.ItemId == key) == true
+                || inventory.SpecialSlots.Values.Any(slot => slot.Stack?.Item.ItemId == key);
         }
+
+        private void OnStageGenerationFailed() => _transitionInProgress = false;
 
         private void OnStageGenerated()
         {
+            _transitionInProgress = false;
+            if (_currentConfig is { } config && GetParent() is BattleSceneManager { AutoShowLevelName: true } manager)
+                manager.ShowLevelNamePopup(config.ArrivalName);
+
             // 玩家被传送到新关起点，相机直接跟随（避免平滑滑过整关）
             var camera = GetNodeOrNull<CameraFollow>(CameraPath);
             if (camera != null && GodotObject.IsInstanceValid(camera))

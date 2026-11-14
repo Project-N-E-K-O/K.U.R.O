@@ -68,7 +68,7 @@ namespace Kuros.Systems.Cutscene
 
             // 阻塞等待动画完成。必须判存活：节点可能在动画里自毁（method 轨道调 DestroySelf 等），
             // 对已释放的 GodotObject 调 IsPlaying() 会抛 ObjectDisposedException，把这一步打断。
-            while (!ctx.IsSkipping && GodotObject.IsInstanceValid(animPlayer) && animPlayer.IsPlaying())
+            while (!ctx.IsCancelled && !ctx.IsSkipping && GodotObject.IsInstanceValid(animPlayer) && animPlayer.IsPlaying())
                 await ctx.NextFrame();
 
             if (!GodotObject.IsInstanceValid(animPlayer))
@@ -78,6 +78,7 @@ namespace Kuros.Systems.Cutscene
             else if (ctx.IsSkipping)
             {
                 animPlayer.Seek(animPlayer.CurrentAnimationLength, true);
+                if (ctx.IsBackground) animPlayer.Stop(keepState: true);
                 GD.Print("[Cutscene] PlayAnimationStep 被skip，动画快进到结尾");
             }
 
@@ -90,12 +91,13 @@ namespace Kuros.Systems.Cutscene
         private async Task MonitorSkipAndFinishAsync(CutsceneContext ctx, AnimationPlayer animPlayer)
         {
             // 同阻塞分支：节点自毁后立即收工（对已释放对象调 IsPlaying() 会抛异常）
-            while (!ctx.IsSkipping && GodotObject.IsInstanceValid(animPlayer) && animPlayer.IsPlaying())
+            while (!ctx.IsCancelled && !ctx.IsSkipping && GodotObject.IsInstanceValid(animPlayer) && animPlayer.IsPlaying())
                 await ctx.NextFrame();
 
             if (ctx.IsSkipping && GodotObject.IsInstanceValid(animPlayer))
             {
                 animPlayer.Seek(animPlayer.CurrentAnimationLength, true);
+                if (ctx.IsBackground) animPlayer.Stop(keepState: true);
                 GD.Print("[Cutscene] PlayAnimationStep 被skip，快进到结尾");
             }
         }

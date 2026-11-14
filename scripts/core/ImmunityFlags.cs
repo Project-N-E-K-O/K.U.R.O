@@ -28,6 +28,12 @@ namespace Kuros.Core
         NonThrowableDamage   = 1 << 8,
         /// <summary>独立的地形坠落免疫；Stun / ForcedMovement 不包含此能力。</summary>
         Fall                 = 1 << 9,
+        /// <summary>攻击预热阶段免坠落；由攻击模组按阶段查询，不作为全程免疫写入 ActiveImmunities。</summary>
+        WarmupFallImmunity   = 1 << 10,
+        /// <summary>攻击生效阶段免坠落。</summary>
+        ActiveFallImmunity   = 1 << 11,
+        /// <summary>攻击恢复阶段免坠落。</summary>
+        RecoveryFallImmunity = 1 << 12,
 
     }
 }

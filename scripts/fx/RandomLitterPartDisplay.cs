@@ -27,7 +27,7 @@ namespace Kuros.FX
         public bool ShowLargeSmoke = true;
 
         /// <summary>
-        /// 所有LitterPart节点列表
+        /// 参与随机显示的候选节点（来自 SelectedLitterParts，不依赖节点命名）
         /// </summary>
         private List<Node2D> _allLitterParts = new();
 
@@ -38,7 +38,7 @@ namespace Kuros.FX
 
         public override void _Ready()
         {
-            FindAllLitterParts();
+            CollectSelectedParts();
             FindLargeSmoke();
             ApplyRandomDisplay();
         }
@@ -52,17 +52,18 @@ namespace Kuros.FX
         }
 
         /// <summary>
-        /// 查找所有LitterPart节点
+        /// 候选节点直接取编辑器里选中的 SelectedLitterParts——不按节点名扫描，
+        /// 场景里叫什么（LitterPartA / GlassA / …）都能用。
         /// </summary>
-        private void FindAllLitterParts()
+        private void CollectSelectedParts()
         {
             _allLitterParts.Clear();
-            
-            foreach (var child in GetChildren())
+
+            foreach (var part in SelectedLitterParts)
             {
-                if (child is Node2D node && child.Name.ToString().StartsWith("LitterPart"))
+                if (part != null && GodotObject.IsInstanceValid(part) && !_allLitterParts.Contains(part))
                 {
-                    _allLitterParts.Add(node);
+                    _allLitterParts.Add(part);
                 }
             }
         }

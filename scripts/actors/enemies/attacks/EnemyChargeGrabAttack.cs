@@ -13,8 +13,9 @@ namespace Kuros.Actors.Enemies.Attacks
     /// </summary>
     public partial class EnemyChargeGrabAttack : EnemyAttackTemplate
     {
+        protected override bool RequiresAttackArea => true;
         // 区域由基类统一提供：TriggerAreaPath（起手检测区；未配置 = 不做额外限制）、
-        // AttackAreaPath（命中判定带）、DamageAreaPath（伤害落点；未配置 = AttackArea）。
+        // AttackAreaPath（命中判定带）、DamageAreaPath（伤害落点；未配置不执行区域伤害）。
         // 旧的 DetectionAreaPath / GrabAreaPath 已并入基类。
 
         [ExportCategory("Dash")]
@@ -93,10 +94,6 @@ namespace Kuros.Actors.Enemies.Attacks
                 _detectionArea.BodyEntered += OnDetectionAreaBodyEntered;
 				_detectionArea.BodyExited += OnDetectionAreaBodyExited;
 			}
-			else
-			{
-				GD.PushWarning($"[EnemyChargeGrabAttack] DetectionArea not found for {Enemy?.Name ?? Name}, fallback to DetectionRange.");
-            }
 
 			SetPhysicsProcess(true);
         }
@@ -121,7 +118,7 @@ namespace Kuros.Actors.Enemies.Attacks
             base._ExitTree();
         }
 
-        public override bool CanStart()
+        protected override bool CanStartCore()
         {
 			if (Enemy == null || Enemy.PlayerTarget == null) return false;
 			if (IsRunning || IsOnCooldown) return false;
@@ -130,16 +127,7 @@ namespace Kuros.Actors.Enemies.Attacks
 			{
 				return false;
 			}
-
-			// 使用自己的 DetectionArea 或回退到 Enemy.DetectionArea
-			bool detectionSatisfied = _detectionArea != null
-				? _playerInsideDetection || _detectionArea.OverlapsBody(Enemy.PlayerTarget)
-				: Enemy.IsPlayerWithinDetectionRange();
-
-			if (!detectionSatisfied)
-			{
-				return false;
-			}
+			// TriggerArea 的选招和起手限制由非虚公共入口统一检查。
 
             AlignFacingWithPlayer();
 

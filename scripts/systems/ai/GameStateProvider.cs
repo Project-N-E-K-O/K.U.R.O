@@ -239,6 +239,9 @@ namespace Kuros.Systems.AI
         /// 缺失时回退当前场景名。BattleSceneManager 节点按类型递归查找并缓存（每场景一次）。</summary>
         private (string name, string description) ResolveLevelInfo()
         {
+            if (Kuros.Systems.Stage.StageSession.Current?.CurrentConfig is { } stage)
+                return (stage.ArrivalName, stage.LevelDescription);
+
             if (_cachedBattleScene == null || !IsInstanceValid(_cachedBattleScene) || !_cachedBattleScene.IsInsideTree())
             {
                 _cachedBattleScene = FindBattleSceneManager(GetTree().CurrentScene);

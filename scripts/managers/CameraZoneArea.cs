@@ -1,4 +1,5 @@
 using Godot;
+using Kuros.Actors.Heroes;
 using Kuros.Utils;
 
 namespace Kuros.Managers
@@ -29,6 +30,9 @@ namespace Kuros.Managers
         /// <summary>相机下限（世界 Y 坐标）。</summary>
         [Export] public int CameraLimitBottom { get; set; } = 1500;
 
+        /// <summary>开启时，上下镜头边界以相机区域的 Y 坐标为原点。</summary>
+        [Export] public bool UseLocalVerticalLimits { get; set; }
+
         /// <summary>进入此区域时相机的目标 Zoom（X/Y 相同）。</summary>
         [Export(PropertyHint.Range, "0.01,2.0,0.01")] public float ZoomLevel { get; set; } = 0.43f;
 
@@ -38,9 +42,11 @@ namespace Kuros.Managers
         private CameraZoneManager? _cameraZoneManager;
         private bool _playerInside = false;
         private bool _cleanupDone = false;
+        private bool _fallExitSettling;
 
         public override void _Ready()
         {
+            SetPhysicsProcess(false);
             AreaEntered += OnAreaEntered;
             AreaExited  += OnAreaExited;
             
@@ -103,11 +109,39 @@ namespace Kuros.Managers
 
             // 玩家真的离开了
             if (!_playerInside) return;
+            // 坠落临时关闭 HitArea 的碰撞层；此时重叠消失不代表离开房间。
+            if (IsPlayerFalling())
+            {
+                _fallExitSettling = false;
+                SetPhysicsProcess(true);
+                return;
+            }
             _playerInside = false;
             var mgr = GetOrFindManager();
             if (mgr == null) return;
             mgr.ExitZone(ZoneName);
         }
+
+        public override void _PhysicsProcess(double delta)
+        {
+            // 等回岸坐标和恢复后的 HitArea 进入下一次物理重叠更新。
+            if (IsPlayerFalling())
+            {
+                _fallExitSettling = false;
+                return;
+            }
+            if (!_fallExitSettling)
+            {
+                _fallExitSettling = true;
+                return;
+            }
+            SetPhysicsProcess(false);
+            CallDeferred(MethodName.DeferredExitCheck);
+        }
+
+        private bool IsPlayerFalling()
+            => GetTree().GetFirstNodeInGroup("player")?
+                .GetNodeOrNull<PlayerFallController>("FallController")?.IsFalling == true;
 
         // ─── 内部工具 ──────────────────────────────────────────────────────
 
@@ -142,6 +176,7 @@ namespace Kuros.Managers
         /// </summary>
         private Rect2 ComputeWorldBounds()
         {
+            float top = CameraLimitTop + (UseLocalVerticalLimits ? GlobalPosition.Y : 0f);
             var shape = GetNodeOrNull<CollisionShape2D>("CollisionShape2D");
             if (shape?.Shape is RectangleShape2D rect)
             {
@@ -149,14 +184,14 @@ namespace Kuros.Managers
                 var worldCenter = GlobalPosition + shape.Position;
                 return new Rect2(
                     worldCenter.X - rect.Size.X / 2f,
-                    CameraLimitTop,
+                    top,
                     rect.Size.X,
                     CameraLimitBottom - CameraLimitTop
                 );
             }
 
             GameLogger.Warn(nameof(CameraZoneArea), $"[{ZoneName}] 未找到 RectangleShape2D，使用默认宽度 5000。");
-            return new Rect2(GlobalPosition.X - 2500f, CameraLimitTop, 5000f, CameraLimitBottom - CameraLimitTop);
+            return new Rect2(GlobalPosition.X - 2500f, top, 5000f, CameraLimitBottom - CameraLimitTop);
         }
     }
 }

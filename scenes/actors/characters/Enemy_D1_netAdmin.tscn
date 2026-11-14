@@ -1,4 +1,4 @@
-[gd_scene load_steps=51 format=3 uid="uid://bpjv2iuy8x0hw"]
+[gd_scene load_steps=52 format=3 uid="uid://bpjv2iuy8x0hw"]
 
 [ext_resource type="Script" uid="uid://gdrtj0ygftu2" path="res://scripts/actors/enemies/EnemyD1NetAdmin.cs" id="1_1rlfu"]
 [ext_resource type="Script" uid="uid://bs5lhgllhwdlg" path="res://scripts/actors/enemies/EnemyBehaviorConfig.cs" id="2_keki5"]
@@ -34,6 +34,8 @@
 [ext_resource type="Script" uid="uid://jck748njiny7" path="res://scripts/actors/enemies/animation/EnemyD1NetAdminSpineAnimationController.cs" id="23_1rlfu"]
 [ext_resource type="Script" uid="uid://dasv6eyuks8yq" path="res://scripts/actors/enemies/movement/EnemyFreezeOnTurnMovement.cs" id="23_i1bxq"]
 [ext_resource type="PackedScene" uid="uid://domkhiw1qy7dh" path="res://scenes/objects/Animation_drone_ultimate.tscn" id="23_q24rg"]
+[ext_resource type="Script" path="res://scripts/controllers/ShadowGroundController.cs" id="shadow_ground"]
+
 [ext_resource type="Script" uid="uid://4dd56677a2aa" path="res://scripts/controllers/ShadowFollower.cs" id="26_sf01"]
 [ext_resource type="Script" uid="uid://e84825ehiw7v" path="res://scripts/actors/heroes/GhostHealthComponent.cs" id="99_ghost"]
 
@@ -441,3 +443,6 @@ script = ExtResource("99_ghost")
 GhostHoldDuration = 0.3
 GhostDescendRatio = 1.2
 HealHoldDuration = 0.3
+
+[node name="ShadowGroundController" type="Node" parent="Shadow"]
+script = ExtResource("shadow_ground")

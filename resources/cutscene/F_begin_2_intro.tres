@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CutsceneSequence" load_steps=23 format=3 uid="uid://ttehlcct8cgr"]
+[gd_resource type="Resource" script_class="CutsceneSequence" load_steps=25 format=3 uid="uid://ttehlcct8cgr"]
 
 [ext_resource type="Script" uid="uid://ctrko7add3r5h" path="res://scripts/systems/cutscene/CutsceneStep.cs" id="1_283r1"]
 [ext_resource type="Script" uid="uid://cjl1hjmndwvcg" path="res://scripts/systems/cutscene/steps/FadeStep.cs" id="2_00y1s"]
@@ -10,6 +10,7 @@
 [ext_resource type="PackedScene" uid="uid://b6dltrf0y1t38" path="res://scenes/actors/characters/Enemy_F1_rogueAI_part1.tscn" id="8_0ltgo"]
 [ext_resource type="PackedScene" uid="uid://cx332v8gr3ytf" path="res://scenes/actors/characters/Enemy_F1_rogueAI_Magnet.tscn" id="8_magnet"]
 [ext_resource type="PackedScene" uid="uid://cmh3bnabinwi0" path="res://resources/effects/CameraShakeEffect.tscn" id="9_w8qgw"]
+[ext_resource type="PackedScene" uid="uid://cgiphulgcow8x" path="res://scenes/environments/FallRegion_F_begin.tscn" id="9_xxti7"]
 
 [sub_resource type="Resource" id="Resource_bcybp"]
 script = ExtResource("2_00y1s")
@@ -107,9 +108,16 @@ PropertyOverrides = Dictionary[String, Variant]({
 })
 metadata/_custom_type_script = "uid://dhch281hkryms"
 
+[sub_resource type="Resource" id="Resource_51dqd"]
+script = ExtResource("5_kbexi")
+EffectScene = ExtResource("9_xxti7")
+SpawnType = 2
+TargetNodePath = NodePath("../World/FBegin/LiftingPlatform")
+metadata/_custom_type_script = "uid://dhch281hkryms"
+
 [sub_resource type="Resource" id="Resource_l7d0y"]
 script = ExtResource("6_kbexi")
-Effects = Array[ExtResource("5_kbexi")]([SubResource("Resource_0ltgo"), SubResource("Resource_w8qgw"), SubResource("Resource_slide3"), SubResource("Resource_m7swt")])
+Effects = Array[ExtResource("5_kbexi")]([SubResource("Resource_0ltgo"), SubResource("Resource_w8qgw"), SubResource("Resource_slide3"), SubResource("Resource_m7swt"), SubResource("Resource_51dqd")])
 metadata/_custom_type_script = "uid://bdni42t83syt8"
 
 [resource]

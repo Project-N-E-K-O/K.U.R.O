@@ -12,6 +12,8 @@ namespace Kuros.Core
     {
         /// <summary>防抖窗口（秒）：窗口内新请求会推迟烘焙，直到停顿满窗口才执行一次。</summary>
         public const double DebounceSeconds = 0.5;
+        /// <summary>手工制作/随平台移动的独立导航面加入此组，不参与家具触发的全场重烘焙。</summary>
+        public const string ExcludedRegionGroup = "navigation_rebake_excluded";
 
         private static readonly HashSet<SceneTree> PendingRebakeScenes = new();
         private static double _lastRequestMsec;
@@ -70,13 +72,13 @@ namespace Kuros.Core
             PendingRebakeScenes.Clear();
         }
 
-        /// <summary>递归触发场景中所有 NavigationRegion2D 重新烘焙。</summary>
+        /// <summary>递归重烘焙普通区域；保留显式排除的独立导航面。</summary>
         private static void RebakeAllNavigationRegions(Node node)
         {
             if (!GodotObject.IsInstanceValid(node)) return;
             if (node is NavigationRegion2D navRegion)
             {
-                navRegion.BakeNavigationPolygon();
+                if (!navRegion.IsInGroup(ExcludedRegionGroup)) navRegion.BakeNavigationPolygon();
                 return;
             }
             foreach (Node child in node.GetChildren())

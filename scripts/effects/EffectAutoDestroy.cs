@@ -1,6 +1,7 @@
 using System;
 using Godot;
 using Kuros.Core;
+using Kuros.Core.Effects;
 
 namespace Kuros.Fx
 {
@@ -16,8 +17,10 @@ namespace Kuros.Fx
 		/// <summary>伤害来源（玩家），传递给衍生的伤害特效（BoomDmgEffect/LaserBeamPlayerWeapon）。</summary>
 		public GameActor? Attacker { get; set; }
 
-		/// <summary>在自身位置生成的特效场景列表（可多个）。生成时机由 SpawnDelay 决定。</summary>
-		[Export] public PackedScene[] SpawnOnDestroyScenes { get; set; } = Array.Empty<PackedScene>();
+		/// <summary>在自身位置生成的特效条目（可多个）。生成时机由 SpawnDelay 决定。
+		/// 用 <see cref="EffectSpawnConfig"/> 可在实例化前覆盖被生成场景的导出属性值
+		/// （PropertyOverrides；EffectOffset 相对本特效叠加，未配置用外层 SpawnOffset）。</summary>
+		[Export] public EffectSpawnConfig[] SpawnOnDestroyEntries { get; set; } = Array.Empty<EffectSpawnConfig>();
 		/// <summary>衍生特效的生成偏移（相对本特效位置）。按**未镜像（朝右）姿态**摆——
 		/// 本体被水平镜像（Scale.X &lt; 0：自身翻转或生成方外翻都会落到这里）时 X 自动翻，
 		/// 偏移始终跟随实际画面朝向。默认 (0,0) = 生成在原点（旧行为）。</summary>
@@ -80,16 +83,24 @@ namespace Kuros.Fx
 
 			Vector2 spawnPos = GlobalPosition;
 
-			// 衍生特效偏移：按未镜像（朝右）姿态摆，本体被水平镜像时 X 自动翻——
-			// fx.GlobalPosition 是绝对赋值，不翻的话朝左时偏移会留在画面的错误一侧
-			Vector2 spawnOffset = Scale.X < 0f
-				? new Vector2(-SpawnOffset.X, SpawnOffset.Y)
-				: SpawnOffset;
-
-			foreach (var scene in SpawnOnDestroyScenes)
+			foreach (var entry in SpawnOnDestroyEntries)
 			{
-				if (scene == null) continue;
-				var fx = scene.Instantiate<Node2D>();
+				if (entry?.Scene == null) continue;
+				var instantiated = entry.InstantiateNode();
+				if (instantiated is not Node2D fx)
+				{
+					instantiated?.Free();
+					continue;
+				}
+
+				// 衍生特效偏移：按未镜像（朝右）姿态摆，本体被水平镜像时 X 自动翻——
+				// fx.GlobalPosition 是绝对赋值，不翻的话朝左时偏移会留在画面的错误一侧。
+				// entry 的 EffectOffset 与自身 SpawnOffset 叠加，一起参与镜像。
+				Vector2 authoredOffset = SpawnOffset + entry.ResolveOffset(Vector2.Zero);
+				Vector2 spawnOffset = Scale.X < 0f
+					? new Vector2(-authoredOffset.X, authoredOffset.Y)
+					: authoredOffset;
+
 				spawnParent?.AddChild(fx);
 
 				// 自身是"世界锚定"的（TopLevel，如落在滑槽机械旁的爆炸）→ 衍生特效同样锚定：

@@ -27,6 +27,9 @@ namespace Kuros.Systems.Cutscene
         /// <summary>目标节点路径（SpawnType=RelativeToNode 时使用）</summary>
         [Export] public NodePath TargetNodePath { get; set; } = new NodePath();
 
+        /// <summary>实例父节点路径，相对于 CutsceneManager。留空时使用管理器的父节点。</summary>
+        [Export] public NodePath SpawnParentPath { get; set; } = new NodePath();
+
         /// <summary>生成延迟（秒）。0 = 立即生成</summary>
         [Export(PropertyHint.Range, "0,30,0.1")] public float SpawnDelay { get; set; } = 0f;
 

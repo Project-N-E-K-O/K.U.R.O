@@ -78,6 +78,15 @@ public partial class SlideRailMount : Node2D
 	private float _carriageNear;
 	private float _carriageFar;
 	private float _target;
+	private Vector2 _initialParentPosition;
+
+	// 只计入父级平移，滑槽自身的移动不改变行程原点。
+	private Vector2 ParentPosition => !TopLevel && GetParent() is Node2D parent
+		? parent.GlobalPosition
+		: Vector2.Zero;
+	private Vector2 ParentTravel => ParentPosition - _initialParentPosition;
+	private float SlotTravel => GetCoordinate(ParentTravel);
+	private float TargetCoordinate => _target + SlotTravel;
 	private bool _hasTarget;
 	/// <summary>本次目标的速度覆盖（&gt; 0 时用它，否则用自身 <see cref="Speed"/>）：见 <see cref="SetTargetInTime"/>。
 	/// 每次 <see cref="SetTarget"/>（常规跟随）会清零——时长只对"设目标那一次"负责。</summary>
@@ -87,18 +96,18 @@ public partial class SlideRailMount : Node2D
 	public bool IsResolved => _resolved;
 	/// <summary>滑槽是否可动（两端点偏移不等）。</summary>
 	public bool HasSlotLimits { get; private set; }
-	public float SlotStart => _slotStart;
-	public float SlotEnd => _slotEnd;
+	public float SlotStart => _slotStart + SlotTravel;
+	public float SlotEnd => _slotEnd + SlotTravel;
 	/// <summary>
 	/// 两个行程端点的坐标（世界坐标 = 本节点摆放位置 + 偏移，沿 <see cref="CarriageAxis"/>），**已按角色解释**：
 	/// Near = 贴玩家侧端、Far = 场外端；勾了 <see cref="FlipCarriageEnds"/> 时两个端点**整体镜像**到轴的另一侧（角色不变）。
 	/// 机械直接用这两个选端点（退场去 Far），用下面的区间做夹取/钳位。
 	/// </summary>
-	public float CarriageNear => _carriageNear;
-	public float CarriageFar => _carriageFar;
+	public float CarriageNear => _carriageNear + GetCarriageCoordinate(ParentTravel);
+	public float CarriageFar => _carriageFar + GetCarriageCoordinate(ParentTravel);
 	/// <summary>行程区间（已排序，与角色无关）：夹取/钳位用这两个，别拿 Near/Far 当 Clamp 的上下界。</summary>
-	public float CarriageLo => Mathf.Min(_carriageNear, _carriageFar);
-	public float CarriageHi => Mathf.Max(_carriageNear, _carriageFar);
+	public float CarriageLo => Mathf.Min(CarriageNear, CarriageFar);
+	public float CarriageHi => Mathf.Max(CarriageNear, CarriageFar);
 	/// <summary>机械沿其移动的轴 = 滑动轴的正交轴。</summary>
 	public RailAxis CarriageAxis => Axis == RailAxis.Y ? RailAxis.X : RailAxis.Y;
 	/// <summary>滑槽当前在滑动轴上的世界坐标。</summary>
@@ -106,7 +115,7 @@ public partial class SlideRailMount : Node2D
 
 	/// <summary>滑槽是否已滑到目标（无 Slot 限位/无目标 = 视为到位）。</summary>
 	public bool Arrived => !HasSlotLimits || !_hasTarget
-		|| Mathf.Abs(_target - CurrentRailCoordinate) <= ArriveDeadzone;
+		|| Mathf.Abs(TargetCoordinate - CurrentRailCoordinate) <= ArriveDeadzone;
 
 	/// <summary>机械的出生点（**局部坐标**，Mount 坐标系）：机械可以据此"回生成点"
 	/// （例如满进度后收工归位）。与出生摆放同源，FlipCarriageEnds/CarriageSpawn 都算在内。</summary>
@@ -141,11 +150,11 @@ public partial class SlideRailMount : Node2D
 		if (!_hasTarget || HoldTargetDrive)
 		{
 			// 待命 / 被阻挡：不朝目标推进，但两端硬钳照旧（外部推力、叠加位移都压不出去）
-			SetCoordinate(Mathf.Clamp(CurrentRailCoordinate, _slotStart, _slotEnd));
+			SetCoordinate(Mathf.Clamp(CurrentRailCoordinate, SlotStart, SlotEnd));
 			return;
 		}
 
-		float step = _target - CurrentRailCoordinate;
+		float step = TargetCoordinate - CurrentRailCoordinate;
 		float distance = Mathf.Abs(step);
 
 		// 推进方式二选一：
@@ -155,7 +164,7 @@ public partial class SlideRailMount : Node2D
 		{
 			if (distance <= ArriveDeadzone)
 			{
-				SetCoordinate(_target);
+				SetCoordinate(TargetCoordinate);
 				return;
 			}
 			SetCoordinate(CurrentRailCoordinate + Mathf.Sign(step) * _targetSpeed * (float)delta);
@@ -166,14 +175,14 @@ public partial class SlideRailMount : Node2D
 			// 吸附会把轨道逐帧直接拽到目标上 = 逐帧锁步，看起来"完全没有惯性"
 			//（参考实现 伞/浮游炮/P2 也没有吸附；到位判定仍由 Arrived 按死区容差给出）。
 			float blend = 1f - Mathf.Exp(-FollowSmoothing * (float)delta);
-			SetCoordinate(Mathf.Lerp(CurrentRailCoordinate, _target, blend));
+			SetCoordinate(Mathf.Lerp(CurrentRailCoordinate, TargetCoordinate, blend));
 		}
 		else
 		{
-			SetCoordinate(_target);   // 关闭平滑：直接到位
+			SetCoordinate(TargetCoordinate);   // 关闭平滑：直接到位
 		}
 		// 硬钳兜底：外部系统（爆炸/黑洞直接写位置）也推不出滑槽
-		SetCoordinate(Mathf.Clamp(CurrentRailCoordinate, _slotStart, _slotEnd));
+		SetCoordinate(Mathf.Clamp(CurrentRailCoordinate, SlotStart, SlotEnd));
 	}
 
 	/// <summary>把"角色翻转"同步到外观：<see cref="FlipCarriageEnds"/> 时 <see cref="VisualPath"/> 的 scale.x 写负
@@ -229,9 +238,9 @@ public partial class SlideRailMount : Node2D
 	/// <summary>当前下发的滑动方向（沿 <see cref="Axis"/> 的符号）：无行程 / 无目标 / 已到位 = 0。</summary>
 	public float CommandedAxisSign => !HasSlotLimits || !_hasTarget
 		? 0f
-		: (Mathf.Abs(_target - CurrentRailCoordinate) <= ArriveDeadzone
+		: (Mathf.Abs(TargetCoordinate - CurrentRailCoordinate) <= ArriveDeadzone
 			? 0f
-			: Mathf.Sign(_target - CurrentRailCoordinate));
+			: Mathf.Sign(TargetCoordinate - CurrentRailCoordinate));
 
 	/// <summary>沿滑动轴额外偏移一段（相对当前坐标，带两端硬钳）。
 	/// 供子类做"叠加式"运动（轮子的回弹偏移）：与 <see cref="SetTarget"/> 的目标驱动互不干扰——
@@ -241,7 +250,7 @@ public partial class SlideRailMount : Node2D
 		if (delta == 0f) return;
 
 		float next = CurrentRailCoordinate + delta;
-		if (HasSlotLimits) next = Mathf.Clamp(next, _slotStart, _slotEnd);
+		if (HasSlotLimits) next = Mathf.Clamp(next, SlotStart, SlotEnd);
 		SetCoordinate(next);
 	}
 
@@ -263,24 +272,24 @@ public partial class SlideRailMount : Node2D
 		float before = CurrentRailCoordinate;
 		SetTargetInternal(coordinate);
 		_targetSpeed = duration > 0f && _hasTarget
-			? Mathf.Abs(_target - before) / duration
+			? Mathf.Abs(TargetCoordinate - before) / duration
 			: 0f;
 	}
 
 	private void SetTargetInternal(float coordinate)
 	{
 		if (!HasSlotLimits) return;
-		_target = Mathf.Clamp(coordinate, _slotStart, _slotEnd);
+		_target = Mathf.Clamp(coordinate, SlotStart, SlotEnd) - SlotTravel;
 		_hasTarget = true;
 	}
 
 	/// <summary>解析限位（幂等；机械侧可主动调用以避开节点处理顺序假设）。
-	/// 偏移是"相对本节点摆放位置"的，所以世界坐标 = **解析那一刻本节点的坐标 + 偏移**，只算一次——
-	/// 滑槽随后自己滑动、机械随后被钳位，都不会再改变这两个端点（与过去读 Marker 世界坐标完全等价）。</summary>
+	/// 记录摆放位置与端点的初值。后续端点跟随父节点平移，滑槽和机械自身移动时端点保持相对父节点固定。</summary>
 	public void ResolveNow()
 	{
 		if (_resolved) return;
 		_resolved = true;
+		_initialParentPosition = ParentPosition;
 
 		// 滑槽自身行程（沿 Axis）：两端相等 = 无行程 → 静止
 		HasSlotLimits = !Mathf.IsEqualApprox(SlotStartOffset, SlotEndOffset);
@@ -289,7 +298,7 @@ public partial class SlideRailMount : Node2D
 			float origin = CurrentRailCoordinate;
 			_slotStart = origin + Mathf.Min(SlotStartOffset, SlotEndOffset);
 			_slotEnd = origin + Mathf.Max(SlotStartOffset, SlotEndOffset);
-			SetCoordinate(Mathf.Clamp(CurrentRailCoordinate, _slotStart, _slotEnd));
+			SetCoordinate(Mathf.Clamp(CurrentRailCoordinate, SlotStart, SlotEnd));
 		}
 		else
 		{

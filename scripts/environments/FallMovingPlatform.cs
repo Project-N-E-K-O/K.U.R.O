@@ -2,6 +2,7 @@ using Godot;
 using Kuros.Actors.Heroes;
 using Kuros.Core;
 using System.Collections.Generic;
+using System;
 
 namespace Kuros.Environments;
 
@@ -32,6 +33,14 @@ public partial class FallMovingPlatform : Node2D
     /// <summary>当前方向：true = 驶向 TravelOffset 终点；false = 驶回起点。</summary>
     private bool _outward = true;
     private FallSupportArea? _support;
+    private readonly HashSet<IPlatformPassenger> _attached = new();
+    public void RegisterAttachedPassenger(IPlatformPassenger passenger) => _attached.Add(passenger);
+    public void UnregisterAttachedPassenger(IPlatformPassenger passenger) => _attached.Remove(passenger);
+    /// <summary>平台本帧完成平移后的实际世界位移，供显式附着的地面效果使用。</summary>
+    public event Action<Vector2>? WorldDisplaced;
+    public FallSupportArea? SupportArea => _support;
+    public bool CanAttachEffects => IsInsideTree() && !IsQueuedForDeletion() && CanProcess()
+        && PlatformCarryPhysics.IsSupportEnabled(_support);
 
     public override void _Ready()
     {
@@ -53,7 +62,7 @@ public partial class FallMovingPlatform : Node2D
             ? parent.GlobalTransform.BasisXform(next - Position) : next - Position;
 
         var riders = new List<Node>();
-        if (_support != null && _support.SupportEnabled && !displacement.IsZeroApprox())
+        if (PlatformCarryPhysics.IsSupportEnabled(_support) && !displacement.IsZeroApprox())
         {
             var seen = new HashSet<ulong>();
             if (CarryPlayers) Collect("player", riders, seen);
@@ -62,15 +71,21 @@ public partial class FallMovingPlatform : Node2D
         }
 
         // 先移动平台，再把同样的位移施加给乘客（MoveAndCollide：撞墙会被挡，不会被硬推进墙里）。
+        Vector2 previousWorldPosition = GlobalPosition;
         Position = next;
         foreach (var rider in riders)
         {
             if (!IsInstanceValid(rider) || rider.IsQueuedForDeletion()) continue;
-            if (rider is IPlatformPassenger passenger)
-                passenger.ApplyPlatformDisplacement(displacement, FurnitureObstacleMask);
-            else if (rider is CharacterBody2D character)
-                character.MoveAndCollide(displacement);
+            ApplyMotion(rider as IPlatformPassenger, rider as Node2D, displacement);
         }
+        Vector2 actualDisplacement = GlobalPosition - previousWorldPosition;
+        if (CanAttachEffects && !actualDisplacement.IsZeroApprox())
+            foreach (var attached in new List<IPlatformPassenger>(_attached))
+            {
+                if (attached is GodotObject obj && !IsInstanceValid(obj)) { _attached.Remove(attached); continue; }
+                ApplyMotion(attached, attached.PlatformTarget, actualDisplacement);
+            }
+        if (!actualDisplacement.IsZeroApprox()) WorldDisplaced?.Invoke(actualDisplacement);
 
         // 到端点后掉头（MoveToward 保证不会越过，所以近似相等即可）。
         if (Position.IsEqualApprox(target)) _outward = !_outward;
@@ -83,28 +98,49 @@ public partial class FallMovingPlatform : Node2D
             if (!seen.Add(node.GetInstanceId()) || node.IsQueuedForDeletion() || !node.CanProcess()
                 || (!string.IsNullOrEmpty(ExcludedGroup) && node.IsInGroup(ExcludedGroup))) continue;
             Vector2 foot;
+            var sensor = GroundContactSensor.For(node);
             if (node is IPlatformPassenger passenger)
             {
                 if (!passenger.CanRidePlatform) continue;
+                var controller = sensor?.GetParent() as GroundObjectController;
+                if (controller == null || !controller.IsInsideTree() || controller.IsQueuedForDeletion()
+                    || !controller.FollowPlatformEnabled || !controller.Grounded || controller.IsFalling) continue;
                 foot = passenger.PlatformGroundPosition;
             }
             else if (node is GameActor actor)
             {
-                if (actor.IsDead || actor.IsDeathSequenceActive
-                    || (actor is SamplePlayer player && player.IsFalling)
-                    || !PlatformCarryPhysics.HasEnabledBodyShape(actor)) continue;
-                foot = actor.GetNodeOrNull<Node2D>("GroundProbe")?.GlobalPosition ?? actor.GlobalPosition;
+                if (actor.IsDead || !actor.Visible || actor is SamplePlayer player && player.IsFalling) continue;
+                if (actor.IsDeathSequenceActive)
+                {
+                    // Dying 禁用身体碰撞；仅原本可落坑的实体尸体继续承载，悬浮 Boss 不纳入。
+                    if (sensor?.GetParent() is not FallController fall || !fall.CanCarryCorpse) continue;
+                }
+                else if (!PlatformCarryPhysics.HasEnabledBodyShape(actor)) continue;
+                foot = PlatformCarryPhysics.CharacterGroundPosition(actor);
             }
             else continue; // 不对未知 Node2D / 正在自由模拟的刚体强行修改坐标。
 
-            var hits = GetWorld2D().DirectSpaceState.IntersectPoint(new PhysicsPointQueryParameters2D
-            { Position = foot, CollisionMask = FallSupportArea.Layer, CollideWithAreas = true, CollideWithBodies = false }, 128);
-            foreach (var hit in hits)
-            {
-                if (hit["collider"].AsGodotObject() != _support) continue;
-                if (PlatformCarryPhysics.TryClaim(node)) riders.Add(node);
-                break;
-            }
+            bool supported = sensor != null ? sensor.SampleNow().Platform == this
+                : PlatformCarryPhysics.IsOnPlatform(GetWorld2D(), foot, this);
+            if (supported)
+                riders.Add(node);
+        }
+    }
+
+    private void ApplyMotion(IPlatformPassenger? passenger, Node2D? target, Vector2 motion)
+    {
+        if (!IsInstanceValid(target) || !target!.IsInsideTree() || target.IsQueuedForDeletion() || !target.CanProcess()
+            || !string.IsNullOrEmpty(ExcludedGroup) && target.IsInGroup(ExcludedGroup)
+            || target.IsInGroup("world_items") && !CarryWorldItems
+            || target.IsInGroup("player") && !CarryPlayers || target.IsInGroup("enemies") && !CarryEnemies) return;
+        if (passenger != null && !passenger.CanRidePlatform) return;
+        if (!PlatformCarryPhysics.TryClaim(target)) return;
+        if (passenger != null) passenger.ApplyPlatformDisplacement(motion, FurnitureObstacleMask);
+        else if (target is CharacterBody2D character)
+        {
+            if (target is GameActor actor && actor.IsDeathSequenceActive)
+                character.GlobalPosition += motion; // 尸体碰撞已停用，仍需保留相对平台位置。
+            else character.MoveAndCollide(motion);
         }
     }
 }

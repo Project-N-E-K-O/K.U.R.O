@@ -14,6 +14,8 @@ namespace Kuros.Actors.Heroes.States
 		private PlayerAttackTemplate? _activeTemplate;
 
 		public IReadOnlyList<PlayerAttackTemplate> AttackTemplates => _attackTemplates;
+		/// <summary>仅当前正在执行的攻击模板可以提供阶段坠落免疫。</summary>
+		public bool ProvidesFallImmunity => _activeTemplate?.IsRunning == true && _activeTemplate.ProvidesFallImmunity;
 
 		/// <summary>
 		/// 当前攻击模板是否处于 Recovery（后摇）阶段：攻击判定已完成，

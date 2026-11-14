@@ -33,8 +33,8 @@ namespace Kuros.Builds.BuildCore
             var owner = area.IsInGroup(PlayerGroup) ? (Node)area : area.GetParent();
             if (owner == null || !owner.IsInGroup(PlayerGroup)) return;
 
-            _triggered = true;
-            BuildSelectionManager.Instance.TriggerCoreSelection();
+            if (BuildSelectionManager.Instance?.TryTriggerCoreSelection() == true)
+                _triggered = true;
         }
     }
 }

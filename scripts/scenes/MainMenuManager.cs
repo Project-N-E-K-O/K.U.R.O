@@ -8,7 +8,7 @@ namespace Kuros.Scenes
     /// <summary>
     /// 主菜单场景管理器。
     ///
-    /// 流程：启动 → TitleScreen → MainMenu（3按钮）→ SaveSlotSelection → Stage_1
+    /// 流程：启动 → TitleScreen → MainMenu（3按钮）→ SaveSlotSelection → Stage_home
     ///
     /// 三个按钮：
     ///   开始游戏 → LoadSaveSlotSelection() → 选槽位 → 读档/新游戏 → 场景切换
@@ -22,7 +22,7 @@ namespace Kuros.Scenes
     public partial class MainMenuManager : Control
     {
         [ExportCategory("Scene Paths")]
-        [Export] public string BattleScenePath = "res://scenes/Stage_1.tscn";
+        [Export] public string BattleScenePath = "res://scenes/Stage_home.tscn";
 
         [ExportCategory("Main Menu Buttons")]
         [Export] public Button StartGameButton { get; private set; } = null!;

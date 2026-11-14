@@ -1,0 +1,22 @@
+[gd_scene load_steps=4 format=3 uid="uid://bkhpog7n64g7e"]
+
+[ext_resource type="Script" uid="uid://cl5s51qty8p58" path="res://scripts/managers/BattleExitGate.cs" id="1_gate"]
+[ext_resource type="Texture2D" uid="uid://cfqcvbhy00mr1" path="res://assets/environments/scene_6_hotel/警戒条.png" id="2_4vrm8"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_gate"]
+size = Vector2(100, 4070)
+
+[node name="BattleExitGate" type="StaticBody2D"]
+z_index = 1
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_gate")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_gate")
+
+[node name="GateSprite" type="Sprite2D" parent="."]
+visible = false
+rotation = 1.5707964
+scale = Vector2(2, 2)
+texture = ExtResource("2_4vrm8")

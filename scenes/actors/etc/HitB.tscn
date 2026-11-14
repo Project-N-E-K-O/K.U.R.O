@@ -168,21 +168,18 @@ Duration = 0.0
 self_modulate = Color(0.39215687, 0.5882353, 0, 1)
 sprite_frames = SubResource("SpriteFrames_a81kp")
 autoplay = "default"
-frame = 4
 
 [node name="AnimatedSprite2D2" type="AnimatedSprite2D" parent="."]
 self_modulate = Color(0.39215687, 0.78431374, 0, 1)
 scale = Vector2(0.8, 0.8)
 sprite_frames = SubResource("SpriteFrames_a81kp")
 autoplay = "default"
-frame = 4
 
 [node name="AnimatedSprite2D3" type="AnimatedSprite2D" parent="."]
 self_modulate = Color(0.78431374, 0.98039216, 0, 1)
 scale = Vector2(0.6, 0.6)
 sprite_frames = SubResource("SpriteFrames_a81kp")
 autoplay = "default"
-frame = 4
 
 [node name="AnimatedSprite2D6" type="AnimatedSprite2D" parent="."]
 self_modulate = Color(0.78431374, 0.98039216, 0, 1)
@@ -191,7 +188,6 @@ position = Vector2(-50, -50)
 scale = Vector2(0.6, 0.6)
 sprite_frames = SubResource("SpriteFrames_pr6qu")
 autoplay = "default"
-frame = 4
 
 [node name="AnimatedSprite2D5" type="AnimatedSprite2D" parent="."]
 self_modulate = Color(0.39215687, 0.78431374, 0, 1)
@@ -200,7 +196,6 @@ position = Vector2(-50, -50)
 scale = Vector2(0.8, 0.8)
 sprite_frames = SubResource("SpriteFrames_15crs")
 autoplay = "default"
-frame = 4
 
 [node name="AnimatedSprite2D4" type="AnimatedSprite2D" parent="."]
 self_modulate = Color(0.39215687, 0.5882353, 0, 1)
@@ -208,4 +203,3 @@ z_index = 2
 position = Vector2(-50, -50)
 sprite_frames = SubResource("SpriteFrames_blqok")
 autoplay = "default"
-frame = 4

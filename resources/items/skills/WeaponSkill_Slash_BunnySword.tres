@@ -11,23 +11,23 @@
 
 [sub_resource type="Resource" id="Resource_ushmn"]
 script = ExtResource("1_sh13i")
+SpawnTiming = 1
 Scene = ExtResource("2_dovl4")
 EffectOffset = Vector2(300, 0)
-SpawnTiming = 1
 metadata/_custom_type_script = "uid://fd5076f50ca0"
 
 [sub_resource type="Resource" id="Resource_sb5cf"]
 script = ExtResource("1_sh13i")
+SpawnTiming = 1
 Scene = ExtResource("3_o02lj")
 EffectOffset = Vector2(300, 0)
-SpawnTiming = 1
 metadata/_custom_type_script = "uid://fd5076f50ca0"
 
 [sub_resource type="Resource" id="Resource_14em4"]
 script = ExtResource("1_sh13i")
+SpawnTiming = 1
 Scene = ExtResource("4_0h0ug")
 EffectOffset = Vector2(nan, nan)
-SpawnTiming = 1
 PropertyOverrides = Dictionary[String, Variant]({
 "ShakeStrength": 10.0
 })
@@ -63,6 +63,7 @@ ShowHitboxDebug = false
 Description = "攻击时召唤浮游炮，冷却10秒，浮游炮每秒对目标的敌人发射激光造成伤害，持续5秒。每次攻击消耗电量，电量不足无法攻击"
 Effects = Array[ExtResource("1_2po5m")]([SubResource("Resource_2po5m"), SubResource("Resource_battery")])
 DashAttackFxEntries = Array[ExtResource("1_sh13i")]([SubResource("Resource_ushmn"), SubResource("Resource_sb5cf"), SubResource("Resource_14em4")])
+DashAttackFallImmunities = 3
 WarmupDuration = 0.2
 ActiveDuration = 0.47
 RecoveryDuration = 0.16

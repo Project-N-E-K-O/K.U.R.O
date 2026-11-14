@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="StageConfig" load_steps=2 format=3 uid="uid://ck0oryxrkbkq5"]
+
+[ext_resource type="Script" uid="uid://dim2ctx63qcxt" path="res://scripts/systems/stage/StageConfig.cs" id="12_ot1o8"]
+
+[resource]
+script = ExtResource("12_ot1o8")
+StageId = "stage_1"
+DisplayName = "酒店大堂门口"
+LevelDescription = "博士委托我们调查的酒店一层大厅，在故障的管理型AI影响的影响下目前整个楼层受到管制，被复制人保安和各种自动化机械把守，拒绝一切人员进入。"
+Floor = 1
+DownFloorTarget = -1
+FloorTheme = "B"
+RoomSequence = Array[int]([0, 5])

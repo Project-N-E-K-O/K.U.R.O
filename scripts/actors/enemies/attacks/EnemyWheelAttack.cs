@@ -15,6 +15,6 @@ namespace Kuros.Actors.Enemies.Attacks
         // （原字段声明了但从未被读取，等于摆设）。
 
         /// <summary>起手额外要求玩家在 TriggerAreaPath 指定的区内（未配置则不限制）。</summary>
-        public override bool CanStart() => base.CanStart() && IsPlayerInTriggerArea();
+        protected override bool CanStartCore() => base.CanStartCore() && IsPlayerInTriggerArea();
     }
 }

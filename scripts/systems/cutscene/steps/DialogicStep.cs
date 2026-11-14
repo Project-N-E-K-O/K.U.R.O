@@ -34,7 +34,7 @@ namespace Kuros.Systems.Cutscene
 
         /// <summary>
         /// 气泡对话框锚点的绝对节点路径（需从场景根可访问）。
-        /// 例如："/root/Stage_1/NPC/Marker2D"
+        /// 例如："/root/BattleScene/NPC/Marker2D"
         /// </summary>
         [Export] public NodePath BubbleAnchorPath { get; set; } = new NodePath();
 

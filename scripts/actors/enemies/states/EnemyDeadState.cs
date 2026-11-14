@@ -17,7 +17,8 @@ namespace Kuros.Actors.Enemies.States
         public override void Enter()
         {
             // 先生成特效、再终结实体（FinalizeDeath 会销毁敌人，特效已挂在父级下不受影响）
-            SpawnEffectAtSelf(DeadEffect, EffectOffset);
+            if (Enemy.GetNodeOrNull<EnemyFallController>("FallController")?.HasCorpseFallen != true)
+                SpawnEffectAtSelf(DeadEffect, EffectOffset);
             Enemy.FinalizeDeath();
         }
     }

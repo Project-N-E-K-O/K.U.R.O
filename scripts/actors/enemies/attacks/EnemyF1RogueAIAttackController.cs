@@ -163,9 +163,9 @@ namespace Kuros.Actors.Enemies.Attacks
 		/// 且大招本身确实可起手（避免进了 Attack 却起不了手导致的进/出抖动）。
 		/// 阈值被消费后（ConsumeUltimate）自动失效，交回基类的正常判定。
 		/// </summary>
-		public override bool CanStart()
+		protected override bool CanStartCore()
 		{
-			if (!ShouldTriggerUltimate()) return base.CanStart();
+			if (!ShouldTriggerUltimate()) return base.CanStartCore();
 
 			if (Enemy == null || !GodotObject.IsInstanceValid(Enemy)) return false;
 			if (Enemy.IsDead || Enemy.IsDeathSequenceActive) return false;

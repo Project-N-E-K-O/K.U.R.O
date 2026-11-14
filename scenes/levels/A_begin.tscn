@@ -52,7 +52,7 @@ size = Vector2(400, 600)
 size = Vector2(700, 400)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_oxmw7"]
-size = Vector2(200, 3000)
+size = Vector2(1000, 3000)
 
 [node name="ABegin" type="Node2D"]
 y_sort_enabled = true

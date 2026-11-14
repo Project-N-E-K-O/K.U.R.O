@@ -1,0 +1,89 @@
+[gd_scene load_steps=12 format=3 uid="uid://btqx0751t5bx4"]
+
+[ext_resource type="Script" uid="uid://x1ic1ym4ykq8" path="res://scripts/scenes/BattleSceneManager.cs" id="1_givaq"]
+[ext_resource type="Script" uid="uid://b6qifqg0v8c6o" path="res://scripts/managers/CameraZoneManager.cs" id="2_tbvpk"]
+[ext_resource type="Script" uid="uid://b0qiaumw3ige7" path="res://scripts/systems/cutscene/CutsceneManager.cs" id="3_31t1p"]
+[ext_resource type="PackedScene" uid="uid://ufprfd4r8ijj" path="res://scenes/actors/characters/main_character.tscn" id="4_givaq"]
+[ext_resource type="Script" uid="uid://l1558pct4220" path="res://scripts/managers/StageGeneratorManager.cs" id="4_l5arx"]
+[ext_resource type="PackedScene" uid="uid://bjwnor5ufbb8r" path="res://scenes/managers/BuildSelectionManager.tscn" id="8_r3qlf"]
+[ext_resource type="Script" uid="uid://del8hgcg3sr4i" path="res://scripts/managers/CameraFollow.cs" id="11_31t1p"]
+[ext_resource type="PackedScene" uid="uid://cgjrdwkemgrcy" path="res://scenes/actors/characters/P2.tscn" id="12_31t1p"]
+[ext_resource type="Resource" uid="uid://cfqfibxgsuw2y" path="res://resources/stages/hotel_room_catalog.tres" id="room_catalog"]
+[ext_resource type="Script" uid="uid://dim2ctx63qcxt" path="res://scripts/systems/stage/StageConfig.cs" id="stage_config"]
+
+[sub_resource type="Resource" id="initial_route"]
+script = ExtResource("stage_config")
+StageId = "stage_home"
+FloorTheme = "A"
+RoomSequence = Array[int]([0, 1, 6])
+
+[node name="BattleScene" type="Node2D" node_paths=PackedStringArray("Player")]
+y_sort_enabled = true
+script = ExtResource("1_givaq")
+Player = NodePath("World/MainCharacter")
+LevelName = "住宅区D23_A091_1806"
+AiLevelDescription = "家，提供休整的地方，每次醒来后所待的地方"
+
+[node name="CameraZoneManager" type="Node" parent="." node_paths=PackedStringArray("TargetCamera", "Player")]
+script = ExtResource("2_tbvpk")
+TargetCamera = NodePath("../World/Camera2D")
+Player = NodePath("../World/MainCharacter")
+
+[node name="CutsceneManager" type="Node" parent="."]
+script = ExtResource("3_31t1p")
+CameraPath = NodePath("../World/Camera2D")
+TopBlackBarPath = NodePath("../CanvasLayer/ColorRectTop")
+BottomBlackBarPath = NodePath("../CanvasLayer/ColorRectBottom")
+BattleSceneManagerPath = NodePath("..")
+
+[node name="StageGeneratorManager" type="Node" parent="."]
+script = ExtResource("4_l5arx")
+StandaloneStage = SubResource("initial_route")
+Catalog = ExtResource("room_catalog")
+
+[node name="BuildSelectionManager" parent="." instance=ExtResource("8_r3qlf")]
+
+[node name="World" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="MainCharacter" parent="World" instance=ExtResource("4_givaq")]
+Speed = 600.0
+
+[node name="Camera2D" type="Camera2D" parent="World" node_paths=PackedStringArray("Target")]
+scale = Vector2(0.32999998, 0.32999998)
+ignore_rotation = false
+zoom = Vector2(0.43, 0.43)
+position_smoothing_enabled = true
+rotation_smoothing_enabled = true
+drag_horizontal_enabled = true
+drag_vertical_enabled = true
+script = ExtResource("11_31t1p")
+Target = NodePath("../MainCharacter")
+ShakeOnPlayerDamaged = true
+ShakeRecoverySpeed = 20.0
+PlayerDamagedShakeStrength = 12.0
+ShakeOnPlayerAttackHit = true
+PlayerAttackKillShakeStrength = 20.0
+PlayerDamagedHitStopDuration = 0.18
+PlayerAttackHitHitStopDuration = 0.1
+PlayerAttackKillHitStopDuration = 0.3
+HitStopDelay = 0.1
+
+[node name="P2" parent="World" instance=ExtResource("12_31t1p")]
+position = Vector2(300, 0)
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+layer = 128
+
+[node name="ColorRectTop" type="ColorRect" parent="CanvasLayer"]
+offset_right = 1920.0
+offset_bottom = 150.0
+color = Color(0, 0, 0, 1)
+metadata/_edit_use_anchors_ = true
+
+[node name="ColorRectBottom" type="ColorRect" parent="CanvasLayer"]
+offset_top = 930.0
+offset_right = 1920.0
+offset_bottom = 1080.0
+color = Color(0, 0, 0, 1)
+metadata/_edit_use_anchors_ = true

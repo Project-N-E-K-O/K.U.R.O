@@ -10,23 +10,23 @@
 
 [sub_resource type="Resource" id="Resource_3a2co"]
 script = ExtResource("1_vhody")
+SpawnTiming = 2
 Scene = ExtResource("2_vhody")
 EffectOffset = Vector2(275, 0)
-SpawnTiming = 2
 metadata/_custom_type_script = "uid://fd5076f50ca0"
 
 [sub_resource type="Resource" id="Resource_hgras"]
 script = ExtResource("1_vhody")
+SpawnTiming = 2
 Scene = ExtResource("3_7ni5r")
 EffectOffset = Vector2(275, 0)
-SpawnTiming = 2
 metadata/_custom_type_script = "uid://fd5076f50ca0"
 
 [sub_resource type="Resource" id="Resource_p66tr"]
 script = ExtResource("1_vhody")
+SpawnTiming = 2
 Scene = ExtResource("4_3uwal")
 EffectOffset = Vector2(nan, nan)
-SpawnTiming = 2
 PropertyOverrides = Dictionary[String, Variant]({
 "ShakeStrength": 10.0
 })
@@ -53,6 +53,7 @@ ShowHitboxDebug = false
 Description = "手持该武器攻击敌人3次后，该武器的下一次攻击触发暴击"
 Effects = Array[ExtResource("1_8mx5c")]([SubResource("Resource_hr7lc")])
 DashAttackFxEntries = Array[ExtResource("1_vhody")]([SubResource("Resource_3a2co"), SubResource("Resource_hgras"), SubResource("Resource_p66tr")])
+DashAttackFallImmunities = 3
 WarmupDuration = 0.3
 ActiveDuration = 0.2
 RecoveryDuration = 0.17

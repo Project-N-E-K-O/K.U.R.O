@@ -5,7 +5,7 @@ using Kuros.Systems.Cutscene;
 namespace Kuros.Environments;
 
 /// <summary>
-/// 管网生命周期：指定 SpawnTag 的罐子最终死亡时，淡出根 Modulate，完成后释放整个管网；
+/// 管网生命周期：有 SpawnTag 时初始透明，目标罐子登记后淡入；最终死亡时淡出并释放；
 /// Duration 从 Ready 独立计时，到期释放整个管网（0 = 不限时）。
 /// 使用过场登记表识别左右罐子，不把 SpawnTag 当作节点名或分组。
 /// </summary>
@@ -19,6 +19,9 @@ public partial class PipeLifecycleController : Node2D
     [Export] public NodePath CutsceneManagerPath { get; set; } = new();
 
     [ExportCategory("Lifetime")]
+    /// <summary>目标出现后淡入耗时，淡入到场景原本的 Modulate.A；0 = 立即显示。</summary>
+    [Export(PropertyHint.Range, "0,60,0.1,or_greater")]
+    public float FadeInSeconds { get; set; } = 1.0f;
     /// <summary>击破后淡出耗时，完成后释放整个管网；0 = 立即隐藏并释放。</summary>
     [Export(PropertyHint.Range, "0,60,0.1,or_greater")]
     public float FadeSeconds { get; set; } = 3.0f;
@@ -33,6 +36,11 @@ public partial class PipeLifecycleController : Node2D
     private float _fadeStartAlpha;
     private double _fadeElapsed;
     private double _aliveElapsed;
+    private bool _fadeInStarted;
+    private bool _fadeInCompleted;
+    private double _fadeInElapsed;
+    private double _searchElapsed;
+    private float _visibleAlpha;
 
     public override void _Ready()
     {
@@ -40,8 +48,13 @@ public partial class PipeLifecycleController : Node2D
         _fadeCompleted = false;
         _fadeElapsed = 0.0;
         _aliveElapsed = 0.0;
+        _fadeInStarted = false;
+        _fadeInCompleted = false;
+        _fadeInElapsed = _searchElapsed = 0.0;
+        _visibleAlpha = Modulate.A;
         if (!string.IsNullOrWhiteSpace(SpawnTag))
         {
+            SetAlpha(0.0f);
             GameActor.DeathFinalized += OnDeathFinalized;
             _subscribed = true;
             // 注册发生在生成节点 Ready 之后；延后一拍也覆盖管道晚于罐子生成的情况。
@@ -51,7 +64,7 @@ public partial class PipeLifecycleController : Node2D
         {
             GD.PushWarning($"[{nameof(PipeLifecycleController)}] {Name}: SpawnTag 为空，仅启用 Duration。");
         }
-        SetProcess(Duration > 0.0f);
+        SetProcess(Duration > 0.0f || !string.IsNullOrWhiteSpace(SpawnTag));
     }
 
     private DestructibleStageController? FindJar()
@@ -78,7 +91,15 @@ public partial class PipeLifecycleController : Node2D
     private void CheckExistingJar()
     {
         if (!IsInsideTree() || IsQueuedForDeletion() || _fadeStarted) return;
-        if (FindJar() is { IsDeadOrDying: true }) BeginFade();
+        var jar = FindJar();
+        if (jar == null) return;
+        if (jar.IsDeadOrDying) { BeginFade(); return; }
+        if (_fadeInStarted || jar.IsQueuedForDeletion()) return;
+        _fadeInStarted = true;
+        _fadeInElapsed = 0.0;
+        _fadeInCompleted = FadeInSeconds <= 0.0f;
+        if (_fadeInCompleted) SetAlpha(_visibleAlpha);
+        UpdateProcessing();
     }
 
     private void OnDeathFinalized(GameActor actor)
@@ -112,6 +133,24 @@ public partial class PipeLifecycleController : Node2D
             QueueFree();
             return;
         }
+        // 仅等待阶段低频查询，兼容管理器或罐子晚于管网生成；绑定后停止轮询。
+        if (!_fadeStarted && !_fadeInStarted && !string.IsNullOrWhiteSpace(SpawnTag))
+        {
+            _searchElapsed += delta;
+            if (_searchElapsed >= 0.1)
+            {
+                _searchElapsed = 0.0;
+                CheckExistingJar();
+            }
+        }
+        if (!_fadeStarted && _fadeInStarted && !_fadeInCompleted)
+        {
+            _fadeInElapsed += delta;
+            float t = FadeInSeconds <= 0.0f ? 1.0f
+                : (float)System.Math.Clamp(_fadeInElapsed / FadeInSeconds, 0.0, 1.0);
+            SetAlpha(_visibleAlpha * t);
+            _fadeInCompleted = t >= 1.0f;
+        }
         if (_fadeStarted && !_fadeCompleted)
         {
             _fadeElapsed += delta;
@@ -125,8 +164,12 @@ public partial class PipeLifecycleController : Node2D
                 return;
             }
         }
-        SetProcess(Duration > 0.0f || (_fadeStarted && !_fadeCompleted));
+        UpdateProcessing();
     }
+
+    private void UpdateProcessing()
+        => SetProcess(Duration > 0.0f || (_fadeStarted ? !_fadeCompleted
+            : !string.IsNullOrWhiteSpace(SpawnTag) && (!_fadeInStarted || !_fadeInCompleted)));
 
     private void SetAlpha(float alpha)
     {

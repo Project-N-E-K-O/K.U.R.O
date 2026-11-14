@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://beup3s3dr4q8h"]
+[gd_scene load_steps=23 format=3 uid="uid://beup3s3dr4q8h"]
 
 [ext_resource type="Script" uid="uid://b0qiaumw3ige7" path="res://scripts/systems/cutscene/CutsceneManager.cs" id="1_csmgr"]
 [ext_resource type="Script" uid="uid://x1ic1ym4ykq8" path="res://scripts/scenes/BattleSceneManager.cs" id="1_ctuyy"]
@@ -8,29 +8,31 @@
 [ext_resource type="PackedScene" uid="uid://cgjrdwkemgrcy" path="res://scenes/actors/characters/P2.tscn" id="5_p2"]
 [ext_resource type="Script" uid="uid://l1558pct4220" path="res://scripts/managers/StageGeneratorManager.cs" id="6_gen"]
 [ext_resource type="Script" uid="uid://b7afb3wjghskq" path="res://scripts/items/world/DropItemDebugger.cs" id="7_drop"]
-[ext_resource type="Resource" uid="uid://bqf7cvpc2hsyb" path="res://resources/stages/stage_3a.tres" id="8_83iw7"]
-[ext_resource type="Resource" uid="uid://d38w8aochis65" path="res://resources/stages/stage_3b.tres" id="9_5g8wj"]
-[ext_resource type="Resource" uid="uid://ums8c0rjdgqb" path="res://resources/stages/stage_3c.tres" id="10_axi2i"]
-[ext_resource type="Resource" uid="uid://qahny8a0xlvn" path="res://resources/stages/stage_4a.tres" id="11_i2bjf"]
-[ext_resource type="Resource" uid="uid://wc3mrmbaq4g6" path="res://resources/stages/stage_4b.tres" id="12_axi2i"]
-[ext_resource type="Resource" uid="uid://bg57yox7dv4vg" path="res://resources/stages/stage_4c.tres" id="13_i2bjf"]
-[ext_resource type="Resource" uid="uid://beoxjmbyvy6s0" path="res://resources/stages/stage_6.tres" id="13_ohqcc"]
+[ext_resource type="Resource" uid="uid://bqf7cvpc2hsyb" path="res://resources/stages/stage_2a.tres" id="8_83iw7"]
+[ext_resource type="Resource" uid="uid://cy64kb7txy4no" path="res://resources/stages/stage_2b.tres" id="9_5g8wj"]
+[ext_resource type="Resource" uid="uid://ums8c0rjdgqb" path="res://resources/stages/stage_2c.tres" id="10_axi2i"]
+[ext_resource type="Resource" uid="uid://qahny8a0xlvn" path="res://resources/stages/stage_3a.tres" id="11_i2bjf"]
+[ext_resource type="Resource" uid="uid://wc3mrmbaq4g6" path="res://resources/stages/stage_3b.tres" id="12_axi2i"]
+[ext_resource type="Resource" uid="uid://bg57yox7dv4vg" path="res://resources/stages/stage_3c.tres" id="13_i2bjf"]
+[ext_resource type="Resource" uid="uid://beoxjmbyvy6s0" path="res://resources/stages/stage_5.tres" id="13_ohqcc"]
 [ext_resource type="Resource" uid="uid://m2i8t5utuame" path="res://resources/stages/stage_eggA.tres" id="14_i2bjf"]
 [ext_resource type="PackedScene" uid="uid://bjwnor5ufbb8r" path="res://scenes/managers/BuildSelectionManager.tscn" id="14_pvxkr"]
 [ext_resource type="Script" uid="uid://ghxude6q2vj8" path="res://scripts/systems/stage/StageSession.cs" id="16_sess"]
 [ext_resource type="Script" uid="uid://dim2ctx63qcxt" path="res://scripts/systems/stage/StageConfig.cs" id="17_scfg"]
 [ext_resource type="Resource" uid="uid://bj4jgj656v1r0" path="res://resources/stages/stage_difficulty.tres" id="18_diff"]
+[ext_resource type="Resource" uid="uid://ck0oryxrkbkq5" path="res://resources/stages/stage_1.tres" id="hotel_lobby"]
+[ext_resource type="Resource" uid="uid://cfqfibxgsuw2y" path="res://resources/stages/hotel_room_catalog.tres" id="hotel_rooms"]
 
 [node name="BattleScene" type="Node2D" node_paths=PackedStringArray("Player")]
 y_sort_enabled = true
 script = ExtResource("1_ctuyy")
 Player = NodePath("World/MainCharacter")
-LevelName = "KURO酒店"
 
 [node name="CameraZoneManager" type="Node" parent="." node_paths=PackedStringArray("TargetCamera", "Player")]
 script = ExtResource("4_camera")
 TargetCamera = NodePath("../World/Camera2D")
 Player = NodePath("../World/MainCharacter")
+DebugPrintZoom = false
 
 [node name="CutsceneManager" type="Node" parent="."]
 script = ExtResource("1_csmgr")
@@ -41,12 +43,12 @@ BattleSceneManagerPath = NodePath("..")
 
 [node name="StageGeneratorManager" type="Node" parent="."]
 script = ExtResource("6_gen")
-GenerateOnReady = false
+Catalog = ExtResource("hotel_rooms")
 
 [node name="StageSession" type="Node" parent="."]
 script = ExtResource("16_sess")
-AllConfigs = Array[ExtResource("17_scfg")]([ExtResource("8_83iw7"), ExtResource("9_5g8wj"), ExtResource("10_axi2i"), ExtResource("11_i2bjf"), ExtResource("12_axi2i"), ExtResource("13_i2bjf"), ExtResource("13_ohqcc"), ExtResource("14_i2bjf")])
-StartStage = ExtResource("14_i2bjf")
+AllConfigs = Array[ExtResource("17_scfg")]([ExtResource("hotel_lobby"), ExtResource("8_83iw7"), ExtResource("9_5g8wj"), ExtResource("10_axi2i"), ExtResource("11_i2bjf"), ExtResource("12_axi2i"), ExtResource("13_i2bjf"), ExtResource("13_ohqcc"), ExtResource("14_i2bjf")])
+StartStage = ExtResource("11_i2bjf")
 Difficulty = ExtResource("18_diff")
 
 [node name="BuildSelectionManager" parent="." instance=ExtResource("14_pvxkr")]
@@ -55,12 +57,13 @@ Difficulty = ExtResource("18_diff")
 y_sort_enabled = true
 
 [node name="MainCharacter" parent="World" instance=ExtResource("2_s0pgc")]
+AttackDamage = 1000.0
 MaxHealth = 12000
 
 [node name="Camera2D" type="Camera2D" parent="World" node_paths=PackedStringArray("Target")]
 scale = Vector2(0.32999998, 0.32999998)
 ignore_rotation = false
-zoom = Vector2(0.35, 0.35)
+zoom = Vector2(0.43, 0.43)
 position_smoothing_enabled = true
 rotation_smoothing_enabled = true
 drag_horizontal_enabled = true

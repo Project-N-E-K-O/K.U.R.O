@@ -6,8 +6,9 @@
 [node name="InterferenceHazardField" type="Node2D"]
 script = ExtResource("1_field")
 ZoneCount = 3
-ForwardOffset = 0.0
+ForwardOffset = -200.0
 SpawnLength = 2000.0
-SpawnWidth = 3000.0
+SpawnWidth = 4000.0
+MaxZoneRadius = 240.0
 ZoneScene = ExtResource("2_zone")
 SpawnDebugDuration = 3.0

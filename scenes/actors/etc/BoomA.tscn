@@ -1,0 +1,81 @@
+[gd_scene load_steps=17 format=3 uid="uid://qyq1x8dk354w"]
+
+[ext_resource type="Shader" uid="uid://33ra4ty3whq3" path="res://shaders/materials/pseudo_3d_rotate.gdshader" id="1_ie262"]
+[ext_resource type="Texture2D" uid="uid://bx37ocy10x3w5" path="res://assets/effect/AttackEffect/hit_h/HIT_H0001.png" id="2_meoci"]
+[ext_resource type="Texture2D" uid="uid://cp3ywoxk4lkxi" path="res://assets/effect/AttackEffect/hit_h/HIT_H0002.png" id="3_p1nwr"]
+[ext_resource type="Texture2D" uid="uid://dpgcn3rnubo12" path="res://assets/effect/AttackEffect/hit_h/HIT_H0003.png" id="4_pft4k"]
+[ext_resource type="Texture2D" uid="uid://dj3cj57mnpxvl" path="res://assets/effect/AttackEffect/hit_h/HIT_H0004.png" id="5_ke474"]
+[ext_resource type="Texture2D" uid="uid://bqi5y2ljne00e" path="res://assets/effect/AttackEffect/hit_h/HIT_H0005.png" id="6_76sce"]
+[ext_resource type="Texture2D" uid="uid://cujom167pu87o" path="res://assets/effect/AttackEffect/hit_h/HIT_H0006.png" id="7_8fqb6"]
+[ext_resource type="Texture2D" uid="uid://dne85b3ejnuok" path="res://assets/effect/AttackEffect/hit_h/HIT_H0007.png" id="8_2nfwg"]
+[ext_resource type="Texture2D" uid="uid://bh1pwlpwr1hc8" path="res://assets/effect/AttackEffect/hit_h/HIT_H0008.png" id="9_ml82f"]
+[ext_resource type="PackedScene" uid="uid://yyltmrdqmlo8" path="res://resources/effects/BoomDmgEffect.tscn" id="12_meoci"]
+[ext_resource type="Script" uid="uid://5tqak7y4n1s0" path="res://scripts/effects/EffectAutoDestroy.cs" id="21_xmh8b"]
+[ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/GroundObjectController.cs" id="23_tdbdw"]
+[ext_resource type="Script" uid="uid://lp00o6veicth" path="res://scripts/core/effects/EffectSpawnConfig.cs" id="fx_config"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_u2h3r"]
+shader = ExtResource("1_ie262")
+shader_parameter/isInRadians = false
+shader_parameter/xDegrees = 35.0000016625
+shader_parameter/yDegrees = 0.0
+shader_parameter/zDegrees = 0.0
+shader_parameter/xRadians = 0.0
+shader_parameter/yRadians = 0.0
+shader_parameter/zRadians = 0.0
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_rnm45"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_meoci")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_p1nwr")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_pft4k")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_ke474")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_76sce")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_8fqb6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_2nfwg")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_ml82f")
+}],
+"loop": false,
+"name": &"default",
+"speed": 30.0
+}]
+
+[sub_resource type="Resource" id="Resource_boom_dmg"]
+script = ExtResource("fx_config")
+Scene = ExtResource("12_meoci")
+EffectOffset = Vector2(nan, nan)
+PropertyOverrides = Dictionary[String, Variant]({
+"Damage": 20.0
+})
+
+[node name="BoomA" type="AnimatedSprite2D"]
+modulate = Color(0, 1, 0, 1)
+z_index = 3
+z_as_relative = false
+y_sort_enabled = true
+material = SubResource("ShaderMaterial_u2h3r")
+sprite_frames = SubResource("SpriteFrames_rnm45")
+autoplay = "default"
+script = ExtResource("21_xmh8b")
+SpawnOnDestroyEntries = [SubResource("Resource_boom_dmg")]
+ScaleSpawnWithSelf = true
+
+[node name="GroundObjectController" type="Node" parent="."]
+script = ExtResource("23_tdbdw")
+FallEnabled = false

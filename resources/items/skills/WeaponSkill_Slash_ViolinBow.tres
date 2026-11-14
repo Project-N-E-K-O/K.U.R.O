@@ -11,23 +11,23 @@
 
 [sub_resource type="Resource" id="Resource_3cyqu"]
 script = ExtResource("1_1tcmq")
+SpawnTiming = 2
 Scene = ExtResource("2_tyo52")
 EffectOffset = Vector2(350, 0)
-SpawnTiming = 2
 metadata/_custom_type_script = "uid://fd5076f50ca0"
 
 [sub_resource type="Resource" id="Resource_3x4ab"]
 script = ExtResource("1_1tcmq")
+SpawnTiming = 2
 Scene = ExtResource("3_ovxky")
 EffectOffset = Vector2(350, 0)
-SpawnTiming = 2
 metadata/_custom_type_script = "uid://fd5076f50ca0"
 
 [sub_resource type="Resource" id="Resource_eee0m"]
 script = ExtResource("1_1tcmq")
+SpawnTiming = 2
 Scene = ExtResource("4_vk1sm")
 EffectOffset = Vector2(nan, nan)
-SpawnTiming = 2
 PropertyOverrides = Dictionary[String, Variant]({
 "ShakeStrength": 10.0
 })
@@ -72,6 +72,7 @@ Description = "攻击到敌人时生成一道对敌人造成伤害和减速的�
 Effects = Array[ExtResource("1_0yij6")]([SubResource("Resource_1tcmq")])
 DashEffects = Array[ExtResource("1_0yij6")]([SubResource("Resource_vk1sm"), SubResource("Resource_mm4j5")])
 DashAttackFxEntries = Array[ExtResource("1_1tcmq")]([SubResource("Resource_3cyqu"), SubResource("Resource_3x4ab"), SubResource("Resource_eee0m")])
+DashAttackFallImmunities = 3
 WarmupDuration = 0.17
 ActiveDuration = 0.2
 RecoveryDuration = 0.16

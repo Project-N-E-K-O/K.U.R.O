@@ -28,11 +28,7 @@ namespace Kuros.Actors.Enemies.Attacks
 
         /// <summary>起手条件：基类（检测圈 + 朝向角）之上再要求玩家在自配触发区里。
         /// 纯查询、无任何副作用（轮询/信号/翻朝向都不做）。</summary>
-        public override bool CanStart()
-        {
-            if (!base.CanStart()) return false;
-            return IsPlayerInTriggerArea();
-        }
+
 
         protected override void OnAttackStarted()
         {
@@ -97,8 +93,8 @@ namespace Kuros.Actors.Enemies.Attacks
         protected override void OnAnimationHit()
         {
             base.OnAnimationHit();
-            if (Enemy?.PlayerTarget is SamplePlayer player && AttackArea != null
-                && player.IsHitByArea(AttackArea))
+            if (Enemy?.PlayerTarget is SamplePlayer player && DamageArea != null
+                && player.IsHitByArea(DamageArea))
             {
                 TryApplyPlayerKnockback(player, KnockbackDistance, KnockbackDuration, _dashDirection);
             }

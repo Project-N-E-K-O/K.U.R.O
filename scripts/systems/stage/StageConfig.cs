@@ -1,8 +1,13 @@
 using Godot;
-using Godot.Collections;
 
 namespace Kuros.Systems.Stage
 {
+    public enum StageRouteMode
+    {
+        Ordered = 0,
+        RandomMiddleRooms = 1,
+    }
+
     /// <summary>
     /// 关卡配置：房间池 + 元信息。新增一个关卡 = 新建一份此资源并填入房间池，
     /// 无需复制关卡壳场景（壳结构与 Stage_1~4 完全同构，差异只有池与文本）。
@@ -12,7 +17,9 @@ namespace Kuros.Systems.Stage
     {
         [Export] public string StageId { get; set; } = "";
         [Export] public string DisplayName { get; set; } = "";
-        [Export] public string LevelDescription { get; set; } = "";
+        [Export] public string ElevatorLabel { get; set; } = "";
+        [Export] public Texture2D? ElevatorPreviewTexture { get; set; }
+        [Export(PropertyHint.MultilineText)] public string LevelDescription { get; set; } = "";
 
         /// <summary>所在楼层/层序号：电梯上行默认取 Floor+1 的分支（支持负值 = 地下层）。</summary>
         [Export(PropertyHint.Range, "-20,20,1")] public int Floor { get; set; } = 0;
@@ -28,26 +35,24 @@ namespace Kuros.Systems.Stage
         /// 不填就不会错：新关只要 Floor 对，强度自动一致。</summary>
         [Export] public StageDifficultyConfig? DifficultyOverride { get; set; }
 
-        /// <summary>隐藏彩蛋关：不出现在普通下一层列表，满足解锁条件后附在选项尾部。</summary>
-        [Export] public bool EasterEgg { get; set; } = false;
-
-        /// <summary>彩蛋解锁所需剧情旗标（空 = 始终可选，开发用）。</summary>
+        [Export] public bool IsHiddenFloor { get; set; }
         [Export] public string RequiredStoryFlag { get; set; } = "";
+        [Export] public string RequiredRoomKeyItemId { get; set; } = "";
 
-        [ExportCategory("Room Pools")]
-        [Export] public Array<PackedScene> BeginPool { get; set; } = new();
-        [Export] public Array<PackedScene> EndPool { get; set; } = new();
+        [ExportCategory("Room Route")]
+        [Export] public string FloorTheme { get; set; } = "";
+        [Export] public StageRouteMode RouteMode { get; set; }
+        [Export] public Godot.Collections.Array<RoomType> RoomSequence { get; set; } = new();
 
-        [Export] public Array<PackedScene> EasyMiddlePool { get; set; } = new();
-        [Export(PropertyHint.Range, "0,10,1")] public int EasyRoomMin { get; set; } = 0;
-        [Export(PropertyHint.Range, "0,10,1")] public int EasyRoomMax { get; set; } = 0;
+        [ExportGroup("Random Middle Rooms")]
+        /// <summary>留空时使用当前主题的所有可随机中间房。</summary>
+        [Export] public string MiddleRoomRouteTag { get; set; } = "";
+        [Export(PropertyHint.Range, "0,64,1")] public int MiddleRoomCount { get; set; }
+        [Export(PropertyHint.File, "*.tscn,*.scn")] public string BeginScenePath { get; set; } = "";
+        [Export(PropertyHint.File, "*.tscn,*.scn")] public string EndScenePath { get; set; } = "";
 
-        [Export] public Array<PackedScene> NormalMiddlePool { get; set; } = new();
-        [Export(PropertyHint.Range, "0,10,1")] public int NormalRoomMin { get; set; } = 0;
-        [Export(PropertyHint.Range, "0,10,1")] public int NormalRoomMax { get; set; } = 0;
+        public string ArrivalName => string.IsNullOrWhiteSpace(DisplayName) ? StageId : DisplayName;
+        public string DepartureLabel => string.IsNullOrWhiteSpace(ElevatorLabel) ? "？？？" : ElevatorLabel;
 
-        [Export] public Array<PackedScene> HardMiddlePool { get; set; } = new();
-        [Export(PropertyHint.Range, "0,10,1")] public int HardRoomMin { get; set; } = 0;
-        [Export(PropertyHint.Range, "0,10,1")] public int HardRoomMax { get; set; } = 0;
     }
 }

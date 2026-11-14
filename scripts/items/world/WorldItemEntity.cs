@@ -17,7 +17,7 @@ namespace Kuros.Items.World
 	/// 地图场景中的物品实体，与具体 <see cref="ItemDefinition"/> 一一对应，
 	/// 负责识别物品、暴露属性并在拾取/丢弃时与背包系统交互。
 	/// </summary>
-	public partial class WorldItemEntity : CharacterBody2D, IWorldItemEntity, Kuros.Environments.IPlatformPassenger
+	public partial class WorldItemEntity : CharacterBody2D, IWorldItemEntity, Kuros.Environments.IPlatformPassenger, Kuros.Environments.IGroundFallReceiver
 	{
 		[Signal] public delegate void ItemTransferredEventHandler(WorldItemEntity entity, GameActor actor, ItemDefinition item, int amount);
 		[Signal] public delegate void ItemTransferFailedEventHandler(WorldItemEntity entity, GameActor actor);
@@ -50,10 +50,22 @@ namespace Kuros.Items.World
 		[Export] public bool PlatformCarryEnabled { get; set; } = true;
 		/// <summary>相对于物品根节点的可选脚底 Marker；空时使用物品根节点世界位置。</summary>
 		[Export] public NodePath PlatformGroundProbePath { get; set; } = new();
+		public Node2D PlatformTarget => this;
 		public bool CanRidePlatform => PlatformCarryEnabled && !_isPicked && !IsQueuedForDeletion()
 			&& IsVisibleInTree() && CanProcess()
 			&& _pendingVelocity.LengthSquared() <= 0.0001f && Velocity.LengthSquared() <= 0.0001f;
-		public Vector2 PlatformGroundPosition => GetNodeOrNull<Node2D>(PlatformGroundProbePath)?.GlobalPosition ?? GlobalPosition;
+		public Vector2 PlatformGroundPosition => Kuros.Environments.PlatformCarryPhysics.GroundPosition(this, PlatformGroundProbePath);
+		/// <summary>地面滑行仍可坠落，不复用要求静止的 CanRidePlatform。</summary>
+		public bool CanFall => !_isPicked && !IsQueuedForDeletion() && IsVisibleInTree() && CanProcess();
+		public Vector2 FallGroundPosition => PlatformGroundPosition;
+		public void PrepareForFall()
+		{
+			_isPicked = true; // 立即拒绝拾取，不转移物品到背包。
+			_pendingVelocity = Vector2.Zero;
+			Velocity = Vector2.Zero;
+			_focusedActor = null;
+			if (ReferenceEquals(CurrentHighlightedEntity, this)) CurrentHighlightedEntity = null;
+		}
 
 		public void ApplyPlatformDisplacement(Vector2 displacement, uint obstacleMask)
 		{

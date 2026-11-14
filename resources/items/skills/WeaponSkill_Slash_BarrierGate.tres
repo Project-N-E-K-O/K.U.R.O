@@ -10,16 +10,16 @@
 
 [sub_resource type="Resource" id="Resource_gprf2"]
 script = ExtResource("1_hrrjb")
+SpawnTiming = 2
 Scene = ExtResource("2_w1ai1")
 EffectOffset = Vector2(375, 0)
-SpawnTiming = 2
 metadata/_custom_type_script = "uid://fd5076f50ca0"
 
 [sub_resource type="Resource" id="Resource_bp688"]
 script = ExtResource("1_hrrjb")
+SpawnTiming = 2
 Scene = ExtResource("3_u4dse")
 EffectOffset = Vector2(nan, nan)
-SpawnTiming = 2
 metadata/_custom_type_script = "uid://fd5076f50ca0"
 
 [sub_resource type="Resource" id="Resource_w1ai1"]
@@ -64,6 +64,7 @@ Description = "攻击到敌人时使该敌人移动速度减少50%，持续1秒�
 Effects = Array[ExtResource("1_joilt")]([SubResource("Resource_nfyj5")])
 DashEffects = Array[ExtResource("1_joilt")]([SubResource("Resource_w1ai1"), SubResource("Resource_u4dse")])
 DashAttackFxEntries = Array[ExtResource("1_hrrjb")]([SubResource("Resource_gprf2"), SubResource("Resource_bp688")])
+DashAttackFallImmunities = 3
 WarmupDuration = 0.53
 ActiveDuration = 0.31
 RecoveryDuration = 0.16

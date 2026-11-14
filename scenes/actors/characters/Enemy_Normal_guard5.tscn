@@ -1,4 +1,4 @@
-[gd_scene load_steps=35 format=3 uid="uid://c7cs5rykiiay0"]
+[gd_scene load_steps=38 format=3 uid="uid://c7cs5rykiiay0"]
 
 [ext_resource type="Script" uid="uid://xpeu3h5p7n6t" path="res://scripts/actors/enemies/EnemyNormalGuard5.cs" id="1_podts"]
 [ext_resource type="Resource" uid="uid://biq1vqy017vmi" path="res://resources/loot/Enemy_NormalDrops.tres" id="2_w06kf"]
@@ -25,6 +25,9 @@
 [ext_resource type="Script" uid="uid://d6ppl6a6djpr" path="res://scripts/core/effects/EffectController.cs" id="22_ptbvf"]
 [ext_resource type="Script" uid="uid://dasv6eyuks8yq" path="res://scripts/actors/enemies/movement/EnemyFreezeOnTurnMovement.cs" id="23_urhpp"]
 [ext_resource type="Script" uid="uid://didlkwqg6m8a" path="res://scripts/actors/enemies/animation/EnemyNormalGuard5SpineAnimationController.cs" id="24_5ya5j"]
+[ext_resource type="Script" uid="uid://dsbna0napv0bt" path="res://scripts/actors/enemies/EnemyFallController.cs" id="fall_controller"]
+[ext_resource type="PackedScene" uid="uid://bxymkx3ekrxh0" path="res://scenes/objects/Animation_enemy.tscn" id="fall_effect"]
+[ext_resource type="Script" uid="uid://isk4s1w8ixcu" path="res://scripts/actors/enemies/states/EnemyFallState.cs" id="fall_state"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_b5vhy"]
 shader = ExtResource("3_wb3gc")
@@ -230,9 +233,14 @@ scale = Vector2(0.99999994, 0.99999994)
 rotation = 1.5707964
 shape = SubResource("CapsuleShape2D_bo3lt")
 
+[node name="GroundProbe" type="Marker2D" parent="."]
+
 [node name="StateMachine" type="Node" parent="." node_paths=PackedStringArray("InitialState")]
 script = ExtResource("8_ysw5s")
 InitialState = NodePath("Idle")
+
+[node name="Fall" type="Node" parent="StateMachine"]
+script = ExtResource("fall_state")
 
 [node name="Idle" type="Node" parent="StateMachine"]
 script = ExtResource("9_o2fps")
@@ -300,6 +308,12 @@ RecoverDuration = 0.16
 
 [node name="Frozen" type="Node" parent="StateMachine"]
 script = ExtResource("18_qqpg6")
+
+[node name="FallController" type="Node" parent="."]
+script = ExtResource("fall_controller")
+FallEnabled = true
+FallEffectScene = ExtResource("fall_effect")
+FallAnimationName = "fall_guard5"
 
 [node name="CooldownFrozen" type="Node" parent="StateMachine"]
 script = ExtResource("19_0dmap")

@@ -117,11 +117,7 @@ namespace Kuros.Actors.Enemies.Attacks
         /// <summary>起手条件：在基类（大检测圈 + 朝向角）之上**再要求玩家在自配的触发区里**
         /// （场景 TriggerAreaPath = AttackDetectionArea）——基类 CanStart 不查这张触发区，
         /// 不补的话玩家在圈外也能起手招架（KickAttack 同款约定）。</summary>
-        public override bool CanStart()
-        {
-            if (!base.CanStart()) return false;
-            return IsPlayerInTriggerArea();
-        }
+
 
         protected override void OnAttackStarted()
         {

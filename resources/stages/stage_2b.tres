@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="StageConfig" load_steps=2 format=3 uid="uid://cy64kb7txy4no"]
+
+[ext_resource type="Script" uid="uid://dim2ctx63qcxt" path="res://scripts/systems/stage/StageConfig.cs" id="3_ltvbw"]
+
+[resource]
+script = ExtResource("3_ltvbw")
+StageId = "stage_2b"
+DisplayName = "餐厅东区"
+ElevatorLabel = "餐厅东区"
+LevelDescription = "酒店二层餐厅东区"
+Floor = 2
+FloorTheme = "C"
+RouteMode = 1
+MiddleRoomCount = 4
+BeginScenePath = "res://scenes/levels/C_begin.tscn"
+EndScenePath = "res://scenes/levels/C_end.tscn"

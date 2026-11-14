@@ -45,6 +45,8 @@ SpinSpritePath = NodePath("Visual/bullet")
 SpinDegreesPerSecond = 720.0
 TargetableFactions = 5
 Damage = 8
+KnockbackDistance = 50.0
+KnockbackDuration = 0.09
 
 [node name="Visual" type="Node2D" parent="."]
 

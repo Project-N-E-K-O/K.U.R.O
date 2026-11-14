@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="StageConfig" load_steps=2 format=3 uid="uid://bqf7cvpc2hsyb"]
+
+[ext_resource type="Script" uid="uid://dim2ctx63qcxt" path="res://scripts/systems/stage/StageConfig.cs" id="3_5mb6o"]
+
+[resource]
+script = ExtResource("3_5mb6o")
+StageId = "stage_2a"
+DisplayName = "餐厅北区"
+ElevatorLabel = "餐厅北区"
+LevelDescription = "餐厅区目前被各种失控的女仆型机器人占领"
+Floor = 2
+FloorTheme = "C"
+RouteMode = 1
+MiddleRoomCount = 4
+BeginScenePath = "res://scenes/levels/C_begin.tscn"
+EndScenePath = "res://scenes/levels/C_end.tscn"

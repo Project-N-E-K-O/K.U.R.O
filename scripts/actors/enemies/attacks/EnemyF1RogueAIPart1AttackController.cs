@@ -24,6 +24,27 @@ namespace Kuros.Actors.Enemies.Attacks
 		protected override float[] TriggerThresholds => ProgressThresholds;
 		protected override float UpgradeThreshold => ProgressUpgradeThreshold;
 
+		private EnemyEmpowerController? _empower;
+
+		public override void Initialize(SampleEnemy enemy)
+		{
+			base.Initialize(enemy);
+			_empower = enemy.GetNodeOrNull<EnemyEmpowerController>("EmpowerController");
+		}
+
+		public override void _PhysicsProcess(double delta)
+		{
+			base._PhysicsProcess(delta);
+			if (_empower == null || !IsInstanceValid(_empower)) return;
+
+			bool shouldEmpower = Enemy is EnemyF1RogueAI { IsFinished: false, IsDeadOrDying: false }
+				&& ShouldUpgradeUltimate();
+			if (shouldEmpower == _empower.IsEmpowered) return;
+
+			if (shouldEmpower) _empower.Activate();
+			else _empower.Clear();
+		}
+
 		protected override IEnumerable<string> EnumerateMeleeNames()
 		{
 			foreach (string name in base.EnumerateMeleeNames())

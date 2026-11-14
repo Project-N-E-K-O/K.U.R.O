@@ -1,4 +1,4 @@
-[gd_scene load_steps=93 format=3 uid="uid://v3n56xk6n8ca"]
+[gd_scene load_steps=95 format=3 uid="uid://v3n56xk6n8ca"]
 
 [ext_resource type="Texture2D" uid="uid://tm160ewu2yyj" path="res://assets/environments/scene_loading_elevator/ElevatorBackground.png" id="1_1e411"]
 [ext_resource type="Texture2D" uid="uid://bd81ty7uf16q3" path="res://assets/environments/scene_loading_elevator/Elevator.png" id="2_1rckx"]
@@ -78,6 +78,7 @@
 [ext_resource type="Texture2D" uid="uid://c05di42jayd65" path="res://assets/environments/scene_loading_elevator/ElevatorGate_right/时间轴 1_0021.png" id="76_3tp1a"]
 [ext_resource type="Texture2D" uid="uid://ow05i4crn14y" path="res://assets/environments/scene_loading_elevator/ElevatorGate_right/时间轴 1_0022.png" id="77_ah4t7"]
 [ext_resource type="Texture2D" uid="uid://cntknyx50waxi" path="res://assets/environments/scene_loading_elevator/ElevatorGate_right/时间轴 1_0023.png" id="78_gbipy"]
+[ext_resource type="Script" uid="uid://cra7y7mt0x1j8" path="res://scripts/managers/CameraZoneArea.cs" id="elevator_camera_zone"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_hkl1o"]
 shader = ExtResource("3_h28jp")
@@ -98,6 +99,9 @@ size = Vector2(200, 1100)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_h28jp"]
 size = Vector2(2100, 965.5)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_elevator_camera"]
+size = Vector2(2000, 1200)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_u66l2"]
 size = Vector2(311, 708)
@@ -620,6 +624,7 @@ texture = ExtResource("3_5rppg")
 texture = ExtResource("3_5rppg")
 
 [node name="AirWall" type="StaticBody2D" parent="."]
+visible = false
 z_index = 10
 
 [node name="Gate" type="CollisionShape2D" parent="AirWall"]
@@ -638,6 +643,21 @@ shape = SubResource("RectangleShape2D_5rppg")
 [node name="CollisionShape2D3" type="CollisionShape2D" parent="AirWall"]
 position = Vector2(0, -21)
 shape = SubResource("RectangleShape2D_h28jp")
+
+[node name="CameraZone" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 4
+monitorable = false
+script = ExtResource("elevator_camera_zone")
+ZoneName = "LoadingElevator"
+CameraLimitTop = -650
+CameraLimitBottom = 550
+UseLocalVerticalLimits = true
+ZoomLevel = 0.95
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CameraZone"]
+position = Vector2(0, 20)
+shape = SubResource("RectangleShape2D_elevator_camera")
 
 [node name="ExitArea" type="Area2D" parent="."]
 position = Vector2(1200, 400)
@@ -658,10 +678,11 @@ shape = SubResource("RectangleShape2D_interact")
 
 [node name="HintLabel" type="Label" parent="."]
 z_index = 10
-offset_left = 65.0
+offset_left = -510.0
 offset_top = 262.0
-offset_right = 121.0
+offset_right = 510.0
 offset_bottom = 301.0
+grow_horizontal = 2
 theme_override_colors/font_color = Color(1, 1, 0.6, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8)
 theme_override_constants/shadow_offset_x = 2

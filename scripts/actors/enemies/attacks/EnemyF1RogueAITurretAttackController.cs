@@ -21,9 +21,18 @@ namespace Kuros.Actors.Enemies.Attacks
         /// <summary>近战须已满足起手条件才参与排队，避免远距离选中近战后空等超时。</summary>
         [Export] public bool RequireMeleeReadyBeforeQueue { get; set; } = false;
 
+        [ExportCategory("Jar Assist Selection")]
+        /// <summary>首次或再次使用协助罐前需发动的普通攻击次数。0 表示直接按权重选招。</summary>
+        [Export(PropertyHint.Range, "0,20,1,or_greater")]
+        public int NormalAttacksBeforeJarAssist { get; set; } = 3;
+
+        private int _normalAttacksSinceJarAssist;
+
         protected override bool IsAttackAllowed(EnemyAttackTemplate attack)
         {
             if (!base.IsAttackAllowed(attack)) return false;
+            if (attack is JarAssistAttack && _normalAttacksSinceJarAssist < NormalAttacksBeforeJarAssist)
+                return false;
             if (RequireMeleeReadyBeforeQueue && attack is EnemyF1RogueAITurretMeleeAttack
                 && !attack.CanStart()) return false;
             bool normalOnly = System.Array.IndexOf(NormalOnlyAttackNames, attack.AttackName) >= 0;
@@ -33,6 +42,16 @@ namespace Kuros.Actors.Enemies.Attacks
             // 配置冲突时不允许该攻击，避免普通/Pro 同时进入选招池。
             if (normalOnly && empoweredOnly) return false;
             return empoweredOnly ? empowered : !empowered;
+        }
+
+        protected override void OnChildAttackStarted(EnemyAttackTemplate attack)
+        {
+            if (attack is JarAssistAttack)
+                _normalAttacksSinceJarAssist = 0;
+            else if (attack.AttackName is "SimpleMeleeAttack" or "MeleeAttack")
+                _normalAttacksSinceJarAssist++;
+
+            base.OnChildAttackStarted(attack);
         }
 
         public EnemyF1RogueAITurretAttackController()

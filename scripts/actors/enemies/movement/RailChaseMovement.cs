@@ -16,8 +16,6 @@ public partial class RailChaseMovement : EnemyChaseMovement
 
 	private SlideRailMount? _rail;
 	private bool _resolved;
-	private float _carriageLo;
-	private float _carriageHi;
 	private Vector2 _mountLocal;
 
 	/// <summary>外部接管移动：true 时本组件不再自行追击/减速/MoveAndSlide，只保留每帧硬钳（ClampToRail）。
@@ -76,8 +74,6 @@ public partial class RailChaseMovement : EnemyChaseMovement
 		}
 
 		_rail.ResolveNow();
-		_carriageLo = _rail.CarriageLo;
-		_carriageHi = _rail.CarriageHi;
 		_mountLocal = Enemy.Position;
 	}
 
@@ -95,9 +91,9 @@ public partial class RailChaseMovement : EnemyChaseMovement
 		// 机械轴向：区间用排序后的 Lo/Hi（不能拿 Near/Far 当上下界）
 		var pos = Enemy.GlobalPosition;
 		if (_rail.CarriageAxis == SlideRailMount.RailAxis.X)
-			pos.X = Mathf.Clamp(pos.X, _carriageLo, _carriageHi);
+			pos.X = Mathf.Clamp(pos.X, _rail.CarriageLo, _rail.CarriageHi);
 		else
-			pos.Y = Mathf.Clamp(pos.Y, _carriageLo, _carriageHi);
+			pos.Y = Mathf.Clamp(pos.Y, _rail.CarriageLo, _rail.CarriageHi);
 		Enemy.GlobalPosition = pos;
 	}
 }

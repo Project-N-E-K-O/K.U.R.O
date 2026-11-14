@@ -1,13 +1,14 @@
-[gd_resource type="Resource" script_class="StageConfig" load_steps=3 format=3 uid="uid://m2i8t5utuame"]
+[gd_resource type="Resource" script_class="StageConfig" load_steps=2 format=3 uid="uid://m2i8t5utuame"]
 
-[ext_resource type="PackedScene" uid="uid://dstgcw0tto5oa" path="res://scenes/levels/Test_begin.tscn" id="1_7gm2k"]
 [ext_resource type="Script" uid="uid://dim2ctx63qcxt" path="res://scripts/systems/stage/StageConfig.cs" id="3_vnw1l"]
 
 [resource]
 script = ExtResource("3_vnw1l")
 StageId = "stageEggA"
 DisplayName = "404NotFound"
-LevelDescription = "酒店隐藏区域a"
+LevelDescription = "从内部封闭起来，无法抵达的楼层，提供各种战斗测试。"
 UpFloorTarget = 1
-EasterEgg = true
-BeginPool = Array[PackedScene]([ExtResource("1_7gm2k")])
+IsHiddenFloor = true
+RequiredRoomKeyItemId = "room_key_hidden_a"
+FloorTheme = "HiddenA"
+RoomSequence = Array[int]([10])

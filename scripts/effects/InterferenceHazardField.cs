@@ -23,24 +23,27 @@ namespace Kuros.Effects
 	[GlobalClass]
 	public partial class InterferenceHazardField : Node2D, IAttackerProvider
 	{
-		[ExportCategory("Spawn 生成")]
+		[ExportCategory("Spawn")]
 		[Export(PropertyHint.Range, "1,12,1")] public int ZoneCount { get; set; } = 4;
 		/// <summary>散布方向：Below/Above = 世界坐标正下/正上；AttackerFacing = 沿攻击者朝向左右。</summary>
 		[Export] public HazardSpawnDirection SpawnDirection { get; set; } = HazardSpawnDirection.Below;
-		/// <summary>矩形起点距本节点的纵深偏移（像素）：沿散布方向，避免 zone 刷在脚下。</summary>
-		[Export(PropertyHint.Range, "0,3000,10")] public float ForwardOffset { get; set; } = 250f;
+		/// <summary>矩形起点距本节点的纵深偏移（像素）：沿散布方向，避免 zone 刷在脚下。
+		/// 可为负：沿散布方向的反方向铺（Below 时为世界 -Y，即往原点上方偏移）。</summary>
+		[Export(PropertyHint.Range, "-3000,3000,10")] public float ForwardOffset { get; set; } = 250f;
 		/// <summary>矩形纵深（像素）：沿散布方向展开的长度。</summary>
-		[Export(PropertyHint.Range, "100,3000,10")] public float SpawnLength { get; set; } = 1000f;
+		[Export(PropertyHint.Range, "100,6000,10")] public float SpawnLength { get; set; } = 1000f;
 		/// <summary>矩形横向宽度（像素）：垂直于散布方向。</summary>
-		[Export(PropertyHint.Range, "100,3000,10")] public float SpawnWidth { get; set; } = 700f;
+		[Export(PropertyHint.Range, "100,6000,10")] public float SpawnWidth { get; set; } = 700f;
 		[Export(PropertyHint.Range, "40,600,5")] public float MinZoneRadius { get; set; } = 120f;
 		[Export(PropertyHint.Range, "40,600,5")] public float MaxZoneRadius { get; set; } = 200f;
+		/// <summary>同批 Zone 边缘之间的目标间距。空间不足时选间距最大的候选点；0 恢复独立随机。</summary>
+		[Export(PropertyHint.Range, "0,1500,10")] public float ZoneEdgeSpacing { get; set; } = 200f;
 		[Export] public PackedScene? ZoneScene { get; set; }
 
-		[ExportCategory("Damage 伤害")]
+		[ExportCategory("Damage")]
 		[Export(PropertyHint.Range, "0,200,1")] public int Damage { get; set; } = 20;
 
-		[ExportCategory("Debug 调试")]
+		[ExportCategory("Debug")]
 		/// <summary>在生成点绘制前方矩形的散布范围与实际落点（仅调试用）。</summary>
 		[Export] public bool ShowSpawnDebug { get; set; } = false;
 		/// <summary>调试图形保留时长（秒）；开启时生成器节点延后释放。</summary>
@@ -86,7 +89,7 @@ namespace Kuros.Effects
 		{
 			if (!_spawned || !ShowSpawnDebug) return;
 
-			float forwardStart = Mathf.Max(ForwardOffset, 0f);
+			float forwardStart = ForwardOffset;
 			float length = Mathf.Max(SpawnLength, 0f);
 			float halfWidth = Mathf.Max(SpawnWidth, 0f) * 0.5f;
 
@@ -169,10 +172,11 @@ namespace Kuros.Effects
 			_debugForwardAxis = forwardAxis;
 			_debugLateralAxis = lateralAxis;
 
-			float forwardStart = Mathf.Max(ForwardOffset, 0f);
+			float forwardStart = ForwardOffset;
 			float length = Mathf.Max(SpawnLength, 0f);
 			float halfWidth = Mathf.Max(SpawnWidth, 0f) * 0.5f;
 
+			var placements = new List<(Vector2 Offset, float Radius)>(count);
 			for (int i = 0; i < count; i++)
 			{
 				var zone = ZoneScene.Instantiate<InterferenceZone>();
@@ -182,9 +186,32 @@ namespace Kuros.Effects
 				zone.Damage = Damage;
 				zone.Radius = (float)GD.RandRange(minRadius, maxRadius);
 
-				float forward = forwardStart + GD.Randf() * length;
-				float lateral = (float)GD.RandRange(-halfWidth, halfWidth);
-				Vector2 offset = forwardAxis * forward + lateralAxis * lateral;
+				Vector2 offset = Vector2.Zero;
+				float bestClearance = float.NegativeInfinity;
+				const int maxAttempts = 24;
+				for (int attempt = 0; attempt < maxAttempts; attempt++)
+				{
+					float forward = forwardStart + GD.Randf() * length;
+					float lateral = (float)GD.RandRange(-halfWidth, halfWidth);
+					Vector2 candidate = forwardAxis * forward + lateralAxis * lateral;
+					if (ZoneEdgeSpacing <= 0f || placements.Count == 0)
+					{
+						offset = candidate;
+						break;
+					}
+
+					float clearance = float.PositiveInfinity;
+					foreach (var placement in placements)
+						clearance = Mathf.Min(clearance, candidate.DistanceTo(placement.Offset) - zone.Radius - placement.Radius);
+
+					if (clearance > bestClearance)
+					{
+						bestClearance = clearance;
+						offset = candidate;
+					}
+					if (clearance >= ZoneEdgeSpacing) break;
+				}
+				placements.Add((offset, zone.Radius));
 
 				parent.AddChild(zone);
 				zone.GlobalPosition = GlobalPosition + offset;

@@ -11,7 +11,6 @@ namespace Kuros.UI
     {
         public Dictionary<int, int> Requests { get; set; } = new();
         public bool DisableAI { get; set; }
-        public bool DisableLoot { get; set; }
     }
 
     /// <summary>
@@ -340,8 +339,7 @@ namespace Kuros.UI
                 var config = new EnemySpawnConfig
                 {
                     Requests = requests,
-                    DisableAI = DisableAICheckBox?.ButtonPressed ?? false,
-                    DisableLoot = true  // 固定为 true，禁用掉落物品
+                    DisableAI = DisableAICheckBox?.ButtonPressed ?? false
                 };
                 SpawnConfirmed?.Invoke(config);
             }

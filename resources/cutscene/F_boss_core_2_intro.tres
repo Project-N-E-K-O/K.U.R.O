@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="CutsceneSequence" load_steps=8 format=3 uid="uid://bfvnxhygsyei"]
+
+[ext_resource type="Script" uid="uid://ctrko7add3r5h" path="res://scripts/systems/cutscene/CutsceneStep.cs" id="1_7jsum"]
+[ext_resource type="Script" uid="uid://cgnajq1ykl2mn" path="res://scripts/systems/cutscene/CutsceneSequence.cs" id="1_sequence"]
+[ext_resource type="Script" uid="uid://5xu2sir0yhv1" path="res://scripts/systems/cutscene/steps/PlayAnimationStep.cs" id="2_play_animation"]
+[ext_resource type="Script" uid="uid://1551srxqrxye" path="res://scripts/systems/cutscene/steps/MovePlayerStep.cs" id="3_move_player"]
+
+[sub_resource type="Resource" id="Resource_close_platform"]
+script = ExtResource("2_play_animation")
+AnimationPlayerPath = NodePath("../World/F_boss_core/LiftingPlatform/AnimationPlayer")
+AnimationName = "close"
+WaitForCompletion = true
+metadata/_custom_type_script = "uid://5xu2sir0yhv1"
+
+[sub_resource type="Resource" id="Resource_raise_platform"]
+script = ExtResource("2_play_animation")
+AnimationPlayerPath = NodePath("../World/F_boss_core/AnimationPlayer")
+AnimationName = "up"
+WaitForCompletion = true
+metadata/_custom_type_script = "uid://5xu2sir0yhv1"
+
+[sub_resource type="Resource" id="Resource_move_to_end"]
+script = ExtResource("3_move_player")
+TargetPath = NodePath("../World/FEnd/PlayerSpawnPoint")
+metadata/_custom_type_script = "uid://1551srxqrxye"
+
+[resource]
+script = ExtResource("1_sequence")
+SequenceId = "F_boss_core_2_intro"
+Steps = Array[ExtResource("1_7jsum")]([SubResource("Resource_close_platform"), SubResource("Resource_raise_platform"), SubResource("Resource_move_to_end")])
+DisablePlayerInput = false
+HidePlayer = false

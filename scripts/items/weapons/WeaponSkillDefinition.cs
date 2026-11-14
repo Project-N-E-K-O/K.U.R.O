@@ -4,6 +4,15 @@ using Kuros.Items.Effects;
 
 namespace Kuros.Items.Weapons
 {
+    /// <summary>玩家武器攻击阶段坠落免疫；CSV 使用可组合的 0/1/2/4 位值。</summary>
+    [System.Flags]
+    public enum WeaponAttackFallPhases
+    {
+        None = 0,
+        Warmup = 1,
+        Active = 2,
+        Recovery = 4
+    }
     /// <summary>冲刺攻击速度来源（CSV 以 int 存序号，只增不改）。</summary>
     public enum DashAttackSpeedSource
     {
@@ -67,6 +76,14 @@ namespace Kuros.Items.Weapons
         [Export] public bool UseDefaultAttackAnimationFallback { get; set; } = true;
         [Export] public string ActivationAction { get; set; } = string.Empty;
         [Export] public bool AllowHoldContinuousAttack { get; set; } = true;
+
+        [ExportGroup("Fall Immunity")]
+        /// <summary>普通攻击免坠落阶段；默认无，不影响普通 Dash 状态免疫。</summary>
+        [Export(PropertyHint.Flags, "Warmup:1,Active:2,Recovery:4")]
+        public WeaponAttackFallPhases AttackFallImmunities { get; set; } = WeaponAttackFallPhases.None;
+        /// <summary>冲刺攻击免坠落阶段；默认无，空配置不会继承普通攻击。</summary>
+        [Export(PropertyHint.Flags, "Warmup:1,Active:2,Recovery:4")]
+        public WeaponAttackFallPhases DashAttackFallImmunities { get; set; } = WeaponAttackFallPhases.None;
 
         [ExportGroup("Attack Timing Override")]
         [Export(PropertyHint.MultilineText)] public string AttackTimingNote { get; set; } = "负数 = 使用攻击模板的默认值";

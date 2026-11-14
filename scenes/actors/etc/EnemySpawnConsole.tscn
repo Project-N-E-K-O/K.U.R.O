@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=3 uid="uid://mwpdlx1yup0k"]
+[gd_scene load_steps=33 format=3 uid="uid://mwpdlx1yup0k"]
 
 [ext_resource type="Script" uid="uid://dlbrxuciurl4o" path="res://scripts/environments/EnemySpawnConsole.cs" id="1_2lj3c"]
 [ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="1_bllfa"]
@@ -23,6 +23,10 @@
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="14_qj5ja"]
 [ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="15_qnjvr"]
 [ext_resource type="PackedScene" uid="uid://cx332v8gr3ytf" path="res://scenes/actors/characters/Enemy_F1_rogueAI_Magnet.tscn" id="16_w4w1u"]
+[ext_resource type="PackedScene" uid="uid://cw42j1o501x83" path="res://scenes/actors/characters/Enemy_F1_rogueAI_MachineGun.tscn" id="19_8aaey"]
+[ext_resource type="PackedScene" uid="uid://duryvwia2gyyc" path="res://scenes/actors/characters/Enemy_F1_rogueAI_Cannon.tscn" id="20_w2ery"]
+[ext_resource type="PackedScene" uid="uid://b6dltrf0y1t38" path="res://scenes/actors/characters/Enemy_F1_rogueAI_part1.tscn" id="21_cuieh"]
+[ext_resource type="PackedScene" uid="uid://xloj3kvnvpo2" path="res://scenes/actors/characters/Enemy_F1_rogueAI_part2.tscn" id="22_4l1sb"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_nmbao"]
 shader = ExtResource("1_bllfa")
@@ -50,7 +54,7 @@ size = Vector2(636, 266)
 z_index = 2
 y_sort_enabled = true
 script = ExtResource("1_2lj3c")
-EnemyScenes = Array[PackedScene]([ExtResource("4_bt2sr"), ExtResource("5_njsr5"), ExtResource("4_w5fa5"), ExtResource("7_f5erk"), ExtResource("6_bn6u4"), ExtResource("2_bqlf7"), ExtResource("3_b7qyu"), ExtResource("6_w5fa5"), ExtResource("7_5vnba"), ExtResource("8_qj5ja"), ExtResource("9_qnjvr"), ExtResource("11_gn3c5"), ExtResource("12_jj8gp"), ExtResource("13_jj8gp"), ExtResource("14_8ri3c"), ExtResource("14_1kajl"), ExtResource("16_w4w1u")])
+EnemyScenes = Array[PackedScene]([ExtResource("4_bt2sr"), ExtResource("5_njsr5"), ExtResource("4_w5fa5"), ExtResource("7_f5erk"), ExtResource("6_bn6u4"), ExtResource("2_bqlf7"), ExtResource("3_b7qyu"), ExtResource("6_w5fa5"), ExtResource("7_5vnba"), ExtResource("8_qj5ja"), ExtResource("9_qnjvr"), ExtResource("11_gn3c5"), ExtResource("12_jj8gp"), ExtResource("13_jj8gp"), ExtResource("14_8ri3c"), ExtResource("14_1kajl"), ExtResource("16_w4w1u"), ExtResource("19_8aaey"), ExtResource("20_w2ery"), ExtResource("21_cuieh"), ExtResource("22_4l1sb")])
 EnemySpawnOffset = Vector2(0, 200)
 EnemyAppearDelay = 1.0
 AutoLowerFrontEffectAfterEnemySpawn = true

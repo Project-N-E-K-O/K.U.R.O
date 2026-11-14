@@ -124,7 +124,7 @@ namespace Kuros.UI
             UpdateHighlights();
         }
 
-        public void CloseWindow()
+        public void CloseWindow(bool immediate = false)
         {
             if (!_isOpen) return;
 
@@ -132,11 +132,19 @@ namespace Kuros.UI
             SetProcessInput(false);
             _isOpen = false;
 
-            GetTree().CreateTimer(0.15f).Timeout += () =>
+            if (immediate)
             {
                 if (PauseManager.Instance.IsPaused)
                     PauseManager.Instance.PopPause();
-            };
+            }
+            else
+            {
+                GetTree().CreateTimer(0.15f).Timeout += () =>
+                {
+                    if (PauseManager.Instance.IsPaused)
+                        PauseManager.Instance.PopPause();
+                };
+            }
 
             var parent = GetParent();
             if (parent is CanvasLayer canvasLayer)

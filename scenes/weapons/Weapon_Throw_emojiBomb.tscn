@@ -1,9 +1,10 @@
-[gd_scene load_steps=27 format=3 uid="uid://b81xhi3r08vha"]
+[gd_scene load_steps=30 format=3 uid="uid://b81xhi3r08vha"]
 
 [ext_resource type="Script" uid="uid://dhfq2rrha0awm" path="res://scripts/items/world/RigidBodyWorldItemEntity.cs" id="1_1d0of"]
 [ext_resource type="Resource" uid="uid://dtv412g1klamn" path="res://resources/items/Weapon_Throw_EmojiBomb.tres" id="2_vfp1h"]
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="3_n0uqx"]
 [ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="4_g5wk3"]
+[ext_resource type="Script" uid="uid://bp7k64w3rc75b" path="res://scripts/controllers/ShadowGroundController.cs" id="5_njwgo"]
 [ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="5_uc5id"]
 [ext_resource type="Shader" uid="uid://caxdo713k5kug" path="res://shaders/materials/sparkling.gdshader" id="6_ahq4c"]
 [ext_resource type="Texture2D" uid="uid://cd24tjl6wpw4i" path="res://assets/objects/emoji_boom/时间轴 1_0000.png" id="6_vfp1h"]
@@ -17,6 +18,8 @@
 [ext_resource type="Texture2D" uid="uid://frs87ufjfuoy" path="res://assets/objects/emoji_boom/时间轴 1_0009.png" id="14_uelip"]
 [ext_resource type="Texture2D" uid="uid://cg7aibnohxiqi" path="res://assets/objects/emoji_boom/时间轴 1_0010.png" id="15_3ncya"]
 [ext_resource type="Texture2D" uid="uid://dabxdflvss2xs" path="res://assets/art/godot_icon.png" id="17_sql12"]
+[ext_resource type="PackedScene" uid="uid://dby51i7slqvd5" path="res://scenes/objects/Animation_item.tscn" id="fall_anim_item"]
+[ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/GroundObjectController.cs" id="ground_object_ctrl"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_idk0v"]
 shader = ExtResource("3_n0uqx")
@@ -37,6 +40,7 @@ shader_parameter/highlight_width = 0.08
 shader_parameter/highlight_speed = 2.0
 shader_parameter/highlight_intensity = 1.2
 shader_parameter/highlight_interval = 1.00000002375
+shader_parameter/brightness = 1.0
 shader_parameter/alpha_factor = 1.0
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_2aaj6"]
@@ -149,6 +153,9 @@ position = Vector2(10, 20)
 scale = Vector2(3.5, 2)
 texture = ExtResource("4_g5wk3")
 
+[node name="ShadowGroundController" type="Node" parent="RigidBody2D/Shadow"]
+script = ExtResource("5_njwgo")
+
 [node name="Outline" type="Sprite2D" parent="RigidBody2D"]
 material = SubResource("ShaderMaterial_0nltr")
 scale = Vector2(0.33, 0.33)
@@ -188,3 +195,8 @@ shape = SubResource("RectangleShape2D_idk0v")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D/AttackArea"]
 shape = SubResource("RectangleShape2D_w57jh")
+
+[node name="GroundObjectController" type="Node" parent="."]
+script = ExtResource("ground_object_ctrl")
+FallEffectScene = ExtResource("fall_anim_item")
+FallAnimationName = "fall_emoji_bomb"

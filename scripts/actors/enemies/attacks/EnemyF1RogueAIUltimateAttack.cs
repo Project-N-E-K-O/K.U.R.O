@@ -1,4 +1,6 @@
 using Godot;
+using Kuros.Managers;
+using Kuros.Fx;
 
 namespace Kuros.Actors.Enemies.Attacks
 {
@@ -45,6 +47,8 @@ namespace Kuros.Actors.Enemies.Attacks
 		[Export(PropertyHint.Range, "1,64,1")] public float ArriveDeadzone { get; set; } = 8f;
 		/// <summary>Active 段扫到另一端后**折返**回蓄力端（强化版 Pro：A→B→A）。</summary>
 		[Export] public bool ReturnOnActive { get; set; } = false;
+		[Export] public bool UseRoomSweep { get; set; }
+		[Export(PropertyHint.Range, "100,10000,100")] public float RoomApproachSpeed { get; set; } = 5000f;
 
 		/// <summary>当前阶段（动画控制器据此选循环动画）。</summary>
 		public UltPhase Phase { get; private set; } = UltPhase.None;
@@ -57,6 +61,12 @@ namespace Kuros.Actors.Enemies.Attacks
 		private float _dashElapsed;
 		private int _dashLeg;   // 0 = 第一段（A→B）；1 = 折返段（B→A，仅 ReturnOnActive）
 		private bool _missingRailWarned;
+		private OverloadRoom? _lockedRoom;
+		private float _roomStart;
+		private float _roomEnd;
+		private bool _approaching;
+		private float _approachRemaining;
+		private float _roomChargeRemaining;
 
 		protected override void OnInitialized()
 		{
@@ -70,11 +80,68 @@ namespace Kuros.Actors.Enemies.Attacks
 		}
 
 		/// <summary>不看距离与朝向角度（本体在玩家正上方，默认角度门会把大招判死）：能不能放由控制器的权重决定。</summary>
-		public override bool CanStart()
+		protected override bool CanStartCore()
 		{
 			if (Enemy == null) return false;
 			if (Enemy.IsDeathSequenceActive || Enemy.IsDead) return false;
-			return !IsRunning && !IsOnCooldown;
+			return !IsRunning && !IsOnCooldown
+				&& (!UseRoomSweep || FindRoomRoute(out _, out _, out _));
+		}
+
+		private bool FindRoomRoute(out OverloadRoom room, out float start, out float end)
+		{
+			room = null!;
+			start = end = 0f;
+			EnsureRailResolved();
+			if (_rail is not { IsResolved: true } rail || rail.CarriageAxis != SlideRailMount.RailAxis.X
+				|| Player is not { } player || !IsInstanceValid(player)) return false;
+
+			float railMin = Mathf.Min(rail.CarriageNear, rail.CarriageFar);
+			float railMax = Mathf.Max(rail.CarriageNear, rail.CarriageFar);
+			foreach (var node in GetTree().GetNodesInGroup(OverloadRoom.GroupName))
+			{
+				if (node is not OverloadRoom candidate || candidate.IsQueuedForDeletion()
+					|| candidate.GetWorld2D() != Enemy.GetWorld2D() || !candidate.CanLock(player)) continue;
+				var leftMarker = candidate.GetNodeOrNull<Marker2D>("SweepLeft");
+				var rightMarker = candidate.GetNodeOrNull<Marker2D>("SweepRight");
+				if (leftMarker == null || rightMarker == null) continue;
+				float left = Mathf.Max(railMin, leftMarker.GlobalPosition.X);
+				float right = Mathf.Min(railMax, rightMarker.GlobalPosition.X);
+				if (right - left <= ArriveDeadzone * 2f) continue;
+
+				float current = RailCoordinate(Enemy.GlobalPosition);
+				bool startLeft = Mathf.Abs(current - left) <= Mathf.Abs(current - right);
+				start = startLeft ? left : right;
+				end = startLeft ? right : left;
+				room = candidate;
+				return true;
+			}
+			return false;
+		}
+
+		protected override bool TryPrepareStart()
+		{
+			if (!UseRoomSweep) return true;
+			if (!FindRoomRoute(out var room, out float start, out float end)
+				|| Player is not { } player || !room.TryLock(this, player)) return false;
+
+			_lockedRoom = room;
+			_roomStart = start;
+			_roomEnd = end;
+			_approaching = Mathf.Abs(RailCoordinate(Enemy.GlobalPosition) - start) > ArriveDeadzone;
+			_approachRemaining = Mathf.Abs(RailCoordinate(Enemy.GlobalPosition) - start) / Mathf.Max(RoomApproachSpeed, 100f) + 2f;
+			_roomChargeRemaining = WarmupDuration;
+			return true;
+		}
+
+		protected override bool ShouldHoldWarmupPhase()
+			=> _lockedRoom != null && (_approaching || _roomChargeRemaining > 0f);
+
+		protected override void OnAttackEffectSpawned(Node2D effect, AttackEffectEntry? entry)
+		{
+			if (_lockedRoom != null && effect is RogueAIOverloadBeam beam)
+				beam.RestrictToRoom(_lockedRoom, this);
+			base.OnAttackEffectSpawned(effect, entry);
 		}
 
 		protected override void OnWarmupStarted()
@@ -110,6 +177,7 @@ namespace Kuros.Actors.Enemies.Attacks
 		protected override void OnRecoveryStarted()
 		{
 			base.OnRecoveryStarted();
+			ReleaseRoom();
 			Phase = UltPhase.Settle;
 			if (Enemy != null) Enemy.Velocity = Vector2.Zero;
 		}
@@ -119,6 +187,7 @@ namespace Kuros.Actors.Enemies.Attacks
 			Phase = UltPhase.None;
 			SetExternalDrive(false);
 			base.OnAttackFinished();    // 基类收尾（写 CD / 还原免疫 / 清绑定特效）放最后
+			ReleaseRoom();
 		}
 
 		/// <summary>被打断同样要复位（本体常态免伤，实际极少触发，作兜底）。</summary>
@@ -131,21 +200,52 @@ namespace Kuros.Actors.Enemies.Attacks
 		public override void _PhysicsProcess(double delta)
 		{
 			if (!IsRunning || Enemy == null) return;
+			if (Enemy.IsDeadOrDying || (_lockedRoom != null
+				&& (!IsInstanceValid(_lockedRoom) || _lockedRoom.IsQueuedForDeletion())))
+			{
+				AbortRoomSweep();
+				return;
+			}
 			if (Phase != UltPhase.Charge && Phase != UltPhase.Dash) return;
 
 			EnsureRailResolved();
-			if (_rail == null) return;
+			if (_rail == null)
+			{
+				if (UseRoomSweep) AbortRoomSweep();
+				return;
+			}
+
+			if (Phase == UltPhase.Charge && _lockedRoom != null)
+			{
+				float remaining = _roomStart - RailCoordinate(Enemy.GlobalPosition);
+				if (_approaching && Mathf.Abs(remaining) > ArriveDeadzone)
+				{
+					_approachRemaining -= (float)delta;
+					if (_approachRemaining <= 0f)
+					{
+						AbortRoomSweep();
+						return;
+					}
+					Enemy.Velocity = DirectionAlongRail(remaining) *
+						Mathf.Min(Mathf.Max(RoomApproachSpeed, 100f), Mathf.Abs(remaining) / (float)delta);
+					return;
+				}
+				_approaching = false;
+				_roomChargeRemaining -= (float)delta;
+				Enemy.Velocity = Vector2.Zero;
+				return;
+			}
 
 			// 冲刺计时：用满 ActiveDuration 即收手（ShouldHoldActivePhase 随之放开，相位推进到 Recovery）
 			if (Phase == UltPhase.Dash)
 			{
-				_dashElapsed += (float)delta;
 				if (_dashElapsed >= ActiveDuration)
 				{
 					Phase = UltPhase.Settle;
 					Enemy.Velocity = Vector2.Zero;
 					return;
 				}
+				_dashElapsed += (float)delta;
 			}
 
 			float current = RailCoordinate(Enemy.GlobalPosition);
@@ -158,12 +258,13 @@ namespace Kuros.Actors.Enemies.Attacks
 				if (Phase == UltPhase.Dash && ReturnOnActive && _dashLeg == 0)
 				{
 					_dashLeg = 1;
-					_dashSpeed = 0f;   // 折返段按剩余时长重新锁速（见下）
+					distance = DashEndCoordinate - current;
+				}
+				else
+				{
+					Enemy.Velocity = Vector2.Zero;
 					return;
 				}
-
-				Enemy.Velocity = Vector2.Zero;
-				return;
 			}
 
 			// 速度只在各段开始时算一次：每帧按"剩余距离 / 段时长"重算会变成芝诺式收敛，永远差一点到不了端点
@@ -173,14 +274,16 @@ namespace Kuros.Actors.Enemies.Attacks
 					: Mathf.Max(50f, Mathf.Abs(distance) / Mathf.Max(0.05f, WarmupDuration));
 			if (Phase == UltPhase.Dash && _dashSpeed <= 0f)
 			{
-				float legLength = Mathf.Abs(_rail.CarriageFar - _rail.CarriageNear);
-				float totalLength = ReturnOnActive ? legLength * 2f : legLength;   // 折返 = 两倍行程
+				float totalLength = Mathf.Abs(distance);
+				if (ReturnOnActive && _dashLeg == 0)
+					totalLength += Mathf.Abs(DashEndCoordinate - ChargeEndCoordinate);
 				_dashSpeed = DashSpeed > 0f
 					? DashSpeed
 					: Mathf.Max(50f, totalLength / Mathf.Max(0.05f, ActiveDuration));
 			}
 
 			float speed = Phase == UltPhase.Charge ? _chargeSpeed : _dashSpeed;
+			if (_lockedRoom != null) speed = Mathf.Min(speed, Mathf.Abs(distance) / (float)delta);
 			Enemy.Velocity = DirectionAlongRail(distance) * speed;   // 位移交给 EnemyAttackState 的 MoveAndSlide
 		}
 
@@ -188,10 +291,9 @@ namespace Kuros.Actors.Enemies.Attacks
 
 		private void EnsureRailResolved()
 		{
-			if (_rail != null && GodotObject.IsInstanceValid(_rail)) return;
-
-			_rail = SlideRailMount.FindFor(Enemy);
-			_rail?.ResolveNow();   // 幂等：限位在滑槽首个物理帧才解析出来
+			if (_rail == null || !GodotObject.IsInstanceValid(_rail))
+				_rail = SlideRailMount.FindFor(Enemy);
+			if (_rail is { IsResolved: false }) _rail.ResolveNow();
 		}
 
 		private void SetExternalDrive(bool value)
@@ -202,12 +304,12 @@ namespace Kuros.Actors.Enemies.Attacks
 
 		/// <summary>蓄力端（角色语义：Far = 场外端）的世界坐标。</summary>
 		private float ChargeEndCoordinate
-			=> _chargeAtFar ? _rail!.CarriageFar : _rail!.CarriageNear;
+			=> _lockedRoom != null ? _roomStart : (_chargeAtFar ? _rail!.CarriageFar : _rail!.CarriageNear);
 
 		/// <summary>横扫端：第一段 = 蓄力端的另一端（A→B）；折返段 = 回到蓄力端（B→A）。</summary>
 		private float DashEndCoordinate
 			=> _dashLeg == 0
-				? (_chargeAtFar ? _rail!.CarriageNear : _rail!.CarriageFar)
+				? (_lockedRoom != null ? _roomEnd : (_chargeAtFar ? _rail!.CarriageNear : _rail!.CarriageFar))
 				: ChargeEndCoordinate;
 
 		private float RailCoordinate(Vector2 worldPosition)
@@ -219,6 +321,27 @@ namespace Kuros.Actors.Enemies.Attacks
 			return _rail!.CarriageAxis == SlideRailMount.RailAxis.X
 				? new Vector2(sign, 0f)
 				: new Vector2(0f, sign);
+		}
+
+		private void ReleaseRoom()
+		{
+			if (_lockedRoom != null && IsInstanceValid(_lockedRoom)) _lockedRoom.Release(this);
+			_lockedRoom = null;
+		}
+
+		private void AbortRoomSweep()
+		{
+			if (GetParent() is EnemyAttackController { IsRunning: true } controller)
+				controller.Cancel();
+			else
+				Cancel();
+		}
+
+		public override void _ExitTree()
+		{
+			base._ExitTree();
+			ReleaseRoom();
+			SetExternalDrive(false);
 		}
 	}
 }

@@ -45,9 +45,9 @@ namespace Kuros.Actors.Enemies.Attacks
             _activeKnockbackTimer = 0f;
         }
 
-        public override bool CanStart()
+        protected override bool CanStartCore()
         {
-            if (!base.CanStart()) return false;
+            if (!base.CanStartCore()) return false;
             return IsPlayerInsideHitbox();
         }
 
@@ -83,7 +83,7 @@ namespace Kuros.Actors.Enemies.Attacks
             }
 
             float distance = Mathf.Max(0f, KnockbackDistance);
-            if (distance <= 0f || !IsPlayerInsideHitbox())
+            if (distance <= 0f || DamageArea == null || !Player.IsHitByArea(DamageArea))
             {
                 return;
             }
@@ -107,7 +107,7 @@ namespace Kuros.Actors.Enemies.Attacks
         private bool IsPlayerInsideHitbox()
         {
             if (Player == null) return false;
-            if (AttackArea == null) return Enemy.IsPlayerInAttackRange();
+            if (AttackArea == null) return true; // 未配置不增加攻击盒起手条件（支持纯召唤/特效招式）。
             return Player.IsHitByArea(AttackArea);
         }
     }

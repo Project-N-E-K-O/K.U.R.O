@@ -1,4 +1,4 @@
-[gd_scene load_steps=40 format=3 uid="uid://c1acqfacsuky6"]
+[gd_scene load_steps=41 format=3 uid="uid://c1acqfacsuky6"]
 
 [ext_resource type="Script" uid="uid://cnm33l1nmqohv" path="res://scripts/fx/DirectionalSceneEffect.cs" id="1_y33dl"]
 [ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="2_pa1ur"]
@@ -783,6 +783,104 @@ tracks/7/keys = {
 "update": 0,
 "values": [0.0]
 }
+tracks/8/type = "value"
+tracks/8/imported = false
+tracks/8/enabled = true
+tracks/8/path = NodePath("position/Sprite2D:scale")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0.7, 0.7)]
+}
+tracks/9/type = "value"
+tracks/9/imported = false
+tracks/9/enabled = true
+tracks/9/path = NodePath("position/Sprite2D:position")
+tracks/9/interp = 1
+tracks/9/loop_wrap = true
+tracks/9/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(-20, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_2ckxy"]
+resource_name = "death"
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("position/SpineSprite:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+tracks/2/type = "animation"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("position/SpineSprite/SpineAnimationTrack/SpineSprite Track 0")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"clips": PackedStringArray("death_down_looped"),
+"times": PackedFloat32Array(0)
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("position/Sprite2D:position:y")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [293.0]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("position/Sprite2D:visible")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 0.13333334, 0.3, 0.56666666, 0.65, 0.7, 0.8),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [false, true, false, true, false, true, false]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("position/Sprite2D:scale")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0.7, 0.7)]
+}
 
 [sub_resource type="Animation" id="Animation_wtpwj"]
 resource_name = "leave"
@@ -1141,10 +1239,23 @@ tracks/4/keys = {
 "update": 0,
 "values": [Color(0, 0, 0, 0), Color(0, 0, 0, 1), Color(0.54901963, 0.54901963, 0.54901963, 1)]
 }
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("position/Sprite2D:position")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0, 1, 1.4),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(-20, -120), Vector2(-20, -100), Vector2(-20, -80)]
+}
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_wtpwj"]
 _data = {
 &"RESET": SubResource("Animation_80asv"),
+&"death": SubResource("Animation_2ckxy"),
 &"leave": SubResource("Animation_wtpwj"),
 &"move_down": SubResource("Animation_i5f6q"),
 &"slamB_appear": SubResource("Animation_8xwst"),
@@ -1172,13 +1283,6 @@ preview_animation = "-- Empty --"
 preview_frame = false
 preview_time = 0.0
 
-[node name="SpineBoneNode" type="SpineBoneNode" parent="position/SpineSprite"]
-show_behind_parent = true
-position = Vector2(-27.368887, -483.15295)
-rotation = 0.013512622
-scale = Vector2(0.9999998, 0.9999998)
-bone_name = "bone5"
-
 [node name="SpineAnimationTrack" type="SpineAnimationTrack" parent="position/SpineSprite"]
 track_index = 0
 
@@ -1188,16 +1292,16 @@ libraries = {
 }
 
 [node name="Sprite2D" type="Sprite2D" parent="position"]
-position = Vector2(-21.363153, -113.331314)
-scale = Vector2(0.6, 0.55)
+position = Vector2(-20, 0)
+scale = Vector2(0.7, 0.7)
 texture = ExtResource("6_5sirc")
 script = ExtResource("7_pa1ur")
-TargetBone = NodePath("../SpineSprite/SpineBoneNode")
+TargetBone = NodePath("")
 FollowBoneY = true
 
 [node name="Sprite2D" type="Sprite2D" parent="position/Sprite2D"]
 position = Vector2(30, 40)
-scale = Vector2(3, 3)
+scale = Vector2(3.5, 3.5)
 texture = ExtResource("5_5sirc")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]

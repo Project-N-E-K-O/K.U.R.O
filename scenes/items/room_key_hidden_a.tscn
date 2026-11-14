@@ -1,0 +1,26 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/world/WorldItemEntity.cs" id="world_item"]
+[ext_resource type="Resource" path="res://resources/items/RoomKey_HiddenA.tres" id="key"]
+[ext_resource type="Texture2D" path="res://assets/ui/room_key_hidden_a.svg" id="icon"]
+
+[sub_resource type="CircleShape2D" id="pickup_circle"]
+radius = 65.0
+
+[node name="RoomKeyHiddenA" type="CharacterBody2D" node_paths=PackedStringArray("TriggerArea")]
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("world_item")
+ItemDefinition = ExtResource("key")
+TriggerArea = NodePath("TriggerArea")
+EnableGrabAreaOutlineHighlight = false
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("icon")
+
+[node name="TriggerArea" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TriggerArea"]
+shape = SubResource("pickup_circle")

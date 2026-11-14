@@ -110,7 +110,7 @@ namespace Kuros.Scenes
 			CallDeferred(MethodName.RestoreBuildState);
 
 			// 显示关卡名称弹窗
-			if (AutoShowLevelName)
+			if (AutoShowLevelName && GetNodeOrNull<Kuros.Systems.Stage.StageSession>("StageSession") == null)
 			{
 				ShowLevelNamePopup();
 			}
@@ -326,7 +326,7 @@ namespace Kuros.Scenes
 		/// <summary>
 		/// 显示关卡名称弹窗
 		/// </summary>
-		public void ShowLevelNamePopup()
+		public void ShowLevelNamePopup(string? arrivalName = null)
 		{
 			if (UIManager.Instance == null)
 			{
@@ -340,7 +340,7 @@ namespace Kuros.Scenes
 			if (_levelNamePopup != null)
 			{
 				// 确定关卡名称
-				string levelName = LevelName;
+				string levelName = arrivalName ?? LevelName;
 				if (string.IsNullOrEmpty(levelName))
 				{
 					// 如果未设置关卡名称，使用场景名称

@@ -18,12 +18,12 @@ namespace Kuros.Actors.Enemies.Attacks
 		public bool IsActive => CurrentPhase == EnemyAttackTemplate.AttackPhase.Active;
 
 		/// <summary>选招资格同样受血量门限制，避免另一个变体被随机选中后起不了手。</summary>
-		public override bool IsPlayerInDetectionRange()
-			=> IsUpgradeStateAllowed() && base.IsPlayerInDetectionRange();
+		protected override bool IsPlayerInDetectionRangeCore()
+			=> IsUpgradeStateAllowed() && base.IsPlayerInDetectionRangeCore();
 
 		/// <summary>起手门：普通/Pro 变体按通用血量阈值二选一。</summary>
-		public override bool CanStart()
-			=> IsUpgradeStateAllowed() && base.CanStart();
+		protected override bool CanStartCore()
+			=> IsUpgradeStateAllowed() && base.CanStartCore();
 
 		private bool IsUpgradeStateAllowed()
 		{

@@ -1,14 +1,38 @@
-[gd_scene load_steps=3 format=3 uid="uid://dv6nbmv1yc02i"]
+[gd_scene load_steps=7 format=3 uid="uid://dv6nbmv1yc02i"]
 
-[ext_resource type="Texture2D" uid="uid://bdm27yiqdm8df" path="res://assets/effect/AttackEffect/traces/TracesOfBoom.png" id="2_c7upr"]
-[ext_resource type="Script" uid="uid://mbol0v4le42t" path="res://scripts/effects/FadeInOutDestroy.cs" id="3_x8fl3"]
+[ext_resource type="Shader" uid="uid://33ra4ty3whq3" path="res://shaders/materials/pseudo_3d_rotate.gdshader" id="1_456kx"]
+[ext_resource type="Texture2D" uid="uid://2y5phplst13w" path="res://assets/effect/AttackEffect/traces/boom_b_crater_top_1.png" id="2_c7upr"]
+[ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/GroundObjectController.cs" id="3_c7upr"]
+[ext_resource type="Script" uid="uid://bwpdes5olkolw" path="res://scripts/effects/BoomInkTrace.cs" id="3_x8fl3"]
+[ext_resource type="Texture2D" uid="uid://dnoia5buue83v" path="res://assets/effect/AttackEffect/traces/boom_b_crater_top_2.png" id="4_mask"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_0vsp2"]
+shader = ExtResource("1_456kx")
+shader_parameter/isInRadians = false
+shader_parameter/xDegrees = 30.000001425
+shader_parameter/yDegrees = 0.0
+shader_parameter/zDegrees = 0.0
+shader_parameter/xRadians = 0.0
+shader_parameter/yRadians = 0.0
+shader_parameter/zRadians = 0.0
 
 [node name="Traces" type="Sprite2D"]
 z_index = 1
 z_as_relative = false
-scale = Vector2(0.7, 0.6)
+texture_filter = 2
+material = SubResource("ShaderMaterial_0vsp2")
+scale = Vector2(0.7, 0.7)
 texture = ExtResource("2_c7upr")
 script = ExtResource("3_x8fl3")
+AlternateMask = ExtResource("4_mask")
 FadeInDuration = 0.0
 HoldDuration = 3.0
 FadeOutDuration = 1.0
+
+[node name="Marker2D" type="Marker2D" parent="."]
+position = Vector2(-85, 0)
+
+[node name="GroundObjectController" type="Node" parent="." node_paths=PackedStringArray("GroundAnchor")]
+script = ExtResource("3_c7upr")
+GroundAnchor = NodePath("../Marker2D")
+FallEnabled = false

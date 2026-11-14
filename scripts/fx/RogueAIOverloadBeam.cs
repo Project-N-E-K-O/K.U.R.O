@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using Godot;
 using Kuros.Core;
 using Kuros.Core.Events;
+using Kuros.Managers;
+using Kuros.Actors.Enemies.Attacks;
 
 namespace Kuros.Fx
 {
@@ -17,6 +19,15 @@ namespace Kuros.Fx
 	/// </summary>
 	public partial class RogueAIOverloadBeam : LaserBeamVisualBase, IFollowAnchor, IAttackerProvider
 	{
+		private OverloadRoom? _room;
+		private EnemyF1RogueAIUltimateAttack? _roomLockOwner;
+
+		public void RestrictToRoom(OverloadRoom room, EnemyF1RogueAIUltimateAttack owner)
+		{
+			_room = room;
+			_roomLockOwner = owner;
+		}
+
 		[ExportCategory("Direction 方向")]
 		/// <summary>光束方向（度）：90 = 垂直向下（默认）。旋转只作用于视觉层与判定带，根节点恒 0。</summary>
 		[Export(PropertyHint.Range, "-180,180,1")] public float AngleDegrees { get; set; } = 90f;
@@ -242,6 +253,10 @@ namespace Kuros.Fx
 
 		private void TryDamageReceiver(Node receiver, Vector2 beamDir)
 		{
+			if (_room != null && (!IsInstanceValid(_room) || _roomLockOwner == null
+				|| !IsInstanceValid(_roomLockOwner) || !_room.IsLockedBy(_roomLockOwner)
+				|| receiver is not Node2D target || !_room.ContainsPoint(target.GlobalPosition))) return;
+
 			if (!_damaged.Add(receiver.GetInstanceId())) return;
 
 			bool dealt = DamageDispatcher.DealDamage(receiver, Damage, GlobalPosition, Attacker,

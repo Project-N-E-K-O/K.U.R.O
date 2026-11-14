@@ -7,8 +7,8 @@ namespace Kuros.Actors.Enemies.Attacks
     /// 仅负责范围判断、动画播放和效果生成，具体伤害、击退、轨迹由投掷物自身实现。
     /// 
     /// 工作原理：
-    ///   - 订阅 DetectionAreaPath 的 BodyEntered/Exited，记录玩家是否在范围内
-    ///   - CanStart() 使用自身的检测状态（与 EnemyChargeGrabAttack 一致）
+    ///   - TriggerAreaPath 由父类统一检查，无需重复订阅身体信号
+    ///   - CanStartCore() 仅补充玩家引用和攻击间隔条件
     ///   - 生效时生成投掷物 effect（通过 EffectScene 配置）
     ///   - 投掷物自身处理飞行、伤害、碰撞等逻辑
     ///   - 不使用 AttackArea hitbox，不直接调用 PerformAttackNow
@@ -21,51 +21,13 @@ namespace Kuros.Actors.Enemies.Attacks
         [ExportCategory("Behaviour")]
         [Export] public bool FacePlayerOnAttack { get; set; } = true;
 
-        private Area2D? _detectionArea;
-        private bool _playerInsideDetection;
-
-        protected override void OnInitialized()
-        {
-            base.OnInitialized();
-
-            _detectionArea = TriggerArea;
-            if (_detectionArea != null)
-            {
-                _detectionArea.Monitoring = true;
-                _detectionArea.BodyEntered += OnDetectionAreaBodyEntered;
-                _detectionArea.BodyExited  += OnDetectionAreaBodyExited;
-            }
-
-            SetPhysicsProcess(true);
-        }
-
-        public override void _ExitTree()
-        {
-            if (_detectionArea != null)
-            {
-                var entered = new Callable(this, MethodName.OnDetectionAreaBodyEntered);
-                var exited  = new Callable(this, MethodName.OnDetectionAreaBodyExited);
-                if (_detectionArea.IsConnected(Area2D.SignalName.BodyEntered, entered))
-                    _detectionArea.BodyEntered -= OnDetectionAreaBodyEntered;
-                if (_detectionArea.IsConnected(Area2D.SignalName.BodyExited, exited))
-                    _detectionArea.BodyExited -= OnDetectionAreaBodyExited;
-            }
-
-            base._ExitTree();
-        }
-
-        public override bool CanStart()
+        protected override bool CanStartCore()
         {
             if (Enemy == null || Enemy.PlayerTarget == null) return false;
             if (IsRunning || IsOnCooldown) return false;
             if (Enemy.AttackTimer > 0) return false;
-
-            // 使用自身 DetectionArea 或回退到敌人默认检测范围
-            bool detectionSatisfied = _detectionArea != null
-                ? _playerInsideDetection || _detectionArea.OverlapsBody(Enemy.PlayerTarget)
-                : Enemy.IsPlayerInAttackRange();
-
-            return detectionSatisfied;
+            // TriggerArea 的选招和起手限制由非虚公共入口统一检查。
+            return true;
         }
 
         protected override void OnAttackStarted()
@@ -110,17 +72,6 @@ namespace Kuros.Actors.Enemies.Attacks
             SpawnEffectAtEnemy(EffectSpawnTiming.OnAnimationHit);
         }
 
-        private void OnDetectionAreaBodyEntered(Node body)
-        {
-            if (body == Enemy?.PlayerTarget)
-                _playerInsideDetection = true;
-        }
-
-        private void OnDetectionAreaBodyExited(Node body)
-        {
-            if (body == Enemy?.PlayerTarget)
-                _playerInsideDetection = false;
-        }
 
     }
 }

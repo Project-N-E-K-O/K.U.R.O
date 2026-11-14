@@ -158,7 +158,7 @@ tracks/11/keys = {
 
 [sub_resource type="Animation" id="Animation_n6yfj"]
 resource_name = "diffusion"
-length = 5.0
+length = 6.0
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -166,7 +166,7 @@ tracks/0/path = NodePath("FireWallC_1:scale")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 1.5, 2, 5),
+"times": PackedFloat32Array(0, 1.5, 2, 6),
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 0,
 "values": [Vector2(0, 0), Vector2(0, 0), Vector2(3, 2), Vector2(4, 3)]
@@ -178,7 +178,7 @@ tracks/1/path = NodePath("FireWallC_2:scale")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0, 1, 1.5, 4),
+"times": PackedFloat32Array(0, 1, 1.5, 5),
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 0,
 "values": [Vector2(0, 0), Vector2(0, 0), Vector2(3, 2), Vector2(4, 3)]
@@ -190,10 +190,10 @@ tracks/2/path = NodePath("FireWallC_3:scale")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
-"times": PackedFloat32Array(0, 0.5, 1, 3),
+"times": PackedFloat32Array(0, 0.5, 1, 4),
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 0,
-"values": [Vector2(0, 0), Vector2(0, 0), Vector2(3, 2), Vector2(3, 2)]
+"values": [Vector2(0, 0), Vector2(0, 0), Vector2(3, 2), Vector2(4, 3)]
 }
 tracks/3/type = "value"
 tracks/3/imported = false
@@ -202,7 +202,7 @@ tracks/3/path = NodePath("FireWallC_4:scale")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
-"times": PackedFloat32Array(0, 0.5, 1, 3),
+"times": PackedFloat32Array(0, 0.5, 1, 4),
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 0,
 "values": [Vector2(0, 0), Vector2(0, 0), Vector2(3, 2), Vector2(4, 3)]
@@ -214,7 +214,7 @@ tracks/4/path = NodePath("FireWallC_5:scale")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
-"times": PackedFloat32Array(0, 1, 1.5, 4),
+"times": PackedFloat32Array(0, 1, 1.5, 5),
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 0,
 "values": [Vector2(0, 0), Vector2(0, 0), Vector2(3, 2), Vector2(4, 3)]
@@ -226,7 +226,7 @@ tracks/5/path = NodePath("FireWallC_6:scale")
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
-"times": PackedFloat32Array(0, 1.5, 2, 5),
+"times": PackedFloat32Array(0, 1.5, 2, 6),
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 0,
 "values": [Vector2(0, 0), Vector2(0, 0), Vector2(3, 2), Vector2(4, 3)]
@@ -238,7 +238,7 @@ tracks/6/path = NodePath("FireWallC_1:position")
 tracks/6/interp = 1
 tracks/6/loop_wrap = true
 tracks/6/keys = {
-"times": PackedFloat32Array(0, 1, 1.5, 2.5, 5),
+"times": PackedFloat32Array(0, 1, 1.5, 2.5, 6),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1),
 "update": 0,
 "values": [Vector2(0, 0), Vector2(0, 0), Vector2(-1110, -375), Vector2(-1110, -375), Vector2(-5530, 3000)]
@@ -250,7 +250,7 @@ tracks/7/path = NodePath("FireWallC_2:position")
 tracks/7/interp = 1
 tracks/7/loop_wrap = true
 tracks/7/keys = {
-"times": PackedFloat32Array(0, 0.5, 1, 2, 4),
+"times": PackedFloat32Array(0, 0.5, 1, 2, 5),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1),
 "update": 0,
 "values": [Vector2(0, 0), Vector2(0, 0), Vector2(-710, -140), Vector2(-710, -140), Vector2(-4000, 4400)]
@@ -262,10 +262,10 @@ tracks/8/path = NodePath("FireWallC_3:position")
 tracks/8/interp = 1
 tracks/8/loop_wrap = true
 tracks/8/keys = {
-"times": PackedFloat32Array(0, 0.5, 1.5, 3),
+"times": PackedFloat32Array(0, 0.5, 1.5, 4),
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 0,
-"values": [Vector2(0, 0), Vector2(-220, 0), Vector2(-220, 0), Vector2(-1750, 5400)]
+"values": [Vector2(0, 0), Vector2(-220, 0), Vector2(-220, 0), Vector2(-1750, 5000)]
 }
 tracks/9/type = "value"
 tracks/9/imported = false
@@ -274,10 +274,10 @@ tracks/9/path = NodePath("FireWallC_4:position")
 tracks/9/interp = 1
 tracks/9/loop_wrap = true
 tracks/9/keys = {
-"times": PackedFloat32Array(0, 0.5, 1.5, 3),
+"times": PackedFloat32Array(0, 0.5, 1.5, 4),
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 0,
-"values": [Vector2(0, 0), Vector2(220, 0), Vector2(220, 0), Vector2(1750, 5400)]
+"values": [Vector2(0, 0), Vector2(220, 0), Vector2(220, 0), Vector2(1750, 5000)]
 }
 tracks/10/type = "value"
 tracks/10/imported = false
@@ -286,7 +286,7 @@ tracks/10/path = NodePath("FireWallC_5:position")
 tracks/10/interp = 1
 tracks/10/loop_wrap = true
 tracks/10/keys = {
-"times": PackedFloat32Array(0, 0.5, 1, 2, 4),
+"times": PackedFloat32Array(0, 0.5, 1, 2, 5),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1),
 "update": 0,
 "values": [Vector2(0, 0), Vector2(0, 0), Vector2(695, -130), Vector2(695, -130), Vector2(4000, 4400)]
@@ -298,7 +298,7 @@ tracks/11/path = NodePath("FireWallC_6:position")
 tracks/11/interp = 1
 tracks/11/loop_wrap = true
 tracks/11/keys = {
-"times": PackedFloat32Array(0, 1, 1.5, 2.5, 5),
+"times": PackedFloat32Array(0, 1, 1.5, 2.5, 6),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1),
 "update": 0,
 "values": [Vector2(0, 0), Vector2(0, 0), Vector2(1090, -450), Vector2(1090, -450), Vector2(5530, 3000)]
@@ -310,7 +310,7 @@ tracks/12/path = NodePath(".")
 tracks/12/interp = 1
 tracks/12/loop_wrap = true
 tracks/12/keys = {
-"times": PackedFloat32Array(5),
+"times": PackedFloat32Array(6),
 "transitions": PackedFloat32Array(1),
 "values": [{
 "args": [],

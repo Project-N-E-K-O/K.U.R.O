@@ -1,30 +1,16 @@
-[gd_resource type="Resource" script_class="StageConfig" load_steps=13 format=3 uid="uid://d38w8aochis65"]
+[gd_resource type="Resource" script_class="StageConfig" load_steps=2 format=3 uid="uid://wc3mrmbaq4g6"]
 
-[ext_resource type="PackedScene" uid="uid://cg2o6k0etyc25" path="res://scenes/levels/C_begin.tscn" id="1_ka4jt"]
-[ext_resource type="PackedScene" uid="uid://cqdtru26cvd8g" path="res://scenes/levels/C1.tscn" id="2_dgafx"]
-[ext_resource type="PackedScene" uid="uid://dboywwkmaxr72" path="res://scenes/levels/C_end.tscn" id="2_gppba"]
-[ext_resource type="PackedScene" uid="uid://dhpq7nfmc0ou" path="res://scenes/levels/C2.tscn" id="3_fuwmq"]
-[ext_resource type="Script" uid="uid://dim2ctx63qcxt" path="res://scripts/systems/stage/StageConfig.cs" id="3_ltvbw"]
-[ext_resource type="PackedScene" uid="uid://ds10xe62cut56" path="res://scenes/levels/C3.tscn" id="4_7oitc"]
-[ext_resource type="PackedScene" uid="uid://b52b8f866rmt7" path="res://scenes/levels/C7.tscn" id="6_5o8ai"]
-[ext_resource type="PackedScene" uid="uid://tgbgg687lml" path="res://scenes/levels/C4.tscn" id="6_xj2sf"]
-[ext_resource type="PackedScene" uid="uid://y3iytfkqks1b" path="res://scenes/levels/C8.tscn" id="7_ryx1w"]
-[ext_resource type="PackedScene" uid="uid://0bfnw4nhnj05" path="res://scenes/levels/C5.tscn" id="7_u4l0n"]
-[ext_resource type="PackedScene" uid="uid://b8o8r7vuk28v8" path="res://scenes/levels/C9.tscn" id="8_2hxct"]
-[ext_resource type="PackedScene" uid="uid://o0figewcx2r8" path="res://scenes/levels/C6.tscn" id="8_sfd04"]
+[ext_resource type="Script" uid="uid://dim2ctx63qcxt" path="res://scripts/systems/stage/StageConfig.cs" id="3_mhmh1"]
 
 [resource]
-script = ExtResource("3_ltvbw")
-StageId = "stage3b"
-DisplayName = "餐厅b区"
-LevelDescription = "酒店二层餐厅b区（Stage_3 房间池）"
-Floor = 2
-BeginPool = Array[PackedScene]([ExtResource("1_ka4jt")])
-EndPool = Array[PackedScene]([ExtResource("2_gppba")])
-EasyMiddlePool = Array[PackedScene]([ExtResource("2_dgafx"), ExtResource("3_fuwmq"), ExtResource("4_7oitc")])
-EasyRoomMin = 1
-EasyRoomMax = 1
-NormalMiddlePool = Array[PackedScene]([ExtResource("6_xj2sf"), ExtResource("7_u4l0n"), ExtResource("8_sfd04")])
-NormalRoomMin = 1
-NormalRoomMax = 1
-HardMiddlePool = Array[PackedScene]([ExtResource("6_5o8ai"), ExtResource("7_ryx1w"), ExtResource("8_2hxct")])
+script = ExtResource("3_mhmh1")
+StageId = "stage_3b"
+DisplayName = "办公b区"
+ElevatorLabel = "办公b区"
+LevelDescription = "酒店三层办公b区"
+Floor = 3
+FloorTheme = "D"
+RouteMode = 1
+MiddleRoomCount = 2
+BeginScenePath = "res://scenes/levels/D_begin.tscn"
+EndScenePath = "res://scenes/levels/D_end.tscn"

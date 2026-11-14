@@ -1,6 +1,8 @@
-[gd_scene load_steps=7 format=3 uid="uid://ckvi05o7l1mv4"]
+[gd_scene load_steps=9 format=3 uid="uid://ckvi05o7l1mv4"]
 
 [ext_resource type="Texture2D" uid="uid://bk0ipufx3kn76" path="res://assets/environments/26.3.17 烟.png" id="1_kqt4o"]
+[ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/GroundObjectController.cs" id="2_dqqw5"]
+[ext_resource type="PackedScene" uid="uid://dby51i7slqvd5" path="res://scenes/objects/Animation_item.tscn" id="3_iu77y"]
 
 [sub_resource type="Gradient" id="Gradient_kqt4o"]
 offsets = PackedFloat32Array(0.3592233, 1)
@@ -40,5 +42,10 @@ texture = ExtResource("1_kqt4o")
 lifetime = 8.0
 one_shot = true
 explosiveness = 1.0
-process_material = SubResource("ParticleProcessMaterial_srf2u")
 visibility_rect = Rect2(-800, -800, 1600, 1600)
+process_material = SubResource("ParticleProcessMaterial_srf2u")
+
+[node name="GroundObjectController" type="Node" parent="."]
+script = ExtResource("2_dqqw5")
+FallEffectScene = ExtResource("3_iu77y")
+FallAnimationName = "fall_smoke_grenade"

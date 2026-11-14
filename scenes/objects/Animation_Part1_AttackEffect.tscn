@@ -1,0 +1,199 @@
+[gd_scene load_steps=7 format=3 uid="uid://b8si6jikj8ool"]
+
+[ext_resource type="PackedScene" uid="uid://qyq1x8dk354w" path="res://scenes/actors/etc/BoomA.tscn" id="boom_a"]
+[ext_resource type="PackedScene" uid="uid://bl2nwvbijnwtd" path="res://scenes/actors/etc/LandingIndicatorA.tscn" id="landing_a"]
+[ext_resource type="Script" uid="uid://bk1gpqw1e0gjq" path="res://scripts/effects/ExplosionChainAnimator.cs" id="chain_script"]
+
+[sub_resource type="Animation" id="Animation_chain"]
+resource_name = "chainA"
+length = 2.4
+tracks/0/type = "method"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4, 0.6, 0.8, 1, 1.2),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"values": [{
+"args": [0],
+"method": &"SpawnIndicatorAt"
+}, {
+"args": [1],
+"method": &"SpawnIndicatorAt"
+}, {
+"args": [2],
+"method": &"SpawnIndicatorAt"
+}, {
+"args": [3],
+"method": &"SpawnIndicatorAt"
+}, {
+"args": [4],
+"method": &"SpawnIndicatorAt"
+}, {
+"args": [5],
+"method": &"SpawnIndicatorAt"
+}, {
+"args": [6],
+"method": &"SpawnIndicatorAt"
+}]
+}
+tracks/1/type = "method"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(1, 1.2, 1.4, 1.6, 1.8, 2, 2.2),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"values": [{
+"args": [0],
+"method": &"SpawnExplosionAt"
+}, {
+"args": [1],
+"method": &"SpawnExplosionAt"
+}, {
+"args": [2],
+"method": &"SpawnExplosionAt"
+}, {
+"args": [3],
+"method": &"SpawnExplosionAt"
+}, {
+"args": [4],
+"method": &"SpawnExplosionAt"
+}, {
+"args": [5],
+"method": &"SpawnExplosionAt"
+}, {
+"args": [6],
+"method": &"SpawnExplosionAt"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_chainB"]
+resource_name = "chainB"
+length = 2.4
+tracks/0/type = "method"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4, 0.6, 0.8, 1, 1.2),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"values": [{
+"args": [7],
+"method": &"SpawnIndicatorAt"
+}, {
+"args": [8],
+"method": &"SpawnIndicatorAt"
+}, {
+"args": [9],
+"method": &"SpawnIndicatorAt"
+}, {
+"args": [10],
+"method": &"SpawnIndicatorAt"
+}, {
+"args": [11],
+"method": &"SpawnIndicatorAt"
+}, {
+"args": [12],
+"method": &"SpawnIndicatorAt"
+}, {
+"args": [13],
+"method": &"SpawnIndicatorAt"
+}]
+}
+tracks/1/type = "method"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(1, 1.2, 1.4, 1.6, 1.8, 2, 2.2),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"values": [{
+"args": [7],
+"method": &"SpawnExplosionAt"
+}, {
+"args": [8],
+"method": &"SpawnExplosionAt"
+}, {
+"args": [9],
+"method": &"SpawnExplosionAt"
+}, {
+"args": [10],
+"method": &"SpawnExplosionAt"
+}, {
+"args": [11],
+"method": &"SpawnExplosionAt"
+}, {
+"args": [12],
+"method": &"SpawnExplosionAt"
+}, {
+"args": [13],
+"method": &"SpawnExplosionAt"
+}]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_chain"]
+_data = {
+&"chainA": SubResource("Animation_chain"),
+&"chainB": SubResource("Animation_chainB")
+}
+
+[node name="Animation_Part1_AttackEffect" type="Node2D" node_paths=PackedStringArray("Markers")]
+script = ExtResource("chain_script")
+ExplosionScene = ExtResource("boom_a")
+IndicatorScene = ExtResource("landing_a")
+RandomizeAnimation = true
+Markers = [NodePath("Marker0"), NodePath("Marker1"), NodePath("Marker2"), NodePath("Marker3"), NodePath("Marker4"), NodePath("Marker5"), NodePath("Marker6"), NodePath("MarkerB0"), NodePath("MarkerB1"), NodePath("MarkerB2"), NodePath("MarkerB3"), NodePath("MarkerB4"), NodePath("MarkerB5"), NodePath("MarkerB6")]
+
+[node name="Marker0" type="Marker2D" parent="."]
+position = Vector2(-1650, -562.5)
+
+[node name="Marker1" type="Marker2D" parent="."]
+position = Vector2(-1100, -375)
+
+[node name="Marker2" type="Marker2D" parent="."]
+position = Vector2(-550, -187.5)
+
+[node name="Marker3" type="Marker2D" parent="."]
+
+[node name="Marker4" type="Marker2D" parent="."]
+position = Vector2(550, 187.5)
+
+[node name="Marker5" type="Marker2D" parent="."]
+position = Vector2(1100, 375)
+
+[node name="Marker6" type="Marker2D" parent="."]
+position = Vector2(1650, 562.5)
+
+[node name="MarkerB0" type="Marker2D" parent="."]
+position = Vector2(1650, -562.5)
+
+[node name="MarkerB1" type="Marker2D" parent="."]
+position = Vector2(1100, -375)
+
+[node name="MarkerB2" type="Marker2D" parent="."]
+position = Vector2(550, -187.5)
+
+[node name="MarkerB3" type="Marker2D" parent="."]
+
+[node name="MarkerB4" type="Marker2D" parent="."]
+position = Vector2(-550, 187.5)
+
+[node name="MarkerB5" type="Marker2D" parent="."]
+position = Vector2(-1100, 375)
+
+[node name="MarkerB6" type="Marker2D" parent="."]
+position = Vector2(-1650, 562.5)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_chain")
+}

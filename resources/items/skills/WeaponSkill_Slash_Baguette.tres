@@ -11,23 +11,23 @@
 
 [sub_resource type="Resource" id="Resource_05c8l"]
 script = ExtResource("1_itwdm")
+SpawnTiming = 2
 Scene = ExtResource("2_t013a")
 EffectOffset = Vector2(300, 0)
-SpawnTiming = 2
 metadata/_custom_type_script = "uid://fd5076f50ca0"
 
 [sub_resource type="Resource" id="Resource_6i2y8"]
 script = ExtResource("1_itwdm")
+SpawnTiming = 2
 Scene = ExtResource("3_l17fu")
 EffectOffset = Vector2(300, 0)
-SpawnTiming = 2
 metadata/_custom_type_script = "uid://fd5076f50ca0"
 
 [sub_resource type="Resource" id="Resource_j3myv"]
 script = ExtResource("1_itwdm")
+SpawnTiming = 2
 Scene = ExtResource("4_rjjlq")
 EffectOffset = Vector2(nan, nan)
-SpawnTiming = 2
 PropertyOverrides = Dictionary[String, Variant]({
 "ShakeStrength": 10.0
 })
@@ -73,6 +73,7 @@ Description = "手持该武器攻击敌人后，有20%概率生成面包碎块�
 Effects = Array[ExtResource("1_8bkkx")]([SubResource("Resource_axkj6")])
 DashEffects = Array[ExtResource("1_8bkkx")]([SubResource("Resource_dmijq"), SubResource("Resource_itwdm")])
 DashAttackFxEntries = Array[ExtResource("1_itwdm")]([SubResource("Resource_05c8l"), SubResource("Resource_6i2y8"), SubResource("Resource_j3myv")])
+DashAttackFallImmunities = 3
 WarmupDuration = 0.3
 ActiveDuration = 0.2
 RecoveryDuration = 0.17

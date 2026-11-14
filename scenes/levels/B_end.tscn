@@ -1,4 +1,4 @@
-[gd_scene load_steps=38 format=3 uid="uid://bco3niswcahcc"]
+[gd_scene load_steps=37 format=3 uid="uid://bco3niswcahcc"]
 
 [ext_resource type="Script" uid="uid://cra7y7mt0x1j8" path="res://scripts/managers/CameraZoneArea.cs" id="1_b2kum"]
 [ext_resource type="Texture2D" uid="uid://behye8vdgemoq" path="res://assets/environments/scene_2_hotel/地板.png" id="1_fjfxm"]
@@ -31,9 +31,6 @@ size = Vector2(5610, 3050)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_3a114"]
 size = Vector2(5592, 3050)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_oh5lj"]
-size = Vector2(1950, 1200)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_g4yxj"]
 size = Vector2(300, 2500)
@@ -97,21 +94,6 @@ position = Vector2(46, 0)
 shape = SubResource("RectangleShape2D_3a114")
 debug_color = Color(0, 1, 0, 0.41960785)
 
-[node name="CameraZone2" type="Area2D" parent="."]
-visible = false
-z_index = 10
-position = Vector2(3940, 360)
-collision_layer = 0
-collision_mask = 4
-script = ExtResource("1_b2kum")
-ZoneName = "Room_Zone_B_End_2"
-CameraLimitTop = -500
-CameraLimitBottom = 900
-ZoomLevel = 0.95
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="CameraZone2"]
-shape = SubResource("RectangleShape2D_oh5lj")
-
 [node name="CutsceneTrigger" type="Area2D" parent="."]
 z_index = 10
 collision_layer = 0
@@ -172,7 +154,7 @@ position = Vector2(3940, 340)
 script = ExtResource("6_b2kum")
 ElevatorScenePath = "uid://v3n56xk6n8ca"
 NextStagePath = "uid://beup3s3dr4q8h"
-LoadDistance = 2500.0
+LoadDistance = 4000.0
 
 [node name="Environments" type="Node2D" parent="."]
 position = Vector2(0, 340)

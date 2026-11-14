@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CutsceneSequence" load_steps=11 format=3 uid="uid://xag881d6vxpv"]
+[gd_resource type="Resource" script_class="CutsceneSequence" load_steps=12 format=3 uid="uid://xag881d6vxpv"]
 
 [ext_resource type="Script" uid="uid://ctrko7add3r5h" path="res://scripts/systems/cutscene/CutsceneStep.cs" id="1_011l4"]
 [ext_resource type="Script" uid="uid://cjl1hjmndwvcg" path="res://scripts/systems/cutscene/steps/FadeStep.cs" id="2_6ps0p"]
@@ -41,9 +41,15 @@ AnimationPlayerPath = NodePath("../World/FBegin/Environments/ElevatorGateF_filp/
 AnimationName = "close"
 metadata/_custom_type_script = "uid://5xu2sir0yhv1"
 
+[sub_resource type="Resource" id="Resource_011l4"]
+script = ExtResource("4_tbcgo")
+AnimationPlayerPath = NodePath("../World/FBegin/LiftingPlatform/AnimationPlayer")
+AnimationName = "open_leftside"
+metadata/_custom_type_script = "uid://5xu2sir0yhv1"
+
 [resource]
 script = ExtResource("5_fbltc")
 SequenceId = "F_begin_intro"
-Steps = Array[ExtResource("1_011l4")]([SubResource("Resource_bcybp"), SubResource("Resource_n13f1"), SubResource("Resource_kdt07"), SubResource("Resource_wih2s"), SubResource("Resource_4mijq")])
+Steps = Array[ExtResource("1_011l4")]([SubResource("Resource_bcybp"), SubResource("Resource_n13f1"), SubResource("Resource_kdt07"), SubResource("Resource_wih2s"), SubResource("Resource_4mijq"), SubResource("Resource_011l4")])
 HideNodePaths = Array[NodePath]([NodePath("../World/P2")])
 metadata/_custom_type_script = "uid://cgnajq1ykl2mn"

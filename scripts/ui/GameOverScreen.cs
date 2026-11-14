@@ -11,7 +11,7 @@ namespace Kuros.UI
     public partial class GameOverScreen : Control
     {
         private const string TitleScreenPath = "res://scenes/ui/menus/TitleScreen.tscn";
-        private const string Stage1Path = "res://scenes/Stage_1.tscn";
+        private const string HomeScenePath = "res://scenes/Stage_home.tscn";
 
         [ExportGroup("Title")]
         /// <summary>GameOver 标题贴图（可替换）。为空时隐藏 TextureRect，显示场景里的兜底 Label。</summary>
@@ -105,7 +105,7 @@ namespace Kuros.UI
             BuildSelectionManager.Instance?.ResetForNewRun();
             WeaponBatteryManager.Instance?.ResetAll();
             FloatingDamageTextManager.Instance?.ClearAll(); // 清理 Root 级残留飘字
-            GetTree().ChangeSceneToFile(Stage1Path); // 重试：从第一关重新开始
+            GetTree().ChangeSceneToFile(HomeScenePath); // 重试：从第一关重新开始
         }
 
         private void OnMenuPressed()

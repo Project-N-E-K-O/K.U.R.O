@@ -1,0 +1,39 @@
+[gd_resource type="Resource" script_class="CutsceneSequence" load_steps=10 format=3 uid="uid://dxfvo573f68lx"]
+
+[ext_resource type="Script" uid="uid://ctrko7add3r5h" path="res://scripts/systems/cutscene/CutsceneStep.cs" id="1_step"]
+[ext_resource type="Script" uid="uid://cgnajq1ykl2mn" path="res://scripts/systems/cutscene/CutsceneSequence.cs" id="2_sequence"]
+[ext_resource type="Script" uid="uid://5xu2sir0yhv1" path="res://scripts/systems/cutscene/steps/PlayAnimationStep.cs" id="3_animation"]
+[ext_resource type="Script" uid="uid://dfa1ahl1vdlc1" path="res://scripts/systems/cutscene/steps/EffectDespawnStep.cs" id="4_despawn"]
+
+[sub_resource type="Resource" id="Resource_cleanup"]
+script = ExtResource("4_despawn")
+
+[sub_resource type="Resource" id="Resource_rogue_death"]
+script = ExtResource("3_animation")
+AnimationPlayerPath = NodePath("../World/FEnd/Animation_rogueAI/AnimationPlayer")
+AnimationName = "death"
+
+[sub_resource type="Resource" id="Resource_up"]
+script = ExtResource("3_animation")
+AnimationPlayerPath = NodePath("../World/FEnd/AnimationPlayer")
+AnimationName = "up"
+WaitForCompletion = true
+
+[sub_resource type="Resource" id="Resource_open_rightside"]
+script = ExtResource("3_animation")
+AnimationPlayerPath = NodePath("../World/FEnd/LiftingPlatform/AnimationPlayer")
+AnimationName = "open_rightside"
+WaitForCompletion = true
+
+[sub_resource type="Resource" id="Resource_open_elevator_gate"]
+script = ExtResource("3_animation")
+AnimationPlayerPath = NodePath("../World/FEnd/Environments/ElevatorGateF/AnimationPlayer")
+AnimationName = "open"
+WaitForCompletion = true
+
+[resource]
+script = ExtResource("2_sequence")
+SequenceId = "F_end_intro"
+Steps = Array[ExtResource("1_step")]([SubResource("Resource_cleanup"), SubResource("Resource_rogue_death"), SubResource("Resource_up"), SubResource("Resource_open_rightside"), SubResource("Resource_open_elevator_gate")])
+DisablePlayerInput = false
+HidePlayer = false

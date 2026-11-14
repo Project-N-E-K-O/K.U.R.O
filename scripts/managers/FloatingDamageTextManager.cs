@@ -5,6 +5,7 @@ using Kuros.Core;
 using Kuros.Core.Events;
 using Kuros.UI;
 using Kuros.Utils;
+using Kuros.Actors.Heroes;
 
 namespace Kuros.Managers
 {
@@ -99,6 +100,9 @@ namespace Kuros.Managers
 			if (!EnableFloatingText) return;
 			if (victim == null || damage <= 0) return;
 			if (_floatingTextScene == null) return;
+			// 伤害事件先于 Die()/Fall.Exit：此时生命已归零，但死亡标记尚未设置。
+			// 隐藏的坠落致死本体不生成或合并飘字；存活坠落和普通致死仍正常显示。
+			if (victim is MainCharacter player && player.IsFalling && player.CurrentHealth <= 0) return;
 
 			// 计算伤害来源方向
 			Vector2 damageDirection = Vector2.Right;

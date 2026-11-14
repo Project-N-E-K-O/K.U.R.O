@@ -75,6 +75,7 @@ namespace Kuros.Systems.Cutscene
 
         // ── 内部访问（供 Step 使用）──────────────────────────────────────
         internal bool                  IsSkipRequested { get; private set; } = false;
+        internal ulong SkipRevision { get; private set; }
         internal Node2D?               Player          { get; private set; }
         internal Camera2D?             Camera          { get; private set; }
         internal CutsceneDialoguePanel? DialoguePanel  { get; private set; }
@@ -193,7 +194,7 @@ namespace Kuros.Systems.Cutscene
             if (_skipHold >= SkipHoldSeconds)
             {
                 _skipHold = 0f;
-                IsSkipRequested = true;
+                RequestSkip();
                 GD.Print("[Cutscene] 长按跳过触发");
             }
         }
@@ -375,7 +376,12 @@ namespace Kuros.Systems.Cutscene
         }
 
         /// <summary>手动请求跳过当前过场（例如由 UI 按钮调用）。</summary>
-        public void RequestSkip() => IsSkipRequested = true;
+        public void RequestSkip()
+        {
+            if (IsSkipRequested) return;
+            IsSkipRequested = true;
+            if (IsPlaying) SkipRevision++;
+        }
 
         // ── 生成物登记（EffectSpawnStep / EffectGroupSpawnStep ↔ EffectDespawnStep）────────
         /// <summary>登记一个过场生成物的**根节点**（生成步骤在 AddChild 之后调用）。

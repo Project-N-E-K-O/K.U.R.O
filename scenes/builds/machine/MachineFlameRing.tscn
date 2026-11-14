@@ -1,4 +1,4 @@
-[gd_scene load_steps=41 format=3 uid="uid://bhfxd1mo7qdpd"]
+[gd_scene load_steps=42 format=3 uid="uid://bhfxd1mo7qdpd"]
 
 [ext_resource type="Script" uid="uid://k4r24d1vsno1" path="res://scripts/fx/MachineFlameRingEffect.cs" id="1_ring"]
 [ext_resource type="Script" uid="uid://fd5076f50ca0" path="res://scripts/actors/enemies/attacks/AttackEffectEntry.cs" id="2_entry"]
@@ -34,10 +34,12 @@
 [ext_resource type="Texture2D" uid="uid://dv3ro6dgupy3n" path="res://assets/effect/AttackEffect/burn_b/BurnB_23.png" id="32_8ysv1"]
 [ext_resource type="Texture2D" uid="uid://dvm38cy86g2ij" path="res://assets/effect/AttackEffect/burn_b/BurnB_24.png" id="33_td06n"]
 [ext_resource type="Texture2D" uid="uid://dv0yy7bmcjoke" path="res://assets/effect/AttackEffect/burn_b/BurnB_25.png" id="34_8ru48"]
+[ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/GroundObjectController.cs" id="35_8auex"]
 
 [sub_resource type="Resource" id="BurnEntry_Ring"]
 script = ExtResource("2_entry")
 Scene = ExtResource("3_burn")
+EffectOffset = Vector2(nan, nan)
 PropertyOverrides = Dictionary[String, Variant]({
 "DamagePercentPerSecond": 100.0,
 "Duration": 3.0,
@@ -376,3 +378,6 @@ position = Vector2(0, 74.28571)
 scale = Vector2(0.7, 0.7)
 sprite_frames = SubResource("SpriteFrames_3gppx")
 autoplay = "default"
+
+[node name="GroundObjectController" type="Node" parent="."]
+script = ExtResource("35_8auex")

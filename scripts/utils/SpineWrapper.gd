@@ -74,6 +74,23 @@ func flash_damage(root: Node, color: Color, restore_color = null, duration: floa
 	)
 
 # 动画控制相关
+## 读取 Spine track 0 当前**实际播放**的动画名（含 d_ / 非 d_ 前缀）。
+## 直接读运行时 state，不依赖谁调用了 play（SpineWrapper / SpineController 混用也能读到）；
+## 读不到骨架或尚无动画时返回空串。
+func get_current_animation_name(root: Node) -> String:
+	var sprite = find_spine_node(root)
+	if not sprite:
+		return ""
+	var state = sprite.get_animation_state()
+	if not state:
+		return ""
+	var entry = state.get_current(0)
+	if entry:
+		var anim = entry.get_animation()
+		if anim:
+			return anim.get_name()
+	return ""
+
 func play_animation(root: Node, anim_name: String, loop: bool, mix_duration: float = 0.1, time_scale: float = 1.0) -> bool:
 	var sprites = find_spine_nodes(root)
 	if sprites.is_empty():

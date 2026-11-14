@@ -196,6 +196,11 @@ namespace Kuros.Actors.Enemies.Animation
 
 		private void PlayHitAnimation(bool right)
 		{
+			if (Enemy?.StateMachine?.CurrentState is EnemyF1RogueAITurretHitState { IsLethalHit: true } lethal)
+			{
+				PlayOnceIfNeeded($"TurretLethalHit:{lethal.PhaseTick}", ResolveFacingName(right, HitAnimation), HitMixDuration);
+				return;
+			}
 			if (Enemy?.StateMachine?.CurrentState is EnemyF1RogueAITurretHitState hit
 				&& hit.UseStunRecovery && hit.CurrentPhase == EnemyHitState.HitPhase.Recover)
 			{

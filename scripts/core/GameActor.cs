@@ -808,6 +808,18 @@ namespace Kuros.Core
 			EnterDyingState();
 		}
 
+		/// <summary>敌人地形坠落终结：绕过伤害免疫、Hit/Dying 和伤害飘字，保留统一死亡结算及事件。</summary>
+		protected void FinalizeEnvironmentalFallDeath()
+		{
+			if (_deathStarted || _deathFinalized) return;
+			_deathStarted = true;
+			_dyingDeferred = false;
+			CurrentHealth = 0;
+			ClearStunAfterHit();
+			NotifyHealthChanged();
+			FinalizeDeath();
+		}
+
 		/// <summary>进入死亡流程：有 Dying 状态则切入（死亡动画），否则直接结算。</summary>
 		private void EnterDyingState()
 		{
@@ -1039,7 +1051,7 @@ public void ApplyEffect(ActorEffect effect)
 		}
 
 		/// <summary>
-		/// 禁用自身及所有子节点的 CollisionShape2D。
+		/// 禁用身体与攻击等子节点的 CollisionShape2D；独立地面探针保留，用于尸体承托与坠落。
 		/// </summary>
 		public void DisableCollisionShape()
 		{
@@ -1050,6 +1062,7 @@ public void ApplyEffect(ActorEffect effect)
 		{
 			foreach (Node child in node.GetChildren())
 			{
+				if (child is Kuros.Environments.GroundContactSensor) continue;
 				if (child is CollisionShape2D shape)
 				{	
 					//shape.Disabled = true;

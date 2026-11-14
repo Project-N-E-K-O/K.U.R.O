@@ -1,0 +1,273 @@
+[gd_resource type="Resource" script_class="RoomCatalog" load_steps=45 format=3 uid="uid://cfqfibxgsuw2y"]
+
+[ext_resource type="Script" uid="uid://b4lmmy0tm6sh2" path="res://scripts/systems/stage/RoomCatalog.cs" id="catalog"]
+[ext_resource type="Script" uid="uid://pofudi314bdk" path="res://scripts/systems/stage/RoomDefinition.cs" id="room"]
+
+[sub_resource type="Resource" id="room_1"]
+script = ExtResource("room")
+FloorTheme = "B"
+ScenePath = "res://scenes/levels/B_begin.tscn"
+
+[sub_resource type="Resource" id="room_2"]
+script = ExtResource("room")
+FloorTheme = "B"
+RoomType = 5
+ScenePath = "res://scenes/levels/B_end.tscn"
+
+[sub_resource type="Resource" id="room_3"]
+script = ExtResource("room")
+FloorTheme = "B"
+RoomType = 1
+ScenePath = "res://scenes/levels/B1.tscn"
+
+[sub_resource type="Resource" id="room_4"]
+script = ExtResource("room")
+FloorTheme = "B"
+RoomType = 1
+ScenePath = "res://scenes/levels/B2.tscn"
+
+[sub_resource type="Resource" id="room_5"]
+script = ExtResource("room")
+FloorTheme = "B"
+RoomType = 1
+ScenePath = "res://scenes/levels/B3.tscn"
+
+[sub_resource type="Resource" id="room_6"]
+script = ExtResource("room")
+FloorTheme = "B"
+RoomType = 2
+ScenePath = "res://scenes/levels/B7.tscn"
+
+[sub_resource type="Resource" id="room_7"]
+script = ExtResource("room")
+FloorTheme = "B"
+RoomType = 2
+ScenePath = "res://scenes/levels/B8.tscn"
+
+[sub_resource type="Resource" id="room_8"]
+script = ExtResource("room")
+FloorTheme = "B"
+RoomType = 2
+ScenePath = "res://scenes/levels/B9.tscn"
+
+[sub_resource type="Resource" id="room_9"]
+script = ExtResource("room")
+FloorTheme = "B"
+RoomType = 3
+ScenePath = "uid://r71es6oubh5f"
+
+[sub_resource type="Resource" id="room_10"]
+script = ExtResource("room")
+FloorTheme = "B"
+RoomType = 3
+ScenePath = "res://scenes/levels/B5.tscn"
+
+[sub_resource type="Resource" id="room_11"]
+script = ExtResource("room")
+FloorTheme = "B"
+RoomType = 3
+ScenePath = "res://scenes/levels/B6.tscn"
+
+[sub_resource type="Resource" id="room_12"]
+script = ExtResource("room")
+FloorTheme = "C"
+ScenePath = "res://scenes/levels/C_begin.tscn"
+
+[sub_resource type="Resource" id="room_13"]
+script = ExtResource("room")
+FloorTheme = "C"
+RoomType = 5
+ScenePath = "res://scenes/levels/C_end.tscn"
+
+[sub_resource type="Resource" id="room_14"]
+script = ExtResource("room")
+FloorTheme = "C"
+RoomType = 1
+RouteTags = PackedStringArray("C_a")
+ScenePath = "res://scenes/levels/C1.tscn"
+
+[sub_resource type="Resource" id="room_15"]
+script = ExtResource("room")
+FloorTheme = "C"
+RoomType = 1
+RouteTags = PackedStringArray("C_b")
+ScenePath = "res://scenes/levels/C2.tscn"
+
+[sub_resource type="Resource" id="room_16"]
+script = ExtResource("room")
+FloorTheme = "C"
+RoomType = 1
+RouteTags = PackedStringArray("C_c")
+ScenePath = "res://scenes/levels/C3.tscn"
+
+[sub_resource type="Resource" id="room_17"]
+script = ExtResource("room")
+FloorTheme = "C"
+RoomType = 2
+RouteTags = PackedStringArray("C_a")
+ScenePath = "res://scenes/levels/C4.tscn"
+
+[sub_resource type="Resource" id="room_18"]
+script = ExtResource("room")
+FloorTheme = "C"
+RoomType = 2
+RouteTags = PackedStringArray("C_b")
+ScenePath = "res://scenes/levels/C5.tscn"
+
+[sub_resource type="Resource" id="room_19"]
+script = ExtResource("room")
+FloorTheme = "C"
+RoomType = 2
+RouteTags = PackedStringArray("C_c")
+ScenePath = "res://scenes/levels/C6.tscn"
+
+[sub_resource type="Resource" id="room_20"]
+script = ExtResource("room")
+FloorTheme = "C"
+RoomType = 3
+RouteTags = PackedStringArray("C_a")
+ScenePath = "res://scenes/levels/C7.tscn"
+
+[sub_resource type="Resource" id="room_21"]
+script = ExtResource("room")
+FloorTheme = "C"
+RoomType = 3
+RouteTags = PackedStringArray("C_b")
+ScenePath = "res://scenes/levels/C8.tscn"
+
+[sub_resource type="Resource" id="room_22"]
+script = ExtResource("room")
+FloorTheme = "C"
+RoomType = 3
+RouteTags = PackedStringArray("C_c")
+ScenePath = "res://scenes/levels/C9.tscn"
+
+[sub_resource type="Resource" id="room_23"]
+script = ExtResource("room")
+FloorTheme = "D"
+ScenePath = "res://scenes/levels/D_begin.tscn"
+
+[sub_resource type="Resource" id="room_24"]
+script = ExtResource("room")
+FloorTheme = "D"
+RoomType = 5
+ScenePath = "res://scenes/levels/D_end.tscn"
+
+[sub_resource type="Resource" id="room_25"]
+script = ExtResource("room")
+FloorTheme = "D"
+RoomType = 1
+RouteTags = PackedStringArray("D_a")
+ScenePath = "res://scenes/levels/D1.tscn"
+
+[sub_resource type="Resource" id="room_26"]
+script = ExtResource("room")
+FloorTheme = "D"
+RoomType = 1
+RouteTags = PackedStringArray("D_b")
+ScenePath = "res://scenes/levels/D2.tscn"
+
+[sub_resource type="Resource" id="room_27"]
+script = ExtResource("room")
+FloorTheme = "D"
+RoomType = 1
+RouteTags = PackedStringArray("D_c")
+ScenePath = "res://scenes/levels/D3.tscn"
+
+[sub_resource type="Resource" id="room_28"]
+script = ExtResource("room")
+FloorTheme = "D"
+RoomType = 2
+RouteTags = PackedStringArray("D_a")
+ScenePath = "res://scenes/levels/D4.tscn"
+
+[sub_resource type="Resource" id="room_29"]
+script = ExtResource("room")
+FloorTheme = "D"
+RoomType = 2
+RouteTags = PackedStringArray("D_b")
+ScenePath = "res://scenes/levels/D5.tscn"
+
+[sub_resource type="Resource" id="room_30"]
+script = ExtResource("room")
+FloorTheme = "D"
+RoomType = 2
+RouteTags = PackedStringArray("D_c")
+ScenePath = "res://scenes/levels/D6.tscn"
+
+[sub_resource type="Resource" id="room_31"]
+script = ExtResource("room")
+FloorTheme = "D"
+RoomType = 3
+RouteTags = PackedStringArray("D_a")
+ScenePath = "res://scenes/levels/D7.tscn"
+
+[sub_resource type="Resource" id="room_32"]
+script = ExtResource("room")
+FloorTheme = "D"
+RoomType = 3
+RouteTags = PackedStringArray("D_b")
+ScenePath = "res://scenes/levels/D8.tscn"
+
+[sub_resource type="Resource" id="room_33"]
+script = ExtResource("room")
+FloorTheme = "D"
+RoomType = 3
+RouteTags = PackedStringArray("D_c")
+ScenePath = "res://scenes/levels/D9.tscn"
+
+[sub_resource type="Resource" id="room_34"]
+script = ExtResource("room")
+FloorTheme = "F"
+ScenePath = "res://scenes/levels/F_begin.tscn"
+
+[sub_resource type="Resource" id="room_35"]
+script = ExtResource("room")
+FloorTheme = "F"
+RoomType = 6
+ScenePath = "res://scenes/levels/F_end.tscn"
+
+[sub_resource type="Resource" id="room_36"]
+script = ExtResource("room")
+FloorTheme = "F"
+RoomType = 7
+ScenePath = "res://scenes/levels/F_a1.tscn"
+
+[sub_resource type="Resource" id="room_37"]
+script = ExtResource("room")
+FloorTheme = "F"
+RoomType = 8
+ScenePath = "res://scenes/levels/F_boss_core.tscn"
+
+[sub_resource type="Resource" id="room_38"]
+script = ExtResource("room")
+FloorTheme = "F"
+RoomType = 9
+ScenePath = "res://scenes/levels/F_c1.tscn"
+
+[sub_resource type="Resource" id="room_39"]
+script = ExtResource("room")
+FloorTheme = "HiddenA"
+RoomType = 10
+ScenePath = "res://scenes/levels/Test_begin.tscn"
+
+[sub_resource type="Resource" id="standalone_0"]
+script = ExtResource("room")
+FloorTheme = "A"
+ScenePath = "res://scenes/levels/A_begin.tscn"
+
+[sub_resource type="Resource" id="standalone_1"]
+script = ExtResource("room")
+FloorTheme = "A"
+RoomType = 1
+ScenePath = "res://scenes/levels/A1.tscn"
+
+[sub_resource type="Resource" id="standalone_2"]
+script = ExtResource("room")
+FloorTheme = "A"
+RoomType = 6
+ScenePath = "res://scenes/levels/A_end.tscn"
+
+[resource]
+script = ExtResource("catalog")
+Rooms = Array[ExtResource("room")]([SubResource("room_1"), SubResource("room_2"), SubResource("room_3"), SubResource("room_4"), SubResource("room_5"), SubResource("room_6"), SubResource("room_7"), SubResource("room_8"), SubResource("room_9"), SubResource("room_10"), SubResource("room_11"), SubResource("room_12"), SubResource("room_13"), SubResource("room_14"), SubResource("room_15"), SubResource("room_16"), SubResource("room_17"), SubResource("room_18"), SubResource("room_19"), SubResource("room_20"), SubResource("room_21"), SubResource("room_22"), SubResource("room_23"), SubResource("room_24"), SubResource("room_25"), SubResource("room_26"), SubResource("room_27"), SubResource("room_28"), SubResource("room_29"), SubResource("room_30"), SubResource("room_31"), SubResource("room_32"), SubResource("room_33"), SubResource("room_34"), SubResource("room_35"), SubResource("room_36"), SubResource("room_37"), SubResource("room_38"), SubResource("room_39"), SubResource("standalone_0"), SubResource("standalone_1"), SubResource("standalone_2")])

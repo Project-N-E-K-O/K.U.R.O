@@ -1,0 +1,29 @@
+[gd_scene load_steps=4 format=3 uid="uid://dyk2ejmi1nfyh"]
+
+[ext_resource type="Texture2D" uid="uid://we603302caaj" path="res://assets/ui/charging_panel.svg" id="1_panel"]
+[ext_resource type="Shader" uid="uid://bwd4koyrkuflm" path="res://shaders/ui/charging_panel.gdshader" id="2_charging"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_charging"]
+shader = ExtResource("2_charging")
+shader_parameter/sweep_period = 1.0000000074506001
+shader_parameter/sweep_strength = 0.5
+shader_parameter/pulse_strength = 0.2999999932944
+
+[node name="JarAssistChargingHud" type="Node2D"]
+z_index = 10
+
+[node name="PanelSprite" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_charging")
+position = Vector2(0, -310)
+texture = ExtResource("1_panel")
+
+[node name="ChargingLabel" type="Label" parent="."]
+offset_left = -240.0
+offset_top = -358.0
+offset_right = 232.0
+offset_bottom = -270.0
+theme_override_colors/font_color = Color(0.78, 0.96, 0.43, 1)
+theme_override_font_sizes/font_size = 64
+text = "CHARGING"
+horizontal_alignment = 1
+vertical_alignment = 1

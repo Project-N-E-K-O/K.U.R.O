@@ -10,7 +10,7 @@ script = ExtResource("2_ohvy7")
 IdleAnimation = "bumper_idle"
 HitAnimation = "bumper_hit"
 BreakAnimation = "bumper_destroy"
-Threshold = 200.0
+Threshold = 500.0
 metadata/_custom_type_script = "uid://elxwhcec5gcr"
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_4uhaw"]
@@ -230,7 +230,7 @@ collision_mask = 7
 script = ExtResource("1_rsry7")
 Stages = Array[ExtResource("2_ohvy7")]([SubResource("Resource_0o47q")])
 DeclaredFaction = 1
-MaxHealth = 200
+MaxHealth = 500
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 material = SubResource("ShaderMaterial_4uhaw")

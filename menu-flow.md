@@ -40,7 +40,7 @@ BattleMenu（局内暂停菜单）：**返回游戏 / 设置 / 图鉴 / 返回�
 ## 槽位选择逻辑
 
 ```
-空槽位 → SaveManager.NewGame(slot) 写初始数据 → PerformSceneChange(Stage_1)
+空槽位 → SaveManager.NewGame(slot) 写初始数据 → PerformSceneChange(Stage_home)
 有数据 → SaveManager.SetCurrentGameData(LoadGame(slot)) → PerformSceneChange(MaxStageReached 对应场景)
 
 ### 删除存档

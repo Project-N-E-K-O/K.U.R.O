@@ -2,6 +2,7 @@ using Godot;
 using Kuros.Actors.Enemies;
 using Kuros.Core;
 using Kuros.Environments;
+using Kuros.Fx;
 
 namespace Kuros.Actors.Enemies.Attacks
 {
@@ -20,8 +21,17 @@ namespace Kuros.Actors.Enemies.Attacks
 		/// <summary>罐子被击破后炮台的眩晕时长（秒）。</summary>
 		[Export(PropertyHint.Range, "0.5,20,0.1")] public float StunSeconds { get; set; } = 7.5f;
 		[Export] public bool EnableDebugLogs { get; set; } = false;
+		[Export] public Texture2D? IndicatorIcon { get; set; }
+		/// <summary>协助追踪期间播放的循环特效，由本攻击清除。</summary>
+		[Export] public PackedScene? AssistEffectScene { get; set; }
+		/// <summary>相对炮台根节点的挂点。留空时挂在炮台根节点。</summary>
+		[Export] public NodePath AssistEffectAnchorPath { get; set; } = new("");
+		/// <summary>罐子根节点到地面点的世界偏移；采样验证地面点，生成原点为地面点减去此偏移。</summary>
+		[Export] public Vector2 SpawnGroundOffset { get; set; }
 
 		private DestructibleStageController? _activeJar;
+		private CanvasLayer? _jarIndicator;
+		private Node2D? _assistEffect;
 		private float _remaining;
 		private bool _tracking;
 		private bool _resolved;
@@ -33,11 +43,11 @@ namespace Kuros.Actors.Enemies.Attacks
 			SetProcess(true);
 		}
 
-		public override bool CanStart()
+		protected override bool CanStartCore()
 		{
 			if (_tracking) return false;
 			if (Enemy is not EnemyF1RogueAITurret) return false;
-			return base.CanStart();
+			return base.CanStartCore();
 		}
 
 		protected override void OnAttackStarted()
@@ -55,6 +65,53 @@ namespace Kuros.Actors.Enemies.Attacks
 			// 只生成 Effects（罐子），不调用 base（避免 PerformAttackNow 结算伤害）。
 			SpawnEffectAtEnemy(EffectSpawnTiming.OnActive);
 		}
+
+		/// <summary>以敌人为中心的世界坐标采样半径；不随 Spine 或敌人缩放。</summary>
+		[Export(PropertyHint.Range, "1,10000,1,or_greater")] public float SpawnRadius { get; set; } = 3000f;
+		[Export] public Vector2 SpawnCenterOffset { get; set; }
+		/// <summary>相对敌人根节点解析，用其导航地图与导航层，不依赖关卡路径。</summary>
+		[Export] public NodePath NavigationAgentPath { get; set; } = new("NavigationAgent2D");
+		[Export(PropertyHint.Range, "1,256,1")] public int SpawnSampleAttempts { get; set; } = 48;
+		private const float NavigationTolerance = 1f;
+
+		protected override bool TryResolveEffectSpawnPosition(Node2D effect, AttackEffectEntry? entry,
+			ref Vector2 position, ref Node2D? marker)
+		{
+			if (effect is not DestructibleStageController) return base.TryResolveEffectSpawnPosition(effect, entry, ref position, ref marker);
+			marker = null; // 罐子使用独立圆形采样，不再使用 entry Marker/EffectOffset。
+			var agent = Enemy?.GetNodeOrNull<NavigationAgent2D>(NavigationAgentPath);
+			if (agent == null) return SpawnUnavailable("缺少 NavigationAgent2D");
+			var map = agent.GetNavigationMap();
+			if (!map.IsValid || NavigationServer2D.MapGetIterationId(map) == 0 || agent.NavigationLayers == 0)
+				return SpawnUnavailable("导航地图尚未就绪或导航层为空");
+			Vector2 center = Enemy!.GlobalPosition + SpawnCenterOffset;
+			Vector2 origin = NavigationServer2D.MapGetClosestPoint(map, Enemy.GlobalPosition);
+			float radius = Mathf.Max(1, SpawnRadius);
+			for (int i = 0; i < Mathf.Clamp(SpawnSampleAttempts, 1, 256); i++)
+			{
+				// sqrt 随机半径使圆内按面积均匀，不把点堆到圆心或导航边缘。
+				Vector2 ground = center + Vector2.FromAngle((float)GD.RandRange(0.0, Mathf.Tau))
+					* (Mathf.Sqrt(GD.Randf()) * radius);
+				var owner = NavigationServer2D.MapGetClosestPointOwner(map, ground);
+				if (!owner.IsValid || !NavigationServer2D.RegionGetEnabled(owner)
+					|| (NavigationServer2D.RegionGetNavigationLayers(owner) & agent.NavigationLayers) == 0) continue;
+				// 仅用最近点验证在网格内，不把圆外/坑边的无效候选强制吸附到网格。
+				if (NavigationServer2D.MapGetClosestPoint(map, ground).DistanceSquaredTo(ground) > NavigationTolerance * NavigationTolerance) continue;
+				Vector2 spawn = ground - SpawnGroundOffset;
+				var path = NavigationServer2D.MapGetPath(map, origin, ground, true, agent.NavigationLayers);
+				if (path.Length == 0 || path[^1].DistanceSquaredTo(ground) > NavigationTolerance * NavigationTolerance) continue;
+				position = spawn;
+				return true;
+			}
+			return SpawnUnavailable("圆形范围内未采样到可达的导航落点");
+		}
+
+		private bool SpawnUnavailable(string reason)
+		{
+			if (EnableDebugLogs) GD.Print($"[{AttackName}] {reason}，跳过罐子生成。");
+			return false;
+		}
+
 
 		/// <summary>罐子要留在原地并与玩家同一层级（世界层）：生成在玩家父级（World）下——
 		/// 不能挂在敌人父级（滑槽 Mount 下会继承滑轨变换随炮台漂移，z 排序也跟着滑轨）。
@@ -85,6 +142,14 @@ namespace Kuros.Actors.Enemies.Attacks
 			_remaining = Mathf.Max(0.1f, AssistSeconds);
 			_tracking = true;
 			_resolved = false;
+			_jarIndicator = new CanvasLayer { Name = "JarAssistIndicatorLayer", Layer = 8 };
+			_jarIndicator.AddChild(new AssistJarIndicator
+			{
+				Target = jar.GetNodeOrNull<Marker2D>("IndicatorAnchor") ?? (Node2D)jar,
+				Icon = IndicatorIcon
+			});
+			AddChild(_jarIndicator);
+			SpawnAssistEffect();
 
 			if (!_deathSubscribed)
 			{
@@ -94,6 +159,30 @@ namespace Kuros.Actors.Enemies.Attacks
 
 			if (EnableDebugLogs)
 				GD.Print($"[{AttackName}] 罐子已生成，开始计数 {_remaining:F1}s");
+		}
+
+		private void SpawnAssistEffect()
+		{
+			if (AssistEffectScene == null || Enemy == null) return;
+			var anchor = AssistEffectAnchorPath.IsEmpty
+				? Enemy
+				: Enemy.GetNodeOrNull<Node2D>(AssistEffectAnchorPath);
+			if (anchor == null)
+			{
+				GD.PushWarning($"[{AttackName}] 协助特效挂点不存在：{AssistEffectAnchorPath}");
+				return;
+			}
+
+			var instance = AssistEffectScene.Instantiate();
+			if (instance is not Node2D visual)
+			{
+				instance.Free();
+				GD.PushWarning($"[{AttackName}] AssistEffectScene 的根节点必须是 Node2D");
+				return;
+			}
+
+			_assistEffect = visual;
+			anchor.AddChild(visual);
 		}
 
 		private void OnJarDeathFinalized(GameActor actor)
@@ -141,10 +230,7 @@ namespace Kuros.Actors.Enemies.Attacks
 		private void ResolveSuccess()
 		{
 			if (!_tracking || _resolved) return;
-			_resolved = true;
-			_tracking = false;
-			UnsubscribeDeath();
-			_activeJar = null;
+			StopTracking();
 
 			EnsureCooldown(AssistSeconds);
 			if (Enemy is EnemyF1RogueAITurret host)
@@ -157,10 +243,7 @@ namespace Kuros.Actors.Enemies.Attacks
 		private void ResolveFailure()
 		{
 			if (!_tracking || _resolved) return;
-			_resolved = true;
-			_tracking = false;
-			UnsubscribeDeath();
-			_activeJar = null;
+			StopTracking();
 
 			EnsureCooldown(AssistSeconds);
 			if (Enemy is EnemyF1RogueAITurret host)
@@ -172,10 +255,30 @@ namespace Kuros.Actors.Enemies.Attacks
 
 		private void StopTracking()
 		{
+			if (_assistEffect != null && IsInstanceValid(_assistEffect))
+			{
+				_assistEffect.Hide();
+				_assistEffect.QueueFree();
+			}
+			_assistEffect = null;
+			if (_jarIndicator != null && IsInstanceValid(_jarIndicator))
+			{
+				_jarIndicator.Hide();
+				_jarIndicator.QueueFree();
+			}
+			_jarIndicator = null;
 			_tracking = false;
 			_resolved = true;
 			_activeJar = null;
 			UnsubscribeDeath();
+		}
+
+		/// <summary>停机时取消独立协助计时，清理罐子，不触发其死亡结算。</summary>
+		public void CancelAssist()
+		{
+			var jar = _activeJar;
+			StopTracking();
+			if (GodotObject.IsInstanceValid(jar) && !jar!.IsQueuedForDeletion()) jar.QueueFree();
 		}
 
 		private void UnsubscribeDeath()

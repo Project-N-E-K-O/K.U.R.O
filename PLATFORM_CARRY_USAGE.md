@@ -1,55 +1,76 @@
 # 移动平台承载配置
 
-## 对象筛选
+当前完整架构见 [地面系统架构](GROUND_SYSTEM_ARCHITECTURE.md)。玩家、敌人共用 FallController；物品、武器、地面特效统一使用 GroundObjectController。
 
-`FallMovingPlatform` 按现有组筛选，不需要给每个角色或家具额外挂载组件：
+## 平台职责
 
-| 组 | 条件与位移方式 |
+FallMovingPlatform 在起点和 TravelOffset 之间平移。所有承载位移由平台统一分发，按实际目标 PlatformTarget 每物理帧去重。平台既处理脚下站立者，也处理已登记的固定附着特效。
+
+| 参数 | 含义 |
 | --- | --- |
-| player | GameActor 存活、可处理、身体形状启用且未 Fall；MoveAndCollide |
-| enemies | GameActor 存活、可处理、至少一个实际身体形状启用；MoveAndCollide |
-| world_items | RigidBodyWorldItemEntity 的地面静置家具/投掷武器，以及 WorldItemEntity 的静置武器/物品；由各自接口处理位移 |
+| TravelOffset / Speed | 往返终点偏移与速度 |
+| SupportPath | 平台的绿色 FallSupportArea |
+| CarryPlayers / CarryEnemies / CarryWorldItems | 分类承载开关，默认全部开启 |
+| ExcludedGroup | 默认 platform_carry_excluded，明确排除指定对象 |
+| FurnitureObstacleMask | 家具身体扫掠阻挡层，默认 7 |
 
-仅组标签不足以判断飞行状态。玩家出手后，常规家具副本仍在 world_items 组内；ApplyThrowImpulse 让同一实例进入飞行，而非统一替换为独立特效。只有 SpawnEffectOnThrow 特殊分支立即销毁本体并生成效果。
+player / enemies 的活体需要可处理且实际身体形状有效，使用 MoveAndCollide。不把 AttackArea / HitArea 的形状当作身体，禁用身体的 Boss 不会被平台携带。Dying 尸体使用已启用 FallController 缓存的初始身体资格，允许死亡阶段关闭碰撞后继续随平台平移；已隐藏、已坠落或死亡结算完成者不承载。
 
-刚体包装物品（家具或投掷武器）承载要求：可见、未拾取、未销毁、不在飞行/回弹/隐藏归还阶段，不在散落未停稳阶段，内部刚体冻结。不要求 IsFurniture，也不要求存在 StaticBody2D。拾取后实例销毁，手持图标不参与承载。
+world_items 通过 IPlatformPassenger 提供 CanRidePlatform、PlatformGroundPosition、PlatformTarget 和 ApplyPlatformDisplacement。分组本身不足以判断飞行状态。
 
-敌人的身体检查只检查该 PhysicsBody2D 的 ShapeOwner，忽略 AttackArea、HitArea 等子区域。因此 rogueAI、cannon、machinegun、netadmin 等对象在实际身体形状全部禁用时自动排除，不按类名写死名单。
+## 物品和武器
 
-## 平台 Inspector
+WorldItemEntity 与 RigidBodyWorldItemEntity 不再自动添加 GroundObjectController。现有 64 个物品/武器场景已显式挂载，已有武器动画配置保留。新场景需要自行添加该 Node 组件；无组件时既不参与坠落，也不参与平台携带。家具暂未配置专属替身，可按场景补充。
 
-- `CarryPlayers` / `CarryEnemies` / `CarryWorldItems`：默认全部开启，按类别关闭。
-- `ExcludedGroup`：默认 `platform_carry_excluded`；加入此组可明确排除，即使碰撞启用也不携带。
-- `FurnitureObstacleMask`：家具扫掠检测层，默认 Environment + Enemy + Player（7）。
-- `SupportPath`：本平台绿色 FallSupportArea。乘客脚底在其内，且 SupportEnabled 为 true，才参与承载。
+- PlatformCarryEnabled：默认 true，控制物品自身承载资格。
+- PlatformGroundProbePath：可选地面节点，同时作为默认坠落地面位置。
+- WorldItemEntity：没有自身滑行速度、未拾取、可见且有效时允许携带。无身体时整体平移，有身体时沿用身体碰撞移动。
+- RigidBodyWorldItemEntity：非投掷、回弹、隐藏归还、散落未稳阶段，且内部刚体冻结时允许携带。实际 StaticBody 形状优先作为地面点，其次内部刚体；位移扫掠后同步包装根与内部刚体。
+- GroundObjectController 的 FollowPlatformEnabled、Grounded 也会过滤物品承载，且不受组件节点名称影响。
+- 物品不会额外登记为固定附着对象，避免与平台按 world_items 携带的路径叠加。
+- CanFall 与 CanRidePlatform 独立：滑行物品仍会坠落；关闭平台承载不等于免坠落。
 
-原有平台实例不用修改即可使用默认配置。未移动的平台不占用乘客，同一对象每物理帧最多被一个移动平台携带一次；重叠时按平台执行顺序先到先得。
+## 地面特效
 
-## 家具与投掷武器 Inspector
+将 GroundObjectController 作为 Node 子节点挂在需要处理的特效下。原 GroundEffectController / PlatformEffectFollower 场景挂载已迁移。
 
-`RigidBodyWorldItemEntity` 增加两个可选配置：
+| 字段 | 含义 |
+| --- | --- |
+| TargetPath | 组件相对路径，默认 ..，指定实际控制的 Node2D |
+| GroundAnchor / GroundOffset | 地面 Marker 与世界偏移；平台跟随、坠落使用同一点 |
+| FollowPlatformEnabled | 默认 true |
+| AutoBindOnFirstPhysicsFrame | 默认 true；只自动尝试一次固定附着 |
+| DestroyOnPlatformLost | 默认 false；开启时平台丢失直接销毁，不播放替身 |
+| FallEnabled | 默认 true，沿用重构前工作区当前值；可单独关闭 |
+| Grounded | 默认 true，普通特效飞行阶段需关闭 |
+| FallEffectScene / FallAnimationName / FallEffectOffset | 可选独立坠落替身、动画名与相对地面点的世界偏移 |
 
-- `PlatformCarryEnabled`：默认 true，可单件关闭。
-- `PlatformGroundProbePath`：相对于物品根节点的可选脚底 Marker。留空时优先使用 StaticBody2D 的启用身体形状原点，其次使用内部刚体的启用身体形状原点；没有身体形状则使用内部刚体世界位置。
+FireWallA/B 保留对应 Marker 引用。GroundAnchor 不改变 TargetPath，只改变地面检测位置。平台位移仍作用于完整 Target，包括视觉和伤害区域。
 
-沿用已有 RigidBodyPath，无需逐个修改 Furniture 或 Weapon_Throw 场景。物品自己的 ApplyPlatformDisplacement 接口同时移动包装根节点与冻结刚体，保留内部偏移；已有身体、贴图、影子、拾取与攻击区域随其一起移动。
+特效首次绑定后保持附着，不因锚点越过平台边缘反复脱离，也不会被后来路过的平台自动吸走。通过 TryBindToPlatformBelow() 显式重绑，通过 Detach() 解除绑定。平台已是目标祖先且目标继承其变换时，不额外叠加位移。多个组件共享实际目标去重。
 
-存在实际身体形状时使用该形状扫掠，遇墙截短位移；无身体形状时不把 CollisionArea / AttackArea 当成实体身体，直接同步根与刚体。被挡后可能被平台甩下，当前不额外推开障碍。承载不会让物品或敌人自动获得坠落、回岸功能。
+Grounded=false 时暂停承载与坠落；落地设置 true 并调用 RefreshGroundDetection()。运行时从休眠状态开启功能或外部传送后同样主动刷新。该方法默认尝试绑定；传 false 只刷新地面检测。TargetPath 运行时更换需重建组件。
 
-## 普通武器与 WorldItemEntity
+## 检测与坠落
 
-`Weapon_Brawl_discoBall.tscn` 等使用 WorldItemEntity 的场景已经统一接入，无需逐个修改武器场景。
+GroundContactSensor / FallDetectionGate 通过黄色范围激活精确检测；所有对象统一自动创建仅监听黄色层的脚底探针，远处只同步坐标，身体停用不影响探针。无需手动添加 Area2D，原有 GroundProbePath / GroundAnchor 仍决定检测位置。出生、传送和动态黄区加载会补查。相同帧、相同脚底坐标复用查询结果。
 
-- 默认 `PlatformCarryEnabled = true`，不要求实际身体碰撞形状；敌人的身体碰撞要求不应用于这类物品。
-- 未拾取、可见、未排队销毁、没有自身滑行速度时承载。散落/投掷滑行中暂停，停稳后自动恢复。
-- 可用 `PlatformGroundProbePath` 指定脚底 Marker；默认使用物品根节点世界坐标。
-- 没有身体形状时整体移动根节点，使贴图、影子和拾取区域一起移动；有身体形状时使用 MoveAndCollide，沿用物品自己的碰撞遮罩。
-- 平台的 CarryWorldItems、ExcludedGroup 和重叠平台去重同样生效。不会额外生成身体碰撞或将区域形状当成身体。
+无有效绿色承托且脚底在红区时，组件请求坠落。物品通过 IGroundFallReceiver 拒绝飞行、回弹、等待归还等阶段；普通特效由 Grounded 控制。坠落停用本体处理与碰撞并释放，配置替身时在世界独立播放并按区域 FallDuration 回收。
+
+FallStarted 信号可用于取消外部任务。物品掉坑不触发普通爆炸或归还链；特效已生成到外部世界的攻击不自动清理。平台失效后默认解除附着并重新检查地面，不自动绑定其他平台。
+
+仅支持平台平移。目标若另有绝对位置 Tween、TopLevel 子节点或世界空间粒子，需要协调自身位移方式。
 
 ## 验证
 
-运行 `res://scenes/tests/PlatformCarryRuntimeCheck.tscn`，自动验证玩家、普通敌人、禁用身体对象、排除组、真实办公椅家具、内部位置同步、分类开关、重叠平台去重、飞行副本的 world_items 组身份与排除、家具遇墙截断，以及真实迪斯科球的无身体承载、拾取区域同步、滑行暂停与停稳恢复、拾取后释放。
+### 平台独立导航面
 
-2026-11-02：扩展后 51 项运行检查全部通过，包含现有 7 种 Weapon_Throw 投掷武器的静置承载、根与刚体同步、出手后停止承载；原有玩家、敌人、家具与普通武器检查也通过。
+`FallMovingPlatformA/NavigationRegion2D` 加入 `navigation_rebake_excluded` 组，家具生成或销毁触发的 `NavigationRebakeCoordinator` 全场重烘焙会跳过它，普通关卡导航仍正常更新。该组应加在导航区域节点上。
 
-日志保存到 `res://output/platform-carry.stdout.log` 和 `res://output/platform-carry.stderr.log`。实际家具资源在无窗口渲染中可能产生原有材质编译诊断，应与 CarryCheck 断言结果分开查看。
+平台的 NavigationPolygon 使用本节点子树作为几何来源（Source Geometry Mode = Root Node Children），不收集全场的深坑导航障碍。平台移动依靠子节点变换同步导航位置，无需反复烘焙。修改平台轮廓时仍可手动烘焙。
+
+2026-11-05 在 Test_begin 复现：旧配置进入场景后导航多边形从 1 个变为 0 个，节点仍存在。修复后验证重复全场烘焙保持 1 个多边形、普通区域仍重烘焙、平台移动后导航位置更新、局部手动烘焙有效。测试实例单独指定行程，未更改关卡的平台行程配置。
+
+2026-11-04：平台承载 51 项、特效跟随 20 项、玩家 Fall 44 项、敌人 Fall 32 项、统一对象接入 45 项断言通过，共 192 项。覆盖全部 11 种已接入敌人和 7 种投掷武器。
+
+部分既有材质在 headless 下有 custom_samplers 诊断，既有 DotBleedEffect 清理存在粒子数量设为 0 的报错；与此次逻辑无关，未修改这些效果。临时自动测试场景、专用脚本与日志在验证后清理，保留手动 PlayerFallTest.tscn。

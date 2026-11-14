@@ -1,5 +1,6 @@
-[gd_scene load_steps=7 format=3 uid="uid://dqcp2msh4e70y"]
+[gd_scene load_steps=8 format=3 uid="uid://dqcp2msh4e70y"]
 
+[ext_resource type="Script" uid="uid://dysumllfdydys" path="res://scripts/environments/GroundObjectController.cs" id="2_4vn4d"]
 [ext_resource type="Texture2D" uid="uid://bk0ipufx3kn76" path="res://assets/environments/26.3.17 烟.png" id="3_ybhnl"]
 
 [sub_resource type="Gradient" id="Gradient_tdsuh"]
@@ -50,10 +51,12 @@ z_index = 1
 z_index = 3
 texture_filter = 1
 scale = Vector2(5, 5)
-emitting = true
 amount = 4
 texture = ExtResource("3_ybhnl")
 one_shot = true
 explosiveness = 0.95
 randomness = 0.2
 process_material = SubResource("ParticleProcessMaterial_a4dwl")
+
+[node name="GroundObjectController" type="Node" parent="."]
+script = ExtResource("2_4vn4d")

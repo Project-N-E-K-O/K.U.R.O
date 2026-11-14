@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="StageConfig" load_steps=2 format=3 uid="uid://beoxjmbyvy6s0"]
+
+[ext_resource type="Script" uid="uid://dim2ctx63qcxt" path="res://scripts/systems/stage/StageConfig.cs" id="2_tlmiy"]
+
+[resource]
+script = ExtResource("2_tlmiy")
+StageId = "stage_5"
+DisplayName = "AI工厂"
+LevelDescription = "酒店五层最终层"
+Floor = 4
+FloorTheme = "F"
+RoomSequence = Array[int]([0, 7, 8, 9, 6])

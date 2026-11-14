@@ -5,8 +5,9 @@ namespace Kuros.Actors.Enemies.Attacks
 {
 	public partial class EnemyDashSlashAttack : EnemyAttackTemplate
 	{
+        protected override bool RequiresAttackArea => true;
 		// 区域由基类统一提供：TriggerAreaPath（起手检测区；未配置 = 不做额外限制）、
-		// AttackAreaPath（命中/冲刺停止判定带）、DamageAreaPath（伤害落点；未配置 = AttackArea）。
+		// AttackAreaPath（命中/冲刺停止判定带）、DamageAreaPath（伤害落点；未配置不执行区域伤害）。
 		// 旧的 DetectionAreaPath / DashStopAreaPath / DashSlashAreaPath 已并入基类
 		// —— 其中 DashStopArea 就是"命中判定带"，DashSlashArea 就是"伤害落点"。
 
@@ -69,10 +70,6 @@ namespace Kuros.Actors.Enemies.Attacks
 				_detectionArea.BodyEntered += OnDetectionAreaBodyEntered;
 				_detectionArea.BodyExited += OnDetectionAreaBodyExited;
 			}
-			else
-			{
-				GD.PushWarning($"[EnemyDashSlashAttack] DetectionArea not found for {Enemy?.Name ?? Name}, fallback to DetectionRange.");
-			}
 
 			SetPhysicsProcess(true);
 			_navAgent = Enemy?.GetNodeOrNull<NavigationAgent2D>("NavigationAgent2D");
@@ -92,18 +89,14 @@ namespace Kuros.Actors.Enemies.Attacks
 			base._ExitTree();
 		}
 
-		public override bool CanStart()
+		protected override bool CanStartCore()
 		{
 			if (Enemy == null || Enemy.PlayerTarget == null) return false;
 			if (IsRunning || IsOnCooldown) return false;
 			if (Enemy.AttackTimer > 0) return false;
 			if (_postAttackCooldown > 0f) return false;
 
-			bool detectionSatisfied = _detectionArea != null
-				? _playerInsideDetection || _detectionArea.OverlapsBody(Enemy.PlayerTarget)
-				: Enemy.IsPlayerWithinDetectionRange();
-
-			if (!detectionSatisfied) return false;
+			// TriggerArea 的选招和起手限制由非虚公共入口统一检查。
 
 			AlignFacingWithPlayer();
 
@@ -332,7 +325,7 @@ namespace Kuros.Actors.Enemies.Attacks
 
 		private bool IsPlayerInsideDashSlashArea(SamplePlayer player)
 		{
-			if (AttackArea == null) return true;
+			if (AttackArea == null) return false;
 			return player.IsHitByArea(AttackArea);
 		}
 
@@ -387,7 +380,7 @@ namespace Kuros.Actors.Enemies.Attacks
 			if (Enemy.PlayerTarget == null) return;
 			if (DamageArea != null) ApplyAttackAreaMaskOverride(DamageArea);
 			DealDamage(DamageArea!);
-			if (!IsPlayerInsideDashSlashArea(Enemy.PlayerTarget)) return;
+			if (DamageArea == null || !Enemy.PlayerTarget.IsHitByArea(DamageArea)) return;
 			ExecuteStrike();
 		}
 

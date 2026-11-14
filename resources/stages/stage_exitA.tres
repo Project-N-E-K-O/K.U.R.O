@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="StageConfig" load_steps=2 format=3 uid="uid://bmhnobwnd0s4a"]
+
+[ext_resource type="Script" uid="uid://dim2ctx63qcxt" path="res://scripts/systems/stage/StageConfig.cs" id="2_03eot"]
+
+[resource]
+script = ExtResource("2_03eot")
+StageId = "stageExitA"
+DisplayName = "???"
+LevelDescription = "酒店大堂后门"

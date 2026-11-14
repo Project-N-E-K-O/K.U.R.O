@@ -96,6 +96,7 @@ namespace Kuros.Systems.Cutscene
 
         public override async Task Execute(CutsceneContext ctx)
         {
+            if (ctx.IsCancelled) return;
             if (EffectScene == null)
             {
                 GD.PrintErr($"[Cutscene] EffectSpawnStep: EffectScene 未配置");
@@ -151,16 +152,16 @@ namespace Kuros.Systems.Cutscene
                 if (!WaitForCompletion)
                 {
                     // 异步销毁：立即返回，后台计时
-                    _ = DestroyEffectAsync(effectNode2D, timer, ctx);
+                    ctx.TrackTask(DestroyEffectAsync(effectNode2D, timer, ctx));
                     GD.Print($"[Cutscene] EffectSpawnStep: 异步销毁模式（{DestroyAfterDuration}秒后销毁）");
                     return;
                 }
 
                 // 阻塞等待销毁
-                while (!ctx.IsSkipping && timer.TimeLeft > 0f)
+                while (!ctx.IsCancelled && !ctx.IsSkipping && timer.TimeLeft > 0f)
                     await ctx.NextFrame();
 
-                if (GodotObject.IsInstanceValid(effectNode2D))
+                if (!ctx.IsCancelled && GodotObject.IsInstanceValid(effectNode2D))
                     effectNode2D.QueueFree();
 
                 GD.Print("[Cutscene] EffectSpawnStep: 完成（特效已销毁）");
@@ -215,7 +216,7 @@ namespace Kuros.Systems.Cutscene
 
         private async Task DestroyEffectAsync(Node2D effect, SceneTreeTimer timer, CutsceneContext ctx)
         {
-            while (!ctx.IsSkipping && timer.TimeLeft > 0f && GodotObject.IsInstanceValid(effect))
+            while (!ctx.IsCancelled && !ctx.IsSkipping && timer.TimeLeft > 0f && GodotObject.IsInstanceValid(effect))
                 await ctx.NextFrame();
 
             if (GodotObject.IsInstanceValid(effect))

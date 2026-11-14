@@ -1,9 +1,9 @@
-[gd_resource type="Resource" script_class="WeaponSkillDefinition" load_steps=6 format=3]
+[gd_resource type="Resource" script_class="WeaponSkillDefinition" load_steps=6 format=3 uid="uid://d3vtrx2uv3fdy"]
 
-[ext_resource type="Script" path="res://scripts/actors/enemies/attacks/AttackEffectEntry.cs" id="1_pbs6n"]
-[ext_resource type="Script" path="res://scripts/items/weapons/WeaponSkillDefinition.cs" id="1_weapon_skill"]
-[ext_resource type="Script" path="res://scripts/items/effects/ItemEffectEntry.cs" id="2_j53ud"]
-[ext_resource type="PackedScene" path="res://resources/effects/KnockbackOnAttackEffect.tscn" id="3_kv0gt"]
+[ext_resource type="Script" uid="uid://fd5076f50ca0" path="res://scripts/actors/enemies/attacks/AttackEffectEntry.cs" id="1_pbs6n"]
+[ext_resource type="Script" uid="uid://bp6pwgoj44cuq" path="res://scripts/items/weapons/WeaponSkillDefinition.cs" id="1_weapon_skill"]
+[ext_resource type="Script" uid="uid://bv0es4osw3x0r" path="res://scripts/items/effects/ItemEffectEntry.cs" id="2_j53ud"]
+[ext_resource type="PackedScene" uid="uid://bioknm040r2lo" path="res://resources/effects/KnockbackOnAttackEffect.tscn" id="3_kv0gt"]
 
 [sub_resource type="Resource" id="Resource_6gfsk"]
 script = ExtResource("2_j53ud")
@@ -25,6 +25,7 @@ DashDamageMultiplier = 2.0
 ShowHitboxDebug = false
 Description = "空手近战攻击（默认武器技能）：普通攻击用 attack，冲刺攻击用专属动画 attack_runAttack。阶段时长/速度未配置（-1）时回退攻击模板默认值"
 DashEffects = Array[ExtResource("2_j53ud")]([SubResource("Resource_6gfsk")])
+DashAttackFallImmunities = 1
 WarmupDuration = 0.19
 ActiveDuration = 0.3
 RecoveryDuration = 0.18

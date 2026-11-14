@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=3 uid="uid://baq1ujdk2e22i"]
+[gd_scene load_steps=34 format=3 uid="uid://baq1ujdk2e22i"]
 
 [ext_resource type="Script" uid="uid://cra7y7mt0x1j8" path="res://scripts/managers/CameraZoneArea.cs" id="1_h2apx"]
 [ext_resource type="Script" uid="uid://cbui22isww64v" path="res://scripts/systems/cutscene/CutsceneTrigger.cs" id="2_s4dnd"]
@@ -12,7 +12,11 @@
 [ext_resource type="Texture2D" uid="uid://dan0dd2p76nuk" path="res://assets/environments/scene_6_hotel/龙门吊右滑槽.png" id="6_h2apx"]
 [ext_resource type="Texture2D" uid="uid://dxrn8y2or0pgc" path="res://assets/environments/scene_6_hotel/右墙壁.png" id="7_h2apx"]
 [ext_resource type="PackedScene" uid="uid://da4f3288xy4h5" path="res://scenes/environments/Pipe180.tscn" id="9_8f36w"]
-[ext_resource type="PackedScene" uid="uid://v6k338a22m4w" path="res://scenes/environments/FallRegionA.tscn" id="13_t41q2"]
+[ext_resource type="Texture2D" uid="uid://dpcp3yjik2nx0" path="res://assets/environments/scene_6_hotel/右墙壁纯色.png" id="13_7xcxc"]
+[ext_resource type="PackedScene" uid="uid://v6k338a22m4w" path="res://scenes/environments/FallRegion_F_c1.tscn" id="13_t41q2"]
+[ext_resource type="PackedScene" uid="uid://bkhpog7n64g7e" path="res://scenes/environments/BattleExitGate.tscn" id="overload_gate"]
+[ext_resource type="Script" uid="uid://de45v6bgrx2yc" path="res://scripts/managers/OverloadRoom.cs" id="overload_room"]
+[ext_resource type="Resource" uid="uid://ddpujdj0t2jbe" path="res://resources/cutscene/F_c1_2_intro.tres" id="part2_intro"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1mlw7"]
 size = Vector2(7030, 4070)
@@ -22,6 +26,12 @@ size = Vector2(7030, 4070)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1d5w0"]
 size = Vector2(5000, 2000)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_part2_trigger"]
+size = Vector2(2000, 500)
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_7xcxc"]
+load_path = "res://.godot/imported/右墙壁纯色.png-bedd51b764e9ff4dfe8610e0e63f9332.ctex"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_kj57q"]
 size = Vector2(500, 4000)
@@ -45,11 +55,48 @@ size = Vector2(800, 500)
 size = Vector2(8000, 500)
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_ka7vx"]
-vertices = PackedVector2Array(-4776.461, 1350, -4781.508, -677, -3658.9219, -677, -3646.7031, -652, 1916, 1350, -3595.4375, -677, -3531, -677, 767.72656, -602.1797, 788.96094, -639, 1916, -639, -2980.3828, -977, 118.53906, -977, -3531, -708.4297)
-polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3), PackedInt32Array(4, 0, 3, 5, 6, 7), PackedInt32Array(8, 9, 4, 7), PackedInt32Array(10, 11, 7, 6, 12)])
+vertices = PackedVector2Array(-3531, -708.4297, -2997, -968.8906, -2997, 1350, -3531, -677, -3595.4375, -677, -4776.461, 1350, -3646.7031, -652, -4781.508, -677, -3658.9219, -677, 767.72656, -602.1797, 788.96094, -639, 1916, -639, 1916, 1350, 113, 1350, 113, -977, 118.53906, -977)
+polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3), PackedInt32Array(4, 3, 2, 5, 6), PackedInt32Array(6, 5, 7, 8), PackedInt32Array(9, 10, 11, 12, 13), PackedInt32Array(9, 13, 14, 15)])
 outlines = Array[PackedVector2Array]([PackedVector2Array(-4863, -1275, 2093, -1319, 2102, 1505, -4856, 1532)])
 source_geometry_mode = 2
 agent_radius = 80.0
+
+[sub_resource type="Animation" id="Animation_lfpho"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:position:y")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0.0]
+}
+
+[sub_resource type="Animation" id="Animation_c1bnv"]
+resource_name = "up"
+length = 4.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:position:y")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1.5, 4.5),
+"transitions": PackedFloat32Array(2, 1, 1),
+"update": 0,
+"values": [0.0, 750.0, 6000.0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_aolv4"]
+_data = {
+&"RESET": SubResource("Animation_lfpho"),
+&"up": SubResource("Animation_c1bnv")
+}
 
 [node name="F_c1" type="Node2D"]
 y_sort_enabled = true
@@ -91,6 +138,21 @@ position = Vector2(50, 100)
 shape = SubResource("RectangleShape2D_5prnb")
 debug_color = Color(0, 1, 0, 0.41960785)
 
+[node name="OverloadRoom" type="Node2D" parent="." groups=["overload_room"]]
+script = ExtResource("overload_room")
+
+[node name="SweepLeft" type="Marker2D" parent="OverloadRoom"]
+position = Vector2(-3000, 0)
+
+[node name="LeftGate" parent="OverloadRoom" instance=ExtResource("overload_gate")]
+position = Vector2(-3413, 100)
+
+[node name="SweepRight" type="Marker2D" parent="OverloadRoom"]
+position = Vector2(2900, 0)
+
+[node name="FallRegion_F_c1" parent="." instance=ExtResource("13_t41q2")]
+position = Vector2(-108, 975)
+
 [node name="CutsceneTrigger" type="Area2D" parent="."]
 z_index = 10
 position = Vector2(-6750, 850)
@@ -98,10 +160,26 @@ collision_layer = 0
 collision_mask = 4
 script = ExtResource("2_s4dnd")
 Sequence = ExtResource("3_h2apx")
+StartsDisarmed = true
+ExecutionMode = 1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CutsceneTrigger"]
 shape = SubResource("RectangleShape2D_1d5w0")
 debug_color = Color(1, 0, 0, 0.41960785)
+
+[node name="CutsceneTrigger2" type="Area2D" parent="." groups=["f_boss_core_part2_defeated_cutscene"]]
+z_index = 10
+position = Vector2(-6750, 850)
+collision_layer = 0
+collision_mask = 4
+script = ExtResource("2_s4dnd")
+Sequence = ExtResource("part2_intro")
+ExecutionMode = 1
+StartsDisarmed = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CutsceneTrigger2"]
+shape = SubResource("RectangleShape2D_part2_trigger")
+debug_color = Color(1, 0, 1, 0.41960785)
 
 [node name="Environments" type="Node2D" parent="."]
 position = Vector2(0, 1060)
@@ -117,7 +195,7 @@ position = Vector2(0, 927)
 texture = ExtResource("5_7c6k6")
 
 [node name="BlackRect" type="Sprite2D" parent="Environments"]
-z_index = -9
+z_index = -3
 position = Vector2(0, 1100)
 rotation = -1.5707964
 scale = Vector2(3, 2)
@@ -163,6 +241,21 @@ texture = ExtResource("7_h2apx")
 position = Vector2(-605, -5)
 SpawnTag = "JarRight"
 
+[node name="LeftWall2" type="Sprite2D" parent="Environments"]
+modulate = Color(0.38928655, 0.38928664, 0.3892865, 1)
+z_index = -5
+position = Vector2(1385, 660)
+scale = Vector2(0.5, 1)
+texture = SubResource("CompressedTexture2D_7xcxc")
+
+[node name="RightWall" type="Sprite2D" parent="Environments"]
+modulate = Color(0.38928655, 0.38928664, 0.3892865, 1)
+z_index = -5
+position = Vector2(-1595, 660)
+scale = Vector2(0.5, 1)
+texture = ExtResource("13_7xcxc")
+flip_h = true
+
 [node name="AirWall" type="StaticBody2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
 z_index = 10
 
@@ -201,6 +294,7 @@ visible = false
 position = Vector2(1334, 710)
 navigation_polygon = SubResource("NavigationPolygon_ka7vx")
 
-[node name="FallRegionA" parent="." instance=ExtResource("13_t41q2")]
-z_index = 1
-position = Vector2(-108, 975)
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_aolv4")
+}

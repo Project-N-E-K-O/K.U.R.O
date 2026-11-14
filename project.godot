@@ -230,6 +230,7 @@ logging/enable_file_logging=true
 2d_physics/layer_18="FallActivation"
 2d_physics/layer_19="FallHazard"
 2d_physics/layer_20="FallSupport"
+2d_physics/layer_21="BattleExitGate"
 
 [navigation]
 

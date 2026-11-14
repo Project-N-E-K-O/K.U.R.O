@@ -36,6 +36,7 @@ DashDamageMultiplier = 0.8
 ShowHitboxDebug = false
 Description = "第三次攻击到敌人后击退敌人5 m，如果三次攻击都击中敌人则最后一击发生暴击"
 Effects = Array[ExtResource("1_rpm6u")]([SubResource("Resource_bk1ns"), SubResource("Resource_ni6ga")])
+DashAttackFallImmunities = 1
 WarmupDuration = 0.5
 ActiveDuration = 0.43
 RecoveryDuration = 0.4
