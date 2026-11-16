@@ -556,7 +556,7 @@ script = ExtResource("17_dead")
 [node name="EmpowerController" type="Node" parent="."]
 script = ExtResource("empower_ctrl")
 Duration = 0.0
-AttackIntervalMultiplier = 0.3
+AttackIntervalMultiplier = 0.15
 EffectScene = ExtResource("37_qvk6n")
 EffectAnchorPath = NodePath("VisualEffectPosition/VisualEffectMarker2D")
 EffectScale = Vector2(2, 2)

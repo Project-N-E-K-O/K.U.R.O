@@ -32,6 +32,8 @@ namespace Kuros.Systems.Cutscene
         /// 与 ElevatorController 行为一致，跨关卡切换时建议开启。
         /// </summary>
         [Export] public bool ClearWorldItemCache { get; set; } = true;
+        /// <summary>酒店入场：换场前云层盖满，由 StageSession 首层就绪后退场。</summary>
+        [Export] public bool UseCloudTransition { get; set; }
 
         public override async Task Execute(CutsceneContext ctx)
         {
@@ -51,6 +53,19 @@ namespace Kuros.Systems.Cutscene
 
             // 优先使用 TaxiController 预加载的场景（已在内存中，切换几乎瞬间）
             var preloaded = TaxiController.ConsumePreloadedScene();
+            Kuros.UI.CloudSceneTransition? cloud = null;
+            if (UseCloudTransition && (preloaded != null || !string.IsNullOrEmpty(ScenePath)))
+            {
+                string destination = preloaded?.ResourcePath ?? ScenePath;
+                if (destination.StartsWith("uid://"))
+                    destination = ResourceUid.GetIdPath(ResourceUid.TextToId(destination));
+                cloud = await Kuros.UI.CloudSceneTransition.CoverAsync(tree, destination);
+                if (!GodotObject.IsInstanceValid(ctx.Manager) || !ctx.Manager.IsInsideTree())
+                {
+                    if (GodotObject.IsInstanceValid(cloud)) cloud.QueueFree();
+                    return;
+                }
+            }
 
             if (ClearWorldItemCache)
             {
@@ -63,12 +78,12 @@ namespace Kuros.Systems.Cutscene
             if (preloaded != null)
             {
                 GD.Print($"[Cutscene] ChangeSceneStep: 使用预加载场景切换 {preloaded.ResourcePath}");
-                tree.ChangeSceneToPacked(preloaded);
+                if (tree.ChangeSceneToPacked(preloaded) != Error.Ok) cloud?.QueueFree();
             }
             else if (!string.IsNullOrEmpty(ScenePath))
             {
                 GD.Print($"[Cutscene] ChangeSceneStep: 切换到路径 {ScenePath}");
-                tree.ChangeSceneToFile(ScenePath);
+                if (tree.ChangeSceneToFile(ScenePath) != Error.Ok) cloud?.QueueFree();
             }
             else
             {

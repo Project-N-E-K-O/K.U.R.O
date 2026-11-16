@@ -52,7 +52,7 @@ Speed = 600.0
 [node name="Camera2D" type="Camera2D" parent="World" node_paths=PackedStringArray("Target")]
 scale = Vector2(0.32999998, 0.32999998)
 ignore_rotation = false
-zoom = Vector2(0.43, 0.43)
+zoom = Vector2(0.65, 0.65)
 position_smoothing_enabled = true
 rotation_smoothing_enabled = true
 drag_horizontal_enabled = true

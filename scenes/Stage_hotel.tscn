@@ -48,7 +48,7 @@ Catalog = ExtResource("hotel_rooms")
 [node name="StageSession" type="Node" parent="."]
 script = ExtResource("16_sess")
 AllConfigs = Array[ExtResource("17_scfg")]([ExtResource("hotel_lobby"), ExtResource("8_83iw7"), ExtResource("9_5g8wj"), ExtResource("10_axi2i"), ExtResource("11_i2bjf"), ExtResource("12_axi2i"), ExtResource("13_i2bjf"), ExtResource("13_ohqcc"), ExtResource("14_i2bjf")])
-StartStage = ExtResource("11_i2bjf")
+StartStage = ExtResource("hotel_lobby")
 Difficulty = ExtResource("18_diff")
 
 [node name="BuildSelectionManager" parent="." instance=ExtResource("14_pvxkr")]
@@ -100,3 +100,26 @@ offset_top = 930.0
 offset_right = 1920.0
 offset_bottom = 1080.0
 color = Color(0, 0, 0, 1)
+
+[node name="InitialLoadingCover" type="CanvasLayer" parent="."]
+layer = 129
+
+[node name="Background" type="ColorRect" parent="InitialLoadingCover"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
+[node name="Message" type="Label" parent="InitialLoadingCover"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+text = "加载中…"
+horizontal_alignment = 1
+vertical_alignment = 1

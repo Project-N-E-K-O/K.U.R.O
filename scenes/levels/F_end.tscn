@@ -230,7 +230,7 @@ script = ExtResource("1_6jipc")
 Phases = Array[ExtResource("2_3qogf")]([SubResource("Resource_rqd1e")])
 
 [node name="PlayerSpawnPoint" type="Node2D" parent="."]
-position = Vector2(-240, 300)
+position = Vector2(240, 300)
 
 [node name="AreaSize" type="Area2D" parent="."]
 visible = false

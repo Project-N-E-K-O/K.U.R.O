@@ -123,19 +123,11 @@ WaitForCompletion:  false                               ← false=异步（后�
 ```
 类型: PlayAnimationStep
 AnimationPlayerPath: "../BBegin/Taxi/AnimationPlayer"   ← 相对于 CutsceneManager（BBegin 是 StageGeneratorManager 实例化后挂载的房间根节点名）
-AnimationName:       "taxi_intro"
+AnimationName:       "taxi_enter"
 WaitForCompletion:   true   ← true = 等动画播完再继续下一步
 ```
 
-> **注意（Taxi 特殊情况）**：`Moving_A1_taxi.tscn` 已设置 `autoplay = "taxi_intro"`，
-> 场景加载后动画会**自动播放**，`TaxiController` 也会在播完后自动切换到 `taxi_idle`。
-> 因此针对 Taxi 过场，**不需要 PlayAnimationStep**，直接用 `WaitStep` 等待其动画时长（约 6 秒）即可：
->
-> ```
-> WaitStep  Duration: 6.0   ← 与 taxi_intro 动画时长一致
-> ```
->
-> `PlayAnimationStep` 适用于**不自动播放、需要由过场系统主动触发**的动画节点。
+> **Taxi 动画**：统一使用 `Animation_taxi.tscn`。场景默认隐藏，由 `PlayAnimationStep` 播放 `taxi_enter`，随后播放 `taxi_idle`；呼叫时由 `TaxiController` 播放 `taxi_enter`，离场播放 `taxi_leave`。AnimationPlayer 不自动播放入场动画。
 
 #### FadeStep（淡出）
 ```
@@ -175,7 +167,7 @@ Steps:
   [0] FadeStep           TargetAlpha=1.0, Duration=0.0   ← 初始全黑
   [1] FadeStep           TargetAlpha=0.0, Duration=0.5   ← 淡入场景（Taxi autoplay 已自动开始播放）
   [2] CameraMoveStep     TargetPath="../BBegin/Taxi", Duration=1.5  ← 镜头跟随 Taxi
-  [3] WaitStep           Duration=6.0                    ← 等待 taxi_intro 播完（约 6 秒）
+  [3] WaitStep           Duration=6.0                    ← 等待 taxi_enter 播完（约 6 秒）
   [4] DialogueStep       Lines=[{Speaker:"???", Text:"今晚有点不对劲……"}]
   [5] CameraMoveStep     TargetPath="../World/MainCharacter", Duration=1.0
   [6] WaitStep           Duration=0.3

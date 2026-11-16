@@ -22,6 +22,23 @@ public partial class RailChaseMovement : EnemyChaseMovement
 	/// 供"自己驱动位移"的技能使用（如 rogueAI 大招的蓄力/冲刺）；用完**必须复位**，否则永远不再追击。</summary>
 	public bool ExternalDrive { get; set; }
 
+	private Node? _limitOwner;
+	private float _limitMin;
+	private float _limitMax;
+
+	/// <summary>攻击期间的世界坐标限位，与轨道行程取交集，不修改轨道本身。</summary>
+	public void SetTemporaryLimits(Node owner, float start, float end)
+	{
+		_limitOwner = owner;
+		_limitMin = Mathf.Min(start, end);
+		_limitMax = Mathf.Max(start, end);
+	}
+
+	public void ClearTemporaryLimits(Node owner)
+	{
+		if (_limitOwner == owner) _limitOwner = null;
+	}
+
 	public override void _Ready()
 	{
 		base._Ready();
@@ -90,10 +107,21 @@ public partial class RailChaseMovement : EnemyChaseMovement
 
 		// 机械轴向：区间用排序后的 Lo/Hi（不能拿 Near/Far 当上下界）
 		var pos = Enemy.GlobalPosition;
+		float min = _rail.CarriageLo;
+		float max = _rail.CarriageHi;
+		if (_limitOwner != null)
+		{
+			if (!IsInstanceValid(_limitOwner) || _limitOwner.IsQueuedForDeletion()) _limitOwner = null;
+			else
+			{
+				min = Mathf.Clamp(_limitMin, min, max);
+				max = Mathf.Clamp(_limitMax, min, max);
+			}
+		}
 		if (_rail.CarriageAxis == SlideRailMount.RailAxis.X)
-			pos.X = Mathf.Clamp(pos.X, _rail.CarriageLo, _rail.CarriageHi);
+			pos.X = Mathf.Clamp(pos.X, min, max);
 		else
-			pos.Y = Mathf.Clamp(pos.Y, _rail.CarriageLo, _rail.CarriageHi);
+			pos.Y = Mathf.Clamp(pos.Y, min, max);
 		Enemy.GlobalPosition = pos;
 	}
 }

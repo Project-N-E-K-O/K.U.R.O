@@ -24,7 +24,7 @@ metadata/_custom_type_script = "uid://b4pd4ynf4k04p"
 [sub_resource type="Resource" id="Resource_a6q5w"]
 script = ExtResource("4_7qph7")
 AnimationPlayerPath = NodePath("../World/BBegin/Taxi/AnimationPlayer")
-AnimationName = "taxi_intro"
+AnimationName = "taxi_enter"
 WaitForCompletion = true
 metadata/_custom_type_script = "uid://5xu2sir0yhv1"
 

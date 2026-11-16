@@ -9,6 +9,7 @@ namespace Kuros.Actors.Enemies.Attacks
 	///   · Charge（Warmup）：循环 attack_warming_up / attack_warming_down（动画控制器按 <see cref="Phase"/> +
 	///     形态选），沿轨道滑到随机选中的一端；
 	///     速度 = 该段距离 / <see cref="EnemyAttackTemplate.WarmupDuration"/>（蓄力结束刚好到位），可用 ChargeSpeed 覆盖。
+	///     房间模式：先从房外进入最近边界，再在房内边滑动边蓄力至较远端；入场时间不计入房内蓄力。
 	///   · Dash（Active）：循环 attack_up / attack_down（同上按形态），从该端横扫到另一端；
 	///     速度 = 两端距离 / <see cref="EnemyAttackTemplate.ActiveDuration"/>，可用 DashSpeed 覆盖。
 	///   · Settle（Recovery）：停在另一端，交给收招。
@@ -48,6 +49,7 @@ namespace Kuros.Actors.Enemies.Attacks
 		/// <summary>Active 段扫到另一端后**折返**回蓄力端（强化版 Pro：A→B→A）。</summary>
 		[Export] public bool ReturnOnActive { get; set; } = false;
 		[Export] public bool UseRoomSweep { get; set; }
+		/// <summary>仅用于从房外进入锁定房间；房内蓄力速度使用 ChargeSpeed。</summary>
 		[Export(PropertyHint.Range, "100,10000,100")] public float RoomApproachSpeed { get; set; } = 5000f;
 
 		/// <summary>当前阶段（动画控制器据此选循环动画）。</summary>
@@ -67,6 +69,10 @@ namespace Kuros.Actors.Enemies.Attacks
 		private bool _approaching;
 		private float _approachRemaining;
 		private float _roomChargeRemaining;
+		private float _roomEntry;
+		private float _roomChargeTimeout;
+		private bool _roomChargeStarted;
+		private bool _roomChargeComplete;
 
 		protected override void OnInitialized()
 		{
@@ -126,16 +132,21 @@ namespace Kuros.Actors.Enemies.Attacks
 				|| Player is not { } player || !room.TryLock(this, player)) return false;
 
 			_lockedRoom = room;
-			_roomStart = start;
-			_roomEnd = end;
-			_approaching = Mathf.Abs(RailCoordinate(Enemy.GlobalPosition) - start) > ArriveDeadzone;
-			_approachRemaining = Mathf.Abs(RailCoordinate(Enemy.GlobalPosition) - start) / Mathf.Max(RoomApproachSpeed, 100f) + 2f;
+			// FindRoomRoute 的 start 是最近端。向较远端蓄力，避免房外入场后原地等待。
+			_roomStart = end;
+			_roomEnd = start;
+			float current = RailCoordinate(Enemy.GlobalPosition);
+			_roomEntry = Mathf.Clamp(current, Mathf.Min(start, end), Mathf.Max(start, end));
+			_approaching = !Mathf.IsEqualApprox(current, _roomEntry);
+			_approachRemaining = Mathf.Abs(current - _roomEntry) / Mathf.Max(RoomApproachSpeed, 100f) + 2f;
 			_roomChargeRemaining = WarmupDuration;
+			_roomChargeStarted = false;
+			_roomChargeComplete = false;
 			return true;
 		}
 
 		protected override bool ShouldHoldWarmupPhase()
-			=> _lockedRoom != null && (_approaching || _roomChargeRemaining > 0f);
+			=> _lockedRoom != null && !_roomChargeComplete;
 
 		protected override void OnAttackEffectSpawned(Node2D effect, AttackEffectEntry? entry)
 		{
@@ -195,6 +206,7 @@ namespace Kuros.Actors.Enemies.Attacks
 		{
 			Phase = UltPhase.None;
 			SetExternalDrive(false);
+			ReleaseRoom();
 		}
 
 		public override void _PhysicsProcess(double delta)
@@ -217,7 +229,7 @@ namespace Kuros.Actors.Enemies.Attacks
 
 			if (Phase == UltPhase.Charge && _lockedRoom != null)
 			{
-				float remaining = _roomStart - RailCoordinate(Enemy.GlobalPosition);
+				float remaining = _roomEntry - RailCoordinate(Enemy.GlobalPosition);
 				if (_approaching && Mathf.Abs(remaining) > ArriveDeadzone)
 				{
 					_approachRemaining -= (float)delta;
@@ -231,8 +243,28 @@ namespace Kuros.Actors.Enemies.Attacks
 					return;
 				}
 				_approaching = false;
+				if (!_roomChargeStarted)
+				{
+					_roomChargeStarted = true;
+					// 入场后才启用限位，避免把房外的 Boss 瞬移进房间。
+					_drive?.SetTemporaryLimits(this, _roomStart, _roomEnd);
+					float travel = Mathf.Abs(_roomStart - RailCoordinate(Enemy.GlobalPosition));
+					_chargeSpeed = ChargeSpeed > 0f ? ChargeSpeed
+						: Mathf.Max(50f, travel / Mathf.Max(0.05f, WarmupDuration));
+					_roomChargeTimeout = Mathf.Max(WarmupDuration, travel / _chargeSpeed) + 2f;
+				}
 				_roomChargeRemaining -= (float)delta;
-				Enemy.Velocity = Vector2.Zero;
+				_roomChargeTimeout -= (float)delta;
+				float distanceToCharge = _roomStart - RailCoordinate(Enemy.GlobalPosition);
+				bool arrived = Mathf.Abs(distanceToCharge) <= ArriveDeadzone;
+				_roomChargeComplete = arrived && _roomChargeRemaining <= 0f;
+				if (!_roomChargeComplete && _roomChargeTimeout <= 0f)
+				{
+					AbortRoomSweep();
+					return;
+				}
+				Enemy.Velocity = arrived ? Vector2.Zero : DirectionAlongRail(distanceToCharge)
+					* Mathf.Min(_chargeSpeed, Mathf.Abs(distanceToCharge) / (float)delta);
 				return;
 			}
 
@@ -325,6 +357,7 @@ namespace Kuros.Actors.Enemies.Attacks
 
 		private void ReleaseRoom()
 		{
+			if (_drive != null && IsInstanceValid(_drive)) _drive.ClearTemporaryLimits(this);
 			if (_lockedRoom != null && IsInstanceValid(_lockedRoom)) _lockedRoom.Release(this);
 			_lockedRoom = null;
 		}

@@ -1,4 +1,4 @@
-[gd_scene load_steps=47 format=3 uid="uid://cnc8qhgt2qlco"]
+[gd_scene load_steps=51 format=3 uid="uid://cnc8qhgt2qlco"]
 
 [ext_resource type="Script" uid="uid://dmqu7phxi8gbi" path="res://scripts/managers/BattleArena.cs" id="1_kesvg"]
 [ext_resource type="Script" uid="uid://b3iq6dm2pc5y0" path="res://scripts/controllers/EnemySpawnManager.cs" id="2_py885"]
@@ -15,7 +15,6 @@
 [ext_resource type="PackedScene" uid="uid://cb4xinggegye7" path="res://scenes/environments/gate.tscn" id="13_d0c6g"]
 [ext_resource type="Script" uid="uid://ch3pldopfd7tr" path="res://scripts/effects/AreaSpriteFadeTrigger.cs" id="13_hjjd7"]
 [ext_resource type="PackedScene" uid="uid://dqrmlh3reek3f" path="res://scenes/items/Furniture_B_garbageCanA.tscn" id="14_n0h0p"]
-[ext_resource type="PackedScene" uid="uid://cgy13s0ewifos" path="res://scenes/environments/taxiSign.tscn" id="15_2etho"]
 [ext_resource type="PackedScene" uid="uid://bajoxcyk7pslj" path="res://scenes/items/Furniture_B_gate.tscn" id="15_av3q5"]
 [ext_resource type="PackedScene" uid="uid://ddi1sshkssyq" path="res://scenes/items/Furniture_B_cautionTape_side.tscn" id="15_d0c6g"]
 [ext_resource type="Script" uid="uid://cbui22isww64v" path="res://scripts/systems/cutscene/CutsceneTrigger.cs" id="15_o7u55"]
@@ -23,11 +22,14 @@
 [ext_resource type="Resource" uid="uid://dpxai5bvaoeto" path="res://resources/cutscene/B_begin_intro.tres" id="16_xf8xq"]
 [ext_resource type="PackedScene" uid="uid://bkbhucnxqiys2" path="res://scenes/items/Furniture_B_CounterB.tscn" id="17_xi57c"]
 [ext_resource type="PackedScene" uid="uid://0anrcfm2pnsd" path="res://scenes/items/Furniture_B_luggageCartA.tscn" id="18_hjjd7"]
+[ext_resource type="Texture2D" uid="uid://pmhcu661yxfl" path="res://assets/furnitures/hotel_scene2/TaxiSign.png" id="18_jmfwt"]
+[ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="19_bnleq"]
 [ext_resource type="PackedScene" uid="uid://1mc4twnj45va" path="res://scenes/items/Furniture_B_tableRoundB.tscn" id="19_o7u55"]
+[ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="20_8ntdb"]
 [ext_resource type="PackedScene" uid="uid://bkxqiwlgdq03s" path="res://scenes/items/Furniture_B_sofaA_fwd.tscn" id="20_xf8xq"]
 [ext_resource type="PackedScene" uid="uid://d02ytff0caglq" path="res://scenes/items/Furniture_B_sofaA_rwd.tscn" id="21_av3q5"]
 [ext_resource type="Script" uid="uid://cra7y7mt0x1j8" path="res://scripts/managers/CameraZoneArea.cs" id="22_camzone"]
-[ext_resource type="PackedScene" uid="uid://chway4etqkroy" path="res://scenes/objects/Moving_A1_taxi.tscn" id="26_xi57c"]
+[ext_resource type="PackedScene" uid="uid://csx671h6qdwci" path="res://scenes/objects/Animation_taxi.tscn" id="26_xi57c"]
 [ext_resource type="Resource" uid="uid://j5frdbob2k6q" path="res://resources/loot/Enemy_SpecialDrops.tres" id="29_1xaay"]
 [ext_resource type="PackedScene" uid="uid://bya6to34ex05t" path="res://scenes/actors/npc/Dialogic_Interaction.tscn" id="29_xf8xq"]
 [ext_resource type="PackedScene" uid="uid://bm5ryerrw6s32" path="res://resources/effects/EnemyDetectAttackEffect.tscn" id="30_av3q5"]
@@ -75,11 +77,19 @@ size = Vector2(1650, 1250)
 size = Vector2(1650, 700)
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_d0c6g"]
-vertices = PackedVector2Array(3769, 1340, 4050.1172, 1370, -1370, 1370, -483, 1355, 3409, 1340, -5039, -126, -3180, -144, -1428, -144, -1428, -11, -3180, 681, -1143, 1355, 3429, -562, 3473, -140, 2813, -140, 2805, -246, 2805, -706, 767, -79, 939, -79, 939, 634, 424, 634, 279, 437, 279, -3, 3769, 1060, 3409, 1060, 3473, 820, 4042.1094, -770, 2813, 820, 2601, 585, 2601, 125, 1453, 1147, 1599, 820, 1821, 585, 1599, -140, 1821, 125, 3789, -562, -1370, 819, -1143, 895, -504, 819, -483, 895, -3180, -530, -5039, -414, -3405, -530, -3180, -1370, -3180, -810, -3405, -810, -7270, -1370, -518, -11, -518, -182, 408, -182, -1252, -502, -1252, -251, -1370, -251, -1370, -770, 408, -502, 834, -770, 834, -562, 3789, -770, 3429, -770, 1194, -770, 2145, -706, 1194, -562, 2145, -246, 1453, -467, 1453, -140, 989, -467, 989, -339, 767, -339, 424, 1094, 834, 1094, 834, 1340, 1194, 1340, 1194, 1147, 1453, 820, -1414, 579, -1414, 681, -3180, 1090, -3405, 1090, -5369, -126, -3405, 1370, -7270, 1370, -5369, -414, -1081, -3, -1081, 437, -504, 579)
+vertices = PackedVector2Array(3769, 1340, 4050.1172, 1370, -1370, 1370, -483, 1355, 3409, 1340, -5059, -126, -3180, -144, -1428, -144, -1428, -16, -3180, 681, -1143, 1355, 3429, -562, 3473, -140, 2813, -140, 2805, -246, 2805, -706, 767, -79, 939, -79, 939, 634, 424, 634, 279, 437, 279, -3, 3769, 1060, 3409, 1060, 3473, 820, 4042.1094, -770, 2813, 820, 2601, 585, 2601, 125, 1453, 1147, 1599, 820, 1821, 585, 1599, -140, 1821, 125, 3789, -562, -1370, 814, -1143, 895, -504, 814, -483, 895, -3180, -530, -5059, -418, -3405, -530, -3180, -1370, -3180, -810, -3405, -810, -7270, -1370, -518, -16, -518, -182, 408, -182, -1252, -502, -1252, -256, -1370, -256, -1370, -770, 408, -502, 834, -770, 834, -562, 3789, -770, 3429, -770, 1194, -770, 2145, -706, 1194, -562, 2145, -246, 1453, -467, 1453, -140, 989, -467, 989, -339, 767, -339, 424, 1094, 834, 1094, 834, 1340, 1194, 1340, 1194, 1147, 1453, 820, -1414, 574, -1414, 681, -3180, 1090, -3405, 1090, -5351, -126, -3405, 1370, -7270, 1370, -5351, -418, -1081, -3, -1081, 437, -504, 574)
 polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3, 4), PackedInt32Array(5, 6, 7, 8, 9), PackedInt32Array(10, 3, 2), PackedInt32Array(11, 12, 13, 14, 15), PackedInt32Array(16, 17, 18, 19, 20, 21), PackedInt32Array(22, 23, 24, 25), PackedInt32Array(13, 26, 27, 28), PackedInt32Array(27, 26, 29, 30, 31), PackedInt32Array(31, 30, 32, 33), PackedInt32Array(26, 24, 23), PackedInt32Array(25, 1, 0, 22), PackedInt32Array(25, 24, 12, 34), PackedInt32Array(10, 2, 35, 36), PackedInt32Array(36, 35, 37, 38), PackedInt32Array(39, 6, 5, 40, 41), PackedInt32Array(42, 43, 44, 45), PackedInt32Array(46, 47, 48, 21), PackedInt32Array(49, 50, 51, 52), PackedInt32Array(53, 49, 52, 54, 55), PackedInt32Array(34, 56, 25), PackedInt32Array(11, 34, 12), PackedInt32Array(57, 11, 15), PackedInt32Array(58, 57, 15, 59), PackedInt32Array(60, 58, 59, 61, 62), PackedInt32Array(32, 63, 62, 61), PackedInt32Array(64, 65, 66, 55), PackedInt32Array(67, 68, 69, 3), PackedInt32Array(70, 71, 29, 4), PackedInt32Array(29, 72, 30), PackedInt32Array(73, 74, 9, 8), PackedInt32Array(5, 9, 75, 76, 77), PackedInt32Array(76, 78, 79, 77), PackedInt32Array(45, 44, 41, 40, 80), PackedInt32Array(79, 45, 80, 77), PackedInt32Array(61, 14, 13, 28, 33, 32), PackedInt32Array(48, 53, 55, 66), PackedInt32Array(66, 16, 21, 48), PackedInt32Array(60, 62, 64, 55), PackedInt32Array(46, 21, 81, 8), PackedInt32Array(73, 8, 81, 82), PackedInt32Array(83, 73, 82, 20), PackedInt32Array(37, 83, 20, 19, 67, 38), PackedInt32Array(3, 38, 67), PackedInt32Array(26, 23, 4, 29), PackedInt32Array(70, 4, 3), PackedInt32Array(3, 69, 70)])
 outlines = Array[PackedVector2Array]([PackedVector2Array(-7411, -1594, 4119, -1601, 4131, 1605, -7409, 1606)])
 source_geometry_mode = 2
 agent_radius = 80.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_8nsrn"]
+shader = ExtResource("19_bnleq")
+shader_parameter/softness = 0.5
+shader_parameter/alpha = 0.4
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_5qifj"]
+size = Vector2(400, 400)
 
 [node name="BBegin" type="Node2D"]
 y_sort_enabled = true
@@ -309,9 +319,29 @@ navigation_polygon = SubResource("NavigationPolygon_d0c6g")
 
 [node name="Taxi" parent="." instance=ExtResource("26_xi57c")]
 position = Vector2(-5800, -1300)
+SkipAnimation = "taxi_idle"
 
-[node name="TaxiSign" parent="." instance=ExtResource("15_2etho")]
+[node name="TaxiSign" type="Sprite2D" parent="."]
+z_index = 2
+y_sort_enabled = true
 position = Vector2(-5205, -272)
+scale = Vector2(0.33, 0.33)
+texture = ExtResource("18_jmfwt")
+offset = Vector2(0, -1000)
+
+[node name="Shadow" type="Sprite2D" parent="TaxiSign"]
+z_index = 1
+z_as_relative = false
+material = SubResource("ShaderMaterial_8nsrn")
+position = Vector2(-3, 40)
+scale = Vector2(9, 8)
+texture = ExtResource("20_8ntdb")
+offset = Vector2(0, 5)
+
+[node name="StaticBody2D" type="StaticBody2D" parent="TaxiSign" groups=["navigation_polygon_source_geometry_group"]]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TaxiSign/StaticBody2D"]
+shape = SubResource("RectangleShape2D_5qifj")
 
 [node name="columnsB1" parent="." instance=ExtResource("12_w425v")]
 position = Vector2(1209, -300)
