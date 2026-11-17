@@ -18,6 +18,7 @@ namespace Kuros.Systems.Cutscene
     [GlobalClass]
     public partial class ChangeSceneStep : CutsceneStep
     {
+        internal const string HomeTaxiReturnMeta = "home_taxi_return";
         /// <summary>场景切换必须执行，即使过场被 skip 也不跳过。</summary>
         public override bool ExecuteOnSkip => true;
 
@@ -34,6 +35,8 @@ namespace Kuros.Systems.Cutscene
         [Export] public bool ClearWorldItemCache { get; set; } = true;
         /// <summary>酒店入场：换场前云层盖满，由 StageSession 首层就绪后退场。</summary>
         [Export] public bool UseCloudTransition { get; set; }
+        /// <summary>由目标 Stage_home 消费的一次性返程请求。</summary>
+        [Export] public bool ReturnHomeByTaxi { get; set; }
 
         public override async Task Execute(CutsceneContext ctx)
         {
@@ -53,12 +56,15 @@ namespace Kuros.Systems.Cutscene
 
             // 优先使用 TaxiController 预加载的场景（已在内存中，切换几乎瞬间）
             var preloaded = TaxiController.ConsumePreloadedScene();
+            string configuredPath = ScenePath.StartsWith("uid://")
+                ? ResourceUid.GetIdPath(ResourceUid.TextToId(ScenePath))
+                : ScenePath;
+            if (ReturnHomeByTaxi && preloaded?.ResourcePath != configuredPath)
+                preloaded = null;
+            string destination = preloaded?.ResourcePath ?? configuredPath;
             Kuros.UI.CloudSceneTransition? cloud = null;
             if (UseCloudTransition && (preloaded != null || !string.IsNullOrEmpty(ScenePath)))
             {
-                string destination = preloaded?.ResourcePath ?? ScenePath;
-                if (destination.StartsWith("uid://"))
-                    destination = ResourceUid.GetIdPath(ResourceUid.TextToId(destination));
                 cloud = await Kuros.UI.CloudSceneTransition.CoverAsync(tree, destination);
                 if (!GodotObject.IsInstanceValid(ctx.Manager) || !ctx.Manager.IsInsideTree())
                 {
@@ -75,22 +81,29 @@ namespace Kuros.Systems.Cutscene
 
             DialogicUtils.CleanupPersistentState(ctx.Manager);
 
+            if (ReturnHomeByTaxi && !string.IsNullOrEmpty(destination))
+                tree.Root.SetMeta(HomeTaxiReturnMeta, destination);
+
+            Error error;
             if (preloaded != null)
             {
                 GD.Print($"[Cutscene] ChangeSceneStep: 使用预加载场景切换 {preloaded.ResourcePath}");
-                if (tree.ChangeSceneToPacked(preloaded) != Error.Ok) cloud?.QueueFree();
+                error = tree.ChangeSceneToPacked(preloaded);
             }
             else if (!string.IsNullOrEmpty(ScenePath))
             {
                 GD.Print($"[Cutscene] ChangeSceneStep: 切换到路径 {ScenePath}");
-                if (tree.ChangeSceneToFile(ScenePath) != Error.Ok) cloud?.QueueFree();
+                error = tree.ChangeSceneToFile(ScenePath);
             }
             else
             {
                 GD.PrintErr("[Cutscene] ChangeSceneStep: ScenePath 未设置，跳过");
+                error = Error.InvalidParameter;
             }
 
-            // 场景切换后当前场景树会被销毁，此处不再执行后续代码
+            if (error == Error.Ok) return;
+            if (ReturnHomeByTaxi) tree.Root.RemoveMeta(HomeTaxiReturnMeta);
+            cloud?.QueueFree();
         }
     }
 }

@@ -48,8 +48,9 @@ namespace Kuros.Systems.Stage
         /// <summary>留空时使用当前主题的所有可随机中间房。</summary>
         [Export] public string MiddleRoomRouteTag { get; set; } = "";
         [Export(PropertyHint.Range, "0,64,1")] public int MiddleRoomCount { get; set; }
-        [Export(PropertyHint.File, "*.tscn,*.scn")] public string BeginScenePath { get; set; } = "";
-        [Export(PropertyHint.File, "*.tscn,*.scn")] public string EndScenePath { get; set; } = "";
+        [Export] public Godot.Collections.Array<RoomTypeRule> MiddleRoomRules { get; set; } = new();
+        /// <summary>0 不限制连续相同类型的中间房数量。</summary>
+        [Export(PropertyHint.Range, "0,64,1")] public int MaxConsecutiveRoomType { get; set; }
 
         public string ArrivalName => string.IsNullOrWhiteSpace(DisplayName) ? StageId : DisplayName;
         public string DepartureLabel => string.IsNullOrWhiteSpace(ElevatorLabel) ? "？？？" : ElevatorLabel;

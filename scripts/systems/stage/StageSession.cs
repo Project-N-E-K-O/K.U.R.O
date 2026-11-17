@@ -48,6 +48,9 @@ namespace Kuros.Systems.Stage
         private readonly HashSet<StageConfig> _unlockedHiddenFloors = new();
         private StageConfig? _hiddenEntryStage;
         private bool _transitionInProgress;
+        private uint _routeRevision;
+        private readonly System.Collections.Generic.Dictionary<RoomType, int> _roomTypeMisses = new();
+        private StagePlan? _generatingPlan;
         private CanvasLayer? _initialLoadingCover;
 
         /// <summary>当前会话（同场景只有一个）。敌人生成时据此拿楼层系数；未就绪 = null。</summary>
@@ -148,8 +151,24 @@ namespace Kuros.Systems.Stage
         private StagePlan? GetCandidatePlan(StageConfig config)
         {
             if (!_candidatePlans.TryGetValue(config, out var plan))
-                _candidatePlans[config] = plan = _generator?.CreatePlan(config);
+                _candidatePlans[config] = plan = _generator?.CreatePlan(config, _routeRevision, _roomTypeMisses);
             return plan;
+        }
+
+        public bool RefreshRoute(int index)
+        {
+            if (_transitionInProgress || _generator == null || index < 0 || index >= _displayedPlans.Count)
+                return false;
+            var config = _displayedPlans[index].Config;
+            if (!GetOptions().Contains(config) || config.RouteMode != StageRouteMode.RandomMiddleRooms)
+                return false;
+            var replacement = _generator.CreatePlan(config, ++_routeRevision, _roomTypeMisses);
+            if (replacement == null) return false;
+            _pendingPlan = null;
+            _pendingLoad = null;
+            _candidatePlans[config] = replacement;
+            _displayedPlans[index] = replacement;
+            return true;
         }
 
         public IReadOnlyList<StagePlan> DisplayedPlans => _displayedPlans;
@@ -309,6 +328,7 @@ namespace Kuros.Systems.Stage
 
             _generator!.ClearWorldRemnants();
             Kuros.Items.World.WorldItemSpawner.ClearStageWorldItems(this);
+            _generatingPlan = plan;
             _generator.Regenerate(plan, rooms, landingPosition);
         }
 
@@ -369,6 +389,7 @@ namespace Kuros.Systems.Stage
 
         private void OnStageGenerationFailed()
         {
+            _generatingPlan = null;
             _transitionInProgress = false;
             ShowInitialLoadFailure();
         }
@@ -404,6 +425,7 @@ namespace Kuros.Systems.Stage
 
         private void OnStageGenerated()
         {
+            RecordRoomHistory();
             _transitionInProgress = false;
             if (_currentConfig is { } config && GetParent() is BattleSceneManager { AutoShowLevelName: true } manager)
                 manager.ShowLevelNamePopup(config.ArrivalName);
@@ -413,6 +435,34 @@ namespace Kuros.Systems.Stage
             if (camera != null && GodotObject.IsInstanceValid(camera))
                 camera.SnapToTarget();
             _ = RevealInitialStageAsync();
+        }
+
+        private void RecordRoomHistory()
+        {
+            var plan = _generatingPlan;
+            _generatingPlan = null;
+            if (plan == null || plan.Config.IsHiddenFloor
+                || plan.Config.RouteMode != StageRouteMode.RandomMiddleRooms) return;
+            var tracked = AllConfigs.Where(config => config != null)
+                .SelectMany(config => config.MiddleRoomRules)
+                .Where(rule => rule != null && rule.GuaranteeAfter > 0)
+                .Select(rule => rule.RoomType).Distinct();
+            foreach (var type in tracked)
+            {
+                if (plan.RoomTypes.Contains(type))
+                {
+                    _roomTypeMisses[type] = 0;
+                    continue;
+                }
+                bool eligible = _generator?.Catalog?.Rooms.Any(room => room != null
+                    && room.FloorTheme == plan.Config.FloorTheme && room.RoomType == type
+                    && !string.IsNullOrWhiteSpace(room.ScenePath)
+                    && (string.IsNullOrWhiteSpace(plan.Config.MiddleRoomRouteTag)
+                        || room.RouteTags.Contains(plan.Config.MiddleRoomRouteTag))) == true;
+                var rule = plan.Config.MiddleRoomRules.FirstOrDefault(item => item?.RoomType == type);
+                if (eligible && plan.Config.MiddleRoomCount > 0 && rule?.MaxCount != 0)
+                    _roomTypeMisses[type] = _roomTypeMisses.GetValueOrDefault(type) + 1;
+            }
         }
     }
 }

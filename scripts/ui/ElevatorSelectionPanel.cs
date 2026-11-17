@@ -18,6 +18,7 @@ public partial class ElevatorSelectionPanel : CanvasLayer
     private VBoxContainer _rows = null!;
     private int _selected;
     private PauseManager? _pauseOwner;
+    private Label _refreshStatus = null!;
 
     private sealed record Card(Button Button, TextureRect Background, TextureRect Arrow,
         TextureRect ThumbnailBacking, TextureRect Frame, Label Floor);
@@ -50,18 +51,37 @@ public partial class ElevatorSelectionPanel : CanvasLayer
         _scroll = new ScrollContainer
         {
             Position = new Vector2(27, 124),
-            Size = new Vector2(527, 491),
+            Size = new Vector2(527, 443),
             HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled
         };
         _panel.AddChild(_scroll);
         _rows = new VBoxContainer { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill };
         _rows.AddThemeConstantOverride("separation", 2);
         _scroll.AddChild(_rows);
+        var refresh = new Button
+        {
+            Text = "刷新选中路线", Position = new Vector2(34, 575), Size = new Vector2(180, 36)
+        };
+        _panel.AddChild(refresh);
+        _refreshStatus = Text(_panel, "", 225, 578, 325, 30, 16, new Color("#44434a"));
+        refresh.Pressed += () =>
+        {
+            var session = StageSession.Current;
+            int index = _selected;
+            if (session?.RefreshRoute(index) == true)
+            {
+                Open(session.DisplayedPlans);
+                Select(index);
+                _refreshStatus.Text = "路线已刷新";
+            }
+            else _refreshStatus.Text = "该路线无法刷新";
+        };
         Close();
     }
 
     public void Open(IReadOnlyList<StagePlan> plans)
     {
+        _refreshStatus.Text = "";
         foreach (Node child in _rows.GetChildren())
         {
             _rows.RemoveChild(child);

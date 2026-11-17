@@ -7,6 +7,7 @@ namespace Kuros.Systems.Stage
     {
         [Export] public string FloorTheme { get; set; } = "";
         [Export] public RoomType RoomType { get; set; }
+        [Export] public string ElevatorPreviewName { get; set; } = "";
         [Export] public Texture2D? ElevatorPreviewIcon { get; set; }
         [Export] public string[] RouteTags { get; set; } = System.Array.Empty<string>();
         [Export(PropertyHint.File, "*.tscn,*.scn")] public string ScenePath { get; set; } = "";

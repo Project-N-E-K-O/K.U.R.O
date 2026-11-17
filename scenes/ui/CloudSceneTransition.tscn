@@ -8,9 +8,10 @@ resource_local_to_scene = true
 shader = ExtResource("2")
 shader_parameter/progress = 0.0
 shader_parameter/departing = false
+shader_parameter/cloud_opacity = 1.0
 shader_parameter/layer_seed = 0.0
-shader_parameter/layer_offset = -0.5
-shader_parameter/radius = 0.25
+shader_parameter/layer_offset = -0.8000000044704
+shader_parameter/radius = 0.1
 shader_parameter/seed_drift = 9.99999955296
 shader_parameter/radius_breath = 0.1999999955296
 shader_parameter/cloud_color = Color(0.40784, 0.46667, 0.51765, 1)
@@ -21,9 +22,10 @@ resource_local_to_scene = true
 shader = ExtResource("2")
 shader_parameter/progress = 0.0
 shader_parameter/departing = false
+shader_parameter/cloud_opacity = 1.0
 shader_parameter/layer_seed = 0.47
-shader_parameter/layer_offset = -0.4000000022352
-shader_parameter/radius = 0.207
+shader_parameter/layer_offset = -0.75
+shader_parameter/radius = 0.125
 shader_parameter/seed_drift = -2.2352000073055933e-07
 shader_parameter/radius_breath = 0.0
 shader_parameter/cloud_color = Color(0.40784, 0.46667, 0.51765, 1)
@@ -34,9 +36,10 @@ resource_local_to_scene = true
 shader = ExtResource("2")
 shader_parameter/progress = 0.0
 shader_parameter/departing = false
+shader_parameter/cloud_opacity = 1.0
 shader_parameter/layer_seed = 0.84
-shader_parameter/layer_offset = -0.3000000044704
-shader_parameter/radius = 0.231
+shader_parameter/layer_offset = -0.6000000089408
+shader_parameter/radius = 0.15
 shader_parameter/seed_drift = -10.0
 shader_parameter/radius_breath = 0.0
 shader_parameter/cloud_color = Color(0.40784, 0.46667, 0.51765, 1)
@@ -47,9 +50,10 @@ resource_local_to_scene = true
 shader = ExtResource("2")
 shader_parameter/progress = 0.0
 shader_parameter/departing = false
+shader_parameter/cloud_opacity = 1.0
 shader_parameter/layer_seed = 0.22
-shader_parameter/layer_offset = -0.10000000894080002
-shader_parameter/radius = 0.202
+shader_parameter/layer_offset = -0.1500000189992
+shader_parameter/radius = 0.2
 shader_parameter/seed_drift = 9.99999955296
 shader_parameter/radius_breath = 0.1999999955296
 shader_parameter/cloud_color = Color(0.66667, 0.72549, 0.76078, 1)
@@ -60,9 +64,10 @@ resource_local_to_scene = true
 shader = ExtResource("2")
 shader_parameter/progress = 0.0
 shader_parameter/departing = false
+shader_parameter/cloud_opacity = 1.0
 shader_parameter/layer_seed = 0.69
-shader_parameter/layer_offset = -1.1176000014323506e-08
-shader_parameter/radius = 0.165
+shader_parameter/layer_offset = 0.0
+shader_parameter/radius = 0.225
 shader_parameter/seed_drift = -2.2352000073055933e-07
 shader_parameter/radius_breath = 0.0
 shader_parameter/cloud_color = Color(0.66667, 0.72549, 0.76078, 1)
@@ -73,9 +78,10 @@ resource_local_to_scene = true
 shader = ExtResource("2")
 shader_parameter/progress = 0.0
 shader_parameter/departing = false
+shader_parameter/cloud_opacity = 1.0
 shader_parameter/layer_seed = 0.39
-shader_parameter/layer_offset = 0.09999998658880005
-shader_parameter/radius = 0.183
+shader_parameter/layer_offset = 0.14999997429520007
+shader_parameter/radius = 0.25
 shader_parameter/seed_drift = -10.0
 shader_parameter/radius_breath = 0.0
 shader_parameter/cloud_color = Color(0.66667, 0.72549, 0.76078, 1)
@@ -86,9 +92,10 @@ resource_local_to_scene = true
 shader = ExtResource("2")
 shader_parameter/progress = 0.0
 shader_parameter/departing = false
+shader_parameter/cloud_opacity = 1.0
 shader_parameter/layer_seed = 0.78
-shader_parameter/layer_offset = 0.29999998211839995
-shader_parameter/radius = 0.163
+shader_parameter/layer_offset = 0.5
+shader_parameter/radius = 0.3
 shader_parameter/seed_drift = 9.99999955296
 shader_parameter/radius_breath = 0.1999999955296
 shader_parameter/cloud_color = Color(0.89804, 0.92157, 0.91765, 1)
@@ -99,9 +106,10 @@ resource_local_to_scene = true
 shader = ExtResource("2")
 shader_parameter/progress = 0.0
 shader_parameter/departing = false
+shader_parameter/cloud_opacity = 1.0
 shader_parameter/layer_seed = 0.31
-shader_parameter/layer_offset = 0.3999999798832
-shader_parameter/radius = 0.125
+shader_parameter/layer_offset = 0.75
+shader_parameter/radius = 0.4
 shader_parameter/seed_drift = -2.2352000073055933e-07
 shader_parameter/radius_breath = 0.0
 shader_parameter/cloud_color = Color(0.89804, 0.92157, 0.91765, 1)
@@ -112,9 +120,10 @@ resource_local_to_scene = true
 shader = ExtResource("2")
 shader_parameter/progress = 0.0
 shader_parameter/departing = false
+shader_parameter/cloud_opacity = 1.0
 shader_parameter/layer_seed = 0.56
-shader_parameter/layer_offset = 0.49999997764799997
-shader_parameter/radius = 0.147
+shader_parameter/layer_offset = 1.0
+shader_parameter/radius = 0.5
 shader_parameter/seed_drift = -10.0
 shader_parameter/radius_breath = 0.0
 shader_parameter/cloud_color = Color(0.89804, 0.92157, 0.91765, 1)
@@ -340,7 +349,11 @@ tracks/17/keys = {
 "values": [0.0]
 }
 tracks/18/type = "value"
+tracks/18/imported = false
+tracks/18/enabled = true
 tracks/18/path = NodePath("Back1:material:shader_parameter/cloud_opacity")
+tracks/18/interp = 1
+tracks/18/loop_wrap = true
 tracks/18/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
@@ -348,7 +361,11 @@ tracks/18/keys = {
 "values": [1.0]
 }
 tracks/19/type = "value"
+tracks/19/imported = false
+tracks/19/enabled = true
 tracks/19/path = NodePath("Back2:material:shader_parameter/cloud_opacity")
+tracks/19/interp = 1
+tracks/19/loop_wrap = true
 tracks/19/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
@@ -356,7 +373,11 @@ tracks/19/keys = {
 "values": [1.0]
 }
 tracks/20/type = "value"
+tracks/20/imported = false
+tracks/20/enabled = true
 tracks/20/path = NodePath("Back3:material:shader_parameter/cloud_opacity")
+tracks/20/interp = 1
+tracks/20/loop_wrap = true
 tracks/20/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
@@ -364,7 +385,11 @@ tracks/20/keys = {
 "values": [1.0]
 }
 tracks/21/type = "value"
+tracks/21/imported = false
+tracks/21/enabled = true
 tracks/21/path = NodePath("Middle1:material:shader_parameter/cloud_opacity")
+tracks/21/interp = 1
+tracks/21/loop_wrap = true
 tracks/21/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
@@ -372,7 +397,11 @@ tracks/21/keys = {
 "values": [1.0]
 }
 tracks/22/type = "value"
+tracks/22/imported = false
+tracks/22/enabled = true
 tracks/22/path = NodePath("Middle2:material:shader_parameter/cloud_opacity")
+tracks/22/interp = 1
+tracks/22/loop_wrap = true
 tracks/22/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
@@ -380,7 +409,11 @@ tracks/22/keys = {
 "values": [1.0]
 }
 tracks/23/type = "value"
+tracks/23/imported = false
+tracks/23/enabled = true
 tracks/23/path = NodePath("Middle3:material:shader_parameter/cloud_opacity")
+tracks/23/interp = 1
+tracks/23/loop_wrap = true
 tracks/23/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
@@ -388,7 +421,11 @@ tracks/23/keys = {
 "values": [1.0]
 }
 tracks/24/type = "value"
+tracks/24/imported = false
+tracks/24/enabled = true
 tracks/24/path = NodePath("Front1:material:shader_parameter/cloud_opacity")
+tracks/24/interp = 1
+tracks/24/loop_wrap = true
 tracks/24/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
@@ -396,7 +433,11 @@ tracks/24/keys = {
 "values": [1.0]
 }
 tracks/25/type = "value"
+tracks/25/imported = false
+tracks/25/enabled = true
 tracks/25/path = NodePath("Front2:material:shader_parameter/cloud_opacity")
+tracks/25/interp = 1
+tracks/25/loop_wrap = true
 tracks/25/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
@@ -404,7 +445,11 @@ tracks/25/keys = {
 "values": [1.0]
 }
 tracks/26/type = "value"
+tracks/26/imported = false
+tracks/26/enabled = true
 tracks/26/path = NodePath("Front3:material:shader_parameter/cloud_opacity")
+tracks/26/interp = 1
+tracks/26/loop_wrap = true
 tracks/26/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
@@ -632,7 +677,11 @@ tracks/17/keys = {
 "values": [0.0, 1.0]
 }
 tracks/18/type = "value"
+tracks/18/imported = false
+tracks/18/enabled = true
 tracks/18/path = NodePath("Back1:material:shader_parameter/cloud_opacity")
+tracks/18/interp = 1
+tracks/18/loop_wrap = true
 tracks/18/keys = {
 "times": PackedFloat32Array(0, 0.7, 2),
 "transitions": PackedFloat32Array(1, 1, 1),
@@ -640,7 +689,11 @@ tracks/18/keys = {
 "values": [0.0, 1.0, 1.0]
 }
 tracks/19/type = "value"
+tracks/19/imported = false
+tracks/19/enabled = true
 tracks/19/path = NodePath("Back2:material:shader_parameter/cloud_opacity")
+tracks/19/interp = 1
+tracks/19/loop_wrap = true
 tracks/19/keys = {
 "times": PackedFloat32Array(0, 0.7, 2),
 "transitions": PackedFloat32Array(1, 1, 1),
@@ -648,7 +701,11 @@ tracks/19/keys = {
 "values": [0.0, 1.0, 1.0]
 }
 tracks/20/type = "value"
+tracks/20/imported = false
+tracks/20/enabled = true
 tracks/20/path = NodePath("Back3:material:shader_parameter/cloud_opacity")
+tracks/20/interp = 1
+tracks/20/loop_wrap = true
 tracks/20/keys = {
 "times": PackedFloat32Array(0, 0.7, 2),
 "transitions": PackedFloat32Array(1, 1, 1),
@@ -656,7 +713,11 @@ tracks/20/keys = {
 "values": [0.0, 1.0, 1.0]
 }
 tracks/21/type = "value"
+tracks/21/imported = false
+tracks/21/enabled = true
 tracks/21/path = NodePath("Middle1:material:shader_parameter/cloud_opacity")
+tracks/21/interp = 1
+tracks/21/loop_wrap = true
 tracks/21/keys = {
 "times": PackedFloat32Array(0, 0.7, 2),
 "transitions": PackedFloat32Array(1, 1, 1),
@@ -664,7 +725,11 @@ tracks/21/keys = {
 "values": [0.0, 1.0, 1.0]
 }
 tracks/22/type = "value"
+tracks/22/imported = false
+tracks/22/enabled = true
 tracks/22/path = NodePath("Middle2:material:shader_parameter/cloud_opacity")
+tracks/22/interp = 1
+tracks/22/loop_wrap = true
 tracks/22/keys = {
 "times": PackedFloat32Array(0, 0.7, 2),
 "transitions": PackedFloat32Array(1, 1, 1),
@@ -672,7 +737,11 @@ tracks/22/keys = {
 "values": [0.0, 1.0, 1.0]
 }
 tracks/23/type = "value"
+tracks/23/imported = false
+tracks/23/enabled = true
 tracks/23/path = NodePath("Middle3:material:shader_parameter/cloud_opacity")
+tracks/23/interp = 1
+tracks/23/loop_wrap = true
 tracks/23/keys = {
 "times": PackedFloat32Array(0, 0.7, 2),
 "transitions": PackedFloat32Array(1, 1, 1),
@@ -680,7 +749,11 @@ tracks/23/keys = {
 "values": [0.0, 1.0, 1.0]
 }
 tracks/24/type = "value"
+tracks/24/imported = false
+tracks/24/enabled = true
 tracks/24/path = NodePath("Front1:material:shader_parameter/cloud_opacity")
+tracks/24/interp = 1
+tracks/24/loop_wrap = true
 tracks/24/keys = {
 "times": PackedFloat32Array(0, 0.7, 2),
 "transitions": PackedFloat32Array(1, 1, 1),
@@ -688,7 +761,11 @@ tracks/24/keys = {
 "values": [0.0, 1.0, 1.0]
 }
 tracks/25/type = "value"
+tracks/25/imported = false
+tracks/25/enabled = true
 tracks/25/path = NodePath("Front2:material:shader_parameter/cloud_opacity")
+tracks/25/interp = 1
+tracks/25/loop_wrap = true
 tracks/25/keys = {
 "times": PackedFloat32Array(0, 0.7, 2),
 "transitions": PackedFloat32Array(1, 1, 1),
@@ -696,7 +773,11 @@ tracks/25/keys = {
 "values": [0.0, 1.0, 1.0]
 }
 tracks/26/type = "value"
+tracks/26/imported = false
+tracks/26/enabled = true
 tracks/26/path = NodePath("Front3:material:shader_parameter/cloud_opacity")
+tracks/26/interp = 1
+tracks/26/loop_wrap = true
 tracks/26/keys = {
 "times": PackedFloat32Array(0, 0.7, 2),
 "transitions": PackedFloat32Array(1, 1, 1),
@@ -924,7 +1005,11 @@ tracks/17/keys = {
 "values": [0.0, 1.0]
 }
 tracks/18/type = "value"
+tracks/18/imported = false
+tracks/18/enabled = true
 tracks/18/path = NodePath("Back1:material:shader_parameter/cloud_opacity")
+tracks/18/interp = 1
+tracks/18/loop_wrap = true
 tracks/18/keys = {
 "times": PackedFloat32Array(0, 1.3, 2),
 "transitions": PackedFloat32Array(1, 1, 1),
@@ -932,7 +1017,11 @@ tracks/18/keys = {
 "values": [1.0, 1.0, 0.0]
 }
 tracks/19/type = "value"
+tracks/19/imported = false
+tracks/19/enabled = true
 tracks/19/path = NodePath("Back2:material:shader_parameter/cloud_opacity")
+tracks/19/interp = 1
+tracks/19/loop_wrap = true
 tracks/19/keys = {
 "times": PackedFloat32Array(0, 1.3, 2),
 "transitions": PackedFloat32Array(1, 1, 1),
@@ -940,7 +1029,11 @@ tracks/19/keys = {
 "values": [1.0, 1.0, 0.0]
 }
 tracks/20/type = "value"
+tracks/20/imported = false
+tracks/20/enabled = true
 tracks/20/path = NodePath("Back3:material:shader_parameter/cloud_opacity")
+tracks/20/interp = 1
+tracks/20/loop_wrap = true
 tracks/20/keys = {
 "times": PackedFloat32Array(0, 1.3, 2),
 "transitions": PackedFloat32Array(1, 1, 1),
@@ -948,7 +1041,11 @@ tracks/20/keys = {
 "values": [1.0, 1.0, 0.0]
 }
 tracks/21/type = "value"
+tracks/21/imported = false
+tracks/21/enabled = true
 tracks/21/path = NodePath("Middle1:material:shader_parameter/cloud_opacity")
+tracks/21/interp = 1
+tracks/21/loop_wrap = true
 tracks/21/keys = {
 "times": PackedFloat32Array(0, 1.3, 2),
 "transitions": PackedFloat32Array(1, 1, 1),
@@ -956,7 +1053,11 @@ tracks/21/keys = {
 "values": [1.0, 1.0, 0.0]
 }
 tracks/22/type = "value"
+tracks/22/imported = false
+tracks/22/enabled = true
 tracks/22/path = NodePath("Middle2:material:shader_parameter/cloud_opacity")
+tracks/22/interp = 1
+tracks/22/loop_wrap = true
 tracks/22/keys = {
 "times": PackedFloat32Array(0, 1.3, 2),
 "transitions": PackedFloat32Array(1, 1, 1),
@@ -964,7 +1065,11 @@ tracks/22/keys = {
 "values": [1.0, 1.0, 0.0]
 }
 tracks/23/type = "value"
+tracks/23/imported = false
+tracks/23/enabled = true
 tracks/23/path = NodePath("Middle3:material:shader_parameter/cloud_opacity")
+tracks/23/interp = 1
+tracks/23/loop_wrap = true
 tracks/23/keys = {
 "times": PackedFloat32Array(0, 1.3, 2),
 "transitions": PackedFloat32Array(1, 1, 1),
@@ -972,7 +1077,11 @@ tracks/23/keys = {
 "values": [1.0, 1.0, 0.0]
 }
 tracks/24/type = "value"
+tracks/24/imported = false
+tracks/24/enabled = true
 tracks/24/path = NodePath("Front1:material:shader_parameter/cloud_opacity")
+tracks/24/interp = 1
+tracks/24/loop_wrap = true
 tracks/24/keys = {
 "times": PackedFloat32Array(0, 1.3, 2),
 "transitions": PackedFloat32Array(1, 1, 1),
@@ -980,7 +1089,11 @@ tracks/24/keys = {
 "values": [1.0, 1.0, 0.0]
 }
 tracks/25/type = "value"
+tracks/25/imported = false
+tracks/25/enabled = true
 tracks/25/path = NodePath("Front2:material:shader_parameter/cloud_opacity")
+tracks/25/interp = 1
+tracks/25/loop_wrap = true
 tracks/25/keys = {
 "times": PackedFloat32Array(0, 1.3, 2),
 "transitions": PackedFloat32Array(1, 1, 1),
@@ -988,7 +1101,11 @@ tracks/25/keys = {
 "values": [1.0, 1.0, 0.0]
 }
 tracks/26/type = "value"
+tracks/26/imported = false
+tracks/26/enabled = true
 tracks/26/path = NodePath("Front3:material:shader_parameter/cloud_opacity")
+tracks/26/interp = 1
+tracks/26/loop_wrap = true
 tracks/26/keys = {
 "times": PackedFloat32Array(0, 1.3, 2),
 "transitions": PackedFloat32Array(1, 1, 1),

@@ -71,3 +71,19 @@ monitorable = false
 [node name="CollisionShape2D" type="CollisionShape2D" parent="InteractArea"]
 position = Vector2(2, -150)
 shape = SubResource("RectangleShape2D_ld8jn")
+
+[node name="HintLabel" type="Label" parent="."]
+visible = false
+z_index = 10
+z_as_relative = false
+offset_left = -230.0
+offset_top = -341.0
+offset_right = 230.0
+offset_bottom = -251.0
+theme_override_colors/font_color = Color(1, 1, 0.6, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 64
+text = "[{KEY}]"
+horizontal_alignment = 1

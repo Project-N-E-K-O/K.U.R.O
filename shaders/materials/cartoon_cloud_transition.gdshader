@@ -18,7 +18,8 @@ uniform float cloud_opacity : hint_range(0.0, 1.0) = 1.0;
 // 每层的随机种子：决定云弧相位与各格半径差异（同一层内稳定）
 uniform float layer_seed = 0.0;
 // 层与层的固定错位，占移动方向视口长度的比例，整个动画期间保持不变。
-uniform float layer_offset : hint_range(-0.5, 0.5, 0.005) = 0.0;
+// 有效范围 ±1（超出部分在下面 clamp 掉）；离屏余量已按 ±1 预留。
+uniform float layer_offset : hint_range(-1, 1, 0.005) = 0.0;
 // 单个云弧的半径（以屏幕高度为单位的 UV 尺度）
 uniform float radius = 0.16;
 // 云格网格随进度整体漂移的量：各层配不同值，转场时云会"流"起来
@@ -63,15 +64,16 @@ void fragment() {
     float inside;  
 
     // 各层共用运动基线，离屏余量容纳偏移和圆弧。
+    // padding 里的 1.0 = 为 layer_offset 的 ±1 预留的一个整视口。
     float arc_padding = max(0.35, radius * 1.2);
-    float offset = clamp(layer_offset, -0.5, 0.5);
+    float offset = clamp(layer_offset, -1.0, 1.0);
 
     if (departing) {
-        float padding = 0.5 + arc_padding;
+        float padding = 1.0 + arc_padding;
         edge = mix(1.0 + padding, -padding, progress) + scallop - offset;
         inside = edge - p.y;
     } else {
-        float padding = 0.5 * aspect + arc_padding;
+        float padding = 1.0 * aspect + arc_padding;
         edge = mix(aspect + padding, -padding, progress) - scallop + offset * aspect;
         inside = p.x - edge;
     }

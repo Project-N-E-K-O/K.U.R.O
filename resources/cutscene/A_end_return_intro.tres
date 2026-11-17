@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="CutsceneSequence" load_steps=8 format=3 uid="uid://bli0swpbyfktm"]
+
+[ext_resource type="Script" uid="uid://ctrko7add3r5h" path="res://scripts/systems/cutscene/CutsceneStep.cs" id="1_step"]
+[ext_resource type="Script" uid="uid://cgnajq1ykl2mn" path="res://scripts/systems/cutscene/CutsceneSequence.cs" id="2_sequence"]
+[ext_resource type="Script" uid="uid://1551srxqrxye" path="res://scripts/systems/cutscene/steps/MovePlayerStep.cs" id="3_move"]
+[ext_resource type="Script" uid="uid://5xu2sir0yhv1" path="res://scripts/systems/cutscene/steps/PlayAnimationStep.cs" id="4_anim"]
+
+[sub_resource type="Resource" id="MoveToLanding"]
+script = ExtResource("3_move")
+TargetPath = NodePath("../World/AEnd/ReturnSpawnPoint")
+Instant = true
+
+[sub_resource type="Resource" id="TaxiArrives"]
+script = ExtResource("4_anim")
+AnimationPlayerPath = NodePath("../World/AEnd/AnimationTaxi/AnimationPlayer")
+AnimationName = "taxi_enter"
+WaitForCompletion = true
+
+[sub_resource type="Resource" id="GetOff"]
+script = ExtResource("4_anim")
+AnimationPlayerPath = NodePath("../World/AEnd/ReturnCharacter/AnimationPlayer")
+AnimationName = "run_short"
+WaitForCompletion = true
+
+[resource]
+script = ExtResource("2_sequence")
+SequenceId = "A_end_return_intro"
+Steps = Array[ExtResource("1_step")]([SubResource("MoveToLanding"), SubResource("TaxiArrives"), SubResource("GetOff")])
+HideNodePaths = Array[NodePath]([NodePath("../World/P2")])

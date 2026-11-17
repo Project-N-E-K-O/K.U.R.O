@@ -14,6 +14,7 @@ namespace Kuros.Environments
         [ExportCategory("Paths")]
         [Export] public NodePath AnimationPlayerPath { get; set; } = new NodePath();
         [Export] public NodePath HintLabelPath { get; set; } = new NodePath();
+        [Export] public NodePath InteractionAreaPath { get; set; } = new NodePath();
 
         [ExportCategory("Animations")]
         [Export] public string EnterAnimName { get; set; } = "taxi_enter";
@@ -32,6 +33,7 @@ namespace Kuros.Environments
         private TaxiState        _state = TaxiState.Idle;
         private AnimationPlayer? _animPlayer;
         private Label?           _hintLabel;
+        private Area2D?          _interactionArea;
         private bool             _playerInRange;
         private bool             _sceneReady;
         private PackedScene?     _loadedScene;
@@ -53,8 +55,18 @@ namespace Kuros.Environments
             if (_animPlayer == null)
                 GD.PushWarning($"[TaxiController] AnimationPlayer not found: {AnimationPlayerPath}");
 
-            AreaEntered += OnAreaEntered;
-            AreaExited  += OnAreaExited;
+            _interactionArea = InteractionAreaPath.IsEmpty
+                ? this
+                : GetNodeOrNull<Area2D>(InteractionAreaPath);
+            if (_interactionArea != null)
+            {
+                _interactionArea.AreaEntered += OnAreaEntered;
+                _interactionArea.AreaExited  += OnAreaExited;
+            }
+            else
+            {
+                GD.PushWarning($"[TaxiController] 交互区域未找到：{InteractionAreaPath}");
+            }
 
             if (_animPlayer != null)
                 _animPlayer.AnimationFinished += OnAnimationFinished;
@@ -67,8 +79,11 @@ namespace Kuros.Environments
 
         public override void _ExitTree()
         {
-            AreaEntered -= OnAreaEntered;
-            AreaExited  -= OnAreaExited;
+            if (IsInstanceValid(_interactionArea))
+            {
+                _interactionArea!.AreaEntered -= OnAreaEntered;
+                _interactionArea.AreaExited  -= OnAreaExited;
+            }
 
             if (_animPlayer != null)
                 _animPlayer.AnimationFinished -= OnAnimationFinished;

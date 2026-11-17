@@ -1,35 +1,37 @@
-[gd_scene load_steps=28 format=3 uid="uid://cw0awm20hvura"]
+[gd_scene load_steps=30 format=3 uid="uid://cw0awm20hvura"]
 
-[ext_resource type="Script" uid="uid://cra7y7mt0x1j8" path="res://scripts/managers/CameraZoneArea.cs" id="1_lrw81"]
-[ext_resource type="Texture2D" uid="uid://behye8vdgemoq" path="res://assets/environments/scene_2_hotel/地板.png" id="6_ddqae"]
-[ext_resource type="Texture2D" uid="uid://dw2alagwosewh" path="res://assets/environments/scene_2_hotel/地毯.png" id="7_cqaus"]
-[ext_resource type="Texture2D" uid="uid://k45cthgn2dgq" path="res://assets/environments/scene_2_hotel/墙面.png" id="8_76ug7"]
-[ext_resource type="Texture2D" uid="uid://rpleid8er0tq" path="res://assets/environments/scene_2_hotel/去掉遮挡墙面的大门底图.png" id="10_vk5d7"]
-[ext_resource type="PackedScene" uid="uid://cb4xinggegye7" path="res://scenes/environments/gate.tscn" id="11_tfa3l"]
-[ext_resource type="PackedScene" uid="uid://b2lwpadux0htf" path="res://scenes/environments/elevatorGate_B_flip.tscn" id="11_ytoth"]
-[ext_resource type="Texture2D" uid="uid://dkgva412sqgj1" path="res://assets/environments/scene_2_hotel/酒店大门口墙前_翻转.png" id="12_lrw81"]
-[ext_resource type="Script" uid="uid://ch3pldopfd7tr" path="res://scripts/effects/AreaSpriteFadeTrigger.cs" id="13_negym"]
-[ext_resource type="PackedScene" uid="uid://csx671h6qdwci" path="res://scenes/objects/Animation_taxi.tscn" id="14_d566i"]
-[ext_resource type="Texture2D" uid="uid://dkpv0dxfg1rx7" path="res://assets/environments/scene_2_hotel/酒店大门口墙后.png" id="14_frm18"]
-[ext_resource type="Script" uid="uid://cbui22isww64v" path="res://scripts/systems/cutscene/CutsceneTrigger.cs" id="15_nnmu0"]
-[ext_resource type="Resource" uid="uid://dpxai5bvaoeto" path="res://resources/cutscene/B_begin_intro.tres" id="16_42e1b"]
-[ext_resource type="PackedScene" uid="uid://cgy13s0ewifos" path="res://scenes/environments/taxiSign.tscn" id="18_yx521"]
-[ext_resource type="PackedScene" uid="uid://bo6r21cbk3ftm" path="res://scenes/environments/columnsB.tscn" id="19_stldm"]
+[ext_resource type="Script" uid="uid://cra7y7mt0x1j8" path="res://scripts/managers/CameraZoneArea.cs" id="1_ydrrm"]
+[ext_resource type="Texture2D" uid="uid://rpleid8er0tq" path="res://assets/environments/scene_2_hotel/去掉遮挡墙面的大门底图.png" id="2_3k2gb"]
+[ext_resource type="Texture2D" uid="uid://behye8vdgemoq" path="res://assets/environments/scene_2_hotel/地板.png" id="3_ebuaw"]
+[ext_resource type="Texture2D" uid="uid://dw2alagwosewh" path="res://assets/environments/scene_2_hotel/地毯.png" id="4_s3o1o"]
+[ext_resource type="Texture2D" uid="uid://k45cthgn2dgq" path="res://assets/environments/scene_2_hotel/墙面.png" id="5_21x3k"]
+[ext_resource type="Texture2D" uid="uid://dkgva412sqgj1" path="res://assets/environments/scene_2_hotel/酒店大门口墙前_翻转.png" id="6_em0ba"]
+[ext_resource type="Script" uid="uid://ch3pldopfd7tr" path="res://scripts/effects/AreaSpriteFadeTrigger.cs" id="7_e4osw"]
+[ext_resource type="Texture2D" uid="uid://dkpv0dxfg1rx7" path="res://assets/environments/scene_2_hotel/酒店大门口墙后.png" id="8_1wm10"]
+[ext_resource type="PackedScene" uid="uid://b2lwpadux0htf" path="res://scenes/environments/elevatorGate_B_flip.tscn" id="9_fnnr0"]
+[ext_resource type="Script" uid="uid://cbui22isww64v" path="res://scripts/systems/cutscene/CutsceneTrigger.cs" id="10_nmvj6"]
+[ext_resource type="Resource" uid="uid://bpi00ydi2nluh" path="res://resources/cutscene/Z_begin_intro.tres" id="11_z_intro"]
+[ext_resource type="Script" uid="uid://1rvj0kv60p00" path="res://scripts/environments/TaxiController.cs" id="12_21x3k"]
+[ext_resource type="PackedScene" uid="uid://cgy13s0ewifos" path="res://scenes/environments/taxiSign.tscn" id="12_q7o53"]
+[ext_resource type="PackedScene" uid="uid://csx671h6qdwci" path="res://scenes/objects/Animation_taxi.tscn" id="13_ljuiv"]
+[ext_resource type="Resource" uid="uid://0n07cikwlpv8" path="res://resources/cutscene/Z_begin_2_intro.tres" id="13_s3o1o"]
+[ext_resource type="PackedScene" uid="uid://bo6r21cbk3ftm" path="res://scenes/environments/columnsB.tscn" id="14_ogskt"]
+[ext_resource type="PackedScene" uid="uid://dva26mfp5yohw" path="res://scenes/objects/Animation_character.tscn" id="15_z_character"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_d0c6g"]
 size = Vector2(11500, 3050)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_cam_bbegin"]
-size = Vector2(6000, 3050)
+size = Vector2(4610, 3050)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2etho"]
-size = Vector2(5500, 3050)
+size = Vector2(6100, 3050)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_7fi66"]
-size = Vector2(6132, 3200)
+size = Vector2(4170, 3050)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_av3q5"]
-size = Vector2(2000, 2000)
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_em0ba"]
+size = Vector2(1000, 1000)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_py885"]
 size = Vector2(6949, 700)
@@ -56,99 +58,103 @@ outlines = Array[PackedVector2Array]([PackedVector2Array(-7411, -1594, 4119, -16
 source_geometry_mode = 2
 agent_radius = 80.0
 
-[node name="BBegin" type="Node2D"]
+[node name="ZBegin" type="Node2D"]
 y_sort_enabled = true
 
+[node name="ArrivalAnimationStart" type="Marker2D" parent="."]
+position = Vector2(-3100, 718)
+
+[node name="TaxiBoardAnimationStart" type="Marker2D" parent="."]
+position = Vector2(5545, -140)
+
 [node name="PlayerSpawnPoint" type="Node2D" parent="."]
-position = Vector2(-5300, 200)
+position = Vector2(-2400, 718)
 
 [node name="AreaSize" type="Area2D" parent="."]
 visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AreaSize"]
 z_index = 10
+position = Vector2(-1600, 0)
 shape = SubResource("RectangleShape2D_d0c6g")
 debug_color = Color(0.6428762, 0.52304673, 0.06685588, 0.41960785)
 
 [node name="CameraZone" type="Area2D" parent="."]
-visible = false
 z_index = 10
 collision_layer = 0
 collision_mask = 4
-script = ExtResource("1_lrw81")
-ZoneName = "Room_Zone_B_Begin_1"
+script = ExtResource("1_ydrrm")
+ZoneName = "Room_Zone_Z_Begin_1"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CameraZone"]
+position = Vector2(-695, 0)
 shape = SubResource("RectangleShape2D_cam_bbegin")
-debug_color = Color(0, 1, 0, 0.41960785)
+debug_color = Color(0, 1, 0, 0.19607843)
 
 [node name="CameraZone2" type="Area2D" parent="."]
-visible = false
 z_index = 10
 position = Vector2(1300, 0)
 collision_layer = 0
 collision_mask = 4
-script = ExtResource("1_lrw81")
-ZoneName = "Room_Zone_B_Begin_2"
-NodesToCleanup = [NodePath("../Environments/Gate"), NodePath("")]
+script = ExtResource("1_ydrrm")
+ZoneName = "Room_Zone_Z_Begin_2"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CameraZone2"]
+position = Vector2(3700, 0)
 shape = SubResource("RectangleShape2D_2etho")
 debug_color = Color(0, 0.91764706, 0.1254902, 0.41960785)
 
 [node name="Environments" type="Node2D" parent="."]
 position = Vector2(0, 340)
 
+[node name="Floor" type="Sprite2D" parent="Environments"]
+texture = ExtResource("3_ebuaw")
+
+[node name="Carpet" type="Sprite2D" parent="Environments"]
+scale = Vector2(1.317, 1)
+texture = ExtResource("4_s3o1o")
+
+[node name="Wall" type="Sprite2D" parent="Environments"]
+position = Vector2(0, -1530)
+texture = ExtResource("5_21x3k")
+
+[node name="ElevatorGateB_filp" parent="Environments" instance=ExtResource("9_fnnr0")]
+position = Vector2(-2845, 205)
+
 [node name="GateFloor" type="Sprite2D" parent="Environments"]
-position = Vector2(5100, -350)
-rotation = 3.1415927
+position = Vector2(5112, -350)
+rotation = -3.1415925
 scale = Vector2(1, -1)
-texture = ExtResource("10_vk5d7")
+texture = ExtResource("2_3k2gb")
 
 [node name="GateFloor" type="Sprite2D" parent="Environments/GateFloor"]
 z_index = -1
 position = Vector2(-700, 323)
-texture = ExtResource("10_vk5d7")
+texture = ExtResource("2_3k2gb")
 
 [node name="GateFloor2" type="Sprite2D" parent="Environments/GateFloor"]
 z_index = -1
 position = Vector2(-761, -2721)
-texture = ExtResource("10_vk5d7")
-
-[node name="Floor" type="Sprite2D" parent="Environments"]
-texture = ExtResource("6_ddqae")
-
-[node name="Carpet" type="Sprite2D" parent="Environments"]
-scale = Vector2(1.317, 1)
-texture = ExtResource("7_cqaus")
-region_enabled = true
-region_rect = Rect2(0, 1, 4250, 854)
-
-[node name="Wall" type="Sprite2D" parent="Environments"]
-position = Vector2(0, -1540)
-texture = ExtResource("8_76ug7")
-
-[node name="Gate" parent="Environments" instance=ExtResource("11_tfa3l")]
-position = Vector2(1221, -3490)
+texture = ExtResource("2_3k2gb")
 
 [node name="FrontWall" type="Node2D" parent="Environments"]
-position = Vector2(2500, -348)
+position = Vector2(2471, -348)
 
 [node name="GateFrontWall" type="Sprite2D" parent="Environments/FrontWall"]
 z_index = 3
-texture = ExtResource("12_lrw81")
+texture = ExtResource("6_em0ba")
 region_enabled = true
 region_rect = Rect2(1, 0, 1689, 3059)
-script = ExtResource("13_negym")
+script = ExtResource("7_e4osw")
 TriggerAreaPath = NodePath("Area2D")
 TargetPath = NodePath(".")
-FadedAlpha = 0.95
+FadedAlpha = 0.9
 
 [node name="gatewall" type="Sprite2D" parent="Environments/FrontWall/GateFrontWall"]
 z_as_relative = false
 position = Vector2(568, -875)
 scale = Vector2(-1, 1)
-texture = ExtResource("14_frm18")
+texture = ExtResource("8_1wm10")
 region_enabled = true
 region_rect = Rect2(0, 0, 437, 1307)
 
@@ -156,23 +162,35 @@ region_rect = Rect2(0, 0, 437, 1307)
 collision_mask = 4
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Environments/FrontWall/GateFrontWall/Area2D"]
-position = Vector2(2676, 0)
+position = Vector2(-1680, 8)
 shape = SubResource("RectangleShape2D_7fi66")
 
-[node name="ElevatorGateB_filp" parent="Environments" instance=ExtResource("11_ytoth")]
-position = Vector2(-2840, 205)
-
 [node name="CutsceneTrigger" type="Area2D" parent="."]
+visible = false
 z_index = 10
-position = Vector2(4107, -4585)
+position = Vector2(-1897, 708)
 collision_layer = 0
 collision_mask = 4
-script = ExtResource("15_nnmu0")
-Sequence = ExtResource("16_42e1b")
+script = ExtResource("10_nmvj6")
+Sequence = ExtResource("11_z_intro")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CutsceneTrigger"]
-shape = SubResource("RectangleShape2D_av3q5")
+shape = SubResource("RectangleShape2D_em0ba")
 debug_color = Color(1, 0, 1, 0.41960785)
+
+[node name="CutsceneTrigger2" type="Area2D" parent="."]
+visible = false
+z_index = 10
+position = Vector2(7357, 1608)
+collision_layer = 0
+collision_mask = 4
+script = ExtResource("12_21x3k")
+NextStagePath = "res://scenes/Stage_home.tscn"
+Sequence = ExtResource("13_s3o1o")
+AnimationPlayerPath = NodePath("../Taxi/AnimationPlayer")
+HintLabelPath = NodePath("../TaxiSign/HintLabel")
+InteractionAreaPath = NodePath("../TaxiSign/InteractArea")
+BoardHintText = "[{KEY}] 返回"
 
 [node name="AirWall" type="StaticBody2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
 visible = false
@@ -212,14 +230,26 @@ debug_color = Color(0, 0, 0, 0.21568628)
 visible = false
 navigation_polygon = SubResource("NavigationPolygon_d0c6g")
 
-[node name="TaxiSign" parent="." instance=ExtResource("18_yx521")]
-position = Vector2(7027, 0)
+[node name="TaxiSign" parent="." instance=ExtResource("12_q7o53")]
+position = Vector2(5260, -410)
 
-[node name="Taxi" parent="." instance=ExtResource("14_d566i")]
-position = Vector2(6195, -118)
+[node name="Taxi" parent="." instance=ExtResource("13_ljuiv")]
+position = Vector2(5945, -1640)
 
-[node name="columnsB1" parent="." instance=ExtResource("19_stldm")]
-position = Vector2(1209, -300)
+[node name="AnimationCharacter" parent="." instance=ExtResource("15_z_character")]
+position = Vector2(5545, -140)
 
-[node name="columnsB2" parent="." instance=ExtResource("19_stldm")]
-position = Vector2(1209, 900)
+[node name="ArrivalAnimationCharacter" parent="." instance=ExtResource("15_z_character")]
+position = Vector2(-3100, 718)
+
+[node name="columnsB1" parent="." instance=ExtResource("14_ogskt")]
+position = Vector2(-800, -300)
+
+[node name="columnsB2" parent="." instance=ExtResource("14_ogskt")]
+position = Vector2(-800, 900)
+
+[node name="columnsB3" parent="." instance=ExtResource("14_ogskt")]
+position = Vector2(528, -300)
+
+[node name="columnsB4" parent="." instance=ExtResource("14_ogskt")]
+position = Vector2(528, 900)

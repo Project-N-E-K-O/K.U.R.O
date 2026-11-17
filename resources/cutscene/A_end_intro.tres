@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CutsceneSequence" load_steps=11 format=3 uid="uid://qsacvgs2q4fq"]
+[gd_resource type="Resource" script_class="CutsceneSequence" load_steps=12 format=3 uid="uid://qsacvgs2q4fq"]
 
 [ext_resource type="Script" uid="uid://ctrko7add3r5h" path="res://scripts/systems/cutscene/CutsceneStep.cs" id="1_hfoi8"]
 [ext_resource type="Script" uid="uid://cgnajq1ykl2mn" path="res://scripts/systems/cutscene/CutsceneSequence.cs" id="2_bob04"]
@@ -17,9 +17,17 @@ metadata/_custom_type_script = "uid://cjl1hjmndwvcg"
 script = ExtResource("3_hfoi8")
 TargetPath = NodePath("../World/AEnd/AnimationTaxi/TaxiPosition")
 TargetZoom = 0.38
+Duration = 3.0
 Ease = 0
-FollowDuration = 2.0
+FollowDuration = 4.0
 metadata/_custom_type_script = "uid://b4pd4ynf4k04p"
+
+[sub_resource type="Resource" id="Resource_hb1hi"]
+script = ExtResource("4_shld6")
+AnimationPlayerPath = NodePath("../World/AEnd/AnimationCharacter/AnimationPlayer")
+AnimationName = "run_normal"
+WaitForCompletion = true
+metadata/_custom_type_script = "uid://5xu2sir0yhv1"
 
 [sub_resource type="Resource" id="Resource_hfoi8"]
 script = ExtResource("4_shld6")
@@ -30,13 +38,13 @@ metadata/_custom_type_script = "uid://5xu2sir0yhv1"
 [sub_resource type="Resource" id="Resource_e8fuv"]
 script = ExtResource("5_nyepk")
 ScenePath = "uid://beup3s3dr4q8h"
-DelayBeforeChange = 2.5
+DelayBeforeChange = 2.75
 UseCloudTransition = true
 metadata/_custom_type_script = "uid://bomrc4guqwn7l"
 
 [resource]
 script = ExtResource("2_bob04")
 SequenceId = "A_end_intro"
-Steps = Array[ExtResource("1_hfoi8")]([SubResource("Resource_rfho0"), SubResource("Resource_nyepk"), SubResource("Resource_hfoi8"), SubResource("Resource_e8fuv")])
+Steps = Array[ExtResource("1_hfoi8")]([SubResource("Resource_rfho0"), SubResource("Resource_nyepk"), SubResource("Resource_hb1hi"), SubResource("Resource_hfoi8"), SubResource("Resource_e8fuv")])
 HideNodePaths = Array[NodePath]([NodePath("../World/P2")])
 TakeOverCamera = true

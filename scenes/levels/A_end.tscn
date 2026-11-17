@@ -11,15 +11,13 @@
 [ext_resource type="PackedScene" uid="uid://cgy13s0ewifos" path="res://scenes/environments/taxiSign.tscn" id="6_4di3j"]
 [ext_resource type="Script" uid="uid://1rvj0kv60p00" path="res://scripts/environments/TaxiController.cs" id="10_taxi"]
 [ext_resource type="PackedScene" uid="uid://csx671h6qdwci" path="res://scenes/objects/Animation_taxi.tscn" id="11_3uxt7"]
+[ext_resource type="PackedScene" uid="uid://dva26mfp5yohw" path="res://scenes/objects/Animation_character.tscn" id="11_245md"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_245md"]
 size = Vector2(10314, 3000)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_cn8a4"]
 size = Vector2(9640, 2826)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_3uxt7"]
-size = Vector2(300, 300)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4di3j"]
 size = Vector2(300, 1500)
@@ -75,12 +73,8 @@ script = ExtResource("10_taxi")
 NextStagePath = "uid://beup3s3dr4q8h"
 Sequence = ExtResource("3_ggdpc")
 AnimationPlayerPath = NodePath("../AnimationTaxi/AnimationPlayer")
-HintLabelPath = NodePath("../HintLabel")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="CutsceneTrigger"]
-z_index = 10
-shape = SubResource("RectangleShape2D_3uxt7")
-debug_color = Color(1, 0, 1, 0.41960785)
+HintLabelPath = NodePath("../TaxiSign/HintLabel")
+InteractionAreaPath = NodePath("../TaxiSign/InteractArea")
 
 [node name="Environments" type="Node2D" parent="."]
 
@@ -146,19 +140,15 @@ shape = SubResource("RectangleShape2D_xhmyt")
 [node name="TaxiSign" parent="." instance=ExtResource("6_4di3j")]
 position = Vector2(-2002, -728)
 
+[node name="AnimationCharacter" parent="." instance=ExtResource("11_245md")]
+position = Vector2(-2077, -454)
+
 [node name="AnimationTaxi" parent="." instance=ExtResource("11_3uxt7")]
 position = Vector2(-1466, -2080)
 
-[node name="HintLabel" type="Label" parent="."]
-z_index = 10
-offset_left = -2174.0
-offset_top = -1059.0
-offset_right = -1969.0
-offset_bottom = -971.0
-theme_override_colors/font_color = Color(1, 1, 0.6, 1)
-theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8)
-theme_override_constants/shadow_offset_x = 2
-theme_override_constants/shadow_offset_y = 2
-theme_override_font_sizes/font_size = 64
-text = "[{KEY}]"
-horizontal_alignment = 1
+[node name="ReturnCharacter" parent="." instance=ExtResource("11_245md")]
+position = Vector2(-1466, -580)
+scale = Vector2(-1, 1)
+
+[node name="ReturnSpawnPoint" type="Marker2D" parent="."]
+position = Vector2(-1866, -580)

@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://btqx0751t5bx4"]
+[gd_scene load_steps=14 format=3 uid="uid://btqx0751t5bx4"]
 
 [ext_resource type="Script" uid="uid://x1ic1ym4ykq8" path="res://scripts/scenes/BattleSceneManager.cs" id="1_givaq"]
 [ext_resource type="Script" uid="uid://b6qifqg0v8c6o" path="res://scripts/managers/CameraZoneManager.cs" id="2_tbvpk"]
@@ -10,6 +10,8 @@
 [ext_resource type="PackedScene" uid="uid://cgjrdwkemgrcy" path="res://scenes/actors/characters/P2.tscn" id="12_31t1p"]
 [ext_resource type="Resource" uid="uid://cfqfibxgsuw2y" path="res://resources/stages/hotel_room_catalog.tres" id="room_catalog"]
 [ext_resource type="Script" uid="uid://dim2ctx63qcxt" path="res://scripts/systems/stage/StageConfig.cs" id="stage_config"]
+[ext_resource type="Script" path="res://scripts/scenes/StageHomeArrivalController.cs" id="arrival"]
+[ext_resource type="Resource" path="res://resources/cutscene/A_end_return_intro.tres" id="return_sequence"]
 
 [sub_resource type="Resource" id="initial_route"]
 script = ExtResource("stage_config")
@@ -40,6 +42,10 @@ BattleSceneManagerPath = NodePath("..")
 script = ExtResource("4_l5arx")
 StandaloneStage = SubResource("initial_route")
 Catalog = ExtResource("room_catalog")
+
+[node name="ArrivalController" type="Node" parent="."]
+script = ExtResource("arrival")
+ReturnSequence = ExtResource("return_sequence")
 
 [node name="BuildSelectionManager" parent="." instance=ExtResource("8_r3qlf")]
 

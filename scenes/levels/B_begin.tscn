@@ -1,4 +1,4 @@
-[gd_scene load_steps=51 format=3 uid="uid://cnc8qhgt2qlco"]
+[gd_scene load_steps=52 format=3 uid="uid://cnc8qhgt2qlco"]
 
 [ext_resource type="Script" uid="uid://dmqu7phxi8gbi" path="res://scripts/managers/BattleArena.cs" id="1_kesvg"]
 [ext_resource type="Script" uid="uid://b3iq6dm2pc5y0" path="res://scripts/controllers/EnemySpawnManager.cs" id="2_py885"]
@@ -20,6 +20,7 @@
 [ext_resource type="Script" uid="uid://cbui22isww64v" path="res://scripts/systems/cutscene/CutsceneTrigger.cs" id="15_o7u55"]
 [ext_resource type="Texture2D" uid="uid://dkpv0dxfg1rx7" path="res://assets/environments/scene_2_hotel/酒店大门口墙后.png" id="15_xf8xq"]
 [ext_resource type="Resource" uid="uid://dpxai5bvaoeto" path="res://resources/cutscene/B_begin_intro.tres" id="16_xf8xq"]
+[ext_resource type="PackedScene" uid="uid://dva26mfp5yohw" path="res://scenes/objects/Animation_character.tscn" id="17_jmfwt"]
 [ext_resource type="PackedScene" uid="uid://bkbhucnxqiys2" path="res://scenes/items/Furniture_B_CounterB.tscn" id="17_xi57c"]
 [ext_resource type="PackedScene" uid="uid://0anrcfm2pnsd" path="res://scenes/items/Furniture_B_luggageCartA.tscn" id="18_hjjd7"]
 [ext_resource type="Texture2D" uid="uid://pmhcu661yxfl" path="res://assets/furnitures/hotel_scene2/TaxiSign.png" id="18_jmfwt"]
@@ -107,7 +108,6 @@ shape = SubResource("RectangleShape2D_d0c6g")
 debug_color = Color(0.6428762, 0.52304673, 0.06685588, 0.41960785)
 
 [node name="CameraZone" type="Area2D" parent="."]
-visible = false
 z_index = 10
 collision_layer = 0
 collision_mask = 4
@@ -120,20 +120,20 @@ shape = SubResource("RectangleShape2D_cam_bbegin")
 debug_color = Color(0, 1, 0, 0.41960785)
 
 [node name="CameraZone2" type="Area2D" parent="."]
-visible = false
 z_index = 10
 position = Vector2(1300, 0)
 collision_layer = 0
 collision_mask = 4
 script = ExtResource("22_camzone")
 ZoneName = "Room_Zone_B_Begin_2"
-NodesToCleanup = [NodePath("../Environments/Gate"), NodePath("../Taxi")]
+NodesToCleanup = [NodePath("../AnimationTaxi")]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CameraZone2"]
 shape = SubResource("RectangleShape2D_2etho")
 debug_color = Color(0, 0.91764706, 0.1254902, 0.41960785)
 
 [node name="BattleArena1" type="Area2D" parent="."]
+visible = false
 z_index = 10
 position = Vector2(-5100, 0)
 script = ExtResource("1_kesvg")
@@ -315,9 +315,13 @@ shape = SubResource("RectangleShape2D_ad0tl")
 debug_color = Color(0, 0, 0, 0.21568628)
 
 [node name="NavigationRegion2D" type="NavigationRegion2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
+visible = false
 navigation_polygon = SubResource("NavigationPolygon_d0c6g")
 
-[node name="Taxi" parent="." instance=ExtResource("26_xi57c")]
+[node name="AnimationCharacter" parent="." instance=ExtResource("17_jmfwt")]
+position = Vector2(-5700, 200)
+
+[node name="AnimationTaxi" parent="." instance=ExtResource("26_xi57c")]
 position = Vector2(-5800, -1300)
 SkipAnimation = "taxi_idle"
 
