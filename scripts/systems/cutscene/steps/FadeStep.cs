@@ -14,8 +14,7 @@ namespace Kuros.Systems.Cutscene
     /// - BottomBlackBarPath：指向下方黑色 ColorRect
     /// 
     /// 动画行为：
-    /// - TargetAlpha >= 0.5（淡出/黑条进入）：黑条返回初始位置
-    /// - TargetAlpha < 0.5（淡入/黑条消失）：黑条向外移动
+    /// - 电影模式：黑条移入、保持 Duration 秒、移出并隐藏
     /// </summary>
     [GlobalClass]
     public partial class FadeStep : CutsceneStep
@@ -23,7 +22,7 @@ namespace Kuros.Systems.Cutscene
         [Export] public float TargetAlpha { get; set; } = 0f;
 
         /// <summary>
-        /// 延迟时长（秒）：等待多久后才开始转变
+        /// 透明度模式的等待时间，或电影模式的黑条保持时间（秒）。
         /// </summary>
         [Export] public float Duration { get; set; } = 0f;
 
@@ -153,11 +152,15 @@ namespace Kuros.Systems.Cutscene
             topRect.Position    = new Vector2(topRect.Position.X, topOutsideY);
             bottomRect.Position = new Vector2(bottomRect.Position.X, bottomOutsideY);
 
-            if (ctx.IsSkipping)
+            if (ctx.IsSkipping || ctx.IsCancelled)
             {
-                GD.Print("[Cutscene] MovieBlackBars skip立即结束（黑条保持隐藏）");
+                topRect.Hide();
+                bottomRect.Hide();
                 return;
             }
+
+            topRect.Show();
+            bottomRect.Show();
 
             if (!WaitForCompletion)
             {
@@ -174,61 +177,40 @@ namespace Kuros.Systems.Cutscene
         /// <summary>
         /// 执行完整的移入→保持→移出三段动画。
         /// </summary>
-        private async System.Threading.Tasks.Task RunMovieBlackBarsAsync(
+        private static async Task RunMovieBlackBarsAsync(
             CutsceneContext ctx,
             Control topRect, Control bottomRect,
             float topInsideY, float topOutsideY,
             float bottomInsideY, float bottomOutsideY,
             float transTime, float holdTime)
         {
-            // ── Phase 1: 从屏幕外向内移入 ────────────────────────
-            var tweenIn = ctx.Tree.CreateTween();
-            tweenIn.TweenProperty(topRect, "position:y", topInsideY, transTime);
-            tweenIn.Parallel().TweenProperty(bottomRect, "position:y", bottomInsideY, transTime);
-
-            while (!ctx.IsSkipping && tweenIn.IsRunning())
-                await ctx.NextFrame();
-
-            if (ctx.IsSkipping)
+            Tween? tween = null;
+            try
             {
-                tweenIn.Kill();
-                topRect.Position    = new Vector2(topRect.Position.X, topOutsideY);
-                bottomRect.Position = new Vector2(bottomRect.Position.X, bottomOutsideY);
-                GD.Print("[Cutscene] MovieBlackBars skip at IN phase，黑条已隐藏");
-                return;
-            }
+                tween = topRect.CreateTween();
+                tween.TweenProperty(topRect, "position:y", topInsideY, transTime);
+                tween.Parallel().TweenProperty(bottomRect, "position:y", bottomInsideY, transTime);
+                while (!ctx.IsCancelled && !ctx.IsSkipping && tween.IsRunning()) await ctx.NextFrame();
 
-            // ── Phase 2: 保持 Duration 秒 ────────────────────────
-            if (holdTime > 0f)
-            {
-                ulong startMs = Godot.Time.GetTicksMsec();
-                ulong holdMs  = (ulong)(holdTime * 1000.0);
-                while (!ctx.IsSkipping && Godot.Time.GetTicksMsec() - startMs < holdMs)
+                ulong startMs = Time.GetTicksMsec();
+                ulong holdMs = (ulong)(holdTime * 1000.0);
+                while (!ctx.IsCancelled && !ctx.IsSkipping && Time.GetTicksMsec() - startMs < holdMs)
                     await ctx.NextFrame();
-            }
 
-            if (ctx.IsSkipping)
+                if (ctx.IsCancelled || ctx.IsSkipping
+                    || !GodotObject.IsInstanceValid(topRect) || !GodotObject.IsInstanceValid(bottomRect)) return;
+
+                tween = topRect.CreateTween();
+                tween.TweenProperty(topRect, "position:y", topOutsideY, transTime);
+                tween.Parallel().TweenProperty(bottomRect, "position:y", bottomOutsideY, transTime);
+                while (!ctx.IsCancelled && !ctx.IsSkipping && tween.IsRunning()) await ctx.NextFrame();
+            }
+            finally
             {
-                topRect.Position    = new Vector2(topRect.Position.X, topOutsideY);
-                bottomRect.Position = new Vector2(bottomRect.Position.X, bottomOutsideY);
-                GD.Print("[Cutscene] MovieBlackBars skip at HOLD phase，黑条已隐藏");
-                return;
+                if (tween?.IsRunning() == true) tween.Kill();
+                if (GodotObject.IsInstanceValid(topRect)) topRect.Hide();
+                if (GodotObject.IsInstanceValid(bottomRect)) bottomRect.Hide();
             }
-
-            // ── Phase 3: 从内向外移出 ────────────────────────────
-            var tweenOut = ctx.Tree.CreateTween();
-            tweenOut.TweenProperty(topRect, "position:y", topOutsideY, transTime);
-            tweenOut.Parallel().TweenProperty(bottomRect, "position:y", bottomOutsideY, transTime);
-
-            while (!ctx.IsSkipping && tweenOut.IsRunning())
-                await ctx.NextFrame();
-
-            if (ctx.IsSkipping)
-                tweenOut.Kill();
-
-            topRect.Position    = new Vector2(topRect.Position.X, topOutsideY);
-            bottomRect.Position = new Vector2(bottomRect.Position.X, bottomOutsideY);
-            GD.Print("[Cutscene] MovieBlackBars 完成（移入→保持→移出）");
         }
     }
 }

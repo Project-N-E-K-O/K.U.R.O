@@ -2,6 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://cye54v0tcgk7u" path="res://assets/environments/scene_1_home/房间1 地面.png" id="1_1xo5x"]
 [ext_resource type="Script" uid="uid://cra7y7mt0x1j8" path="res://scripts/managers/CameraZoneArea.cs" id="1_exti5"]
+[ext_resource type="PackedScene" uid="uid://dva26mfp5yohw" path="res://scenes/objects/Animation_character.tscn" id="1_oxmw7"]
 [ext_resource type="Texture2D" uid="uid://ddqu3x286qvkb" path="res://assets/environments/scene_1_home/房间1 墙壁.png" id="2_aiicl"]
 [ext_resource type="Resource" uid="uid://hvl6chuo43us" path="res://resources/cutscene/A_begin_intro.tres" id="3_5y2nu"]
 [ext_resource type="Texture2D" uid="uid://dglsvq66c7lld" path="res://assets/environments/scene_1_home/房间1背景.png" id="3_556c4"]
@@ -10,8 +11,8 @@
 [ext_resource type="Script" uid="uid://cbui22isww64v" path="res://scripts/systems/cutscene/CutsceneTrigger.cs" id="6_ocwig"]
 [ext_resource type="Script" uid="uid://dprlx2bg0y3k5" path="res://scripts/environments/ParallaxBackground2D.cs" id="7_paral"]
 [ext_resource type="Script" uid="uid://5obw65hewcve" path="res://scripts/builds/buildcore/CorePickupZone.cs" id="10_rnaj2"]
-[ext_resource type="Texture2D" uid="uid://gd2g77t46552" path="res://assets/furnitures/home_scene1/TableOfficeA.png" id="11_23r6t"]
 [ext_resource type="PackedScene" uid="uid://dqb7hct2obgg5" path="res://scenes/items/Furniture_A_bedA.tscn" id="11_k0aw5"]
+[ext_resource type="PackedScene" uid="uid://dxjqksef0olgx" path="res://scenes/environments/homeTable.tscn" id="11_rnaj2"]
 [ext_resource type="PackedScene" uid="uid://xr3dxjuou057" path="res://scenes/items/Furniture_A_chairOfficeA.tscn" id="12_k0aw5"]
 [ext_resource type="PackedScene" uid="uid://dugfq8qy1okf1" path="res://scenes/items/Furniture_A_chairOfficeB.tscn" id="13_rnaj2"]
 [ext_resource type="PackedScene" uid="uid://cbm0exjbphlq5" path="res://scenes/items/Furniture_A_lampFloorA.tscn" id="14_oxmw7"]
@@ -48,17 +49,17 @@ size = Vector2(400, 1872)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_pal6r"]
 size = Vector2(400, 600)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_k0aw5"]
-size = Vector2(700, 400)
-
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_oxmw7"]
 size = Vector2(1000, 3000)
 
 [node name="ABegin" type="Node2D"]
 y_sort_enabled = true
 
+[node name="CameraZoom" type="Node2D" parent="."]
+position = Vector2(250, -1024)
+
 [node name="PlayerSpawnPoint" type="Node2D" parent="."]
-position = Vector2(-1009, -310)
+position = Vector2(251, -402)
 
 [node name="AreaSize" type="Area2D" parent="."]
 visible = false
@@ -128,6 +129,7 @@ position = Vector2(1695.55, 632.5)
 scale = Vector2(0.7, 0.8)
 
 [node name="AirWall" type="StaticBody2D" parent="."]
+visible = false
 z_index = 10
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AirWall"]
@@ -155,10 +157,6 @@ position = Vector2(-1799.9999, -877.9999)
 rotation = 0.6981317
 shape = SubResource("RectangleShape2D_pal6r")
 
-[node name="CollisionShape2D7" type="CollisionShape2D" parent="AirWall"]
-position = Vector2(281, -776)
-shape = SubResource("RectangleShape2D_k0aw5")
-
 [node name="CorePickupZone" type="Area2D" parent="."]
 collision_mask = 4
 script = ExtResource("10_rnaj2")
@@ -167,14 +165,11 @@ script = ExtResource("10_rnaj2")
 position = Vector2(1500, 0)
 shape = SubResource("RectangleShape2D_oxmw7")
 
-[node name="Node2D" type="Node2D" parent="."]
-z_index = 2
-y_sort_enabled = true
-position = Vector2(280.00003, -840)
-scale = Vector2(0.33, 0.33)
+[node name="AnimationCharacter" parent="." instance=ExtResource("1_oxmw7")]
+position = Vector2(251, -402)
 
-[node name="Sprite2D" type="Sprite2D" parent="Node2D"]
-texture = ExtResource("11_23r6t")
+[node name="homeTable" parent="." instance=ExtResource("11_rnaj2")]
+position = Vector2(285, -608)
 
 [node name="FurnitureBedA" parent="." instance=ExtResource("11_k0aw5")]
 position = Vector2(-1406, -544)
@@ -183,7 +178,8 @@ position = Vector2(-1406, -544)
 position = Vector2(1242, -662)
 
 [node name="FurnitureChairOfficeB" parent="." instance=ExtResource("13_rnaj2")]
-position = Vector2(260, -470)
+position = Vector2(556, -405)
+scale = Vector2(-1, 1)
 
 [node name="FurnitureLampFloorA" parent="." instance=ExtResource("14_oxmw7")]
 position = Vector2(-828, -750)

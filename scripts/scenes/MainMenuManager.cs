@@ -175,6 +175,8 @@ namespace Kuros.Scenes
 
         private void OnSaveSlotSelected(int slotIndex)
         {
+            if (_isLoadingScene) return;
+
             GD.Print($"MainMenuManager.OnSaveSlotSelected 被调用，槽位: {slotIndex}");
             if (_saveSlotSelection == null || SaveManager.Instance == null)
             {
@@ -207,7 +209,7 @@ namespace Kuros.Scenes
 
         // ── 场景切换 ──
 
-        private void PerformSceneChange(string scenePath)
+        private async void PerformSceneChange(string scenePath)
         {
             var tree = GetTree();
             if (tree == null)
@@ -215,11 +217,6 @@ namespace Kuros.Scenes
                 GameLogger.Error(nameof(MainMenuManager), "无法获取场景树！");
                 return;
             }
-
-            if (PauseManager.Instance != null)
-                PauseManager.Instance.ClearAllPauses();
-
-            CleanupUI();
 
             if (!ResourceLoader.Exists(scenePath))
             {
@@ -234,17 +231,30 @@ namespace Kuros.Scenes
                 return;
             }
 
-            var testInstance = scene.Instantiate();
-            if (testInstance == null)
+            _isLoadingScene = true;
+            MonitorShutdownTransition? transition = null;
+            if (scene.ResourcePath == MonitorShutdownTransition.HomeScenePath)
             {
-                GameLogger.Error(nameof(MainMenuManager), $"场景实例化失败: {scenePath}");
+                transition = MonitorShutdownTransition.Create(tree);
+                if (transition != null)
+                    await transition.ShutdownAsync();
+            }
+
+            if (!IsInstanceValid(this) || !IsInsideTree())
+            {
+                if (IsInstanceValid(transition)) transition!.QueueFree();
                 return;
             }
-            testInstance.QueueFree();
 
-            var error = tree.ChangeSceneToFile(scenePath);
+            PauseManager.Instance?.ClearAllPauses();
+
+            var error = tree.ChangeSceneToPacked(scene);
             if (error != Error.Ok)
+            {
                 GameLogger.Error(nameof(MainMenuManager), $"切换场景失败: {error}, 路径: {scenePath}");
+                if (IsInstanceValid(transition)) await transition!.RevealAsync();
+                if (IsInstanceValid(this)) _isLoadingScene = false;
+            }
             else
                 GameLogger.Info(nameof(MainMenuManager), $"成功切换到场景: {scenePath}");
         }

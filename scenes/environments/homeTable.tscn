@@ -1,0 +1,75 @@
+[gd_scene load_steps=11 format=3 uid="uid://dxjqksef0olgx"]
+
+[ext_resource type="Script" uid="uid://dq0vqwi52hgyp" path="res://scripts/utils/ProximityOutlineHighlight.cs" id="1_qimqx"]
+[ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="2_ljalp"]
+[ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="3_okevb"]
+[ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="4_frsuy"]
+[ext_resource type="Texture2D" uid="uid://cco66slr1m60m" path="res://assets/furnitures/home_scene1/ComputerA.png" id="5_qimqx"]
+[ext_resource type="Texture2D" uid="uid://gd2g77t46552" path="res://assets/furnitures/home_scene1/TableOfficeA.png" id="6_ljalp"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_4unrl"]
+shader = ExtResource("2_ljalp")
+shader_parameter/softness = 0.5
+shader_parameter/alpha = 0.4
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ld8jn"]
+shader = ExtResource("4_frsuy")
+shader_parameter/outline_color = Color(0.019607844, 0.019607844, 0.019607844, 0)
+shader_parameter/outline_size = 32.0
+shader_parameter/alpha_threshold = 0.5
+shader_parameter/edge_softness = 0.12
+shader_parameter/preserve_fill = true
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ns468"]
+size = Vector2(700, 250)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ld8jn"]
+size = Vector2(400, 100)
+
+[node name="homeTable" type="Node2D"]
+z_index = 1
+
+[node name="OutlineEffect" type="Node" parent="."]
+script = ExtResource("1_qimqx")
+OutlineSpritePath = NodePath("../Outline")
+HighlightOutlineColor = Color(1, 0.39215687, 0, 1)
+
+[node name="Shadow" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_4unrl")
+position = Vector2(0, -75)
+scale = Vector2(12, 3.5)
+texture = ExtResource("3_okevb")
+offset = Vector2(0, 5)
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.33, 0.33)
+texture = ExtResource("6_ljalp")
+offset = Vector2(0, -750)
+
+[node name="Outline" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_ld8jn")
+position = Vector2(-33, -169)
+scale = Vector2(0.33, 0.33)
+texture = ExtResource("5_qimqx")
+offset = Vector2(0, -750)
+
+[node name="Sprite2D" type="Sprite2D" parent="Outline"]
+texture = ExtResource("5_qimqx")
+offset = Vector2(0, -750)
+
+[node name="StaticBody2D" type="StaticBody2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(0, -100)
+shape = SubResource("RectangleShape2D_ns468")
+
+[node name="InteractArea" type="Area2D" parent="."]
+z_index = 10
+position = Vector2(0, 180)
+collision_layer = 0
+collision_mask = 4
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InteractArea"]
+position = Vector2(-25, -300)
+shape = SubResource("RectangleShape2D_ld8jn")

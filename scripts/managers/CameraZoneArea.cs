@@ -66,6 +66,11 @@ namespace Kuros.Managers
         private void OnAreaEntered(Area2D area)
         {
             if (!IsPlayerArea(area)) return;
+            EnterForPlayer();
+        }
+
+        internal void EnterForPlayer()
+        {
             if (_playerInside) return; // 防止重复触发
 
             _playerInside = true;
@@ -174,7 +179,7 @@ namespace Kuros.Managers
         /// 根据 CollisionShape2D 的世界位置计算房间相机边界。
         /// X 边界由碰撞形状决定，Y 边界由 CameraLimitTop/Bottom 决定。
         /// </summary>
-        private Rect2 ComputeWorldBounds()
+        internal Rect2 ComputeWorldBounds()
         {
             float top = CameraLimitTop + (UseLocalVerticalLimits ? GlobalPosition.Y : 0f);
             var shape = GetNodeOrNull<CollisionShape2D>("CollisionShape2D");

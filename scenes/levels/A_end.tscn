@@ -38,7 +38,7 @@ size = Vector2(400, 3000)
 y_sort_enabled = true
 
 [node name="PlayerSpawnPoint" type="Node2D" parent="."]
-position = Vector2(-2515, -672)
+position = Vector2(-2077, -454)
 
 [node name="AreaSize" type="Area2D" parent="."]
 visible = false
@@ -50,7 +50,6 @@ shape = SubResource("RectangleShape2D_245md")
 debug_color = Color(0.6428762, 0.52304673, 0.06685588, 0.41960785)
 
 [node name="CameraZone" type="Area2D" parent="."]
-visible = false
 collision_layer = 0
 collision_mask = 4
 script = ExtResource("1_t2ifw")
@@ -143,12 +142,9 @@ position = Vector2(-2002, -728)
 [node name="AnimationCharacter" parent="." instance=ExtResource("11_245md")]
 position = Vector2(-2077, -454)
 
-[node name="AnimationTaxi" parent="." instance=ExtResource("11_3uxt7")]
-position = Vector2(-1466, -2080)
-
-[node name="ReturnCharacter" parent="." instance=ExtResource("11_245md")]
-position = Vector2(-1466, -580)
+[node name="AnimationCharacterReturn" parent="." instance=ExtResource("11_245md")]
+position = Vector2(-1677, -454)
 scale = Vector2(-1, 1)
 
-[node name="ReturnSpawnPoint" type="Marker2D" parent="."]
-position = Vector2(-1866, -580)
+[node name="AnimationTaxi" parent="." instance=ExtResource("11_3uxt7")]
+position = Vector2(-1466, -2080)

@@ -1,14 +1,25 @@
-[gd_resource type="Resource" script_class="CutsceneSequence" load_steps=8 format=3 uid="uid://bli0swpbyfktm"]
+[gd_resource type="Resource" script_class="CutsceneSequence" load_steps=13 format=3 uid="uid://bli0swpbyfktm"]
 
 [ext_resource type="Script" uid="uid://ctrko7add3r5h" path="res://scripts/systems/cutscene/CutsceneStep.cs" id="1_step"]
+[ext_resource type="Script" uid="uid://cjl1hjmndwvcg" path="res://scripts/systems/cutscene/steps/FadeStep.cs" id="2_bdhai"]
 [ext_resource type="Script" uid="uid://cgnajq1ykl2mn" path="res://scripts/systems/cutscene/CutsceneSequence.cs" id="2_sequence"]
 [ext_resource type="Script" uid="uid://1551srxqrxye" path="res://scripts/systems/cutscene/steps/MovePlayerStep.cs" id="3_move"]
 [ext_resource type="Script" uid="uid://5xu2sir0yhv1" path="res://scripts/systems/cutscene/steps/PlayAnimationStep.cs" id="4_anim"]
+[ext_resource type="Script" uid="uid://b4pd4ynf4k04p" path="res://scripts/systems/cutscene/steps/CameraMoveStep.cs" id="5_camera"]
 
-[sub_resource type="Resource" id="MoveToLanding"]
-script = ExtResource("3_move")
-TargetPath = NodePath("../World/AEnd/ReturnSpawnPoint")
+[sub_resource type="Resource" id="Resource_4wywo"]
+script = ExtResource("2_bdhai")
+Duration = 5.0
+TransitionDuration = 1.0
+metadata/_custom_type_script = "uid://cjl1hjmndwvcg"
+
+[sub_resource type="Resource" id="FollowTaxi"]
+script = ExtResource("5_camera")
+TargetPath = NodePath("../World/AEnd/AnimationTaxi/TaxiPosition")
+TargetZoom = 0.5
 Instant = true
+Duration = 3.0
+FollowDuration = 3.0
 
 [sub_resource type="Resource" id="TaxiArrives"]
 script = ExtResource("4_anim")
@@ -16,14 +27,22 @@ AnimationPlayerPath = NodePath("../World/AEnd/AnimationTaxi/AnimationPlayer")
 AnimationName = "taxi_enter"
 WaitForCompletion = true
 
-[sub_resource type="Resource" id="GetOff"]
+[sub_resource type="Resource" id="Resource_bdhai"]
 script = ExtResource("4_anim")
-AnimationPlayerPath = NodePath("../World/AEnd/ReturnCharacter/AnimationPlayer")
+AnimationPlayerPath = NodePath("../World/AEnd/AnimationCharacterReturn/AnimationPlayer")
 AnimationName = "run_short"
 WaitForCompletion = true
+metadata/_custom_type_script = "uid://5xu2sir0yhv1"
+
+[sub_resource type="Resource" id="Resource_15gbm"]
+script = ExtResource("4_anim")
+AnimationPlayerPath = NodePath("../World/AEnd/AnimationCharacter/AnimationPlayer")
+AnimationName = "taxi_leave"
+metadata/_custom_type_script = "uid://5xu2sir0yhv1"
 
 [resource]
 script = ExtResource("2_sequence")
 SequenceId = "A_end_return_intro"
-Steps = Array[ExtResource("1_step")]([SubResource("MoveToLanding"), SubResource("TaxiArrives"), SubResource("GetOff")])
+Steps = Array[ExtResource("1_step")]([SubResource("Resource_4wywo"), SubResource("Resource_44373"), SubResource("FollowTaxi"), SubResource("TaxiArrives"), SubResource("Resource_bdhai"), SubResource("Resource_15gbm")])
 HideNodePaths = Array[NodePath]([NodePath("../World/P2")])
+TakeOverCamera = true

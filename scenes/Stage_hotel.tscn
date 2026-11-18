@@ -91,12 +91,14 @@ script = ExtResource("7_drop")
 layer = 128
 
 [node name="ColorRectTop" type="ColorRect" parent="CanvasLayer"]
+visible = false
 offset_right = 1920.0
 offset_bottom = 150.0
 color = Color(0, 0, 0, 1)
 metadata/_edit_use_anchors_ = true
 
 [node name="ColorRectBottom" type="ColorRect" parent="CanvasLayer"]
+visible = false
 offset_top = 930.0
 offset_right = 1920.0
 offset_bottom = 1080.0

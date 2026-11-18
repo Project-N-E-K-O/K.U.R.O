@@ -69,17 +69,6 @@ namespace Kuros.Systems.Cutscene
 
             GD.Print($"[Cutscene] BodyEntered — body: {body.Name}");
 
-            if (_running || TriggerOnce && _triggered)
-            {
-                GD.Print("[Cutscene] 已触发过，跳过");
-                return;
-            }
-            if (Sequence == null)
-            {
-                GD.PrintErr("[Cutscene] Sequence 未设置！");
-                return;
-            }
-
             // BodyEntered 直接拿到玩家物理体根节点，无需向上查父节点
             if (!body.IsInGroup(PlayerGroup))
             {
@@ -87,31 +76,47 @@ namespace Kuros.Systems.Cutscene
                 return;
             }
 
-            GD.Print($"[Cutscene] 玩家进入触发区，准备播放: {Sequence.SequenceId}");
+            _ = TriggerAsync();
+        }
 
+        /// <summary>主动启动过场，与玩家进入区域共用武装、执行中和一次性判定。</summary>
+        public Task TriggerAsync()
+        {
+            if (!_armed || _running || TriggerOnce && _triggered) return Task.CompletedTask;
+            var sequence = Sequence;
+            if (sequence == null)
+            {
+                GD.PushError("[Cutscene] Sequence 未设置！");
+                return Task.CompletedTask;
+            }
             var manager = GetTree().GetFirstNodeInGroup("cutscene_manager") as CutsceneManager;
             if (manager == null)
             {
                 GD.PrintErr("[Cutscene] 未找到 CutsceneManager！确认 Stage_2 中已添加该节点。");
-                return;
+                return Task.CompletedTask;
             }
             if (ExecutionMode == ExecutionModeEnum.BackgroundSteps)
             {
-                foreach (var step in Sequence.Steps)
+                foreach (var step in sequence.Steps)
                     if (step != null && step is not EffectGroupSpawnStep && step is not EffectSpawnStep
                         && step is not WaitStep && step is not PlayAnimationStep)
                     {
-                        GD.PushWarning($"[Cutscene] {Sequence.SequenceId}: 后台模式不支持 {step.GetType().Name}，未启动。");
-                        return;
+                        GD.PushWarning($"[Cutscene] {sequence.SequenceId}: 后台模式不支持 {step.GetType().Name}，未启动。");
+                        return Task.CompletedTask;
                     }
             }
 
             _triggered = true;
             _running = true;
-            var sequence = Sequence;
             var mode = ExecutionMode;
             // 避开物理 Area 信号回调中的建树/碰撞修改。
-            Callable.From(() => { _ = ExecuteRequest(manager, sequence, mode); }).CallDeferred();
+            var completion = new TaskCompletionSource<bool>();
+            Callable.From(async () =>
+            {
+                try { await ExecuteRequest(manager, sequence, mode); }
+                finally { completion.TrySetResult(true); }
+            }).CallDeferred();
+            return completion.Task;
         }
 
         private async Task ExecuteRequest(CutsceneManager manager, CutsceneSequence sequence, ExecutionModeEnum mode)

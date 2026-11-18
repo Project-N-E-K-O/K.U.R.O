@@ -108,6 +108,7 @@ shape = SubResource("RectangleShape2D_d0c6g")
 debug_color = Color(0.6428762, 0.52304673, 0.06685588, 0.41960785)
 
 [node name="CameraZone" type="Area2D" parent="."]
+visible = false
 z_index = 10
 collision_layer = 0
 collision_mask = 4
@@ -120,6 +121,7 @@ shape = SubResource("RectangleShape2D_cam_bbegin")
 debug_color = Color(0, 1, 0, 0.41960785)
 
 [node name="CameraZone2" type="Area2D" parent="."]
+visible = false
 z_index = 10
 position = Vector2(1300, 0)
 collision_layer = 0

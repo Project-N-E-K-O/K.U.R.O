@@ -15,7 +15,7 @@ namespace Kuros.Managers
         [Export] public NodePath DarkLayerPath { get; set; } = new();
         /// <summary>
         /// 光圈分组（嵌套数组）：每组一个路径数组——同组所有灯**同时**亮起（共享同一延迟），
-        /// 组与组之间间隔 FadeIntervalSeconds。节点只取坐标，不渲染自身。
+        /// 组与组之间按预热/全亮各自序列的间隔错峰。节点只取坐标，不渲染自身。
         /// </summary>
         [Export] public Godot.Collections.Array<Godot.Collections.Array<NodePath>> SpotGroups { get; set; } = new();
         [Export] public NodePath TriggerAreaPath { get; set; } = new();
@@ -24,17 +24,25 @@ namespace Kuros.Managers
         /// <summary>阴影色（圆外暗影；圆内 alpha 归零露出场景）。</summary>
         [Export] public Color DarkColor { get; set; } = new(0f, 0f, 0f, 0.85f);
         /// <summary>第一段（预热）灯光半径：触发后先扩散到此半径，预热结束后进入第二段全亮。</summary>
-        [Export(PropertyHint.Range, "50,3000,50")] public float PreheatRadius { get; set; } = 200f;
+        [Export(PropertyHint.Range, "0,3000,5")] public float PreheatRadius { get; set; } = 200f;
         /// <summary>第一段（预热）圆边缘柔化宽度（px）。预热结束后过渡到 Softness。</summary>
-        [Export(PropertyHint.Range, "0,5000,10")] public float PreheatSoftness { get; set; } = 300f;
+        [Export(PropertyHint.Range, "0,5000,5")] public float PreheatSoftness { get; set; } = 300f;
         /// <summary>灯光照亮半径（px，圆内完全透明露出场景）。</summary>
-        [Export(PropertyHint.Range, "50,3000,50")] public float SpotRadius { get; set; } = 500f;
+        [Export(PropertyHint.Range, "0,3000,5")] public float SpotRadius { get; set; } = 500f;
         /// <summary>圆边缘柔化宽度（px）。</summary>
-        [Export(PropertyHint.Range, "0,5000,10")] public float Softness { get; set; } = 80f;
-        /// <summary>单盏灯的扩散时长（秒）。两段各占一个 FadeDurationSeconds：预热一段 + 全亮一段。</summary>
-        [Export(PropertyHint.Range, "0.1,3,0.05")] public float FadeDurationSeconds { get; set; } = 1.0f;
-        /// <summary>相邻两盏灯的扩散间隔（秒）。</summary>
-        [Export(PropertyHint.Range, "0,2,0.05")] public float FadeIntervalSeconds { get; set; } = 0.8f;
+        [Export(PropertyHint.Range, "0,5000,5")] public float Softness { get; set; } = 80f;
+        /// <summary>半径淡入时长（秒）：每个阶段里 radius 先变化，默认 0.1s。</summary>
+        [Export(PropertyHint.Range, "0.01,3,0.01")] public float RadiusFadeSeconds { get; set; } = 0.1f;
+        /// <summary>软度淡入时长（秒）：radius 变化完成后，softness 再花这段时间过渡，默认 0.4s。</summary>
+        [Export(PropertyHint.Range, "0.01,3,0.01")] public float SoftnessFadeSeconds { get; set; } = 0.4f;
+        /// <summary>预热序列：第一组的开始延迟（秒，从触发算起）。</summary>
+        [Export(PropertyHint.Range, "0,20,0.05")] public float PreheatStartDelaySeconds { get; set; }
+        /// <summary>预热序列：相邻两组的开始间隔（秒）；小于单组时长时自动顺延，保证不重叠。</summary>
+        [Export(PropertyHint.Range, "0,20,0.05")] public float PreheatIntervalSeconds { get; set; } = 1f;
+        /// <summary>全亮序列：第一组的开始延迟（秒，从触发算起）；与预热序列相互独立。</summary>
+        [Export(PropertyHint.Range, "0,30,0.05")] public float SpotStartDelaySeconds { get; set; } = 2f;
+        /// <summary>全亮序列：相邻两组的开始间隔（秒）；同样自动顺延避免重叠。</summary>
+        [Export(PropertyHint.Range, "0,20,0.05")] public float SpotIntervalSeconds { get; set; } = 1f;
 
         private const string DefaultMaskShaderPath = "res://shaders/materials/dark_mask.gdshader";
         private const int MaxLights = 16;
@@ -141,35 +149,67 @@ namespace Kuros.Managers
         }
 
         /// <summary>
-        /// 开始逐排亮灯，两段式：同组所有灯共享同一延迟（同时亮），组与组之间间隔 FadeIntervalSeconds。
-        /// 第一段（预热）：半径 0 → PreheatRadius，软度切到 PreheatSoftness，时长 FadeDurationSeconds；
-        /// 第二段（全亮）：预热结束后半径 PreheatRadius → SpotRadius，同时软度 PreheatSoftness → Softness，
-        /// 再一个 FadeDurationSeconds。半径与软度均为每灯独立，各组错峰互不影响。
+        /// 开始逐排亮灯：预热与全亮是**两条独立时间线**，可以全局重叠（如预热 1~5s、全亮 3~7s）。
+        /// 每个阶段内部先 radius（RadiusFadeSeconds，默认 0.1s），radius 完成后 softness
+        /// （SoftnessFadeSeconds，默认 0.4s）。两条序列各自保证"上一组完全结束才轮到下一组"：
+        /// 当设定间隔小于单组时长时，后一组自动顺延，不会与本组前一阶段或其他组重叠。
         /// </summary>
         public void StartReveal()
         {
             if (_started) return;
             _started = true;
 
+            float stageSeconds = RadiusFadeSeconds + SoftnessFadeSeconds;
+
+            int groupCount = 0;
+            foreach (int groupIndex in _spotGroups)
+                groupCount = Mathf.Max(groupCount, groupIndex + 1);
+            if (groupCount <= 0) return;
+
+            // 预热序列：组 g 起点 = max(设定节奏, 上一组结束)；组内固定占 stageSeconds。
+            var preheatStart = new float[groupCount];
+            var preheatEnd = new float[groupCount];
+            float cursor = 0f;
+            for (int g = 0; g < groupCount; g++)
+            {
+                preheatStart[g] = Mathf.Max(PreheatStartDelaySeconds + g * PreheatIntervalSeconds, cursor);
+                preheatEnd[g] = preheatStart[g] + stageSeconds;
+                cursor = preheatEnd[g];
+            }
+
+            // 全亮序列：独立节奏，且不早于本组预热结束、不早于上一组全亮结束。
+            var spotStart = new float[groupCount];
+            cursor = 0f;
+            for (int g = 0; g < groupCount; g++)
+            {
+                spotStart[g] = Mathf.Max(
+                    Mathf.Max(SpotStartDelaySeconds + g * SpotIntervalSeconds, cursor),
+                    preheatEnd[g]);
+                cursor = spotStart[g] + stageSeconds;
+            }
+
             for (int i = 0; i < _spots.Count; i++)
             {
                 int index = i; // 捕获局部副本
-                float delay = _spotGroups[i] * FadeIntervalSeconds;
+                int group = _spotGroups[i];
                 var tween = CreateTween();
-                tween.TweenInterval(delay);
-                // 预热段开始：软度立即切到预热值（此时半径≈0，切换不可见）
-                tween.TweenCallback(Callable.From(() => _softnesses[index] = PreheatSoftness));
-                // 第一段：预热（半径 0 → PreheatRadius）
-                tween.TweenMethod(Callable.From<float>(value => _radii[index] = value), 0f, PreheatRadius, FadeDurationSeconds)
+                tween.TweenInterval(preheatStart[group]);
+                // 预热：radius 先变（短）
+                tween.TweenMethod(Callable.From<float>(value => _radii[index] = value), 0f, PreheatRadius, RadiusFadeSeconds)
                     .SetTrans(Tween.TransitionType.Quad)
                     .SetEase(Tween.EaseType.Out);
-                // 第二段：全亮（半径 → SpotRadius，软度并行过渡到全亮值）
-                tween.TweenMethod(Callable.From<float>(value => _radii[index] = value), PreheatRadius, SpotRadius, FadeDurationSeconds)
+                // radius 完成后再过渡 softness（长）
+                tween.TweenMethod(Callable.From<float>(value => _softnesses[index] = value), Softness, PreheatSoftness, SoftnessFadeSeconds)
                     .SetTrans(Tween.TransitionType.Quad)
                     .SetEase(Tween.EaseType.Out);
-                tween.Parallel().TweenMethod(
-                        Callable.From<float>(value => _softnesses[index] = value),
-                        PreheatSoftness, Softness, FadeDurationSeconds)
+                // 等待全亮序列轮到本组；期间保持预热值
+                tween.TweenInterval(Mathf.Max(0f, spotStart[group] - preheatEnd[group]));
+                // 全亮：同样 radius 先变（短）
+                tween.TweenMethod(Callable.From<float>(value => _radii[index] = value), PreheatRadius, SpotRadius, RadiusFadeSeconds)
+                    .SetTrans(Tween.TransitionType.Quad)
+                    .SetEase(Tween.EaseType.Out);
+                // radius 完成后再过渡 softness（长）
+                tween.TweenMethod(Callable.From<float>(value => _softnesses[index] = value), PreheatSoftness, Softness, SoftnessFadeSeconds)
                     .SetTrans(Tween.TransitionType.Quad)
                     .SetEase(Tween.EaseType.Out);
             }

@@ -9,7 +9,7 @@ namespace Kuros.Systems.Cutscene
     /// 
     /// 功能：
     /// - 位置移动：从当前位置移动到 TargetPosition（或目标节点位置）
-    /// - 缩放变换：从当前 Zoom 变换到 TargetZoom（若 TargetZoom != 1）
+    /// - 缩放变换：从当前 Zoom 变换到 TargetZoom（大于 0 时）
     /// - 跟随模式：FollowDuration > 0 时，先做初始移动（Duration 秒），再持续每帧同步到目标 GlobalPosition
     /// - 异步模式：WaitForCompletion=false 时不阻塞后续步骤
     /// </summary>
@@ -22,10 +22,16 @@ namespace Kuros.Systems.Cutscene
         /// <summary>目标世界坐标（TargetPath 为空时使用）。</summary>
         [Export] public Vector2 TargetPosition { get; set; }
 
-        /// <summary>目标缩放级别。1.0 = 100%（无缩放），0.5 = 50%（放大），2.0 = 200%（缩小）。若为 <= 0，则不改变缩放。</summary>
+        /// <summary>目标缩放。1.0 为原比例，大于 1 放大，小于 1 缩小。小于或等于 0 时不改变缩放。</summary>
         [Export] public float TargetZoom { get; set; } = 0f;
 
-        /// <summary>是否立即完成移动/缩放，无动画。</summary>
+        /// <summary>可选的跟随起始缩放。与正值 TargetZoom 配合，在 FollowDuration 内渐变；0 沿用固定缩放。</summary>
+        [Export(PropertyHint.Range, "0,10,0.01,or_greater")] public float FollowStartZoom { get; set; }
+
+        /// <summary>可选玩法镜头终点。使用指定 CameraZone 的缩放和 CameraFollow 的玩家构图。</summary>
+        [Export] public NodePath ReturnToCameraZonePath { get; set; } = new NodePath();
+
+        /// <summary>跳过初始移动，立即对准目标。后续跟随及其缩放渐变仍会执行。</summary>
         [Export] public bool Instant { get; set; } = false;
 
         /// <summary>移动/缩放的持续时间（秒）。若 <= 0，则立即完成。</summary>
@@ -72,7 +78,20 @@ namespace Kuros.Systems.Cutscene
 
             Node2D? targetNode = null;
             var target = TargetPosition;
-            if (!TargetPath.IsEmpty)
+            float targetZoom = TargetZoom;
+            if (!ReturnToCameraZonePath.IsEmpty)
+            {
+                var zone = ctx.Manager.GetNodeOrNull<Managers.CameraZoneArea>(ReturnToCameraZonePath);
+                if (!ctx.Sequence.TakeOverCamera || zone == null || camera is not Managers.CameraFollow follow
+                    || !follow.TryGetFollowPosition(out target))
+                {
+                    GD.PushWarning($"[Cutscene] 无法解析玩法镜头：{ReturnToCameraZonePath}");
+                    return;
+                }
+                ctx.Manager.SetCameraReturnZone(zone);
+                targetZoom = zone.ZoomLevel;
+            }
+            else if (!TargetPath.IsEmpty)
             {
                 targetNode = ctx.Manager.GetNodeOrNull<Node2D>(TargetPath);
                 if (targetNode != null)
@@ -86,7 +105,7 @@ namespace Kuros.Systems.Cutscene
                 }
             }
 
-            GD.Print($"[Cutscene] CameraMoveStep: Camera.TopLevel={camera.TopLevel}，从 {camera.GlobalPosition} 移动到 {target}，Zoom: {camera.Zoom} → {(TargetZoom > 0 ? TargetZoom : "不变")}");
+            GD.Print($"[Cutscene] CameraMoveStep: Camera.TopLevel={camera.TopLevel}，从 {camera.GlobalPosition} 移动到 {target}，Zoom: {camera.Zoom} → {(targetZoom > 0 ? targetZoom : "不变")}");
 
             // ── 跟随模式：先初始移动，再持续同步目标 GlobalPosition ──────────────
             if (FollowDuration > 0f && targetNode != null)
@@ -104,9 +123,7 @@ namespace Kuros.Systems.Cutscene
             // ── 普通单次移动模式 ─────────────────────────────────────────────────
             if (ctx.IsSkipping || Instant || Duration <= 0f)
             {
-                camera.GlobalPosition = target;
-                if (TargetZoom > 0f)
-                    camera.Zoom = new Vector2(TargetZoom, TargetZoom);
+                Snap(camera, target, targetZoom);
                 GD.Print("[Cutscene] CameraMoveStep 立即完成");
                 return;
             }
@@ -117,30 +134,29 @@ namespace Kuros.Systems.Cutscene
                  .SetEase(Ease).SetTrans(Transition);
 
             // 如果需要缩放，并行执行缩放动画
-            if (TargetZoom > 0f)
+            if (targetZoom > 0f)
             {
-                tween.Parallel().TweenProperty(camera, "zoom", new Vector2(TargetZoom, TargetZoom), Duration)
+                tween.Parallel().TweenProperty(camera, "zoom", Vector2.One * targetZoom, Duration)
                      .SetEase(Ease).SetTrans(Transition);
             }
 
             // 若不等待完成，立即返回，但后台仍监听skip事件
             if (!WaitForCompletion)
             {
-                _ = MonitorSkipAndFinishAsync(ctx, tween, camera, target);
+                _ = MonitorSkipAndFinishAsync(ctx, tween, camera, target, targetZoom);
                 GD.Print($"[Cutscene] CameraMoveStep 异步执行（WaitForCompletion=false），总耗时约 {Duration} 秒");
                 return;
             }
 
             // 否则阻塞等待整个过程完成或skip
-            while (!ctx.IsSkipping && tween.IsRunning())
+            while (!ctx.IsCancelled && !ctx.IsSkipping && tween.IsRunning())
                 await ctx.NextFrame();
 
+            if (ctx.IsCancelled) return;
             if (ctx.IsSkipping)
             {
                 tween.Kill();
-                camera.GlobalPosition = target;
-                if (TargetZoom > 0f)
-                    camera.Zoom = new Vector2(TargetZoom, TargetZoom);
+                Snap(camera, target, targetZoom);
             }
             GD.Print($"[Cutscene] CameraMoveStep 完成，Camera.GlobalPosition={camera.GlobalPosition}, Zoom={camera.Zoom}");
         }
@@ -154,6 +170,8 @@ namespace Kuros.Systems.Cutscene
             // 可选恢复接管前的区域目标，避免把未完成缩放 Tween 的中间值存为正常视野。
             var posBeforeFollow = camera.GlobalPosition;
             var zoomBeforeFollow = RestoreNormalZoomAfterFollow ? ctx.Manager.NormalCameraZoom : camera.Zoom;
+            bool animateFollowZoom = FollowStartZoom > 0f && TargetZoom > 0f;
+            float startZoom = animateFollowZoom ? FollowStartZoom : TargetZoom;
 
             // Phase 1: 初始 Tween 移动到目标当前位置
             if (Duration > 0f && !ctx.IsSkipping && !Instant)
@@ -161,13 +179,14 @@ namespace Kuros.Systems.Cutscene
                 var tweenInit = camera.CreateTween();
                 tweenInit.TweenProperty(camera, "global_position", targetNode.GlobalPosition, Duration)
                          .SetEase(Ease).SetTrans(Transition);
-                if (TargetZoom > 0f)
-                    tweenInit.Parallel().TweenProperty(camera, "zoom", new Vector2(TargetZoom, TargetZoom), Duration)
+                if (startZoom > 0f)
+                    tweenInit.Parallel().TweenProperty(camera, "zoom", Vector2.One * startZoom, Duration)
                              .SetEase(Ease).SetTrans(Transition);
 
-                while (!ctx.IsSkipping && tweenInit.IsRunning())
+                while (!ctx.IsCancelled && !ctx.IsSkipping && tweenInit.IsRunning())
                     await ctx.NextFrame();
 
+                if (ctx.IsCancelled) return;
                 if (ctx.IsSkipping)
                 {
                     tweenInit.Kill();
@@ -177,29 +196,41 @@ namespace Kuros.Systems.Cutscene
                         camera.GlobalPosition = posBeforeFollow;
                         camera.Zoom = zoomBeforeFollow;
                     }
+                    else if (animateFollowZoom && GodotObject.IsInstanceValid(targetNode))
+                    {
+                        Snap(camera, targetNode.GlobalPosition, TargetZoom);
+                    }
                     GD.Print("[Cutscene] CameraMoveStep 跟随模式 skip at 初始移动阶段");
                     return;
                 }
             }
             else
             {
-                camera.GlobalPosition = targetNode.GlobalPosition;
-                if (TargetZoom > 0f)
-                    camera.Zoom = new Vector2(TargetZoom, TargetZoom);
+                Snap(camera, targetNode.GlobalPosition, startZoom);
             }
 
             // Phase 2: 每帧同步 GlobalPosition，持续 FollowDuration 秒
             ulong startMs = Godot.Time.GetTicksMsec();
-            ulong durationMs = (ulong)(FollowDuration * 1000.0);
-            while (!ctx.IsSkipping && Godot.Time.GetTicksMsec() - startMs < durationMs)
+            double elapsed = 0;
+            bool refreshViewport = ctx.Sequence.TakeOverCamera && ctx.Sequence.PreciseCamera;
+            while (!ctx.IsCancelled && !ctx.IsSkipping && elapsed < FollowDuration)
             {
                 if (GodotObject.IsInstanceValid(targetNode))
                     camera.GlobalPosition = targetNode.GlobalPosition;
-                if (TargetZoom > 0f)
-                    camera.Zoom = new Vector2(TargetZoom, TargetZoom);
+                if (animateFollowZoom)
+                {
+                    var zoom = Tween.InterpolateValue(startZoom, TargetZoom - startZoom,
+                        elapsed, FollowDuration, Transition, Ease).AsSingle();
+                    camera.Zoom = Vector2.One * zoom;
+                }
+                else if (TargetZoom > 0f)
+                    camera.Zoom = Vector2.One * TargetZoom;
+                if (refreshViewport) camera.ForceUpdateScroll();
                 await ctx.NextFrame();
+                elapsed = (Godot.Time.GetTicksMsec() - startMs) / 1000.0;
             }
 
+            if (ctx.IsCancelled) return;
             if (GodotObject.IsInstanceValid(targetNode))
                 camera.GlobalPosition = targetNode.GlobalPosition;
 
@@ -211,26 +242,35 @@ namespace Kuros.Systems.Cutscene
             }
             else
             {
+                if (animateFollowZoom) camera.Zoom = Vector2.One * TargetZoom;
                 GD.Print($"[Cutscene] CameraMoveStep 跟随完成，Camera.GlobalPosition={camera.GlobalPosition}");
             }
+            if (refreshViewport) camera.ForceUpdateScroll();
         }
 
         /// <summary>
         /// 后台监听skip事件，如果发生skip则立刻跳到最终位置和缩放
         /// </summary>
-        private async Task MonitorSkipAndFinishAsync(CutsceneContext ctx, Tween tween, Camera2D camera, Vector2 targetPosition)
+        private static async Task MonitorSkipAndFinishAsync(CutsceneContext ctx, Tween tween, Camera2D camera,
+            Vector2 targetPosition, float targetZoom)
         {
-            while (!ctx.IsSkipping && tween.IsRunning())
+            while (!ctx.IsCancelled && !ctx.IsSkipping && tween.IsRunning())
                 await ctx.NextFrame();
 
             if (ctx.IsSkipping)
             {
                 tween.Kill();
-                camera.GlobalPosition = targetPosition;
-                if (TargetZoom > 0f)
-                    camera.Zoom = new Vector2(TargetZoom, TargetZoom);
+                Snap(camera, targetPosition, targetZoom);
                 GD.Print("[Cutscene] CameraMoveStep 被skip，立刻完成移动和缩放");
             }
+        }
+
+        private static void Snap(Camera2D camera, Vector2 position, float zoom)
+        {
+            camera.GlobalPosition = position;
+            if (zoom > 0f) camera.Zoom = Vector2.One * zoom;
+            camera.ResetSmoothing();
+            camera.ForceUpdateScroll();
         }
     }
 }

@@ -1,20 +1,44 @@
-[gd_resource type="Resource" script_class="CutsceneSequence" load_steps=9 format=3 uid="uid://hvl6chuo43us"]
+[gd_resource type="Resource" script_class="CutsceneSequence" load_steps=13 format=3 uid="uid://hvl6chuo43us"]
 
 [ext_resource type="Script" uid="uid://ctrko7add3r5h" path="res://scripts/systems/cutscene/CutsceneStep.cs" id="1_84lnv"]
 [ext_resource type="Script" uid="uid://cgnajq1ykl2mn" path="res://scripts/systems/cutscene/CutsceneSequence.cs" id="2_gqujs"]
-[ext_resource type="Script" uid="uid://cjl1hjmndwvcg" path="res://scripts/systems/cutscene/steps/FadeStep.cs" id="2_mlsay"]
-[ext_resource type="Script" uid="uid://dp0y7ubaf3v06" path="res://scripts/systems/cutscene/steps/WaitStep.cs" id="4_84lnv"]
 [ext_resource type="Script" uid="uid://cnkygkr74mjs4" path="res://scripts/systems/cutscene/steps/DialogicStep.cs" id="4_egs0q"]
+[ext_resource type="Script" uid="uid://b4pd4ynf4k04p" path="res://scripts/systems/cutscene/steps/CameraMoveStep.cs" id="5_egs0q"]
+[ext_resource type="Script" uid="uid://5xu2sir0yhv1" path="res://scripts/systems/cutscene/steps/PlayAnimationStep.cs" id="5_q6fo8"]
+[ext_resource type="Script" uid="uid://mgowytehhgjh" path="res://scripts/systems/cutscene/steps/RevealMonitorTransitionStep.cs" id="6_reveal"]
 
-[sub_resource type="Resource" id="Resource_84lnv"]
-script = ExtResource("2_mlsay")
-Duration = 1.0
-TransitionDuration = 0.5
-metadata/_custom_type_script = "uid://cjl1hjmndwvcg"
+[sub_resource type="Resource" id="FrameMonitor"]
+script = ExtResource("5_egs0q")
+TargetPath = NodePath("../World/ABegin/CameraZoom")
+TargetZoom = 6.5
+Instant = true
 
-[sub_resource type="Resource" id="Resource_egs0q"]
-script = ExtResource("4_84lnv")
-metadata/_custom_type_script = "uid://dp0y7ubaf3v06"
+[sub_resource type="Resource" id="RevealMonitor"]
+script = ExtResource("6_reveal")
+WaitForCompletion = false
+
+[sub_resource type="Resource" id="ZoomOutFromMonitor"]
+script = ExtResource("5_egs0q")
+TargetPath = NodePath("../World/ABegin/CameraZoom")
+TargetZoom = 4.0
+FollowStartZoom = 10.0
+Instant = true
+WaitForCompletion = true
+FollowDuration = 3.0
+metadata/_custom_type_script = "uid://b4pd4ynf4k04p"
+
+[sub_resource type="Resource" id="PullBackToRoom"]
+script = ExtResource("5_egs0q")
+ReturnToCameraZonePath = NodePath("../World/ABegin/CameraZone")
+Duration = 2.0
+WaitForCompletion = true
+
+[sub_resource type="Resource" id="Resource_vxlc7"]
+script = ExtResource("5_q6fo8")
+AnimationPlayerPath = NodePath("../World/ABegin/AnimationCharacter/AnimationPlayer")
+AnimationName = "idle_lookaround"
+WaitForCompletion = true
+metadata/_custom_type_script = "uid://5xu2sir0yhv1"
 
 [sub_resource type="Resource" id="Resource_mlsay"]
 script = ExtResource("4_egs0q")
@@ -27,7 +51,8 @@ metadata/_custom_type_script = "uid://cnkygkr74mjs4"
 [resource]
 script = ExtResource("2_gqujs")
 SequenceId = "A_begin_intro"
-Steps = Array[ExtResource("1_84lnv")]([SubResource("Resource_84lnv"), SubResource("Resource_egs0q"), SubResource("Resource_mlsay")])
+Steps = Array[ExtResource("1_84lnv")]([SubResource("FrameMonitor"), SubResource("RevealMonitor"), SubResource("ZoomOutFromMonitor"), SubResource("PullBackToRoom"), SubResource("Resource_vxlc7"), SubResource("Resource_mlsay")])
 HideNodePaths = Array[NodePath]([NodePath("../World/P2")])
 TakeOverCamera = true
+PreciseCamera = true
 metadata/_custom_type_script = "uid://cgnajq1ykl2mn"
