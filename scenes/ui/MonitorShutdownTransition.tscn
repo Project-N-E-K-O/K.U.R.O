@@ -105,7 +105,7 @@ layer = 200
 script = ExtResource("2_script")
 
 [node name="Screen" type="ColorRect" parent="."]
-modulate = Color(0.345098, 0.4, 0.45098, 1)
+modulate = Color(0, 0, 0, 1)
 material = SubResource("ScreenMaterial")
 anchors_preset = 15
 anchor_right = 1.0

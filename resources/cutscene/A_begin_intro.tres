@@ -27,18 +27,17 @@ WaitForCompletion = true
 FollowDuration = 3.0
 metadata/_custom_type_script = "uid://b4pd4ynf4k04p"
 
+[sub_resource type="Resource" id="Resource_vxlc7"]
+script = ExtResource("5_q6fo8")
+AnimationPlayerPath = NodePath("../World/ABegin/AnimationCharacter/AnimationPlayer")
+AnimationName = "idle_lookaround"
+metadata/_custom_type_script = "uid://5xu2sir0yhv1"
+
 [sub_resource type="Resource" id="PullBackToRoom"]
 script = ExtResource("5_egs0q")
 ReturnToCameraZonePath = NodePath("../World/ABegin/CameraZone")
 Duration = 2.0
 WaitForCompletion = true
-
-[sub_resource type="Resource" id="Resource_vxlc7"]
-script = ExtResource("5_q6fo8")
-AnimationPlayerPath = NodePath("../World/ABegin/AnimationCharacter/AnimationPlayer")
-AnimationName = "idle_lookaround"
-WaitForCompletion = true
-metadata/_custom_type_script = "uid://5xu2sir0yhv1"
 
 [sub_resource type="Resource" id="Resource_mlsay"]
 script = ExtResource("4_egs0q")
@@ -51,7 +50,7 @@ metadata/_custom_type_script = "uid://cnkygkr74mjs4"
 [resource]
 script = ExtResource("2_gqujs")
 SequenceId = "A_begin_intro"
-Steps = Array[ExtResource("1_84lnv")]([SubResource("FrameMonitor"), SubResource("RevealMonitor"), SubResource("ZoomOutFromMonitor"), SubResource("PullBackToRoom"), SubResource("Resource_vxlc7"), SubResource("Resource_mlsay")])
+Steps = Array[ExtResource("1_84lnv")]([SubResource("FrameMonitor"), SubResource("RevealMonitor"), SubResource("ZoomOutFromMonitor"), SubResource("Resource_vxlc7"), SubResource("PullBackToRoom"), SubResource("Resource_mlsay")])
 HideNodePaths = Array[NodePath]([NodePath("../World/P2")])
 TakeOverCamera = true
 PreciseCamera = true

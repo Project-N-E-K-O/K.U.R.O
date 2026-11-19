@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Godot;
+using Kuros.Environments;
 using Kuros.Managers;
 using Kuros.Systems.Cutscene;
 using Kuros.UI;
@@ -9,11 +10,44 @@ namespace Kuros.Scenes
 {
     public partial class StageHomeArrivalController : Node
     {
+        internal const string HomeScenePath = "res://scenes/Stage_home.tscn";
+        private const string DesktopScenePath = "res://scenes/ui/menus/InGameDesktopMenu.tscn";
+        private const string EntryLayerName = "StageHomeDesktopEntry";
+        private const string ExcludePlayTimeGroup = "exclude_play_time";
+
         [Export] public CutsceneSequence? ReturnSequence { get; set; }
 
         private StageGeneratorManager? _generator;
-        private MonitorShutdownTransition? _monitorTransition;
+        private CanvasLayer? _entryDesktop;
         private bool _returningByTaxi;
+        private bool _excludePlayTime;
+
+        internal static Error EnterFromDesktop(SceneTree tree, PackedScene? home = null)
+        {
+            if (tree.Root.HasNode(EntryLayerName)) return Error.Busy;
+
+            home ??= GD.Load<PackedScene>(HomeScenePath);
+            var desktopScene = GD.Load<PackedScene>(DesktopScenePath);
+            if (home == null || desktopScene == null) return Error.CantOpen;
+
+            var desktop = desktopScene.InstantiateOrNull<DesktopMenu>();
+            if (desktop == null) return Error.CantCreate;
+
+            desktop.IsHomeEntry = true;
+            desktop.ProcessMode = ProcessModeEnum.Disabled;
+            var layer = new CanvasLayer { Name = EntryLayerName, Layer = HomeComputerController.DesktopCanvasLayer };
+            layer.AddChild(desktop);
+            tree.Root.AddChild(layer);
+
+            PauseManager.Instance?.ClearAllPauses();
+            var error = tree.ChangeSceneToPacked(home);
+            if (error != Error.Ok)
+            {
+                layer.Hide();
+                layer.QueueFree();
+            }
+            return error;
+        }
 
         public override void _Ready()
         {
@@ -21,8 +55,14 @@ namespace Kuros.Scenes
             var stage = GetParent();
             _returningByTaxi = root.HasMeta(ChangeSceneStep.HomeTaxiReturnMeta)
                 && root.GetMeta(ChangeSceneStep.HomeTaxiReturnMeta).AsString() == stage.SceneFilePath;
-            _monitorTransition = MonitorShutdownTransition.Find(GetTree());
-            if (!_returningByTaxi && _monitorTransition == null) return;
+            var entry = root.GetNodeOrNull<CanvasLayer>(EntryLayerName);
+            if (entry != null && !entry.IsQueuedForDeletion())
+            {
+                _entryDesktop = entry;
+                _excludePlayTime = !stage.IsInGroup(ExcludePlayTimeGroup);
+                if (_excludePlayTime) stage.AddToGroup(ExcludePlayTimeGroup);
+            }
+            if (!_returningByTaxi && _entryDesktop == null) return;
 
             if (_returningByTaxi) root.RemoveMeta(ChangeSceneStep.HomeTaxiReturnMeta);
             _generator = stage.GetNode<StageGeneratorManager>("StageGeneratorManager");
@@ -33,32 +73,66 @@ namespace Kuros.Scenes
         public override void _ExitTree()
         {
             DisconnectGenerator();
-            if (IsInstanceValid(_monitorTransition)) _monitorTransition!.QueueFree();
+            if (IsInstanceValid(_entryDesktop)) _entryDesktop!.QueueFree();
         }
 
         private void OnStageGenerated()
         {
             DisconnectGenerator();
-            if (IsInstanceValid(_monitorTransition))
-                _ = PlayMonitorArrival();
-            if (_returningByTaxi) _ = PlayArrival();
+            if (IsInstanceValid(_entryDesktop))
+            {
+                // 等待 BattleScene 的延迟初始化载入存档和 HUD，桌面覆盖层继续保留。
+                Callable.From(() => { _ = PlayDesktopArrival(); }).CallDeferred();
+            }
+            else if (_returningByTaxi) _ = PlayArrival();
         }
 
-        private async Task PlayMonitorArrival()
+        private async Task PlayDesktopArrival()
         {
-            var trigger = GetParent().GetNodeOrNull<CutsceneTrigger>("World/ABegin/CutsceneTrigger");
-            if (trigger != null) await trigger.TriggerAsync();
+            if (!IsInstanceValid(this) || !IsInsideTree() || _entryDesktop is not { } layer || !IsInstanceValid(layer)) return;
+            _entryDesktop = null;
+            var desktop = layer.GetChild<DesktopMenu>(0);
+            desktop.ComputerClosed += BeginPlayTime;
+            try
+            {
+                var stage = GetParent();
+                var computer = stage.GetNodeOrNull<HomeComputerController>("World/ABegin/homeTable");
+                var manager = stage.GetNodeOrNull<CutsceneManager>("CutsceneManager");
+                if (computer == null || manager == null)
+                {
+                    GD.PushError("[StageHomeArrivalController] 缺少 homeTable 或 CutsceneManager");
+                    return;
+                }
+                await computer.PlayComputerAsync(manager, layer);
+            }
+            finally
+            {
+                if (IsInstanceValid(desktop)) desktop.ComputerClosed -= BeginPlayTime;
+                BeginPlayTime();
+                if (IsInstanceValid(layer) && !layer.IsQueuedForDeletion()) layer.QueueFree();
+            }
+        }
 
-            // 配置缺失或镜头步骤提前结束时，避免遮罩留在画面上。
-            if (IsInstanceValid(_monitorTransition) && !_monitorTransition!.IsQueuedForDeletion())
-                await _monitorTransition.RevealAsync();
+        private void BeginPlayTime()
+        {
+            if (!_excludePlayTime) return;
+            _excludePlayTime = false;
+            if (IsInstanceValid(this) && IsInsideTree()) GetParent().RemoveFromGroup(ExcludePlayTimeGroup);
         }
 
         private void OnStageGenerationFailed()
         {
             DisconnectGenerator();
-            if (IsInstanceValid(_monitorTransition)) _ = _monitorTransition!.RevealAsync();
-            if (_returningByTaxi) CloudSceneTransition.Find(GetTree())?.QueueFree();
+            if (IsInstanceValid(_entryDesktop))
+            {
+                _entryDesktop!.QueueFree();
+                _entryDesktop = null;
+                BeginPlayTime();
+                var error = GetTree().ChangeSceneToFile(TitleScreen.ScenePath);
+                if (error == Error.Ok) SaveManager.Instance?.ClearCurrentGameData();
+                else GD.PushError($"[StageHomeArrivalController] 无法返回标题页：{error}");
+            }
+            else if (_returningByTaxi) CloudSceneTransition.Find(GetTree())?.QueueFree();
         }
 
         private void DisconnectGenerator()

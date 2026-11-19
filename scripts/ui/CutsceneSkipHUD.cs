@@ -89,7 +89,7 @@ namespace Kuros.UI
                 return;
             }
 
-            Visible = _manager.IsPlaying;
+            Visible = _manager.CanSkip;
             IsButtonHeld = Visible
                 && Ring != null
                 && GodotObject.IsInstanceValid(Ring)

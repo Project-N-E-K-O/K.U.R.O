@@ -58,6 +58,8 @@ namespace Kuros.Managers
         
         public override void _Process(double delta)
         {
+            if (GetTree().CurrentScene?.IsInGroup("exclude_play_time") == true) return;
+
             // 更新游戏时间（仅在游戏未暂停时）
             if (PauseManager.Instance == null || !PauseManager.Instance.IsPaused)
             {
@@ -347,7 +349,7 @@ namespace Kuros.Managers
         }
 
         /// <summary>新游戏：在空槽位写入初始永久进度数据，并设为当前存档（死亡/电梯自动存档依赖它）。</summary>
-        public void NewGame(int slotIndex)
+        public bool NewGame(int slotIndex)
         {
             var data = new GameSaveData
             {
@@ -359,8 +361,9 @@ namespace Kuros.Managers
                 CycleCount = 0,
                 MaxStageReached = 1,
             };
-            SaveGame(slotIndex, data);
+            if (!SaveGame(slotIndex, data)) return false;
             SetCurrentGameData(data);
+            return true;
         }
 
         /// <summary>删除指定槽位的存档。</summary>
@@ -369,7 +372,9 @@ namespace Kuros.Managers
             if (slotIndex < 0 || slotIndex >= SaveSlotsCount) return false;
             string filePath = GetSaveFilePath(slotIndex);
             if (!Godot.FileAccess.FileExists(filePath)) return false;
-            DirAccess.RemoveAbsolute(filePath);
+            if (DirAccess.RemoveAbsolute(filePath) != Error.Ok) return false;
+            if (CurrentGameData?.SlotIndex == slotIndex)
+                ClearCurrentGameData();
             GD.Print($"SaveManager: 已删除存档槽位 {slotIndex}");
             return true;
         }

@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/ui/menus/DesktopMenu.tscn" id="1_desktop"]
+
+[node name="InGameDesktopMenu" instance=ExtResource("1_desktop")]
+IsInGameComputer = true

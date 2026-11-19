@@ -30,7 +30,6 @@ AiLevelDescription = "家，提供休整的地方，每次醒来后所待的地�
 script = ExtResource("2_tbvpk")
 TargetCamera = NodePath("../World/Camera2D")
 Player = NodePath("../World/MainCharacter")
-DebugPrintZoom = false
 
 [node name="CutsceneManager" type="Node" parent="."]
 script = ExtResource("3_31t1p")

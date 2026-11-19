@@ -10,7 +10,6 @@ namespace Kuros.UI
     [GlobalClass]
     public partial class GameOverScreen : Control
     {
-        private const string TitleScreenPath = "res://scenes/ui/menus/TitleScreen.tscn";
         private const string HomeScenePath = "res://scenes/Stage_home.tscn";
 
         [ExportGroup("Title")]
@@ -111,11 +110,11 @@ namespace Kuros.UI
         private void OnMenuPressed()
         {
             UIManager.Instance?.UnloadGameOverScreen();
-            // 返回标题同样清空本局构筑与武器电量，避免旧数据带入新游戏
+            // 返回桌面时清空本局构筑与武器电量。
             BuildSelectionManager.Instance?.ResetForNewRun();
             WeaponBatteryManager.Instance?.ResetAll();
             FloatingDamageTextManager.Instance?.ClearAll(); // 清理 Root 级残留飘字
-            GetTree().ChangeSceneToFile(TitleScreenPath); // 返回初始界面（标题界面）
+            GetTree().ChangeSceneToFile(Kuros.Scenes.DesktopMenu.ScenePath);
         }
     }
 }

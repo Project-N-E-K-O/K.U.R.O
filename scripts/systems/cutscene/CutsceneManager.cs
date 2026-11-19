@@ -87,6 +87,8 @@ namespace Kuros.Systems.Cutscene
         private bool    _cameraWasTopLevel = false;
 
         private bool _cameraOverrideActive;
+        private bool _interactive;
+        internal bool CanSkip => IsPlaying && !_interactive;
         private (bool HorizontalDrag, bool VerticalDrag, bool Smoothing)? _cameraTrackingSettings;
         private CameraZoneArea? _returnCameraZone;
         private Vector2 _normalCameraZoom;
@@ -95,6 +97,7 @@ namespace Kuros.Systems.Cutscene
             ? _normalCameraZoom : Camera?.Zoom ?? Vector2.One;
         private bool    _playerWasVisible  = false;
         private bool    _playerProcessDisabled = false;
+        private ProcessModeEnum _playerProcessModeBeforeCutscene;
         private readonly System.Collections.Generic.List<CanvasItem> _hiddenNodes = new();
         /// <summary>本次过场被本管理器改成 ProcessMode.Disabled 的节点（含切换前就不可见的）——
         /// 恢复必须按这份清单走，否则"本来就不可见"的节点会永久停在 Disabled。</summary>
@@ -190,7 +193,7 @@ namespace Kuros.Systems.Cutscene
         /// </summary>
         private void UpdateSkipHold(float delta)
         {
-            if (!IsPlaying || SkipHoldSeconds <= 0f)
+            if (!CanSkip || SkipHoldSeconds <= 0f)
             {
                 _skipHold = 0f;
                 return;
@@ -234,7 +237,12 @@ namespace Kuros.Systems.Cutscene
 
         // ── 公开 API ──────────────────────────────────────────────────────
         /// <summary>播放一段过场动画序列。已在播放中则忽略。</summary>
-        public async Task PlayCutscene(CutsceneSequence sequence)
+        public Task PlayCutscene(CutsceneSequence sequence) => PlaySequence(sequence, null);
+
+        internal Task PlayInteractiveCutscene(CutsceneSequence sequence, System.Func<CutsceneContext, Task> play)
+            => PlaySequence(sequence, play);
+
+        private async Task PlaySequence(CutsceneSequence sequence, System.Func<CutsceneContext, Task>? play)
         {
             if (IsPlaying) return;
 
@@ -246,6 +254,7 @@ namespace Kuros.Systems.Cutscene
             GD.Print($"[Cutscene] FadeOverlay: {(FadeOverlay != null ? FadeOverlay.Name : "null")}");
 
             IsPlaying       = true;
+            _interactive = play != null;
             IsSkipRequested = false;
             _skipHold       = 0f;   // 每段过场从零开始的长按进度
 
@@ -257,6 +266,7 @@ namespace Kuros.Systems.Cutscene
             // 玩家：禁用输入 与 隐藏 各自独立（序列的 DisablePlayerInput / HidePlayer）
             _playerWasVisible = false;
             _playerProcessDisabled = false;
+            _playerProcessModeBeforeCutscene = Player?.ProcessMode ?? ProcessModeEnum.Inherit;
             if (sequence.DisablePlayerInput)
             {
                 if (Player != null)
@@ -307,6 +317,11 @@ namespace Kuros.Systems.Cutscene
 
             // 依次执行步骤
             var ctx = new CutsceneContext(this, sequence);
+            if (play != null)
+            {
+                try { await play(ctx); }
+                catch (System.Exception ex) { GD.PushError($"[Cutscene] {sequence.SequenceId} 交互失败：{ex}"); }
+            }
             int stepIndex = 0;
             foreach (var step in sequence.Steps ?? new Godot.Collections.Array<CutsceneStep>())
             {
@@ -347,14 +362,9 @@ namespace Kuros.Systems.Cutscene
                 EndCameraOverride();
 
             // 恢复玩家输入与可见性（各自独立，只还原本次真的改过的项）
-            if (Player != null && GodotObject.IsInstanceValid(Player) && (_playerProcessDisabled || _playerWasVisible))
-            {
-                if (_playerProcessDisabled)
-                    Player.ProcessMode = ProcessModeEnum.Inherit;
-                if (_playerWasVisible)
-                    Player.Show();
-                GD.Print($"[Cutscene] 恢复玩家: {Player.Name}（输入={_playerProcessDisabled} 显示={_playerWasVisible}）");
-            }
+            RestorePlayerInput();
+            if (_playerWasVisible && IsInstanceValid(Player))
+                Player!.Show();
 
             // 恢复显示（只还原本次真的隐藏过的）
             foreach (var node in _hiddenNodes)
@@ -383,15 +393,33 @@ namespace Kuros.Systems.Cutscene
             // 恢复 BattleSceneManager 管理的 UI
             _battleSceneManager?.ShowAllUI();
 
+            _interactive = false;
             IsPlaying = false;
             GD.Print($"[Cutscene] === PlayCutscene 结束: {sequence.SequenceId} ===");
             EmitSignal(SignalName.CutsceneFinished, sequence.SequenceId);
         }
 
+        internal void ReleaseInteractivePlayer()
+        {
+            if (_interactive) RestorePlayerInput();
+        }
+
+        internal void ReleaseInteractiveCamera()
+        {
+            if (_interactive) EndCameraOverride();
+        }
+
+        private void RestorePlayerInput()
+        {
+            if (!_playerProcessDisabled) return;
+            _playerProcessDisabled = false;
+            if (IsInstanceValid(Player)) Player!.ProcessMode = _playerProcessModeBeforeCutscene;
+        }
+
         /// <summary>手动请求跳过当前过场（例如由 UI 按钮调用）。</summary>
         public void RequestSkip()
         {
-            if (IsSkipRequested) return;
+            if (IsSkipRequested || _interactive) return;
             IsSkipRequested = true;
             if (IsPlaying) SkipRevision++;
         }

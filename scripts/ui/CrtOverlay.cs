@@ -51,7 +51,7 @@ namespace Kuros.UI
 
         public override void _Ready()
         {
-            Layer       = 127;
+            Layer       = 999;
             ProcessMode = ProcessModeEnum.Always;
 
             _rect = GetNodeOrNull<ColorRect>("ColorRect");

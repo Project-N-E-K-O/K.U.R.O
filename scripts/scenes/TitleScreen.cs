@@ -6,7 +6,7 @@ namespace Kuros.Scenes
     /// <summary>
     /// 游戏启动画面 —— "按任意键开始"。
     ///
-    /// 流程：project.godot → TitleScreen → (任意键) → NextScenePath（默认 MainMenu.tscn）
+    /// 流程：project.godot → TitleScreen → (任意键) → NextScenePath（默认 DesktopMenu.tscn）
     ///
     /// 0.5 秒延迟（_canProceed）防止启动误触跳过。
     /// "按任意键开始" 文字通过正弦波透明度实现闪烁效果。
@@ -15,7 +15,9 @@ namespace Kuros.Scenes
     /// </summary>
     public partial class TitleScreen : Control
     {
-        [Export] public string NextScenePath = "res://scenes/ui/menus/MainMenu.tscn";
+        public const string ScenePath = "res://scenes/ui/menus/TitleScreen.tscn";
+
+        [Export] public string NextScenePath = DesktopMenu.ScenePath;
         [Export] public Label PressAnyKeyLabel { get; private set; } = null!;
         /// <summary>标题节点（TextureRect/Label 均可），用于延时淡入 + 呼吸闪烁效果。</summary>
         [Export] public Control TitleNode { get; private set; } = null!;
@@ -105,6 +107,7 @@ namespace Kuros.Scenes
 
             if (shouldProceed)
             {
+                GetViewport().SetInputAsHandled();
                 GetTree().ChangeSceneToFile(NextScenePath);
             }
         }

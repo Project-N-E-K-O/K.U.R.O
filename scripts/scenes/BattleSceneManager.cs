@@ -432,7 +432,7 @@ namespace Kuros.Scenes
 				{
 					Kuros.Managers.BuildSelectionManager.Instance.ClearBuildState();
 				}
-				tree.ChangeSceneToFile("res://scenes/ui/menus/MainMenu.tscn");
+				tree.ChangeSceneToFile(DesktopMenu.ScenePath);
 			}
 		}
 

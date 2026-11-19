@@ -1,6 +1,28 @@
-[gd_scene load_steps=2 format=3 uid="uid://cnkk83sm7ys0t"]
+[gd_scene load_steps=6 format=3 uid="uid://cnkk83sm7ys0t"]
 
 [ext_resource type="Script" uid="uid://cskt3sx0gi3j7" path="res://scripts/scenes/MainMenuManager.cs" id="1"]
+[ext_resource type="Shader" uid="uid://dp884ubyaxawl" path="res://shaders/materials/menu_title_pattern.gdshader" id="2_pattern_shader"]
+[ext_resource type="Texture2D" uid="uid://k3ioi2yc73qo" path="res://assets/art/KURO_Title_Pattern.png" id="3_pattern_texture"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_title_pattern"]
+shader = ExtResource("2_pattern_shader")
+shader_parameter/pattern_texture = ExtResource("3_pattern_texture")
+shader_parameter/pattern_angle_degrees = -45.0
+shader_parameter/scroll_angle_degrees = -45.0
+shader_parameter/scroll_speed = 42.0
+shader_parameter/tile_width = 960.0
+shader_parameter/opacity = 0.0499999988824
+shader_parameter/pattern_offset = Vector2(0, 0)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_title_pattern_2"]
+shader = ExtResource("2_pattern_shader")
+shader_parameter/pattern_texture = ExtResource("3_pattern_texture")
+shader_parameter/pattern_angle_degrees = -45.0
+shader_parameter/scroll_angle_degrees = 135.0
+shader_parameter/scroll_speed = 42.0
+shader_parameter/tile_width = 960.0
+shader_parameter/opacity = 0.0499999988824
+shader_parameter/pattern_offset = Vector2(0, 0.16666667)
 
 [node name="MainMenuScene" type="Control"]
 layout_mode = 3
@@ -19,6 +41,26 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.1, 0.1, 0.15, 1)
+
+[node name="TitlePattern" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_title_pattern")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="TitlePattern2" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_title_pattern_2")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
 
 [node name="MenuPanel" type="Control" parent="."]
 layout_mode = 1

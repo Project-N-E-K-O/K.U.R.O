@@ -221,10 +221,14 @@ DarkLayerPath = NodePath("Sprite2D")
 SpotGroups = Array[Array]([[NodePath("Spot1"), NodePath("Spot2")], [NodePath("Spot9"), NodePath("Spot10")], [NodePath("Spot3"), NodePath("Spot4")], [NodePath("Spot5"), NodePath("Spot6")], [NodePath("Spot11"), NodePath("Spot12")], [NodePath("Spot7"), NodePath("Spot8")]])
 TriggerAreaPath = NodePath("../LightTrigger")
 PreheatRadius = 40.0
-SpotRadius = 80.0
+PreheatSoftness = 40.0
+SpotRadius = 100.0
 Softness = 40.0
+SoftnessFadeSeconds = 0.3
 PreheatStartDelaySeconds = 0.5
-SpotStartDelaySeconds = 1.0
+PreheatIntervalSeconds = 0.5
+SpotStartDelaySeconds = 1.5
+SpotIntervalSeconds = 0.5
 
 [node name="Sprite2D" type="Sprite2D" parent="DarkCovers"]
 modulate = Color(0, 0, 0, 0.60784316)
