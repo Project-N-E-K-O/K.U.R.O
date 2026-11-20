@@ -12,7 +12,7 @@ namespace Kuros.UI
     ///   有存档 → 存档名 + 游戏时间 + 通关次数 + 循环次数 + 保存时间 + 删除按钮
     ///   空槽位 → "存档槽位 N（空）" + "点击开始新游戏"
     ///
-    /// 点击按钮 → 发射 SlotSelected 信号 → MainMenuManager 处理场景切换
+    /// 点击按钮 → 发射 SlotSelected 信号，由菜单决定如何使用该档案。
     /// 删除按钮 → ConfirmationDialog 二次确认 → SaveManager.DeleteSave()
     ///
     /// 按钮在 .tscn 中预置为 Button 子节点，C# 通过 GetNodeOrNull 查找。
@@ -41,6 +41,7 @@ namespace Kuros.UI
         private Label[] _slotNames = null!;
         private Label[] _slotDetails = null!;
         private Button[] _slotDeletes = null!;
+        public bool SelectProfileOnly { get; set; }
 
         public override void _Ready()
         {
@@ -156,7 +157,7 @@ namespace Kuros.UI
             else
             {
                 _slotNames[i].Text = $"存档槽位 {i + 1}（空）";
-                _slotDetails[i].Text = "点击开始新游戏";
+                _slotDetails[i].Text = SelectProfileOnly ? "创建并选择档案" : "点击开始新游戏";
                 _slotDeletes[i].Visible = false;
             }
         }
@@ -174,7 +175,7 @@ namespace Kuros.UI
                 dialog.QueueFree();
             };
             dialog.Canceled += dialog.QueueFree;
-            GetTree().Root.AddChild(dialog);
+            AddChild(dialog);
             dialog.PopupCentered();
         }
 
@@ -199,10 +200,13 @@ namespace Kuros.UI
         public override void _Input(InputEvent @event)
         {
             if (!IsVisibleInTree()) return;
-            if (@event.IsActionPressed("ui_cancel") || (@event is InputEventKey k && k.Pressed && k.Keycode == Key.Escape))
-            {
-                GetViewport().SetInputAsHandled();
-            }
+            bool escape = @event is InputEventKey { Pressed: true, Echo: false } key
+                && (key.Keycode == Key.Escape || key.PhysicalKeycode == Key.Escape);
+            // 档案选择中 Enter 确认焦点槽位，Esc 返回。项目里的 ui_cancel 仍绑定 Enter。
+            if (!escape && (SelectProfileOnly || !@event.IsActionPressed("ui_cancel"))) return;
+
+            GetViewport().SetInputAsHandled();
+            if (SelectProfileOnly) EmitSignal(SignalName.BackRequested);
         }
     }
 

@@ -2,6 +2,8 @@ using System.Threading.Tasks;
 using Godot;
 using Kuros.Environments;
 using Kuros.Items.World;
+using Kuros.Managers;
+using Kuros.Scenes;
 using Kuros.Utils;
 
 namespace Kuros.Systems.Cutscene
@@ -18,6 +20,7 @@ namespace Kuros.Systems.Cutscene
     [GlobalClass]
     public partial class ChangeSceneStep : CutsceneStep
     {
+        internal const string HomeTaxiReturnMeta = "home_taxi_return";
         /// <summary>场景切换必须执行，即使过场被 skip 也不跳过。</summary>
         public override bool ExecuteOnSkip => true;
 
@@ -32,25 +35,65 @@ namespace Kuros.Systems.Cutscene
         /// 与 ElevatorController 行为一致，跨关卡切换时建议开启。
         /// </summary>
         [Export] public bool ClearWorldItemCache { get; set; } = true;
+        /// <summary>酒店入场：换场前云层盖满，由 StageSession 首层就绪后退场。</summary>
+        [Export] public bool UseCloudTransition { get; set; }
+        /// <summary>由目标 Stage_home 消费的一次性返程请求。</summary>
+        [Export] public bool ReturnHomeByTaxi { get; set; }
+        /// <summary>切入 Stage_home 时显示的电脑桌面页面。None 为普通换场。</summary>
+        [Export] public HomeDesktopPage OpenHomeDesktop { get; set; }
+        /// <summary>显式结束当前一轮。普通换场和单纯返家保持 None。</summary>
+        [Export] public RunOutcome FinishRunAs { get; set; }
 
         public override async Task Execute(CutsceneContext ctx)
         {
+            bool enterHomeDesktop = OpenHomeDesktop != HomeDesktopPage.None;
+            bool endsRun = FinishRunAs != RunOutcome.None;
             GD.Print($"[Cutscene] ChangeSceneStep 开始，ScenePath={ScenePath}, Delay={DelayBeforeChange}");
 
             if (DelayBeforeChange > 0f)
             {
                 float elapsed = 0f;
-                while (elapsed < DelayBeforeChange && !ctx.IsSkipping)
+                while (elapsed < DelayBeforeChange && !ctx.IsSkipping && !ctx.IsCancelled)
                 {
                     await ctx.NextFrame();
+                    if (ctx.IsCancelled) return;
                     elapsed += (float)ctx.Manager.GetProcessDeltaTime();
                 }
             }
+
+            if (ctx.IsCancelled) return;
 
             var tree = ctx.Manager.GetTree();
 
             // 优先使用 TaxiController 预加载的场景（已在内存中，切换几乎瞬间）
             var preloaded = TaxiController.ConsumePreloadedScene();
+            string configuredPath = ScenePath.StartsWith("uid://")
+                ? ResourceUid.GetIdPath(ResourceUid.TextToId(ScenePath))
+                : ScenePath;
+            if (enterHomeDesktop && configuredPath != StageHomeArrivalController.HomeScenePath)
+            {
+                GD.PushError("[Cutscene] OpenHomeDesktop 需要将 ScenePath 指向 Stage_home");
+                return;
+            }
+            if ((ReturnHomeByTaxi || enterHomeDesktop) && preloaded?.ResourcePath != configuredPath)
+                preloaded = null;
+            if (endsRun && SaveManager.Instance is { HasRunToFinish: true } saves
+                && !saves.FinishRun(FinishRunAs))
+            {
+                GD.PushError("[Cutscene] 保存结算失败，已保留本轮记录供重试");
+                return;
+            }
+            string destination = preloaded?.ResourcePath ?? configuredPath;
+            Kuros.UI.CloudSceneTransition? cloud = null;
+            if (!enterHomeDesktop && UseCloudTransition && (preloaded != null || !string.IsNullOrEmpty(ScenePath)))
+            {
+                cloud = await Kuros.UI.CloudSceneTransition.CoverAsync(tree, destination);
+                if (!GodotObject.IsInstanceValid(ctx.Manager) || !ctx.Manager.IsInsideTree())
+                {
+                    if (GodotObject.IsInstanceValid(cloud)) cloud.QueueFree();
+                    return;
+                }
+            }
 
             if (ClearWorldItemCache)
             {
@@ -60,22 +103,41 @@ namespace Kuros.Systems.Cutscene
 
             DialogicUtils.CleanupPersistentState(ctx.Manager);
 
+            if (enterHomeDesktop)
+            {
+                var desktopError = StageHomeArrivalController.EnterFromDesktop(tree, preloaded, OpenHomeDesktop);
+                if (desktopError != Error.Ok) GD.PushError($"[Cutscene] 无法打开返家桌面：{desktopError}");
+                else if (endsRun) RunStateReset.AfterSceneChange();
+                return;
+            }
+
+            if (ReturnHomeByTaxi && !string.IsNullOrEmpty(destination))
+                tree.Root.SetMeta(HomeTaxiReturnMeta, destination);
+
+            Error error;
             if (preloaded != null)
             {
                 GD.Print($"[Cutscene] ChangeSceneStep: 使用预加载场景切换 {preloaded.ResourcePath}");
-                tree.ChangeSceneToPacked(preloaded);
+                error = tree.ChangeSceneToPacked(preloaded);
             }
             else if (!string.IsNullOrEmpty(ScenePath))
             {
                 GD.Print($"[Cutscene] ChangeSceneStep: 切换到路径 {ScenePath}");
-                tree.ChangeSceneToFile(ScenePath);
+                error = tree.ChangeSceneToFile(ScenePath);
             }
             else
             {
                 GD.PrintErr("[Cutscene] ChangeSceneStep: ScenePath 未设置，跳过");
+                error = Error.InvalidParameter;
             }
 
-            // 场景切换后当前场景树会被销毁，此处不再执行后续代码
+            if (error == Error.Ok)
+            {
+                if (endsRun) RunStateReset.AfterSceneChange();
+                return;
+            }
+            if (ReturnHomeByTaxi) tree.Root.RemoveMeta(HomeTaxiReturnMeta);
+            cloud?.QueueFree();
         }
     }
 }

@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3 uid="uid://beup3s3dr4q8h"]
+[gd_scene load_steps=24 format=3 uid="uid://beup3s3dr4q8h"]
 
 [ext_resource type="Script" uid="uid://b0qiaumw3ige7" path="res://scripts/systems/cutscene/CutsceneManager.cs" id="1_csmgr"]
 [ext_resource type="Script" uid="uid://x1ic1ym4ykq8" path="res://scripts/scenes/BattleSceneManager.cs" id="1_ctuyy"]
@@ -20,6 +20,7 @@
 [ext_resource type="Script" uid="uid://ghxude6q2vj8" path="res://scripts/systems/stage/StageSession.cs" id="16_sess"]
 [ext_resource type="Script" uid="uid://dim2ctx63qcxt" path="res://scripts/systems/stage/StageConfig.cs" id="17_scfg"]
 [ext_resource type="Resource" uid="uid://bj4jgj656v1r0" path="res://resources/stages/stage_difficulty.tres" id="18_diff"]
+[ext_resource type="Resource" uid="uid://bmhnobwnd0s4a" path="res://resources/stages/stage_exitA.tres" id="hotel_exit"]
 [ext_resource type="Resource" uid="uid://ck0oryxrkbkq5" path="res://resources/stages/stage_1.tres" id="hotel_lobby"]
 [ext_resource type="Resource" uid="uid://cfqfibxgsuw2y" path="res://resources/stages/hotel_room_catalog.tres" id="hotel_rooms"]
 
@@ -32,7 +33,6 @@ Player = NodePath("World/MainCharacter")
 script = ExtResource("4_camera")
 TargetCamera = NodePath("../World/Camera2D")
 Player = NodePath("../World/MainCharacter")
-DebugPrintZoom = false
 
 [node name="CutsceneManager" type="Node" parent="."]
 script = ExtResource("1_csmgr")
@@ -47,8 +47,8 @@ Catalog = ExtResource("hotel_rooms")
 
 [node name="StageSession" type="Node" parent="."]
 script = ExtResource("16_sess")
-AllConfigs = Array[ExtResource("17_scfg")]([ExtResource("hotel_lobby"), ExtResource("8_83iw7"), ExtResource("9_5g8wj"), ExtResource("10_axi2i"), ExtResource("11_i2bjf"), ExtResource("12_axi2i"), ExtResource("13_i2bjf"), ExtResource("13_ohqcc"), ExtResource("14_i2bjf")])
-StartStage = ExtResource("11_i2bjf")
+AllConfigs = Array[ExtResource("17_scfg")]([ExtResource("hotel_lobby"), ExtResource("8_83iw7"), ExtResource("9_5g8wj"), ExtResource("10_axi2i"), ExtResource("11_i2bjf"), ExtResource("12_axi2i"), ExtResource("13_i2bjf"), ExtResource("13_ohqcc"), ExtResource("14_i2bjf"), ExtResource("hotel_exit")])
+StartStage = ExtResource("hotel_lobby")
 Difficulty = ExtResource("18_diff")
 
 [node name="BuildSelectionManager" parent="." instance=ExtResource("14_pvxkr")]
@@ -57,8 +57,6 @@ Difficulty = ExtResource("18_diff")
 y_sort_enabled = true
 
 [node name="MainCharacter" parent="World" instance=ExtResource("2_s0pgc")]
-AttackDamage = 1000.0
-MaxHealth = 12000
 
 [node name="Camera2D" type="Camera2D" parent="World" node_paths=PackedStringArray("Target")]
 scale = Vector2(0.32999998, 0.32999998)
@@ -90,13 +88,37 @@ script = ExtResource("7_drop")
 layer = 128
 
 [node name="ColorRectTop" type="ColorRect" parent="CanvasLayer"]
+visible = false
 offset_right = 1920.0
 offset_bottom = 150.0
 color = Color(0, 0, 0, 1)
 metadata/_edit_use_anchors_ = true
 
 [node name="ColorRectBottom" type="ColorRect" parent="CanvasLayer"]
+visible = false
 offset_top = 930.0
 offset_right = 1920.0
 offset_bottom = 1080.0
 color = Color(0, 0, 0, 1)
+
+[node name="InitialLoadingCover" type="CanvasLayer" parent="."]
+layer = 129
+
+[node name="Background" type="ColorRect" parent="InitialLoadingCover"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
+[node name="Message" type="Label" parent="InitialLoadingCover"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "加载中…"
+horizontal_alignment = 1
+vertical_alignment = 1

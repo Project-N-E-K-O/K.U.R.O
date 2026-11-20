@@ -5,7 +5,7 @@ using System.Linq;
 namespace Kuros.Systems.Stage
 {
     public sealed record StagePlan(StageConfig Config, IReadOnlyList<RoomType> RoomTypes, IReadOnlyList<string> RoomPaths,
-        IReadOnlyList<Texture2D?> RoomIcons)
+        IReadOnlyList<Texture2D?> RoomIcons, IReadOnlyList<string> RoomNames)
     {
         public IEnumerable<(string Text, Texture2D? Icon)> GetElevatorPreview()
         {
@@ -24,13 +24,16 @@ namespace Kuros.Systems.Stage
 
             if (core >= 0)
             {
-                yield return ("Boss", RoomIcons[core]);
+                yield return (PreviewName(core), RoomIcons[core]);
                 yield break;
             }
 
             for (int i = 0; i < RoomTypes.Count; i++)
-                yield return (DescribeRoomType(RoomTypes[i]), RoomIcons[i]);
+                yield return (PreviewName(i), RoomIcons[i]);
         }
+
+        private string PreviewName(int index) => string.IsNullOrWhiteSpace(RoomNames[index])
+            ? DescribeRoomType(RoomTypes[index]) : RoomNames[index];
 
         public string DescribeRoute() => string.Join(" → ", GetElevatorPreview().Select(room => room.Text));
 
@@ -42,11 +45,13 @@ namespace Kuros.Systems.Stage
             RoomType.EliteCombat => "战斗++",
             RoomType.Puzzle => "谜题",
             RoomType.Boss => "Boss",
-            RoomType.Exit => "出口",
+            RoomType.End => "终点",
             RoomType.BossWingA => "Boss 左翼",
             RoomType.BossCore => "Boss 中枢",
             RoomType.BossWingC => "Boss 右翼",
             RoomType.Hidden => "？？？",
+            RoomType.Shop => "商店",
+            RoomType.Healing => "治疗",
             _ => type.ToString()
         };
     }

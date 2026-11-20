@@ -175,6 +175,8 @@ namespace Kuros.Scenes
 
         private void OnSaveSlotSelected(int slotIndex)
         {
+            if (_isLoadingScene) return;
+
             GD.Print($"MainMenuManager.OnSaveSlotSelected 被调用，槽位: {slotIndex}");
             if (_saveSlotSelection == null || SaveManager.Instance == null)
             {
@@ -197,7 +199,7 @@ namespace Kuros.Scenes
             else
             {
                 GD.Print($"MainMenuManager: 槽位 {slotIndex} 无存档，创建新游戏...");
-                SaveManager.Instance.NewGame(slotIndex);
+                if (!SaveManager.Instance.NewGame(slotIndex)) return;
                 GameLogger.Info(nameof(MainMenuManager), $"新游戏槽位 {slotIndex}，进入场景");
             }
 
@@ -216,11 +218,6 @@ namespace Kuros.Scenes
                 return;
             }
 
-            if (PauseManager.Instance != null)
-                PauseManager.Instance.ClearAllPauses();
-
-            CleanupUI();
-
             if (!ResourceLoader.Exists(scenePath))
             {
                 GameLogger.Error(nameof(MainMenuManager), $"场景文件不存在: {scenePath}");
@@ -234,19 +231,23 @@ namespace Kuros.Scenes
                 return;
             }
 
-            var testInstance = scene.Instantiate();
-            if (testInstance == null)
-            {
-                GameLogger.Error(nameof(MainMenuManager), $"场景实例化失败: {scenePath}");
-                return;
-            }
-            testInstance.QueueFree();
-
-            var error = tree.ChangeSceneToFile(scenePath);
+            _isLoadingScene = true;
+            var error = scene.ResourcePath == StageHomeArrivalController.HomeScenePath
+                ? StageHomeArrivalController.EnterFromDesktop(tree, scene)
+                : ChangeScene(tree, scene);
             if (error != Error.Ok)
+            {
                 GameLogger.Error(nameof(MainMenuManager), $"切换场景失败: {error}, 路径: {scenePath}");
+                _isLoadingScene = false;
+            }
             else
                 GameLogger.Info(nameof(MainMenuManager), $"成功切换到场景: {scenePath}");
+        }
+
+        private static Error ChangeScene(SceneTree tree, PackedScene scene)
+        {
+            PauseManager.Instance?.ClearAllPauses();
+            return tree.ChangeSceneToPacked(scene);
         }
 
         // ── 清理 ──

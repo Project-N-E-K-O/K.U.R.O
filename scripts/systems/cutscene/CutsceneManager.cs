@@ -87,12 +87,17 @@ namespace Kuros.Systems.Cutscene
         private bool    _cameraWasTopLevel = false;
 
         private bool _cameraOverrideActive;
+        private bool _interactive;
+        internal bool CanSkip => IsPlaying && !_interactive;
+        private (bool HorizontalDrag, bool VerticalDrag, bool Smoothing)? _cameraTrackingSettings;
+        private CameraZoneArea? _returnCameraZone;
         private Vector2 _normalCameraZoom;
         /// <summary>接管前正常区域的目标缩放，供镜头返回；无接管时使用实时值。</summary>
         public Vector2 NormalCameraZoom => _cameraOverrideActive
             ? _normalCameraZoom : Camera?.Zoom ?? Vector2.One;
         private bool    _playerWasVisible  = false;
         private bool    _playerProcessDisabled = false;
+        private ProcessModeEnum _playerProcessModeBeforeCutscene;
         private readonly System.Collections.Generic.List<CanvasItem> _hiddenNodes = new();
         /// <summary>本次过场被本管理器改成 ProcessMode.Disabled 的节点（含切换前就不可见的）——
         /// 恢复必须按这份清单走，否则"本来就不可见"的节点会永久停在 Disabled。</summary>
@@ -137,6 +142,9 @@ namespace Kuros.Systems.Cutscene
             if (!BottomBlackBarPath.IsEmpty)
                 BottomBlackBar = GetNodeOrNull<Control>(BottomBlackBarPath);
 
+            TopBlackBar?.Hide();
+            BottomBlackBar?.Hide();
+
             if (!BattleSceneManagerPath.IsEmpty)
                 _battleSceneManager = GetNodeOrNull<Kuros.Scenes.BattleSceneManager>(BattleSceneManagerPath);
 
@@ -168,6 +176,11 @@ namespace Kuros.Systems.Cutscene
             GD.Print($"[Cutscene] LateInit — Player: {(Player != null ? Player.Name : "null")}, Camera: {(Camera != null ? Camera.Name : "null")}, BattleSceneManager: {(_battleSceneManager != null ? _battleSceneManager.Name : "null")}");
         }
 
+        public override void _ExitTree()
+        {
+            if (_cameraOverrideActive) EndCameraOverride();
+        }
+
         public override void _Process(double delta)
         {
             UpdateSkipHold((float)delta);
@@ -180,7 +193,7 @@ namespace Kuros.Systems.Cutscene
         /// </summary>
         private void UpdateSkipHold(float delta)
         {
-            if (!IsPlaying || SkipHoldSeconds <= 0f)
+            if (!CanSkip || SkipHoldSeconds <= 0f)
             {
                 _skipHold = 0f;
                 return;
@@ -224,7 +237,12 @@ namespace Kuros.Systems.Cutscene
 
         // ── 公开 API ──────────────────────────────────────────────────────
         /// <summary>播放一段过场动画序列。已在播放中则忽略。</summary>
-        public async Task PlayCutscene(CutsceneSequence sequence)
+        public Task PlayCutscene(CutsceneSequence sequence) => PlaySequence(sequence, null);
+
+        internal Task PlayInteractiveCutscene(CutsceneSequence sequence, System.Func<CutsceneContext, Task> play)
+            => PlaySequence(sequence, play);
+
+        private async Task PlaySequence(CutsceneSequence sequence, System.Func<CutsceneContext, Task>? play)
         {
             if (IsPlaying) return;
 
@@ -236,6 +254,7 @@ namespace Kuros.Systems.Cutscene
             GD.Print($"[Cutscene] FadeOverlay: {(FadeOverlay != null ? FadeOverlay.Name : "null")}");
 
             IsPlaying       = true;
+            _interactive = play != null;
             IsSkipRequested = false;
             _skipHold       = 0f;   // 每段过场从零开始的长按进度
 
@@ -247,6 +266,7 @@ namespace Kuros.Systems.Cutscene
             // 玩家：禁用输入 与 隐藏 各自独立（序列的 DisablePlayerInput / HidePlayer）
             _playerWasVisible = false;
             _playerProcessDisabled = false;
+            _playerProcessModeBeforeCutscene = Player?.ProcessMode ?? ProcessModeEnum.Inherit;
             if (sequence.DisablePlayerInput)
             {
                 if (Player != null)
@@ -293,13 +313,19 @@ namespace Kuros.Systems.Cutscene
 
             // 接管摄像机
             if (sequence.TakeOverCamera)
-                BeginCameraOverride();
+                BeginCameraOverride(sequence.PreciseCamera);
 
             // 依次执行步骤
             var ctx = new CutsceneContext(this, sequence);
+            if (play != null)
+            {
+                try { await play(ctx); }
+                catch (System.Exception ex) { GD.PushError($"[Cutscene] {sequence.SequenceId} 交互失败：{ex}"); }
+            }
             int stepIndex = 0;
             foreach (var step in sequence.Steps ?? new Godot.Collections.Array<CutsceneStep>())
             {
+                if (ctx.IsCancelled) break;
                 if (step == null)
                 {
                     GD.PrintErr($"[Cutscene] 第 {stepIndex} 步为 null，跳过");
@@ -329,19 +355,16 @@ namespace Kuros.Systems.Cutscene
                 stepIndex++;
             }
 
+            if (ctx.IsCancelled) return; // 离开场景树时由 _ExitTree 交还相机
+
             // 还原
             if (sequence.TakeOverCamera)
                 EndCameraOverride();
 
             // 恢复玩家输入与可见性（各自独立，只还原本次真的改过的项）
-            if (Player != null && GodotObject.IsInstanceValid(Player) && (_playerProcessDisabled || _playerWasVisible))
-            {
-                if (_playerProcessDisabled)
-                    Player.ProcessMode = ProcessModeEnum.Inherit;
-                if (_playerWasVisible)
-                    Player.Show();
-                GD.Print($"[Cutscene] 恢复玩家: {Player.Name}（输入={_playerProcessDisabled} 显示={_playerWasVisible}）");
-            }
+            RestorePlayerInput();
+            if (_playerWasVisible && IsInstanceValid(Player))
+                Player!.Show();
 
             // 恢复显示（只还原本次真的隐藏过的）
             foreach (var node in _hiddenNodes)
@@ -370,15 +393,33 @@ namespace Kuros.Systems.Cutscene
             // 恢复 BattleSceneManager 管理的 UI
             _battleSceneManager?.ShowAllUI();
 
+            _interactive = false;
             IsPlaying = false;
             GD.Print($"[Cutscene] === PlayCutscene 结束: {sequence.SequenceId} ===");
             EmitSignal(SignalName.CutsceneFinished, sequence.SequenceId);
         }
 
+        internal void ReleaseInteractivePlayer()
+        {
+            if (_interactive) RestorePlayerInput();
+        }
+
+        internal void ReleaseInteractiveCamera()
+        {
+            if (_interactive) EndCameraOverride();
+        }
+
+        private void RestorePlayerInput()
+        {
+            if (!_playerProcessDisabled) return;
+            _playerProcessDisabled = false;
+            if (IsInstanceValid(Player)) Player!.ProcessMode = _playerProcessModeBeforeCutscene;
+        }
+
         /// <summary>手动请求跳过当前过场（例如由 UI 按钮调用）。</summary>
         public void RequestSkip()
         {
-            if (IsSkipRequested) return;
+            if (IsSkipRequested || _interactive) return;
             IsSkipRequested = true;
             if (IsPlaying) SkipRevision++;
         }
@@ -426,7 +467,7 @@ namespace Kuros.Systems.Cutscene
         }
 
         // ── 摄像机接管 ────────────────────────────────────────────────────
-        private void BeginCameraOverride()
+        private void BeginCameraOverride(bool preciseCamera)
         {
             if (Camera == null) return;
 
@@ -447,21 +488,61 @@ namespace Kuros.Systems.Cutscene
             Camera.TopLevel        = true;
             Camera.GlobalPosition  = gpos;
 
+            if (preciseCamera)
+            {
+                _cameraTrackingSettings = (Camera.DragHorizontalEnabled, Camera.DragVerticalEnabled,
+                    Camera.PositionSmoothingEnabled);
+                Camera.DragHorizontalEnabled = false;
+                Camera.DragVerticalEnabled = false;
+                Camera.PositionSmoothingEnabled = false;
+            }
+        }
+
+        internal void SetCameraReturnZone(CameraZoneArea zone)
+        {
+            if (!_cameraOverrideActive || Camera == null || _cameraZoneManager == null) return;
+            var bounds = zone.ComputeWorldBounds();
+            _cameraZoneManager.RegisterZone(zone.ZoneName, bounds, zone.ZoomLevel);
+            _returnCameraZone = zone;
+            Camera.LimitLeft = (int)bounds.Position.X;
+            Camera.LimitTop = (int)bounds.Position.Y;
+            Camera.LimitRight = (int)bounds.End.X;
+            Camera.LimitBottom = (int)bounds.End.Y;
         }
 
         private void EndCameraOverride()
         {
-            if (Camera == null) return;
-
-            Camera.Zoom = _normalCameraZoom;
-            // Unlock 会按锁定期间持续维护的区域栈重应用边界/缩放。
-            _cameraZoneManager?.UnlockZone();
+            if (!_cameraOverrideActive) return;
             _cameraOverrideActive = false;
+            var returnZone = IsInstanceValid(_returnCameraZone) && _returnCameraZone!.IsInsideTree()
+                ? _returnCameraZone : null;
+            _returnCameraZone = null;
+            if (!IsInstanceValid(Camera))
+            {
+                _cameraTrackingSettings = null;
+                return;
+            }
+            var camera = Camera!;
+            camera.Zoom = returnZone == null ? _normalCameraZoom : Vector2.One * returnZone.ZoomLevel;
+            // Unlock 会按锁定期间持续维护的区域栈重应用边界/缩放。
+            if (IsInstanceValid(_cameraZoneManager))
+                _cameraZoneManager!.UnlockZone(returnZone?.ZoneName);
+            if (IsInsideTree()) returnZone?.EnterForPlayer();
 
-            Camera.TopLevel = _cameraWasTopLevel;
-            Camera.SetProcess(true);
-            Camera.SetPhysicsProcess(true);
-            // CameraFollow 恢复后会通过 position_smoothing 平滑归位
+            var position = camera.GlobalPosition;
+            camera.TopLevel = _cameraWasTopLevel;
+            if (_cameraTrackingSettings is { } settings)
+            {
+                camera.GlobalPosition = position;
+                camera.ResetSmoothing();
+                camera.ForceUpdateScroll();
+                camera.DragHorizontalEnabled = settings.HorizontalDrag;
+                camera.DragVerticalEnabled = settings.VerticalDrag;
+                camera.PositionSmoothingEnabled = settings.Smoothing;
+                _cameraTrackingSettings = null;
+            }
+            camera.SetProcess(true);
+            camera.SetPhysicsProcess(true);
         }
     }
 }

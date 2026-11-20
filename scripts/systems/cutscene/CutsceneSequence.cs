@@ -28,5 +28,8 @@ namespace Kuros.Systems.Cutscene
 
         /// <summary>过场期间接管摄像机（需要 CutsceneManager 设置 CameraPath）。</summary>
         [Export] public bool TakeOverCamera { get; set; } = false;
+
+        /// <summary>接管期间关闭拖拽边距和引擎位置平滑，由过场步骤控制构图与缓动。</summary>
+        [Export] public bool PreciseCamera { get; set; }
     }
 }

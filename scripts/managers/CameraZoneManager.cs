@@ -32,7 +32,7 @@ namespace Kuros.Managers
         [Export] public Node2D? Player { get; set; }
 
         /// <summary>打印相机实时 Zoom（变化超过 0.001 才输出；排查过场/区域切换的缩放问题用）。</summary>
-        [Export] public bool DebugPrintZoom { get; set; } = true;
+        [Export] public bool DebugPrintZoom { get; set; } = false;
 
         private float _lastPrintedZoom = float.NaN;
 
@@ -62,10 +62,13 @@ namespace Kuros.Managers
         }
 
         /// <summary>解锁区域切换，过场动画结束时调用。</summary>
-        public void UnlockZone()
+        public void UnlockZone(string? destinationZone = null)
         {
             _zoneLocked = false;
-            RestoreActiveZone();
+            if (destinationZone != null && _registeredZones.ContainsKey(destinationZone))
+                SwitchToZone(destinationZone, force: true, zoomDuration: 0f);
+            else
+                RestoreActiveZone();
             GameLogger.Debug(nameof(CameraZoneManager), "区域解锁");
         }
 

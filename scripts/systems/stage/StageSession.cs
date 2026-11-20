@@ -46,8 +46,13 @@ namespace Kuros.Systems.Stage
         private readonly System.Collections.Generic.Dictionary<StageConfig, StagePlan?> _candidatePlans = new();
         private List<StagePlan> _displayedPlans = new();
         private readonly HashSet<StageConfig> _unlockedHiddenFloors = new();
+        private bool _runStarted;
         private StageConfig? _hiddenEntryStage;
         private bool _transitionInProgress;
+        private uint _routeRevision;
+        private readonly System.Collections.Generic.Dictionary<RoomType, int> _roomTypeMisses = new();
+        private StagePlan? _generatingPlan;
+        private CanvasLayer? _initialLoadingCover;
 
         /// <summary>当前会话（同场景只有一个）。敌人生成时据此拿楼层系数；未就绪 = null。</summary>
         public static StageSession? Current { get; private set; }
@@ -80,11 +85,15 @@ namespace Kuros.Systems.Stage
         public override void _Ready()
         {
             AddToGroup("stage_session");
+            _initialLoadingCover = GetParent().GetNodeOrNull<CanvasLayer>("InitialLoadingCover");
+            if (_initialLoadingCover != null && Kuros.UI.CloudSceneTransition.Find(GetTree()) != null)
+                _initialLoadingCover.Hide();
 
             _generator = GetNodeOrNull<StageGeneratorManager>(GeneratorPath);
             if (_generator == null)
             {
                 GameLogger.Warn(nameof(StageSession), $"未找到 StageGeneratorManager（路径：{GeneratorPath}）。");
+                ShowInitialLoadFailure();
                 return;
             }
             _generator.StageGenerated += OnStageGenerated;
@@ -99,6 +108,7 @@ namespace Kuros.Systems.Stage
                 GameLogger.Info(nameof(StageSession), $"首关：{first.StageId}（Floor {first.Floor}）");
                 ApplyStageAsync(first);
             }
+            else ShowInitialLoadFailure();
         }
 
         public override void _ExitTree()
@@ -142,8 +152,24 @@ namespace Kuros.Systems.Stage
         private StagePlan? GetCandidatePlan(StageConfig config)
         {
             if (!_candidatePlans.TryGetValue(config, out var plan))
-                _candidatePlans[config] = plan = _generator?.CreatePlan(config);
+                _candidatePlans[config] = plan = _generator?.CreatePlan(config, _routeRevision, _roomTypeMisses);
             return plan;
+        }
+
+        public bool RefreshRoute(int index)
+        {
+            if (_transitionInProgress || _generator == null || index < 0 || index >= _displayedPlans.Count)
+                return false;
+            var config = _displayedPlans[index].Config;
+            if (!GetOptions().Contains(config) || config.RouteMode != StageRouteMode.RandomMiddleRooms)
+                return false;
+            var replacement = _generator.CreatePlan(config, ++_routeRevision, _roomTypeMisses);
+            if (replacement == null) return false;
+            _pendingPlan = null;
+            _pendingLoad = null;
+            _candidatePlans[config] = replacement;
+            _displayedPlans[index] = replacement;
+            return true;
         }
 
         public IReadOnlyList<StagePlan> DisplayedPlans => _displayedPlans;
@@ -242,14 +268,22 @@ namespace Kuros.Systems.Stage
 
         private async void ApplyStageAsync(StageConfig config, Vector2? landingPosition = null)
         {
-            if (_transitionInProgress || GetCandidatePlan(config) is not { } plan) return;
+            if (_transitionInProgress) return;
+            if (GetCandidatePlan(config) is not { } plan)
+            {
+                ShowInitialLoadFailure();
+                return;
+            }
             var source = _currentConfig;
             _transitionInProgress = true;
             var rooms = await LoadPlanAsync(plan);
             if (!GodotObject.IsInstanceValid(this) || !IsInsideTree()) return;
             _transitionInProgress = false;
             if (rooms != null && source == _currentConfig)
-                QueueTransition(plan, rooms, landingPosition);
+            {
+                if (!QueueTransition(plan, rooms, landingPosition)) ShowInitialLoadFailure();
+            }
+            else ShowInitialLoadFailure();
         }
 
         public bool QueueTransition(StagePlan plan, IReadOnlyList<PackedScene> rooms,
@@ -295,6 +329,7 @@ namespace Kuros.Systems.Stage
 
             _generator!.ClearWorldRemnants();
             Kuros.Items.World.WorldItemSpawner.ClearStageWorldItems(this);
+            _generatingPlan = plan;
             _generator.Regenerate(plan, rooms, landingPosition);
         }
 
@@ -353,10 +388,50 @@ namespace Kuros.Systems.Stage
                 || inventory.SpecialSlots.Values.Any(slot => slot.Stack?.Item.ItemId == key);
         }
 
-        private void OnStageGenerationFailed() => _transitionInProgress = false;
+        private void OnStageGenerationFailed()
+        {
+            _generatingPlan = null;
+            _transitionInProgress = false;
+            ShowInitialLoadFailure();
+        }
+
+        private void ShowInitialLoadFailure()
+        {
+            if (_initialLoadingCover == null) return;
+            if (_initialLoadingCover.GetNodeOrNull<Label>("Message") is { } label)
+                label.Text = "楼层加载失败，请返回主菜单后重试";
+            _initialLoadingCover.Show();
+            Kuros.UI.CloudSceneTransition.Find(GetTree())?.QueueFree();
+        }
+
+        private async Task RevealInitialStageAsync()
+        {
+            if (_initialLoadingCover == null) return;
+            var tree = GetTree();
+            // 等待传送后的区域检测与相机更新，避免解除遮罩时仍显示旧视口。
+            for (int i = 0; i < 2; i++)
+            {
+                await ToSignal(tree, SceneTree.SignalName.PhysicsFrame);
+                if (!IsInstanceValid(this) || !IsInsideTree()) return;
+            }
+            await ToSignal(tree, SceneTree.SignalName.ProcessFrame);
+            if (!IsInstanceValid(this) || !IsInsideTree()) return;
+            // 此时入场过场可能已接管相机，不再强行 SnapToTarget。
+            if (_initialLoadingCover != null && IsInstanceValid(_initialLoadingCover))
+                _initialLoadingCover.QueueFree();
+            _initialLoadingCover = null;
+            if (Kuros.UI.CloudSceneTransition.Find(tree) is { } cloud)
+                await cloud.RevealAsync();
+        }
 
         private void OnStageGenerated()
         {
+            if (!_runStarted)
+            {
+                _runStarted = true;
+                SaveManager.Instance?.BeginRun();
+            }
+            RecordRoomHistory();
             _transitionInProgress = false;
             if (_currentConfig is { } config && GetParent() is BattleSceneManager { AutoShowLevelName: true } manager)
                 manager.ShowLevelNamePopup(config.ArrivalName);
@@ -365,6 +440,35 @@ namespace Kuros.Systems.Stage
             var camera = GetNodeOrNull<CameraFollow>(CameraPath);
             if (camera != null && GodotObject.IsInstanceValid(camera))
                 camera.SnapToTarget();
+            _ = RevealInitialStageAsync();
+        }
+
+        private void RecordRoomHistory()
+        {
+            var plan = _generatingPlan;
+            _generatingPlan = null;
+            if (plan == null || plan.Config.IsHiddenFloor
+                || plan.Config.RouteMode != StageRouteMode.RandomMiddleRooms) return;
+            var tracked = AllConfigs.Where(config => config != null)
+                .SelectMany(config => config.MiddleRoomRules)
+                .Where(rule => rule != null && rule.GuaranteeAfter > 0)
+                .Select(rule => rule.RoomType).Distinct();
+            foreach (var type in tracked)
+            {
+                if (plan.RoomTypes.Contains(type))
+                {
+                    _roomTypeMisses[type] = 0;
+                    continue;
+                }
+                bool eligible = _generator?.Catalog?.Rooms.Any(room => room != null
+                    && room.FloorTheme == plan.Config.FloorTheme && room.RoomType == type
+                    && !string.IsNullOrWhiteSpace(room.ScenePath)
+                    && (string.IsNullOrWhiteSpace(plan.Config.MiddleRoomRouteTag)
+                        || room.RouteTags.Contains(plan.Config.MiddleRoomRouteTag))) == true;
+                var rule = plan.Config.MiddleRoomRules.FirstOrDefault(item => item?.RoomType == type);
+                if (eligible && plan.Config.MiddleRoomCount > 0 && rule?.MaxCount != 0)
+                    _roomTypeMisses[type] = _roomTypeMisses.GetValueOrDefault(type) + 1;
+            }
         }
     }
 }

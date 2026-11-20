@@ -1,4 +1,4 @@
-[gd_scene load_steps=35 format=3 uid="uid://cl1ki1csawpip"]
+[gd_scene load_steps=34 format=3 uid="uid://cl1ki1csawpip"]
 
 [ext_resource type="Script" uid="uid://cra7y7mt0x1j8" path="res://scripts/managers/CameraZoneArea.cs" id="1_eajhg"]
 [ext_resource type="Script" uid="uid://cifwu23mu55li" path="res://scripts/managers/LightRevealController.cs" id="1_lightreveal"]
@@ -73,8 +73,6 @@ polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3, 4), PackedInt32
 outlines = Array[PackedVector2Array]([PackedVector2Array(-7411, -1594, -1471, -1556, -1460, 1597, -7409, 1606)])
 source_geometry_mode = 2
 agent_radius = 80.0
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_40pjx"]
 
 [node name="A1" type="Node2D"]
 y_sort_enabled = true
@@ -220,44 +218,59 @@ EnemyScenes = Array[PackedScene]([ExtResource("15_cmy21"), ExtResource("16_w6i5k
 z_index = 3
 script = ExtResource("1_lightreveal")
 DarkLayerPath = NodePath("Sprite2D")
-SpotGroups = Array[Array]([[NodePath("Spot1"), NodePath("Spot5")], [NodePath("Spot2"), NodePath("Spot6")], [NodePath("Spot3"), NodePath("Spot7")], [NodePath("Spot4"), NodePath("Spot8")]])
+SpotGroups = Array[Array]([[NodePath("Spot1"), NodePath("Spot2")], [NodePath("Spot9"), NodePath("Spot10")], [NodePath("Spot3"), NodePath("Spot4")], [NodePath("Spot5"), NodePath("Spot6")], [NodePath("Spot11"), NodePath("Spot12")], [NodePath("Spot7"), NodePath("Spot8")]])
 TriggerAreaPath = NodePath("../LightTrigger")
-PreheatSoftness = 400.0
-SpotRadius = 400.0
-Softness = 200.0
-FadeIntervalSeconds = 1.0
+PreheatRadius = 40.0
+PreheatSoftness = 40.0
+SpotRadius = 100.0
+Softness = 40.0
+SoftnessFadeSeconds = 0.3
+PreheatStartDelaySeconds = 0.5
+PreheatIntervalSeconds = 0.5
+SpotStartDelaySeconds = 1.5
+SpotIntervalSeconds = 0.5
 
 [node name="Sprite2D" type="Sprite2D" parent="DarkCovers"]
 modulate = Color(0, 0, 0, 0.60784316)
-scale = Vector2(15, 7)
+scale = Vector2(15, 15)
 texture = ExtResource("13_4wkas")
 
 [node name="Spot1" type="Sprite2D" parent="DarkCovers"]
 modulate = Color(1, 1, 1, 0)
-material = SubResource("ShaderMaterial_40pjx")
-position = Vector2(-1666, -850)
+position = Vector2(-2400, -850)
 
 [node name="Spot2" type="Sprite2D" parent="DarkCovers"]
 modulate = Color(1, 1, 1, 0)
-position = Vector2(-546, -850)
+position = Vector2(-2400, 400)
 
 [node name="Spot3" type="Sprite2D" parent="DarkCovers"]
-position = Vector2(574, -850)
+modulate = Color(1, 1, 1, 0)
+position = Vector2(-480, -850)
 
 [node name="Spot4" type="Sprite2D" parent="DarkCovers"]
-position = Vector2(1694, -850)
+modulate = Color(1, 1, 1, 0)
+position = Vector2(-480, 400)
 
 [node name="Spot5" type="Sprite2D" parent="DarkCovers"]
-modulate = Color(1, 1, 1, 0)
-material = SubResource("ShaderMaterial_40pjx")
-position = Vector2(-1666, 400)
+position = Vector2(480, -850)
 
 [node name="Spot6" type="Sprite2D" parent="DarkCovers"]
-modulate = Color(1, 1, 1, 0)
-position = Vector2(-546, 400)
+position = Vector2(480, 400)
 
 [node name="Spot7" type="Sprite2D" parent="DarkCovers"]
-position = Vector2(574, 400)
+position = Vector2(2400, -850)
 
 [node name="Spot8" type="Sprite2D" parent="DarkCovers"]
-position = Vector2(1694, 400)
+position = Vector2(2400, 400)
+
+[node name="Spot9" type="Sprite2D" parent="DarkCovers"]
+position = Vector2(-1440, -850)
+
+[node name="Spot10" type="Sprite2D" parent="DarkCovers"]
+position = Vector2(-1440, 400)
+
+[node name="Spot11" type="Sprite2D" parent="DarkCovers"]
+position = Vector2(1440, -850)
+
+[node name="Spot12" type="Sprite2D" parent="DarkCovers"]
+position = Vector2(1440, 400)

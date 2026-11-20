@@ -1,6 +1,28 @@
-[gd_scene load_steps=2 format=3 uid="uid://dlneh4fvslb5q"]
+[gd_scene load_steps=6 format=3 uid="uid://dlneh4fvslb5q"]
 
 [ext_resource type="Script" uid="uid://c068arqlmstak" path="res://scripts/ui/SettingsMenu.cs" id="1_settings"]
+[ext_resource type="Shader" uid="uid://dp884ubyaxawl" path="res://shaders/materials/menu_title_pattern.gdshader" id="2_h01ic"]
+[ext_resource type="Texture2D" uid="uid://k3ioi2yc73qo" path="res://assets/art/KURO_Title_Pattern.png" id="3_gcdef"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_6b8ie"]
+shader = ExtResource("2_h01ic")
+shader_parameter/pattern_texture = ExtResource("3_gcdef")
+shader_parameter/pattern_angle_degrees = -45.0
+shader_parameter/scroll_angle_degrees = -45.0
+shader_parameter/scroll_speed = 42.0
+shader_parameter/tile_width = 960.0
+shader_parameter/opacity = 0.0499999988824
+shader_parameter/pattern_offset = Vector2(0, 0)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_1h8by"]
+shader = ExtResource("2_h01ic")
+shader_parameter/pattern_texture = ExtResource("3_gcdef")
+shader_parameter/pattern_angle_degrees = -45.0
+shader_parameter/scroll_angle_degrees = 135.0
+shader_parameter/scroll_speed = 42.0
+shader_parameter/tile_width = 960.0
+shader_parameter/opacity = 0.0499999988824
+shader_parameter/pattern_offset = Vector2(0, 0.16666667)
 
 [node name="SettingsMenu" type="Control"]
 layout_mode = 3
@@ -19,6 +41,26 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.1, 0.1, 0.15, 1)
+
+[node name="TitlePattern" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_6b8ie")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="TitlePattern2" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_1h8by")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
 
 [node name="MenuPanel" type="Control" parent="."]
 layout_mode = 1
@@ -69,10 +111,9 @@ layout_mode = 2
 [node name="SettingsTabs" type="TabContainer" parent="MenuPanel/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
-current_tab = 3
+current_tab = 0
 
 [node name="VideoTab" type="Control" parent="MenuPanel/VBoxContainer/SettingsTabs"]
-visible = false
 layout_mode = 2
 metadata/_tab_index = 0
 
@@ -225,6 +266,7 @@ theme_override_font_sizes/font_size = 18
 text = "确认改键"
 
 [node name="ApiTab" type="Control" parent="MenuPanel/VBoxContainer/SettingsTabs"]
+visible = false
 layout_mode = 2
 metadata/_tab_index = 3
 

@@ -2223,7 +2223,7 @@ namespace Kuros.Items.World
 			// 若原槽已被其他物品占用，则走智能放入逻辑
 			if (!returnedToSlot)
 			{
-				player.InventoryComponent.AddItemSmart(item, 1, showPopupIfFirstTime: false);
+				player.InventoryComponent.AddItemSmart(item, 1, showPopupIfFirstTime: false, recordAcquisition: false);
 			}
 
 			// 释放预占

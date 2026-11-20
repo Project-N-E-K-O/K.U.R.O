@@ -1,16 +1,15 @@
-[gd_resource type="Resource" script_class="StageConfig" load_steps=2 format=3 uid="uid://wc3mrmbaq4g6"]
+[gd_resource type="Resource" script_class="StageConfig" load_steps=3 format=3 uid="uid://wc3mrmbaq4g6"]
 
+[ext_resource type="Script" uid="uid://c8d3j0ojq43gv" path="res://scripts/systems/stage/RoomTypeRule.cs" id="1_eaml7"]
 [ext_resource type="Script" uid="uid://dim2ctx63qcxt" path="res://scripts/systems/stage/StageConfig.cs" id="3_mhmh1"]
 
 [resource]
 script = ExtResource("3_mhmh1")
 StageId = "stage_3b"
-DisplayName = "办公b区"
-ElevatorLabel = "办公b区"
+DisplayName = "办公东区"
+ElevatorLabel = "办公东区"
 LevelDescription = "酒店三层办公b区"
 Floor = 3
 FloorTheme = "D"
 RouteMode = 1
-MiddleRoomCount = 2
-BeginScenePath = "res://scenes/levels/D_begin.tscn"
-EndScenePath = "res://scenes/levels/D_end.tscn"
+MiddleRoomCount = 4

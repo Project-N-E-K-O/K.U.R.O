@@ -1,12 +1,10 @@
-[gd_resource type="Resource" script_class="CutsceneSequence" load_steps=13 format=3 uid="uid://dpxai5bvaoeto"]
+[gd_resource type="Resource" script_class="CutsceneSequence" load_steps=11 format=3 uid="uid://dpxai5bvaoeto"]
 
 [ext_resource type="Script" uid="uid://ctrko7add3r5h" path="res://scripts/systems/cutscene/CutsceneStep.cs" id="1_ref6e"]
 [ext_resource type="Script" uid="uid://cgnajq1ykl2mn" path="res://scripts/systems/cutscene/CutsceneSequence.cs" id="2_87567"]
 [ext_resource type="Script" uid="uid://cjl1hjmndwvcg" path="res://scripts/systems/cutscene/steps/FadeStep.cs" id="3_7qph7"]
 [ext_resource type="Script" uid="uid://b4pd4ynf4k04p" path="res://scripts/systems/cutscene/steps/CameraMoveStep.cs" id="3_bcybp"]
 [ext_resource type="Script" uid="uid://5xu2sir0yhv1" path="res://scripts/systems/cutscene/steps/PlayAnimationStep.cs" id="4_7qph7"]
-[ext_resource type="Script" uid="uid://boec8wbtajskl" path="res://scripts/systems/cutscene/steps/EffectSpawnStep.cs" id="5_ref6e"]
-[ext_resource type="PackedScene" uid="uid://c4ecb44j734sb" path="res://scenes/actors/etc/ActorSpawnEffect.tscn" id="6_effect"]
 
 [sub_resource type="Resource" id="Resource_bcybp"]
 script = ExtResource("3_7qph7")
@@ -16,35 +14,37 @@ metadata/_custom_type_script = "uid://cjl1hjmndwvcg"
 
 [sub_resource type="Resource" id="Resource_ref6e"]
 script = ExtResource("3_bcybp")
-TargetPath = NodePath("../World/Camera2D")
-TargetZoom = 0.6
-FollowDuration = 1.0
+TargetPath = NodePath("../World/BBegin/AnimationTaxi/TaxiPosition")
+TargetZoom = 0.5
+Instant = true
+Duration = 3.0
+FollowDuration = 3.0
 metadata/_custom_type_script = "uid://b4pd4ynf4k04p"
 
 [sub_resource type="Resource" id="Resource_a6q5w"]
 script = ExtResource("4_7qph7")
-AnimationPlayerPath = NodePath("../World/BBegin/Taxi/AnimationPlayer")
-AnimationName = "taxi_intro"
+AnimationPlayerPath = NodePath("../World/BBegin/AnimationTaxi/AnimationPlayer")
+AnimationName = "taxi_enter"
+WaitForCompletion = true
+metadata/_custom_type_script = "uid://5xu2sir0yhv1"
+
+[sub_resource type="Resource" id="Resource_7qph7"]
+script = ExtResource("4_7qph7")
+AnimationPlayerPath = NodePath("../World/BBegin/AnimationCharacter/AnimationPlayer")
+AnimationName = "run_short"
 WaitForCompletion = true
 metadata/_custom_type_script = "uid://5xu2sir0yhv1"
 
 [sub_resource type="Resource" id="Resource_w0u1a"]
 script = ExtResource("4_7qph7")
-AnimationPlayerPath = NodePath("../World/BBegin/Taxi/AnimationPlayer")
-AnimationName = "taxi_idle"
+AnimationPlayerPath = NodePath("../World/BBegin/AnimationTaxi/AnimationPlayer")
+AnimationName = "taxi_leave_left"
 metadata/_custom_type_script = "uid://5xu2sir0yhv1"
-
-[sub_resource type="Resource" id="Resource_7qph7"]
-script = ExtResource("5_ref6e")
-EffectScene = ExtResource("6_effect")
-Position = Vector2(0, -200)
-GenerateOnSkip = false
-metadata/_custom_type_script = "uid://boec8wbtajskl"
 
 [resource]
 script = ExtResource("2_87567")
 SequenceId = "B_begin_intro"
-Steps = Array[ExtResource("1_ref6e")]([SubResource("Resource_bcybp"), SubResource("Resource_ref6e"), SubResource("Resource_a6q5w"), SubResource("Resource_w0u1a"), SubResource("Resource_7qph7")])
+Steps = Array[ExtResource("1_ref6e")]([SubResource("Resource_bcybp"), SubResource("Resource_ref6e"), SubResource("Resource_a6q5w"), SubResource("Resource_7qph7"), SubResource("Resource_w0u1a")])
 HideNodePaths = Array[NodePath]([NodePath("../World/P2")])
 TakeOverCamera = true
 metadata/_custom_type_script = "uid://cgnajq1ykl2mn"

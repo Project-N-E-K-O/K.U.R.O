@@ -191,11 +191,11 @@ namespace Kuros.Managers
                 $"关卡生成完成：总宽度 {stageRight - stageLeft:F0}，X[{(int)stageLeft}, {(int)stageRight}]");
         }
 
-        public StagePlan? CreatePlan(StageConfig config)
+        public StagePlan? CreatePlan(StageConfig config, uint revision = 0, IReadOnlyDictionary<RoomType, int>? misses = null)
         {
             var rng = new RandomNumberGenerator();
             if (RandomSeed == 0) rng.Randomize();
-            else rng.Seed = (ulong)RandomSeed;
+            else rng.Seed = (ulong)RandomSeed + revision * 104729UL;
 
             var types = new List<RoomType?>();
             var candidates = new List<string[]>();
@@ -211,18 +211,18 @@ namespace Kuros.Managers
             {
                 foreach (var room in roomsForTheme)
                     if (room.RoomType is (RoomType.Combat or RoomType.AdvancedCombat
-                            or RoomType.EliteCombat or RoomType.Puzzle)
+                            or RoomType.EliteCombat or RoomType.Puzzle or RoomType.Shop or RoomType.Healing)
                         && (string.IsNullOrWhiteSpace(config.MiddleRoomRouteTag)
                             || room.RouteTags.Contains(config.MiddleRoomRouteTag))
-                        && !string.IsNullOrWhiteSpace(room.ScenePath)
-                        && room.ScenePath != config.BeginScenePath
-                        && room.ScenePath != config.EndScenePath)
+                        && !string.IsNullOrWhiteSpace(room.ScenePath))
                         middleTypes.TryAdd(room.ScenePath, room.RoomType);
 
-                AddSlot(RoomType.Begin, new[] { config.BeginScenePath });
-                for (int i = 0; i < config.MiddleRoomCount; i++)
-                    AddSlot(null, middleTypes.Keys);
-                AddSlot(RoomType.Boss, new[] { config.EndScenePath });
+                AddSlot(RoomType.Begin, roomsForTheme.Where(room => room.RoomType == RoomType.Begin).Select(room => room.ScenePath));
+                var order = RoomRoutePlanner.Plan(config, middleTypes, rng, misses);
+                if (order == null) return null;
+                foreach (var type in order)
+                    AddSlot(type, middleTypes.Where(pair => pair.Value == type).Select(pair => pair.Key));
+                AddSlot(RoomType.End, roomsForTheme.Where(room => room.RoomType == RoomType.End).Select(room => room.ScenePath));
             }
             else
             {
@@ -266,7 +266,8 @@ namespace Kuros.Managers
                 roomsForTheme.FirstOrDefault(room => room.ScenePath == path && room.RoomType == resolvedTypes[index])?.ElevatorPreviewIcon
                 ?? roomsForTheme.FirstOrDefault(room => room.ScenePath == path)?.ElevatorPreviewIcon).ToArray();
             return new StagePlan(config, System.Array.AsReadOnly(resolvedTypes),
-                System.Array.AsReadOnly(selected), System.Array.AsReadOnly(icons));
+                System.Array.AsReadOnly(selected), System.Array.AsReadOnly(icons),
+                selected.Select(path => roomsForTheme.FirstOrDefault(room => room.ScenePath == path)?.ElevatorPreviewName ?? "").ToArray());
         }
 
         /// <summary>

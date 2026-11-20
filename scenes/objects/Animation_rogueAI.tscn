@@ -5,7 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="3_spsct"]
 [ext_resource type="Texture2D" uid="uid://5cvi3ej8m7r3" path="res://assets/effect/LightEffect/屏幕光晕.png" id="5_5sirc"]
 [ext_resource type="SpineSkeletonDataResource" uid="uid://cu7dh3atg6s4d" path="res://animations/spine/Enemy_F1_rogueAI.tres" id="5_y33dl"]
-[ext_resource type="Texture2D" uid="uid://752sqoqmoavc" path="res://addons/dialogic/Modules/Signal/sign/exit_sign.png" id="6_5sirc"]
+[ext_resource type="Texture2D" path="res://assets/environments/scene_6_hotel/exit_sign.png" id="6_5sirc"]
 [ext_resource type="Script" uid="uid://4dd56677a2aa" path="res://scripts/controllers/ShadowFollower.cs" id="7_pa1ur"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_f7mh0"]

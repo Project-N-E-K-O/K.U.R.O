@@ -15,6 +15,12 @@ namespace Kuros.Systems.Cutscene
 
         [Export] public string AnimationName { get; set; } = "";
 
+        /// <summary>可选起点，相对 CutsceneManager。播放前将动画根节点移到该点。</summary>
+        [Export] public NodePath StartPositionPath { get; set; } = new NodePath();
+
+        /// <summary>等待播放完成时，结束或跳过后隐藏动画根节点。</summary>
+        [Export] public bool HideRootOnCompletion { get; set; }
+
         /// <summary>
         /// 是否等待动画播放完毕。
         /// true（默认）：阻塞执行，等动画播完才执行下一步。
@@ -55,6 +61,19 @@ namespace Kuros.Systems.Cutscene
                 animPlayer.SpeedScale = 1f;
             }
 
+            var animationRoot = !StartPositionPath.IsEmpty || HideRootOnCompletion
+                ? animPlayer.GetNodeOrNull<Node2D>(animPlayer.RootNode) : null;
+            if (!StartPositionPath.IsEmpty)
+            {
+                var start = ctx.Manager.GetNodeOrNull<Node2D>(StartPositionPath);
+                if (start == null || animationRoot == null)
+                {
+                    GD.PushWarning($"[Cutscene] PlayAnimationStep: 无法定位动画根节点或起点 '{StartPositionPath}'");
+                    return;
+                }
+                animationRoot.GlobalPosition = start.GlobalPosition;
+            }
+
             animPlayer.Play(AnimationName);
             GD.Print($"[Cutscene] PlayAnimationStep: 已播放动画 {AnimationName}");
 
@@ -81,6 +100,9 @@ namespace Kuros.Systems.Cutscene
                 if (ctx.IsBackground) animPlayer.Stop(keepState: true);
                 GD.Print("[Cutscene] PlayAnimationStep 被skip，动画快进到结尾");
             }
+
+            if (HideRootOnCompletion && GodotObject.IsInstanceValid(animationRoot))
+                animationRoot!.Hide();
 
             GD.Print("[Cutscene] PlayAnimationStep 完成");
         }

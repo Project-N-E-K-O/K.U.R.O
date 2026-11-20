@@ -1,0 +1,186 @@
+[gd_scene load_steps=4 format=3 uid="uid://c8wgqwbhgjv45"]
+
+[ext_resource type="Script" path="res://scripts/ui/RunHistoryApp.cs" id="3_history"]
+[ext_resource type="PackedScene" path="res://scenes/ui/windows/BuildCardList.tscn" id="4_cards"]
+[ext_resource type="Texture2D" uid="uid://cx8mvmvrwdlkj" path="res://assets/ui/金币.png" id="5_gold"]
+
+[node name="RunHistoryApp" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("3_history")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.1, 0.1, 0.15, 1)
+
+[node name="Panel" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.025
+anchor_top = 0.05
+anchor_right = 0.975
+anchor_bottom = 0.95
+
+[node name="Content" type="VBoxContainer" parent="Panel"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Header" type="HBoxContainer" parent="Panel/Content"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Panel/Content/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 34
+text = "通关记录"
+
+[node name="CloseButton" type="Button" parent="Panel/Content/Header"]
+custom_minimum_size = Vector2(52, 52)
+layout_mode = 2
+tooltip_text = "关闭通关记录"
+accessibility_name = "关闭通关记录"
+theme_override_font_sizes/font_size = 30
+text = "×"
+
+[node name="Columns" type="HBoxContainer" parent="Panel/Content"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 14
+
+[node name="History" type="PanelContainer" parent="Panel/Content/Columns"]
+custom_minimum_size = Vector2(272, 0)
+layout_mode = 2
+
+[node name="Body" type="VBoxContainer" parent="Panel/Content/Columns/History"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Title" type="Label" parent="Panel/Content/Columns/History/Body"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "历史记录"
+
+[node name="Scroll" type="ScrollContainer" parent="Panel/Content/Columns/History/Body"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Entries" type="VBoxContainer" parent="Panel/Content/Columns/History/Body/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="Pages" type="HBoxContainer" parent="Panel/Content/Columns/History/Body"]
+layout_mode = 2
+alignment = 1
+
+[node name="Previous" type="Button" parent="Panel/Content/Columns/History/Body/Pages"]
+layout_mode = 2
+text = "上一页"
+
+[node name="PageLabel" type="Label" parent="Panel/Content/Columns/History/Body/Pages"]
+layout_mode = 2
+
+[node name="Next" type="Button" parent="Panel/Content/Columns/History/Body/Pages"]
+layout_mode = 2
+text = "下一页"
+
+[node name="Build" type="PanelContainer" parent="Panel/Content/Columns"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Body" type="VBoxContainer" parent="Panel/Content/Columns/Build"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Title" type="Label" parent="Panel/Content/Columns/Build/Body"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "本轮构筑"
+
+[node name="BuildCardList" parent="Panel/Content/Columns/Build/Body" instance=ExtResource("4_cards")]
+layout_mode = 2
+
+[node name="Stats" type="PanelContainer" parent="Panel/Content/Columns"]
+custom_minimum_size = Vector2(380, 0)
+layout_mode = 2
+
+[node name="Scroll" type="ScrollContainer" parent="Panel/Content/Columns/Stats"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="Sections" type="VBoxContainer" parent="Panel/Content/Columns/Stats/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 16
+
+[node name="Result" type="Label" parent="Panel/Content/Columns/Stats/Scroll/Sections"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+
+[node name="Elapsed" type="HBoxContainer" parent="Panel/Content/Columns/Stats/Scroll/Sections"]
+layout_mode = 2
+
+[node name="Name" type="Label" parent="Panel/Content/Columns/Stats/Scroll/Sections/Elapsed"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "本轮用时"
+
+[node name="Value" type="Label" parent="Panel/Content/Columns/Stats/Scroll/Sections/Elapsed"]
+layout_mode = 2
+
+[node name="Best" type="HBoxContainer" parent="Panel/Content/Columns/Stats/Scroll/Sections"]
+layout_mode = 2
+
+[node name="Name" type="Label" parent="Panel/Content/Columns/Stats/Scroll/Sections/Best"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "最佳通关用时"
+
+[node name="Value" type="Label" parent="Panel/Content/Columns/Stats/Scroll/Sections/Best"]
+layout_mode = 2
+
+[node name="ItemsSeparator" type="HSeparator" parent="Panel/Content/Columns/Stats/Scroll/Sections"]
+layout_mode = 2
+
+[node name="ItemTitle" type="Label" parent="Panel/Content/Columns/Stats/Scroll/Sections"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "获得道具"
+
+[node name="Items" type="HFlowContainer" parent="Panel/Content/Columns/Stats/Scroll/Sections"]
+layout_mode = 2
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 12
+
+[node name="GoldSeparator" type="HSeparator" parent="Panel/Content/Columns/Stats/Scroll/Sections"]
+layout_mode = 2
+
+[node name="Gold" type="HBoxContainer" parent="Panel/Content/Columns/Stats/Scroll/Sections"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Coin" type="TextureRect" parent="Panel/Content/Columns/Stats/Scroll/Sections/Gold"]
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+texture = ExtResource("5_gold")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Name" type="Label" parent="Panel/Content/Columns/Stats/Scroll/Sections/Gold"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "获得金币"
+
+[node name="Value" type="Label" parent="Panel/Content/Columns/Stats/Scroll/Sections/Gold"]
+layout_mode = 2

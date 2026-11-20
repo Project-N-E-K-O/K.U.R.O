@@ -1,13 +1,15 @@
-[gd_scene load_steps=12 format=3 uid="uid://btqx0751t5bx4"]
+[gd_scene load_steps=14 format=3 uid="uid://btqx0751t5bx4"]
 
 [ext_resource type="Script" uid="uid://x1ic1ym4ykq8" path="res://scripts/scenes/BattleSceneManager.cs" id="1_givaq"]
 [ext_resource type="Script" uid="uid://b6qifqg0v8c6o" path="res://scripts/managers/CameraZoneManager.cs" id="2_tbvpk"]
 [ext_resource type="Script" uid="uid://b0qiaumw3ige7" path="res://scripts/systems/cutscene/CutsceneManager.cs" id="3_31t1p"]
 [ext_resource type="PackedScene" uid="uid://ufprfd4r8ijj" path="res://scenes/actors/characters/main_character.tscn" id="4_givaq"]
 [ext_resource type="Script" uid="uid://l1558pct4220" path="res://scripts/managers/StageGeneratorManager.cs" id="4_l5arx"]
+[ext_resource type="Script" uid="uid://c8d3j0ojq43gv" path="res://scripts/systems/stage/RoomTypeRule.cs" id="5_6q4ny"]
 [ext_resource type="PackedScene" uid="uid://bjwnor5ufbb8r" path="res://scenes/managers/BuildSelectionManager.tscn" id="8_r3qlf"]
 [ext_resource type="Script" uid="uid://del8hgcg3sr4i" path="res://scripts/managers/CameraFollow.cs" id="11_31t1p"]
 [ext_resource type="PackedScene" uid="uid://cgjrdwkemgrcy" path="res://scenes/actors/characters/P2.tscn" id="12_31t1p"]
+[ext_resource type="Script" uid="uid://bj4rh6urme4to" path="res://scripts/scenes/StageHomeArrivalController.cs" id="arrival"]
 [ext_resource type="Resource" uid="uid://cfqfibxgsuw2y" path="res://resources/stages/hotel_room_catalog.tres" id="room_catalog"]
 [ext_resource type="Script" uid="uid://dim2ctx63qcxt" path="res://scripts/systems/stage/StageConfig.cs" id="stage_config"]
 
@@ -31,6 +33,7 @@ Player = NodePath("../World/MainCharacter")
 
 [node name="CutsceneManager" type="Node" parent="."]
 script = ExtResource("3_31t1p")
+PlayerPath = NodePath("../World/MainCharacter")
 CameraPath = NodePath("../World/Camera2D")
 TopBlackBarPath = NodePath("../CanvasLayer/ColorRectTop")
 BottomBlackBarPath = NodePath("../CanvasLayer/ColorRectBottom")
@@ -41,18 +44,20 @@ script = ExtResource("4_l5arx")
 StandaloneStage = SubResource("initial_route")
 Catalog = ExtResource("room_catalog")
 
+[node name="ArrivalController" type="Node" parent="."]
+script = ExtResource("arrival")
+
 [node name="BuildSelectionManager" parent="." instance=ExtResource("8_r3qlf")]
 
 [node name="World" type="Node2D" parent="."]
 y_sort_enabled = true
 
 [node name="MainCharacter" parent="World" instance=ExtResource("4_givaq")]
-Speed = 600.0
 
 [node name="Camera2D" type="Camera2D" parent="World" node_paths=PackedStringArray("Target")]
 scale = Vector2(0.32999998, 0.32999998)
 ignore_rotation = false
-zoom = Vector2(0.43, 0.43)
+zoom = Vector2(0.65, 0.65)
 position_smoothing_enabled = true
 rotation_smoothing_enabled = true
 drag_horizontal_enabled = true
@@ -76,12 +81,14 @@ position = Vector2(300, 0)
 layer = 128
 
 [node name="ColorRectTop" type="ColorRect" parent="CanvasLayer"]
+visible = false
 offset_right = 1920.0
 offset_bottom = 150.0
 color = Color(0, 0, 0, 1)
 metadata/_edit_use_anchors_ = true
 
 [node name="ColorRectBottom" type="ColorRect" parent="CanvasLayer"]
+visible = false
 offset_top = 930.0
 offset_right = 1920.0
 offset_bottom = 1080.0

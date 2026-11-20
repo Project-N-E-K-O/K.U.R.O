@@ -1,0 +1,152 @@
+[gd_scene load_steps=18 format=3 uid="uid://dxjqksef0olgx"]
+
+[ext_resource type="Script" uid="uid://dq0vqwi52hgyp" path="res://scripts/utils/ProximityOutlineHighlight.cs" id="1_qimqx"]
+[ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="2_ljalp"]
+[ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="3_okevb"]
+[ext_resource type="Shader" uid="uid://cgt8onjsoqr12" path="res://shaders/materials/sprite_outline.gdshader" id="4_frsuy"]
+[ext_resource type="Texture2D" uid="uid://cco66slr1m60m" path="res://assets/furnitures/home_scene1/ComputerA.png" id="5_qimqx"]
+[ext_resource type="Texture2D" uid="uid://gd2g77t46552" path="res://assets/furnitures/home_scene1/TableOfficeA.png" id="6_ljalp"]
+[ext_resource type="Script" uid="uid://b2h6whsir8l0p" path="res://scripts/environments/HomeComputerController.cs" id="7_computer"]
+[ext_resource type="PackedScene" path="res://scenes/ui/menus/InGameDesktopMenu.tscn" id="8_desktop"]
+[ext_resource type="Shader" uid="uid://ds5ffqroypp1x" path="res://shaders/materials/computer_screen_shutdown.gdshader" id="9_shutdown"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_4unrl"]
+shader = ExtResource("2_ljalp")
+shader_parameter/softness = 0.5
+shader_parameter/alpha = 0.4
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ld8jn"]
+shader = ExtResource("4_frsuy")
+shader_parameter/outline_color = Color(0.019607844, 0.019607844, 0.019607844, 0)
+shader_parameter/outline_size = 32.0
+shader_parameter/alpha_threshold = 0.5
+shader_parameter/edge_softness = 0.12
+shader_parameter/preserve_fill = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_screen_snapshot"]
+resource_local_to_scene = true
+shader = ExtResource("9_shutdown")
+shader_parameter/snapshot_area = Vector2(1, 1)
+shader_parameter/progress = 0.0
+shader_parameter/glow_color = Color(0.59, 0.94, 0.96, 1)
+
+[sub_resource type="Animation" id="Animation_screen_reset"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Outline/Screen/ScreenBounds/Snapshot:material:shader_parameter/progress")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="Animation" id="Animation_screen_shutdown"]
+resource_name = "shutdown"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Outline/Screen/ScreenBounds/Snapshot:material:shader_parameter/progress")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.5),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [0.0, 0.0, 1.0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_screen"]
+_data = {
+&"RESET": SubResource("Animation_screen_reset"),
+&"shutdown": SubResource("Animation_screen_shutdown")
+}
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ns468"]
+size = Vector2(700, 250)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ld8jn"]
+size = Vector2(400, 100)
+
+[node name="homeTable" type="Node2D"]
+z_index = 1
+script = ExtResource("7_computer")
+DesktopScene = ExtResource("8_desktop")
+
+[node name="OutlineEffect" type="Node" parent="."]
+script = ExtResource("1_qimqx")
+OutlineSpritePath = NodePath("../Outline")
+HighlightOutlineColor = Color(1, 0.39215687, 0, 1)
+
+[node name="Shadow" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_4unrl")
+position = Vector2(0, -75)
+scale = Vector2(12, 3.5)
+texture = ExtResource("3_okevb")
+offset = Vector2(0, 5)
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.33, 0.33)
+texture = ExtResource("6_ljalp")
+offset = Vector2(0, -750)
+
+[node name="Outline" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_ld8jn")
+position = Vector2(-33, -169)
+scale = Vector2(0.33, 0.33)
+texture = ExtResource("5_qimqx")
+offset = Vector2(0, -750)
+
+[node name="Screen" type="Sprite2D" parent="Outline"]
+texture = ExtResource("5_qimqx")
+offset = Vector2(0, -750)
+
+[node name="ScreenBounds" type="Node2D" parent="Outline/Screen"]
+position = Vector2(0, -755)
+
+[node name="ScreenCenter" type="Marker2D" parent="Outline/Screen/ScreenBounds"]
+gizmo_extents = 26.0
+
+[node name="TopLeft" type="Marker2D" parent="Outline/Screen/ScreenBounds"]
+position = Vector2(-470, -220)
+gizmo_extents = 18.0
+
+[node name="BottomRight" type="Marker2D" parent="Outline/Screen/ScreenBounds"]
+position = Vector2(470, 220)
+gizmo_extents = 18.0
+
+[node name="Snapshot" type="ColorRect" parent="Outline/Screen/ScreenBounds"]
+visible = false
+material = SubResource("ShaderMaterial_screen_snapshot")
+offset_left = -470.0
+offset_top = -220.0
+offset_right = 470.0
+offset_bottom = 220.0
+mouse_filter = 2
+
+[node name="ScreenAnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_screen")
+}
+
+[node name="StaticBody2D" type="StaticBody2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(0, -100)
+shape = SubResource("RectangleShape2D_ns468")
+
+[node name="InteractArea" type="Area2D" parent="."]
+z_index = 10
+position = Vector2(0, 180)
+collision_layer = 0
+collision_mask = 4
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InteractArea"]
+position = Vector2(-25, -300)
+shape = SubResource("RectangleShape2D_ld8jn")

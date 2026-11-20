@@ -24,6 +24,13 @@ namespace Kuros.Effects
             _host.Begin(Mathf.Clamp(timeScale, 0.05f, 1f), durationSeconds, Mathf.Max(0f, recoverySeconds));
         }
 
+        internal static void Cancel()
+        {
+            var host = _host;
+            _host = null;
+            if (GodotObject.IsInstanceValid(host)) host!.Cancel();
+        }
+
         private static void EnsureHost()
         {
             if (_host != null && GodotObject.IsInstanceValid(_host) && !_host.IsQueuedForDeletion()) return;
@@ -82,6 +89,12 @@ namespace Kuros.Effects
             {
                 _active = false;
                 Engine.TimeScale = _originalTimeScale;
+                QueueFree();
+            }
+
+            internal void Cancel()
+            {
+                _active = false;
                 QueueFree();
             }
 

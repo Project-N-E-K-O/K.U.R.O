@@ -1,8 +1,34 @@
-[gd_scene load_steps=4 format=3 uid="uid://d1giwhfb8ctq5"]
+[gd_scene load_steps=8 format=3 uid="uid://d1giwhfb8ctq5"]
 
 [ext_resource type="Script" uid="uid://nvvma0swgv5x" path="res://scripts/scenes/TitleScreen.cs" id="1"]
 [ext_resource type="Texture2D" uid="uid://boei7alwnkvlw" path="res://assets/art/背景.png" id="2_afy3f"]
 [ext_resource type="Texture2D" uid="uid://bldundyoac04y" path="res://assets/art/标题.png" id="3_5hkou"]
+[ext_resource type="Shader" uid="uid://dp884ubyaxawl" path="res://shaders/materials/menu_title_pattern.gdshader" id="3_bjhy7"]
+[ext_resource type="Texture2D" uid="uid://k3ioi2yc73qo" path="res://assets/art/KURO_Title_Pattern.png" id="4_by5sb"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_0064l"]
+shader = ExtResource("3_bjhy7")
+shader_parameter/pattern_texture = ExtResource("4_by5sb")
+shader_parameter/pattern_angle_degrees = -45.0
+shader_parameter/scroll_angle_degrees = -45.0
+shader_parameter/scroll_speed = 42.0
+shader_parameter/tile_width = 960.0
+shader_parameter/opacity = 0.0499999988824
+shader_parameter/pattern_offset = Vector2(0, 0)
+shader_parameter/ink_tint = Color(1, 1, 1, 1)
+shader_parameter/tint_mix = 0.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_rlol1"]
+shader = ExtResource("3_bjhy7")
+shader_parameter/pattern_texture = ExtResource("4_by5sb")
+shader_parameter/pattern_angle_degrees = -45.0
+shader_parameter/scroll_angle_degrees = 135.0
+shader_parameter/scroll_speed = 42.0
+shader_parameter/tile_width = 960.0
+shader_parameter/opacity = 0.0499999988824
+shader_parameter/pattern_offset = Vector2(0, 0.16666667)
+shader_parameter/ink_tint = Color(1, 1, 1, 1)
+shader_parameter/tint_mix = 0.0
 
 [node name="TitleScreen" type="Control" node_paths=PackedStringArray("TitleNode")]
 layout_mode = 3
@@ -16,6 +42,7 @@ script = ExtResource("1")
 TitleNode = NodePath("TitleContainer/Title")
 
 [node name="Background" type="TextureRect" parent="."]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -24,6 +51,35 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 texture = ExtResource("2_afy3f")
+
+[node name="Background2" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.1, 0.1, 0.15, 1)
+
+[node name="TitlePattern" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_0064l")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="TitlePattern2" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_rlol1")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
 
 [node name="TitleContainer" type="CenterContainer" parent="."]
 layout_mode = 1
@@ -67,7 +123,7 @@ offset_right = 112.0
 grow_vertical = 0
 theme_override_constants/outline_size = 5
 theme_override_font_sizes/font_size = 20
-text = "V0.1.0"
+text = "V0.2.0"
 horizontal_alignment = 1
 
 [node name="ContactButton" type="Button" parent="."]

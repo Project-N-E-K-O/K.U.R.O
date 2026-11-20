@@ -1,5 +1,6 @@
-[gd_resource type="Resource" script_class="StageConfig" load_steps=2 format=3 uid="uid://m2i8t5utuame"]
+[gd_resource type="Resource" script_class="StageConfig" load_steps=3 format=3 uid="uid://m2i8t5utuame"]
 
+[ext_resource type="Script" uid="uid://c8d3j0ojq43gv" path="res://scripts/systems/stage/RoomTypeRule.cs" id="1_7gm2k"]
 [ext_resource type="Script" uid="uid://dim2ctx63qcxt" path="res://scripts/systems/stage/StageConfig.cs" id="3_vnw1l"]
 
 [resource]

@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using Kuros.Scenes;
+using Kuros.Systems;
 using Kuros.Systems.Inventory;
 using Kuros.Actors.Heroes;
 using Kuros.Core;
@@ -27,6 +28,8 @@ namespace Kuros.Managers
         // 游戏时间追踪
         private int _totalPlayTimeSeconds = 0;
         private double _accumulatedDelta = 0.0;
+        private RunSession? _run;
+        private double CurrentPlayTime => _totalPlayTimeSeconds + _accumulatedDelta;
 
         /// <summary>
         /// 当前加载的游戏数据（从存档加载后存储，供场景使用）
@@ -58,6 +61,8 @@ namespace Kuros.Managers
         
         public override void _Process(double delta)
         {
+            if (GetTree().CurrentScene?.IsInGroup("exclude_play_time") == true) return;
+
             // 更新游戏时间（仅在游戏未暂停时）
             if (PauseManager.Instance == null || !PauseManager.Instance.IsPaused)
             {
@@ -131,13 +136,6 @@ namespace Kuros.Managers
             }
 
             string filePath = GetSaveFilePath(slotIndex);
-            
-            using var file = Godot.FileAccess.Open(filePath, Godot.FileAccess.ModeFlags.Write);
-            if (file == null)
-            {
-                GD.PrintErr($"SaveManager: 无法创建存档文件: {filePath}");
-                return false;
-            }
 
             // 确保存档数据包含正确的槽位索引
             data.SlotIndex = slotIndex;
@@ -149,8 +147,20 @@ namespace Kuros.Managers
                 { "data", data.ToDictionary() }
             };
             var json = Json.Stringify(savePayload);
-            file.StoreString(json);
-            file.Close();
+            var temporaryPath = filePath + "." + Guid.NewGuid().ToString("N") + ".tmp";
+            try
+            {
+                File.WriteAllText(temporaryPath, json);
+                File.Move(temporaryPath, filePath, overwrite: true);
+            }
+            catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+            {
+                GD.PushError($"SaveManager: 无法保存槽位 {slotIndex}: {exception.Message}");
+                try { File.Delete(temporaryPath); }
+                catch (Exception cleanup) when (cleanup is IOException or UnauthorizedAccessException)
+                { GD.PushWarning($"SaveManager: 无法清理临时存档: {cleanup.Message}"); }
+                return false;
+            }
 
             GD.Print($"SaveManager: 成功保存到槽位 {slotIndex}: {filePath}");
             return true;
@@ -341,13 +351,57 @@ namespace Kuros.Managers
                 return false;
             }
 
+            if (_run?.FinalRecord is { } record && !CurrentGameData.HasRunRecord(record.Id))
+                return FinishRun(record.Outcome, _run.CountDeath);
+
             CurrentGameData.SaveTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
             CurrentGameData.PlayTimeSeconds = _totalPlayTimeSeconds;
             return SaveGame(CurrentGameData.SlotIndex, CurrentGameData);
         }
 
+        internal void BeginRun()
+        {
+            if (CurrentGameData == null) return;
+            if (_run?.FinalRecord is { } pending && !FinishRun(pending.Outcome, _run.CountDeath)) return;
+            _run = new RunSession(CurrentPlayTime);
+        }
+
+        internal void RecordRunGold(int amount) => _run?.AddGold(amount);
+
+        internal void RecordRunItem(ItemDefinition item, int quantity) => _run?.AddItem(item, quantity);
+
+        internal bool HasActiveRun => _run is { FinalRecord: null };
+
+        internal bool HasRunToFinish => _run != null;
+
+        internal void ResetRunState()
+        {
+            PendingInventoryTransit = null;
+            PendingNextStagePath = "";
+            // 死亡结算写盘失败时保留已冻结的记录，以便下次自动存档重试。
+            if (CurrentGameData == null || _run?.FinalRecord is not { } record || CurrentGameData.HasRunRecord(record.Id))
+                _run = null;
+        }
+
+        internal bool FinishRun(RunOutcome outcome, bool playerDied = false)
+        {
+            if (outcome == RunOutcome.None || CurrentGameData is not { } current || _run == null) return false;
+            var record = _run.Finish(outcome, playerDied, CurrentPlayTime);
+            if (current.HasRunRecord(record.Id)) return true;
+
+            var updated = GameSaveData.FromDictionary(current.ToDictionary());
+            updated.AppendRunRecord(record);
+            if (record.Outcome == RunOutcome.Cleared) updated.ClearCount++;
+            if (_run.CountDeath) updated.CycleCount++;
+            updated.SaveTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            updated.PlayTimeSeconds = _totalPlayTimeSeconds;
+            if (!SaveGame(updated.SlotIndex, updated)) return false;
+            CurrentGameData = updated;
+            return true;
+        }
+
         /// <summary>新游戏：在空槽位写入初始永久进度数据，并设为当前存档（死亡/电梯自动存档依赖它）。</summary>
-        public void NewGame(int slotIndex)
+        public bool NewGame(int slotIndex)
         {
             var data = new GameSaveData
             {
@@ -359,8 +413,9 @@ namespace Kuros.Managers
                 CycleCount = 0,
                 MaxStageReached = 1,
             };
-            SaveGame(slotIndex, data);
+            if (!SaveGame(slotIndex, data)) return false;
             SetCurrentGameData(data);
+            return true;
         }
 
         /// <summary>删除指定槽位的存档。</summary>
@@ -369,7 +424,9 @@ namespace Kuros.Managers
             if (slotIndex < 0 || slotIndex >= SaveSlotsCount) return false;
             string filePath = GetSaveFilePath(slotIndex);
             if (!Godot.FileAccess.FileExists(filePath)) return false;
-            DirAccess.RemoveAbsolute(filePath);
+            if (DirAccess.RemoveAbsolute(filePath) != Error.Ok) return false;
+            if (CurrentGameData?.SlotIndex == slotIndex)
+                ClearCurrentGameData();
             GD.Print($"SaveManager: 已删除存档槽位 {slotIndex}");
             return true;
         }
@@ -379,6 +436,7 @@ namespace Kuros.Managers
         /// </summary>
         public void SetCurrentGameData(GameSaveData? data)
         {
+            _run = null;
             CurrentGameData = data;
             if (data != null)
             {
@@ -407,6 +465,7 @@ namespace Kuros.Managers
         /// </summary>
         public void ClearCurrentGameData()
         {
+            _run = null;
             CurrentGameData = null;
         }
 
@@ -527,7 +586,7 @@ namespace Kuros.Managers
                 {
                     // 先清空家具槽，确保 AddFurnitureItem 不会因槽已占用而失败
                     inv.ClearFurnitureSlot();
-                    inv.AddItemSmart(item, FurnitureSlot.Quantity, owner);
+                    inv.AddItemSmart(item, FurnitureSlot.Quantity, owner, recordAcquisition: false);
                 }
             }
 
@@ -553,6 +612,32 @@ namespace Kuros.Managers
         public int HighScore       { get => Get<int>("HighScore"); set => Set("HighScore", value); }
         public int ClearCount      { get => Get<int>("ClearCount"); set => Set("ClearCount", value); }
         public int CycleCount      { get => Get<int>("CycleCount"); set => Set("CycleCount", value); }
+
+        internal IEnumerable<RunRecord> ReadRunHistory()
+        {
+            foreach (var value in ReadRunEntries())
+                if (value.VariantType == Variant.Type.Dictionary && RunRecord.Decode(value.AsGodotDictionary()) is { } record)
+                    yield return record;
+        }
+
+        internal bool HasRunRecord(string id)
+        {
+            foreach (var value in ReadRunEntries())
+                if (value.VariantType == Variant.Type.Dictionary && value.AsGodotDictionary().TryGetValue("id", out var savedId)
+                    && savedId.AsString() == id) return true;
+            return false;
+        }
+
+        internal void AppendRunRecord(RunRecord record)
+        {
+            var entries = ReadRunEntries().Duplicate();
+            entries.Add(record.Encode());
+            _data["RunHistory"] = entries;
+        }
+
+        private Godot.Collections.Array ReadRunEntries() =>
+            _data.TryGetValue("RunHistory", out var entries) && entries.VariantType == Variant.Type.Array
+                ? entries.AsGodotArray() : new Godot.Collections.Array();
         public int MaxStageReached { get => Get<int>("MaxStageReached"); set => Set("MaxStageReached", value); }
 
         // 剧情
