@@ -663,6 +663,8 @@ namespace Kuros.Managers
 
         public IReadOnlyDictionary<string, int> PickedEffectIds => _pickedEffectIds;
 
+        internal BuildCoreDefinition? SelectedCore => _selectedCoreId == null ? null : FindCoreById(_selectedCoreId);
+
         /// <summary>构筑选择历史（含废卡,UI 层叠展示用）。</summary>
         public IReadOnlyList<BuildPickRecord> PickHistory => _pickRecords;
 

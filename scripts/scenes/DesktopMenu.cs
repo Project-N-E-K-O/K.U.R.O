@@ -1,5 +1,6 @@
 using Godot;
 using Kuros.Managers;
+using Kuros.Systems;
 using Kuros.UI;
 using Kuros.Utils;
 
@@ -14,15 +15,21 @@ public partial class DesktopMenu : Control
     [Export] public PackedScene SaveSlotsScene { get; set; } = null!;
     [Export] public PackedScene SettingsScene { get; set; } = null!;
     [Export] public PackedScene CompendiumScene { get; set; } = null!;
+    [Export] public PackedScene RunHistoryScene { get; set; } = null!;
 
     [Export] public bool IsInGameComputer { get; set; }
     internal bool IsHomeEntry { get; set; }
+    internal HomeDesktopPage InitialPage { get; set; }
 
     private Control _desktop = null!;
     private Control _appWindows = null!;
+    private Control _actionMenu = null!;
+    private Button _startButton = null!;
     private Button _start = null!;
+    private Button _cancelAction = null!;
     private Button _settingsButton = null!;
     private Button _compendiumButton = null!;
+    private Button _runHistoryButton = null!;
     private Button _closeProfile = null!;
     private Label _profileLabel = null!;
     private Label _profileError = null!;
@@ -31,6 +38,8 @@ public partial class DesktopMenu : Control
     private SaveSlotSelection? _saveSlots;
     private SettingsMenu? _settings;
     private CompendiumWindow? _compendium;
+    private RunHistoryApp? _runHistory;
+    private Button? _runHistoryCloseButton;
     private bool _enteringGame;
 
     public override void _Ready()
@@ -49,51 +58,73 @@ public partial class DesktopMenu : Control
         _closeProfile.Pressed += CloseProfiles;
 
         const string apps = "Desktop/Apps/";
-        const string taskbarActions = "Desktop/Taskbar/Actions/";
-        _start = GetNode<Button>(taskbarActions + "StartGame");
+        const string actions = "Content/ActionBand/Actions/";
+        _actionMenu = GetNode<Control>("Desktop/ActionMenu");
+        _startButton = GetNode<Button>("Desktop/Taskbar/StartButton");
+        _startButton.Pressed += ToggleActionMenu;
+        _start = _actionMenu.GetNode<Button>(actions + "StartGame");
+        _cancelAction = _actionMenu.GetNode<Button>("Content/Cancel");
+        _cancelAction.Pressed += () => CloseActionMenu();
         _compendiumButton = GetNode<Button>(apps + "Compendium");
         _compendiumButton.Pressed += OpenCompendium;
+        _runHistoryButton = GetNode<Button>(apps + "RunHistory");
+        _runHistoryButton.Pressed += OpenRunHistory;
         _settingsButton = GetNode<Button>(apps + "Settings");
         _settingsButton.Pressed += () => OpenSettings(_settingsButton);
-        var returnButton = GetNode<Button>(taskbarActions + "ReturnToTitle");
-        var quitButton = GetNode<Button>(taskbarActions + "Quit");
-        if (IsInGameComputer)
-            _start.Pressed += CloseComputer;
-        else
-            _start.Pressed += EnterHome;
+        var returnButton = _actionMenu.GetNode<Button>(actions + "ReturnToTitle");
+        var quitButton = _actionMenu.GetNode<Button>(actions + "Quit");
+        _start.Pressed += () =>
+        {
+            CloseActionMenu();
+            if (IsInGameComputer) CloseComputer();
+            else EnterHome();
+        };
 
         if (IsInGameComputer && !IsHomeEntry)
         {
             returnButton.Hide();
             quitButton.Hide();
-            _start.Text = "返回游戏";
             _start.Icon = returnButton.Icon;
-            _start.IconAlignment = HorizontalAlignment.Left;
-            _start.CustomMinimumSize = new Vector2(164f, _start.CustomMinimumSize.Y);
             _start.TooltipText = "关闭电脑并返回当前游戏";
             _start.AccessibilityName = "返回游戏";
         }
         else
         {
-            returnButton.Pressed += ReturnToTitle;
+            if (IsHomeEntry && InitialPage == HomeDesktopPage.RunHistory)
+            {
+                _start.TooltipText = string.Empty;
+                _start.AccessibilityName = "返回住宅区";
+            }
+            returnButton.Pressed += () =>
+            {
+                CloseActionMenu();
+                ReturnToTitle();
+            };
             var quit = GetNode<ConfirmationDialog>("QuitConfirmation");
-            quitButton.Pressed += () => quit.PopupCentered();
+            quitButton.Pressed += () =>
+            {
+                CloseActionMenu();
+                quit.PopupCentered();
+            };
+            quit.Canceled += _startButton.GrabFocus;
             quit.Confirmed += () => GetTree().Quit();
             quit.WindowInput += input =>
             {
                 if (!IsEscapePressed(input)) return;
                 quit.SetInputAsHandled();
                 quit.Hide();
-                quitButton.GrabFocus();
+                _startButton.GrabFocus();
             };
         }
 
         RefreshDesktop();
         if (_start.Disabled)
             OpenProfiles();
+        else if (IsInGameComputer && InitialPage == HomeDesktopPage.RunHistory)
+            OpenRunHistory();
         else
         {
-            _start.GrabFocus();
+            _startButton.GrabFocus();
             // 从结算或暂停菜单返回桌面时可能已有当前档案。
             if (!IsInGameComputer) Callable.From(EnterHome).CallDeferred();
         }
@@ -101,8 +132,26 @@ public partial class DesktopMenu : Control
 
     public override void _Input(InputEvent input)
     {
+        if (_enteringGame || !IsVisibleInTree()) return;
+
+        if (_actionMenu.IsVisibleInTree() && (IsEscapePressed(input) || IsOutsideActionMenuClick(input)))
+        {
+            GetViewport().SetInputAsHandled();
+            CloseActionMenu();
+            return;
+        }
+
         // 设置、图鉴和档案选择各自处理 Esc，包括取消设置中的改键捕获。
-        if (_enteringGame || _activeApp != null || !IsVisibleInTree() || !IsEscapePressed(input)) return;
+        if (!IsEscapePressed(input)) return;
+        if (_activeApp != null)
+        {
+            if (_activeApp == _runHistory)
+            {
+                GetViewport().SetInputAsHandled();
+                CloseApp();
+            }
+            return;
+        }
 
         GetViewport().SetInputAsHandled();
         if (IsInGameComputer) CloseComputer();
@@ -113,6 +162,35 @@ public partial class DesktopMenu : Control
         input is InputEventKey { Pressed: true, Echo: false } key
         && (key.Keycode == Key.Escape || key.PhysicalKeycode == Key.Escape);
 
+    private bool IsOutsideActionMenuClick(InputEvent input)
+    {
+        if (input is not InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left })
+            return false;
+
+        var position = GetGlobalMousePosition();
+        return !_actionMenu.GetGlobalRect().HasPoint(position) && !_startButton.GetGlobalRect().HasPoint(position);
+    }
+
+    private void ToggleActionMenu()
+    {
+        if (_actionMenu.Visible)
+        {
+            CloseActionMenu();
+            return;
+        }
+
+        _actionMenu.Show();
+        _startButton.SetPressedNoSignal(true);
+        (_start.Disabled ? _cancelAction : _start).GrabFocus();
+    }
+
+    private void CloseActionMenu(bool restoreFocus = true)
+    {
+        _actionMenu.Hide();
+        _startButton.SetPressedNoSignal(false);
+        if (restoreFocus) _startButton.GrabFocus();
+    }
+
     private void RefreshDesktop()
     {
         var profile = SaveManager.Instance?.CurrentGameData;
@@ -122,7 +200,13 @@ public partial class DesktopMenu : Control
         if (profile != null) _profileLabel.Text = $"当前档案  {profile.SlotIndex + 1}";
     }
 
-    internal void FocusComputerCloseButton() => _start.GrabFocus();
+    internal void FocusComputerCloseButton()
+    {
+        if (_activeApp != null && _activeApp == _runHistory)
+            _runHistoryCloseButton?.GrabFocus();
+        else
+            _startButton.GrabFocus();
+    }
 
     private void CloseComputer() => EmitSignal(SignalName.ComputerClosed);
 
@@ -159,7 +243,10 @@ public partial class DesktopMenu : Control
 
         var error = GetTree().ChangeSceneToFile(TitleScreen.ScenePath);
         if (error == Error.Ok)
+        {
+            RunStateReset.AfterSceneChange();
             SaveManager.Instance?.ClearCurrentGameData();
+        }
         else
             GD.PushError($"[DesktopMenu] 无法返回标题页：{error}");
     }
@@ -220,6 +307,20 @@ public partial class DesktopMenu : Control
         _compendium.CloseButton?.GrabFocus();
     }
 
+    private void OpenRunHistory()
+    {
+        if (_runHistory == null)
+        {
+            _runHistory = RunHistoryScene.Instantiate<RunHistoryApp>();
+            _runHistoryCloseButton = _runHistory.GetNode<Button>("Panel/Content/Header/CloseButton");
+            _runHistoryCloseButton.Pressed += CloseApp;
+            AddApp(_runHistory);
+        }
+        OpenApp(_runHistory, _runHistoryButton);
+        _runHistory.Refresh();
+        _runHistoryCloseButton?.GrabFocus();
+    }
+
     private void AddApp(Control app)
     {
         app.Hide();
@@ -228,6 +329,7 @@ public partial class DesktopMenu : Control
 
     private void OpenApp(Control app, Button? shortcut = null)
     {
+        CloseActionMenu(restoreFocus: false);
         _desktop.Hide();
         _activeApp = app;
         _appShortcut = shortcut;

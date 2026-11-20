@@ -136,6 +136,7 @@ rotation = 0.6981317
 shape = SubResource("RectangleShape2D_pal6r")
 
 [node name="CorePickupZone" type="Area2D" parent="."]
+visible = false
 collision_mask = 4
 script = ExtResource("10_rnaj2")
 

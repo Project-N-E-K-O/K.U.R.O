@@ -1871,6 +1871,7 @@ public partial class SamplePlayer : GameActor, IPlayerStatsSource, IThrowableMod
 		}
 		
 		_gold += amount;
+		SaveManager.Instance?.RecordRunGold(amount);
 		EmitSignal(SignalName.GoldChanged, _gold);
 	}
 	

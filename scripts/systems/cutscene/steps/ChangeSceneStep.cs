@@ -2,6 +2,8 @@ using System.Threading.Tasks;
 using Godot;
 using Kuros.Environments;
 using Kuros.Items.World;
+using Kuros.Managers;
+using Kuros.Scenes;
 using Kuros.Utils;
 
 namespace Kuros.Systems.Cutscene
@@ -37,20 +39,29 @@ namespace Kuros.Systems.Cutscene
         [Export] public bool UseCloudTransition { get; set; }
         /// <summary>由目标 Stage_home 消费的一次性返程请求。</summary>
         [Export] public bool ReturnHomeByTaxi { get; set; }
+        /// <summary>切入 Stage_home 时显示的电脑桌面页面。None 为普通换场。</summary>
+        [Export] public HomeDesktopPage OpenHomeDesktop { get; set; }
+        /// <summary>显式结束当前一轮。普通换场和单纯返家保持 None。</summary>
+        [Export] public RunOutcome FinishRunAs { get; set; }
 
         public override async Task Execute(CutsceneContext ctx)
         {
+            bool enterHomeDesktop = OpenHomeDesktop != HomeDesktopPage.None;
+            bool endsRun = FinishRunAs != RunOutcome.None;
             GD.Print($"[Cutscene] ChangeSceneStep 开始，ScenePath={ScenePath}, Delay={DelayBeforeChange}");
 
             if (DelayBeforeChange > 0f)
             {
                 float elapsed = 0f;
-                while (elapsed < DelayBeforeChange && !ctx.IsSkipping)
+                while (elapsed < DelayBeforeChange && !ctx.IsSkipping && !ctx.IsCancelled)
                 {
                     await ctx.NextFrame();
+                    if (ctx.IsCancelled) return;
                     elapsed += (float)ctx.Manager.GetProcessDeltaTime();
                 }
             }
+
+            if (ctx.IsCancelled) return;
 
             var tree = ctx.Manager.GetTree();
 
@@ -59,11 +70,22 @@ namespace Kuros.Systems.Cutscene
             string configuredPath = ScenePath.StartsWith("uid://")
                 ? ResourceUid.GetIdPath(ResourceUid.TextToId(ScenePath))
                 : ScenePath;
-            if (ReturnHomeByTaxi && preloaded?.ResourcePath != configuredPath)
+            if (enterHomeDesktop && configuredPath != StageHomeArrivalController.HomeScenePath)
+            {
+                GD.PushError("[Cutscene] OpenHomeDesktop 需要将 ScenePath 指向 Stage_home");
+                return;
+            }
+            if ((ReturnHomeByTaxi || enterHomeDesktop) && preloaded?.ResourcePath != configuredPath)
                 preloaded = null;
+            if (endsRun && SaveManager.Instance is { HasRunToFinish: true } saves
+                && !saves.FinishRun(FinishRunAs))
+            {
+                GD.PushError("[Cutscene] 保存结算失败，已保留本轮记录供重试");
+                return;
+            }
             string destination = preloaded?.ResourcePath ?? configuredPath;
             Kuros.UI.CloudSceneTransition? cloud = null;
-            if (UseCloudTransition && (preloaded != null || !string.IsNullOrEmpty(ScenePath)))
+            if (!enterHomeDesktop && UseCloudTransition && (preloaded != null || !string.IsNullOrEmpty(ScenePath)))
             {
                 cloud = await Kuros.UI.CloudSceneTransition.CoverAsync(tree, destination);
                 if (!GodotObject.IsInstanceValid(ctx.Manager) || !ctx.Manager.IsInsideTree())
@@ -80,6 +102,14 @@ namespace Kuros.Systems.Cutscene
             }
 
             DialogicUtils.CleanupPersistentState(ctx.Manager);
+
+            if (enterHomeDesktop)
+            {
+                var desktopError = StageHomeArrivalController.EnterFromDesktop(tree, preloaded, OpenHomeDesktop);
+                if (desktopError != Error.Ok) GD.PushError($"[Cutscene] 无法打开返家桌面：{desktopError}");
+                else if (endsRun) RunStateReset.AfterSceneChange();
+                return;
+            }
 
             if (ReturnHomeByTaxi && !string.IsNullOrEmpty(destination))
                 tree.Root.SetMeta(HomeTaxiReturnMeta, destination);
@@ -101,7 +131,11 @@ namespace Kuros.Systems.Cutscene
                 error = Error.InvalidParameter;
             }
 
-            if (error == Error.Ok) return;
+            if (error == Error.Ok)
+            {
+                if (endsRun) RunStateReset.AfterSceneChange();
+                return;
+            }
             if (ReturnHomeByTaxi) tree.Root.RemoveMeta(HomeTaxiReturnMeta);
             cloud?.QueueFree();
         }

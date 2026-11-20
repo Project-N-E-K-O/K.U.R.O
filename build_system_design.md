@@ -171,6 +171,8 @@ CSV 共 18 张，现有 13 张（A_001-A_010 多了一张 A_010），需补 B_00
 
 ### Phase 5：CSV 导出 — ExportCsv.gd
 
+以下两阶段记录构筑卡 CSV 的设计。当前工具支持的表格和回写规则见 [CSV 数据导出与导入指南](CSV_EXPORT_IMPORT_GUIDE.md)。
+
 **依赖 Phase 4，数据模型和 .tres 已稳定**
 
 1. 新增 `_export_builds()` 方法，读取 `resources/builds/*.tres`

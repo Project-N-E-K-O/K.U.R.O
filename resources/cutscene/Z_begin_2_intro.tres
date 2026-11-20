@@ -41,8 +41,8 @@ metadata/_custom_type_script = "uid://5xu2sir0yhv1"
 script = ExtResource("5_qgwch")
 ScenePath = "res://scenes/Stage_home.tscn"
 DelayBeforeChange = 2.75
-UseCloudTransition = true
-ReturnHomeByTaxi = true
+OpenHomeDesktop = 2
+FinishRunAs = 1
 metadata/_custom_type_script = "uid://bomrc4guqwn7l"
 
 [resource]

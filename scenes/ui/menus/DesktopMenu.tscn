@@ -1,79 +1,77 @@
-[gd_scene load_steps=21 format=3 uid="uid://8rs7e4hggg8u"]
+[gd_scene load_steps=22 format=3 uid="uid://8rs7e4hggg8u"]
 
 [ext_resource type="Script" uid="uid://ci352ttyu8of3" path="res://scripts/scenes/DesktopMenu.cs" id="1_desktop"]
 [ext_resource type="Texture2D" uid="uid://dabxdflvss2xs" path="res://assets/art/godot_icon.png" id="2_icon"]
 [ext_resource type="PackedScene" uid="uid://brvsg7qyyl8tg" path="res://scenes/ui/menus/SaveSlotSelection.tscn" id="3_profiles"]
 [ext_resource type="PackedScene" uid="uid://dlneh4fvslb5q" path="res://scenes/ui/menus/SettingsMenu.tscn" id="4_settings"]
 [ext_resource type="PackedScene" path="res://scenes/ui/windows/CompendiumWindow.tscn" id="5_compendium"]
-[ext_resource type="Shader" uid="uid://dp884ubyaxawl" path="res://shaders/materials/menu_title_pattern.gdshader" id="5_ldj2w"]
-[ext_resource type="Texture2D" uid="uid://k3ioi2yc73qo" path="res://assets/art/KURO_Title_Pattern.png" id="6_5a4vu"]
 [ext_resource type="Shader" uid="uid://cv2ty48fw3fpg" path="res://shaders/materials/desktop_taskbar.gdshader" id="7_taskbar"]
 [ext_resource type="Texture2D" uid="uid://yy773wrjr584" path="res://assets/ui/menu/desktop_taskbar_icons.svg" id="8_taskbar_icons"]
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_n51gd"]
-shader = ExtResource("5_ldj2w")
-shader_parameter/pattern_texture = ExtResource("6_5a4vu")
-shader_parameter/pattern_angle_degrees = -45.0
-shader_parameter/scroll_angle_degrees = -45.0
-shader_parameter/scroll_speed = 42.0
-shader_parameter/tile_width = 960.0
-shader_parameter/opacity = 0.0499999988824
-shader_parameter/pattern_offset = Vector2(0, 0)
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_f5re3"]
-shader = ExtResource("5_ldj2w")
-shader_parameter/pattern_texture = ExtResource("6_5a4vu")
-shader_parameter/pattern_angle_degrees = -45.0
-shader_parameter/scroll_angle_degrees = 135.0
-shader_parameter/scroll_speed = 42.0
-shader_parameter/tile_width = 960.0
-shader_parameter/opacity = 0.0499999988824
-shader_parameter/pattern_offset = Vector2(0, 0.16666667)
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_shortcut"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_shortcut_focus"]
-draw_center = false
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.5, 0.8, 1, 0.7)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_shortcut_hover"]
-bg_color = Color(0.35, 0.61, 0.85, 0.19)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_shortcut_pressed"]
-bg_color = Color(0.35, 0.61, 0.85, 0.32)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[sub_resource type="Theme" id="Theme_desktop_shortcut"]
-Button/constants/icon_max_width = 50
-Button/font_sizes/font_size = 19
-Button/styles/disabled = SubResource("StyleBoxEmpty_shortcut")
-Button/styles/focus = SubResource("StyleBoxFlat_shortcut_focus")
-Button/styles/hover = SubResource("StyleBoxFlat_shortcut_hover")
-Button/styles/normal = SubResource("StyleBoxEmpty_shortcut")
-Button/styles/pressed = SubResource("StyleBoxFlat_shortcut_pressed")
+[ext_resource type="PackedScene" uid="uid://c8wgqwbhgjv45" path="res://scenes/ui/menus/RunHistoryApp.tscn" id="9_run_history"]
+[ext_resource type="PackedScene" path="res://scenes/ui/menus/MenuBackdrop.tscn" id="menu_backdrop"]
+[ext_resource type="Script" uid="uid://dq1f2r33g2027" path="res://scripts/ui/MenuInkStyleBox.gd" id="menu_ink"]
+[ext_resource type="Theme" uid="uid://klrcn17xd86i" path="res://resources/ui/MenuTheme.tres" id="menu_theme"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_taskbar"]
 shader = ExtResource("7_taskbar")
 shader_parameter/bar_color = Color(0.2, 0.31, 0.57, 1)
 shader_parameter/edge_color = Color(0.06, 0.09, 0.19, 1)
-shader_parameter/highlight_color = Color(0.1697059, 0.40864295, 0.724631, 1)
-shader_parameter/edge_width = 2.0000000298024
-shader_parameter/stroke_wobble = 0.0
+shader_parameter/highlight_color = Color(0.55, 0.72, 0.96, 1)
+shader_parameter/edge_width = 4.0
+shader_parameter/stroke_wobble = 1.8
+
+[sub_resource type="StyleBox" id="StyleBox_launcher"]
+resource_local_to_scene = false
+resource_name = ""
+content_margin_left = 19.0
+content_margin_top = -1.0
+content_margin_right = 19.0
+content_margin_bottom = -1.0
+script = ExtResource("menu_ink")
+fill = Color(0.43, 0.77, 0.42, 1)
+stroke_width = 3.5
+wobble = 1.6
+
+[sub_resource type="StyleBox" id="StyleBox_launcher_active"]
+resource_local_to_scene = false
+resource_name = ""
+content_margin_left = 19.0
+content_margin_top = -1.0
+content_margin_right = 19.0
+content_margin_bottom = -1.0
+script = ExtResource("menu_ink")
+fill = Color(0.59, 0.86, 0.49, 1)
+stroke_width = 3.5
+wobble = 1.6
+
+[sub_resource type="StyleBox" id="StyleBox_action_menu"]
+resource_local_to_scene = false
+resource_name = ""
+content_margin_left = 11.0
+content_margin_top = 11.0
+content_margin_right = 11.0
+content_margin_bottom = 11.0
+script = ExtResource("menu_ink")
+fill = Color(0.09, 0.24, 0.53, 1)
+stroke_width = 4.0
+wobble = 1.8
+shadow = true
+
+[sub_resource type="Gradient" id="Gradient_action_band"]
+offsets = PackedFloat32Array(0, 0.54, 1)
+colors = PackedColorArray(0.35, 0.48, 0.76, 1, 0.59, 0.71, 0.93, 1, 0.39, 0.51, 0.78, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture_action_band"]
+gradient = SubResource("Gradient_action_band")
+width = 256
+height = 4
+
+[sub_resource type="StyleBoxTexture" id="StyleBox_action_band"]
+content_margin_left = 13.0
+content_margin_top = 16.0
+content_margin_right = 13.0
+content_margin_bottom = 16.0
+texture = SubResource("GradientTexture_action_band")
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_start"]
 atlas = ExtResource("8_taskbar_icons")
@@ -101,6 +99,7 @@ script = ExtResource("1_desktop")
 SaveSlotsScene = ExtResource("3_profiles")
 SettingsScene = ExtResource("4_settings")
 CompendiumScene = ExtResource("5_compendium")
+RunHistoryScene = ExtResource("9_run_history")
 
 [node name="Desktop" type="Control" parent="."]
 layout_mode = 1
@@ -109,35 +108,9 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("menu_theme")
 
-[node name="Background" type="ColorRect" parent="Desktop"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0.1, 0.1, 0.15, 1)
-
-[node name="TitlePattern" type="ColorRect" parent="Desktop"]
-material = SubResource("ShaderMaterial_n51gd")
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-
-[node name="TitlePattern2" type="ColorRect" parent="Desktop"]
-material = SubResource("ShaderMaterial_f5re3")
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
+[node name="MenuBackdrop" parent="Desktop" instance=ExtResource("menu_backdrop")]
 
 [node name="Profile" type="Label" parent="Desktop"]
 visible = false
@@ -156,12 +129,12 @@ offset_left = 24.0
 offset_top = 24.0
 offset_right = 140.0
 offset_bottom = 300.0
-theme = SubResource("Theme_desktop_shortcut")
 theme_override_constants/separation = 12
 
 [node name="Compendium" type="Button" parent="Desktop/Apps"]
 custom_minimum_size = Vector2(116, 84)
 layout_mode = 2
+theme_type_variation = &"DesktopShortcut"
 disabled = true
 text = "图鉴"
 icon = ExtResource("2_icon")
@@ -173,6 +146,7 @@ expand_icon = true
 custom_minimum_size = Vector2(116, 84)
 layout_mode = 2
 tooltip_text = "邮箱尚未开放"
+theme_type_variation = &"DesktopShortcut"
 disabled = true
 text = "邮箱"
 icon = ExtResource("2_icon")
@@ -183,7 +157,18 @@ expand_icon = true
 [node name="Settings" type="Button" parent="Desktop/Apps"]
 custom_minimum_size = Vector2(116, 84)
 layout_mode = 2
+theme_type_variation = &"DesktopShortcut"
 text = "设置"
+icon = ExtResource("2_icon")
+icon_alignment = 1
+vertical_icon_alignment = 0
+expand_icon = true
+
+[node name="RunHistory" type="Button" parent="Desktop/Apps"]
+custom_minimum_size = Vector2(116, 84)
+layout_mode = 2
+theme_type_variation = &"DesktopShortcut"
+text = "记录"
 icon = ExtResource("2_icon")
 icon_alignment = 1
 vertical_icon_alignment = 0
@@ -212,47 +197,100 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="Actions" type="HBoxContainer" parent="Desktop/Taskbar"]
+[node name="StartButton" type="Button" parent="Desktop/Taskbar"]
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 1.0
 anchor_top = 0.5
-anchor_right = 1.0
 anchor_bottom = 0.5
-offset_left = -208.0
-offset_top = -26.0
-offset_right = -20.0
-offset_bottom = 26.0
-grow_horizontal = 0
+offset_left = 17.0
+offset_top = -29.0
+offset_right = 155.0
+offset_bottom = 29.0
 grow_vertical = 2
-theme = SubResource("Theme_desktop_shortcut")
-theme_override_constants/separation = 10
-alignment = 2
+theme_override_constants/icon_max_width = 31
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("StyleBox_launcher")
+theme_override_styles/pressed = SubResource("StyleBox_launcher_active")
+theme_override_styles/hover = SubResource("StyleBox_launcher_active")
+theme_override_styles/hover_pressed = SubResource("StyleBox_launcher_active")
+toggle_mode = true
+expand_icon = true
 
-[node name="StartGame" type="Button" parent="Desktop/Taskbar/Actions"]
-custom_minimum_size = Vector2(56, 52)
+[node name="ActionMenu" type="PanelContainer" parent="Desktop"]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -277.5
+offset_top = -134.0
+offset_right = 277.5
+offset_bottom = 134.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBox_action_menu")
+
+[node name="Content" type="VBoxContainer" parent="Desktop/ActionMenu"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Title" type="Label" parent="Desktop/ActionMenu/Content"]
+custom_minimum_size = Vector2(0, 43)
+layout_mode = 2
+theme_type_variation = &"MenuHeading"
+theme_override_colors/font_color = Color(0.97, 0.98, 1, 1)
+theme_override_font_sizes/font_size = 26
+text = "系统操作"
+vertical_alignment = 1
+
+[node name="ActionBand" type="PanelContainer" parent="Desktop/ActionMenu/Content"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBox_action_band")
+
+[node name="Actions" type="HBoxContainer" parent="Desktop/ActionMenu/Content/ActionBand"]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="StartGame" type="Button" parent="Desktop/ActionMenu/Content/ActionBand/Actions"]
+custom_minimum_size = Vector2(156, 94)
 layout_mode = 2
 tooltip_text = "开始游戏"
 accessibility_name = "开始游戏"
+theme_type_variation = &"DesktopShortcut"
 disabled = true
 icon = SubResource("AtlasTexture_start")
 icon_alignment = 1
+expand_icon = true
 
-[node name="ReturnToTitle" type="Button" parent="Desktop/Taskbar/Actions"]
-custom_minimum_size = Vector2(56, 52)
+[node name="ReturnToTitle" type="Button" parent="Desktop/ActionMenu/Content/ActionBand/Actions"]
+custom_minimum_size = Vector2(156, 94)
 layout_mode = 2
 tooltip_text = "返回标题页"
 accessibility_name = "返回标题页"
+theme_type_variation = &"DesktopShortcut"
 icon = SubResource("AtlasTexture_title")
 icon_alignment = 1
+expand_icon = true
 
-[node name="Quit" type="Button" parent="Desktop/Taskbar/Actions"]
-custom_minimum_size = Vector2(56, 52)
+[node name="Quit" type="Button" parent="Desktop/ActionMenu/Content/ActionBand/Actions"]
+custom_minimum_size = Vector2(156, 94)
 layout_mode = 2
 tooltip_text = "退出游戏"
 accessibility_name = "退出游戏"
+theme_type_variation = &"DesktopShortcut"
 icon = SubResource("AtlasTexture_quit")
 icon_alignment = 1
+expand_icon = true
+
+[node name="Cancel" type="Button" parent="Desktop/ActionMenu/Content"]
+custom_minimum_size = Vector2(92, 40)
+layout_mode = 2
+size_flags_horizontal = 8
+text = "取消"
 
 [node name="AppWindows" type="Control" parent="."]
 layout_mode = 1
@@ -296,6 +334,7 @@ horizontal_alignment = 1
 
 [node name="QuitConfirmation" type="ConfirmationDialog" parent="."]
 title = "退出游戏"
+theme = ExtResource("menu_theme")
 ok_button_text = "退出"
 dialog_text = "确定要退出游戏吗？"
 cancel_button_text = "取消"

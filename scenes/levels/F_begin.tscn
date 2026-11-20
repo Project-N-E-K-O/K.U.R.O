@@ -8,7 +8,7 @@
 [ext_resource type="Script" uid="uid://cnm33l1nmqohv" path="res://scripts/fx/DirectionalSceneEffect.cs" id="3_mbxjs"]
 [ext_resource type="PackedScene" uid="uid://cdrcs3qtqh8q4" path="res://scenes/actors/etc/HitA.tscn" id="4_mbxjs"]
 [ext_resource type="Resource" uid="uid://ttehlcct8cgr" path="res://resources/cutscene/F_begin_2_intro.tres" id="4_xart7"]
-[ext_resource type="Texture2D" uid="uid://752sqoqmoavc" path="res://addons/dialogic/Modules/Signal/sign/exit_sign.png" id="9_anorx"]
+[ext_resource type="Texture2D" path="res://assets/environments/scene_6_hotel/exit_sign.png" id="9_anorx"]
 [ext_resource type="Resource" uid="uid://xag881d6vxpv" path="res://resources/cutscene/F_begin_intro.tres" id="10_1owxs"]
 [ext_resource type="SpineSkeletonDataResource" uid="uid://cu7dh3atg6s4d" path="res://animations/spine/Enemy_F1_rogueAI.tres" id="10_1yie0"]
 [ext_resource type="Texture2D" uid="uid://t6lil4dopg4b" path="res://assets/environments/scene_6_hotel/升降机背景培养皿.png" id="10_x26y1"]
@@ -34,7 +34,6 @@
 [sub_resource type="Resource" id="Resource_rqd1e"]
 script = ExtResource("2_82263")
 PhaseId = "stage_up"
-TotalKillsForFull = 1
 ArrivalTriggerPath = NodePath("CutsceneTrigger3")
 ArrivalTriggerDelay = 2.5
 MinSpeedScale = 0.5

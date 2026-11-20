@@ -8,6 +8,8 @@ using Kuros.UI;
 
 namespace Kuros.Scenes
 {
+    public enum HomeDesktopPage { None, Desktop, RunHistory }
+
     public partial class StageHomeArrivalController : Node
     {
         internal const string HomeScenePath = "res://scenes/Stage_home.tscn";
@@ -22,7 +24,8 @@ namespace Kuros.Scenes
         private bool _returningByTaxi;
         private bool _excludePlayTime;
 
-        internal static Error EnterFromDesktop(SceneTree tree, PackedScene? home = null)
+        internal static Error EnterFromDesktop(SceneTree tree, PackedScene? home = null,
+            HomeDesktopPage page = HomeDesktopPage.Desktop)
         {
             if (tree.Root.HasNode(EntryLayerName)) return Error.Busy;
 
@@ -34,6 +37,7 @@ namespace Kuros.Scenes
             if (desktop == null) return Error.CantCreate;
 
             desktop.IsHomeEntry = true;
+            desktop.InitialPage = page;
             desktop.ProcessMode = ProcessModeEnum.Disabled;
             var layer = new CanvasLayer { Name = EntryLayerName, Layer = HomeComputerController.DesktopCanvasLayer };
             layer.AddChild(desktop);

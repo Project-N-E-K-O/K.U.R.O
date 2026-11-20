@@ -1,5 +1,7 @@
 using Godot;
 using Kuros.Managers;
+using Kuros.Scenes;
+using Kuros.Systems;
 
 namespace Kuros.UI
 {
@@ -10,8 +12,6 @@ namespace Kuros.UI
     [GlobalClass]
     public partial class GameOverScreen : Control
     {
-        private const string HomeScenePath = "res://scenes/Stage_home.tscn";
-
         [ExportGroup("Title")]
         /// <summary>GameOver 标题贴图（可替换）。为空时隐藏 TextureRect，显示场景里的兜底 Label。</summary>
         [Export] public Texture2D? TitleTexture { get; set; }
@@ -96,25 +96,20 @@ namespace Kuros.UI
             return btn;
         }
 
-        private void OnRetryPressed()
-        {
-            // UIManager 常驻根节点，切换场景不会销毁它——先卸载死亡界面再切换
-            UIManager.Instance?.UnloadGameOverScreen();
-            // 清空本局构筑/分数/核心选择与武器电量，从 Stage 1 从头开始
-            BuildSelectionManager.Instance?.ResetForNewRun();
-            WeaponBatteryManager.Instance?.ResetAll();
-            FloatingDamageTextManager.Instance?.ClearAll(); // 清理 Root 级残留飘字
-            GetTree().ChangeSceneToFile(HomeScenePath); // 重试：从第一关重新开始
-        }
+        private void OnRetryPressed() => LeaveRun(StageHomeArrivalController.HomeScenePath);
 
-        private void OnMenuPressed()
+        private void OnMenuPressed() => LeaveRun(DesktopMenu.ScenePath);
+
+        private void LeaveRun(string scenePath)
         {
+            var error = GetTree().ChangeSceneToFile(scenePath);
+            if (error != Error.Ok)
+            {
+                GD.PushError($"[GameOverScreen] 无法切换到 {scenePath}：{error}");
+                return;
+            }
             UIManager.Instance?.UnloadGameOverScreen();
-            // 返回桌面时清空本局构筑与武器电量。
-            BuildSelectionManager.Instance?.ResetForNewRun();
-            WeaponBatteryManager.Instance?.ResetAll();
-            FloatingDamageTextManager.Instance?.ClearAll(); // 清理 Root 级残留飘字
-            GetTree().ChangeSceneToFile(Kuros.Scenes.DesktopMenu.ScenePath);
+            RunStateReset.AfterSceneChange();
         }
     }
 }

@@ -1,8 +1,9 @@
-[gd_scene load_steps=2 format=3 uid="uid://d24iqbdcdv8ct"]
+[gd_scene load_steps=3 format=3 uid="uid://d24iqbdcdv8ct"]
 
 [ext_resource type="Script" uid="uid://taba2rwukbup" path="res://scripts/ui/SkillDetailWindow.cs" id="1_skill_detail_window_script"]
+[ext_resource type="PackedScene" path="res://scenes/ui/windows/BuildCardList.tscn" id="2_cards"]
 
-[node name="SkillDetailWindow" type="Control" node_paths=PackedStringArray("CloseButton", "SkillsScrollContainer", "SkillsContainer")]
+[node name="SkillDetailWindow" type="Control" node_paths=PackedStringArray("CloseButton")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -11,8 +12,6 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_skill_detail_window_script")
 CloseButton = NodePath("MainPanel/CloseButton")
-SkillsScrollContainer = NodePath("MainPanel/Body/SkillsScroll")
-SkillsContainer = NodePath("MainPanel/Body/SkillsScroll/SkillsContainer")
 
 [node name="Background" type="ColorRect" parent="."]
 layout_mode = 1
@@ -80,12 +79,5 @@ offset_bottom = -16.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="SkillsScroll" type="ScrollContainer" parent="MainPanel/Body"]
+[node name="BuildCardList" parent="MainPanel/Body" instance=ExtResource("2_cards")]
 layout_mode = 2
-size_flags_vertical = 3
-
-[node name="SkillsContainer" type="VBoxContainer" parent="MainPanel/Body/SkillsScroll"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-theme_override_constants/separation = 16

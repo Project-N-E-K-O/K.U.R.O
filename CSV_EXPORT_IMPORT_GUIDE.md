@@ -1,203 +1,80 @@
-# CSV 数据导出 / 导入说明
+# CSV 数据导出与导入指南
 
-本文档说明项目中 CSV 工作流的原理、使用方法及各 CSV 文件的字段含义。
+项目使用 CSV 批量查看和调整资源参数。游戏运行时读取资源和场景，编辑表格后要运行回写工具才会更新这些源文件。
 
----
+| 操作 | 入口 | 结果 |
+|---|---|---|
+| 导出项目数据 | [run_export.ps1](scripts/tools/run_export.ps1) 调用 [ExportCsv.gd](scripts/tools/ExportCsv.gd) | 从 .tres 和角色 .tscn 生成 data/ 下的四张 CSV |
+| 回写项目数据 | 在 Godot 编辑器运行 [RunImportCsv.gd](scripts/tools/RunImportCsv.gd) | [ImportCsv.gd](scripts/tools/ImportCsv.gd) 更新已有 .tres 和角色 .tscn |
+| Godot 文件系统中的「重新导入」 | [csv-data-importer](addons/csv-data-importer/import_plugin.gd) 的 CSV Data 导入器 | 从 CSV 或 TSV 生成可读取的 CsvData 资源，源 .tres 和 .tscn 保持原值 |
 
-## 工作流概览
+## 导出
 
-```
-.tres 资源文件                   CSV 文件                    游戏运行时
-─────────────────────────────────────────────────────────────────────
-resources/items/*.tres  ──┐
-resources/builds/*.tres ──┤  [导出 Export]   data/items.csv
-resources/items/skills/  ──┤  ExportCsv.gd   data/builds.csv
-resources/loot/*.tres   ──┘  (GDScript)     data/skills.csv
-											 data/loot.csv
-												 │
-												 │  [导入 Import]
-												 │  csv-data-importer 插件
-												 ▼
-										 data/items.res  ← Array[Dictionary]
-										 data/builds.res
-										 data/skills.res
-										 data/loot.res
-```
+在项目根目录运行：
 
-| 方向 | 工具 | 说明 |
-|------|------|------|
-| **Export** (.tres → CSV) | `ExportCsv.gd` + `run_export.ps1` | 读取所有资源文件，提取关键字段写入 CSV |
-| **Import** (CSV → .res) | `csv-data-importer` 插件 | Godot 编辑器自动处理，CSV 保存后立即生效 |
-
-> **注意：** csv-data-importer 插件将 CSV 导入为 `Array[Dictionary]` 资源（`.res` 文件），
-> 不会修改原始的 `.tres` 资源文件。如需用 CSV 数据驱动运行时逻辑，需在游戏代码中
-> 读取 `data/items.res` 等资源。
-
----
-
-## 导出（Export）
-
-### 快速使用
-
-在 VS Code 中按 **Ctrl+Shift+B**，选择 **"ExportCsv: 导出全部数据"** 任务即可。
-
-或在终端手动运行：
-```powershell
+~~~powershell
 powershell -ExecutionPolicy Bypass -File scripts\tools\run_export.ps1
-```
+~~~
 
-### 运行流程
+脚本中的 Godot 可执行文件路径需要和本机一致。本地已配置 VS Code 任务时，也可以通过 **Ctrl+Shift+B** 运行 **ExportCsv: 导出全部数据**。
 
-`run_export.ps1` 按以下步骤执行：
+启动脚本会临时停用 CSV Data 插件并清理旧输出。ExportCsv.gd 以文本方式读取源文件，将数据写到 .csv.tmp。Godot 退出后，PowerShell 将临时文件改为 .csv，恢复插件配置并检查输出。重新导出会替换现有表格。表格中尚未回写的修改应先处理。
 
-1. **暂停插件** — 从 `project.godot` 中临时移除 `csv-data-importer`，避免 headless 模式下文件句柄冲突
-2. **运行 Godot headless** — 执行 `ExportCsv.gd` 脚本，扫描 `.tres` 文件并生成 CSV
-3. **恢复插件** — 将 `project.godot` 还原，插件恢复正常状态
-4. **验证输出** — 检查 4 个 CSV 文件是否成功生成并显示文件大小
+## 导入并回写源文件
 
-### 源文件
+1. 用最新导出表作为编辑起点。保留原表头，保存为 UTF-8、逗号分隔的 CSV。
+2. 通过文件系统打开 scripts/tools/RunImportCsv.gd，在 Godot 脚本编辑器的 **文件 → 运行** 执行该 EditorScript。
+3. 查看输出面板。工具按技能、物品、掉落、角色的顺序批量回写。运行后检查相应 .tres 和 .tscn 的差异。
 
-| 文件 | 说明 |
-|------|------|
-| `scripts/tools/ExportCsv.gd` | GDScript 导出工具，以文本解析方式读取 `.tres`（不依赖 C# 程序集） |
-| `scripts/tools/run_export.ps1` | PowerShell 执行器，管理插件状态并调用 Godot headless |
+物品、技能和角色通过 file 列匹配文件名，掉落通过 table_file 和 entry_index 匹配。调整 ItemId 或 SkillId 时，对应的字符串字段也会被写回。
 
----
+空单元格的处理取决于字段。物品和技能的普通字符串字段会写入空字符串，缺列时也如此。数值、布尔、数组等由对应的回写函数处理，空值通常跳过。角色列为空时保留场景原值。修改单个字段时，建议保留表内其他字段和值。
 
-## 导入（Import）
+## 支持的表格和字段
 
-### 原理
+| CSV | 源文件 | 回写定位 |
+|---|---|---|
+| data/items.csv | resources/items/*.tres | file，不带 .tres 的文件名 |
+| data/skills.csv | resources/items/skills/*.tres | file，不带 .tres 的文件名 |
+| data/loot.csv | resources/loot/*.tres | table_file，不带 .tres 的文件名。条目按从 1 开始的 entry_index 匹配 |
+| data/characters.csv | scenes/actors/characters/*.tscn | file，不带 .tscn 的文件名 |
 
-`csv-data-importer` 插件（`addons/csv-data-importer/`）是一个 **EditorImportPlugin**，
-它监听 `.csv` / `.tsv` 文件的变化，当文件被添加或修改时自动生成对应的 `.res` 资源。
+### 物品
 
-生成的 `.res` 资源类型为 `CsvData`（继承 `Resource`），包含：
-```gdscript
-@export var records: Array  # Array[Dictionary] — 每行一个字典，键为表头列名
-```
+- 基础字段包括 ItemId、DisplayName、Description、Category、Tags、MaxStackSize 与 attack_power。attack_power 更新已有 AttributeEntries 中匹配的属性条目。
+- 投掷字段包括 IsThrowable、IsThrowWeapon、PreventDropDuringCooldown、SpawnEffectOnThrow、ThrowStartOffset、ThrowParabolicDuration、ThrowParabolicPeakHeight、ThrowHorizontalDistance、ThrowParabolicLandingYOffset、ThrowWeaponCooldown、UnpickedLifetime 和 ThrowTier。
+- Tags 用竖线分隔，ThrowStartOffset 用「X|Y」表示。SkillRefs 导出关联技能文件名供查看，关联关系在 Godot Inspector 中编辑。
 
-### 触发方式
+### 武器技能
 
-在 Godot 编辑器中保存或重新导入任意 CSV 文件时自动触发。也可以在
-**文件系统面板** 右键 CSV 文件 → **重新导入** 手动触发。
+- 基础字段包括 SkillId、DisplayName、SkillType、AnimationName、DamageMultiplier、CooldownSeconds、ShowHitboxDebug、Description、ActivationAction 和 AllowHoldContinuousAttack。SkillType 的 0 为 Passive，1 为 Active。
+- Warmup、Active、Recovery 的 Duration 和 AnimationSpeed 列分别控制各阶段时长和播放速度。冲刺攻击另有带 Dash 前缀的阶段列，以及 DashAnimationName、DashDamageMultiplier、DashAttackSpeedSource、DashAttackFixedSpeed、DashAttackSpeedMultiplier 和 DashAttackDecayWindow。各字段的继承规则见 [WeaponSkillDefinition.cs](scripts/items/weapons/WeaponSkillDefinition.cs)。
+- AttackFallImmunities 和 DashAttackFallImmunities 分别配置普通攻击和冲刺攻击的免坠落阶段。0 表示无，1 为 Warmup，2 为 Active，4 为 Recovery，可相加组合。导出缺省值为 0，导入缺列或空值时保留原值，填写 0 会清除配置。
+- Effects、DashEffects 和攻击阶段特效条目在 Godot Inspector 中维护。
 
-### 插件配置（可在编辑器导入对话框修改）
+### 掉落表
 
-| 选项 | 默认值 | 说明 |
-|------|--------|------|
-| `delimiter` | Comma | 分隔符（逗号 / Tab） |
-| `headers` | false | 第一行是否作为字典键（建议开启） |
-| `detect_numbers` | false | 是否将纯数字字段转为 int/float |
-| `force_float` | true | detect_numbers 开启时，强制转为 float |
+- 同一个 table_file 可有多行。表级字段 SelectionMode、GlobalDropChance、MaxDrops、ScatterRadius 和 DefaultImpulse 使用该表第一行的值。SelectionMode 的 0 为 Sequential，1 为 PickOne。
+- 每条掉落按 entry_index 回写 DropChance、MaxStacks、ImpulseStrength 和 ImpulseSpreadDegrees。item_file 用于查看掉落物引用，修改引用和增删条目在 Godot Inspector 中完成。
 
-> 推荐设置：`headers = true`，`detect_numbers = false`（保持字符串，方便与 .tres 数据对比）
+### 角色
 
-### 在游戏代码中读取 CSV 资源（示例）
+当前处理场景根节点的 Speed、AttackDamage、AttackCooldown、MaxHealth 和 AiDescription。前三项以浮点形式回写。导出只读取 .tscn 根节点里显式配置的字段，空值表示该根节点没有对应配置。
 
-```gdscript
-# 加载已导入的 CSV 资源
-var csv = load("res://data/items.res") as CsvData
-for record in csv.records:
-	print(record["ItemId"], " - ", record["DisplayName"])
-```
+## Godot 的 CSV Data 导入器
 
----
+编辑器可将 CSV 或 TSV 导入为 [CsvData](addons/csv-data-importer/csv_data.gd)。在导入面板开启 Headers 后，records 的每行是按列名访问的字典。可按需要开启 Detect Numbers。代码通过原始 CSV 的 res:// 路径加载导入结果，例如：
 
-## CSV 文件字段说明
+~~~gdscript
+var table := load("res://data/items.csv") as CsvData
+for row in table.records:
+    print(row["ItemId"])
+~~~
 
-### `data/items.csv` — 物品定义（ItemDefinition）
+## 待接入的表格
 
-来源：`resources/items/*.tres`
+当前批处理范围是上述四张表。构筑卡表和房间目录尚未接入。
 
-| 列名 | 类型 | 说明 |
-|------|------|------|
-| `file` | String | .tres 文件名（不含扩展名） |
-| `ItemId` | String | 物品唯一 ID |
-| `DisplayName` | String | 显示名称 |
-| `Description` | String | 描述文本 |
-| `Category` | String | 类别（Weapon / Supplies / Furniture 等） |
-| `Tags` | String | 标签列表，用 `\|` 分隔（如 `tag_weapon\|build_machine`） |
-| `MaxStackSize` | int | 最大堆叠数量 |
-| `BuildClass` | String | 归属构筑类型（guard / machine 等） |
-| `LevelCount` | int | 武器等级档次 |
-| `IsThrowable` | bool | 是否可投掷 |
-| `IsFurniture` | bool | 是否为家具 |
-| `attack_power` | float | 攻击力属性值（来自 AttributeEntries） |
-| `MaxDurability` | int | 最大耐久度（来自 DurabilityConfig） |
-| `DamagePerHit` | int | 每次命中消耗耐久（来自 DurabilityConfig） |
-| `SkillRefs` | String | 关联技能文件名，用 `\|` 分隔 |
+房间目录计划从 [hotel_room_catalog.tres](resources/stages/hotel_room_catalog.tres) 的 Rooms 导出，每个 RoomDefinition 占一行，包含 ScenePath、FloorTheme、RoomType、RouteTags、ElevatorPreviewName 和 ElevatorPreviewIcon。RoomType 使用枚举名称，RouteTags 使用竖线分隔，图标列使用资源路径。实际房间排列仍由 [StageConfig](scripts/systems/stage/StageConfig.cs) 和 [StageGeneratorManager](scripts/managers/StageGeneratorManager.cs) 决定。
 
----
-
-### `data/builds.csv` — 构筑效果（BuildLevelEffectEntry）
-
-来源：`resources/builds/*.tres`
-
-| 列名 | 类型 | 说明 |
-|------|------|------|
-| `file` | String | .tres 文件名 |
-| `BuildId` | String | 构筑唯一 ID |
-| `BuildClass` | String | 构筑类型（guard / machine 等） |
-| `BuildName` | String | 构筑显示名称 |
-| `Level` | int | 构筑等级（1-N） |
-| `RequiredPoints` | int | 激活所需点数 |
-| `EffectId` | String | 效果 ID（对应 C# 效果类） |
-| `EffectScript` | String | 效果 C# 类名 |
-| `Description` | String | 效果描述 |
-
----
-
-### `data/skills.csv` — 武器技能（WeaponSkillDefinition）
-
-来源：`resources/items/skills/*.tres`
-
-| 列名 | 类型 | 说明 |
-|------|------|------|
-| `file` | String | .tres 文件名 |
-| `SkillId` | String | 技能唯一 ID |
-| `DisplayName` | String | 显示名称 |
-| `AnimationName` | String | 对应动画名称 |
-| `DamageMultiplier` | float | 伤害倍率（默认 1.0） |
-| `CooldownSeconds` | float | 冷却时间（秒） |
-| `ShowHitboxDebug` | bool | 是否显示判定框调试 |
-| `Description` | String | 技能描述 |
-| `ActivationAction` | String | 触发动作名（如 `weapon_skill_block`） |
-
----
-
-### `data/loot.csv` — 掉落表（LootDropTable）
-
-来源：`resources/loot/*.tres`
-
-每个掉落条目（Entry）占一行，同一张表会有多行。
-
-| 列名 | 类型 | 说明 |
-|------|------|------|
-| `table_file` | String | 掉落表 .tres 文件名 |
-| `SelectionMode` | int | 选取模式：`0`=Sequential，`1`=PickOne |
-| `GlobalDropChance` | float | 整体触发概率（0-1） |
-| `MaxDrops` | int | 最大掉落数量（0=不限） |
-| `ScatterRadius` | float | 物品散落半径（像素） |
-| `DefaultImpulse` | float | 默认弹射力度 |
-| `entry_index` | int | 条目序号（从 1 开始） |
-| `item_file` | String | 掉落物品的 .tres 文件名 |
-| `DropChance` | float | 该条目的掉落概率 |
-| `MaxStacks` | int | 最多掉落堆叠数 |
-| `ImpulseStrength` | float | 该条目的弹射力度 |
-| `ImpulseSpreadDegrees` | float | 弹射散开角度（度） |
-
----
-
-## 常见问题
-
-**Q: 为什么导出脚本要暂停插件？**  
-A: `csv-data-importer` 插件在 Godot headless 模式下可能对 CSV 文件持有文件句柄，
-导致写入失败。暂停插件可确保导出过程无冲突。
-
-**Q: CSV 数据改变后需要重新运行导出吗？**  
-A: 不需要。CSV 数据流向是单向的：`.tres` → CSV。
-修改 `.tres` 资源后重新运行导出，CSV 会被更新。
-CSV 文件本身仅供查阅或通过插件导入到游戏运行时使用，不会反向修改 `.tres`。
-
-**Q: 导出后 Godot 输出了 "ObjectDB instances leaked" 警告，正常吗？**  
-A: 正常。这是 Godot headless 退出时的已知警告，不影响导出结果，退出码为 0 即成功。
+建议先提供只读导出，再加入显式回写。回写前将 uid:// 和 res:// 解析为同一场景身份，检查重复、非法类型和无法加载的资源。首版按场景更新已有条目，新增、删除和替换场景仍在 Inspector 中操作。校验通过后统一保存目录。

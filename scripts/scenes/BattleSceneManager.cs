@@ -4,6 +4,7 @@ using Kuros.Actors.Heroes;
 using Kuros.Core;
 using Kuros.Items;
 using Kuros.Managers;
+using Kuros.Systems;
 using Kuros.UI;
 using Kuros.Utils;
 
@@ -61,6 +62,9 @@ namespace Kuros.Scenes
 
 		private void InitializeBattleScene()
 		{
+			// 房间生成失败时可能已切回标题页，延迟初始化不能重新创建 HUD。
+			if (!IsInsideTree()) return;
+
 			// 如果没有指定玩家，尝试查找
 			if (Player == null)
 			{
@@ -420,19 +424,9 @@ namespace Kuros.Scenes
 			var tree = GetTree();
 			if (tree != null)
 			{
-				UnloadAllUI();
-				// 清除所有暂停请求，确保场景切换时游戏未暂停
-				if (PauseManager.Instance != null)
-				{
-					PauseManager.Instance.ClearAllPauses();
-				}
-				// 清除构筑选择状态（已选核心/构筑卡）——返回主菜单 = 退出战斗，重进存档后重新选择构筑，
-				// 否则 RestoreBuildState 会从残留记录把旧构筑效果恢复到玩家身上
-				if (Kuros.Managers.BuildSelectionManager.Instance != null)
-				{
-					Kuros.Managers.BuildSelectionManager.Instance.ClearBuildState();
-				}
-				tree.ChangeSceneToFile(DesktopMenu.ScenePath);
+				var error = tree.ChangeSceneToFile(DesktopMenu.ScenePath);
+				if (error == Error.Ok) RunStateReset.AfterSceneChange();
+				else GD.PushError($"[BattleSceneManager] 无法返回桌面：{error}");
 			}
 		}
 

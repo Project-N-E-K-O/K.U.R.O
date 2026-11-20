@@ -9,6 +9,8 @@ uniform float tile_width : hint_range(128.0, 3840.0, 1.0) = 960.0;
 uniform float opacity : hint_range(0.0, 1.0, 0.01) = 0.24;
 // 以平铺块为单位，在旋转后的纹理坐标中错开图案。
 uniform vec2 pattern_offset = vec2(0.0);
+uniform vec4 ink_tint : source_color = vec4(1.0);
+uniform float tint_mix : hint_range(0.0, 1.0) = 0.0;
 
 vec2 rotate_point(vec2 point, float angle) {
 	float c = cos(angle);
@@ -26,5 +28,5 @@ void fragment() {
 	vec2 pattern_uv = rotate_point(screen_position - scroll, -radians(pattern_angle_degrees)) / tile_size;
 	// 采样器负责重复；保留连续 UV 使纹理过滤能正确处理接缝。
 	vec4 ink = texture(pattern_texture, pattern_uv + vec2(0.5) - pattern_offset);
-	COLOR = vec4(ink.rgb * COLOR.rgb, ink.a * opacity * COLOR.a);
+	COLOR = vec4(mix(ink.rgb, ink_tint.rgb, tint_mix) * COLOR.rgb, ink.a * opacity * ink_tint.a * COLOR.a);
 }

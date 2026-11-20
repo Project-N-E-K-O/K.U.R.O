@@ -1,4 +1,5 @@
 using Kuros.Managers;
+using Kuros.Systems;
 
 namespace Kuros.Actors.Heroes.States
 {
@@ -11,9 +12,14 @@ namespace Kuros.Actors.Heroes.States
         public override void Enter()
         {
             // 每次死亡：游戏循环数 +1，并自动保存元数据（进度/时间）
-            if (SaveManager.Instance?.CurrentGameData != null)
-                SaveManager.Instance.CurrentGameData.CycleCount++;
-            SaveManager.Instance?.AutosaveCurrentSlot();
+            var saves = SaveManager.Instance;
+            if (saves?.HasActiveRun == true)
+                saves.FinishRun(RunOutcome.NotCleared, playerDied: true);
+            else if (saves?.CurrentGameData is { } profile)
+            {
+                profile.CycleCount++;
+                saves.AutosaveCurrentSlot();
+            }
 
             // 弹出死亡界面（挂在 UIManager 菜单层，玩家节点销毁不影响其存活）
             UIManager.Instance?.LoadGameOverScreen();

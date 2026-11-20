@@ -15,6 +15,8 @@ shader_parameter/scroll_speed = 42.0
 shader_parameter/tile_width = 960.0
 shader_parameter/opacity = 0.0499999988824
 shader_parameter/pattern_offset = Vector2(0, 0)
+shader_parameter/ink_tint = Color(1, 1, 1, 1)
+shader_parameter/tint_mix = 0.0
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_rlol1"]
 shader = ExtResource("3_bjhy7")
@@ -25,6 +27,8 @@ shader_parameter/scroll_speed = 42.0
 shader_parameter/tile_width = 960.0
 shader_parameter/opacity = 0.0499999988824
 shader_parameter/pattern_offset = Vector2(0, 0.16666667)
+shader_parameter/ink_tint = Color(1, 1, 1, 1)
+shader_parameter/tint_mix = 0.0
 
 [node name="TitleScreen" type="Control" node_paths=PackedStringArray("TitleNode")]
 layout_mode = 3
@@ -119,7 +123,7 @@ offset_right = 112.0
 grow_vertical = 0
 theme_override_constants/outline_size = 5
 theme_override_font_sizes/font_size = 20
-text = "V0.1.0"
+text = "V0.2.0"
 horizontal_alignment = 1
 
 [node name="ContactButton" type="Button" parent="."]

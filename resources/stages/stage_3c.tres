@@ -12,4 +12,4 @@ LevelDescription = "酒店三层办公c区"
 Floor = 3
 FloorTheme = "D"
 RouteMode = 1
-MiddleRoomCount = 3
+MiddleRoomCount = 5

@@ -6,6 +6,7 @@ using Kuros.Items;
 using Kuros.Items.Durability;
 using Kuros.Items.Effects;
 using Kuros.Items.Tags;
+using Kuros.Managers;
 using Kuros.Systems.Inventory;
 using Kuros.Utils;
 
@@ -239,7 +240,8 @@ namespace Kuros.Actors.Heroes
         /// 3. 快捷欄1（索引0）是小木劍，永遠不會被更改
         /// 4. 快捷欄滿時，溢出的物品放置到物品欄中；總武器攜帶上限由 MaxCarriedWeaponCount 控制
         /// </summary>
-        public int AddItemSmart(ItemDefinition item, int amount, GameActor? owner = null, bool showPopupIfFirstTime = true)
+        public int AddItemSmart(ItemDefinition item, int amount, GameActor? owner = null, bool showPopupIfFirstTime = true,
+            bool recordAcquisition = true)
         {
             // 参数验证：检查 item 是否为 null
             if (item == null)
@@ -259,7 +261,9 @@ namespace Kuros.Actors.Heroes
             // 家具类型不显示新获取介绍弹窗
             if (item.IsFurniture)
             {
-                return AddFurnitureItem(item, amount, owner, showPopupIfFirstTime: false);
+                int added = AddFurnitureItem(item, amount, owner, showPopupIfFirstTime: false);
+                if (recordAcquisition && added > 0) SaveManager.Instance?.RecordRunItem(item, added);
+                return added;
             }
 
             int requestedAmount = amount;
@@ -355,6 +359,7 @@ namespace Kuros.Actors.Heroes
             }
 
             int totalAdded = requestedAmount - remaining;
+            if (recordAcquisition && totalAdded > 0) SaveManager.Instance?.RecordRunItem(item, totalAdded);
 
             // 如果成功添加了物品且是第一次获得，标记为已获得
             if (totalAdded > 0 && isFirstTime)
@@ -486,7 +491,9 @@ namespace Kuros.Actors.Heroes
         /// <summary>直接向背包容器添加物品（不走快捷栏优先逻辑）。</summary>
         public bool TryAddItem(ItemDefinition item, int amount)
         {
-            return Backpack.TryAddItem(item, amount);
+            int accepted = Backpack.AddItem(item, amount);
+            if (accepted > 0) SaveManager.Instance?.RecordRunItem(item, accepted);
+            return accepted == amount;
         }
 
         /// <summary>从背包容器移除指定数量的物品（按物品 ID 匹配）。</summary>
@@ -784,6 +791,7 @@ namespace Kuros.Actors.Heroes
             int accepted = Backpack.TryAddItemToSlot(item, quantity, SelectedBackpackSlot);
             if (accepted > 0)
             {
+                SaveManager.Instance?.RecordRunItem(item, accepted);
                 NotifyItemPicked(item);
                 return accepted;
             }

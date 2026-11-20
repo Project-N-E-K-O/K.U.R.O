@@ -179,7 +179,7 @@ namespace Kuros.Environments
             if (_sceneReady)
             {
                 _hintLabel?.Hide();
-                TriggerCutscene();
+                _ = TriggerCutsceneAsync();
             }
             else
             {
@@ -188,11 +188,12 @@ namespace Kuros.Environments
             }
         }
 
-        private void TriggerCutscene()
+        private async System.Threading.Tasks.Task TriggerCutsceneAsync()
         {
             if (Sequence == null)
             {
                 GD.PushError("[TaxiController] Sequence not set!");
+                EnterCalledState();
                 return;
             }
 
@@ -206,12 +207,19 @@ namespace Kuros.Environments
             if (manager == null)
             {
                 GD.PushError("[TaxiController] CutsceneManager not found in group 'cutscene_manager'!");
+                EnterCalledState();
                 return;
             }
-            if (manager.IsPlaying) return;
+            if (manager.IsPlaying)
+            {
+                EnterCalledState();
+                return;
+            }
 
             GD.Print($"[TaxiController] Playing cutscene: {Sequence.SequenceId}");
-            _ = manager.PlayCutscene(Sequence);
+            await manager.PlayCutscene(Sequence);
+            // 写盘或切场失败时，旧房间仍在，允许再次确认离场。
+            if (IsInstanceValid(this) && IsInsideTree() && !IsQueuedForDeletion()) EnterCalledState();
         }
 
         private void PollSceneLoad()
@@ -228,7 +236,7 @@ namespace Kuros.Environments
                     if (_state == TaxiState.Triggered)
                     {
                         _hintLabel?.Hide();
-                        TriggerCutscene();
+                        _ = TriggerCutsceneAsync();
                     }
                     break;
 
@@ -238,7 +246,7 @@ namespace Kuros.Environments
                     if (_state == TaxiState.Triggered)
                     {
                         _hintLabel?.Hide();
-                        TriggerCutscene();
+                        _ = TriggerCutsceneAsync();
                     }
                     break;
             }

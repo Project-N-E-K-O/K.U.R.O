@@ -12,3 +12,4 @@ Floor = 1
 DownFloorTarget = -1
 FloorTheme = "B"
 RoomSequence = Array[int]([0, 6])
+MiddleRoomCount = 3

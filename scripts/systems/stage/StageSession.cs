@@ -46,6 +46,7 @@ namespace Kuros.Systems.Stage
         private readonly System.Collections.Generic.Dictionary<StageConfig, StagePlan?> _candidatePlans = new();
         private List<StagePlan> _displayedPlans = new();
         private readonly HashSet<StageConfig> _unlockedHiddenFloors = new();
+        private bool _runStarted;
         private StageConfig? _hiddenEntryStage;
         private bool _transitionInProgress;
         private uint _routeRevision;
@@ -425,6 +426,11 @@ namespace Kuros.Systems.Stage
 
         private void OnStageGenerated()
         {
+            if (!_runStarted)
+            {
+                _runStarted = true;
+                SaveManager.Instance?.BeginRun();
+            }
             RecordRoomHistory();
             _transitionInProgress = false;
             if (_currentConfig is { } config && GetParent() is BattleSceneManager { AutoShowLevelName: true } manager)
