@@ -87,6 +87,7 @@ shape = SubResource("RectangleShape2D_y44ha")
 debug_color = Color(0, 1, 0, 0.41960785)
 
 [node name="CutsceneTrigger" type="Area2D" parent="."]
+visible = false
 z_index = 10
 collision_layer = 0
 collision_mask = 4
@@ -114,6 +115,7 @@ ShowDebugOverlayInGame = true
 shape = SubResource("RectangleShape2D_mxkb7")
 
 [node name="WaveSpawnManager" type="Node2D" parent="." node_paths=PackedStringArray("TriggerArea")]
+visible = false
 script = ExtResource("5_f0bsw")
 WavePaths = Array[NodePath]([NodePath("../EnemySpawneManager")])
 WaveClearDelay = 0.0
@@ -204,6 +206,7 @@ shape = SubResource("RectangleShape2D_wfnu5")
 debug_color = Color(0, 0, 0, 0.19607843)
 
 [node name="NavigationRegion2D" type="NavigationRegion2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
+visible = false
 position = Vector2(122, -196)
 navigation_polygon = SubResource("NavigationPolygon_ka7vx")
 

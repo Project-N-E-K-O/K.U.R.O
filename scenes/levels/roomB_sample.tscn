@@ -1,0 +1,39 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" uid="uid://cra7y7mt0x1j8" path="res://scripts/managers/CameraZoneArea.cs" id="1_us3fr"]
+[ext_resource type="Script" uid="uid://dprkkl72f62vr" path="res://scripts/scenes/GridRoomTemplate.cs" id="2_template"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_room_bounds"]
+size = Vector2(11500, 3250)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_camera_bounds"]
+size = Vector2(11000, 3000)
+
+[node name="roomB_sample" type="Node2D"]
+y_sort_enabled = true
+script = ExtResource("2_template")
+NorthWallDepth = 900.0
+SouthWallDepth = 150.0
+WestWallDepth = 450.0
+EastWallDepth = 450.0
+
+[node name="AreaSize" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AreaSize"]
+shape = SubResource("RectangleShape2D_room_bounds")
+debug_color = Color(0.6431373, 0.5254902, 0.06666667, 0.19607843)
+
+[node name="CameraZone" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 4
+script = ExtResource("1_us3fr")
+ZoneName = "Room_Zone_RoomB"
+UseLocalVerticalLimits = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CameraZone"]
+shape = SubResource("RectangleShape2D_camera_bounds")
+debug_color = Color(0, 1, 0, 0.09803922)

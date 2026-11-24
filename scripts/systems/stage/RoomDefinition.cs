@@ -2,7 +2,7 @@ using Godot;
 
 namespace Kuros.Systems.Stage
 {
-    [GlobalClass]
+    [Tool, GlobalClass]
     public partial class RoomDefinition : Resource
     {
         [Export] public string FloorTheme { get; set; } = "";

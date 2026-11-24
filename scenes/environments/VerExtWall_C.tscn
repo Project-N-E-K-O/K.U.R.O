@@ -1,0 +1,48 @@
+[gd_scene load_steps=7 format=3 uid="uid://dprint71hg61s"]
+
+[ext_resource type="Shader" uid="uid://dwi65rioev5hr" path="res://shaders/materials/pseudo_3d_card.gdshader" id="1_g062c"]
+[ext_resource type="Texture2D" uid="uid://b2vbxff8qbwlw" path="res://assets/environments/scene_3_hotel/窗外远景.png" id="2_frvcl"]
+[ext_resource type="Texture2D" uid="uid://b46px0v03cabo" path="res://assets/environments/scene_3_hotel/墙壁A_东墙.png" id="3_ksanj"]
+[ext_resource type="Texture2D" uid="uid://ctci4r0iygs2i" path="res://assets/environments/scene_3_hotel/窗户玻璃反射_东墙.png" id="4_iaequ"]
+[ext_resource type="Texture2D" uid="uid://dt5cinfyfj6kj" path="res://assets/environments/scene_3_hotel/墙壁A_完整_东墙.png" id="5_qvp4a"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_3pf5n"]
+shader = ExtResource("1_g062c")
+shader_parameter/cull_backface = true
+shader_parameter/use_front = true
+shader_parameter/fov = 10.0000004275
+shader_parameter/rot_y_deg = 0.0
+shader_parameter/rot_x_deg = -44.99998503749998
+shader_parameter/inset = 0.0
+
+[node name="VerExtWall_C" type="Node2D"]
+
+[node name="Windowed" type="Node2D" parent="."]
+position = Vector2(-175, 1625)
+
+[node name="WindowMask" type="Polygon2D" parent="Windowed"]
+clip_children = 1
+z_index = -11
+polygon = PackedVector2Array(-160, -595, -30, -940, 132, -1020, 132, -45, -160, 90, -160, 445, -25, 125, 132, -55, 132, 1105, -160, 1385)
+polygons = [PackedInt32Array(0, 1, 2, 3, 4), PackedInt32Array(5, 6, 7, 8, 9)]
+
+[node name="BG" type="Sprite2D" parent="Windowed/WindowMask"]
+material = SubResource("ShaderMaterial_3pf5n")
+rotation = 1.5707964
+scale = Vector2(0.6, 1)
+skew = -0.9599311
+texture = ExtResource("2_frvcl")
+
+[node name="WallFrame" type="Sprite2D" parent="Windowed"]
+texture = ExtResource("3_ksanj")
+
+[node name="window" type="Sprite2D" parent="Windowed/WallFrame"]
+modulate = Color(1, 1, 1, 0.55)
+z_index = -1
+scale = Vector2(0.8, 0.7)
+texture = ExtResource("4_iaequ")
+
+[node name="Solid" type="Sprite2D" parent="."]
+visible = false
+position = Vector2(-175, 1625)
+texture = ExtResource("5_qvp4a")

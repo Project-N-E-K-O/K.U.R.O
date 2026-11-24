@@ -15,6 +15,7 @@ const ITEMS_DIR  = "res://resources/items/"
 const SKILLS_DIR = "res://resources/items/skills/"
 const LOOT_DIR   = "res://resources/loot/"
 const CHARACTERS_DIR = "res://scenes/actors/characters/"
+const RoomCatalogCsv := preload("res://scripts/tools/HotelRoomCatalogCsv.gd")
 
 var _log := CsvLogger.new()
 
@@ -26,6 +27,9 @@ func import_all() -> void:
 	import_loot_from_csv()
 	import_characters_from_csv()
 	_log.info("=== 全部导入完成 ===")
+
+func import_room_catalog_from_csv() -> bool:
+	return RoomCatalogCsv.import_rooms()
 
 # ── SKILLS ────────────────────────────────────────────────────────────────────
 func import_skills_from_csv() -> void:

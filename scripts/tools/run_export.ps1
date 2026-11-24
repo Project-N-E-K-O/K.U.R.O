@@ -8,6 +8,7 @@ $ScriptDir   = Split-Path -Parent $MyInvocation.MyCommand.Path
 $ProjectRoot = (Resolve-Path (Join-Path $ScriptDir "..\..")).Path
 $ProjectFile = Join-Path $ProjectRoot "project.godot"
 $ExportScript = "res://scripts/tools/ExportCsv.gd"
+$CsvFiles = @("items.csv", "skills.csv", "loot.csv", "characters.csv", "hotel_room_catalog.csv")
 
 # ── Pre-checks ──────────────────────────────────────────────────────────────
 if (-not (Test-Path $GodotPath)) {
@@ -42,31 +43,15 @@ if ($Modified -ne $ProjectContent) {
     $OriginalContent = $null
 }
 
-# ── Step 2: Delete old CSV + .import files to avoid Godot locking them ────────
+# ── Step 2: Clear temporary files from earlier exports ───────────────────────
 Write-Host ""
-Write-Host "[Step 2] Cleaning old CSV exports..." -ForegroundColor Yellow
+Write-Host "[Step 2] Cleaning temporary CSV files..." -ForegroundColor Yellow
 
 $DataDir  = Join-Path $ProjectRoot "data"
-# builds.csv 无对应导出源（ExportCsv.gd 只导 items/skills/loot/characters）——从清单移除
-$CsvFiles = @("items.csv", "skills.csv", "loot.csv", "characters.csv")
 
 foreach ($csv in $CsvFiles) {
-    $fp       = Join-Path $DataDir $csv
-    $importFp = "$fp.import"
-    # Remove .import first (usually not locked)
-    if (Test-Path $importFp) {
-        Remove-Item $importFp -Force -ErrorAction SilentlyContinue
-        Write-Host "  Removed: $csv.import"
-    }
-    # Remove old CSV (may be locked — ignore error, Godot will recreate)
-    if (Test-Path $fp) {
-        Remove-Item $fp -Force -ErrorAction SilentlyContinue
-        if (Test-Path $fp) {
-            Write-Host "  WARNING: Cannot remove locked file $csv — will try anyway" -ForegroundColor DarkYellow
-        } else {
-            Write-Host "  Removed: $csv"
-        }
-    }
+    $tmpFp = Join-Path $DataDir "$csv.tmp"
+    if (Test-Path -LiteralPath $tmpFp) { Remove-Item -LiteralPath $tmpFp -Force -ErrorAction SilentlyContinue }
 }
 
 # ── Step 3: Run Godot headless ───────────────────────────────────────────────
@@ -115,25 +100,18 @@ if ($ExitCode -ne 0) {
 Write-Host ""
 Write-Host "[Step 3.5] Committing .tmp files..." -ForegroundColor Yellow
 
+$Committed = @()
 foreach ($csv in $CsvFiles) {
+    if ($ExitCode -ne 0) { break }
     $fp    = Join-Path $DataDir $csv
     $tmpFp = "$fp.tmp"
-    if (Test-Path $tmpFp) {
-        # Try to delete the old .csv (lock should be released now that Godot exited)
-        if (Test-Path $fp) {
-            Remove-Item $fp -Force -ErrorAction SilentlyContinue
-            if (Test-Path $fp) {
-                Write-Host "  WARNING: Still cannot remove $csv — skipping rename" -ForegroundColor DarkYellow
-                Remove-Item $tmpFp -Force -ErrorAction SilentlyContinue
-                continue
-            }
-        }
-        Rename-Item $tmpFp $fp -ErrorAction SilentlyContinue
-        if (Test-Path $fp) {
-            Write-Host "  OK: $csv"
-        } else {
-            Write-Host "  ERROR: Rename failed for $csv" -ForegroundColor Red
-        }
+    if (!(Test-Path -LiteralPath $tmpFp)) { continue }
+    try {
+        Move-Item -LiteralPath $tmpFp -Destination $fp -Force -ErrorAction Stop
+        $Committed += $csv
+        Write-Host "  OK: $csv"
+    } catch {
+        Write-Host "  ERROR: Could not replace $csv" -ForegroundColor Red
     }
 }
 
@@ -152,19 +130,15 @@ if ($OriginalContent -ne $null) {
 Write-Host ""
 Write-Host "[Step 5] Checking output files..." -ForegroundColor Yellow
 
-$DataDir  = Join-Path $ProjectRoot "data"
-# builds.csv 无对应导出源（ExportCsv.gd 只导 items/skills/loot/characters）——从清单移除
-$CsvFiles = @("items.csv", "skills.csv", "loot.csv", "characters.csv")
-
 $AllOk = $true
 foreach ($csv in $CsvFiles) {
     $fp = Join-Path $DataDir $csv
-    if (Test-Path $fp) {
+    if ($csv -in $Committed) {
         $size  = (Get-Item $fp).Length
         $lines = (Get-Content $fp | Measure-Object -Line).Lines
         Write-Host ("  OK: {0,-14} {1,6} bytes  {2} rows" -f $csv, $size, $lines) -ForegroundColor Green
     } else {
-        Write-Host "  MISSING: $csv" -ForegroundColor Red
+        Write-Host "  NOT UPDATED: $csv" -ForegroundColor Red
         $AllOk = $false
     }
 }

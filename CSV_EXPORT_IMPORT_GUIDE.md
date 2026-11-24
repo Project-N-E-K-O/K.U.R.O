@@ -4,8 +4,9 @@
 
 | 操作 | 入口 | 结果 |
 |---|---|---|
-| 导出项目数据 | [run_export.ps1](scripts/tools/run_export.ps1) 调用 [ExportCsv.gd](scripts/tools/ExportCsv.gd) | 从 .tres 和角色 .tscn 生成 data/ 下的四张 CSV |
+| 导出项目数据 | [run_export.ps1](scripts/tools/run_export.ps1) 调用 [ExportCsv.gd](scripts/tools/ExportCsv.gd) | 从 .tres 和角色 .tscn 生成 data/ 下的五张 CSV |
 | 回写项目数据 | 在 Godot 编辑器运行 [RunImportCsv.gd](scripts/tools/RunImportCsv.gd) | [ImportCsv.gd](scripts/tools/ImportCsv.gd) 更新已有 .tres 和角色 .tscn |
+| 回写房间目录 | 在 Godot 编辑器运行 [RunImportRoomCatalogCsv.gd](scripts/tools/RunImportRoomCatalogCsv.gd) | 校验并更新已有房间记录 |
 | Godot 文件系统中的「重新导入」 | [csv-data-importer](addons/csv-data-importer/import_plugin.gd) 的 CSV Data 导入器 | 从 CSV 或 TSV 生成可读取的 CsvData 资源，源 .tres 和 .tscn 保持原值 |
 
 ## 导出
@@ -18,7 +19,7 @@ powershell -ExecutionPolicy Bypass -File scripts\tools\run_export.ps1
 
 脚本中的 Godot 可执行文件路径需要和本机一致。本地已配置 VS Code 任务时，也可以通过 **Ctrl+Shift+B** 运行 **ExportCsv: 导出全部数据**。
 
-启动脚本会临时停用 CSV Data 插件并清理旧输出。ExportCsv.gd 以文本方式读取源文件，将数据写到 .csv.tmp。Godot 退出后，PowerShell 将临时文件改为 .csv，恢复插件配置并检查输出。重新导出会替换现有表格。表格中尚未回写的修改应先处理。
+启动脚本会临时停用 CSV Data 插件并清理上次遗留的临时文件。ExportCsv.gd 读取源文件，将数据写到 .csv.tmp。Godot 成功退出后，PowerShell 用临时文件替换 CSV，恢复插件配置并检查输出。房间目录使用 Godot .NET 读取，修改 C# 后应先构建项目。表格中尚未回写的修改应在重新导出前处理。
 
 ## 导入并回写源文件
 
@@ -38,6 +39,7 @@ powershell -ExecutionPolicy Bypass -File scripts\tools\run_export.ps1
 | data/skills.csv | resources/items/skills/*.tres | file，不带 .tres 的文件名 |
 | data/loot.csv | resources/loot/*.tres | table_file，不带 .tres 的文件名。条目按从 1 开始的 entry_index 匹配 |
 | data/characters.csv | scenes/actors/characters/*.tscn | file，不带 .tscn 的文件名 |
+| data/hotel_room_catalog.csv | resources/stages/hotel_room_catalog.tres | ScenePath，接受 res:// 或 uid:// |
 
 ### 物品
 
@@ -68,13 +70,22 @@ powershell -ExecutionPolicy Bypass -File scripts\tools\run_export.ps1
 ~~~gdscript
 var table := load("res://data/items.csv") as CsvData
 for row in table.records:
-    print(row["ItemId"])
+	print(row["ItemId"])
 ~~~
 
-## 待接入的表格
+## 酒店房间目录
 
-当前批处理范围是上述四张表。构筑卡表和房间目录尚未接入。
+每个 `RoomDefinition` 导出一行。可以按楼层主题、类型和路线标签筛选。实际房间排列由 [StageConfig](scripts/systems/stage/StageConfig.cs) 和 [StageGeneratorManager](scripts/managers/StageGeneratorManager.cs) 决定。
 
-房间目录计划从 [hotel_room_catalog.tres](resources/stages/hotel_room_catalog.tres) 的 Rooms 导出，每个 RoomDefinition 占一行，包含 ScenePath、FloorTheme、RoomType、RouteTags、ElevatorPreviewName 和 ElevatorPreviewIcon。RoomType 使用枚举名称，RouteTags 使用竖线分隔，图标列使用资源路径。实际房间排列仍由 [StageConfig](scripts/systems/stage/StageConfig.cs) 和 [StageGeneratorManager](scripts/managers/StageGeneratorManager.cs) 决定。
+| 列名 | 格式 |
+|---|---|
+| `ScenePath` | 用于匹配已有房间。导出显示 `res://` 路径 |
+| `FloorTheme` | 非空楼层主题，如 `C`、`F` 或 `HiddenA` |
+| `RoomType` | 区分大小写的枚举名，如 `Begin`、`Combat`、`End` 或 `BossCore` |
+| `RouteTags` | 多个标签用竖线分隔，可留空清除标签 |
+| `ElevatorPreviewName` | 电梯显示名，可留空清除自定义名称 |
+| `ElevatorPreviewIcon` | 贴图资源路径，可留空移除图标。`@embedded` 保留该房间已有的内嵌图标 |
 
-建议先提供只读导出，再加入显式回写。回写前将 uid:// 和 res:// 解析为同一场景身份，检查重复、非法类型和无法加载的资源。首版按场景更新已有条目，新增、删除和替换场景仍在 Inspector 中操作。校验通过后统一保存目录。
+先保存 Inspector 里对目录的修改，再编辑 [房间 CSV](data/hotel_room_catalog.csv) 并在 Godot 脚本编辑器运行 `RunImportRoomCatalogCsv.gd`。可以调整 CSV 行顺序，也可以仅回写部分房间。新增、删除和替换场景通过 Inspector 完成。
+
+回写前会将 `uid://` 和 `res://` 统一为同一场景身份。检测到重复房间、未登记的场景、无效类型或无法读取的图标时，保留原目录。整表验证通过后才保存，资源 UID 和房间顺序保持原值。

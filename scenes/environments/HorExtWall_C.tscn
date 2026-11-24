@@ -1,0 +1,26 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Texture2D" uid="uid://b5ugc8esuokxg" path="res://assets/environments/scene_3_hotel/墙壁A.png" id="1_frame"]
+[ext_resource type="Texture2D" uid="uid://b2vbxff8qbwlw" path="res://assets/environments/scene_3_hotel/窗外远景.png" id="2_city"]
+[ext_resource type="Texture2D" uid="uid://brk1t88wdisc" path="res://assets/environments/scene_3_hotel/窗户玻璃反射.png" id="3_reflection"]
+
+[node name="HorExtWall_C" type="Node2D"]
+
+[node name="WallLayers" type="Node2D" parent="."]
+scale = Vector2(1.0812335464460323, 1.1083743842364533)
+
+[node name="City" type="Sprite2D" parent="WallLayers"]
+position = Vector2(165, 145)
+scale = Vector2(0.9786148714930352, 0.794047619047619)
+texture = ExtResource("2_city")
+centered = false
+
+[node name="Reflection" type="Sprite2D" parent="WallLayers"]
+position = Vector2(165, 145)
+scale = Vector2(1.0658119658119658, 0.804583835946924)
+texture = ExtResource("3_reflection")
+centered = false
+
+[node name="WallFrame" type="Sprite2D" parent="WallLayers"]
+texture = ExtResource("1_frame")
+centered = false

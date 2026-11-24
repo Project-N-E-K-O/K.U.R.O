@@ -18,22 +18,27 @@ const OUT_ITEMS  := "res://data/items.csv"
 const OUT_CHARACTERS := "res://data/characters.csv"
 const OUT_SKILLS := "res://data/skills.csv"
 const OUT_LOOT   := "res://data/loot.csv"
+const RoomCatalogCsv := preload("res://scripts/tools/HotelRoomCatalogCsv.gd")
 
 # ══════════════════════════════════════════════════════════════════════════════
 #  入口
 # ══════════════════════════════════════════════════════════════════════════════
 
 func _initialize() -> void:
-	_run()
-	quit()
+	quit(_run())
 
-func _run() -> void:
+func _run() -> int:
 	print("[ExportCsv] Starting export...")
+	var rooms := RoomCatalogCsv.export_rows()
+	if rooms.is_empty() or not _write_csv(RoomCatalogCsv.CSV_PATH, rooms):
+		return 1
+	print("[ExportCsv] hotel_room_catalog.csv -> %d rows" % (rooms.size() - 1))
 	_export_items()
 	_export_skills()
 	_export_loot()
 	_export_characters()
 	print("[ExportCsv] All exports completed.")
+	return 0
 # ══════════════════════════════════════════════════════════════════════════════
 #  ITEMS  (resources/items/*.tres  →  ItemDefinition)
 # ══════════════════════════════════════════════════════════════════════════════
@@ -519,7 +524,7 @@ func _list_tres(dir_path: String) -> Array:
 ## 将 rows 数组写入 CSV 文件（res:// 路径）
 ## 实际写入 abs_path + ".tmp"，由 run_export.ps1 在 Godot 退出后重命名，
 ## 从而避免目标文件被编辑器锁定时写入失败的问题。
-func _write_csv(res_path: String, rows: Array) -> void:
+func _write_csv(res_path: String, rows: Array) -> bool:
 	var abs_path := ProjectSettings.globalize_path(res_path)
 	var tmp_path := abs_path + ".tmp"
 	var dir_path := abs_path.get_base_dir()
@@ -536,9 +541,14 @@ func _write_csv(res_path: String, rows: Array) -> void:
 	var f := FileAccess.open(tmp_path, FileAccess.WRITE)
 	if not f:
 		push_error("[ExportCsv] Cannot write: " + tmp_path)
-		return
+		return false
 	f.store_string(content)
+	var error := f.get_error()
 	f.close()
+	if error != OK:
+		push_error("[ExportCsv] Cannot write %s: %s" % [tmp_path, error_string(error)])
+		return false
+	return true
 
 ## CSV 转义：含逗号、引号、换行时加双引号包裹
 func _csv_escape(s: String) -> String:

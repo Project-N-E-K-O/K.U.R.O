@@ -1,0 +1,13 @@
+[gd_scene load_steps=2 format=3 uid="uid://66hsp12fkqf4"]
+
+[ext_resource type="Texture2D" uid="uid://bx5phbsql8yk1" path="res://assets/furnitures/hotel_scene2/PlantPartitionA.png" id="1_wall"]
+
+[node name="HorIntWall_C" type="Node2D"]
+z_index = 2
+
+[node name="Wall" type="Sprite2D" parent="."]
+position = Vector2(-1050, -550)
+texture = ExtResource("1_wall")
+centered = false
+
+[node name="WallAnchor" type="Marker2D" parent="."]
