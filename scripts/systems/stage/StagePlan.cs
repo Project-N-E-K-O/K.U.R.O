@@ -1,12 +1,15 @@
 using Godot;
 using System.Collections.Generic;
 using System.Linq;
+using Kuros.Scenes;
 
 namespace Kuros.Systems.Stage
 {
     public sealed record StagePlan(StageConfig Config, IReadOnlyList<RoomType> RoomTypes, IReadOnlyList<string> RoomPaths,
         IReadOnlyList<Texture2D?> RoomIcons, IReadOnlyList<string> RoomNames)
     {
+        internal GridFloorGenerator? GridLayout { get; init; }
+
         public IEnumerable<(string Text, Texture2D? Icon)> GetElevatorPreview()
         {
             if (Config.IsHiddenFloor)
@@ -14,6 +17,14 @@ namespace Kuros.Systems.Stage
                 yield return ("？？？", null);
                 yield break;
             }
+            if (GridLayout != null)
+            {
+                yield return ("入口", null);
+                yield return ("随机网格", null);
+                yield return ("终点", null);
+                yield break;
+            }
+
             int core = -1;
             for (int i = 0; i < RoomTypes.Count; i++)
                 if (RoomTypes[i] == RoomType.BossCore)
@@ -37,18 +48,16 @@ namespace Kuros.Systems.Stage
 
         public string DescribeRoute() => string.Join(" → ", GetElevatorPreview().Select(room => room.Text));
 
-        private static string DescribeRoomType(RoomType type) => type switch
+        internal static string DescribeRoomType(RoomType type) => type.Normalize() switch
         {
             RoomType.Begin => "入口",
             RoomType.Combat => "战斗",
-            RoomType.AdvancedCombat => "战斗+",
-            RoomType.EliteCombat => "战斗++",
-            RoomType.Puzzle => "谜题",
+            RoomType.Challenge => "挑战",
             RoomType.Boss => "Boss",
             RoomType.End => "终点",
-            RoomType.BossWingA => "Boss 左翼",
+            RoomType.BossWingLeft => "Boss 左翼",
             RoomType.BossCore => "Boss 中枢",
-            RoomType.BossWingC => "Boss 右翼",
+            RoomType.BossWingRight => "Boss 右翼",
             RoomType.Hidden => "？？？",
             RoomType.Shop => "商店",
             RoomType.Healing => "治疗",

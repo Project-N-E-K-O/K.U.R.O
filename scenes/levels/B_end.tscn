@@ -212,6 +212,7 @@ shape = SubResource("RectangleShape2D_b2kum")
 debug_color = Color(0, 0, 0, 0.19607843)
 
 [node name="NavigationRegion2D" type="NavigationRegion2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
+visible = false
 navigation_polygon = SubResource("NavigationPolygon_rvxy7")
 
 [node name="columnsB" parent="." instance=ExtResource("10_gxcvl")]

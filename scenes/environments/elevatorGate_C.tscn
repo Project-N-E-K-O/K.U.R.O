@@ -301,7 +301,8 @@ region_enabled = true
 region_rect = Rect2(0, 0, 336, 1000)
 
 [node name="Elevatorwall2" type="Sprite2D" parent="."]
-z_index = 1
+z_index = 2
+z_as_relative = false
 position = Vector2(12, -1000)
 texture = ExtResource("3_m241u")
 

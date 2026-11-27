@@ -1,0 +1,22 @@
+[gd_scene load_steps=4 format=3 uid="uid://taf3pppnhptg"]
+
+[ext_resource type="PackedScene" uid="uid://dye10t8wa1fi8" path="res://scenes/environments/HorExtWall_C.tscn" id="1_1ou6s"]
+[ext_resource type="Texture2D" uid="uid://ja07111u6077" path="res://assets/environments/scene_3_hotel/墙壁A_完整.png" id="2_ngi2t"]
+[ext_resource type="Texture2D" uid="uid://dtmefhuw7vvci" path="res://assets/environments/scene_2_hotel/酒吧吧台.png" id="3_bebee"]
+
+[node name="HorExtWall_C_Bar" instance=ExtResource("1_1ou6s")]
+
+[node name="WallFrame" parent="WallLayers" index="2"]
+position = Vector2(0, -40)
+region_enabled = true
+region_rect = Rect2(0, 0, 5600, 820)
+
+[node name="Wall" type="Sprite2D" parent="." index="2"]
+position = Vector2(0, -20)
+scale = Vector2(1.25, 1.03)
+texture = ExtResource("2_ngi2t")
+
+[node name="Bar" type="Sprite2D" parent="." index="3"]
+position = Vector2(-40, 0)
+scale = Vector2(1, 1.1)
+texture = ExtResource("3_bebee")

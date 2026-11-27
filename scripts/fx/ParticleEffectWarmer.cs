@@ -38,6 +38,7 @@ namespace Kuros.Fx
         public async void WarmUp(PackedScene scene)
         {
             var instance = scene.Instantiate<Node>();
+            DisableCollisions(instance);
             AddChild(instance);
 
             // 放到当前相机位置（视野内才会被提交渲染，才会真正触发编译）；
@@ -62,6 +63,27 @@ namespace Kuros.Fx
             await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
             await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
             instance.QueueFree();
+        }
+
+        private static void DisableCollisions(Node node)
+        {
+            // 同时禁用形状，避免场景的 _Ready 重设碰撞层后重新参与物理检测。
+            switch (node)
+            {
+                case CollisionObject2D collisionObject:
+                    collisionObject.CollisionLayer = 0;
+                    collisionObject.CollisionMask = 0;
+                    break;
+                case CollisionShape2D shape:
+                    shape.Disabled = true;
+                    break;
+                case CollisionPolygon2D polygon:
+                    polygon.Disabled = true;
+                    break;
+            }
+
+            foreach (Node child in node.GetChildren(includeInternal: true))
+                DisableCollisions(child);
         }
     }
 }

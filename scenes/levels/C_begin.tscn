@@ -107,6 +107,7 @@ ShowDebugOverlayInGame = true
 shape = SubResource("RectangleShape2D_mxkb7")
 
 [node name="WaveSpawnManager" type="Node2D" parent="." node_paths=PackedStringArray("TriggerArea")]
+visible = false
 script = ExtResource("2_ainwx")
 WavePaths = Array[NodePath]([NodePath("../EnemySpawneManager")])
 WaveClearDelay = 0.0
@@ -197,6 +198,7 @@ shape = SubResource("RectangleShape2D_qm83g")
 debug_color = Color(0, 0, 0, 0.21568628)
 
 [node name="NavigationRegion2D" type="NavigationRegion2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
+visible = false
 position = Vector2(122, -196)
 navigation_polygon = SubResource("NavigationPolygon_ka7vx")
 

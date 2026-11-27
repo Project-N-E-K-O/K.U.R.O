@@ -52,7 +52,6 @@ agent_radius = 80.0
 y_sort_enabled = true
 
 [node name="AreaSize" type="Area2D" parent="."]
-visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AreaSize"]
 z_index = 10
@@ -147,16 +146,19 @@ position = Vector2(0, 340)
 
 [node name="background" type="Sprite2D" parent="Environments"]
 z_index = -10
-position = Vector2(0, -1300)
+position = Vector2(0, -1400)
 texture = ExtResource("11_51aoc")
+region_enabled = true
+region_rect = Rect2(0, 0, 5097, 636)
 script = ExtResource("12_ihbuc")
 AreaPath = NodePath("../../AreaSize")
 
 [node name="window" type="Sprite2D" parent="Environments"]
-position = Vector2(0, -1450)
+position = Vector2(0, -1500)
 texture = ExtResource("12_k7rdm")
 
 [node name="floor" type="Sprite2D" parent="Environments"]
+z_index = -11
 position = Vector2(0, 25.5)
 texture = ExtResource("8_0xlrd")
 
@@ -164,8 +166,6 @@ texture = ExtResource("8_0xlrd")
 position = Vector2(0, -1470)
 scale = Vector2(0.98, 1)
 texture = ExtResource("12_v2w3b")
-region_enabled = true
-region_rect = Rect2(53.69226, 0, 5205.487, 812)
 
 [node name="AirWall" type="StaticBody2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
 z_index = 1
@@ -181,6 +181,7 @@ shape = SubResource("RectangleShape2D_cqx0k")
 debug_color = Color(0, 0, 0, 0.21568628)
 
 [node name="NavigationRegion2D" type="NavigationRegion2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
+visible = false
 position = Vector2(122, -196)
 navigation_polygon = SubResource("NavigationPolygon_qym5g")
 

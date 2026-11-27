@@ -497,6 +497,7 @@ script = ExtResource("21_utqjm")
 [node name="AfterimageController" type="Node" parent="."]
 script = ExtResource("45_afterimage")
 lifetime = 0.2
+ghost_color = Color(0.20784314, 0.49803922, 0.40392157, 1)
 
 [node name="HitboxEditorPreview" type="Node2D" parent="."]
 visible = false

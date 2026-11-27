@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="GridFloorConfig" load_steps=9 format=3 uid="uid://rgg5syptcvet"]
+
+[ext_resource type="Script" uid="uid://dyya75hdwfgq8" path="res://scripts/systems/stage/GridFloorConfig.cs" id="1_grid"]
+[ext_resource type="Texture2D" uid="uid://binvuyk5j65a2" path="res://assets/ui/hp&exp_bar/boss图标.png" id="2_htsb6"]
+[ext_resource type="PackedScene" uid="uid://b3icg7y2jonp4" path="res://scenes/levels/roomA_sample.tscn" id="2_room_a"]
+[ext_resource type="Resource" uid="uid://ohb7cefw5f78" path="res://resources/stages/grid_room_catalog_c.tres" id="3_catalog"]
+[ext_resource type="Script" uid="uid://pofudi314bdk" path="res://scripts/systems/stage/RoomDefinition.cs" id="4_room"]
+[ext_resource type="Resource" uid="uid://bbte3dyvim6jk" path="res://resources/stages/floor_c_wall_set.tres" id="5_walls"]
+
+[sub_resource type="Resource" id="room_begin"]
+script = ExtResource("4_room")
+FloorTheme = "C"
+ScenePath = "res://scenes/newlevels/C_begin.tscn"
+
+[sub_resource type="Resource" id="room_end"]
+script = ExtResource("4_room")
+FloorTheme = "C"
+RoomType = 6
+ElevatorPreviewName = "Boss"
+ElevatorPreviewIcon = ExtResource("2_htsb6")
+ScenePath = "res://scenes/newlevels/C_end.tscn"
+
+[resource]
+script = ExtResource("1_grid")
+RoomScene = ExtResource("2_room_a")
+RoomCatalog = ExtResource("3_catalog")
+BeginRoomDefinition = SubResource("room_begin")
+EndRoomDefinition = SubResource("room_end")
+FloorWallSet = ExtResource("5_walls")
+RandomBlockedMin = 12
+RandomBlockedMax = 15
+MinimumRouteLength = 10

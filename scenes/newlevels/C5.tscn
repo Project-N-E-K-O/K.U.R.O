@@ -1,0 +1,165 @@
+[gd_scene load_steps=27 format=3 uid="uid://0bfnw4nhnj05"]
+
+[ext_resource type="Script" uid="uid://dmqu7phxi8gbi" path="res://scripts/managers/BattleArena.cs" id="2_8do3q"]
+[ext_resource type="Script" uid="uid://orymlwdqv2xq" path="res://scripts/controllers/WaveSpawnManager.cs" id="3_flxma"]
+[ext_resource type="Script" uid="uid://b3iq6dm2pc5y0" path="res://scripts/controllers/EnemySpawnManager.cs" id="4_syilc"]
+[ext_resource type="PackedScene" uid="uid://byi2utn347fwu" path="res://scenes/actors/characters/Enemy_Normal_guard1.tscn" id="5_lu7pn"]
+[ext_resource type="PackedScene" uid="uid://bj81vpm6lg1b8" path="res://scenes/actors/characters/Enemy_Normal_guard3.tscn" id="6_3m6k4"]
+[ext_resource type="PackedScene" uid="uid://bvps5t0s8owhw" path="res://scenes/actors/characters/Enemy_C1_waiterA.tscn" id="7_8uvjg"]
+[ext_resource type="PackedScene" uid="uid://ba8fktvib2e1o" path="res://scenes/actors/characters/Enemy_C2_waiterA02.tscn" id="8_0ox8k"]
+[ext_resource type="PackedScene" uid="uid://cofm45kotvgto" path="res://scenes/actors/characters/Enemy_B1_fat.tscn" id="9_ka5jr"]
+[ext_resource type="PackedScene" uid="uid://djio6ojcqw8yf" path="res://scenes/actors/characters/Enemy_Normal_guard2.tscn" id="10_rw1hm"]
+[ext_resource type="Texture2D" uid="uid://bh8t4jl8ruovc" path="res://assets/environments/scene_3_hotel/地面B.png" id="14_1qpjy"]
+[ext_resource type="PackedScene" uid="uid://dtnlow2ek5g46" path="res://scenes/items/Furniture_C_chairB.tscn" id="16_150rw"]
+[ext_resource type="PackedScene" uid="uid://dnq70gu3rymcb" path="res://scenes/items/Furniture_C_chairB_fwd.tscn" id="17_4ynrm"]
+[ext_resource type="PackedScene" uid="uid://bjjo7k06e4sqb" path="res://scenes/items/Furniture_C_tableSquareA.tscn" id="18_x1vgg"]
+[ext_resource type="PackedScene" uid="uid://ddorhljtetljs" path="res://scenes/items/Furniture_C_FoodCartA.tscn" id="19_qd6dr"]
+[ext_resource type="PackedScene" uid="uid://dsfadn8x6iwkh" path="res://scenes/items/Furniture_B_plantA.tscn" id="20_b3vgg"]
+[ext_resource type="PackedScene" uid="uid://dqrmlh3reek3f" path="res://scenes/items/Furniture_B_garbageCanA.tscn" id="21_6ccb5"]
+[ext_resource type="PackedScene" uid="uid://c0oyd0psq7fe1" path="res://scenes/items/Furniture_B_cautionTape_fwd.tscn" id="22_415ch"]
+[ext_resource type="Script" uid="uid://cko7j0qjy4k82" path="res://scripts/scenes/GridWallVisual.cs" id="2_vtgge"]
+[ext_resource type="Script" uid="uid://pr7r8ny61xfw" path="res://scripts/scenes/GridRoomContent.cs" id="24_grid_room_content"]
+[ext_resource type="Resource" uid="uid://cu3oxbo0j5jnm" path="res://resources/stages/hotel_dining_interior_north_wall.tres" id="25_inside_north"]
+[ext_resource type="Resource" uid="uid://d4ihd2e7k3rbv" path="res://resources/stages/hotel_dining_interior_east_wall.tres" id="26_inside_east"]
+[ext_resource type="Resource" uid="uid://b0s205sssp4hg" path="res://resources/stages/hotel_dining_interior_south_wall.tres" id="27_inside_south"]
+[ext_resource type="Resource" uid="uid://dkbikq6p54py8" path="res://resources/stages/hotel_dining_interior_west_wall.tres" id="28_inside_west"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_g7ifb"]
+size = Vector2(5000, 3000)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ccheo"]
+size = Vector2(4000, 2000)
+
+[sub_resource type="NavigationPolygon" id="NavigationPolygon_qym5g"]
+resource_local_to_scene = true
+vertices = PackedVector2Array(-1116, 212, -1116, -138, 2030, -307, 2336.039, -307, 1450, 1019, 1090, 1019, 1072, -455, 2030, -455, 2327.9297, 1616, 1724, 1616, 1724, 1266, 1450, 1266, 1090, 1170, 828, 1170, 18, 896, 828, 1196, 515, 1196, 515, 1606, 828, 1606, 828, 1616, 18, 1616, -262, 1616, -826, 1616, -826, 1563, -514, 1563, -262, 896, -514, 1153, -974, 1153, -974, 1183, -1257, 1183, -1257, 1176, -1717, 1176, -1717, 1221, -2005, 1221, -2541.1328, -302, -2206, -302, -1876, 212, -2005, 1481, -1717, 1481, -1717, 1586, -2545.5, 1616, -1406, 1586, -1406, 1616, -1876, -138, -2206, -501, -1254, -501, -1254, -574, 1072, -574)
+polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3, 4, 5), PackedInt32Array(6, 7, 2, 1), PackedInt32Array(8, 9, 10, 3), PackedInt32Array(10, 11, 4, 3), PackedInt32Array(0, 5, 12, 13, 14), PackedInt32Array(13, 15, 16, 14), PackedInt32Array(17, 18, 19, 20), PackedInt32Array(17, 20, 14, 16), PackedInt32Array(21, 22, 23, 24), PackedInt32Array(25, 21, 24, 26), PackedInt32Array(27, 28, 29, 30, 0), PackedInt32Array(31, 32, 33, 34, 35, 36), PackedInt32Array(37, 38, 39, 40), PackedInt32Array(39, 41, 42, 40), PackedInt32Array(37, 40, 34, 33), PackedInt32Array(1, 43, 35, 44, 45, 6), PackedInt32Array(45, 46, 47, 6), PackedInt32Array(35, 43, 36), PackedInt32Array(31, 36, 0, 30), PackedInt32Array(26, 27, 0, 25), PackedInt32Array(14, 25, 0)])
+outlines = Array[PackedVector2Array]([PackedVector2Array(-2619, -1235, 2420, -1247, 2407, 1835, -2626, 1836)])
+source_geometry_mode = 2
+agent_radius = 80.0
+
+[node name="C5" type="Node2D"]
+y_sort_enabled = true
+script = ExtResource("24_grid_room_content")
+WallVisuals = Array[ExtResource("2_vtgge")]([ExtResource("25_inside_north"), ExtResource("26_inside_east"), ExtResource("27_inside_south"), ExtResource("28_inside_west")])
+
+[node name="BattleArena" type="Area2D" parent="." node_paths=PackedStringArray("TriggerArea")]
+visible = false
+z_index = 10
+script = ExtResource("2_8do3q")
+ArenaSize = Vector2(5000, 3000)
+BoundaryCollisionLayer = 6
+BoundaryCollisionMask = 6
+EnemyDetectionMask = 2
+TriggerArea = NodePath("../WaveSpawnManager/TriggerArea")
+ShowDebugOverlayInGame = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="BattleArena"]
+shape = SubResource("RectangleShape2D_g7ifb")
+
+[node name="WaveSpawnManager" type="Node2D" parent="." node_paths=PackedStringArray("TriggerArea")]
+script = ExtResource("3_flxma")
+WavePaths = Array[NodePath]([NodePath("../EnemySpawneManager"), NodePath("../EnemySpawneManager2")])
+WaveClearDelay = 0.0
+PollInterval = 0.30000000000000004
+TriggerArea = NodePath("TriggerArea")
+BattleArenaPath = NodePath("../BattleArena")
+LogWaveEvents = false
+
+[node name="TriggerArea" type="Area2D" parent="WaveSpawnManager"]
+collision_mask = 4
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WaveSpawnManager/TriggerArea"]
+position = Vector2(0, 200)
+shape = SubResource("RectangleShape2D_ccheo")
+debug_color = Color(1, 0, 0, 0.19607843)
+
+[node name="EnemySpawneManager" type="Node2D" parent="."]
+visible = false
+position = Vector2(0, 356)
+script = ExtResource("4_syilc")
+EnemyScenes = Array[PackedScene]([ExtResource("5_lu7pn"), ExtResource("6_3m6k4"), ExtResource("7_8uvjg")])
+MultiEnemySelectionMode = 1
+SpawnCount = 4
+SpawnInterval = 0.0
+SpawnParentPath = NodePath("..")
+SimultaneousSpawn = true
+EnableTrigger = false
+SpawnAreaExtents = Vector2(2400, 1000)
+EnemySpawnOffset = Vector2(0, 100)
+ObstacleCheckMask = 7
+EnemyAppearDelay = 1.0
+AutoLowerFrontEffectAfterEnemySpawn = true
+ShowDebugOverlay = false
+ShowDebugOverlayInGame = false
+LogSpawnEffectPositions = false
+DebugLineWidth = 8.0
+
+[node name="EnemySpawneManager2" type="Node2D" parent="."]
+visible = false
+position = Vector2(0, 356)
+script = ExtResource("4_syilc")
+EnemyScenes = Array[PackedScene]([ExtResource("7_8uvjg"), ExtResource("8_0ox8k"), ExtResource("9_ka5jr"), ExtResource("10_rw1hm")])
+MultiEnemySelectionMode = 1
+SpawnCount = 4
+SpawnInterval = 0.0
+SpawnParentPath = NodePath("..")
+SimultaneousSpawn = true
+EnableTrigger = false
+SpawnAreaExtents = Vector2(2400, 1000)
+EnemySpawnOffset = Vector2(0, 100)
+ObstacleCheckMask = 7
+EnemyAppearDelay = 1.0
+AutoLowerFrontEffectAfterEnemySpawn = true
+ShowDebugOverlay = false
+ShowDebugOverlayInGame = false
+LogSpawnEffectPositions = false
+SpawnDebugColor = Color(1, 0.8509804, 0.2509804, 0)
+DebugLineWidth = 8.0
+
+[node name="Environments" type="Node2D" parent="."]
+
+[node name="floor" type="Sprite2D" parent="Environments"]
+z_index = -11
+texture = ExtResource("14_1qpjy")
+
+[node name="NavigationRegion2D" type="NavigationRegion2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
+visible = false
+position = Vector2(122, -196)
+navigation_polygon = SubResource("NavigationPolygon_qym5g")
+
+[node name="FurnitureChairB2" parent="." instance=ExtResource("16_150rw")]
+position = Vector2(-612, 1092)
+
+[node name="FurnitureChairB4" parent="." instance=ExtResource("16_150rw")]
+position = Vector2(1626, 1205)
+
+[node name="FurnitureChairB_fwd2" parent="." instance=ExtResource("17_4ynrm")]
+position = Vector2(-1375, 1115)
+
+[node name="FurnitureChairB_fwd4" parent="." instance=ExtResource("17_4ynrm")]
+position = Vector2(857, 1135)
+
+[node name="FurnitureTableSquareA2" parent="." instance=ExtResource("18_x1vgg")]
+position = Vector2(-994, 1262)
+
+[node name="FurnitureTableSquareA4" parent="." instance=ExtResource("18_x1vgg")]
+position = Vector2(1240, 1249)
+
+[node name="FurnitureFoodCartA" parent="." instance=ExtResource("19_qd6dr")]
+position = Vector2(-1374, -244)
+
+[node name="FurniturePlantA" parent="." instance=ExtResource("20_b3vgg")]
+position = Vector2(-2269, -668)
+
+[node name="FurniturePlantA2" parent="." instance=ExtResource("20_b3vgg")]
+position = Vector2(2327, -673)
+
+[node name="FurnitureGarbageCanA3" parent="." instance=ExtResource("21_6ccb5")]
+position = Vector2(-1703, 1125)
+
+[node name="FurnitureGarbageCanA4" parent="." instance=ExtResource("21_6ccb5")]
+position = Vector2(1392, 923)
+
+[node name="FurnitureCautionTape_fwd" parent="." instance=ExtResource("22_415ch")]
+position = Vector2(30, 945)

@@ -19,9 +19,10 @@ Write-Host "Project: $ProjectRoot"
 
 # Run Godot headless; ExportCsv.gd writes data/*.csv.tmp, renamed to .csv after the process exits
 # (the .tmp indirection avoids file-lock conflicts when the editor holds the CSVs).
-Start-Process -FilePath $GodotPath `
+$Process = Start-Process -FilePath $GodotPath `
               -ArgumentList @("--headless", "--quit", "--path", $ProjectRoot, "-s", "res://scripts/tools/ExportCsv.gd") `
-              -Wait -NoNewWindow -PassThru | Out-Null
+              -Wait -NoNewWindow -PassThru
+if ($Process.ExitCode -ne 0) { exit $Process.ExitCode }
 
 Get-ChildItem "$DataDir\*.csv.tmp" | ForEach-Object {
     Move-Item $_.FullName ($_.FullName -replace '\.tmp$','') -Force

@@ -16,7 +16,7 @@ flowchart TD
 
 - 在 `resources/stages/hotel_room_catalog.tres` 添加房间资料。房间场景根节点继续使用现有的 `AreaSize`、相机区域和出生点约定。
 - 在 `StageConfig` 设置 `FloorTheme` 和 `RoomSequence`。例如 `Begin → Combat → Combat → EliteCombat → Boss`。Boss 和出口同场时只写一个 Boss。独立出口使用 `Exit`。
-- 当前 B/C/D 房间按旧池迁移。Easy、Normal、Hard 分别映射为 `Combat`、`AdvancedCombat`、`EliteCombat`。F 层固定拼接一阶段、左翼、中枢、右翼和退场。左右翼按角色池选择，当前各有一个候选。中枢为 F_boss_core，电梯预览仅显示 Boss。新增侧翼变体时，应沿用 F_boss_left 或 F_boss_right 运行时角色路径及现有轨道接缝尺寸。E 层与谜题房等新内容可按相同约定入库。
+- B/C/D 的普通战斗房统一为 `Combat`。谜题和战斗类挑战统一为 `Challenge`。F 层固定拼接一阶段、左翼、中枢、右翼和退场。左右翼按角色池选择，当前各有一个候选。中枢为 F_boss_core，电梯预览仅显示 Boss。新增侧翼变体时，应沿用 F_boss_left 或 F_boss_right 运行时角色路径及现有轨道接缝尺寸。
 - 每份路线按实际场景资源路径在整层去重，入口、各玩法房与终点一起计算。候选交叉时可以重新分配已选位置。无法得到完整排列时，该路线不出现在电梯选项。
 - 初次打开电梯选关时为候选路线生成并缓存方案。同一个来源楼层反复打开时复用方案。出舱后只实例化所选方案中的房间。目录和候选方案只保存场景路径与顺序。确认路线时只后台加载选中的房间，失败可重选。
 - 当前电梯沿用数字键测试选关，每行显示一条路线。出发提示读 `ElevatorLabel`，为空显示 `？？？`。出舱、房间生成成功后，标题读 `DisplayName`。AI 快照读当前楼层的 `LevelDescription`。楼层难度仍由 `stage_difficulty` 和 `DifficultyOverride` 计算。
@@ -34,7 +34,7 @@ flowchart TD
 
 - Stage_home 使用 StandaloneStage 配置启动路线。Stage_2、Stage_3、Stage_4 和 Stage_test 的独立场景已移除。酒店由 StageSession 提交路线。生成器与配置资源均已移除旧五池和房间数量字段。
 
-普通路线当前使用 RandomMiddleRooms，按 FloorTheme 筛选战斗、战斗+、战斗++、谜题、商店、治疗中间房。MiddleRoomRouteTag 可选，填写时进一步筛选 RouteTags。BeginScenePath 和 EndScenePath 当前仍为固定路径。Ordered 模式使用 RoomSequence。
+`RandomMiddleRooms` 路线按 `FloorTheme` 筛选战斗、挑战、商店、治疗中间房。填写 `MiddleRoomRouteTag` 时进一步筛选 `RouteTags`。`Ordered` 模式使用 `RoomSequence`。
 
 ## 下一轮实施计划（2026-11-17）
 

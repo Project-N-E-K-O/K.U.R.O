@@ -74,8 +74,6 @@ namespace Kuros.Effects
                 return;
             }
 
-            _triggerArea.BodyEntered -= OnBodyEntered;
-            _triggerArea.BodyExited -= OnBodyExited;
             _triggerArea.BodyEntered += OnBodyEntered;
             _triggerArea.BodyExited += OnBodyExited;
         }

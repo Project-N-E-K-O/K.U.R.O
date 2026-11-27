@@ -1,12 +1,12 @@
 [gd_scene load_steps=28 format=3 uid="uid://duv46pbl7d7l6"]
 
-[ext_resource type="Script" uid="uid://b5xgtnqb8ifa5" path="res://scripts/managers/BattleArena.cs" id="1_7rk8h"]
-[ext_resource type="Script" uid="uid://bma58jc2sp4rh" path="res://scripts/controllers/EnemySpawnManager.cs" id="2_foxgp"]
-[ext_resource type="Script" uid="uid://ccecrbc2x0efo" path="res://scripts/controllers/WaveSpawnManager.cs" id="2_gho62"]
+[ext_resource type="Script" uid="uid://dmqu7phxi8gbi" path="res://scripts/managers/BattleArena.cs" id="1_7rk8h"]
+[ext_resource type="Script" uid="uid://b3iq6dm2pc5y0" path="res://scripts/controllers/EnemySpawnManager.cs" id="2_foxgp"]
+[ext_resource type="Script" uid="uid://orymlwdqv2xq" path="res://scripts/controllers/WaveSpawnManager.cs" id="2_gho62"]
 [ext_resource type="PackedScene" uid="uid://byi2utn347fwu" path="res://scenes/actors/characters/Enemy_Normal_guard1.tscn" id="3_moveh"]
-[ext_resource type="Texture2D" uid="uid://bmlbrogdyoobg" path="res://assets/environments/scene_2_hotel/地板.png" id="5_moveh"]
+[ext_resource type="Texture2D" uid="uid://behye8vdgemoq" path="res://assets/environments/scene_2_hotel/地板.png" id="5_moveh"]
 [ext_resource type="PackedScene" uid="uid://djio6ojcqw8yf" path="res://scenes/actors/characters/Enemy_Normal_guard2.tscn" id="6_c8qwy"]
-[ext_resource type="Texture2D" uid="uid://84ualture7v7" path="res://assets/environments/scene_2_hotel/地毯.png" id="6_ilowa"]
+[ext_resource type="Texture2D" uid="uid://dw2alagwosewh" path="res://assets/environments/scene_2_hotel/地毯.png" id="6_ilowa"]
 [ext_resource type="Texture2D" uid="uid://k45cthgn2dgq" path="res://assets/environments/scene_2_hotel/墙面.png" id="6_ncd57"]
 [ext_resource type="Texture2D" uid="uid://cu2c3j0gpbqhb" path="res://assets/environments/scene_2_hotel/无缝窗户模块.png" id="7_3u70b"]
 [ext_resource type="PackedScene" uid="uid://bo6r21cbk3ftm" path="res://scenes/environments/columnsB.tscn" id="9_0f1pu"]
@@ -19,7 +19,7 @@
 [ext_resource type="PackedScene" uid="uid://0anrcfm2pnsd" path="res://scenes/items/Furniture_B_luggageCartA.tscn" id="16_2hd1x"]
 [ext_resource type="PackedScene" uid="uid://kwbg3wy7rik" path="res://scenes/items/Furniture_B_chairA.tscn" id="17_8wmdx"]
 [ext_resource type="PackedScene" uid="uid://o3wponugixfj" path="res://scenes/items/Furniture_B_chairA_fwd.tscn" id="18_gho62"]
-[ext_resource type="Script" uid="uid://b217dd0r612wc" path="res://scripts/managers/CameraZoneArea.cs" id="22_qted3"]
+[ext_resource type="Script" uid="uid://cra7y7mt0x1j8" path="res://scripts/managers/CameraZoneArea.cs" id="22_qted3"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_pjkdw"]
 size = Vector2(5590, 3050)
@@ -58,6 +58,7 @@ shape = SubResource("RectangleShape2D_pjkdw")
 debug_color = Color(0.6428762, 0.52304673, 0.06685588, 0.41960785)
 
 [node name="CameraZone" type="Area2D" parent="."]
+visible = false
 collision_layer = 0
 collision_mask = 4
 script = ExtResource("22_qted3")
@@ -83,6 +84,7 @@ DebugLineWidth = 8.0
 shape = SubResource("RectangleShape2D_tma6a")
 
 [node name="WaveSpawnManager" type="Node2D" parent="." node_paths=PackedStringArray("TriggerArea")]
+visible = false
 script = ExtResource("2_gho62")
 WavePaths = Array[NodePath]([NodePath("../EnemySpawneManager")])
 WaveClearDelay = 0.0
@@ -118,7 +120,6 @@ EnemyAppearDelay = 1.0
 AutoLowerFrontEffectAfterEnemySpawn = true
 ShowDebugOverlay = false
 ShowDebugOverlayInGame = false
-LogSpawnEffectPositions = false
 DebugLineWidth = 8.0
 
 [node name="EnemySpawneManager2" type="Node2D" parent="."]
@@ -137,7 +138,6 @@ EnemyAppearDelay = 1.0
 AutoLowerFrontEffectAfterEnemySpawn = true
 ShowDebugOverlay = false
 ShowDebugOverlayInGame = false
-LogSpawnEffectPositions = false
 DebugLineWidth = 8.0
 
 [node name="Environments" type="Node2D" parent="."]
@@ -165,7 +165,6 @@ position = Vector2(1280, -1530)
 texture = ExtResource("7_3u70b")
 
 [node name="AirWall" type="StaticBody2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
-visible = false
 z_index = 1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AirWall"]
@@ -179,6 +178,7 @@ shape = SubResource("RectangleShape2D_0f1pu")
 debug_color = Color(0, 0, 0, 0.19607843)
 
 [node name="NavigationRegion2D" type="NavigationRegion2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
+visible = false
 navigation_polygon = SubResource("NavigationPolygon_ilowa")
 
 [node name="columnsB" parent="." instance=ExtResource("9_0f1pu")]

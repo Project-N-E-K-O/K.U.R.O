@@ -1,4 +1,4 @@
-[gd_scene load_steps=31 format=3 uid="uid://b52b8f866rmt7"]
+[gd_scene load_steps=31 format=3 uid="uid://uajwxkkpm8oo"]
 
 [ext_resource type="Script" uid="uid://cra7y7mt0x1j8" path="res://scripts/managers/CameraZoneArea.cs" id="1_yxxdy"]
 [ext_resource type="Script" uid="uid://dmqu7phxi8gbi" path="res://scripts/managers/BattleArena.cs" id="2_a4c6m"]

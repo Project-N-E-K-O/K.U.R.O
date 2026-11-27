@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="GridWallVisual" load_steps=3 format=3 uid="uid://b0s205sssp4hg"]
+
+[ext_resource type="Script" uid="uid://cko7j0qjy4k82" path="res://scripts/scenes/GridWallVisual.cs" id="1_style"]
+[ext_resource type="PackedScene" uid="uid://66hsp12fkqf4" path="res://scenes/environments/HorIntWall_C.tscn" id="2_art"]
+
+[resource]
+script = ExtResource("1_style")
+Side = 2
+VisualScene = ExtResource("2_art")
+ReferenceLength = 1600.0

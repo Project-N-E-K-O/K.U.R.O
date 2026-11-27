@@ -111,12 +111,17 @@ namespace Kuros.Systems.Cutscene
             var mode = ExecutionMode;
             // 避开物理 Area 信号回调中的建树/碰撞修改。
             var completion = new TaskCompletionSource<bool>();
-            Callable.From(async () =>
+            Callable.From(() =>
+            {
+                _ = CompleteRequestAsync();
+            }).CallDeferred();
+            return completion.Task;
+
+            async Task CompleteRequestAsync()
             {
                 try { await ExecuteRequest(manager, sequence, mode); }
                 finally { completion.TrySetResult(true); }
-            }).CallDeferred();
-            return completion.Task;
+            }
         }
 
         private async Task ExecuteRequest(CutsceneManager manager, CutsceneSequence sequence, ExecutionModeEnum mode)

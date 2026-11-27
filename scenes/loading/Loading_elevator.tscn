@@ -609,7 +609,7 @@ script = ExtResource("2_u66l2")
 [node name="Environments" type="Node2D" parent="."]
 
 [node name="ElevatorBackground" type="Sprite2D" parent="Environments"]
-z_index = -10
+z_index = -11
 texture = ExtResource("1_1e411")
 
 [node name="Elevator" type="Sprite2D" parent="Environments"]
@@ -624,25 +624,28 @@ texture = ExtResource("3_5rppg")
 texture = ExtResource("3_5rppg")
 
 [node name="AirWall" type="StaticBody2D" parent="."]
-visible = false
 z_index = 10
 
 [node name="Gate" type="CollisionShape2D" parent="AirWall"]
 position = Vector2(-950, 0)
 shape = SubResource("RectangleShape2D_1rckx")
 disabled = true
+debug_color = Color(0, 0, 0, 0.39215687)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AirWall"]
 position = Vector2(0, 650)
 shape = SubResource("RectangleShape2D_1e411")
+debug_color = Color(0, 0, 0, 0.39215687)
 
 [node name="Gate_right" type="CollisionShape2D" parent="AirWall"]
 position = Vector2(950, 0)
 shape = SubResource("RectangleShape2D_5rppg")
+debug_color = Color(0, 0, 0, 0.39215687)
 
 [node name="CollisionShape2D3" type="CollisionShape2D" parent="AirWall"]
 position = Vector2(0, -21)
 shape = SubResource("RectangleShape2D_h28jp")
+debug_color = Color(0, 0, 0, 0.39215687)
 
 [node name="CameraZone" type="Area2D" parent="."]
 collision_layer = 0

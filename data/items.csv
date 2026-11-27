@@ -42,6 +42,7 @@ Furniture_D_TableOfficeB_fwd,Furniture_D_TableOfficeB_fwd,办公桌B(侧面),一
 Furniture_D_TableOfficeB_rwd,Furniture_D_TableOfficeB_rwd,办公桌B(侧面),一次性投掷道具：办公桌B(侧面),Furniture,tag_throw|furniture|tier_2,1,true,false,false,false,0|-250,0.0,100.0,0.0,250.0,2.0,0,2,,
 Furniture_D_WaterMachineA,Furniture_D_WaterMachineA,饮水机,一次性投掷道具：饮水机A,Furniture,tag_throw|furniture|tier_1,1,true,false,false,false,0|-250,0.0,100.0,0.0,250.0,2.0,0,1,,
 Furniture_D_WhiteBoardA,Furniture_D_WhiteBoardA,白板A,一次性投掷道具：白板A,Furniture,tag_throw|furniture|tier_2,1,true,false,false,false,0|-250,0.0,100.0,0.0,250.0,2.0,0,2,,
+RoomKey_HiddenA,room_key_hidden_a,隐藏楼层房卡,持有时可以从电梯前往对应的隐藏楼层。,,,1,false,false,false,false,0|-400,0.35,10,500,300,2.0,0,0,,
 Weapon_Brawl_DiscoBall,Weapon_Brawl_DiscoBall,迪斯科闪光球,普通类拳套武器：迪斯科闪光球。攻速快。距离近。对敌人造成伤害时有概率生成范围闪光眩晕敌人,Weapon,tag_weapon|tag_brawl|hit_2,1,false,false,false,false,0|-250,0.35,100.0,500,250.0,2.0,20.0,0,20.0,WeaponSkill_Brawl_DiscoBall
 Weapon_Brawl_MechGlove,Weapon_Brawl_MechGlove,机械冲撞臂,稀有类拳套武器：机械冲撞臂。攻速中。距离较近。攻击到敌人后造成击退，三段攻击全部命中敌人时最后一段伤害触发暴击,Weapon,tag_weapon|tag_brawl|hit_3,1,false,false,false,false,0|-250,0.35,100.0,500,250.0,2.0,30.0,0,30.0,WeaponSkill_Brawl_MechGlove
 Weapon_Brawl_RiotBracer,Weapon_Brawl_RiotBracer,镇暴护腕,稀有类拳套武器：镇暴护腕。攻速中。距离远。普通攻击攻击被冲刺攻击取代，并拥有更高的冲刺攻击伤害,Weapon,tag_weapon|tag_brawl|hit_1,1,false,false,false,false,0|-250,0.35,100.0,500,250.0,2.0,30.0,0,30.0,WeaponSkill_Brawl_RiotBracer

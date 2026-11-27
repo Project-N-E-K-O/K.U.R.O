@@ -1,0 +1,26 @@
+[gd_scene load_steps=5 format=3 uid="uid://66hsp12fkqf4"]
+
+[ext_resource type="Texture2D" uid="uid://bx5phbsql8yk1" path="res://assets/furnitures/hotel_scene2/PlantPartitionA.png" id="1_wall"]
+[ext_resource type="Shader" uid="uid://cpuiqtlgf6b67" path="res://shaders/materials/shadow.gdshader" id="1_y7lx2"]
+[ext_resource type="Texture2D" uid="uid://wkm4jcgntidv" path="res://assets/environments/影子.png" id="2_nh3rk"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_uybvu"]
+shader = ExtResource("1_y7lx2")
+shader_parameter/softness = 0.5
+shader_parameter/alpha = 0.4
+
+[node name="HorIntWall_C" type="Node2D"]
+z_index = 2
+
+[node name="Shadow" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_uybvu")
+position = Vector2(0, 150)
+scale = Vector2(30, 7.5)
+texture = ExtResource("2_nh3rk")
+
+[node name="Wall" type="Sprite2D" parent="."]
+texture = ExtResource("1_wall")
+offset = Vector2(0, -150)
+
+[node name="WallAnchor" type="Marker2D" parent="."]
+position = Vector2(0, -150)

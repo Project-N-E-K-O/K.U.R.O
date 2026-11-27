@@ -161,7 +161,7 @@ namespace Kuros.Systems.Stage
             if (_transitionInProgress || _generator == null || index < 0 || index >= _displayedPlans.Count)
                 return false;
             var config = _displayedPlans[index].Config;
-            if (!GetOptions().Contains(config) || config.RouteMode != StageRouteMode.RandomMiddleRooms)
+            if (!GetOptions().Contains(config) || config.RouteMode is not (StageRouteMode.RandomMiddleRooms or StageRouteMode.Grid))
                 return false;
             var replacement = _generator.CreatePlan(config, ++_routeRevision, _roomTypeMisses);
             if (replacement == null) return false;
@@ -291,6 +291,7 @@ namespace Kuros.Systems.Stage
         {
             if (_transitionInProgress || _generator == null
                 || _generator.GetNodeOrNull<Node2D>(_generator.WorldNodePath) == null
+                || (plan.Config.RouteMode == StageRouteMode.Grid && plan.GridLayout == null)
                 || rooms.Count != plan.RoomPaths.Count || !rooms.All(room => room.CanInstantiate()))
                 return false;
             _transitionInProgress = true;

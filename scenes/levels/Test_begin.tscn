@@ -1,4 +1,4 @@
-[gd_scene load_steps=61 format=3 uid="uid://dstgcw0tto5oa"]
+[gd_scene load_steps=57 format=3 uid="uid://dstgcw0tto5oa"]
 
 [ext_resource type="Script" uid="uid://cra7y7mt0x1j8" path="res://scripts/managers/CameraZoneArea.cs" id="1_7ummj"]
 [ext_resource type="Script" uid="uid://cbui22isww64v" path="res://scripts/systems/cutscene/CutsceneTrigger.cs" id="2_o3k7i"]
@@ -41,10 +41,6 @@
 [ext_resource type="PackedScene" uid="uid://daox4k6bu5oqt" path="res://scenes/items/Furniture_A_sofaB.tscn" id="40_7gqg0"]
 [ext_resource type="Texture2D" uid="uid://brjaqxel52a2o" path="res://assets/BuildIcon/icon.svg" id="40_21m0k"]
 [ext_resource type="PackedScene" uid="uid://dugfq8qy1okf1" path="res://scenes/items/Furniture_A_chairOfficeB.tscn" id="41_y44s2"]
-[ext_resource type="PackedScene" uid="uid://30w6ddbm18ga" path="res://scenes/actors/etc/SlideRail.tscn" id="43_mfk2f"]
-[ext_resource type="PackedScene" uid="uid://cbqp2nyeec5bb" path="res://scenes/environments/FallRegion.tscn" id="44_mfk2f"]
-[ext_resource type="PackedScene" uid="uid://xloj3kvnvpo2" path="res://scenes/actors/characters/Enemy_F1_rogueAI_part2.tscn" id="44_oobfl"]
-[ext_resource type="PackedScene" uid="uid://b8si6jikj8ool" path="res://scenes/objects/Animation_Part1_AttackEffect.tscn" id="45_oobfl"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1mlw7"]
 size = Vector2(5800, 3050)
@@ -310,6 +306,7 @@ position = Vector2(-2880, 1361.5)
 shape = SubResource("RectangleShape2D_jy3vb")
 
 [node name="NavigationRegion2D" type="NavigationRegion2D" parent="." groups=["navigation_polygon_source_geometry_group"]]
+visible = false
 position = Vector2(122, -196)
 navigation_polygon = SubResource("NavigationPolygon_ka7vx")
 
@@ -417,16 +414,3 @@ position = Vector2(793, -689)
 
 [node name="FurnitureChairOfficeB" parent="." instance=ExtResource("41_y44s2")]
 position = Vector2(-1625, 1071)
-
-[node name="FallRegion" parent="." instance=ExtResource("44_mfk2f")]
-position = Vector2(-13, 3720)
-
-[node name="SlideRail" parent="." instance=ExtResource("43_mfk2f")]
-position = Vector2(0, -500)
-CarriageNearOffset = 1000.0
-CarriageFarOffset = -1000.0
-CarriagePrefab = ExtResource("44_oobfl")
-CarriageSpawn = 2
-
-[node name="Animation_Part1_AttackEffect" parent="." instance=ExtResource("45_oobfl")]
-position = Vector2(232, 500)

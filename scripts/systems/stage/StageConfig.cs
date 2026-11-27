@@ -6,6 +6,7 @@ namespace Kuros.Systems.Stage
     {
         Ordered = 0,
         RandomMiddleRooms = 1,
+        Grid = 2,
     }
 
     /// <summary>
@@ -43,6 +44,7 @@ namespace Kuros.Systems.Stage
         [Export] public string FloorTheme { get; set; } = "";
         [Export] public StageRouteMode RouteMode { get; set; }
         [Export] public Godot.Collections.Array<RoomType> RoomSequence { get; set; } = new();
+        [Export] public GridFloorConfig? GridFloor { get; set; }
 
         [ExportGroup("Random Middle Rooms")]
         /// <summary>留空时使用当前主题的所有可随机中间房。</summary>
