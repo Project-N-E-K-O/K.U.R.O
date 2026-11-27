@@ -81,7 +81,7 @@ for row in table.records:
 |---|---|
 | `ScenePath` | 用于匹配已有房间。导出显示 `res://` 路径 |
 | `FloorTheme` | 非空楼层主题，如 `C`、`F` 或 `HiddenA` |
-| `RoomType` | 区分大小写的枚举名，如 `Begin`、`Combat`、`End` 或 `BossCore` |
+| `RoomType` | 区分大小写的枚举名，如 `Begin`、`Combat`、`Challenge`、`End` 或 `BossCore` |
 | `RouteTags` | 多个标签用竖线分隔，可留空清除标签 |
 | `ElevatorPreviewName` | 电梯显示名，可留空清除自定义名称 |
 | `ElevatorPreviewIcon` | 贴图资源路径，可留空移除图标。`@embedded` 保留该房间已有的内嵌图标 |

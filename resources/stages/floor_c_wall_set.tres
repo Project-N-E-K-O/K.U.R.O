@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="GridFloorWallSet" load_steps=13 format=3 uid="uid://bbte3dyvim6jk"]
+[gd_resource type="Resource" script_class="GridFloorWallSet" load_steps=16 format=3 uid="uid://bbte3dyvim6jk"]
 
 [ext_resource type="Script" uid="uid://g1g0lif8u4yv" path="res://scripts/scenes/GridFloorWallSet.cs" id="1_wall_set"]
 [ext_resource type="Script" uid="uid://cko7j0qjy4k82" path="res://scripts/scenes/GridWallVisual.cs" id="2_wall_visual"]
@@ -8,30 +8,36 @@
 [ext_resource type="Resource" uid="uid://eqlvwbppnls8" path="res://resources/stages/hotel_dining_exterior_west_wall.tres" id="6_west_exterior"]
 [ext_resource type="PackedScene" uid="uid://66hsp12fkqf4" path="res://scenes/environments/HorIntWall_C.tscn" id="7_horizontal"]
 [ext_resource type="PackedScene" uid="uid://6twa30q5ffmg" path="res://scenes/environments/VerIntWall_C.tscn" id="8_vertical"]
+[ext_resource type="PackedScene" uid="uid://ctdvacxdp547n" path="res://scenes/environments/IntCorner_C.tscn" id="9_interior_cover"]
+[ext_resource type="PackedScene" uid="uid://cblqol75j4eei" path="res://scenes/environments/ExtCornerL_C.tscn" id="10_exterior_corner"]
+[ext_resource type="PackedScene" uid="uid://bfa563nx0udt3" path="res://scenes/environments/ExtCornerT_C.tscn" id="11_exterior_joint"]
 
 [sub_resource type="Resource" id="Resource_north_interior"]
 script = ExtResource("2_wall_visual")
 VisualScene = ExtResource("7_horizontal")
-ReferenceLength = 1900.0
+ReferenceLength = 1600.0
 
 [sub_resource type="Resource" id="Resource_east_interior"]
 script = ExtResource("2_wall_visual")
 Side = 1
 VisualScene = ExtResource("8_vertical")
-ReferenceLength = 1000.0
+ReferenceLength = 1100.0
 
 [sub_resource type="Resource" id="Resource_south_interior"]
 script = ExtResource("2_wall_visual")
 Side = 2
 VisualScene = ExtResource("7_horizontal")
-ReferenceLength = 1900.0
+ReferenceLength = 1600.0
 
 [sub_resource type="Resource" id="Resource_west_interior"]
 script = ExtResource("2_wall_visual")
 Side = 3
 VisualScene = ExtResource("8_vertical")
-ReferenceLength = 1000.0
+ReferenceLength = 1100.0
 
 [resource]
 script = ExtResource("1_wall_set")
 WallVisuals = Array[ExtResource("2_wall_visual")]([ExtResource("3_north_exterior"), ExtResource("4_east_exterior"), ExtResource("5_south_exterior"), ExtResource("6_west_exterior"), SubResource("Resource_north_interior"), SubResource("Resource_east_interior"), SubResource("Resource_south_interior"), SubResource("Resource_west_interior")])
+ExteriorCornerCover = ExtResource("10_exterior_corner")
+ExteriorJointCover = ExtResource("11_exterior_joint")
+InteriorWallCover = ExtResource("9_interior_cover")

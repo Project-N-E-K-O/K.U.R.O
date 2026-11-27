@@ -1,13 +1,15 @@
 using Godot;
 using System.Collections.Generic;
 using System.Linq;
+using Kuros.Actors.Heroes;
+using Kuros.Scenes;
 using Kuros.Systems.Stage;
 using Kuros.Utils;
 
 namespace Kuros.Managers
 {
     /// <summary>
-    /// 关卡生成器：根据配置随机拼接房间场景，生成无缝横向关卡。
+    /// 关卡生成器：在当前 World 装配横向关卡或网格楼层。
     ///
     /// 拼接规则：
     ///   每个房间场景根节点下必须有 AreaSize/Area2D → CollisionShape2D(RectangleShape2D)
@@ -38,26 +40,30 @@ namespace Kuros.Managers
         [Signal] public delegate void StageGenerationFailedEventHandler();
 
         [Export] public RoomCatalog? Catalog { get; set; }
+        private StagePlan? _queuedPlan;
         private IReadOnlyList<PackedScene>? _loadedRooms;
-        private IReadOnlyList<RoomType>? _roomTypes;
         /// <summary>显式玩家落点（隐藏入口/密道出口用）；null = 新关 PlayerSpawnPoint。</summary>
         private Vector2? _landingPosition;
         private readonly List<Node> _spawnedRooms = new();
+        private GridFloorGenerator? _activeGrid;
 
         public override void _Ready()
         {
+            SetPhysicsProcess(false);
             if (StandaloneStage != null)
                 CallDeferred(MethodName.GenerateStage);
         }
 
+        public override void _PhysicsProcess(double delta) => _activeGrid?.UpdatePlayerRoom();
+
         /// <summary>
-        /// 按已确定的房间顺序重新生成关卡（先清空上次生成的房间）。
+        /// 按已确定的方案重新生成关卡（先清空上次生成的房间）。
         /// landingPosition 指定玩家落点（世界坐标，隐藏入口/密道出口用）；null = 新关 PlayerSpawnPoint。
         /// </summary>
         public void Regenerate(StagePlan plan, IReadOnlyList<PackedScene> rooms, Vector2? landingPosition = null)
         {
+            _queuedPlan = plan;
             _loadedRooms = rooms;
-            _roomTypes = plan.RoomTypes;
             _landingPosition = landingPosition;
             ClearSpawnedRooms();
             CallDeferred(MethodName.GenerateStage);
@@ -65,12 +71,20 @@ namespace Kuros.Managers
 
         private void ClearSpawnedRooms()
         {
+            ClearGridFloor();
             foreach (var room in _spawnedRooms)
             {
                 if (GodotObject.IsInstanceValid(room))
                     room.Free();
             }
             _spawnedRooms.Clear();
+        }
+
+        private void ClearGridFloor()
+        {
+            _activeGrid?.Clear();
+            _activeGrid = null;
+            SetPhysicsProcess(false);
         }
 
         /// <summary>
@@ -82,6 +96,7 @@ namespace Kuros.Managers
         /// </summary>
         public void ClearWorldRemnants()
         {
+            ClearGridFloor();
             var world = GetNodeOrNull<Node>(WorldNodePath);
             if (world == null) return;
 
@@ -97,6 +112,13 @@ namespace Kuros.Managers
 
         private void GenerateStage()
         {
+            var plan = _queuedPlan ?? (StandaloneStage is { } config ? CreatePlan(config) : null);
+            var loadedRooms = _loadedRooms;
+            var landingPosition = _landingPosition;
+            _queuedPlan = null;
+            _loadedRooms = null;
+            _landingPosition = null;
+
             var world = GetNodeOrNull<Node2D>(WorldNodePath);
             if (world == null)
             {
@@ -105,17 +127,24 @@ namespace Kuros.Managers
                 return;
             }
 
-            var roomScenes = _loadedRooms ?? (StandaloneStage is { } config ? CreatePlan(config)?.RoomPaths
-                .Select(path => ResourceLoader.Load<PackedScene>(path)).ToArray() : null);
-            if (roomScenes == null)
+            if (plan == null)
             {
                 EmitSignal(SignalName.StageGenerationFailed);
                 return;
             }
-            if (roomScenes.Count == 0 || roomScenes.Any(room => room == null || !room.CanInstantiate()))
+
+            var roomScenes = loadedRooms ?? plan.RoomPaths.Select(path => ResourceLoader.Load<PackedScene>(path)).ToArray();
+            if (roomScenes.Count == 0 || roomScenes.Count != plan.RoomPaths.Count ||
+                roomScenes.Any(room => room == null || !room.CanInstantiate()))
             {
                 GD.PushWarning("[StageGeneratorManager] 没有配置任何房间场景，跳过生成。");
                 EmitSignal(SignalName.StageGenerationFailed);
+                return;
+            }
+
+            if (plan.GridLayout is { } grid)
+            {
+                GenerateGridStage(grid, world, landingPosition);
                 return;
             }
 
@@ -134,8 +163,8 @@ namespace Kuros.Managers
             {
                 var room = roomScenes[index].Instantiate<Node2D>();
                 // 侧翼过场用固定角色路径访问本次抽中的场景实例。
-                if (_roomTypes?[index] == RoomType.BossWingA) room.Name = "F_boss_left";
-                if (_roomTypes?[index] == RoomType.BossWingC) room.Name = "F_boss_right";
+                if (plan.RoomTypes[index] == RoomType.BossWingLeft) room.Name = "F_boss_left";
+                if (plan.RoomTypes[index] == RoomType.BossWingRight) room.Name = "F_boss_right";
                 // 从 AreaSize 读取本地左右边界
                 var (localLeft, localRight) = GetRoomLocalBounds(room);
 
@@ -168,7 +197,10 @@ namespace Kuros.Managers
             var camMgr = GetParent()?.GetNodeOrNull<CameraZoneManager>("CameraZoneManager");
             if (camMgr != null)
             {
+                bool alreadyInGlobalZone = camMgr.CurrentZoneName == "Stage_Global";
                 camMgr.SetGlobalBounds((int)stageLeft, CameraLimitTop, (int)stageRight, CameraLimitBottom);
+                if (alreadyInGlobalZone)
+                    camMgr.SwitchToZone("Stage_Global", force: true);
             }
             else
             {
@@ -176,26 +208,59 @@ namespace Kuros.Managers
             }
 
             // 重定位玩家和同伴（相机改动已撤回——保持分帧前的循环后重定位 + 平滑跟随行为）
-            RepositionActors(world, playerSpawn, stageLeft, _landingPosition);
+            RepositionActors(world, playerSpawn, stageLeft, landingPosition);
 
-            // 强制 NavigationServer 立即同步所有房间的导航网格
-            // （各房间 AddChild + 设置 Position 后，NavigationServer 在下一物理帧才处理）
-            // 调用此方法确保生成信号发出前导航数据已就绪
-            NavigationServer2D.MapForceUpdate(GetViewport().FindWorld2D().NavigationMap);
-
-            _loadedRooms = null;
-            _roomTypes = null;
-            EmitSignal(SignalName.StageGenerated);
+            FinishGeneration();
 
             GameLogger.Info(nameof(StageGeneratorManager),
                 $"关卡生成完成：总宽度 {stageRight - stageLeft:F0}，X[{(int)stageLeft}, {(int)stageRight}]");
         }
 
+        private void GenerateGridStage(GridFloorGenerator grid, Node2D world, Vector2? landingPosition)
+        {
+            if (world.GetNodeOrNull<CharacterBody2D>("MainCharacter") is not { } player ||
+                GetParent()?.GetNodeOrNull<CameraZoneManager>("CameraZoneManager") is not { } cameraZones)
+            {
+                GD.PushError("[StageGeneratorManager] 网格楼层需要 MainCharacter 和 CameraZoneManager。");
+                EmitSignal(SignalName.StageGenerationFailed);
+                return;
+            }
+
+            _activeGrid = grid;
+            try
+            {
+                grid.Mount(world, player, cameraZones, landingPosition);
+            }
+            catch (System.Exception exception)
+            {
+                ClearGridFloor();
+                GD.PushError($"[StageGeneratorManager] 网格楼层生成失败：{exception}");
+                EmitSignal(SignalName.StageGenerationFailed);
+                return;
+            }
+
+            SetPhysicsProcess(true);
+            FinishGeneration();
+        }
+
+        private void FinishGeneration()
+        {
+            // 强制 NavigationServer 立即同步所有房间的导航网格
+            // （各房间 AddChild + 设置 Position 后，NavigationServer 在下一物理帧才处理）
+            // 调用此方法确保生成信号发出前导航数据已就绪
+            NavigationServer2D.MapForceUpdate(GetViewport().FindWorld2D().NavigationMap);
+
+            EmitSignal(SignalName.StageGenerated);
+        }
+
         public StagePlan? CreatePlan(StageConfig config, uint revision = 0, IReadOnlyDictionary<RoomType, int>? misses = null)
         {
-            var rng = new RandomNumberGenerator();
+            using var rng = new RandomNumberGenerator();
             if (RandomSeed == 0) rng.Randomize();
             else rng.Seed = (ulong)RandomSeed + revision * 104729UL;
+
+            if (config.RouteMode == StageRouteMode.Grid)
+                return CreateGridPlan(config, unchecked((long)rng.Seed));
 
             var types = new List<RoomType?>();
             var candidates = new List<string[]>();
@@ -210,8 +275,7 @@ namespace Kuros.Managers
             if (config.RouteMode == StageRouteMode.RandomMiddleRooms)
             {
                 foreach (var room in roomsForTheme)
-                    if (room.RoomType is (RoomType.Combat or RoomType.AdvancedCombat
-                            or RoomType.EliteCombat or RoomType.Puzzle or RoomType.Shop or RoomType.Healing)
+                    if (room.RoomType.IsRandomMiddle()
                         && (string.IsNullOrWhiteSpace(config.MiddleRoomRouteTag)
                             || room.RouteTags.Contains(config.MiddleRoomRouteTag))
                         && !string.IsNullOrWhiteSpace(room.ScenePath))
@@ -226,7 +290,7 @@ namespace Kuros.Managers
             }
             else
             {
-                foreach (var type in config.RoomSequence)
+                foreach (var type in config.RoomSequence.Select(type => type.Normalize()))
                     AddSlot(type, roomsForTheme.Where(room => room.RoomType == type).Select(room => room.ScenePath));
             }
 
@@ -268,6 +332,27 @@ namespace Kuros.Managers
             return new StagePlan(config, System.Array.AsReadOnly(resolvedTypes),
                 System.Array.AsReadOnly(selected), System.Array.AsReadOnly(icons),
                 selected.Select(path => roomsForTheme.FirstOrDefault(room => room.ScenePath == path)?.ElevatorPreviewName ?? "").ToArray());
+        }
+
+        private StagePlan? CreateGridPlan(StageConfig config, long seed)
+        {
+            if (config.GridFloor is not { } gridConfig ||
+                GetNodeOrNull<Node2D>(WorldNodePath)?.GetNodeOrNull<CharacterBody2D>("MainCharacter") is not { } player ||
+                GetParent()?.GetNodeOrNull<CameraZoneManager>("CameraZoneManager") == null)
+            {
+                GD.PushWarning($"[StageGeneratorManager] {config.StageId} 缺少网格楼层配置、MainCharacter 或 CameraZoneManager。");
+                return null;
+            }
+
+            var grid = new GridFloorGenerator(gridConfig, seed);
+            if (!grid.TryPlan(player, out string error))
+            {
+                GD.PushWarning($"[StageGeneratorManager] {config.StageId}：{error}");
+                return null;
+            }
+
+            return new StagePlan(config, System.Array.Empty<RoomType>(), grid.RoomPaths,
+                System.Array.Empty<Texture2D?>(), System.Array.Empty<string>()) { GridLayout = grid };
         }
 
         /// <summary>
@@ -326,7 +411,7 @@ namespace Kuros.Managers
             var player = world.GetNodeOrNull<Node2D>("MainCharacter");
             if (player != null)
             {
-                player.GetNodeOrNull<Kuros.Actors.Heroes.PlayerFallController>("FallController")?.ResetSafeHistory();
+                player.GetNodeOrNull<PlayerFallController>("FallController")?.ResetSafeHistory();
                 player.GlobalPosition = target;
                 // 复用玩家节点时立即同步碰撞体位置，避免下一次物理检测仍使用出舱前的坐标。
                 player.ForceUpdateTransform();

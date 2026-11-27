@@ -6,6 +6,13 @@ const CSV_PATH := "res://data/hotel_room_catalog.csv"
 const COLUMNS := ["ScenePath", "FloorTheme", "RoomType", "RouteTags",
 	"ElevatorPreviewName", "ElevatorPreviewIcon"]
 const EMBEDDED_ICON := "@embedded"
+const RETIRED_ROOM_TYPES := {
+	"AdvancedCombat": "Combat",
+	"EliteCombat": "Combat",
+	"Puzzle": "Challenge",
+	"BossWingA": "BossWingLeft",
+	"BossWingC": "BossWingRight",
+}
 
 
 static func export_rows() -> Array:
@@ -76,6 +83,7 @@ static func import_rooms(csv_path: String = CSV_PATH, catalog_path: String = CAT
 		seen[path] = true
 		var theme := row[columns["FloorTheme"]].strip_edges()
 		var type_name := row[columns["RoomType"]].strip_edges()
+		type_name = RETIRED_ROOM_TYPES.get(type_name, type_name)
 		if theme.is_empty() or not types.has(type_name):
 			return _error("第 %d 行楼层主题为空或房间类型无效：%s" % [row_number, type_name])
 		var tags := PackedStringArray()

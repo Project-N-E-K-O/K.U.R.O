@@ -121,7 +121,7 @@ texture = ExtResource("2_04gg2")
 region_rect = Rect2(0, 0, 352, 1612)
 
 [node name="ElevatorBackWall" type="Sprite2D" parent="."]
-z_index = 1
+z_index = 2
 position = Vector2(-8, -1000)
 texture = ExtResource("3_yteml")
 

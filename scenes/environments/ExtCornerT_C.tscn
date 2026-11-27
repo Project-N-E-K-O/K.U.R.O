@@ -1,0 +1,21 @@
+[gd_scene load_steps=3 format=3 uid="uid://bfa563nx0udt3"]
+
+[ext_resource type="Texture2D" uid="uid://b87k0gh1hg83o" path="res://assets/environments/scene_3_hotel/墙壁B遮掩.png" id="1_t8gwx"]
+[ext_resource type="Texture2D" uid="uid://bjgxvrslcvg88" path="res://assets/environments/scene_3_hotel/墙壁B遮掩_I形.png" id="2_1modf"]
+
+[node name="ExtCornerT_C" type="Node2D"]
+z_index = 1
+
+[node name="Variants" type="Node2D" parent="."]
+
+[node name="North" type="Sprite2D" parent="Variants"]
+texture = ExtResource("1_t8gwx")
+offset = Vector2(0, -100)
+
+[node name="Side" type="Sprite2D" parent="Variants"]
+visible = false
+texture = ExtResource("2_1modf")
+offset = Vector2(-100, -200)
+flip_h = true
+
+[node name="WallAnchor" type="Marker2D" parent="."]

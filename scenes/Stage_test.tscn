@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://canh64hk37heu"]
+[gd_scene load_steps=17 format=3 uid="uid://canh64hk37heu"]
 
 [ext_resource type="Script" uid="uid://b5dgc5fvlcxkr" path="res://scripts/scenes/StageTest.cs" id="1_stage"]
 [ext_resource type="PackedScene" uid="uid://ufprfd4r8ijj" path="res://scenes/actors/characters/main_character.tscn" id="2_player"]
@@ -12,12 +12,18 @@
 [ext_resource type="PackedScene" uid="uid://wgs3wupdu2jh" path="res://scenes/newlevels/C1.tscn" id="9_content_c1"]
 [ext_resource type="PackedScene" uid="uid://c7psdi7xqqtvc" path="res://scenes/newlevels/C2.tscn" id="10_content_c2"]
 [ext_resource type="Resource" uid="uid://bbte3dyvim6jk" path="res://resources/stages/floor_c_wall_set.tres" id="11_floor_walls"]
+[ext_resource type="PackedScene" uid="uid://c8vybjepi2mam" path="res://scenes/newlevels/C_begin.tscn" id="12_begin"]
+[ext_resource type="PackedScene" uid="uid://cu4cgr722li0e" path="res://scenes/newlevels/C_end.tscn" id="13_end"]
+[ext_resource type="Script" uid="uid://b0qiaumw3ige7" path="res://scripts/systems/cutscene/CutsceneManager.cs" id="14_cutscene"]
+[ext_resource type="PackedScene" uid="uid://ds10xe62cut56" path="res://scenes/newlevels/C3.tscn" id="15_content_c3"]
 
 [node name="Stage_test" type="Node2D"]
 script = ExtResource("1_stage")
 RoomScene = ExtResource("4_room")
 LargeRoomScenes = Array[PackedScene]([ExtResource("7_large_room"), ExtResource("8_tall_room")])
-RoomContentScenes = Array[PackedScene]([ExtResource("9_content_c1"), ExtResource("10_content_c2")])
+RoomContentScenes = Array[PackedScene]([ExtResource("9_content_c1"), ExtResource("10_content_c2"), ExtResource("15_content_c3")])
+BeginRoomScene = ExtResource("12_begin")
+EndRoomScene = ExtResource("13_end")
 FloorWallSet = ExtResource("11_floor_walls")
 RandomBlockedMin = 12
 RandomBlockedMax = 15
@@ -28,15 +34,23 @@ script = ExtResource("5_zones")
 TargetCamera = NodePath("../World/Camera2D")
 Player = NodePath("../World/MainCharacter")
 
+[node name="CutsceneManager" type="Node" parent="."]
+script = ExtResource("14_cutscene")
+PlayerPath = NodePath("../World/MainCharacter")
+CameraPath = NodePath("../World/Camera2D")
+TopBlackBarPath = NodePath("../CutsceneOverlay/Top")
+BottomBlackBarPath = NodePath("../CutsceneOverlay/Bottom")
+
 [node name="World" type="Node2D" parent="."]
 y_sort_enabled = true
 
 [node name="MainCharacter" parent="World" instance=ExtResource("2_player")]
 Speed = 1000.0
+AttackDamage = 100.0
+MaxHealth = 1200
 
 [node name="Camera2D" type="Camera2D" parent="World" node_paths=PackedStringArray("Target")]
-scale = Vector2(0.1, 0.1)
-zoom = Vector2(0.43, 0.43)
+zoom = Vector2(0.095, 0.095)
 script = ExtResource("6_follow")
 Target = NodePath("../MainCharacter")
 
@@ -50,6 +64,10 @@ y_sort_enabled = true
 collision_mask = 0
 
 [node name="WallVisuals" type="Node2D" parent="World"]
+y_sort_enabled = true
+
+[node name="DebugWallFills" type="Node2D" parent="World/WallVisuals"]
+visible = false
 
 [node name="InteriorWallVisuals" type="Node2D" parent="World"]
 y_sort_enabled = true
@@ -62,17 +80,34 @@ layout_mode = 3
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -314.0
-offset_top = 24.0
-offset_right = -24.0
-offset_bottom = 314.0
+offset_left = -220.0
+offset_right = 70.0
+offset_bottom = 290.0
 grow_horizontal = 0
+scale = Vector2(0.75, 0.75)
 mouse_filter = 2
 script = ExtResource("3_minimap")
-DebugFullMap = true
 
 [node name="LayoutError" type="Label" parent="HUD"]
 offset_left = 24.0
 offset_top = 24.0
 theme_override_colors/font_color = Color(1, 0.57, 0.55, 1)
 theme_override_font_sizes/font_size = 24
+
+[node name="CutsceneOverlay" type="CanvasLayer" parent="."]
+layer = 128
+
+[node name="Top" type="ColorRect" parent="CutsceneOverlay"]
+visible = false
+offset_right = 1920.0
+offset_bottom = 150.0
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
+[node name="Bottom" type="ColorRect" parent="CutsceneOverlay"]
+visible = false
+offset_top = 930.0
+offset_right = 1920.0
+offset_bottom = 1080.0
+mouse_filter = 2
+color = Color(0, 0, 0, 1)

@@ -7,4 +7,4 @@
 script = ExtResource("1_style")
 Side = 1
 VisualScene = ExtResource("2_art")
-ReferenceLength = 1000.0
+ReferenceLength = 1100.0

@@ -6,4 +6,8 @@ namespace Kuros.Scenes;
 public partial class GridFloorWallSet : Resource
 {
     [Export] public Godot.Collections.Array<GridWallVisual> WallVisuals { get; set; } = new();
+    [ExportGroup("Wall Covers")]
+    [Export] public PackedScene? ExteriorCornerCover { get; set; }
+    [Export] public PackedScene? ExteriorJointCover { get; set; }
+    [Export] public PackedScene? InteriorWallCover { get; set; }
 }

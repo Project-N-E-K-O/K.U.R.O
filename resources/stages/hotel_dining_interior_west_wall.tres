@@ -8,4 +8,4 @@ script = ExtResource("1_style")
 Side = 3
 VisualScene = ExtResource("2_art")
 FlipHorizontally = true
-ReferenceLength = 1000.0
+ReferenceLength = 1100.0

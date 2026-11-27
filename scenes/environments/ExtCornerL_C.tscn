@@ -1,0 +1,12 @@
+[gd_scene load_steps=2 format=3 uid="uid://cblqol75j4eei"]
+
+[ext_resource type="Texture2D" uid="uid://b87k0gh1hg83o" path="res://assets/environments/scene_3_hotel/墙壁B遮掩.png" id="1_13u0i"]
+
+[node name="ExtCornerL_C" type="Node2D"]
+visible = false
+z_index = 1
+
+[node name="Art" type="Sprite2D" parent="."]
+texture = ExtResource("1_13u0i")
+
+[node name="WallAnchor" type="Marker2D" parent="."]

@@ -36,37 +36,37 @@ ScenePath = "res://scenes/levels/B3.tscn"
 [sub_resource type="Resource" id="room_6"]
 script = ExtResource("1_h8tfy")
 FloorTheme = "B"
-RoomType = 2
+RoomType = 1
 ScenePath = "res://scenes/levels/B7.tscn"
 
 [sub_resource type="Resource" id="room_7"]
 script = ExtResource("1_h8tfy")
 FloorTheme = "B"
-RoomType = 2
+RoomType = 1
 ScenePath = "res://scenes/levels/B8.tscn"
 
 [sub_resource type="Resource" id="room_8"]
 script = ExtResource("1_h8tfy")
 FloorTheme = "B"
-RoomType = 2
+RoomType = 1
 ScenePath = "res://scenes/levels/B9.tscn"
 
 [sub_resource type="Resource" id="room_9"]
 script = ExtResource("1_h8tfy")
 FloorTheme = "B"
-RoomType = 3
+RoomType = 1
 ScenePath = "uid://r71es6oubh5f"
 
 [sub_resource type="Resource" id="room_10"]
 script = ExtResource("1_h8tfy")
 FloorTheme = "B"
-RoomType = 3
+RoomType = 1
 ScenePath = "res://scenes/levels/B5.tscn"
 
 [sub_resource type="Resource" id="room_11"]
 script = ExtResource("1_h8tfy")
 FloorTheme = "B"
-RoomType = 3
+RoomType = 1
 ScenePath = "res://scenes/levels/B6.tscn"
 
 [sub_resource type="Resource" id="room_12"]
@@ -102,37 +102,37 @@ ScenePath = "res://scenes/levels/C3.tscn"
 [sub_resource type="Resource" id="room_17"]
 script = ExtResource("1_h8tfy")
 FloorTheme = "C"
-RoomType = 2
+RoomType = 1
 ScenePath = "res://scenes/levels/C4.tscn"
 
 [sub_resource type="Resource" id="room_18"]
 script = ExtResource("1_h8tfy")
 FloorTheme = "C"
-RoomType = 2
+RoomType = 1
 ScenePath = "res://scenes/levels/C5.tscn"
 
 [sub_resource type="Resource" id="room_19"]
 script = ExtResource("1_h8tfy")
 FloorTheme = "C"
-RoomType = 2
+RoomType = 1
 ScenePath = "res://scenes/levels/C6.tscn"
 
 [sub_resource type="Resource" id="room_20"]
 script = ExtResource("1_h8tfy")
 FloorTheme = "C"
-RoomType = 3
+RoomType = 1
 ScenePath = "res://scenes/levels/C7.tscn"
 
 [sub_resource type="Resource" id="room_21"]
 script = ExtResource("1_h8tfy")
 FloorTheme = "C"
-RoomType = 3
+RoomType = 1
 ScenePath = "res://scenes/levels/C8.tscn"
 
 [sub_resource type="Resource" id="room_22"]
 script = ExtResource("1_h8tfy")
 FloorTheme = "C"
-RoomType = 3
+RoomType = 1
 ScenePath = "res://scenes/levels/C9.tscn"
 
 [sub_resource type="Resource" id="room_23"]
@@ -168,37 +168,37 @@ ScenePath = "res://scenes/levels/D3.tscn"
 [sub_resource type="Resource" id="room_28"]
 script = ExtResource("1_h8tfy")
 FloorTheme = "D"
-RoomType = 2
+RoomType = 1
 ScenePath = "res://scenes/levels/D4.tscn"
 
 [sub_resource type="Resource" id="room_29"]
 script = ExtResource("1_h8tfy")
 FloorTheme = "D"
-RoomType = 2
+RoomType = 1
 ScenePath = "res://scenes/levels/D5.tscn"
 
 [sub_resource type="Resource" id="room_30"]
 script = ExtResource("1_h8tfy")
 FloorTheme = "D"
-RoomType = 2
+RoomType = 1
 ScenePath = "res://scenes/levels/D6.tscn"
 
 [sub_resource type="Resource" id="room_31"]
 script = ExtResource("1_h8tfy")
 FloorTheme = "D"
-RoomType = 3
+RoomType = 1
 ScenePath = "res://scenes/levels/D7.tscn"
 
 [sub_resource type="Resource" id="room_32"]
 script = ExtResource("1_h8tfy")
 FloorTheme = "D"
-RoomType = 3
+RoomType = 1
 ScenePath = "res://scenes/levels/D8.tscn"
 
 [sub_resource type="Resource" id="room_33"]
 script = ExtResource("1_h8tfy")
 FloorTheme = "D"
-RoomType = 3
+RoomType = 1
 ScenePath = "res://scenes/levels/D9.tscn"
 
 [sub_resource type="Resource" id="room_34"]

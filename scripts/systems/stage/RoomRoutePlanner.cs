@@ -13,10 +13,11 @@ public static class RoomRoutePlanner
         var rules = new Dictionary<RoomType, RoomTypeRule>();
         foreach (var rule in config.MiddleRoomRules)
         {
+            // 已取消的战斗分级拥有各自的配额，不能套到统一战斗池。
+            if (rule != null && rule.RoomType != rule.RoomType.Normalize()) continue;
             if (rule == null || !rules.TryAdd(rule.RoomType, rule) || rule.MinCount < 0
                 || rule.MaxCount < -1 || !float.IsFinite(rule.Weight) || rule.Weight < 0
-                || rule.RoomType is not (RoomType.Combat or RoomType.AdvancedCombat or RoomType.EliteCombat
-                    or RoomType.Puzzle or RoomType.Shop or RoomType.Healing)
+                || !rule.RoomType.IsRandomMiddle()
                 || (rule.MaxCount >= 0 && rule.MinCount > rule.MaxCount))
                 return Fail(config);
         }

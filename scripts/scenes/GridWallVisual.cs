@@ -6,7 +6,7 @@ namespace Kuros.Scenes;
 public partial class GridWallVisual : Resource
 {
     public enum WallSide { North, East, South, West }
-    public enum BoundaryKind { Interior, Exterior, FixedVoid, RandomVoid }
+    public enum BoundaryKind { Interior = 0, Exterior = 1, FixedVoid = 2, Any = 3 }
 
     [Export] public WallSide Side { get; set; }
     [Export] public BoundaryKind Boundary { get; set; }
@@ -21,7 +21,7 @@ public partial class GridWallVisual : Resource
     /// <summary>美术场景沿墙方向的原始长度，用于按原尺寸重复摆放。</summary>
     [Export(PropertyHint.Range, "1,10000,1,or_greater,suffix:px")]
     public float ReferenceLength { get; set; } = 3250f;
-    /// <summary>素材局部的对齐点。内墙场景可用 WallAnchor 标记模块中心。</summary>
+    /// <summary>素材的备用对齐点。内外墙场景可用 WallAnchor 标记中心。</summary>
     [Export] public Vector2 FootAnchor { get; set; }
 
     internal bool HasValidLength => float.IsFinite(ReferenceLength) && ReferenceLength > 0f;
@@ -30,13 +30,17 @@ public partial class GridWallVisual : Resource
         WallSide side, BoundaryKind boundary)
     {
         if (visuals == null) return null;
+        GridWallVisual? fallback = null;
         foreach (var visual in visuals)
         {
-            if (visual == null || visual.Side != side || visual.Boundary != boundary) continue;
-            if (visual.FillColor.A > 0f ||
-                (visual.HasValidLength && (visual.TiledTexture != null || visual.VisualScene?.CanInstantiate() == true)))
-                return visual;
+            if (visual == null || visual.Side != side ||
+                (visual.Boundary != boundary && visual.Boundary != BoundaryKind.Any)) continue;
+            if (visual.FillColor.A <= 0f &&
+                (!visual.HasValidLength || (visual.TiledTexture == null && visual.VisualScene?.CanInstantiate() != true))) continue;
+
+            if (visual.Boundary == boundary) return visual;
+            fallback ??= visual;
         }
-        return null;
+        return fallback;
     }
 }

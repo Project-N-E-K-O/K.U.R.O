@@ -244,7 +244,12 @@ namespace Kuros.Managers
         private void OnTriggerBodyEntered(Node2D body)
         {
             if (!body.IsInGroup("player")) return;
-            TriggerBattleOnce(TriggerDurationSeconds);
+            // 进入信号在物理查询回调中发出，结束查询后才能注册新的空气墙。
+            Callable.From(() =>
+            {
+                if (IsInstanceValid(this) && IsInsideTree())
+                    TriggerBattleOnce(TriggerDurationSeconds);
+            }).CallDeferred();
         }
 
         /// <summary>

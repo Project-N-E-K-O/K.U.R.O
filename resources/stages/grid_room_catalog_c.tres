@@ -1,0 +1,62 @@
+[gd_resource type="Resource" script_class="RoomCatalog" load_steps=12 format=3 uid="uid://ohb7cefw5f78"]
+
+[ext_resource type="Script" uid="uid://pofudi314bdk" path="res://scripts/systems/stage/RoomDefinition.cs" id="1_room"]
+[ext_resource type="Script" uid="uid://b4lmmy0tm6sh2" path="res://scripts/systems/stage/RoomCatalog.cs" id="2_catalog"]
+
+[sub_resource type="Resource" id="room_c1"]
+script = ExtResource("1_room")
+FloorTheme = "C"
+RoomType = 1
+ScenePath = "res://scenes/newlevels/C1.tscn"
+
+[sub_resource type="Resource" id="room_c2"]
+script = ExtResource("1_room")
+FloorTheme = "C"
+RoomType = 1
+ScenePath = "res://scenes/newlevels/C2.tscn"
+
+[sub_resource type="Resource" id="room_c3"]
+script = ExtResource("1_room")
+FloorTheme = "C"
+RoomType = 1
+ScenePath = "res://scenes/newlevels/C3.tscn"
+
+[sub_resource type="Resource" id="room_c4"]
+script = ExtResource("1_room")
+FloorTheme = "C"
+RoomType = 1
+ScenePath = "res://scenes/newlevels/C4.tscn"
+
+[sub_resource type="Resource" id="room_c5"]
+script = ExtResource("1_room")
+FloorTheme = "C"
+RoomType = 1
+ScenePath = "res://scenes/newlevels/C5.tscn"
+
+[sub_resource type="Resource" id="room_c6"]
+script = ExtResource("1_room")
+FloorTheme = "C"
+RoomType = 1
+ScenePath = "res://scenes/newlevels/C6.tscn"
+
+[sub_resource type="Resource" id="room_c7"]
+script = ExtResource("1_room")
+FloorTheme = "C"
+RoomType = 1
+ScenePath = "res://scenes/newlevels/C7.tscn"
+
+[sub_resource type="Resource" id="room_c8"]
+script = ExtResource("1_room")
+FloorTheme = "C"
+RoomType = 1
+ScenePath = "res://scenes/newlevels/C8.tscn"
+
+[sub_resource type="Resource" id="room_c9"]
+script = ExtResource("1_room")
+FloorTheme = "C"
+RoomType = 1
+ScenePath = "res://scenes/newlevels/C9.tscn"
+
+[resource]
+script = ExtResource("2_catalog")
+Rooms = Array[ExtResource("1_room")]([SubResource("room_c1"), SubResource("room_c2"), SubResource("room_c3"), SubResource("room_c4"), SubResource("room_c5"), SubResource("room_c6"), SubResource("room_c7"), SubResource("room_c8"), SubResource("room_c9")])

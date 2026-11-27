@@ -1,7 +1,8 @@
-[gd_resource type="Resource" script_class="StageConfig" load_steps=3 format=3 uid="uid://bqf7cvpc2hsyb"]
+[gd_resource type="Resource" script_class="StageConfig" load_steps=4 format=3 uid="uid://bqf7cvpc2hsyb"]
 
 [ext_resource type="Script" uid="uid://c8d3j0ojq43gv" path="res://scripts/systems/stage/RoomTypeRule.cs" id="1_pol6r"]
 [ext_resource type="Script" uid="uid://dim2ctx63qcxt" path="res://scripts/systems/stage/StageConfig.cs" id="3_5mb6o"]
+[ext_resource type="Resource" uid="uid://rgg5syptcvet" path="res://resources/stages/grid_floor_c.tres" id="4_grid"]
 
 [resource]
 script = ExtResource("3_5mb6o")
@@ -11,5 +12,5 @@ ElevatorLabel = "餐厅北区"
 LevelDescription = "餐厅区目前被各种失控的女仆型机器人占领"
 Floor = 2
 FloorTheme = "C"
-RouteMode = 1
-MiddleRoomCount = 3
+RouteMode = 2
+GridFloor = ExtResource("4_grid")

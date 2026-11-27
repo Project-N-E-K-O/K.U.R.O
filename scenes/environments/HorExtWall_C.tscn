@@ -1,26 +1,58 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=8 format=3 uid="uid://dye10t8wa1fi8"]
 
 [ext_resource type="Texture2D" uid="uid://b5ugc8esuokxg" path="res://assets/environments/scene_3_hotel/墙壁A.png" id="1_frame"]
+[ext_resource type="Script" uid="uid://dd5n4gnxiqn2p" path="res://scripts/environments/ParallaxTextureScroll2D.cs" id="2_3f23o"]
 [ext_resource type="Texture2D" uid="uid://b2vbxff8qbwlw" path="res://assets/environments/scene_3_hotel/窗外远景.png" id="2_city"]
 [ext_resource type="Texture2D" uid="uid://brk1t88wdisc" path="res://assets/environments/scene_3_hotel/窗户玻璃反射.png" id="3_reflection"]
+[ext_resource type="Shader" uid="uid://cre1rsmjt1nqg" path="res://shaders/materials/parallax_texture_scroll.gdshader" id="4_parallax"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_city_scroll"]
+resource_local_to_scene = true
+shader = ExtResource("4_parallax")
+shader_parameter/pattern_texture = ExtResource("2_city")
+shader_parameter/tile_scale = Vector2(1, 1)
+shader_parameter/scroll_offset = Vector2(0, 0)
+shader_parameter/scroll_speed = 0.0
+shader_parameter/region_offset = Vector2(0, 0)
+shader_parameter/region_uv_size = Vector2(1, 1)
+shader_parameter/loop_horizontal_trim = Vector2(38, 42)
+shader_parameter/loop_blend_pixels = 48.0
+shader_parameter/opacity = 0.999999977648
+shader_parameter/tint = Color(1, 1, 1, 1)
+shader_parameter/tint_mix = 0.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_s8vhu"]
+size = Vector2(10000, 2500)
 
 [node name="HorExtWall_C" type="Node2D"]
+z_index = -1
+
+[node name="WallAnchor" type="Marker2D" parent="."]
 
 [node name="WallLayers" type="Node2D" parent="."]
-scale = Vector2(1.0812335464460323, 1.1083743842364533)
 
-[node name="City" type="Sprite2D" parent="WallLayers"]
-position = Vector2(165, 145)
-scale = Vector2(0.9786148714930352, 0.794047619047619)
+[node name="BG" type="Sprite2D" parent="WallLayers"]
+material = SubResource("ShaderMaterial_city_scroll")
+position = Vector2(0, 50)
 texture = ExtResource("2_city")
-centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 5097, 604)
+script = ExtResource("2_3f23o")
+AreaPath = NodePath("../../Area2D")
 
-[node name="Reflection" type="Sprite2D" parent="WallLayers"]
-position = Vector2(165, 145)
-scale = Vector2(1.0658119658119658, 0.804583835946924)
+[node name="window" type="Sprite2D" parent="WallLayers"]
+position = Vector2(0, 20)
+scale = Vector2(1.065812, 0.80458385)
 texture = ExtResource("3_reflection")
-centered = false
 
 [node name="WallFrame" type="Sprite2D" parent="WallLayers"]
 texture = ExtResource("1_frame")
-centered = false
+
+[node name="Area2D" type="Area2D" parent="."]
+visible = false
+collision_layer = 0
+collision_mask = 4
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+position = Vector2(0, 1250)
+shape = SubResource("RectangleShape2D_s8vhu")

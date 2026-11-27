@@ -200,7 +200,12 @@ namespace Kuros.Controllers
         {
             if (!string.IsNullOrWhiteSpace(TriggerGroupName) && !body.IsInGroup(TriggerGroupName))
                 return;
-            StartWaves();
+            // 波次会添加带碰撞的刷怪特效，等物理查询回调结束后再启动。
+            Callable.From(() =>
+            {
+                if (IsInstanceValid(this) && IsInsideTree())
+                    StartWaves();
+            }).CallDeferred();
         }
 
         /// <summary>构建波次管理器列表。</summary>
